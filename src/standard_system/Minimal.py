@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2017(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -53,7 +53,7 @@ def Minimal(num_particles, box, rc=1.12246, skin=0.3, dt=0.005, temperature=None
   system.rng     = espressopp.esutil.RNG()
   system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
   system.skin    = skin
-  nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
+  nodeGrid       = espressopp.tools.decomp.nodeGrid(box,rc,skin,MPI.COMM_WORLD.size)
   cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
   system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

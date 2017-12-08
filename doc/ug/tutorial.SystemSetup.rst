@@ -65,7 +65,7 @@ In the most simple case, if you want to use only one CPU, the *nodeGrid* and the
 In general you don't need to take care of that yourself. Just use the corresponding |espp| routines to
 calculate a reasonable  *nodeGrid* and *cellGrid*:
 
->>> nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+>>> nodeGrid       = espressopp.tools.decomp.nodeGrid(box,maxcutoff,skin,espressopp.MPI.COMM_WORLD.size)
 >>> cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, maxcutoff, skin)
 
 Now we have all the ingredients we need for the *domain decomposition* storage of our system:

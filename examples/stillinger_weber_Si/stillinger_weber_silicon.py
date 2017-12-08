@@ -99,7 +99,7 @@ system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size)
+nodeGrid = decomp.nodeGrid(box,rc,skin,comm.size)
 cellGrid = decomp.cellGrid(box, nodeGrid, rc, skin)
 
 system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)

@@ -85,7 +85,7 @@ system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size)
+nodeGrid = decomp.nodeGrid(size,rc,skin,comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 
 # AdResS domain decomposition

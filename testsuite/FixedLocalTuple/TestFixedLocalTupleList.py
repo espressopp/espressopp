@@ -1,6 +1,8 @@
-#  Copyright (C) 2017
+#!/usr/bin/env python2
+#
+#  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
 #  
 #  ESPResSo++ is free software: you can redistribute it and/or modify
@@ -14,8 +16,10 @@
 #  GNU General Public License for more details.
 #  
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
-
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# -*- coding: utf-8 -*-
+#
 
 import espressopp
 from espressopp import unittest
@@ -46,7 +50,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         
         comm = espressopp.MPI.COMM_WORLD
         
-        nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        nodeGrid       = espressopp.tools.decomp.nodeGrid(box,cutoff,system.skin,espressopp.MPI.COMM_WORLD.size)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
         
         print 'NodeGrid = %s'%(nodeGrid,)

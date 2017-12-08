@@ -55,7 +55,7 @@ system.skin        = skin
 
 comm = MPI.COMM_WORLD
 
-nodeGrid = espressopp.tools.decomp.nodeGrid(comm.size)
+nodeGrid = espressopp.tools.decomp.nodeGrid(box,rc,skin,comm.size)
 # calculate a 3D subgrid to speed up verlet list builds and communication
 cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 # create a domain decomposition particle storage with the specified nodeGrid and cellGrid

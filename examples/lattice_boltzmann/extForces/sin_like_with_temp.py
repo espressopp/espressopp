@@ -33,7 +33,7 @@ box = (L, L, L)
 system, integrator = espressopp.standard_system.Default(box=box)
 
 # calculate CPU nodeGrid based on the number of CPUs
-nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+nodeGrid = espressopp.tools.decomp.nodeGridLB(box,espressopp.MPI.COMM_WORLD.size)
 
 # LATTICE BOLTZMANN (LB) INITIALIZATION
 # define an lb object and connect to the integrator

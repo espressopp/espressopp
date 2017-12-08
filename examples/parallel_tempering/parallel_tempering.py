@@ -68,7 +68,7 @@ for i in range(0, pt.getNumberOfSystems()):
     system.bc            = bc
     system.rng           = rng
     system.skin          = skin
-    nodeGrid             = espressopp.tools.decomp.nodeGrid(pt.getNumberOfCPUsPerSystem())
+    nodeGrid             = espressopp.tools.decomp.nodeGrid(boxsize,rc,skin,pt.getNumberOfCPUsPerSystem())
     cellGrid             = espressopp.tools.decomp.cellGrid(boxsize,nodeGrid,rc,skin)
     storage              = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, nocheck=True)
     system.storage       = storage

@@ -92,7 +92,7 @@ system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
 system.bc      = espressopp.bc.SlabBC(system.rng, box)
 system.skin    = skin
-nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(box,rc,skin,MPI.COMM_WORLD.size)
 cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

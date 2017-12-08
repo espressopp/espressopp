@@ -1,3 +1,25 @@
+#!/usr/bin/env python2
+#
+#  Copyright (C) 2013-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# -*- coding: utf-8 -*-
+
 from math import fabs
 import sys
 import time
@@ -24,7 +46,7 @@ class TestCaseConstrainRG(unittest.TestCase):
 
     def test_constrain_rg(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(self.box, 1.5, 0.3,espressopp.MPI.COMM_WORLD.size)
         cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 

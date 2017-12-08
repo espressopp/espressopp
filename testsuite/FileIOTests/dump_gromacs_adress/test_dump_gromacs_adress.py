@@ -1,3 +1,5 @@
+#  Copyright (C) 2017(H)
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & JGU Mainz
 #
@@ -16,6 +18,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+'''
+Note to E++ developers: TODO for JGU collaborators!
+ def test_simple_gromacs_adress(self):
+     particle_list = [
+         (1, espressopp.Real3D(2.2319834598, 3.5858734534, 4.7485623451), espressopp.Real3D(2.2319834598, 1.5556734534, 4.7485623451), 0),(2, espressopp.Real3D(6.3459834598, 9.5858734534, 16.7485623451), espressopp.Real3D(3.2319834598, 1.5858734534, 1.7485623451), 0), (3, espressopp.Real3D(2.2319834598, 15.5858734534, 5.7485623451), espressopp.Real3D(4.2319834598, 2.5858734534, 2.7485623451), 2), (4, espressopp.Real3D(8.2319834598, 7.9958734534, 14.5325623451), espressopp.Real3D(5.2319834598, 6.5858734534, 18.7485623451), 3), (5, espressopp.Real3D(3.2319834598, 19.5858734534, 4.7485623451), espressopp.Real3D(6.2319834598, 8.5858734534, 7.7485623451), 1), ]
+     self.system.storage.addParticles(particle_list, 'id', 'pos', 'v', 'type')
+     file_gro_adress = "test_standard_dumpGROAdress_type_not_hardcoded.gro"
+     dump_gro_adress = espressopp.io.DumpGROAdress(self.system, self.integrator, filename=file_gro, unfolded = False, length_factor = 1.0, length_unit = 'LJ', append = False)
+     dump_gro_adress.dump()
+     self.assertTrue(filecmp.cmp(file_gro_adress, expected_files[0], shallow = False), "!!! Error! Files are not equal!! They should be equal!")
+
+'''
 
 import os
 import filecmp
@@ -73,26 +87,10 @@ class TestDumpGROAdress(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(box,1.5,0.3,espressopp.MPI.COMM_WORLD.size)
         cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, 1.5, 0.3)
         system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
         self.system = system
-
-
-    # def test_simple_gromacs_adress(self):
-    #     particle_list = [
-    #         (1, espressopp.Real3D(2.2319834598, 3.5858734534, 4.7485623451), espressopp.Real3D(2.2319834598, 1.5556734534, 4.7485623451), 0),
-    #         (2, espressopp.Real3D(6.3459834598, 9.5858734534, 16.7485623451), espressopp.Real3D(3.2319834598, 1.5858734534, 1.7485623451), 0),
-    #         (3, espressopp.Real3D(2.2319834598, 15.5858734534, 5.7485623451), espressopp.Real3D(4.2319834598, 2.5858734534, 2.7485623451), 2),
-    #         (4, espressopp.Real3D(8.2319834598, 7.9958734534, 14.5325623451), espressopp.Real3D(5.2319834598, 6.5858734534, 18.7485623451), 3),
-    #         (5, espressopp.Real3D(3.2319834598, 19.5858734534, 4.7485623451), espressopp.Real3D(6.2319834598, 8.5858734534, 7.7485623451), 1),
-    #     ]
-    #     self.system.storage.addParticles(particle_list, 'id', 'pos', 'v', 'type')
-    #     file_gro_adress = "test_standard_dumpGROAdress_type_not_hardcoded.gro"
-    #     dump_gro_adress = espressopp.io.DumpGROAdress(self.system, self.integrator, filename=file_gro, unfolded = False, length_factor = 1.0, length_unit = 'LJ', append = False)
-    #     dump_gro_adress.dump()
-    #     self.assertTrue(filecmp.cmp(file_gro_adress, expected_files[0], shallow = False), "!!! Error! Files are not equal!! They should be equal!")
-
 
     def test_gromacs_adress(self):
         # add some particles

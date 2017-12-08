@@ -1,6 +1,24 @@
-#!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
-
+#!/usr/bin/env python2
+#
+#  Copyright (C) 2013-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# -*- coding: utf-8 -*-
 ###########################################################################
 #                                                                         #
 #  ESPResSo++ Benchmark Python script for a polymer melt                  #
@@ -44,7 +62,7 @@ system.rng = espresso.esutil.RNG(54321)
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size)
+nodeGrid = decomp.nodeGrid(size,rc,skin,comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

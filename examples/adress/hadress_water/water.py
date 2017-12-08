@@ -93,7 +93,7 @@ system.skin = skin
 
 # communication, storage and cell/node grid
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size)
+nodeGrid = decomp.nodeGrid(size,rc,skin,comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
