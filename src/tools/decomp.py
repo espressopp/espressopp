@@ -115,6 +115,11 @@ __all__ = [
 
 
 def nodeGrid(box_size, rc, skin, n, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0]):
+    print "################################################# Warning #####################################################"
+    print "This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(box_size, rc, skin, n)"
+    print "If you prefer to use the old Domain Decomposition algorithm which may affect the performance of your simulation"
+    print "go for the function nodeGrid_OLD(n) or look for more information in ESPResSo++' documentation.                 "
+    print "###############################################################################################################"
     ijkmax = 3 * n * n + 1
     boxList = [box_size[0], box_size[1], box_size[2]]
     ratioEH2CG = [(2. * eh_size) / (abs(box_size[0] - (2. * eh_size))), (2. * eh_size)/(abs(box_size[1] - (2. * eh_size))), (2. * eh_size) / (abs(box_size[2] - (2. * eh_size)))]
@@ -227,7 +232,7 @@ def cellGrid(box_size, node_grid, rc, skin):
     return Int3D(ix, iy, iz)
 
 
-def nodeGridLB(n):
+def nodeGrid_OLD(n):
     ijkmax = 3 * n * n + 1
     d1 = 1
     d2 = 1
@@ -245,7 +250,7 @@ def nodeGridLB(n):
 
 def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0]):
     indMax = max(box_size)
-    indMin = min(box_size)
+    indMin = min(box_size)s
     L_l = box_size[indMax]
     L_s = box_size[indMin]
     L_lHR = 2. * eh_size
