@@ -40,8 +40,8 @@ class TestPythonTools(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(box,1.5,0.3,espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, 1.5, 0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(box,1.5,system.skin,espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, 1.5, system.skin)
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         self.system = system
 
