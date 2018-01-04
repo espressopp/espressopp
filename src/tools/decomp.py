@@ -250,7 +250,7 @@ def nodeGrid_OLD(n):
 
 def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0]):
     indMax = max(box_size)
-    indMin = min(box_size)s
+    indMin = min(box_size)
     L_l = box_size[indMax]
     L_s = box_size[indMin]
     L_lHR = 2. * eh_size
