@@ -92,7 +92,7 @@ class TestLangevinThermostat(unittest.TestCase):
 
     def test_AdResS(self):
         # set up AdResS domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        nodeGrid = espressopp.tools.decomp.nodeGrid((10, 10, 10),1.5,0.3,espressopp.MPI.COMM_WORLD.size)
         cellGrid = espressopp.tools.decomp.cellGrid((10, 10, 10), nodeGrid, 1.5, 0.3)
         self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
 
