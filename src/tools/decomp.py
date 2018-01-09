@@ -110,8 +110,7 @@ __all__ = [
     'nodeGrid', 'cellGrid', 'cherrypickTotalProcs',
     'neiListHom', 'neiListAdress'
 ]
-    is isinstance(box_size, numbers.Number) or (box_size is None and n is not None):
-        return nodeGrid_OLD(box_size)
+
 # WARNING! New arguments are needed! At least...box_size,rc,skin
 
 
