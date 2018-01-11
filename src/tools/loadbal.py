@@ -1,4 +1,4 @@
-#  Copyright (C) 2017(Dr. Horacio Andres Vargas Guzman)
+#  Copyright (C) 2017,2018(1H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++ -> Powered by HeSpaDDA algorithm developed by horacio.v.g@gmail.com
@@ -81,7 +81,7 @@
 
 from random import randint
 
-__author__ = 'Horacio V Guzman'
+__author__ = 'Dr. Horacio V Guzman'
 __email__ = 'horacio.v.g at gmail dot com'
 __version__ = '1.0'
 __all__ = [
