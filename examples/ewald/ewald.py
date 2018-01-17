@@ -107,7 +107,7 @@ bjerrumlength  = 1.0
 temperature    = 1.0
 coulomb_prefactor = bjerrumlength * temperature
 
-nodeGrid       = espressopp.tools.decomp.nodeGrid(box,rspacecutoff,skin,MPI.COMM_WORLD.size)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rspacecutoff,skin)
 cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
 system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()

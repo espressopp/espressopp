@@ -68,7 +68,7 @@ class TestDihedralHarmonic(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = skin
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(box,cutoff,skin,espressopp.MPI.COMM_WORLD.size)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,skin)
         cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, skin)
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         self.system = system

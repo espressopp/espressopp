@@ -31,7 +31,7 @@ system = espressopp.System()
 system.bc = espressopp.bc.OrthorhombicBC(system.rng, (10, 10, 10))
 system.skin = 0.3
 system.comm = MPI.COMM_WORLD
-#nodeGrid = decomp.nodeGrid(size,rc,skin,comm.size)
+#nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
 #cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecomposition(system)
 

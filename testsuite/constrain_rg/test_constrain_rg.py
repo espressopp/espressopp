@@ -46,8 +46,8 @@ class TestCaseConstrainRG(unittest.TestCase):
 
     def test_constrain_rg(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(self.box, 1.5, 0.3,espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,self.box, rc=1.5, skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, rc=1.5, skin=0.3)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)

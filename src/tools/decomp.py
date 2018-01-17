@@ -16,12 +16,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-******************************************
-**decomp.py** - Auxiliary python functions
-******************************************
+*****************************************************
+**decomp.py** - Domain Decomposition python functions
+*****************************************************
 
 
-*  `nodeGrid(box_size,rc,skin,n,eh_size=0,ratioMS=0,idealGas=0,slabMSDims=[0,0,0])`:
+*  `nodeGrid(n,box_size,rc,skin,eh_size=0,ratioMS=0,idealGas=0,slabMSDims=[0,0,0])`:
 
     It determines how the processors are distributed and how the cells are arranged. 
     The algorithm is dimensional sensitive for both homogeneous and inhomogeneous setups. 
@@ -40,7 +40,7 @@
 		 thus none force computations load)
     `slabMSDims` - 3D vector cointainig flags describing the type of axis, if heterogeneous value is 1, else 0
 
-*  `nodeGrid_OLD(n)`:
+*  `nodeGridSimple(n)`:
     It determines how the processors are distributed and how the cells are arranged. Note: Use it exclusively for Lattice-Boltzmann simulations, or non-parallelized tests.
     `n` - number of processes 
 
@@ -112,17 +112,18 @@ __all__ = [
 ]
 
 # WARNING! New arguments are needed! At least...box_size,rc,skin
-
-
-def nodeGrid(box_size=None, rc=None, skin=None, n=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
+	
+def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
     print "################################################# Warning #####################################################"
-    print "This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(box_size, rc, skin, n)"
-    print "If you prefer to use the old Domain Decomposition algorithm which may affect the performance of your simulation"
-    print "go for the function nodeGrid_OLD(n), which is also the default one if you give only one argument. For further  "
-    print "details look into ESPResSo++ documentation.                                                                    "
+    print "This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(n, box_size, rc, skin)"
+    print "If you prefer to use the simple Domain Decomp. algorithm which may affect the performance of your MD simulation"
+    print "go for the function nodeGridSimple(n), which is also the default one if you give only one argument.            "
+    print "Important: In case you are aimign to perform Lattice Boltzmann simulations you no need to worry about the per- "
+    print "formance and you could straight forwadly use nodeGridSimple(n)."
+    print "For further details look into ESPResSo++ documentation."                                                                    "
     print "###############################################################################################################"
-    if isinstance(box_size, numbers.Number):
-        return nodeGrid_OLD(box_size)
+    if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):					
+        return nodeGridSimple(n)
     else:
 	    ijkmax = 3 * n * n + 1
 	    boxList = [box_size[0], box_size[1], box_size[2]]
@@ -236,7 +237,7 @@ def cellGrid(box_size, node_grid, rc, skin):
     return Int3D(ix, iy, iz)
 
 
-def nodeGrid_OLD(n):
+def nodeGridSimple(n):
     ijkmax = 3 * n * n + 1
     d1 = 1
     d2 = 1
@@ -266,7 +267,7 @@ def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, r
     procArray = range(1 * CpN, (MnN + 1) * CpN, CpN)
     print "HeSpaDDA message: Your search array in terms of total number of processors is:", procArray
     for i in xrange(1, MnN + 1):
-        nX[i - 1], nY[i - 1], nZ[i - 1] = nodeGrid(box_size, rc, skin, procArray[i - 1], eh_size, ratioMS, idealGas, slabMSDims)
+        nX[i - 1], nY[i - 1], nZ[i - 1] = nodeGrid(procArray[i - 1], box_size, rc, skin, eh_size, ratioMS, idealGas, slabMSDims)
     print "HeSpaDDA message: For your Information, we are tackling the following number of processors"
     print "HeSpaDDA message: Processors in the x-axis are:", nX, "\nProcessors in the y-axis are:", nY, "\nProcessors in the z-axis are:", nZ
     pickedP = []

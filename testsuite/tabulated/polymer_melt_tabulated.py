@@ -122,7 +122,7 @@ for tabulation in [True, False]:
         
     comm = MPI.COMM_WORLD
         
-    nodeGrid = decomp.nodeGrid(size,rc,skin,comm.size)
+    nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
     cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
     #nodeGrid = Int3D(1, 1, comm.size)
     #cellGrid = Int3D(

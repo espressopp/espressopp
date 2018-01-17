@@ -65,7 +65,7 @@ class makeConf(unittest.TestCase):
 
         system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin    = skin
-        nodeGrid       = espressopp.tools.decomp.nodeGrid(box,rc,skin,espressopp.MPI.COMM_WORLD.size)
+        nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

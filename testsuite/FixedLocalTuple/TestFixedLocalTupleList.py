@@ -50,7 +50,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         
         comm = espressopp.MPI.COMM_WORLD
         
-        nodeGrid       = espressopp.tools.decomp.nodeGrid(box,cutoff,system.skin,espressopp.MPI.COMM_WORLD.size)
+        nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,system.skin)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
         
         print 'NodeGrid = %s'%(nodeGrid,)

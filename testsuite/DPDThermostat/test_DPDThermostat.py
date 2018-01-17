@@ -44,8 +44,8 @@ class TestDPDThermostat(unittest.TestCase):
 
     def test_normal(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid((10, 10, 10), 1.5, self.system.skin,espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid((10, 10, 10), nodeGrid, 1.5, self.system.skin)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box=(10, 10, 10), rc=1.5, self.system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(box=(10, 10, 10), nodeGrid, rc=1.5, self.system.skin)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)

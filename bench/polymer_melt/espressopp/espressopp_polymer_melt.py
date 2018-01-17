@@ -57,7 +57,7 @@ system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-nodeGrid = espresso.tools.decomp.nodeGrid(size,rc,skin,comm.size)
+nodeGrid = espresso.tools.decomp.nodeGrid(comm.size,size,rc,skin)
 cellGrid = espresso.tools.decomp.cellGrid(size,nodeGrid,rc,skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

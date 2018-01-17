@@ -34,7 +34,7 @@ integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = 0.005
 
 # define a LB grid
-nodeGrid=espressopp.tools.decomp.nodeGrid_OLD(espressopp.MPI.COMM_WORLD.size)
+nodeGrid=espressopp.tools.decomp.nodeGridSimple(espressopp.MPI.COMM_WORLD.size)
 lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
 integrator.addExtension(lb)
 

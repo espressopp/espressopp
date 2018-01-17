@@ -82,7 +82,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
   system.rng     = espressopp.esutil.RNG()
   system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
   system.skin    = skin
-  nodeGrid       = espressopp.tools.decomp.nodeGrid(box,rc,skin,MPI.COMM_WORLD.size)
+  nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rc,skin)
   cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
   system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
   interaction    = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))

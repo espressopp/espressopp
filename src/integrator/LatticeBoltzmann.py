@@ -72,8 +72,8 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
     >>> # initialize empty default system with the created cubic box.
     >>> system, integrator = espressopp.standard_system.Default(box)
     >>>
-    >>> # nodeGrid is determined based on the number of CPUs used for simulation
-    >>> nodeGrid=espressopp.tools.decomp.nodeGrid(box,rc,skin,espressopp.MPI.COMM_WORLD.size)
+    >>> # nodeGrid is determined based on the number of CPUs used for simulation among others
+    >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
     >>>
     >>> # initialize lb object. The dimensions of the lattice are obtained from the
     >>> # system's box dimensions employing lattice spacing 1.
@@ -131,7 +131,7 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
         
         >>> # it is advised to set nodeGrid by internal ESPResSo++ function
         >>> # based on the number of CPUs
-        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(box,rc,skin,espressopp.MPI.COMM_WORLD.size)
+        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
 
 
     .. py:data:: real a = 1.
@@ -203,7 +203,7 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
         >>> system, integrator = espressopp.standard_system.LennardJones(N, box, temperature=T)
         >>>
         >>> # nodeGrid is determined based on the number of CPUs used for simulation
-        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(box,rc,skin,espressopp.MPI.COMM_WORLD.size)
+        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
         >>>
         >>> # initialize lb object. The dimensions of the lattice are obtained from the
         >>> # system's box dimensions employing lattice spacing 1.
