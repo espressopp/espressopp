@@ -120,7 +120,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
     print "go for the function nodeGridSimple(n), which is also the default one if you give only one argument.            "
     print "Important: In case you are aimign to perform Lattice Boltzmann simulations you no need to worry about the per- "
     print "formance and you could straight forwadly use nodeGridSimple(n)."
-    print "For further details look into ESPResSo++ documentation."                                                                    "
+    print "For further details look into ESPResSo++ documentation."
     print "###############################################################################################################"
     if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):					
         return nodeGridSimple(n)
