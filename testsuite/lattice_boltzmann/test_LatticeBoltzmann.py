@@ -39,7 +39,7 @@ class TestPureLB(unittest.TestCase):
         # set up system
         global Ni, temperature
         system, integrator = espressopp.standard_system.LennardJones(0, box=(Ni, Ni, Ni), temperature=temperature)
-        nodeGrid = espressopp.tools.decomp.nodeGridSimple(espressopp.MPI.COMM_WORLD.size)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 
         # set up LB fluid
         lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)

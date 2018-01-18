@@ -17,9 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-*******************************************
-**loadbal.py** - Auxiliary python functions
-*******************************************
+**************************************************
+loadbal - HeSpaDDA load balancing python functions
+**************************************************
 
 
 *  `qbicity(box_size,rc,skin)`:

@@ -16,9 +16,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-*****************************************************
-**decomp.py** - Domain Decomposition python functions
-*****************************************************
+***********************************************
+decomp - Domain Decomposition python functions
+***********************************************
 
 
 *  `nodeGrid(n,box_size,rc,skin,eh_size=0,ratioMS=0,idealGas=0,slabMSDims=[0,0,0])`:
