@@ -1,3 +1,26 @@
+#!/usr/bin/env python2
+#
+#  Copyright (C) 2013-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# -*- coding: utf-8 -*-
+#
+
 import sys
 import time
 import espressopp
@@ -12,8 +35,8 @@ class TestAdResS(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, 1.5, 0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
         system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
         self.system = system
 

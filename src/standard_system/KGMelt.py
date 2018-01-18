@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2017(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -39,7 +39,7 @@ class KGMelt:
     self._num_chains    = num_chains
     self._chain_len     = chain_len
     self._num_particles = num_chains * chain_len
-    self._density       = 0.8449
+    self._density       = 0.85
     self._L             = pow(self._num_particles / self._density, 1.0/3.0)
     self._box           = (self._L, self._L, self._L)
     self._system        = espressopp.System()
