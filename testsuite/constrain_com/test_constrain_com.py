@@ -30,6 +30,7 @@ import mpi4py.MPI as MPI
 import unittest
 
 class TestCaseConstrainCOM(unittest.TestCase):
+
     def setUp(self):
         # set up system
         system = espressopp.System()
@@ -44,11 +45,12 @@ class TestCaseConstrainCOM(unittest.TestCase):
         self.system = system
         self.L = L
         self.box = box
+	self.skin =system.skin
 
     def test_constrain_com(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(self.box,1.5,0.3,espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,self.box,rc=1.5, skin=self.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, rc=1.5, skin=self.skin)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)

@@ -28,13 +28,14 @@ import mpi4py.MPI as MPI
 import unittest
 
 class TestLangevinThermostat(unittest.TestCase):
+    global box
+    box = (10, 10, 10)		
     def setUp(self):
         # set up system
         system = espressopp.System()
         rng = espressopp.esutil.RNG()
         rng.seed(1)
         system.rng = rng
-        box = (10, 10, 10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
@@ -42,8 +43,8 @@ class TestLangevinThermostat(unittest.TestCase):
 
     def test_normal(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,self.box,rc=1.5,skin=0.3)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, rc=1.5, skin=0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
@@ -92,7 +93,6 @@ class TestLangevinThermostat(unittest.TestCase):
 
     def test_AdResS(self):
         # set up AdResS domain decomposition
-	box=(10,10,10)
         nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=0.3)
         cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
         self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)

@@ -117,12 +117,12 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
     print "################################################# Warning #####################################################"
     print "This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(n, box_size, rc, skin)"
     print "If you prefer to use the simple Domain Decomp. algorithm which may affect the performance of your MD simulation"
-    print "go for the function nodeGridSimple(n), which is also the default one if you give only one argument.            "
-    print "Important: In case you are aimign to perform Lattice Boltzmann simulations you no need to worry about the per- "
-    print "formance and you could straight forwadly use nodeGridSimple(n)."
+    print "then go for the function nodeGridSimple(n), which is also the default one if you give only one argument.       "
+    print "Important: In case you are aiming to perform Lattice Boltzmann simulations you no need to worry about the per- "
+    print "formance."
     print "For further details look into ESPResSo++ documentation."
     print "###############################################################################################################"
-    if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):					
+    if isinstance(n, numbers.Number) and not isinstance(box_size, numbers.Number):					
         return nodeGridSimple(n)
     else:
 	    ijkmax = 3 * n * n + 1
