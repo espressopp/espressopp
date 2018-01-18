@@ -36,8 +36,8 @@ class TestFreeEnergyCompensation(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, system.skin)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
         system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
         self.system = system
 

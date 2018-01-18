@@ -43,8 +43,9 @@ class TestCaseLangevinThermostatOnRadius(unittest.TestCase):
 
     def test_on_radius(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box=(10, 10, 10),rc=1.5,skin=0.3)
-        cellGrid = espressopp.tools.decomp.cellGrid(box=(10, 10, 10), nodeGrid, rc=1.5, skin=0.3)
+	box=(10,10,10)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
