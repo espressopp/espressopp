@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -243,6 +243,88 @@ namespace espressopp {
           }
     }
 
+    real TDforce::computeTDEnergy() {
+
+          real TDEnergy = 0.0;
+          real TDEnergySum = 0.0;
+          System& system = getSystemRef();
+          const bc::BC& bc = *getSystemRef().bc;
+
+          CellList cells = system.storage->getRealCells();
+          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+
+              Table table = forces.find(cit->getType())->second;
+              if (table) {
+
+                  if (!(verletList->getAdrCenterSet())) {
+
+                    if (sphereAdr){
+
+                      if(verletList->getAdrList().size() > 1){
+
+                        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+                        Real3D pa = **it2;
+                        Real3D dist3D;
+                        bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa);
+                        Real3D mindist3D = dist3D;
+
+                        // Loop over all other centers
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                              pa = **it2;
+                              verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa);
+                              if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D;
+                        }
+
+                        real mindist3Dabs = sqrt(mindist3D.sqr());
+                         if ( mindist3Dabs >0.0 ) {
+                            TDEnergy += table->getEnergy(mindist3Dabs);
+                         }
+
+                      }
+                      else{
+                         center=**(verletList->adrPositions.begin());
+                         Real3D dist3D;
+                         bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center);
+                         real dist = sqrt(dist3D.sqr());
+
+                         if (dist>0.0) {
+                           TDEnergy += table->getEnergy(dist);
+                         }
+                      }
+
+                    }
+                    else{
+                      std::cout << "In TDforce: Trying to use moving AdResS region with adaptive region slab geometry. This is not implemented and doesn't make much sense anyhow.\n";
+                      exit(1);
+                      return 0.0;
+                    }
+
+                  }
+                  else{
+
+                    if (sphereAdr){
+                       Real3D dist3D;
+                       bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center);
+                       real dist = sqrt(dist3D.sqr());
+
+                       if (dist>0.0) {
+                         TDEnergy += table->getEnergy(dist);
+                       }
+                    } else {
+                       real d1 = cit->getPos()[0] - center[0];
+                       real d1abs = fabs(d1);
+                       TDEnergy += table->getEnergy(d1abs);
+                    }
+
+                  }
+              }
+
+          }
+          mpi::all_reduce(*getSystem()->comm, TDEnergy, TDEnergySum, std::plus<real>());
+          return TDEnergySum;
+    }
+
     /****************************************************
     ** REGISTRATION WITH PYTHON
     ****************************************************/
@@ -260,6 +342,7 @@ namespace espressopp {
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)
         .def("addForce", pyAddForce)
+        .def("computeTDEnergy", &TDforce::computeTDEnergy)
         ;
     }
 

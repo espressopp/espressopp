@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -114,6 +114,8 @@ namespace espressopp {
       virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
       virtual real computeEnergyCG();
+      virtual real computeEnergyAA(int atomtype);
+      virtual real computeEnergyCG(int atomtype);
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
@@ -495,6 +497,12 @@ namespace espressopp {
       return esum;
     }
 
+    template < typename _PotentialAT, typename _PotentialCG > inline real
+    VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
+    computeEnergyAA(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyAA(int atomtype) in VerletListHadressInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
 
     template < typename _PotentialAT, typename _PotentialCG >
     inline real
@@ -528,6 +536,12 @@ namespace espressopp {
       return esum;
     }
 
+    template < typename _PotentialAT, typename _PotentialCG > inline real
+    VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
+    computeEnergyCG(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyCG(int atomtype) in VerletListHadressInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
 
     template < typename _PotentialAT, typename _PotentialCG > inline void
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::

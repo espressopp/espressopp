@@ -1,6 +1,8 @@
+#  Copyright (C) 2017,2018
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & JGU Mainz
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2014,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -96,6 +98,11 @@ class ParticleLocal(object):
     def f(self, val): self.__getTmp().f = toReal3DFromVector(val)
 
     @property
+    def fm(self): return self.__getTmp().fm
+    @f.setter
+    def fm(self, val): self.__getTmp().fm = toReal3DFromVector(val)
+
+    @property
     def v(self): return self.__getTmp().v
     @v.setter
     def v(self, val): self.__getTmp().v = toReal3DFromVector(val)
@@ -106,14 +113,34 @@ class ParticleLocal(object):
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
 
     @property
+    def modepos(self): return self.__getTmp().modepos
+    @pos.setter
+    def modepos(self, val): self.__getTmp().modepos = toReal3DFromVector(val)
+
+    @property
+    def modemom(self): return self.__getTmp().modemom
+    @pos.setter
+    def modemom(self, val): self.__getTmp().modemom = toReal3DFromVector(val)
+
+    @property
     def type(self): return self.__getTmp().type
     @type.setter
     def type(self, val): self.__getTmp().type = val
 
     @property
+    def pib(self): return self.__getTmp().pib
+    @pib.setter
+    def pib(self, val): self.__getTmp().pib = val
+
+    @property
     def mass(self): return self.__getTmp().mass
     @mass.setter
     def mass(self, val): self.__getTmp().mass = val
+
+    @property
+    def varmass(self): return self.__getTmp().varmass
+    @varmass.setter
+    def varmass(self, val): self.__getTmp().varmass = val
 
     @property
     def q(self): return self.__getTmp().q
