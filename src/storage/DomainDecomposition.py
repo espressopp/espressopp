@@ -83,7 +83,7 @@ if pmi.isController:
             else:
               if check.System(system, 'bc'):
                 if nodeGrid == 'auto':
-                  nodeGrid = decomp.nodeGrid(system.comm.rank)
+                  nodeGrid = decomp.nodeGridSimple(system.comm.rank)
                 else:
                   nodeGrid = toInt3DFromVector(nodeGrid)
                 if cellGrid == 'auto':
