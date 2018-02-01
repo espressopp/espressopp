@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -45,6 +45,29 @@ namespace espressopp {
                 // by default 
                 setPrint_progress(true);
                 key = "unfolded";
+
+		int localN = system -> storage -> getNRealParticles();
+		boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
+		
+		int n_nodes = system -> comm -> size();
+		int this_node = system -> comm -> rank();
+              
+		//for monodisperse chains
+		int num_chains = num_of_part / chainlength;
+
+		int local_num_of_part = (num_chains / n_nodes + 1) * chainlength;
+
+		idToCpu.clear();
+		int nodeNum = 0;
+		int count = 0;
+		for(long unsigned int k = 1; k <= num_of_part; k++){
+		    idToCpu[k] = nodeNum;
+		    count ++;
+		    if(count>=local_num_of_part){
+			count = 0;
+			nodeNum++;
+		    }
+		}
             }
 
             ~MeanSquareInternalDist() {
