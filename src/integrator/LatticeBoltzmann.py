@@ -1,4 +1,4 @@
-#  Copyright (C) 2012-2016
+#  Copyright (C) 2012-2016,2017(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -65,12 +65,15 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
     >>>
     >>> # create cubic box
     >>> box = (L, L, L)
+    >>> # The rc+skin= lattice_size
+    >>> rc = 0.9
+    >>>	skin= 0.1 
     >>>
     >>> # initialize empty default system with the created cubic box.
     >>> system, integrator = espressopp.standard_system.Default(box)
     >>>
-    >>> # nodeGrid is determined based on the number of CPUs used for simulation
-    >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+    >>> # nodeGrid is determined based on the number of CPUs used for simulation among others
+    >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
     >>>
     >>> # initialize lb object. The dimensions of the lattice are obtained from the
     >>> # system's box dimensions employing lattice spacing 1.
@@ -128,7 +131,7 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
         
         >>> # it is advised to set nodeGrid by internal ESPResSo++ function
         >>> # based on the number of CPUs
-        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
 
 
     .. py:data:: real a = 1.
@@ -193,12 +196,14 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
         >>>
         >>> # create cubic box
         >>> box = (L, L, L)
-        >>>
+	>>> rc=0.9
+	>>> skin=0.1
+        >>> 
         >>> # initialize Lennard Jones system with the created cubic box and given temperature.
         >>> system, integrator = espressopp.standard_system.LennardJones(N, box, temperature=T)
         >>>
         >>> # nodeGrid is determined based on the number of CPUs used for simulation
-        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        >>> nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
         >>>
         >>> # initialize lb object. The dimensions of the lattice are obtained from the
         >>> # system's box dimensions employing lattice spacing 1.
@@ -262,4 +267,3 @@ if pmi.isController :
                             pmiproperty = ['nodeGrid', 'a', 'tau', 'numDims', 'numVels', 'visc_b', 'visc_s', 'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff', 'nSteps', 'profStep', 'getMyNi'],
                             pmicall = ["getLBMom","setLBMom","saveLBConf","keepLBDump"]
                             )
-
