@@ -20,25 +20,24 @@
 
 
 r"""
-***************************************
-espressopp.interaction.AngularPotential
-***************************************
 
-This is an abstract class, only needed to be inherited from.
+Abstract class for angular potentials that only needed to be inherited from.
 
-.. function:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
+.. py:class:: espressopp.interaction.AngularPotential
+
+    .. py:method:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
 
 		:param \*args: 
 		:type \*args: 
 		:rtype: 
 
-.. function:: espressopp.interaction.AngularPotential.computeForce(\*args)
+    .. py:method:: espressopp.interaction.AngularPotential.computeForce(\*args)
 
 		:param \*args: 
 		:type \*args: 
 		:rtype: 
 """
-# -*- coding: iso-8859-1 -*-
+
 from espressopp import pmi
 from espressopp import toReal3DFromVector
 from _espressopp import interaction_AngularPotential

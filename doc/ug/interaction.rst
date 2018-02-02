@@ -4,8 +4,6 @@ interaction
 .. toctree::
    :maxdepth: 2
    
-   espressopp.interaction.AngularCosineSquared.rst
-   espressopp.interaction.AngularHarmonic.rst
    espressopp.interaction.AngularPotential.rst
    espressopp.interaction.AngularUniqueCosineSquared.rst
    espressopp.interaction.AngularUniqueHarmonic.rst

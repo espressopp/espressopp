@@ -19,10 +19,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 """
-**************************************
-espressopp.interaction.AngularHarmonic
-**************************************
-
 Calculates the Angular Harmonic potential as:
 
 .. math::

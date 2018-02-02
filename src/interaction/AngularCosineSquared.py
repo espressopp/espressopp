@@ -20,10 +20,6 @@
 
 
 """
-*******************************************
-espressopp.interaction.AngularCosineSquared
-*******************************************
-
 Calculates the Angular Cosine Squared potential as:
 
 .. math::
