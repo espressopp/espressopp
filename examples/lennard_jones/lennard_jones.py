@@ -142,7 +142,7 @@ system.skin        = skin
 # get the number of CPUs to use
 NCPUs              = espressopp.MPI.COMM_WORLD.size
 # calculate a regular 3D grid according to the number of CPUs available
-nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs)
+nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs,box,warmup_cutoff, skin)
 # calculate a 3D subgrid to speed up verlet list builds and communication
 cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, warmup_cutoff, skin)
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid

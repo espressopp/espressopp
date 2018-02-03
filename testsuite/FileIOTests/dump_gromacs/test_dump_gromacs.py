@@ -1,3 +1,5 @@
+#  Copyright (C) 2017
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & JGU Mainz
 #
