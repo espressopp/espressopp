@@ -12,6 +12,7 @@ tools
    espressopp.tools.gromacs.rst
    espressopp.tools.io_extended.rst
    espressopp.tools.lammps.rst
+   espressopp.tools.loadbal.rst
    espressopp.tools.pathintegral.rst
    espressopp.tools.pdb.rst
    espressopp.tools.povwrite.rst
