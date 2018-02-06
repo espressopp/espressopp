@@ -46,11 +46,7 @@ namespace espressopp {
                 setPrint_progress(true);
                 key = "unfolded";
 
-		int localN = system -> storage -> getNRealParticles();
-		boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
-		
 		int n_nodes = system -> comm -> size();
-		int this_node = system -> comm -> rank();
               
 		//for monodisperse chains
 		int num_chains = num_of_part / chainlength;
