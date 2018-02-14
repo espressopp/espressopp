@@ -1,6 +1,27 @@
-# DEMONSTRATION OF THE LJ-COS POTENTIAL CONTROLLING SOLVENT QUALITY
-# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)
+#!/usr/bin/env python2
+#  Copyright (C) 2016-2017(H)
+#      Max Planck Institute for Polymer Research
 #
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+###########################################################################
+# DEMONSTRATION OF THE LJ-COS POTENTIAL CONTROLLING SOLVENT QUALITY       #
+# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)            #  
+###########################################################################
+
 import espressopp
 from espressopp import Int3D
 from espressopp import Real3D
@@ -22,7 +43,7 @@ system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
 system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin    = skin
-nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc,skin)
 cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 

@@ -1,8 +1,29 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
+#  Copyright (C) 2016-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+###########################################################################			
+#                                                                         #
+#  ESPResSo++ Python script for an methanol simulation 			  #
+#                                                                         #
+###########################################################################
 
 import mpi4py.MPI as MPI
-
-# import the ESPResSo++ python module
 import espressopp
 from espressopp import Real3D
 from espressopp.tools import gromacs
@@ -227,7 +248,7 @@ system.skin        = skin
 # get the number of CPUs to use
 NCPUs              = espressopp.MPI.COMM_WORLD.size
 # calculate a regular 3D grid according to the number of CPUs available
-nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs)
+nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs,box,nbCutoff,skin)
 # calculate a 3D subgrid to speed up verlet list builds and communication
 cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, nbCutoff, skin)
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
