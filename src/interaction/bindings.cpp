@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -85,6 +85,7 @@
 #include "SingleParticlePotential.hpp"
 #include "ConstrainCOM.hpp"
 #include "ConstrainRG.hpp"
+#include "SquareWell.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -122,7 +123,7 @@ namespace espressopp {
       HarmonicTrap::registerPython();
       LennardJones93Wall::registerPython();
       MirrorLennardJones::registerPython();
-      
+
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
@@ -131,7 +132,7 @@ namespace espressopp {
       AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
       AngularUniqueCosineSquared::registerPython();
-      
+
       DihedralPotential::registerPython();
       DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
@@ -141,7 +142,7 @@ namespace espressopp {
       DihedralHarmonicNCos::registerPython();
       DihedralRB::registerPython();
       DihedralHarmonic::registerPython();
-      
+
       CoulombKSpaceEwald::registerPython();
       CoulombRSpace::registerPython();
       StillingerWeberPairTerm::registerPython();
@@ -149,11 +150,12 @@ namespace espressopp {
       StillingerWeberPairTermCapped::registerPython();
       TersoffPairTerm::registerPython();
       TersoffTripleTerm::registerPython();
-      
+
       CoulombKSpaceP3M::registerPython();
 
       ConstrainCOM::registerPython();
       ConstrainRG::registerPython();
+      SquareWell::registerPython();
     }
   }
 }
