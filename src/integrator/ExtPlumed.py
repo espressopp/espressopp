@@ -24,26 +24,56 @@ r"""
 espressopp.integrator.ExtPlumed
 ******************************
 
+usage:
 
-.. function:: espressopp.integrator.ExtPlumed(system, plumedfile, plumelog, units)
+plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.005)
+plumed.setUnitStyle("Natural")
+plumed.Init()
+integrator.addExtension(plumed)
 
-		:param system:
+or:
+
+plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.005)
+plumed.setTimeUnit(1.0)
+plumed.setEnergyUnit(1.0)
+plumed.setLengthUnit(1.0)
+plumed.setChargeState(True)
+plumed.Init()
+integrator.addExtension(plumed)
+
+.. function:: espressopp.integrator.ExtPlumed(system, cmd, log, dt, unit)
+
+		:param system: The Espresso++ system object.
+                :type system: espressopp.System
+                :param cmd: input file for PLUMED
+                :type cmd: ``str``
+                :param log: log file for PLUMED
+                :type log:  ``str``
+                :param dt:  time step
+                :type dt: ``float`` (default: 0.005)
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_ExtPlumed
+import mpi4py.MPI as MPI
 
 class ExtPlumedLocal(ExtensionLocal, integrator_ExtPlumed):
 
-    def __init__(self, system, plumedfile, plumedlog="log.plumed", units="Natural"):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_ExtPlumed, system, plumedfile, plumedlog, units)
+    def __init__(self, system, cmd, log, dt):
+        if pmi._PMIComm and pmi._PMIComm.isActive():
+            if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+                cxxinit(self, integrator_ExtPlumed, system, pmi._PMIComm.getMPIsubcomm(), cmd, log, dt)
+            else:
+                pass
+        else:
+            cxxinit(self, integrator_ExtPlumed, system, pmi._MPIcomm, cmd, log, dt)
 
 if pmi.isController :
     class ExtPlumed(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtPlumedLocal',
-	    pmiproperty = [ 'plumedfile', 'plumedlog', 'units' ],
+            pmicall = ['setChargeState', 'getChargeState', 'setLengthUnit', 'setTimeUnit', 'setEnergyUnit', 'setUnitStyle', 'Init', 'getBias']
             )

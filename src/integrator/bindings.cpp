@@ -61,7 +61,10 @@
 #include "MinimizeEnergy.hpp"
 
 #include "EmptyExtension.hpp"
+#ifdef HAS_PLUMED
 #include "ExtPlumed.hpp"
+#endif
+
 
 namespace espressopp {
   namespace integrator {
@@ -103,7 +106,9 @@ namespace espressopp {
       AssociationReaction::registerPython();
       MinimizeEnergy::registerPython();
       EmptyExtension::registerPython();
+#ifdef HAS_PLUMED
       ExtPlumed::registerPython();
+#endif
     }
   }
 }

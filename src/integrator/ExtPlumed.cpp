@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2017
+  Copyright (C) 2012,2013,2017,2018
   Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
   Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,21 +20,22 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+#include <iostream>
 #include <string>
 #include "python.hpp"
 #include "types.hpp"
 #include "Real3D.hpp"
 #include "System.hpp"
+#include "Buffer.hpp"
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "bc/BC.hpp"
 #include "ExtPlumed.hpp"
-#include "mpi.h"
-/*
-Todo: units. Not just natural units.
-Todo: particle groups. ExtPlumed::applyForceToGroup()
-*/
+#include "mpi.hpp"
+#include <mpi4py/mpi4py.h>
+
 namespace espressopp {
 
   using namespace iterator;
@@ -44,152 +45,202 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtPlumed::theLogger, "ExtPlumed");
 
-    ExtPlumed::ExtPlumed(shared_ptr<System> _system, string _plumedfile, string _plumedlog, string _units)
-      : Extension(_system),
-        plumedfile(_plumedfile),
-        plumedlog(_plumedlog),
-        units(_units),
-        // pe(nullptr),
-        nlocal(0),
-        natoms(0),
-        charged(false),
-        gatindex(nullptr),
-        masses(nullptr),
-        forces(nullptr),
-        pos(nullptr),
-        charges(nullptr)
+    ExtPlumed::ExtPlumed(shared_ptr<System> _system, python::object _pyobj, string _plumedfile, string _plumedlog, real _dt):
+      Extension(_system),
+      plumedfile(_plumedfile),
+      plumedlog(_plumedlog),
+      dt(_dt),
+      nreal(0),
+      chargeState(false),
+      gatindex(NULL),
+      masses(NULL),
+      f(NULL),
+      pos(NULL),
+      charges(NULL)
     {
       System& system = getSystemRef();
-      p=new PLMD::Plumed();
+      p=new PLMD::Plumed;
 
-      // p->cmd("setMPIComm",*system.comm);
-
-      // Todo: support more units
-      if (units == "Natural") p->cmd("setNaturalUnits");
-
+      PyObject * pyobj = _pyobj.ptr();
+      PyMPICommObject* pyMPIComm = (PyMPICommObject*) pyobj;
+      MPI_Comm * comm_p = &pyMPIComm->ob_mpi;
+      p->cmd("setMPIComm", comm_p);
       p->cmd("setPlumedDat",plumedfile.c_str());
       p->cmd("setLogFile",plumedlog.c_str());
       p->cmd("setMDEngine","ESPRESSO++");
-
       longint nReal = system.storage->getNRealParticles();
-      // boost::mpi::all_reduce(*system.comm, nReal, natoms, plus<longint>());
-      natoms = nReal;
-      p->cmd("setNatoms",&natoms);  // check type
-      dt = integrator->getTimeStep();
+      boost::mpi::all_reduce(*system.comm, nReal, natoms, plus<longint>());
+      LOG4ESPP_DEBUG(theLogger, "The total number of atoms is " << natoms);
       p->cmd("setTimestep",&dt); // check type
-      p->cmd("setAtomsNlocal",&nlocal);
+      p->cmd("setNatoms",&natoms);  // check type
+    }
+
+    ExtPlumed::~ExtPlumed() {
+      delete [] f;
+      delete [] pos;
+      delete [] charges;
+      delete [] gatindex;
+      delete [] masses;
+      delete p;
+    }
+
+    real ExtPlumed::getBias() {
+      return bias;
+    }
+
+    void ExtPlumed::setUnitStyle(string _unit) {
+      if (_unit == "Natural") p->cmd("setNaturalUnits");
+      return;
+    }
+
+    void ExtPlumed::setTimeUnit(real _factor) {
+      real timeUnit = _factor;
+      p->cmd("setMDTimeUnits",&timeUnit);
+      return;
+    }
+
+    void ExtPlumed::setLengthUnit(real _factor) {
+      real lengthUnit = _factor;
+      p->cmd("setMDLengthUnits",&lengthUnit);
+      return;
+    }
+
+    void ExtPlumed::setEnergyUnit(real _factor) {
+      real energyUnit = _factor;
+      p->cmd("setMDEnergyUnits", &energyUnit);
+      return;
+    }
+
+    void ExtPlumed::Init() {
       p->cmd("init");
     }
 
-    real ExtPlumed::getBias(){
-      return bias;
+    bool ExtPlumed::getChargeState() {
+      return chargeState;
+    }
+
+    void ExtPlumed::setChargeState(bool q) {
+      chargeState = q;
     }
 
     void ExtPlumed::disconnect() {
       _aftCalcF.disconnect();
-      _runInit.disconnect();
-      // _aftIntV.disconnect();
+      _aftIntV.disconnect();
     }
 
     void ExtPlumed::connect() {
-      // connection to initialisation
       _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::applyForceToAll, this));
-      _runInit = integrator->runInit.connect( boost::bind(&ExtPlumed::getTimeStep, this));
-      // _aftIntV = integrator->aftIntV.connect( boost::bind(&ExtPlumed::computePe, this));
-    }
-
-    void ExtPlumed::getTimeStep() {
-
-      dt = integrator->getTimeStep();
-      p->cmd("setTimestep",&dt); // check type
+      _aftIntV   = integrator->aftIntV.connect( boost::bind(&ExtPlumed::updatePlumed, this));
     }
 
     void ExtPlumed::applyForceToAll() {
       int update_gatindex=0;
       System& system = getSystemRef();
-      CellList localCells = system.storage->getLocalCells();
+      CellList realCells = system.storage->getRealCells();
 
       // Try to find out if the domain decomposition has been updated:
-      if(nlocal!=system.storage->getNLocalParticles()) {
+      if(nreal!=system.storage->getNRealParticles()) {
         if(charges) delete [] charges;
         if(masses) delete [] masses;
         if(gatindex) delete [] gatindex;
-        if(forces) delete [] forces;
         if(pos) delete [] pos;
-        nlocal = system.storage->getNLocalParticles();
-        gatindex = new size_t[nlocal];
-        masses = new real[nlocal];
-        forces = new real[nlocal*3];
-        pos = new real[nlocal*3];
-        if (charged) charges = new real[nlocal];
+        if(f) delete [] f;
+        nreal = system.storage->getNRealParticles();
+        gatindex = new int [nreal];
+        masses = new real [nreal];
+        if (chargeState) charges = new real [nreal];
+        pos = new real[nreal*3];
+        f = new real[nreal*3];
         update_gatindex=1;
       } else {
-        longint pcount = 0;
-        for(CellListIterator cit(localCells); !cit.isDone() && pcount < nlocal; ++cit, ++pcount) {
-          if(gatindex[pcount]!=cit->id()-1) {
+        int i = 0;
+        for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {
+          if(gatindex[i]!=static_cast<int>(cit->id()-1)) {
             update_gatindex=1;
             break;
           }
-          // Check if the number of local particles of plumed is equal to the
-          // total number of particles stored in all cells.
-          assert(pcount==nlocal);
         }
       }
 
-      // boost::mpi::all_reduce(*system.comm, update_gatindex, plus<int>());
+      boost::mpi::all_reduce(*system.comm, update_gatindex, plus<int>());
       if(update_gatindex) {
         int i=0;
-        for(CellListIterator cit(localCells); !cit.isDone() && i < nlocal; ++cit) {
-          gatindex[i]=cit->id()-1;
+        for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {
+          gatindex[i]=static_cast<int>(cit->id())-1;
           masses[i]=cit->mass();
-          if (charged) charges[i]=cit->q(); // maybe aslo charges.
-          pos[3*i] = cit->position()[0];
-          pos[3*i+1] = cit->position()[1];
-          pos[3*i+2] = cit->position()[2];
-          forces[3*i] = cit->force()[0];
-          forces[3*i+1] = cit->force()[1];
-          forces[3*i+2] = cit->force()[2];
-          ++i;
+          if (chargeState) charges[i]=cit->q();
+          pos[i*3] = cit->position()[0];
+          pos[i*3+1] = cit->position()[1];
+          pos[i*3+2] = cit->position()[2];
+          f[i*3] = cit->force()[0];
+          f[i*3+1] = cit->force()[1];
+          f[i*3+2] = cit->force()[2];
         }
       } else {
         int i = 0;
-        for(CellListIterator cit(localCells); !cit.isDone() && i < nlocal; ++cit) {
-          pos[3*i] = cit->position()[0];
-          pos[3*i+1] = cit->position()[1];
-          pos[3*i+2] = cit->position()[2];
-          forces[3*i] = cit->force()[0];
-          forces[3*i+1] = cit->force()[1];
-          forces[3*i+2] = cit->force()[2];
-          ++i;
+        for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {
+          masses[i]=cit->mass();
+          if (chargeState) charges[i]=cit->q();
+          pos[i*3] = cit->position()[0];
+          pos[i*3+1] = cit->position()[1];
+          pos[i*3+2] = cit->position()[2];
+          f[i*3] = cit->force()[0];
+          f[i*3+1] = cit->force()[1];
+          f[i*3+2] = cit->force()[2];
         }
       }
-      p->cmd("setAtomsGatindex",&gatindex[0]);
 
+      p->cmd("setAtomsNlocal",&nreal);
+      p->cmd("setAtomsGatindex",&gatindex[0]);
       real box[3][3];
+
       for(int i=0;i<3;i++) for(int j=0;j<3;j++) box[i][j]=0.0;
       Real3D L = system.bc->getBoxL();
       box[0][0]=L[0];
       box[1][1]=L[1];
       box[2][2]=L[2];
 
-      // local variable with timestep:
-      // step: long long
+      real virial[3][3];
+      for(int i=0; i<3; ++i) for(int j=0; j<3; ++j) virial[i][j]=0.0;
+
       int step=integrator->getStep();
       p->cmd("setStep",&step);
-      p->cmd("setPositions",&pos[0]);
+      p->cmd("setPositions", pos);
+      p->cmd("setForces", f);
       p->cmd("setBox",&box[0][0]);
-      p->cmd("setForces",&forces[0]);
-      p->cmd("setMasses",&masses[0]);
-      p->cmd("setCharges",&charges[0]);
+      p->cmd("setMasses",masses);
+      if (chargeState) p->cmd("setCharges",charges);
+      p->cmd("setVirial", &virial[0][0]);
       p->cmd("getBias",&bias);
-      p->cmd("calc");
 
-      int k =0;
-      for(CellListIterator cit(localCells); !cit.isDone() && k < nlocal; ++cit) {
-        Real3D f = Real3D(forces[3*k], forces[3*k+1], forces[3*k+2]);
-        cit->setF(f);
-        ++k;
+      real pot_energy = 0.;
+      const interaction::InteractionList& srIL = system.shortRangeInteractions;
+      for (size_t j =0; j < srIL.size(); ++j) {
+        pot_energy += srIL[j]->computeEnergy();
       }
+
+      pot_energy /= system.comm->size(); // the way PLUMED defines pe.
+      p->cmd("setEnergy", &pot_energy);
+      p->cmd("prepareCalc");
+      p->cmd("performCalcNoUpdate");
+
+      // modify forces on real particles on each processor.
+      int k = 0;
+      for(CellListIterator cit(realCells); !cit.isDone(); ++cit, ++k) {
+        int i = static_cast<int>(cit->id())-1;
+        assert(i==gatindex[k]);
+        Real3D F = Real3D(f[k*3], f[k*3+1], f[k*3+2]);
+        cit->setF(F);
+      }
+    }
+
+    /***********************************************
+     * PLUMED should be updated only once per step.
+     **********************************************/
+    void ExtPlumed::updatePlumed() {
+      int step=integrator->getStep();
+      p->cmd("setStep",&step);
+      p->cmd("update");
     }
 
     /****************************************************
@@ -201,7 +252,15 @@ namespace espressopp {
 
       class_<ExtPlumed, shared_ptr<ExtPlumed>, bases<Extension> >
 
-        ("integrator_ExtPlumed", init< shared_ptr< System>, string, string, string >())
+        ("integrator_ExtPlumed", init< shared_ptr< System >, python::object, string, string, real >())
+        .def("getChargeState", &ExtPlumed::getChargeState)
+        .def("setChargeState", &ExtPlumed::setChargeState)
+        .def("getBias", &ExtPlumed::getBias)
+        .def("setUnitStyle", &ExtPlumed::setUnitStyle)
+        .def("setTimeUnit", &ExtPlumed::setTimeUnit)
+        .def("setEnergyUnit", &ExtPlumed::setEnergyUnit)
+        .def("setLengthUnit", &ExtPlumed::setLengthUnit)
+        .def("Init", &ExtPlumed::Init)
         .def("connect", &ExtPlumed::connect)
         .def("disconnect", &ExtPlumed::disconnect)
         ;

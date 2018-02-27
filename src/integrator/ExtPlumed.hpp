@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2017
+  Copyright (C) 2012,2013,2017,2018
   Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
   Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,55 +24,62 @@
 #ifndef _INTEGRATOR_ExtPlumed_HPP
 #define _INTEGRATOR_ExtPlumed_HPP
 
+#include "python.hpp"
 #include "types.hpp"
 #include "logging.hpp"
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
-
+#include "mpi.hpp"
+#include "Particle.hpp"
 #include "../../Plumed.h"
 
 namespace espressopp {
   namespace integrator {
 
     /** ExtPlumed */
-
     class ExtPlumed : public Extension {
 
-      public:
-      ExtPlumed(shared_ptr < System >, std::string, std::string, std::string);
+    public:
+      ExtPlumed(shared_ptr < System >, python::object, std::string, std::string, real);
       void applyForceToAll();
-        real getBias();
-        virtual ~ExtPlumed() {};
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+      void updatePlumed();
+      real getBias();
+      void setUnitStyle(std::string);
+      void setTimeUnit(real);
+      void setEnergyUnit(real);
+      void setLengthUnit(real);
+      void Init();
+      bool getChargeState();
+      void setChargeState(bool);
+      virtual ~ExtPlumed();
+      /** Register this class so it can be used from Python. */
+      static void registerPython();
 
-      private:
-        // pointer to plumed object:
-        PLMD::Plumed*p;
-        std::string plumedfile;
-        std::string units;
+    private:
+      // pointer to plumed object:
+      PLMD::Plumed * p;
+      std::string plumedfile;
+      std::string units;
       std::string plumedlog;
-      // real peTotal;
-        real dt;
+      real dt;
 
+      longint nreal; // total number of atoms (real & ghost) on the processor
+      longint natoms; // total number of atoms
+      int *  gatindex;
+      real * masses;
+      real * charges;
+      real * pos, *f;
 
-        longint nlocal; // total number of atoms (real & ghost) on the processor
-        longint natoms; // total number of atoms
-        size_t *gatindex;
-        real *masses;
-        real *forces;
-        real *pos;
-        real *charges;
+      boost::signals2::connection _aftCalcF;
+      boost::signals2::connection _aftIntV;
 
-        boost::signals2::connection _aftCalcF;
-        boost::signals2::connection _runInit;
-        void connect();
-        void disconnect();
-	void getTimeStep();
-        /** Logger */
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-        const bool charged;
-        real bias;
+      void connect();
+      void disconnect();
+      // void getTimeStep();
+      /** Logger */
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+      bool chargeState;
+      real bias;
     };
   }
 }
