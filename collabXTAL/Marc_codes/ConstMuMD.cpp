@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -31,28 +31,30 @@
 #include "math.h"
 
 #include <boost/serialization/map.hpp>
+#if SYSTEM == 0
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+#endif
 
+namespace espressopp {
 
-namespace espresso {
-  
-  using namespace espresso;
+  using namespace espressopp;
   using namespace iterator;
-  using namespace std;  
-  
+  using namespace std;
+
   namespace integrator {
-    
+
     ConstMuMD::ConstMuMD(shared_ptr<System> system): Extension(system){
-      
+
       PI                =   3.1415926535897932384626433832795029;
       SIZE3D            =   5E4;
       MAXPARTNUM        =   5E5;
       RB_WIDTH          =   0.2;
-      
+
       modus             =    -1;
       sizeTR            =  10.0;
       sizeCR            =  10.0;
       sizeFR            =   5.0;
-      sizeCheckR        =  10.0;      
+      sizeCheckR        =  10.0;
       sizeResL          =  73.0;
       sizeResR          =  73.0;
       LSizeRes          = std::vector<real>(5,-1.0);
@@ -85,13 +87,9 @@ namespace espresso {
       molFracInCR       = Real3D(0.8,0.8,0.8);
 
       type              = Extension::ConstMu;
-      
+
     }
 
-    ConstMuMD::~ConstMuMD(){
-      disconnect();
-    }
-    
     void ConstMuMD::disconnect(){
       _initialize.disconnect();
       _perform.disconnect();
@@ -100,7 +98,7 @@ namespace espresso {
     void ConstMuMD::connect(){
       // connection to initialization
       _initialize       = integrator->runInit.connect( boost::bind(&ConstMuMD::initialize, this));
-      
+
       // connection to initialization
       //_applyForce     = integrator->aftInitF.connect( boost::bind(&ConstMuMD::applyForce, this));
       _perform          = integrator->aftInitF.connect( boost::bind(&ConstMuMD::perform, this));
@@ -112,8 +110,8 @@ namespace espresso {
     }
     int ConstMuMD::getModus(){
       return modus;
-    }    
-    
+    }
+
     // set and get size of transition region
     void ConstMuMD::setSizeTR(real _sizeTR){
       sizeTR            = _sizeTR;
@@ -121,7 +119,7 @@ namespace espresso {
     real ConstMuMD::getSizeTR(){
       return sizeTR;
     }
-    
+
     // set and get size of control region
     void ConstMuMD::setSizeCR(real _sizeCR){
       sizeCR            = _sizeCR;
@@ -129,7 +127,7 @@ namespace espresso {
     real ConstMuMD::getSizeCR(){
       return sizeCR;
     }
-    
+
     // set and get size of force region
     void ConstMuMD::setSizeFR(real _sizeFR){
       sizeFR            = _sizeFR;
@@ -137,7 +135,7 @@ namespace espresso {
     real ConstMuMD::getSizeFR(){
       return sizeFR;
     }
-    
+
     // set and get size of adapt. checker region
     void ConstMuMD::setSizeCheckR(real _sizeCheckR){
       sizeCheckR        = _sizeCheckR;
@@ -145,7 +143,7 @@ namespace espresso {
     real ConstMuMD::getSizeCheckR(){
       return sizeCheckR;
     }
-    
+
     // set and get sizes of reservoirs
     void ConstMuMD::setSizeRes(python::list& _sizeRes){
       sizeResL          = boost::python::extract<real>(_sizeRes[0]);
@@ -155,10 +153,10 @@ namespace espresso {
       python::list pyli;
       pyli.append( sizeResL );
       pyli.append( sizeResR );
-      
+
       return pyli;
     }
-    
+
     // set and get 3-dim. bin sizes
     void ConstMuMD::setDR(python::list& _dr){
       real drX           = boost::python::extract<real>(_dr[0]);
@@ -172,10 +170,10 @@ namespace espresso {
       pyli.append( dr[0] );
       pyli.append( dr[1] );
       pyli.append( dr[2] );
-      
+
       return pyli;
     }
-    
+
     // set and get number of bins in plane
     void ConstMuMD::setBinsInPlane(python::list& _binsInPlane){
       binsInPlaneY      = boost::python::extract<int>(_binsInPlane[0]);
@@ -186,10 +184,10 @@ namespace espresso {
       python::list pyli;
       pyli.append( binsInPlaneY );
       pyli.append( binsInPlaneZ );
-      
+
       return pyli;
     }
-    
+
     // set and get number of particles in xtal substrate
     void ConstMuMD::setNThresh(int _nthresh){
       nthresh           = _nthresh;
@@ -197,7 +195,7 @@ namespace espresso {
     int ConstMuMD::getNThresh(){
       return nthresh;
     }
-    
+
     // set and get cutoff radius
     void ConstMuMD::setCutoff(real _cutoff){
       cutoff            = _cutoff;
@@ -205,7 +203,7 @@ namespace espresso {
     real ConstMuMD::getCutoff(){
       return cutoff;
     }
-    
+
     // set and get shape parameter of membrane force
     void ConstMuMD::setShapeParam(real _shapeParam){
       shapeParam        = _shapeParam;
@@ -213,7 +211,7 @@ namespace espresso {
     real ConstMuMD::getShapeParam(){
       return shapeParam;
     }
-    
+
     // set and get prefactor of membrane force
     void ConstMuMD::setForceConst(python::list& _fConst){
       fConst0           = boost::python::extract<real>(_fConst[0]);
@@ -223,10 +221,10 @@ namespace espresso {
       python::list pyli;
       pyli.append( fConst0 );
       pyli.append( fConst1 );
-      
+
       return pyli;
     }
-    
+
 //     // set and get expected number densities
 //     void ConstMuMD::setExpDens(python::list& _expDens){
 //       expDens0          = boost::python::extract<real>(_expDens[0]);
@@ -236,7 +234,7 @@ namespace espresso {
 //       python::list pyli;
 //       pyli.append( expDens0 );
 //       pyli.append( expDens1 );
-//       
+//
 //       return pyli;
 //     }
 
@@ -249,10 +247,10 @@ namespace espresso {
       python::list pyli;
       pyli.append( expMolF0 );
       pyli.append( expMolF1 );
-      
+
       return pyli;
     }
-    
+
     // set and get wall instance
     void ConstMuMD::setWallInstance(Real3D _substrate){
       substrate         = Real3D(_substrate[0],_substrate[1],_substrate[2]);
@@ -260,7 +258,7 @@ namespace espresso {
     Real3D ConstMuMD::getWallInstance(){
       return substrate;
     }
-    
+
     // set and get structure of left surface
     //void ConstMuMD::setWallL(python::list& _wallL){
       //for(int i=0; i<sumBins; i++){
@@ -272,9 +270,9 @@ namespace espresso {
       //for(short i=0; i<sumBins; i++){
 	//pyli.append( wallInstanceL[i] );
       //}
-      //return pyli;      
+      //return pyli;
     //}
-    
+
     // set and get structure of right surface
     //void ConstMuMD::setWallR(python::list& _wallR){
       //for(int i=0; i<sumBins; i++){
@@ -286,9 +284,9 @@ namespace espresso {
       //for(short i=0; i<sumBins; i++){
 	//pyli.append( wallInstanceR[i] );
       //}
-      //return pyli;      
+      //return pyli;
     //}
-    
+
     // set and get total number of particles
     void ConstMuMD::setNtot(int _Ntot){
       Ntot              = _Ntot;
@@ -296,21 +294,21 @@ namespace espresso {
     int ConstMuMD::getNtot(){
       return Ntot;
     }
-    
+
     // set and get prefactor for threshold checker
     void ConstMuMD::setRatio(real _ratio){
       ratio            = _ratio;
     }
     real ConstMuMD::getRatio(){
       return ratio;
-    }    
-    
+    }
+
     // initialization
     void ConstMuMD::initialize(){
       int minbins                  = 100*sumBins;
       if( SIZE3D<minbins )
 	SIZE3D                    *= (int(minbins/SIZE3D)+1);
-      
+
       if( MAXPARTNUM<Ntot )
 	MAXPARTNUM                *= (int(Ntot/MAXPARTNUM)+1);
 
@@ -319,7 +317,7 @@ namespace espresso {
       Real3D Li                    = system.bc->getBoxL();
       Real3D Li_half               = 0.5*Li;
       Int3D dhBins                 = Int3D(int((Li[0]/dr[0])+0.5),binsInPlaneY,binsInPlaneZ);
-      
+
       //SIZE3D                       = dhBins[0]*dhBins[1]*dhBins[2];
 
 //       int  neighbours[MAXPARTNUM];
@@ -344,20 +342,20 @@ namespace espresso {
 // 	  q6_Im_Tot[7*i+j]         = 0.0;
 // 	}
 //       }
-      
+
       partsInCell                  = std::vector<int>(SIZE3D,0);
       totpartsInCell               = std::vector<int>(SIZE3D,0);
       neighboursInCell             = std::vector<int>(SIZE3D,0);
       totneighboursInCell          = std::vector<int>(SIZE3D,0);
       q6InCell                     = std::vector<real>(SIZE3D,0.0);
-      totq6InCell                  = std::vector<real>(SIZE3D,0.0);      
+      totq6InCell                  = std::vector<real>(SIZE3D,0.0);
 
       for(CellListAllPairsIterator it(realCells); it.isValid(); ++it){
         if( (it->first->type()==0) && (it->second->type()==0) ){
 	  Real3D distVector        = it->first->position()-it->second->position();
           // minimize the distance in simulation box
           for(short ii=0; ii<3; ii++){
-            if( distVector[ii]<-Li_half[ii] ) 
+            if( distVector[ii]<-Li_half[ii] )
 	      distVector[ii]      += Li[ii];
             if( distVector[ii]>Li_half[ii] )
 	      distVector[ii]      -= Li[ii];
@@ -377,7 +375,7 @@ namespace espresso {
 	      q6_Re[7*(it->second->id())+m]+= boost::math::spherical_harmonic_r(6,m,theta,phi);
 	      q6_Im[7*(it->second->id())+m]+= boost::math::spherical_harmonic_i(6,m,theta,phi);
 	    }
-	    #endif	    
+	    #endif
 	    neighbours[it->first->id()]++;
 	    neighbours[it->second->id()]++;
 	  }
@@ -437,14 +435,14 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, q6InReg, totq6InReg, std::plus<real>());
       boost::mpi::all_reduce(*mpiWorld, neighboursInXtal, totneighboursInXtal, std::plus<real>());
       boost::mpi::all_reduce(*mpiWorld, q6InXtal, totq6InXtal, std::plus<real>());
-      
+
 //      expDens                      = totpartsInReg/((borderL+Li[0]-borderR)*Li[1]*Li[2]);
       checkerQ6                    = ratio*totq6InXtal/nthresh+(1.0-ratio)*totq6InReg/totnullInReg;
       checkerCN                    = ratio*totneighboursInXtal/nthresh+(1.0-ratio)*totneighboursInReg/totnullInReg;
       maxGrowth                    = 0.5*sizeCheckR;
-  
+
     }
-    
+
     void ConstMuMD::perform(){
       adaptRegions();
       if( modus>=0 ){
@@ -452,7 +450,7 @@ namespace espresso {
 	applyForce();
       }
     }
-    
+
     // get densities for the different regions
     python::list ConstMuMD::getDensityData(){
       python::list pyli;
@@ -461,16 +459,16 @@ namespace espresso {
       pyli.append( numDensInCRTot[2] );
       pyli.append( numDensInRes[2] );
       pyli.append( molFracInCR[2] );
-      
+
       return pyli;
     }
-    
+
     void ConstMuMD::adaptRegions(){
-      
+
       // ############################################################################################
       // ## SET REGIONS                                                                            ##
       // ############################################################################################
-      
+
       System& system               = getSystemRef();
       CellList realCells           = system.storage->getRealCells();
       Real3D Li                    = system.bc->getBoxL();
@@ -503,7 +501,7 @@ namespace espresso {
 	    Real3D distVector        = it->first->position()-it->second->position();
 	    // minimize the distance in simulation box
 	    for(short ii=0; ii<3; ii++){
-	      if( distVector[ii]<-Li_half[ii] ) 
+	      if( distVector[ii]<-Li_half[ii] )
 		distVector[ii]      += Li[ii];
 	      if( distVector[ii]>Li_half[ii] )
 		distVector[ii]      -= Li[ii];
@@ -534,7 +532,7 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, (real*)&q6_Re[0], 7*MAXPARTNUM, (real*)&q6_Re_Tot[0], std::plus<real>());
       boost::mpi::all_reduce(*mpiWorld, (real*)&q6_Im[0], 7*MAXPARTNUM, (real*)&q6_Im_Tot[0], std::plus<real>());
 
-      
+
 //       int  partsInCell[SIZE3D];
 //       int  totpartsInCell[SIZE3D];
 //       int  neighboursInCell[SIZE3D];
@@ -548,15 +546,15 @@ namespace espresso {
 	totneighboursInCell[i]     = 0;
 	q6InCell[i]                = 0.0;
 	totq6InCell[i]             = 0.0;
-      }      
-      
+      }
+
       real localWCenterX           = 0.0;
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit){
 	if( cit->id()<=nthresh ){
 	  localWCenterX           += cit->position()[0];
 	}
 	int checkBin               = int(cit->position()[0]/dr[0]);
-	if( ((checkBin>=binsToCheckL[0]) && (checkBin<=binsToCheckL[1])) || ((checkBin>=binsToCheckR[0]) && (checkBin<=binsToCheckR[1])) ){	
+	if( ((checkBin>=binsToCheckL[0]) && (checkBin<=binsToCheckL[1])) || ((checkBin>=binsToCheckR[0]) && (checkBin<=binsToCheckR[1])) ){
 	  if( cit->type()==0 ){
 	    Int3D bin                  = Int3D(0,0,0);
 	    Real3D loc1                = cit->position();
@@ -597,9 +595,9 @@ namespace espresso {
 
       boost::mpi::all_reduce(*mpiWorld, (int*)&partsInCell[0], SIZE3D, (int*)&totpartsInCell[0], std::plus<int>());
       boost::mpi::all_reduce(*mpiWorld, (int*)&neighboursInCell[0], SIZE3D, (int*)&totneighboursInCell[0], std::plus<int>());
-      boost::mpi::all_reduce(*mpiWorld, (real*)&q6InCell[0], SIZE3D, (real*)&totq6InCell[0], std::plus<real>());      
+      boost::mpi::all_reduce(*mpiWorld, (real*)&q6InCell[0], SIZE3D, (real*)&totq6InCell[0], std::plus<real>());
 
-            
+
       real localWallL[sumBins];
       real localWallR[sumBins];
       for(int i=0; i<sumBins; i++){
@@ -656,17 +654,17 @@ namespace espresso {
 
       center_CR_L                  = substrate[1]-sizeTR-(0.5*sizeCR);
       center_CR_R                  = substrate[2]+sizeTR+(0.5*sizeCR);
-      
+
       center_FR_L                  = substrate[1]-sizeTR-sizeCR-(0.5*sizeFR);
       center_FR_R                  = substrate[2]+sizeTR+sizeCR+(0.5*sizeFR);
-	
+
       reservoir_L                  = substrate[1]-sizeTR-sizeCR-sizeFR;
       reservoir_R                  = substrate[2]+sizeTR+sizeCR+sizeFR;
-      
+
       sizeResL                     = reservoir_L;
       sizeResR                     = Li[0]-reservoir_R;
       calcSizeRes(sizeResL,sizeResR);
-      
+
     }
 
     void ConstMuMD::assignParts(){
@@ -707,7 +705,7 @@ namespace espresso {
 	if( xpos>Lx ){
 	  xpos            -= Lx;
 	}
-	  
+
 	c_npartsXtal                += smoothedHeaviside(xpos,c_CutXtal[0],c_CutXtal[1],RB_WIDTH);
 	if( xpos<substrate[0] ){
 	  c_npartsLiq_L             += smoothedHeaviside(xpos,c_CutLiq_L[0],c_CutLiq_L[1],RB_WIDTH);
@@ -724,7 +722,7 @@ namespace espresso {
 	  c_npartsRes_R             += smoothedHeaviside(xpos,c_CutRes_R[0],c_CutRes_R[1],RB_WIDTH);
 	}
       }
-	  
+
 
       real tot_npartsXtal    = 0.0;
       real tot_npartsLiq_L   = 0.0;
@@ -763,11 +761,11 @@ namespace espresso {
 	molFracInCR      = Real3D(tot_molFCR_L/(tot_npartsCR_L[0]+tot_npartsCR_L[1]),tot_molFCR_R/(tot_npartsCR_R[0]+tot_npartsCR_R[1]),1.0);
 	molFracInCR[2]   = 0.5*(molFracInCR[0]+molFracInCR[1]);
       }
-      
+
     }
-      
+
     void ConstMuMD::applyForce(){
-      
+
       //assignParts();
 
       // ############################################################################################
@@ -776,9 +774,9 @@ namespace espresso {
 
       System& system         = getSystemRef();
       CellList realCells     = system.storage->getRealCells();
-      real Lx                = system.bc->getBoxL()[0];  
+      real Lx                = system.bc->getBoxL()[0];
       real c_CutFR           = (0.5*sizeFR)*(0.5*sizeFR);
-      
+
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit){
 	real xpos          = cit->position()[0];
 	if( xpos<0.0 ){
@@ -787,7 +785,7 @@ namespace espresso {
 	if( xpos>Lx ){
 	  xpos            -= Lx;
 	}
-	
+
 	real cdist2_FR_L   = (xpos-center_FR_L)*(xpos-center_FR_L);
 	real cdist2_FR_R   = (xpos-center_FR_R)*(xpos-center_FR_R);
 	if( cdist2_FR_L<c_CutFR ){
@@ -806,7 +804,7 @@ namespace espresso {
 	      real memForce    = fConst1*(expMolF1+molFracInCR[0]-1.0)*0.5*shapeParam/distFac;
 	      cit->force()[0] += memForce;
             }
-	  }	    
+	  }
 	  continue;
 	}
 	if( cdist2_FR_R<c_CutFR ){
@@ -835,83 +833,42 @@ namespace espresso {
     /****************************************************
     ** REGISTRATION WITH PYTHON
     ****************************************************/
-
-    using namespace boost::python;
-    
     void ConstMuMD::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<ConstMuMD, shared_ptr<ConstMuMD>, bases<Extension> >
 
         ("integrator_ConstMuMD", init< shared_ptr<System> >())
 
-        .add_property("modus",
-              &ConstMuMD::getModus,
-              &ConstMuMD::setModus)	
-        .add_property("sizeTR",
-              &ConstMuMD::getSizeTR,
-              &ConstMuMD::setSizeTR)
-	.add_property("sizeCR",
-              &ConstMuMD::getSizeCR,		   
-              &ConstMuMD::setSizeCR)
-	.add_property("sizeFR",
-              &ConstMuMD::getSizeFR,		      
-              &ConstMuMD::setSizeFR)
-	.add_property("sizeCheckR",
-              &ConstMuMD::getSizeCheckR,		      
-              &ConstMuMD::setSizeCheckR)	
-	.add_property("sizeRes",
-              &ConstMuMD::getSizeRes,
-              &ConstMuMD::setSizeRes)
-	.add_property("dr",
-              &ConstMuMD::getDR,
-              &ConstMuMD::setDR)
-	.add_property("binsInPlane",
-              &ConstMuMD::getBinsInPlane,
-              &ConstMuMD::setBinsInPlane)
-	.add_property("nThresh",
-              &ConstMuMD::getNThresh,	      
-              &ConstMuMD::setNThresh)
-	.add_property("cutoff",
-              &ConstMuMD::getCutoff,
-              &ConstMuMD::setCutoff)
-	.add_property("shapeParam",
-              &ConstMuMD::getShapeParam,		      
-              &ConstMuMD::setShapeParam)
-	.add_property("fConst",
-              &ConstMuMD::getForceConst,		      
-              &ConstMuMD::setForceConst)
-// 	.add_property("expDens",
-//               &ConstMuMD::getExpDens,		      
-//               &ConstMuMD::setExpDens)
-	.add_property("expMolF",
-              &ConstMuMD::getExpMolF,		      
-              &ConstMuMD::setExpMolF)
-	.add_property("substrate",
-              &ConstMuMD::getWallInstance,
-              &ConstMuMD::setWallInstance)
-	.add_property("Ntot",
-              &ConstMuMD::getNtot,	      
-              &ConstMuMD::setNtot)
-	.add_property("ratio",
-              &ConstMuMD::getRatio,
-              &ConstMuMD::setRatio)	
-	//.add_property("structureL",
-              //&ConstMuMD::getWallL,
-              //&ConstMuMD::setWallL)
-	//.add_property("structureR",
-              //&ConstMuMD::getWallR,
-              //&ConstMuMD::setWallR)
+        .add_property("modus", &ConstMuMD::getModus, &ConstMuMD::setModus)
+        .add_property("sizeTR", &ConstMuMD::getSizeTR, &ConstMuMD::setSizeTR)
+        .add_property("sizeCR", &ConstMuMD::getSizeCR, &ConstMuMD::setSizeCR)
+        .add_property("sizeFR", &ConstMuMD::getSizeFR, &ConstMuMD::setSizeFR)
+        .add_property("sizeCheckR", &ConstMuMD::getSizeCheckR, &ConstMuMD::setSizeCheckR)
+        .add_property("sizeRes", &ConstMuMD::getSizeRes, &ConstMuMD::setSizeRes)
+        .add_property("dr", &ConstMuMD::getDR, &ConstMuMD::setDR)
+        .add_property("binsInPlane", &ConstMuMD::getBinsInPlane, &ConstMuMD::setBinsInPlane)
+        .add_property("nThresh", &ConstMuMD::getNThresh, &ConstMuMD::setNThresh)
+        .add_property("cutoff", &ConstMuMD::getCutoff, &ConstMuMD::setCutoff)
+        .add_property("shapeParam", &ConstMuMD::getShapeParam, &ConstMuMD::setShapeParam)
+        .add_property("fConst", &ConstMuMD::getForceConst, &ConstMuMD::setForceConst)
+        // 	.add_property("expDens", &ConstMuMD::getExpDens, &ConstMuMD::setExpDens)
+        .add_property("expMolF", &ConstMuMD::getExpMolF, &ConstMuMD::setExpMolF)
+        .add_property("substrate", &ConstMuMD::getWallInstance, &ConstMuMD::setWallInstance)
+        .add_property("Ntot", &ConstMuMD::getNtot, &ConstMuMD::setNtot)
+        .add_property("ratio", &ConstMuMD::getRatio, &ConstMuMD::setRatio)
+        //.add_property("structureL", &ConstMuMD::getWallL, &ConstMuMD::setWallL)
+        //.add_property("structureR", &ConstMuMD::getWallR, &ConstMuMD::setWallR)
 
         .def("connect", &ConstMuMD::connect)
         .def("disconnect", &ConstMuMD::disconnect)
-	.def("initialize", &ConstMuMD::initialize)
-	.def("perform", &ConstMuMD::perform)
-	.def("adaptRegions", &ConstMuMD::adaptRegions)
-	.def("assignParts", &ConstMuMD::assignParts)
-	.def("applyForce", &ConstMuMD::applyForce)
-	.def("getDensityData", &ConstMuMD::getDensityData)
+        .def("initialize", &ConstMuMD::initialize)
+        .def("perform", &ConstMuMD::perform)
+        .def("adaptRegions", &ConstMuMD::adaptRegions)
+        .def("assignParts", &ConstMuMD::assignParts)
+        .def("applyForce", &ConstMuMD::applyForce)
+        .def("getDensityData", &ConstMuMD::getDensityData)
       ;
     }
   }
