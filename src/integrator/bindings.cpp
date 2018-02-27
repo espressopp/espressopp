@@ -65,6 +65,7 @@
 #include "ExtPlumed.hpp"
 #endif
 
+#include "ConstMuMD.hpp"
 
 namespace espressopp {
   namespace integrator {
@@ -109,6 +110,7 @@ namespace espressopp {
 #ifdef HAS_PLUMED
       ExtPlumed::registerPython();
 #endif
+      ConstMuMD::registerPython();
     }
   }
 }
