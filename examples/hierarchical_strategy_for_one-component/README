@@ -1,0 +1,21 @@
+These six python scripts are an implementation of hierarchical equilibration strategy for one component polymer melts (https://pubs.acs.org/doi/abs/10.1021/mz5000015).
+
+"input.txt" is an input file of the parameter for simulations
+"generate_microscopic-c.py" generates an initial microscopic configuration
+"softblobs_100.py" performs a coarse-graining from microscopic monomers to softblobs consisting Nb=100 monomers.
+"softblobs_50.py" performs a fine-graining from softblobs at Nb=100 to Nb=50.
+"softblobs_25.py" performs out a fine-graining from softblobs at Nb=50 to Nb=25.
+"reinsertion.py" reinserts microscopic monomers into softblobs at Nb=25.
+"fbloop.py" gradually inserts repulsive interactions according to the feedback control mechanism (http://onlinelibrary.wiley.com/doi/10.1002/mats.201500013/full).
+"polymer_melt_from_restart.py" calculates NVT MD simulations using microscopic models.
+
+How to use is in following below:
+1. Input the parameters "num_chains", "monomers_per_chain" and "system_size" into input.txt.
+2. Run generate_microscopic-c.py, i.e. $python generate_microscopic-c.py.
+3. Run softblobs_100.py, i.e. $python softblobs_100.py.
+4. Run softblobs_50.py, i.e. $python softblobs_50.py.
+5. Run softblobs_25.py, i.e. $python softblobs_25.py.
+6. Run reinsertion.py, i.e. $python reinsertion.py.
+7. Run fbloop.py, i.e. $python fbloop.py.
+8. Run polymer_melt_from_restart.py, i.e. $python polymer_melt_from_restart.py.
+
