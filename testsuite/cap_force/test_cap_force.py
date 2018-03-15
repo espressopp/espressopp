@@ -78,7 +78,8 @@ class TestCaseCapForce(unittest.TestCase):
         print particle1.f, particle2.f
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == math.fabs(particle2.f[0]))
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 2 is not capped.")
 
     def test_cap_force_array(self):
         # set up normal domain decomposition
@@ -118,7 +119,8 @@ class TestCaseCapForce(unittest.TestCase):
         print particle1.f, particle2.f
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == math.fabs(particle2.f[0]))
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 2 is not capped.")
 
     def test_cap_force_group(self):
         # set up normal domain decomposition
@@ -162,7 +164,8 @@ class TestCaseCapForce(unittest.TestCase):
         print particle1.f, particle2.f
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) < math.fabs(particle2.f[0]))
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
+        self.assertTrue(math.fabs(particle2.f[0]) > 1.0, "The force of particle 2 is capped.")
 
     def test_cap_force_array_group(self):
         # set up normal domain decomposition
@@ -206,7 +209,8 @@ class TestCaseCapForce(unittest.TestCase):
         print particle1.f, particle2.f
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) < math.fabs(particle2.f[0]))
+        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
+        self.assertTrue(math.fabs(particle2.f[0]) > 1.0, "The force of particle 2 is capped.")
 
 if __name__ == '__main__':
     unittest.main()
