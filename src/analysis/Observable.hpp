@@ -75,11 +75,9 @@ namespace espressopp {
 
      protected:
       result_types result_type;
+      ObservableTypes observable_type;
       std::vector< real > result_real_vector;
       std::vector< int > result_int_vector;
-      ObservableTypes observable_type;
-      std::vector<real> result_real_vector;
-      std::vector<int> result_int_vector;
       longint result_vector_size;
 
       static LOG4ESPP_DECL_LOGGER(logger);
