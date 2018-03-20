@@ -68,6 +68,7 @@
 
 #include "SystemMonitor.hpp"
 #include "PotentialEnergy.hpp"
+#include "KineticEnergy.hpp"
 
 namespace espressopp {
   namespace analysis {
@@ -119,6 +120,7 @@ namespace espressopp {
       SystemMonitorOutputCSV::registerPython();
       SystemMonitor::registerPython();
       PotentialEnergy::registerPython();
+      KineticEnergy::registerPython();
     }
   }
 }
