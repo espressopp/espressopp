@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013, 2017(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -30,7 +30,7 @@ class TestParticleLocal(unittest.TestCase) :
         system.bc = bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
         system.storage = espressopp.storage.DomainDecomposition(
             system=system,
-            nodeGrid=(1,1,1), cellGrid=(1,1,1))
+            nodeGrid=(1,1,1), cellGrid=(2,2,2))
         p = system.storage.addParticle(0, (1.0, 1.0, 1.0))
         p.v = Real3D(1.0, 1.0, 1.0)
         self.assertAlmostEqualReal3D(p.v, Real3D(1.0, 1.0, 1.0))

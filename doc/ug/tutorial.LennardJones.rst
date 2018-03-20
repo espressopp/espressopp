@@ -17,7 +17,7 @@ Lets just copy and paste the beginning from the "System Setup" tutorial:
 >>> system.skin    = skin
 >>> nodeGrid       = (1,1,1)
 >>> cellGrid       = (1,1,1)
->>> nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+>>> nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,maxcutoff,skin)
 >>> cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, maxcutoff, skin)
 >>> ddstorage      = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 >>> system.storage = ddstorage

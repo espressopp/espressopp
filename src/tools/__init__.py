@@ -22,6 +22,7 @@
 import espressopp.tools.convert
 import espressopp.tools.init_cfg
 
+from espressopp.tools.loadbal import *
 from espressopp.tools.analyse import *
 from espressopp.tools.decomp import *
 from espressopp.tools.DumpConfigurations import *
