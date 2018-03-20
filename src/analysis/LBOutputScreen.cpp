@@ -26,9 +26,8 @@
 namespace espressopp {
 namespace analysis {
 //  LOG4ESPP_LOGGER(LBOutputScreen::theLogger, "LBOutputScreen");
-LBOutputScreen::LBOutputScreen(
-    shared_ptr<System> system,
-    shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
+LBOutputScreen::LBOutputScreen(shared_ptr<System> system,
+                               shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
     : LBOutput(system, latticeboltzmann) {}
 
 void LBOutputScreen::writeOutput() {
@@ -58,8 +57,7 @@ void LBOutputScreen::writeOutput() {
 
   if (_restart) {
     // collect cm vels and share the result between CPUs
-    boost::mpi::all_reduce(*system.comm, _myCMVel, _totCMVel,
-                           std::plus<Real3D>());
+    boost::mpi::all_reduce(*system.comm, _myCMVel, _totCMVel, std::plus<Real3D>());
     findLBMom(1);
 
     // correct for difference between LB and MD momenta
@@ -71,8 +69,7 @@ void LBOutputScreen::writeOutput() {
     latticeboltzmann->setDoRestart(false);
   } else {
     // collect cm vels from CPUs
-    boost::mpi::reduce(*system.comm, _myCMVel, _totCMVel, std::plus<Real3D>(),
-                       0);
+    boost::mpi::reduce(*system.comm, _myCMVel, _totCMVel, std::plus<Real3D>(), 0);
     findLBMom(0);
   }
 
@@ -86,8 +83,8 @@ void LBOutputScreen::writeOutput() {
 
     // output MD momentum //
     setMDMom(_totCMVel);  // need this for testsuite
-    printf("MD mom at (+1/2dt): %17.12f %17.12f %17.12f \n", _totCMVel[0],
-           _totCMVel[1], _totCMVel[2]);
+    printf("MD mom at (+1/2dt): %17.12f %17.12f %17.12f \n", _totCMVel[0], _totCMVel[1],
+           _totCMVel[2]);
 
     if (_step != 0) {
       // calculate time performance
@@ -96,11 +93,9 @@ void LBOutputScreen::writeOutput() {
       setLBTimerOld(getLBTimerNew());
 
       // output LB statistics
-      printf("%ld LB steps on %ld nodes done in %f sec, relative MLUPS: %f \n",
-             madeLBSteps, latSize, timelb,
-             madeLBSteps * latSize * 1e-6 / timelb);
-      printf("Speed in LJ units: %f tau / sec \n",
-             (_step - getOldStepNum()) * _timestep / timelb);
+      printf("%ld LB steps on %ld nodes done in %f sec, relative MLUPS: %f \n", madeLBSteps,
+             latSize, timelb, madeLBSteps * latSize * 1e-6 / timelb);
+      printf("Speed in LJ units: %f tau / sec \n", (_step - getOldStepNum()) * _timestep / timelb);
 
     } else {
       // timers //
@@ -147,8 +142,7 @@ void LBOutputScreen::findLBMom(int _mode) {
   if (system.comm->rank() == 0) {
     setLBMom(result);  // need this for testsuite
     printf("after step %d:\n", latticeboltzmann->getStepNum());
-    printf("LB mom in LJ units: %17.12f %17.12f %17.12f \n", result[0],
-           result[1], result[2]);
+    printf("LB mom in LJ units: %17.12f %17.12f %17.12f \n", result[0], result[1], result[2]);
   }
 }
 
@@ -158,19 +152,13 @@ Real3D LBOutputScreen::getLBMom() { return lbMom; }
 void LBOutputScreen::setMDMom(Real3D _mdMom) { mdMom = _mdMom; }
 Real3D LBOutputScreen::getMDMom() { return mdMom; }
 
-void LBOutputScreen::setLBTimerOld(real _lbTimerOld) {
-  lbTimerOld = _lbTimerOld;
-}
+void LBOutputScreen::setLBTimerOld(real _lbTimerOld) { lbTimerOld = _lbTimerOld; }
 real LBOutputScreen::getLBTimerOld() { return lbTimerOld; }
 
-void LBOutputScreen::setLBTimerNew(real _lbTimerNew) {
-  lbTimerNew = _lbTimerNew;
-}
+void LBOutputScreen::setLBTimerNew(real _lbTimerNew) { lbTimerNew = _lbTimerNew; }
 real LBOutputScreen::getLBTimerNew() { return lbTimerNew; }
 
-void LBOutputScreen::setOldStepNum(long int _oldStepNum) {
-  oldStepNum = _oldStepNum;
-}
+void LBOutputScreen::setOldStepNum(long int _oldStepNum) { oldStepNum = _oldStepNum; }
 long int LBOutputScreen::getOldStepNum() { return oldStepNum; }
 
 void LBOutputScreen::registerPython() {

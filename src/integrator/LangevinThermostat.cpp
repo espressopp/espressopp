@@ -35,8 +35,7 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
-    : Extension(system) {
+LangevinThermostat::LangevinThermostat(shared_ptr<System> system) : Extension(system) {
   type = Extension::Thermostat;
 
   gamma = 0.0;
@@ -62,9 +61,7 @@ void LangevinThermostat::setAdress(bool _adress) { adress = _adress; }
 
 bool LangevinThermostat::getAdress() { return adress; }
 
-void LangevinThermostat::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void LangevinThermostat::setTemperature(real _temperature) { temperature = _temperature; }
 
 real LangevinThermostat::getTemperature() { return temperature; }
 
@@ -80,21 +77,17 @@ void LangevinThermostat::disconnect() {
 
 void LangevinThermostat::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostat::initialize, this));
+  _initialize = integrator->runInit.connect(boost::bind(&LangevinThermostat::initialize, this));
 
-  _heatUp = integrator->recalc1.connect(
-      boost::bind(&LangevinThermostat::heatUp, this));
+  _heatUp = integrator->recalc1.connect(boost::bind(&LangevinThermostat::heatUp, this));
 
-  _coolDown = integrator->recalc2.connect(
-      boost::bind(&LangevinThermostat::coolDown, this));
+  _coolDown = integrator->recalc2.connect(boost::bind(&LangevinThermostat::coolDown, this));
 
   if (adress) {
-    _thermalizeAdr = integrator->aftCalcF.connect(
-        boost::bind(&LangevinThermostat::thermalizeAdr, this));
+    _thermalizeAdr =
+        integrator->aftCalcF.connect(boost::bind(&LangevinThermostat::thermalizeAdr, this));
   } else {
-    _thermalize = integrator->aftCalcF.connect(
-        boost::bind(&LangevinThermostat::thermalize, this));
+    _thermalize = integrator->aftCalcF.connect(boost::bind(&LangevinThermostat::thermalize, this));
   }
 }
 
@@ -120,8 +113,8 @@ void LangevinThermostat::thermalizeAdr() {
 
   // thermalize AT particles
   ParticleList& adrATparticles = system.storage->getAdrATParticles();
-  for (std::vector<Particle>::iterator it = adrATparticles.begin();
-       it != adrATparticles.end(); it++) {
+  for (std::vector<Particle>::iterator it = adrATparticles.begin(); it != adrATparticles.end();
+       it++) {
     if (exclusions.count((*it).id()) == 0) {
       frictionThermo(*it);
     }
@@ -188,10 +181,8 @@ void LangevinThermostat::registerPython() {
       .def("connect", &LangevinThermostat::connect)
       .def("disconnect", &LangevinThermostat::disconnect)
       .def("addExclpid", &LangevinThermostat::addExclpid)
-      .add_property("adress", &LangevinThermostat::getAdress,
-                    &LangevinThermostat::setAdress)
-      .add_property("gamma", &LangevinThermostat::getGamma,
-                    &LangevinThermostat::setGamma)
+      .add_property("adress", &LangevinThermostat::getAdress, &LangevinThermostat::setAdress)
+      .add_property("gamma", &LangevinThermostat::getGamma, &LangevinThermostat::setGamma)
       .add_property("temperature", &LangevinThermostat::getTemperature,
                     &LangevinThermostat::setTemperature);
 }

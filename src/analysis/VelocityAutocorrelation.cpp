@@ -43,8 +43,7 @@ python::list VelocityAutocorrelation::compute() const {
   System& system = getSystemRef();
 
   vector<longint> localIDs;
-  for (map<size_t, int>::const_iterator itr = idToCpu.begin();
-       itr != idToCpu.end(); ++itr) {
+  for (map<size_t, int>::const_iterator itr = idToCpu.begin(); itr != idToCpu.end(); ++itr) {
     size_t i = itr->first;
     int whichCPU = itr->second;
     if (system.comm->rank() == whichCPU) {
@@ -58,8 +57,7 @@ python::list VelocityAutocorrelation::compute() const {
     totZ[m] = 0.0;
     Z[m] = 0.0;
     for (int n = 0; n < M - m; n++) {
-      for (vector<longint>::iterator itr = localIDs.begin();
-           itr != localIDs.end(); ++itr) {
+      for (vector<longint>::iterator itr = localIDs.begin(); itr != localIDs.end(); ++itr) {
         size_t i = *itr;
         Real3D vel1 = getConf(n + m)->getCoordinates(i);
         Real3D vel2 = getConf(n)->getCoordinates(i);
@@ -73,8 +71,7 @@ python::list VelocityAutocorrelation::compute() const {
     if (print_progress && system.comm->rank() == 0) {
       perc = (int)(m * denom);
       if (perc % 5 == 0) {
-        cout << "calculation progress (velocity autocorrelation): " << perc
-             << " %\r" << flush;
+        cout << "calculation progress (velocity autocorrelation): " << perc << " %\r" << flush;
       }
     }
   }
@@ -106,10 +103,9 @@ python::list VelocityAutocorrelation::compute() const {
 void VelocityAutocorrelation::registerPython() {
   using namespace espressopp::python;
 
-  class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >(
-      "analysis_VelocityAutocorrelation", init<shared_ptr<System> >())
-      .add_property("print_progress",
-                    &VelocityAutocorrelation::getPrint_progress,
+  class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >("analysis_VelocityAutocorrelation",
+                                                                 init<shared_ptr<System> >())
+      .add_property("print_progress", &VelocityAutocorrelation::getPrint_progress,
                     &VelocityAutocorrelation::setPrint_progress);
 }
 }

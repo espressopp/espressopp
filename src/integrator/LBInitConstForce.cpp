@@ -27,8 +27,8 @@
 namespace espressopp {
 namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitConstForce::theLogger, "LBInitConstForce");
-LBInitConstForce::LBInitConstForce(
-    shared_ptr<System> system, shared_ptr<LatticeBoltzmann> latticeboltzmann)
+LBInitConstForce::LBInitConstForce(shared_ptr<System> system,
+                                   shared_ptr<LatticeBoltzmann> latticeboltzmann)
     : LBInit(system, latticeboltzmann) {}
 
 /* do nothing with initial populations, as we deal here only with forces */
@@ -75,8 +75,7 @@ void LBInitConstForce::addForce(Real3D _force) {
         // set local forces and general flag
         if (existingforce + _force != Real3D(0., 0., 0.)) {
           latticeboltzmann->setDoExtForce(true);
-          latticeboltzmann->setExtForceLoc(Int3D(i, j, k),
-                                           existingforce + _force);
+          latticeboltzmann->setExtForceLoc(Int3D(i, j, k), existingforce + _force);
           _id = 2;
         } else {
           latticeboltzmann->setDoExtForce(false);
@@ -122,8 +121,7 @@ void LBInitConstForce::registerPython() {
   using namespace espressopp::python;
 
   class_<LBInitConstForce, bases<LBInit> >(
-      "integrator_LBInit_ConstForce",
-      init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
+      "integrator_LBInit_ConstForce", init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
       .def("setForce", &LBInitConstForce::setForce)
       .def("addForce", &LBInitConstForce::addForce);
 }

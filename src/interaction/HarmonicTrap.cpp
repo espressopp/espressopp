@@ -29,8 +29,7 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class SingleParticleInteractionTemplate<HarmonicTrap>
-    SingleParticleHarmonicTrap;
+typedef class SingleParticleInteractionTemplate<HarmonicTrap> SingleParticleHarmonicTrap;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -38,11 +37,9 @@ typedef class SingleParticleInteractionTemplate<HarmonicTrap>
 void HarmonicTrap::registerPython() {
   using namespace espressopp::python;
 
-  class_<HarmonicTrap, bases<SingleParticlePotential> >(
-      "interaction_HarmonicTrap", init<>())
+  class_<HarmonicTrap, bases<SingleParticlePotential> >("interaction_HarmonicTrap", init<>())
       .add_property("k", &HarmonicTrap::getK, &HarmonicTrap::setK)
-      .add_property("center", &HarmonicTrap::getCenter,
-                    &HarmonicTrap::setCenter);
+      .add_property("center", &HarmonicTrap::getCenter, &HarmonicTrap::setCenter);
 
   class_<SingleParticleHarmonicTrap, bases<Interaction> >(
       "interaction_SingleParticleHarmonicTrap",

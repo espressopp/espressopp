@@ -35,8 +35,7 @@ LOG4ESPP_LOGGER(ExtAnalyze::theLogger, "ExtAnalyze");
 
 // ExtAnalyze::ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval) :
 // Extension(_analysis->getSystem()), interval(_interval)
-ExtAnalyze::ExtAnalyze(shared_ptr<ParticleAccess> _particle_access,
-                       int _interval)
+ExtAnalyze::ExtAnalyze(shared_ptr<ParticleAccess> _particle_access, int _interval)
     : Extension(_particle_access->getSystem()), interval(_interval) {
   LOG4ESPP_INFO(theLogger, "Analyze observable in integrator");
   // analysis     = _analysis;
@@ -48,8 +47,7 @@ void ExtAnalyze::disconnect() { _aftIntV.disconnect(); }
 
 void ExtAnalyze::connect() {
   // connection to end of integrator
-  _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&ExtAnalyze::perform_action, this));
+  _aftIntV = integrator->aftIntV.connect(boost::bind(&ExtAnalyze::perform_action, this));
   counter = 0;
 }
 

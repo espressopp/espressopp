@@ -92,8 +92,7 @@ Real3D CMVelocity::getV() const { return v; }
 void CMVelocity::registerPython() {
   using namespace espressopp::python;
 
-  class_<CMVelocity, bases<AnalysisBase> >("analysis_CMVelocity",
-                                           init<shared_ptr<System> >())
+  class_<CMVelocity, bases<AnalysisBase> >("analysis_CMVelocity", init<shared_ptr<System> >())
       .add_property("v", &CMVelocity::getV);
 }
 }

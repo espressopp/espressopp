@@ -50,8 +50,7 @@ LOG4ESPP_LOGGER(LangevinBarostat::theLogger, "LangevinBarostat");
 // TODO The ensemble is very sensitive to parameters. The manual how to choose
 // the
 // parameters for simple system should be written.
-LangevinBarostat::LangevinBarostat(shared_ptr<System> _system,
-                                   shared_ptr<esutil::RNG> _rng,
+LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr<esutil::RNG> _rng,
                                    real _temperature)
     : Extension(_system), rng(_rng), desiredTemperature(_temperature) {
   // external parameters
@@ -83,20 +82,15 @@ void LangevinBarostat::disconnect() {
 
 void LangevinBarostat::connect() {
   // connection to initialisation
-  _runInit = integrator->runInit.connect(
-      boost::bind(&LangevinBarostat::initialize, this));
+  _runInit = integrator->runInit.connect(boost::bind(&LangevinBarostat::initialize, this));
 
-  _befIntP =
-      integrator->befIntP.connect(boost::bind(&LangevinBarostat::upd_Vp, this));
+  _befIntP = integrator->befIntP.connect(boost::bind(&LangevinBarostat::upd_Vp, this));
 
-  _inIntP = integrator->inIntP.connect(
-      boost::bind(&LangevinBarostat::updDisplacement, this, _1));
+  _inIntP = integrator->inIntP.connect(boost::bind(&LangevinBarostat::updDisplacement, this, _1));
 
-  _aftIntV =
-      integrator->aftIntV.connect(boost::bind(&LangevinBarostat::upd_pV, this));
+  _aftIntV = integrator->aftIntV.connect(boost::bind(&LangevinBarostat::upd_pV, this));
 
-  _aftCalcF = integrator->aftCalcF.connect(
-      boost::bind(&LangevinBarostat::updForces, this));
+  _aftCalcF = integrator->aftCalcF.connect(boost::bind(&LangevinBarostat::updForces, this));
 }
 
 void LangevinBarostat::setGammaP(real _gammaP) { gammaP = _gammaP; }
@@ -152,8 +146,7 @@ void LangevinBarostat::updVolume() {
     err.checkException();
   }
 
-  scale_factor =
-      pow(volScale, 1. / 3.);  // calculating the current scaling parameter
+  scale_factor = pow(volScale, 1. / 3.);  // calculating the current scaling parameter
 
   system.scaleVolume(scale_factor, false);
 }
@@ -211,8 +204,7 @@ void LangevinBarostat::updVolumeMomentum() {
    * local momentum derivative; in order to optimize term pref6 * v2sum could be
    * coupled with X
    */
-  real pe_deriv = (X - m3V * externalPressure) + pref6 * v2sum +
-                  pref4 * momentum + pref5 * rannum;
+  real pe_deriv = (X - m3V * externalPressure) + pref6 * v2sum + pref4 * momentum + pref5 * rannum;
 
   // cout<< "externalPressure: " << externalPressure << endl;
 
@@ -256,8 +248,7 @@ void LangevinBarostat::frictionBarostat(Particle& p, real factor) {
 void LangevinBarostat::initialize() {
   // calculate the prefactors
   LOG4ESPP_INFO(theLogger,
-                "init, gammaP = " << gammaP << ", external pressure = "
-                                  << externalPressure
+                "init, gammaP = " << gammaP << ", external pressure = " << externalPressure
                                   << ", fictitious mass = " << mass);
 
   // TODO implement Nf for the system with constarins
@@ -295,15 +286,11 @@ void LangevinBarostat::registerPython() {
 
   class_<LangevinBarostat, shared_ptr<LangevinBarostat>, bases<Extension> >
 
-      ("integrator_LangevinBarostat",
-       init<shared_ptr<System>, shared_ptr<esutil::RNG>, real>())
+      ("integrator_LangevinBarostat", init<shared_ptr<System>, shared_ptr<esutil::RNG>, real>())
 
-          .add_property("gammaP", &LangevinBarostat::getGammaP,
-                        &LangevinBarostat::setGammaP)
-          .add_property("pressure", &LangevinBarostat::getPressure,
-                        &LangevinBarostat::setPressure)
-          .add_property("mass", &LangevinBarostat::getMass,
-                        &LangevinBarostat::setMass)
+          .add_property("gammaP", &LangevinBarostat::getGammaP, &LangevinBarostat::setGammaP)
+          .add_property("pressure", &LangevinBarostat::getPressure, &LangevinBarostat::setPressure)
+          .add_property("mass", &LangevinBarostat::getMass, &LangevinBarostat::setMass)
 
           .def("setMassByFrequency", &LangevinBarostat::setMassByFrequency)
 

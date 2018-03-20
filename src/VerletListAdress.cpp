@@ -39,9 +39,8 @@ LOG4ESPP_LOGGER(VerletListAdress::theLogger, "VerletList");
 
 /*-------------------------------------------------------------*/
 
-VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut,
-                                   real adrCut, bool rebuildVL, real _dEx,
-                                   real _dHy)
+VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, real adrCut, bool rebuildVL,
+                                   real _dEx, real _dHy)
     : SystemAccess(system) {
   LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
 
@@ -64,8 +63,8 @@ VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut,
   if (rebuildVL) rebuild();  // not called if exclutions are provided
 
   // make a connection to System to invoke rebuild on resort
-  connectionResort = system->storage->onParticlesChanged.connect(
-      boost::bind(&VerletListAdress::rebuild, this));
+  connectionResort =
+      system->storage->onParticlesChanged.connect(boost::bind(&VerletListAdress::rebuild, this));
 }
 
 /*-------------------------------------------------------------*/
@@ -86,8 +85,8 @@ void VerletListAdress::rebuild() {
     // loop over all VP particles (reals and ghosts) on node
     for (CellListIterator it(localcells); it.isValid(); ++it) {
       // loop over positions
-      for (std::vector<Real3D*>::iterator it2 = adrPositions.begin();
-           it2 != adrPositions.end(); ++it2) {
+      for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end();
+           ++it2) {
         Real3D dist;
         real distsq;
         bc.getMinimumImageVectorBox(dist, it->getPos(), **it2);
@@ -143,8 +142,7 @@ void VerletListAdress::rebuild() {
   }
 
   LOG4ESPP_INFO(theLogger,
-                "rebuilt VerletList, cutsq = " << cutsq << " local size = "
-                                               << vlPairs.size());
+                "rebuilt VerletList, cutsq = " << cutsq << " local size = " << vlPairs.size());
   builds++;
 }
 
@@ -155,9 +153,8 @@ void VerletListAdress::checkPair(Particle& pt1, Particle& pt2) {
   real distsq = d.sqr();
 
   LOG4ESPP_TRACE(theLogger,
-                 "p1: " << pt1.id() << " @ " << pt1.position()
-                        << " - p2: " << pt2.id() << " @ " << pt2.position()
-                        << " -> distsq = " << distsq);
+                 "p1: " << pt1.id() << " @ " << pt1.position() << " - p2: " << pt2.id() << " @ "
+                        << pt2.position() << " -> distsq = " << distsq);
 
   // see if it's in the exclusion list (both directions, CG particles only)
   if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
@@ -198,9 +195,7 @@ void VerletListAdress::setAdrCenter(real x, real y, real z) {
 
 Real3D VerletListAdress::getAdrCenter() { return adrCenter; }
 
-void VerletListAdress::setAdrRegionType(bool _sphereAdr) {
-  sphereAdr = _sphereAdr;
-}
+void VerletListAdress::setAdrRegionType(bool _sphereAdr) { sphereAdr = _sphereAdr; }
 
 bool VerletListAdress::getAdrRegionType() { return sphereAdr; }
 
@@ -221,11 +216,9 @@ VerletListAdress::~VerletListAdress() {
 void VerletListAdress::registerPython() {
   using namespace espressopp::python;
 
-  bool (VerletListAdress::*pyExclude)(longint pid1, longint pid2) =
-      &VerletListAdress::exclude;
+  bool (VerletListAdress::*pyExclude)(longint pid1, longint pid2) = &VerletListAdress::exclude;
 
-  void (VerletListAdress::*pyAddAdrParticle)(longint pid) =
-      &VerletListAdress::addAdrParticle;
+  void (VerletListAdress::*pyAddAdrParticle)(longint pid) = &VerletListAdress::addAdrParticle;
 
   void (VerletListAdress::*pySetAdrCenter)(real x, real y, real z) =
       &VerletListAdress::setAdrCenter;
@@ -234,11 +227,9 @@ void VerletListAdress::registerPython() {
       &VerletListAdress::setAdrRegionType;
 
   class_<VerletListAdress, shared_ptr<VerletList> >(
-      "VerletListAdress",
-      init<shared_ptr<System>, real, real, bool, real, real>())
+      "VerletListAdress", init<shared_ptr<System>, real, real, bool, real, real>())
       .add_property("system", &SystemAccess::getSystem)
-      .add_property("builds", &VerletListAdress::getBuilds,
-                    &VerletListAdress::setBuilds)
+      .add_property("builds", &VerletListAdress::getBuilds, &VerletListAdress::setBuilds)
       .def("totalSize", &VerletListAdress::totalSize)
       .def("exclude", pyExclude)
       .def("addAdrParticle", pyAddAdrParticle)

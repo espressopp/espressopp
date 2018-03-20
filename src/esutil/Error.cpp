@@ -62,8 +62,7 @@ void Error::checkException() {
     msg << totalExceptions << " exceptions occurred";
 
     if (exceptionMessage.length() > 0) {
-      msg << ":\n cpu " << comm->rank() << ":  Exception message(s):\n"
-          << exceptionMessage;
+      msg << ":\n cpu " << comm->rank() << ":  Exception message(s):\n" << exceptionMessage;
       msg << "\n";
       msg << "On proc " << comm->rank() << ": exceptions = " << noExceptions
           << ", total = " << totalExceptions << "\n";

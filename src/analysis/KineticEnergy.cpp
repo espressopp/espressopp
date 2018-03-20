@@ -18,29 +18,26 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "KineticEnergy.hpp"
 #include "interaction/Interaction.hpp"
+#include "python.hpp"
 
-using namespace espressopp;  //NOLINT
+using namespace espressopp;  // NOLINT
 
 namespace espressopp {
 namespace analysis {
 
 real KineticEnergy::compute_real() const {
-  if (!precomputed_)
-    temperature_->compute_real();
+  if (!precomputed_) temperature_->compute_real();
   return temperature_->getEkin();
 }
 
-
 void KineticEnergy::registerPython() {
-  using namespace espressopp::python;  //NOLINT
-  class_<KineticEnergy, bases<Observable> >
-    ("analysis_KineticEnergy",
-        init< shared_ptr<System>, shared_ptr<Temperature> >())
-    .def(init<shared_ptr<System> >())
-    .add_property("value", &KineticEnergy::compute_real);
+  using namespace espressopp::python;  // NOLINT
+  class_<KineticEnergy, bases<Observable> >("analysis_KineticEnergy",
+                                            init<shared_ptr<System>, shared_ptr<Temperature> >())
+      .def(init<shared_ptr<System> >())
+      .add_property("value", &KineticEnergy::compute_real);
 }
 }  // end namespace analysis
 }  // end namespace espressopp

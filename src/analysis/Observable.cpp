@@ -55,8 +55,7 @@ void Observable::registerPython() {
       .def("compute", &Observable::compute)
       .def("compute_real", &Observable::compute_real)
       .def("compute_int", &Observable::compute_int)
-      .def("compute_real_vector_python",
-           &Observable::compute_real_vector_python)
+      .def("compute_real_vector_python", &Observable::compute_real_vector_python)
       .def("compute_int_vector_python", &Observable::compute_int_vector_python)
       .def("getResultType", &Observable::getResultType);
 }

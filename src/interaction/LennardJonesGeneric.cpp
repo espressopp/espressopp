@@ -32,22 +32,16 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListInteractionTemplate<LennardJonesGeneric>
-    VerletListLennardJonesGeneric;
-typedef class VerletListAdressInteractionTemplate<LennardJonesGeneric,
-                                                  Tabulated>
+typedef class VerletListInteractionTemplate<LennardJonesGeneric> VerletListLennardJonesGeneric;
+typedef class VerletListAdressInteractionTemplate<LennardJonesGeneric, Tabulated>
     VerletListAdressLennardJonesGeneric;
-typedef class VerletListAdressInteractionTemplate<LennardJonesGeneric,
-                                                  LennardJonesGeneric>
+typedef class VerletListAdressInteractionTemplate<LennardJonesGeneric, LennardJonesGeneric>
     VerletListAdressLennardJonesGeneric2;
-typedef class VerletListHadressInteractionTemplate<LennardJonesGeneric,
-                                                   Tabulated>
+typedef class VerletListHadressInteractionTemplate<LennardJonesGeneric, Tabulated>
     VerletListHadressLennardJonesGeneric;
-typedef class VerletListHadressInteractionTemplate<LennardJonesGeneric,
-                                                   LennardJonesGeneric>
+typedef class VerletListHadressInteractionTemplate<LennardJonesGeneric, LennardJonesGeneric>
     VerletListHadressLennardJonesGeneric2;
-typedef class CellListAllPairsInteractionTemplate<LennardJonesGeneric>
-    CellListLennardJonesGeneric;
+typedef class CellListAllPairsInteractionTemplate<LennardJonesGeneric> CellListLennardJonesGeneric;
 typedef class FixedPairListInteractionTemplate<LennardJonesGeneric>
     FixedPairListLennardJonesGeneric;
 LOG4ESPP_LOGGER(LennardJonesGeneric::theLogger, "LennardJonesGeneric");
@@ -57,14 +51,11 @@ LOG4ESPP_LOGGER(LennardJonesGeneric::theLogger, "LennardJonesGeneric");
 void LennardJonesGeneric::registerPython() {
   using namespace espressopp::python;
 
-  class_<LennardJonesGeneric, bases<Potential> >(
-      "interaction_LennardJonesGeneric",
-      init<real, real, int, int, real, real>())
+  class_<LennardJonesGeneric, bases<Potential> >("interaction_LennardJonesGeneric",
+                                                 init<real, real, int, int, real, real>())
       .def(init<real, real, int, int, real>())
-      .add_property("sigma", &LennardJonesGeneric::getSigma,
-                    &LennardJonesGeneric::setSigma)
-      .add_property("epsilon", &LennardJonesGeneric::getEpsilon,
-                    &LennardJonesGeneric::setEpsilon)
+      .add_property("sigma", &LennardJonesGeneric::getSigma, &LennardJonesGeneric::setSigma)
+      .add_property("epsilon", &LennardJonesGeneric::getEpsilon, &LennardJonesGeneric::setEpsilon)
       .add_property("a", &LennardJonesGeneric::getA, &LennardJonesGeneric::setA)
       .add_property("b", &LennardJonesGeneric::getB, &LennardJonesGeneric::setB)
       .def_pickle(LennardJonesGeneric_pickle())
@@ -72,8 +63,7 @@ void LennardJonesGeneric::registerPython() {
       ;
 
   class_<VerletListLennardJonesGeneric, bases<Interaction> >(
-      "interaction_VerletListLennardJonesGeneric",
-      init<shared_ptr<VerletList> >())
+      "interaction_VerletListLennardJonesGeneric", init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListLennardJonesGeneric::getVerletList)
       .def("setPotential", &VerletListLennardJonesGeneric::setPotential)
       .def("getPotential", &VerletListLennardJonesGeneric::getPotentialPtr);
@@ -81,57 +71,45 @@ void LennardJonesGeneric::registerPython() {
   class_<VerletListAdressLennardJonesGeneric, bases<Interaction> >(
       "interaction_VerletListAdressLennardJonesGeneric",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressLennardJonesGeneric::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressLennardJonesGeneric::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressLennardJonesGeneric::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressLennardJonesGeneric::setPotentialCG);
   ;
 
   class_<VerletListAdressLennardJonesGeneric2, bases<Interaction> >(
       "interaction_VerletListAdressLennardJonesGeneric2",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressLennardJonesGeneric2::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressLennardJonesGeneric2::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressLennardJonesGeneric2::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressLennardJonesGeneric2::setPotentialCG);
   ;
 
   class_<VerletListHadressLennardJonesGeneric, bases<Interaction> >(
       "interaction_VerletListHadressLennardJonesGeneric",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListHadressLennardJonesGeneric::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListHadressLennardJonesGeneric::setPotentialCG);
+      .def("setPotentialAT", &VerletListHadressLennardJonesGeneric::setPotentialAT)
+      .def("setPotentialCG", &VerletListHadressLennardJonesGeneric::setPotentialCG);
   ;
 
   class_<VerletListHadressLennardJonesGeneric2, bases<Interaction> >(
       "interaction_VerletListHadressLennardJonesGeneric2",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListHadressLennardJonesGeneric2::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListHadressLennardJonesGeneric2::setPotentialCG);
+      .def("setPotentialAT", &VerletListHadressLennardJonesGeneric2::setPotentialAT)
+      .def("setPotentialCG", &VerletListHadressLennardJonesGeneric2::setPotentialCG);
   ;
 
   class_<CellListLennardJonesGeneric, bases<Interaction> >(
-      "interaction_CellListLennardJonesGeneric",
-      init<shared_ptr<storage::Storage> >())
+      "interaction_CellListLennardJonesGeneric", init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListLennardJonesGeneric::setPotential);
   ;
 
   class_<FixedPairListLennardJonesGeneric, bases<Interaction> >(
       "interaction_FixedPairListLennardJonesGeneric",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<LennardJonesGeneric> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesGeneric> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
                 shared_ptr<LennardJonesGeneric> >())
       .def("setPotential", &FixedPairListLennardJonesGeneric::setPotential)
       .def("getPotential", &FixedPairListLennardJonesGeneric::getPotential)
-      .def("setFixedPairList",
-           &FixedPairListLennardJonesGeneric::setFixedPairList)
-      .def("getFixedPairList",
-           &FixedPairListLennardJonesGeneric::getFixedPairList);
+      .def("setFixedPairList", &FixedPairListLennardJonesGeneric::setFixedPairList)
+      .def("getFixedPairList", &FixedPairListLennardJonesGeneric::getFixedPairList);
 }
 }
 }

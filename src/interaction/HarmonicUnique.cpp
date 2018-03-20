@@ -32,22 +32,18 @@ namespace interaction {
 void HarmonicUnique::registerPython() {
   using namespace espressopp::python;
 
-  class_<HarmonicUnique, bases<PotentialUniqueDist> >(
-      "interaction_HarmonicUnique", init<real>())
+  class_<HarmonicUnique, bases<PotentialUniqueDist> >("interaction_HarmonicUnique", init<real>())
       .add_property("K", &HarmonicUnique::getK, &HarmonicUnique::setK);
 
   typedef class FixedPairDistListInteractionTemplate<HarmonicUnique>
       FixedPairDistListHarmonicUnique;
   class_<FixedPairDistListHarmonicUnique, bases<Interaction> >(
       "interaction_FixedPairDistListHarmonicUnique",
-      init<shared_ptr<System>, shared_ptr<FixedPairDistList>,
-           shared_ptr<HarmonicUnique> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairDistList>, shared_ptr<HarmonicUnique> >())
       .def("setPotential", &FixedPairDistListHarmonicUnique::setPotential)
       .def("getPotential", &FixedPairDistListHarmonicUnique::getPotential)
-      .def("setFixedPairList",
-           &FixedPairDistListHarmonicUnique::setFixedPairList)
-      .def("getFixedPairList",
-           &FixedPairDistListHarmonicUnique::getFixedPairList);
+      .def("setFixedPairList", &FixedPairDistListHarmonicUnique::setFixedPairList)
+      .def("getFixedPairList", &FixedPairDistListHarmonicUnique::getFixedPairList);
   ;
 }
 }

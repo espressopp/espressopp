@@ -52,8 +52,7 @@ python::list MeanSquareDispl::compute() const {
 
   // creating vector which stores particleIDs for each CPU
   vector<longint> localIDs;
-  for (map<size_t, int>::const_iterator itr = idToCpu.begin();
-       itr != idToCpu.end(); ++itr) {
+  for (map<size_t, int>::const_iterator itr = idToCpu.begin(); itr != idToCpu.end(); ++itr) {
     size_t i = itr->first;
     int whichCPU = itr->second;
     if (system.comm->rank() == whichCPU) {
@@ -69,8 +68,7 @@ python::list MeanSquareDispl::compute() const {
     Real3D posCOM_sum = Real3D(0.0, 0.0, 0.0);
     real mass_sum = 0.0;
 
-    for (vector<longint>::iterator itr = localIDs.begin();
-         itr != localIDs.end(); ++itr) {
+    for (vector<longint>::iterator itr = localIDs.begin(); itr != localIDs.end(); ++itr) {
       size_t i = *itr;
       Real3D pos = getConf(m)->getCoordinates(i);
       posCOM += pos;
@@ -90,14 +88,11 @@ python::list MeanSquareDispl::compute() const {
     totZ[m] = 0.0;
     Z[m] = 0.0;
     for (int n = 0; n < M - m; n++) {
-      for (vector<longint>::iterator itr = localIDs.begin();
-           itr != localIDs.end(); ++itr) {
+      for (vector<longint>::iterator itr = localIDs.begin(); itr != localIDs.end(); ++itr) {
         size_t i = *itr;
 
-        Real3D pos1 =
-            getConf(n + m)->getCoordinates(i);  // - centerOfMassList[n+m];
-        Real3D pos2 =
-            getConf(n)->getCoordinates(i);  //     - centerOfMassList[n];
+        Real3D pos1 = getConf(n + m)->getCoordinates(i);  // - centerOfMassList[n+m];
+        Real3D pos2 = getConf(n)->getCoordinates(i);      //     - centerOfMassList[n];
         Real3D delta = pos2 - pos1;
         Z[m] += delta.sqr();
       }
@@ -105,8 +100,7 @@ python::list MeanSquareDispl::compute() const {
     if (print_progress && system.comm->rank() == 0) {
       perc = (int)(m * denom);
       if (perc % 5 == 0) {
-        cout << "calculation progress (mean square displacement): " << perc
-             << " %\r" << flush;
+        cout << "calculation progress (mean square displacement): " << perc << " %\r" << flush;
       }
     }
   }
@@ -283,8 +277,7 @@ python::list MeanSquareDispl::computeG3() const {
   /** stores particleIDs of local particles calculated by CPU */
   vector<longint> localIDs;
   // filling each CPUs localIDs-vector
-  for (map<size_t, int>::const_iterator itr = idToCpu.begin();
-       itr != idToCpu.end(); ++itr) {
+  for (map<size_t, int>::const_iterator itr = idToCpu.begin(); itr != idToCpu.end(); ++itr) {
     size_t i = itr->first;       // particle ID
     int whichCPU = itr->second;  // CPU number
     printf("id %lu  CPU %i \n", i, whichCPU);
@@ -327,14 +320,14 @@ python::list MeanSquareDispl::computeG3() const {
   for (int m = 0; m < M; m++) {
     Real3D posCOM = Real3D(0.0, 0.0, 0.0); /**< position of COM of chain */
     real mass = 0.0;                       /**< mass of chain */
-    int part_count = 0;  /**< counts number of particles of one chain */
-    int chain_count = 0; /**< counts chains of one CPU */
+    int part_count = 0;                    /**< counts number of particles of one chain */
+    int chain_count = 0;                   /**< counts chains of one CPU */
 
     // testout
     // printf("snapshot %i... \n", m);
 
     Real3D sysCOM = Real3D(0.0, 0.0, 0.0); /**< COM of particles on one CPU */
-    vector<Real3D> innerList; /**< local chains' COM of one conf/snapshot */
+    vector<Real3D> innerList;              /**< local chains' COM of one conf/snapshot */
 
     // loop over local particles
     for (int entry = 0; entry < localIDs.size(); entry++) {
@@ -364,11 +357,10 @@ python::list MeanSquareDispl::computeG3() const {
     local_chainCOMlist.push_back(innerList);
 
     Real3D sysCOM_sum = Real3D(0.0, 0.0, 0.0); /**< COM of system */
-    int chain_sum = 0;  // stores the total number of chains
+    int chain_sum = 0;                         // stores the total number of chains
     // FM do I have the communicator??
     boost::mpi::all_reduce(*mpiWorld, sysCOM, sysCOM_sum, std::plus<Real3D>());
-    boost::mpi::all_reduce(*mpiWorld, chain_count, chain_sum,
-                           std::plus<real>());
+    boost::mpi::all_reduce(*mpiWorld, chain_count, chain_sum, std::plus<real>());
 
     sysCOMlist.push_back(sysCOM_sum / chain_sum);
     // check if chain_count matches the number of chains
@@ -406,8 +398,7 @@ python::list MeanSquareDispl::computeG3() const {
     Z[m] = 0.0;
     for (int n = 0; n < M - m; n++) {
       // loop over local chains
-      int local_chains =
-          local_chainCOMlist[0].size();  // looked up only for snapshot 0
+      int local_chains = local_chainCOMlist[0].size();  // looked up only for snapshot 0
       // int local_chains = local_chainCOMlist[n].size(); //same value as above,
       // but looked up new for every snapshot
       for (int cid = 0; cid < local_chains; cid++) {
@@ -423,8 +414,7 @@ python::list MeanSquareDispl::computeG3() const {
     if (print_progress && system.comm->rank() == 0) {
       perc = (int)(m * denom);
       if (perc % 5 == 0) {
-        cout << "calculation progress (mean square displacement): " << perc
-             << " %\r" << flush;
+        cout << "calculation progress (mean square displacement): " << perc << " %\r" << flush;
       }
     }
   }
@@ -457,8 +447,8 @@ python::list MeanSquareDispl::computeG3() const {
 void MeanSquareDispl::registerPython() {
   using namespace espressopp::python;
 
-  class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >(
-      "analysis_MeanSquareDispl", init<shared_ptr<System> >())
+  class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >("analysis_MeanSquareDispl",
+                                                         init<shared_ptr<System> >())
       .def(init<shared_ptr<System>, int>())
       .def("computeG2", &MeanSquareDispl::computeG2)
       .def("computeG3", &MeanSquareDispl::computeG3)

@@ -28,13 +28,10 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class CellListAllParticlesInteractionTemplate<CoulombKSpaceP3M>
-    CellListCoulombKSpaceP3M;
+typedef class CellListAllParticlesInteractionTemplate<CoulombKSpaceP3M> CellListCoulombKSpaceP3M;
 
-CoulombKSpaceP3M::CoulombKSpaceP3M(shared_ptr<System> _system,
-                                   real _coulomb_prefactor, real _alpha,
-                                   Int3D _M, int _P, real _rcut,
-                                   int _interpolation)
+CoulombKSpaceP3M::CoulombKSpaceP3M(shared_ptr<System> _system, real _coulomb_prefactor, real _alpha,
+                                   Int3D _M, int _P, real _rcut, int _interpolation)
     : system(_system),
       C_pref(_coulomb_prefactor),
       alpha(_alpha),
@@ -205,8 +202,8 @@ CoulombKSpaceP3M::CoulombKSpaceP3M(shared_ptr<System> _system,
      box
      dimensions change
   */
-  connectionRecalcKVec = system->bc->onBoxDimensionsChanged.connect(
-      boost::bind(&CoulombKSpaceP3M::preset, this));
+  connectionRecalcKVec =
+      system->bc->onBoxDimensionsChanged.connect(boost::bind(&CoulombKSpaceP3M::preset, this));
   // make a connection to storage in order to get number of particles
   connectionGetParticleNumber = system->storage->onParticlesChanged.connect(
       boost::bind(&CoulombKSpaceP3M::getParticleNumber, this));
@@ -232,10 +229,8 @@ void CoulombKSpaceP3M::registerPython() {
   using namespace espressopp::python;
 
   class_<CoulombKSpaceP3M, bases<Potential> >(
-      "interaction_CoulombKSpaceP3M",
-      init<shared_ptr<System>, real, real, Int3D, int, real, int>())
-      .add_property("prefactor", &CoulombKSpaceP3M::getPrefactor,
-                    &CoulombKSpaceP3M::setPrefactor);
+      "interaction_CoulombKSpaceP3M", init<shared_ptr<System>, real, real, Int3D, int, real, int>())
+      .add_property("prefactor", &CoulombKSpaceP3M::getPrefactor, &CoulombKSpaceP3M::setPrefactor);
   //.add_property("alpha", &CoulombKSpaceP3M::getAlpha,
   //&CoulombKSpaceP3M::setAlpha)
   //.add_property("kmax", &CoulombKSpaceP3M::getKMax,

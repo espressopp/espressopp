@@ -37,8 +37,7 @@ namespace integrator {
 
 LOG4ESPP_LOGGER(FreeEnergyCompensation::theLogger, "FreeEnergyCompensation");
 
-FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system,
-                                               bool _sphereAdr)
+FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr)
     : Extension(system), sphereAdr(_sphereAdr) {
   type = Extension::FreeEnergyCompensation;
 
@@ -50,14 +49,13 @@ FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system,
 FreeEnergyCompensation::~FreeEnergyCompensation() {}
 
 void FreeEnergyCompensation::connect() {
-  _applyForce = integrator->aftCalcF.connect(
-      boost::bind(&FreeEnergyCompensation::applyForce, this));
+  _applyForce =
+      integrator->aftCalcF.connect(boost::bind(&FreeEnergyCompensation::applyForce, this));
 }
 
 void FreeEnergyCompensation::disconnect() { _applyForce.disconnect(); }
 
-void FreeEnergyCompensation::addForce(int itype, const char* _filename,
-                                      int type) {
+void FreeEnergyCompensation::addForce(int itype, const char* _filename, int type) {
   boost::mpi::communicator world;
   filename = _filename;
   Table table;
@@ -87,8 +85,7 @@ void FreeEnergyCompensation::applyForce() {
 
   // iterate over CG particles
   CellList cells = system.storage->getRealCells();
-  shared_ptr<FixedTupleListAdress> fixedtupleList =
-      system.storage->getFixedTuples();
+  shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
   FixedTupleListAdress::iterator it2;
   for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
     Table table = forces.find(cit->getType())->second;
@@ -121,20 +118,17 @@ void FreeEnergyCompensation::applyForce() {
                                              // use those for calculation.
           std::vector<Particle*> atList;
           atList = it2->second;
-          for (std::vector<Particle*>::iterator it3 = atList.begin();
-               it3 != atList.end(); ++it3) {
+          for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
             Particle& at = **it3;
 
             if (sphereAdr) {
               at.force() += vp.lambdaDeriv() * at.mass() * dist3D / vp.mass();
             } else {
-              at.force()[0] +=
-                  vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
+              at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
             }
           }
         } else {  // If not, use CG particle itself for calculation.
-          std::cout << "Particle " << vp.id() << " not found in tuples!"
-                    << std::endl
+          std::cout << "Particle " << vp.id() << " not found in tuples!" << std::endl
                     << "It's unclear how FEC work when combining particles, "
                        "which do change resolution with particles that don't."
                     << std::endl;
@@ -143,8 +137,7 @@ void FreeEnergyCompensation::applyForce() {
         }
       }
     } else {
-      std::cout << "ERROR: Using FEC Extension without providing table."
-                << std::endl;
+      std::cout << "ERROR: Using FEC Extension without providing table." << std::endl;
       exit(1);
       return;
     }
@@ -167,20 +160,16 @@ real FreeEnergyCompensation::computeCompEnergy() {
       real weight = vp.lambda();
       CompEnergy += table->getEnergy(weight);
     } else {
-      std::cout << "ERROR: Using FEC Extension without providing table."
-                << std::endl;
+      std::cout << "ERROR: Using FEC Extension without providing table." << std::endl;
       exit(1);
       return 0.0;
     }
   }
-  mpi::all_reduce(*getSystem()->comm, CompEnergy, CompEnergySum,
-                  std::plus<real>());
+  mpi::all_reduce(*getSystem()->comm, CompEnergy, CompEnergySum, std::plus<real>());
   return CompEnergySum;
 }
 
-void FreeEnergyCompensation::setCenter(real x, real y, real z) {
-  center = Real3D(x, y, z);
-}
+void FreeEnergyCompensation::setCenter(real x, real y, real z) { center = Real3D(x, y, z); }
 
 /****************************************************
 ** REGISTRATION WITH PYTHON
@@ -189,9 +178,8 @@ void FreeEnergyCompensation::setCenter(real x, real y, real z) {
 void FreeEnergyCompensation::registerPython() {
   using namespace espressopp::python;
 
-  class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>,
-         bases<Extension> >("integrator_FreeEnergyCompensation",
-                            init<shared_ptr<System>, bool>())
+  class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>, bases<Extension> >(
+      "integrator_FreeEnergyCompensation", init<shared_ptr<System>, bool>())
       .add_property("filename", &FreeEnergyCompensation::getFilename)
       .def("connect", &FreeEnergyCompensation::connect)
       .def("disconnect", &FreeEnergyCompensation::disconnect)

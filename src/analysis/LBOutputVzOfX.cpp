@@ -24,9 +24,8 @@
 
 namespace espressopp {
 namespace analysis {
-LBOutputVzOfX::LBOutputVzOfX(
-    shared_ptr<System> system,
-    shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
+LBOutputVzOfX::LBOutputVzOfX(shared_ptr<System> system,
+                             shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
     : LBOutput(system, latticeboltzmann) {}
 
 void LBOutputVzOfX::writeOutput() {
@@ -34,8 +33,7 @@ void LBOutputVzOfX::writeOutput() {
   int _offset = latticeboltzmann->getHaloSkin();
   int _j = _offset, _k = _offset;
   Int3D _Ni = latticeboltzmann->getMyNi();
-  Int3D _globIdx =
-      latticeboltzmann->findGlobIdx();  // first lb site global index
+  Int3D _globIdx = latticeboltzmann->findGlobIdx();  // first lb site global index
 
   // print profiling notification //
   if (mpiWorld->rank() == 0 && _step == 0)
@@ -55,8 +53,7 @@ void LBOutputVzOfX::writeOutput() {
   for (int i = _offset; i < _Ni[0] - _offset; i++) {
     real _den = latticeboltzmann->getLBMom(Int3D(i, _j, _k), 0);
     real _jz = latticeboltzmann->getLBMom(Int3D(i, _j, _k), 3);
-    fprintf(velProfFile, "%9d %9.6f %9.6f  \n", _globIdx[0] + i, _den,
-            _jz / _den);
+    fprintf(velProfFile, "%9d %9.6f %9.6f  \n", _globIdx[0] + i, _den, _jz / _den);
   }
 
   fclose(velProfFile);

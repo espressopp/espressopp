@@ -35,8 +35,7 @@ namespace integrator {
 
 LOG4ESPP_LOGGER(BerendsenBarostat::theLogger, "BerendsenBarostat");
 
-BerendsenBarostat::BerendsenBarostat(shared_ptr<System> system)
-    : Extension(system) {
+BerendsenBarostat::BerendsenBarostat(shared_ptr<System> system) : Extension(system) {
   tau = 1.0;
   P0 = 1.0;
 
@@ -61,12 +60,10 @@ void BerendsenBarostat::disconnect() {
 
 void BerendsenBarostat::connect() {
   // connection to initialisation
-  _runInit = integrator->runInit.connect(
-      boost::bind(&BerendsenBarostat::initialize, this));
+  _runInit = integrator->runInit.connect(boost::bind(&BerendsenBarostat::initialize, this));
 
   // connection to the signal at the end of the run
-  _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&BerendsenBarostat::barostat, this));
+  _aftIntV = integrator->aftIntV.connect(boost::bind(&BerendsenBarostat::barostat, this));
 }
 
 // set and get time constant for Berendsen barostat
@@ -113,8 +110,7 @@ void BerendsenBarostat::barostat() {
 
 // calculate the prefactors
 void BerendsenBarostat::initialize() {
-  LOG4ESPP_INFO(theLogger,
-                "init, tau = " << tau << ", external pressure = " << P0);
+  LOG4ESPP_INFO(theLogger, "init, tau = " << tau << ", external pressure = " << P0);
   real dt = integrator->getTimeStep();
   pref = dt / tau;
 }
@@ -130,12 +126,10 @@ void BerendsenBarostat::registerPython() {
 
       ("integrator_BerendsenBarostat", init<shared_ptr<System> >())
 
-          .add_property("tau", &BerendsenBarostat::getTau,
-                        &BerendsenBarostat::setTau)
+          .add_property("tau", &BerendsenBarostat::getTau, &BerendsenBarostat::setTau)
           .add_property("pressure", &BerendsenBarostat::getPressure,
                         &BerendsenBarostat::setPressure)
-          .add_property("fixed", &BerendsenBarostat::getFixed,
-                        &BerendsenBarostat::setFixed)
+          .add_property("fixed", &BerendsenBarostat::getFixed, &BerendsenBarostat::setFixed)
 
           .def("connect", &BerendsenBarostat::connect)
           .def("disconnect", &BerendsenBarostat::disconnect);

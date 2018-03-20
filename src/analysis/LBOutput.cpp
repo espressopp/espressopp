@@ -29,8 +29,7 @@ namespace analysis {
 void LBOutput::registerPython() {
   using namespace espressopp::python;
 
-  class_<LBOutput, bases<AnalysisBase>, boost::noncopyable>("analysis_LBOutput",
-                                                            no_init)
+  class_<LBOutput, bases<AnalysisBase>, boost::noncopyable>("analysis_LBOutput", no_init)
 
       .def("writeOutput", pure_virtual(&LBOutput::writeOutput));
 }

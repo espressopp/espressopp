@@ -106,9 +106,8 @@ void ConfigsParticleDecomp::gather() {
           for (int i = 0; i < 3; ++i) property[i] = pos[i] + img[i] * Li[i];
         } else {
           stringstream msg;
-          msg << "Error. Key " << key
-              << " is unknown. Use position, unfolded or"
-                 " velocity.";
+          msg << "Error. Key " << key << " is unknown. Use position, unfolded or"
+                                         " velocity.";
           err.setException(msg.str());
         }
 
@@ -118,8 +117,7 @@ void ConfigsParticleDecomp::gather() {
 
     boost::mpi::broadcast(*system.comm, conf, rank_i);
 
-    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end();
-         ++itr) {
+    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
       size_t id = itr->first;
       Real3D p = itr->second;
       if (idToCpu[id] == myrank) config->set(id, p[0], p[1], p[2]);
@@ -180,8 +178,7 @@ void ConfigsParticleDecomp::gatherFromFile(string filename) {
 
   boost::mpi::broadcast(*system.comm, conf, 0);
 
-  for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end();
-       ++itr) {
+  for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
     size_t id = itr->first;
     Real3D p = itr->second;
     if (idToCpu[id] == myrank) config->set(id, p[0], p[1], p[2]);
@@ -193,10 +190,9 @@ void ConfigsParticleDecomp::gatherFromFile(string filename) {
 void ConfigsParticleDecomp::registerPython() {
   using namespace espressopp::python;
 
-  class_<ConfigsParticleDecomp, boost::noncopyable>(
-      "analysis_ConfigsParticleDecomp", no_init
-      // init< shared_ptr< System > >()
-      )
+  class_<ConfigsParticleDecomp, boost::noncopyable>("analysis_ConfigsParticleDecomp", no_init
+                                                    // init< shared_ptr< System > >()
+                                                    )
       .def_readonly("size", &ConfigsParticleDecomp::getListSize)
 
       .def("gather", &ConfigsParticleDecomp::gather)

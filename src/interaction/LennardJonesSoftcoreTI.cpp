@@ -34,11 +34,9 @@ namespace interaction {
 
 typedef class VerletListInteractionTemplate<LennardJonesSoftcoreTI>
     VerletListLennardJonesSoftcoreTI;
-typedef class VerletListAdressInteractionTemplate<LennardJonesSoftcoreTI,
-                                                  Tabulated>
+typedef class VerletListAdressInteractionTemplate<LennardJonesSoftcoreTI, Tabulated>
     VerletListAdressLennardJonesSoftcoreTI;
-typedef class VerletListHadressInteractionTemplate<LennardJonesSoftcoreTI,
-                                                   Tabulated>
+typedef class VerletListHadressInteractionTemplate<LennardJonesSoftcoreTI, Tabulated>
     VerletListHadressLennardJonesSoftcoreTI;
 typedef class FixedPairListInteractionTemplate<LennardJonesSoftcoreTI>
     FixedPairListLennardJonesSoftcoreTI;
@@ -51,8 +49,7 @@ typedef class FixedPairListTypesInteractionTemplate<LennardJonesSoftcoreTI>
 void LennardJonesSoftcoreTI::registerPython() {
   using namespace espressopp::python;
 
-  void (LennardJonesSoftcoreTI::*pyAddPid)(longint pid) =
-      &LennardJonesSoftcoreTI::addPid;
+  void (LennardJonesSoftcoreTI::*pyAddPid)(longint pid) = &LennardJonesSoftcoreTI::addPid;
 
   class_<LennardJonesSoftcoreTI, bases<Potential> >(
       "interaction_LennardJonesSoftcoreTI",
@@ -70,10 +67,8 @@ void LennardJonesSoftcoreTI::registerPython() {
   class_<VerletListAdressLennardJonesSoftcoreTI, bases<Interaction> >(
       "interaction_VerletListAdressLennardJonesSoftcoreTI",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressLennardJonesSoftcoreTI::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressLennardJonesSoftcoreTI::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressLennardJonesSoftcoreTI::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressLennardJonesSoftcoreTI::setPotentialCG);
   ;
 
   // class_< VerletListHadressLennardJonesSoftcoreTI, bases< Interaction > >

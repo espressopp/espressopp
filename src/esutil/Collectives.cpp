@@ -27,8 +27,7 @@ using namespace boost::mpi;
 using namespace espressopp::python;
 using namespace espressopp::esutil::Collectives;
 
-DuplicateError::DuplicateError()
-    : std::runtime_error("item was found on more than one node") {}
+DuplicateError::DuplicateError() : std::runtime_error("item was found on more than one node") {}
 
 /**
    Reduction operator that evaluates to
@@ -50,8 +49,7 @@ struct UniqueReduce : public std::binary_function<int, int, int> {
   }
 };
 
-int espressopp::esutil::Collectives::locateItem(bool here, int controller,
-                                                communicator world) {
+int espressopp::esutil::Collectives::locateItem(bool here, int controller, communicator world) {
   int node = here ? world.rank() : UniqueReduce::NotHere;
 
   if (world.rank() != controller) {

@@ -54,11 +54,9 @@ void ExtForce::disconnect() { _aftInitF.disconnect(); }
 void ExtForce::connect() {
   // connection to initialisation
   if (!allParticles) {
-    _aftInitF = integrator->aftInitF.connect(
-        boost::bind(&ExtForce::applyForceToGroup, this));
+    _aftInitF = integrator->aftInitF.connect(boost::bind(&ExtForce::applyForceToGroup, this));
   } else {
-    _aftInitF = integrator->aftInitF.connect(
-        boost::bind(&ExtForce::applyForceToAll, this));
+    _aftInitF = integrator->aftInitF.connect(boost::bind(&ExtForce::applyForceToAll, this));
   }
 }
 
@@ -83,12 +81,9 @@ shared_ptr<ParticleGroup> ExtForce::getParticleGroup() {
 
 void ExtForce::applyForceToGroup() {
   LOG4ESPP_DEBUG(theLogger,
-                 "applying external force to particle group of size "
-                     << particleGroup->size());
-  for (ParticleGroup::iterator it = particleGroup->begin();
-       it != particleGroup->end(); it++) {
-    LOG4ESPP_DEBUG(theLogger,
-                   "applying external force to particle " << it->getId());
+                 "applying external force to particle group of size " << particleGroup->size());
+  for (ParticleGroup::iterator it = particleGroup->begin(); it != particleGroup->end(); it++) {
+    LOG4ESPP_DEBUG(theLogger, "applying external force to particle " << it->getId());
     it->force() += extForce;
   }
 }
@@ -111,10 +106,8 @@ void ExtForce::registerPython() {
   class_<ExtForce, shared_ptr<ExtForce>, bases<Extension> >
 
       ("integrator_ExtForce", init<shared_ptr<System>, const Real3D&>())
-          .def(init<shared_ptr<System>, const Real3D&,
-                    shared_ptr<ParticleGroup> >())
-          .add_property("particleGroup", &ExtForce::getParticleGroup,
-                        &ExtForce::setParticleGroup)
+          .def(init<shared_ptr<System>, const Real3D&, shared_ptr<ParticleGroup> >())
+          .add_property("particleGroup", &ExtForce::getParticleGroup, &ExtForce::setParticleGroup)
           .def("getExtForce", &ExtForce::getExtForce,
                return_value_policy<reference_existing_object>())
           .def("setExtForce", &ExtForce::setExtForce)

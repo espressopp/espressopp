@@ -31,8 +31,7 @@ namespace esutil {
 
 // void (Grid::*mapIndexToPositionInts)(int&, int&, int&, longint) const =
 // &Grid::mapIndexToPosition;
-void (Grid::*mapIndexToPositionInt3D)(Int3D&, longint) const =
-    &Grid::mapIndexToPosition;
+void (Grid::*mapIndexToPositionInt3D)(Int3D&, longint) const = &Grid::mapIndexToPosition;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON

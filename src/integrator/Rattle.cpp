@@ -55,16 +55,12 @@ void Rattle::disconnect() {
 }
 
 void Rattle::connect() {
-  _befIntP =
-      integrator->befIntP.connect(boost::bind(&Rattle::saveOldPos, this));
-  _aftIntP = integrator->aftIntP.connect(
-      boost::bind(&Rattle::applyPositionConstraints, this));
-  _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&Rattle::applyVelocityConstraints, this));
+  _befIntP = integrator->befIntP.connect(boost::bind(&Rattle::saveOldPos, this));
+  _aftIntP = integrator->aftIntP.connect(boost::bind(&Rattle::applyPositionConstraints, this));
+  _aftIntV = integrator->aftIntV.connect(boost::bind(&Rattle::applyVelocityConstraints, this));
 }
 
-void Rattle::addBond(int pid1, int pid2, real constraintDist, real mass1,
-                     real mass2) {
+void Rattle::addBond(int pid1, int pid2, real constraintDist, real mass1, real mass2) {
   if (mass2 > mass1) {
     std::ostringstream msg;
     msg << "In Rattle, the heavy atom should be listed before the hydrogen in "
@@ -102,8 +98,7 @@ void Rattle::saveOldPos() {
             << std::endl;
         throw std::runtime_error(msg.str());
       }
-      oldPos.insert(std::make_pair(
-          lightID, std::pair<Real3D, Real3D>(hp->getPos(), lp->getPos())));
+      oldPos.insert(std::make_pair(lightID, std::pair<Real3D, Real3D>(hp->getPos(), lp->getPos())));
     }
   }
 }
@@ -117,10 +112,8 @@ void Rattle::applyPositionConstraints() {
 
   boost::unordered_map<longint, Real3D> currPosition;
   boost::unordered_map<longint, Real3D> currVelocity;
-  boost::unordered_map<longint, bool>
-      movedLastTime;  // was this particle moved last time?
-  boost::unordered_map<longint, bool>
-      movingThisTime;  // is the particle being moved this time?
+  boost::unordered_map<longint, bool> movedLastTime;   // was this particle moved last time?
+  boost::unordered_map<longint, bool> movingThisTime;  // is the particle being moved this time?
 
   if (oldPos.size() == 0) {
     return;
@@ -138,13 +131,10 @@ void Rattle::applyPositionConstraints() {
     movedLastTime[pidHeavy] = true;
     movingThisTime[pidHyd] = false;
     movingThisTime[pidHeavy] = false;
-    currPosition[pidHyd] =
-        system.storage->lookupAdrATParticle(pidHyd)->getPos();
-    currPosition[pidHeavy] =
-        system.storage->lookupAdrATParticle(pidHeavy)->getPos();
+    currPosition[pidHyd] = system.storage->lookupAdrATParticle(pidHyd)->getPos();
+    currPosition[pidHeavy] = system.storage->lookupAdrATParticle(pidHeavy)->getPos();
     currVelocity[pidHyd] = system.storage->lookupAdrATParticle(pidHyd)->getV();
-    currVelocity[pidHeavy] =
-        system.storage->lookupAdrATParticle(pidHeavy)->getV();
+    currVelocity[pidHeavy] = system.storage->lookupAdrATParticle(pidHeavy)->getV();
   }
 
   // constraint interations
@@ -170,10 +160,9 @@ void Rattle::applyPositionConstraints() {
           Real3D rab;
           bc.getMinimumImageVectorBox(
               rab, oldPos[a].second,
-              oldPos[a].first);  // pos at time t (end of last timestep), a-b;
+              oldPos[a].first);          // pos at time t (end of last timestep), a-b;
           real rab_dot_pab = rab * pab;  // r_ab(t) * r_ab,curr(t+dt)
-          if (rab_dot_pab <
-              (constraint_absq * rptol)) {  // i.e. if angle is too large
+          if (rab_dot_pab < (constraint_absq * rptol)) {  // i.e. if angle is too large
             std::ostringstream msg;
             msg << "Constraint failure in RATTLE" << std::endl;
             throw std::runtime_error(msg.str());
@@ -262,13 +251,10 @@ void Rattle::applyVelocityConstraints() {
     changedLastTime[pidHeavy] = true;
     changingThisTime[pidHyd] = false;
     changingThisTime[pidHeavy] = false;
-    currPosition[pidHyd] =
-        system.storage->lookupAdrATParticle(pidHyd)->getPos();
-    currPosition[pidHeavy] =
-        system.storage->lookupAdrATParticle(pidHeavy)->getPos();
+    currPosition[pidHyd] = system.storage->lookupAdrATParticle(pidHyd)->getPos();
+    currPosition[pidHeavy] = system.storage->lookupAdrATParticle(pidHeavy)->getPos();
     currVelocity[pidHyd] = system.storage->lookupAdrATParticle(pidHyd)->getV();
-    currVelocity[pidHeavy] =
-        system.storage->lookupAdrATParticle(pidHeavy)->getV();
+    currVelocity[pidHeavy] = system.storage->lookupAdrATParticle(pidHeavy)->getV();
   }
 
   // constraint interations

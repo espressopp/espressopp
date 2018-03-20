@@ -68,14 +68,12 @@ python::list Autocorrelation::compute() {
 
   if (this_node == 0) {
     // it is 1+2+3+...+M
-    double local_num =
-        ((double)M * (double)(M + 1) / 2.0) / (double)n_nodes + 1.0;
+    double local_num = ((double)M * (double)(M + 1) / 2.0) / (double)n_nodes + 1.0;
 
     for (int i = 0; i < n_nodes; i++) {
       double max_num = (i + 1) * local_num;
 
-      unsigned int m_max =
-          (unsigned int)((sqrt(1.0 + 8.0 * max_num) - 1.0) / 2.);
+      unsigned int m_max = (unsigned int)((sqrt(1.0 + 8.0 * max_num) - 1.0) / 2.);
 
       unsigned int lastNum = (i == 0) ? 0 : num_mH[i - 1];
 
@@ -87,8 +85,7 @@ python::list Autocorrelation::compute() {
       if (num_mH[i] > M) num_mH[i] = M;
     }
 
-    for (int i = 0; i < n_nodes - 1; i++)
-      num_m[i] = M - num_mH[n_nodes - 2 - i];
+    for (int i = 0; i < n_nodes - 1; i++) num_m[i] = M - num_mH[n_nodes - 2 - i];
     num_m[n_nodes - 1] = M;
   }
 
@@ -119,14 +116,12 @@ python::list Autocorrelation::compute() {
     if (system.comm->rank() == 0) {
       perc = (int)(m * denom);
       if (perc % 5 == 0) {
-        cout << "calculation progress (autocorrelation): " << perc << " %\r"
-             << flush;
+        cout << "calculation progress (autocorrelation): " << perc << " %\r" << flush;
       }
     }
   }
 
-  if (system.comm->rank() == 0)
-    cout << "calculation progress (autocorrelation): 100 %" << endl;
+  if (system.comm->rank() == 0) cout << "calculation progress (autocorrelation): 100 %" << endl;
 
   real coef = 3.0;  // only if value is Real3D
 
@@ -162,8 +157,7 @@ python::list Autocorrelation::compute() {
 void Autocorrelation::registerPython() {
   using namespace espressopp::python;
 
-  class_<Autocorrelation>("analysis_Autocorrelation",
-                          init<shared_ptr<System> >())
+  class_<Autocorrelation>("analysis_Autocorrelation", init<shared_ptr<System> >())
       .def_readonly("size", &Autocorrelation::getListSize)
 
       .def("gather", &Autocorrelation::gather)

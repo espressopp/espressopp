@@ -27,14 +27,13 @@
 
 namespace espressopp {
 
-ParticleGroup::ParticleGroup(shared_ptr<storage::Storage> _storage)
-    : storage(_storage) {
+ParticleGroup::ParticleGroup(shared_ptr<storage::Storage> _storage) : storage(_storage) {
   con_send = storage->beforeSendParticles.connect(
       boost::bind(&ParticleGroup::beforeSendParticles, this, _1, _2));
   con_recv = storage->afterRecvParticles.connect(
       boost::bind(&ParticleGroup::afterRecvParticles, this, _1, _2));
-  con_changed = storage->onParticlesChanged.connect(
-      boost::bind(&ParticleGroup::onParticlesChanged, this));
+  con_changed =
+      storage->onParticlesChanged.connect(boost::bind(&ParticleGroup::onParticlesChanged, this));
 }
 
 ParticleGroup::~ParticleGroup() {
@@ -51,29 +50,24 @@ void ParticleGroup::add(longint pid) {
   if (p1) active[pid] = p1;
 }
 
-bool ParticleGroup::has(longint pid) {
-  return particles.find(pid) != particles.end();
-}
+bool ParticleGroup::has(longint pid) { return particles.find(pid) != particles.end(); }
 
 // for debugging purpose
 void ParticleGroup::print() {
-  std::cout << "####### I have " << active.size() << " active particles"
-            << std::endl;
+  std::cout << "####### I have " << active.size() << " active particles" << std::endl;
   for (iterator i = begin(); i != end(); ++i) {
     std::cout << i->getId() << " ";
   }
   std::cout << std::endl;
   // for (std::map<longint,longint>::iterator iter = particles.begin();
-  for (std::set<longint>::iterator iter = particles.begin();
-       iter != particles.end(); ++iter) {
+  for (std::set<longint>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
     // std::cout << iter->first << " ";
     std::cout << *iter << " ";
   }
   std::cout << std::endl;
 }
 
-void ParticleGroup::beforeSendParticles(ParticleList& pl,
-                                        class OutBuffer& buf) {
+void ParticleGroup::beforeSendParticles(ParticleList& pl, class OutBuffer& buf) {
   // remove all particles that move to a different node
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pid = pit->id();
@@ -118,8 +112,8 @@ void ParticleGroup::onParticlesChanged() {
 void ParticleGroup::registerPython() {
   using namespace espressopp::python;
 
-  class_<ParticleGroup, shared_ptr<ParticleGroup> >(
-      "ParticleGroup", init<shared_ptr<storage::Storage> >())
+  class_<ParticleGroup, shared_ptr<ParticleGroup> >("ParticleGroup",
+                                                    init<shared_ptr<storage::Storage> >())
       .def("add", &ParticleGroup::add)
       .def("show", &ParticleGroup::print)
       .def("has", &ParticleGroup::has)

@@ -30,9 +30,7 @@
 namespace espressopp {
 namespace bc {
 /* Constructor */
-OrthorhombicBC::OrthorhombicBC(shared_ptr<esutil::RNG> _rng,
-                               const Real3D& _boxL)
-    : BC(_rng) {
+OrthorhombicBC::OrthorhombicBC(shared_ptr<esutil::RNG> _rng, const Real3D& _boxL) : BC(_rng) {
   setBoxL(_boxL);
 }
 
@@ -129,8 +127,7 @@ void OrthorhombicBC::getMinimumImageVectorX(real dist[3], const real pos1[3],
 }
 
 /* Fold an individual coordinate in the specified direction */
-void OrthorhombicBC::foldCoordinate(Real3D& pos, Int3D& imageBox,
-                                    int dir) const {
+void OrthorhombicBC::foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
   int tmp = static_cast<int>(floor(pos[dir] * invBoxL[dir]));
 
   imageBox[dir] += tmp;
@@ -150,8 +147,7 @@ void OrthorhombicBC::foldCoordinate(Real3D& pos, Int3D& imageBox,
 }
 
 /* Unfold an individual coordinate in the specified direction */
-void OrthorhombicBC::unfoldCoordinate(Real3D& pos, Int3D& imageBox,
-                                      int dir) const {
+void OrthorhombicBC::unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
   pos[dir] += imageBox[dir] * boxL[dir];
   imageBox[dir] = 0;
 }
@@ -167,8 +163,8 @@ void OrthorhombicBC::getRandomPos(Real3D& res) const {
 
 void OrthorhombicBC::registerPython() {
   using namespace espressopp::python;
-  class_<OrthorhombicBC, bases<BC>, boost::noncopyable>(
-      "bc_OrthorhombicBC", init<shared_ptr<esutil::RNG>, Real3D&>())
+  class_<OrthorhombicBC, bases<BC>, boost::noncopyable>("bc_OrthorhombicBC",
+                                                        init<shared_ptr<esutil::RNG>, Real3D&>())
       .add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL);
 }
 }

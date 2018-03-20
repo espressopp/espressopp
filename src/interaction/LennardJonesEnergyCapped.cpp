@@ -34,11 +34,9 @@ namespace interaction {
 
 typedef class VerletListInteractionTemplate<LennardJonesEnergyCapped>
     VerletListLennardJonesEnergyCapped;
-typedef class VerletListAdressInteractionTemplate<LennardJonesEnergyCapped,
-                                                  Tabulated>
+typedef class VerletListAdressInteractionTemplate<LennardJonesEnergyCapped, Tabulated>
     VerletListAdressLennardJonesEnergyCapped;
-typedef class VerletListHadressInteractionTemplate<LennardJonesEnergyCapped,
-                                                   Tabulated>
+typedef class VerletListHadressInteractionTemplate<LennardJonesEnergyCapped, Tabulated>
     VerletListHadressLennardJonesEnergyCapped;
 typedef class CellListAllPairsInteractionTemplate<LennardJonesEnergyCapped>
     CellListLennardJonesEnergyCapped;
@@ -51,8 +49,8 @@ typedef class FixedPairListInteractionTemplate<LennardJonesEnergyCapped>
 void LennardJonesEnergyCapped::registerPython() {
   using namespace espressopp::python;
 
-  class_<LennardJonesEnergyCapped, bases<Potential> >(
-      "interaction_LennardJonesEnergyCapped", init<real, real, real, real>())
+  class_<LennardJonesEnergyCapped, bases<Potential> >("interaction_LennardJonesEnergyCapped",
+                                                      init<real, real, real, real>())
       .def(init<real, real, real, real, real>())
       .add_property("sigma", &LennardJonesEnergyCapped::getSigma,
                     &LennardJonesEnergyCapped::setSigma)
@@ -63,8 +61,7 @@ void LennardJonesEnergyCapped::registerPython() {
       .def_pickle(LennardJonesEnergyCapped_pickle());
 
   class_<VerletListLennardJonesEnergyCapped, bases<Interaction> >(
-      "interaction_VerletListLennardJonesEnergyCapped",
-      init<shared_ptr<VerletList> >())
+      "interaction_VerletListLennardJonesEnergyCapped", init<shared_ptr<VerletList> >())
       .def("setPotential", &VerletListLennardJonesEnergyCapped::setPotential,
            return_value_policy<reference_existing_object>())
       .def("getPotential", &VerletListLennardJonesEnergyCapped::getPotential,
@@ -73,36 +70,27 @@ void LennardJonesEnergyCapped::registerPython() {
   class_<VerletListAdressLennardJonesEnergyCapped, bases<Interaction> >(
       "interaction_VerletListAdressLennardJonesEnergyCapped",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressLennardJonesEnergyCapped::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressLennardJonesEnergyCapped::setPotentialCG)
-      .def("getPotentialAT",
-           &VerletListAdressLennardJonesEnergyCapped::getPotentialAT,
+      .def("setPotentialAT", &VerletListAdressLennardJonesEnergyCapped::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressLennardJonesEnergyCapped::setPotentialCG)
+      .def("getPotentialAT", &VerletListAdressLennardJonesEnergyCapped::getPotentialAT,
            return_value_policy<reference_existing_object>())
-      .def("getPotentialCG",
-           &VerletListAdressLennardJonesEnergyCapped::getPotentialCG,
+      .def("getPotentialCG", &VerletListAdressLennardJonesEnergyCapped::getPotentialCG,
            return_value_policy<reference_existing_object>());
   ;
 
   class_<VerletListHadressLennardJonesEnergyCapped, bases<Interaction> >(
       "interaction_VerletListHadressLennardJonesEnergyCapped",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListHadressLennardJonesEnergyCapped::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListHadressLennardJonesEnergyCapped::setPotentialCG)
-      .def("getPotentialAT",
-           &VerletListHadressLennardJonesEnergyCapped::getPotentialAT,
+      .def("setPotentialAT", &VerletListHadressLennardJonesEnergyCapped::setPotentialAT)
+      .def("setPotentialCG", &VerletListHadressLennardJonesEnergyCapped::setPotentialCG)
+      .def("getPotentialAT", &VerletListHadressLennardJonesEnergyCapped::getPotentialAT,
            return_value_policy<reference_existing_object>())
-      .def("getPotentialCG",
-           &VerletListHadressLennardJonesEnergyCapped::getPotentialCG,
+      .def("getPotentialCG", &VerletListHadressLennardJonesEnergyCapped::getPotentialCG,
            return_value_policy<reference_existing_object>());
   ;
 
   class_<CellListLennardJonesEnergyCapped, bases<Interaction> >(
-      "interaction_CellListLennardJonesEnergyCapped",
-      init<shared_ptr<storage::Storage> >())
+      "interaction_CellListLennardJonesEnergyCapped", init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListLennardJonesEnergyCapped::setPotential)
       .def("getPotential", &CellListLennardJonesEnergyCapped::getPotential,
            return_value_policy<reference_existing_object>());
@@ -110,12 +98,10 @@ void LennardJonesEnergyCapped::registerPython() {
 
   class_<FixedPairListLennardJonesEnergyCapped, bases<Interaction> >(
       "interaction_FixedPairListLennardJonesEnergyCapped",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<LennardJonesEnergyCapped> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesEnergyCapped> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
                 shared_ptr<LennardJonesEnergyCapped> >())
-      .def("setPotential",
-           &FixedPairListLennardJonesEnergyCapped::setPotential);
+      .def("setPotential", &FixedPairListLennardJonesEnergyCapped::setPotential);
   ;
 }
 }

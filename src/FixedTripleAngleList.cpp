@@ -35,8 +35,7 @@ namespace espressopp {
 
 LOG4ESPP_LOGGER(FixedTripleAngleList::theLogger, "FixedTripleAngleList");
 
-FixedTripleAngleList::FixedTripleAngleList(
-    shared_ptr<storage::Storage> _storage)
+FixedTripleAngleList::FixedTripleAngleList(shared_ptr<storage::Storage> _storage)
     : storage(_storage), triplesAngles() {
   LOG4ESPP_INFO(theLogger, "construct FixedTripleAngleList");
 
@@ -73,16 +72,14 @@ bool FixedTripleAngleList::add(longint pid1, longint pid2, longint pid3) {
   } else {
     if (!p1) {
       std::stringstream msg;
-      msg << "triple particle p1 " << pid1
-          << " does not exists here and cannot be added";
+      msg << "triple particle p1 " << pid1 << " does not exists here and cannot be added";
       msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
       err.setException(msg.str());
     }
 
     if (!p3) {
       std::stringstream msg;
-      msg << "triple particle p3 " << pid3
-          << " does not exists here and cannot be added";
+      msg << "triple particle p3 " << pid3 << " does not exists here and cannot be added";
       msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
       err.setException(msg.str());
     }
@@ -109,8 +106,8 @@ bool FixedTripleAngleList::add(longint pid1, longint pid2, longint pid3) {
     if (cosVal > 1) cosVal = 1;
     if (cosVal < -1) cosVal = -1;
 
-    triplesAngles.insert(std::make_pair(
-        pid2, std::make_pair(std::make_pair(pid1, pid3), acos(cosVal))));
+    triplesAngles.insert(
+        std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), acos(cosVal))));
   }
   LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
   return returnVal;
@@ -119,10 +116,8 @@ bool FixedTripleAngleList::add(longint pid1, longint pid2, longint pid3) {
 python::list FixedTripleAngleList::getTriples() {
   python::tuple triple;
   python::list triples;
-  for (TriplesAngles::const_iterator it = triplesAngles.begin();
-       it != triplesAngles.end(); it++) {
-    triple = python::make_tuple(it->first, it->second.first.first,
-                                it->second.first.second);
+  for (TriplesAngles::const_iterator it = triplesAngles.begin(); it != triplesAngles.end(); it++) {
+    triple = python::make_tuple(it->first, it->second.first.first, it->second.first.second);
     triples.append(triple);
   }
 
@@ -132,10 +127,9 @@ python::list FixedTripleAngleList::getTriples() {
 python::list FixedTripleAngleList::getTriplesAngles() {
   python::tuple triple;
   python::list triples;
-  for (TriplesAngles::const_iterator it = triplesAngles.begin();
-       it != triplesAngles.end(); it++) {
-    triple = python::make_tuple(it->first, it->second.first.first,
-                                it->second.first.second, it->second.second);
+  for (TriplesAngles::const_iterator it = triplesAngles.begin(); it != triplesAngles.end(); it++) {
+    triple = python::make_tuple(it->first, it->second.first.first, it->second.first.second,
+                                it->second.second);
     triples.append(triple);
   }
 
@@ -169,8 +163,7 @@ real FixedTripleAngleList::getAngle(int pid1, int pid2, int pid3) {
   return returnVal;
 }
 
-void FixedTripleAngleList::beforeSendParticles(ParticleList &pl,
-                                               OutBuffer &buf) {
+void FixedTripleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf) {
   std::vector<longint> toSendInt;
   std::vector<real> toSendReal;
   // loop over the particle list
@@ -181,8 +174,8 @@ void FixedTripleAngleList::beforeSendParticles(ParticleList &pl,
     int n = triplesAngles.count(pid);
 
     if (n > 0) {
-      std::pair<TriplesAngles::const_iterator, TriplesAngles::const_iterator>
-          equalRange = triplesAngles.equal_range(pid);
+      std::pair<TriplesAngles::const_iterator, TriplesAngles::const_iterator> equalRange =
+          triplesAngles.equal_range(pid);
 
       // first write the pid of this particle
       // then the number of partners (n)
@@ -191,8 +184,7 @@ void FixedTripleAngleList::beforeSendParticles(ParticleList &pl,
       toSendReal.reserve(toSendReal.size() + n);
       toSendInt.push_back(pid);
       toSendInt.push_back(n);
-      for (TriplesAngles::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (TriplesAngles::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSendInt.push_back(it->second.first.first);
         toSendInt.push_back(it->second.first.second);
         toSendReal.push_back(it->second.second);
@@ -232,15 +224,13 @@ void FixedTripleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf) {
 
       // add the triple
       it = triplesAngles.insert(
-          it, std::make_pair(
-                  pid2, std::make_pair(std::make_pair(pid1, pid3), angleVal)));
+          it, std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), angleVal)));
     }
   }
   if (i != size) {
     printf("ATTETNTION:  recv particles might have read garbage\n");
   }
-  LOG4ESPP_INFO(theLogger,
-                "received fixed triple list after receive particles");
+  LOG4ESPP_INFO(theLogger, "received fixed triple list after receive particles");
 }
 
 void FixedTripleAngleList::onParticlesChanged() {
@@ -254,8 +244,7 @@ void FixedTripleAngleList::onParticlesChanged() {
   Particle *p1;
   Particle *p2;
   Particle *p3;
-  for (TriplesAngles::const_iterator it = triplesAngles.begin();
-       it != triplesAngles.end(); ++it) {
+  for (TriplesAngles::const_iterator it = triplesAngles.begin(); it != triplesAngles.end(); ++it) {
     // printf("lookup global triple %d %d %d\n", it->first, it->second.first,
     // it->second.second);
     if (it->first != lastpid2) {
@@ -270,22 +259,19 @@ void FixedTripleAngleList::onParticlesChanged() {
     p1 = storage->lookupLocalParticle(it->second.first.first);
     if (p1 == NULL) {
       std::stringstream msg;
-      msg << "triple particle p1 " << it->second.first.first
-          << " does not exists here";
+      msg << "triple particle p1 " << it->second.first.first << " does not exists here";
       err.setException(msg.str());
     }
     p3 = storage->lookupLocalParticle(it->second.first.second);
     if (p3 == NULL) {
       std::stringstream msg;
-      msg << "triple particle p3 " << it->second.first.second
-          << " does not exists here";
+      msg << "triple particle p3 " << it->second.first.second << " does not exists here";
       err.setException(msg.str());
     }
     this->add(p1, p2, p3);
   }
   err.checkException();
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed triple list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
 }
 
 /****************************************************
@@ -295,8 +281,8 @@ void FixedTripleAngleList::onParticlesChanged() {
 void FixedTripleAngleList::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedTripleAngleList::*pyAdd)(
-      longint pid1, longint pid2, longint pid3) = &FixedTripleAngleList::add;
+  bool (FixedTripleAngleList::*pyAdd)(longint pid1, longint pid2, longint pid3) =
+      &FixedTripleAngleList::add;
   // bool (FixedTripleAngleList::*pyAdd)(pvec pids)
   //      = &FixedTripleAngleList::add;
 

@@ -31,8 +31,7 @@ namespace interaction {
 typedef class CellListAllParticlesInteractionTemplate<CoulombKSpaceEwald>
     CellListCoulombKSpaceEwald;
 
-CoulombKSpaceEwald::CoulombKSpaceEwald(shared_ptr<System> _system,
-                                       real _prefactor, real _alpha,
+CoulombKSpaceEwald::CoulombKSpaceEwald(shared_ptr<System> _system, real _prefactor, real _alpha,
                                        int _kmax) {
   system = _system;
   prefactor = _prefactor;
@@ -54,8 +53,8 @@ CoulombKSpaceEwald::CoulombKSpaceEwald(shared_ptr<System> _system,
 
   // make a connection to boundary conditions to invoke recalculation of KVec if
   // box dimensions change
-  connectionRecalcKVec = system->bc->onBoxDimensionsChanged.connect(
-      boost::bind(&CoulombKSpaceEwald::preset, this));
+  connectionRecalcKVec =
+      system->bc->onBoxDimensionsChanged.connect(boost::bind(&CoulombKSpaceEwald::preset, this));
   // make a connection to storage to get number of particles
   connectionGetParticleNumber = system->storage->onParticlesChanged.connect(
       boost::bind(&CoulombKSpaceEwald::getParticleNumber, this));
@@ -74,15 +73,12 @@ CoulombKSpaceEwald::~CoulombKSpaceEwald() {
 void CoulombKSpaceEwald::registerPython() {
   using namespace espressopp::python;
 
-  class_<CoulombKSpaceEwald, bases<Potential> >(
-      "interaction_CoulombKSpaceEwald",
-      init<shared_ptr<System>, real, real, int>())
+  class_<CoulombKSpaceEwald, bases<Potential> >("interaction_CoulombKSpaceEwald",
+                                                init<shared_ptr<System>, real, real, int>())
       .add_property("prefactor", &CoulombKSpaceEwald::getPrefactor,
                     &CoulombKSpaceEwald::setPrefactor)
-      .add_property("alpha", &CoulombKSpaceEwald::getAlpha,
-                    &CoulombKSpaceEwald::setAlpha)
-      .add_property("kmax", &CoulombKSpaceEwald::getKMax,
-                    &CoulombKSpaceEwald::setKMax);
+      .add_property("alpha", &CoulombKSpaceEwald::getAlpha, &CoulombKSpaceEwald::setAlpha)
+      .add_property("kmax", &CoulombKSpaceEwald::getKMax, &CoulombKSpaceEwald::setKMax);
 
   class_<CellListCoulombKSpaceEwald, bases<Interaction> >(
       "interaction_CellListCoulombKSpaceEwald",

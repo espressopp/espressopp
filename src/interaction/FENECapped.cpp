@@ -26,8 +26,7 @@
 
 namespace espressopp {
 namespace interaction {
-typedef class FixedPairListInteractionTemplate<FENECapped>
-    FixedPairListFENECapped;
+typedef class FixedPairListInteractionTemplate<FENECapped> FixedPairListFENECapped;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -45,10 +44,8 @@ void FENECapped::registerPython() {
 
   class_<FixedPairListFENECapped, bases<Interaction> >(
       "interaction_FixedPairListFENECapped",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<FENECapped> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
-                shared_ptr<FENECapped> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENECapped> >())
+      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENECapped> >())
       .def("setPotential", &FixedPairListFENECapped::setPotential)
       .def("getPotential", &FixedPairListFENECapped::getPotential)
       .def("setFixedPairList", &FixedPairListFENECapped::setFixedPairList)

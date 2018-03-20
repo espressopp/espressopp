@@ -38,8 +38,8 @@ typedef class SingleParticleInteractionTemplate<LennardJones93Wall>
 void LennardJones93Wall::registerPython() {
   using namespace espressopp::python;
 
-  class_<LennardJones93Wall, bases<SingleParticlePotential> >(
-      "interaction_LennardJones93Wall", init<>())
+  class_<LennardJones93Wall, bases<SingleParticlePotential> >("interaction_LennardJones93Wall",
+                                                              init<>())
       .def("setParams", &LennardJones93Wall::setParams)
       .def("getParams", &LennardJones93Wall::getParams);
 

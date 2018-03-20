@@ -129,9 +129,9 @@ void DumpGROAdress::dump() {
         myfile << endl;
       }
       Real3D Li = system->bc->getBoxL();
-      myfile << setw(10) << setprecision(5) << Li[0] * length_factor << setw(10)
-             << setprecision(5) << Li[1] * length_factor << setw(10)
-             << setprecision(5) << Li[2] * length_factor << endl;
+      myfile << setw(10) << setprecision(5) << Li[0] * length_factor << setw(10) << setprecision(5)
+             << Li[1] * length_factor << setw(10) << setprecision(5) << Li[2] * length_factor
+             << endl;
       myfile.close();
     } else
       cout << "Unable to open file: " << file_name << endl;
@@ -147,18 +147,13 @@ void DumpGROAdress::registerPython() {
   class_<DumpGROAdress, bases<ParticleAccess>, boost::noncopyable>(
       "io_DumpGROAdress",
       init<shared_ptr<System>, shared_ptr<FixedTupleListAdress>,
-           shared_ptr<integrator::MDIntegrator>, std::string, bool, real,
-           std::string, bool>())
-      .add_property("filename", &DumpGROAdress::getFilename,
-                    &DumpGROAdress::setFilename)
-      .add_property("unfolded", &DumpGROAdress::getUnfolded,
-                    &DumpGROAdress::setUnfolded)
-      .add_property("append", &DumpGROAdress::getAppend,
-                    &DumpGROAdress::setAppend)
+           shared_ptr<integrator::MDIntegrator>, std::string, bool, real, std::string, bool>())
+      .add_property("filename", &DumpGROAdress::getFilename, &DumpGROAdress::setFilename)
+      .add_property("unfolded", &DumpGROAdress::getUnfolded, &DumpGROAdress::setUnfolded)
+      .add_property("append", &DumpGROAdress::getAppend, &DumpGROAdress::setAppend)
       .add_property("length_factor", &DumpGROAdress::getLengthFactor,
                     &DumpGROAdress::setLengthFactor)
-      .add_property("length_unit", &DumpGROAdress::getLengthUnit,
-                    &DumpGROAdress::setLengthUnit)
+      .add_property("length_unit", &DumpGROAdress::getLengthUnit, &DumpGROAdress::setLengthUnit)
       .def("dump", &DumpGROAdress::dump);
 }
 }

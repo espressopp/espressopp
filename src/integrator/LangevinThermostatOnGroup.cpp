@@ -32,8 +32,8 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-LangevinThermostatOnGroup::LangevinThermostatOnGroup(
-    shared_ptr<System> system, shared_ptr<ParticleGroup> _pg)
+LangevinThermostatOnGroup::LangevinThermostatOnGroup(shared_ptr<System> system,
+                                                     shared_ptr<ParticleGroup> _pg)
     : Extension(system), particle_group(_pg) {
   type = Extension::Thermostat;
 
@@ -53,9 +53,7 @@ void LangevinThermostatOnGroup::setGamma(real _gamma) { gamma = _gamma; }
 
 real LangevinThermostatOnGroup::getGamma() { return gamma; }
 
-void LangevinThermostatOnGroup::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void LangevinThermostatOnGroup::setTemperature(real _temperature) { temperature = _temperature; }
 
 real LangevinThermostatOnGroup::getTemperature() { return temperature; }
 
@@ -70,17 +68,15 @@ void LangevinThermostatOnGroup::disconnect() {
 
 void LangevinThermostatOnGroup::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostatOnGroup::initialize, this));
+  _initialize =
+      integrator->runInit.connect(boost::bind(&LangevinThermostatOnGroup::initialize, this));
 
-  _heatUp = integrator->recalc1.connect(
-      boost::bind(&LangevinThermostatOnGroup::heatUp, this));
+  _heatUp = integrator->recalc1.connect(boost::bind(&LangevinThermostatOnGroup::heatUp, this));
 
-  _coolDown = integrator->recalc2.connect(
-      boost::bind(&LangevinThermostatOnGroup::coolDown, this));
+  _coolDown = integrator->recalc2.connect(boost::bind(&LangevinThermostatOnGroup::coolDown, this));
 
-  _thermalize = integrator->aftCalcF.connect(
-      boost::bind(&LangevinThermostatOnGroup::thermalize, this));
+  _thermalize =
+      integrator->aftCalcF.connect(boost::bind(&LangevinThermostatOnGroup::thermalize, this));
 }
 
 void LangevinThermostatOnGroup::thermalize() {
@@ -88,8 +84,7 @@ void LangevinThermostatOnGroup::thermalize() {
 
   System &system = getSystemRef();
 
-  for (ParticleGroup::iterator it = particle_group->begin();
-       it != particle_group->end(); it++) {
+  for (ParticleGroup::iterator it = particle_group->begin(); it != particle_group->end(); it++) {
     frictionThermo(**it);
   }
 }
@@ -114,8 +109,7 @@ void LangevinThermostatOnGroup::initialize() {  // calculate the prefactors
 
   LOG4ESPP_INFO(theLogger,
                 "init, timestep = " << timestep << ", gamma = " << gamma
-                                    << ", temperature = " << temperature
-                                    << " pref2=" << pref2);
+                                    << ", temperature = " << temperature << " pref2=" << pref2);
 }
 
 /** very nasty: if we recalculate force when leaving/reentering the integrator,
@@ -146,8 +140,7 @@ void LangevinThermostatOnGroup::coolDown() {
 void LangevinThermostatOnGroup::registerPython() {
   using namespace espressopp::python;
 
-  class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>,
-         bases<Extension> >(
+  class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >(
       "integrator_LangevinThermostatOnGroup",
       init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
       .def("connect", &LangevinThermostatOnGroup::connect)

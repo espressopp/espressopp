@@ -28,8 +28,7 @@ namespace analysis {
 
 void Test::registerPython() {
   using namespace espressopp::python;
-  class_<Test, bases<AnalysisBase> >("analysis_Test",
-                                     init<shared_ptr<System> >());
+  class_<Test, bases<AnalysisBase> >("analysis_Test", init<shared_ptr<System> >());
 }
 }
 }

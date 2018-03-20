@@ -32,9 +32,8 @@ namespace espressopp {
 
 LOG4ESPP_LOGGER(FixedPairListAdress::theLogger, "FixedPairListAdress");
 
-FixedPairListAdress::FixedPairListAdress(
-    shared_ptr<storage::Storage> _storage,
-    shared_ptr<FixedTupleListAdress> _fixedtupleList)
+FixedPairListAdress::FixedPairListAdress(shared_ptr<storage::Storage> _storage,
+                                         shared_ptr<FixedTupleListAdress> _fixedtupleList)
     : FixedPairList(_storage), fixedtupleList(_fixedtupleList) {
   LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
 
@@ -73,8 +72,7 @@ bool FixedPairListAdress::add(longint pid1, longint pid2) {
   } else {
     if (!p2) {
       std::stringstream msg;
-      msg << "Atomistic bond particle p2 (id=" << pid2
-          << ") does not exists here "
+      msg << "Atomistic bond particle p2 (id=" << pid2 << ") does not exists here "
           << "and cannot be added. "
           << " The pair " << pid1 << " - " << pid2 << " could not be created.";
       err.setException(msg.str());
@@ -87,15 +85,14 @@ bool FixedPairListAdress::add(longint pid1, longint pid2) {
     this->add(p1, p2);
     // ADD THE GLOBAL PAIR
     // see whether the particle already has pairs
-    std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator>
-        equalRange = globalPairs.equal_range(pid1);
+    std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator> equalRange =
+        globalPairs.equal_range(pid1);
     if (equalRange.first == globalPairs.end()) {
       // if it hasn't, insert the new pair
       globalPairs.insert(std::make_pair(pid1, pid2));
     } else {
       // otherwise test whether the pair already exists
-      for (GlobalPairs::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         if (it->second == pid2) {
           // TODO: Pair already exists, generate error!
           ;
@@ -109,28 +106,25 @@ bool FixedPairListAdress::add(longint pid1, longint pid2) {
   return returnVal;
 }
 
-void FixedPairListAdress::beforeSendATParticles(std::vector<longint>& atpl,
-                                                OutBuffer& buf) {
+void FixedPairListAdress::beforeSendATParticles(std::vector<longint>& atpl, OutBuffer& buf) {
   // std::cout << "beforeSendATParticles() fixed pl (size " << atpl.size() <<
   // ")\n";
 
   std::vector<longint> toSend;
 
   // loop over the VP particle list
-  for (std::vector<longint>::iterator it = atpl.begin(); it != atpl.end();
-       ++it) {
+  for (std::vector<longint>::iterator it = atpl.begin(); it != atpl.end(); ++it) {
     longint pid = *it;
 
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pid << ", find pairs");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 
     // find all pairs that involve this particle
 
     int n = globalPairs.count(pid);
 
     if (n > 0) {
-      std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator>
-          equalRange = globalPairs.equal_range(pid);
+      std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator> equalRange =
+          globalPairs.equal_range(pid);
 
       // first write the pid of the first particle
       // then the number of partners
@@ -138,12 +132,9 @@ void FixedPairListAdress::beforeSendATParticles(std::vector<longint>& atpl,
       toSend.reserve(toSend.size() + n + 1);
       toSend.push_back(pid);
       toSend.push_back(n);
-      for (GlobalPairs::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSend.push_back(it->second);
-        LOG4ESPP_DEBUG(
-            theLogger,
-            "send global bond: pid " << pid << " and partner " << it->second);
+        LOG4ESPP_DEBUG(theLogger, "send global bond: pid " << pid << " and partner " << it->second);
       }
 
       // delete all of these pairs from the global list
@@ -157,8 +148,7 @@ void FixedPairListAdress::beforeSendATParticles(std::vector<longint>& atpl,
 }
 
 // override parent function, this one should be empty
-void FixedPairListAdress::beforeSendParticles(ParticleList& pl,
-                                              OutBuffer& buf) {}
+void FixedPairListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {}
 
 // override parent function (use lookupAdrATParticle())
 void FixedPairListAdress::onParticlesChanged() {
@@ -172,15 +162,13 @@ void FixedPairListAdress::onParticlesChanged() {
   Particle* p1;
   Particle* p2;
 
-  for (GlobalPairs::const_iterator it = globalPairs.begin();
-       it != globalPairs.end(); ++it) {
+  for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
     if (it->first != lastpid1) {
       p1 = storage->lookupAdrATParticle(it->first);
       if (p1 == NULL) {
         std::stringstream msg;
         msg << "FixedPairListAdress ";
-        msg << "Atomistic bond particle p1 (id=" << it->first
-            << ") does not exists here.";
+        msg << "Atomistic bond particle p1 (id=" << it->first << ") does not exists here.";
         err.setException(msg.str());
       }
       lastpid1 = it->first;
@@ -190,8 +178,7 @@ void FixedPairListAdress::onParticlesChanged() {
     if (p2 == NULL) {
       std::stringstream msg;
       msg << "FixedPairListAdress ";
-      msg << "Atomistic bond particle p2 (id=" << it->second
-          << ") does not exists here.";
+      msg << "Atomistic bond particle p2 (id=" << it->second << ") does not exists here.";
       err.setException(msg.str());
     }
 
@@ -200,15 +187,13 @@ void FixedPairListAdress::onParticlesChanged() {
   }
   err.checkException();
 
-  LOG4ESPP_INFO(theLogger,
-                "Regenerated local fixed pair list from global list");
+  LOG4ESPP_INFO(theLogger, "Regenerated local fixed pair list from global list");
 }
 
 python::list FixedPairListAdress::getBonds() {
   python::tuple bond;
   python::list bonds;
-  for (GlobalPairs::const_iterator it = globalPairs.begin();
-       it != globalPairs.end(); it++) {
+  for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
     bond = python::make_tuple(it->first, it->second);
     bonds.append(bond);
   }
@@ -233,8 +218,7 @@ void FixedPairListAdress::remove(void) {
 void FixedPairListAdress::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2) =
-      &FixedPairListAdress::add;
+  bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2) = &FixedPairListAdress::add;
 
   class_<FixedPairListAdress, shared_ptr<FixedPairListAdress> >(
       "FixedPairListAdress",

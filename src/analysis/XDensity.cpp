@@ -125,8 +125,7 @@ python::list XDensity::computeArray(int splitN) const {
   real pos = 0.0;
   int bin = 0;
   if (system.storage->getFixedTuples()) {
-    shared_ptr<FixedTupleListAdress> fixedtupleList =
-        system.storage->getFixedTuples();
+    shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     CellList realCells = system.storage->getRealCells();
 
     for (CellListIterator cit(realCells); !cit.isDone();
@@ -140,8 +139,7 @@ python::list XDensity::computeArray(int splitN) const {
                                            // those for calculation.
         std::vector<Particle *> atList;
         atList = it2->second;
-        for (std::vector<Particle *>::iterator it3 = atList.begin();
-             it3 != atList.end(); ++it3) {
+        for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
           Particle &at = **it3;
           pos = at.position()[0];
           if (pos < 0.0) {
@@ -227,8 +225,7 @@ python::list XDensity::computeArray(int splitN) const {
   totHistogram = new real[splitN];
   for (int i = 0; i < splitN; i++) totHistogram[i] = 0.0;
 
-  boost::mpi::all_reduce(*mpiWorld, histogram, splitN, totHistogram,
-                         std::plus<real>());
+  boost::mpi::all_reduce(*mpiWorld, histogram, splitN, totHistogram, std::plus<real>());
   boost::mpi::all_reduce(*mpiWorld, num_part, total_num_part, std::plus<int>());
 
   // normalizing
@@ -260,8 +257,7 @@ using namespace boost::python;
 
 void XDensity::registerPython() {
   using namespace espressopp::python;
-  class_<XDensity, bases<Observable> >("analysis_XDensity",
-                                       init<shared_ptr<System> >())
+  class_<XDensity, bases<Observable> >("analysis_XDensity", init<shared_ptr<System> >())
       .def("compute", &XDensity::computeArray);
 }
 }

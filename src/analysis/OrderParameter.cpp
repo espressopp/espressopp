@@ -61,12 +61,9 @@ dcomplex OrderParameter::SphHarm(int l, int m, Real3D r) {
 void OrderParameter::registerPython() {
   using namespace espressopp::python;
   class_<OrderParameter, bases<AnalysisBase> >(
-      "analysis_OrderParameter",
-      init<shared_ptr<System>, real, int, bool, bool, real, real>())
-      .add_property("l", &OrderParameter::getAngularMomentum,
-                    &OrderParameter::setAngularMomentum)
-      .add_property("cutoff", &OrderParameter::getCutoff,
-                    &OrderParameter::setCutoff);
+      "analysis_OrderParameter", init<shared_ptr<System>, real, int, bool, bool, real, real>())
+      .add_property("l", &OrderParameter::getAngularMomentum, &OrderParameter::setAngularMomentum)
+      .add_property("cutoff", &OrderParameter::getCutoff, &OrderParameter::setCutoff);
 }
 }
 }

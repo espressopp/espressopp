@@ -36,17 +36,14 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-GeneralizedLangevinThermostat::GeneralizedLangevinThermostat(
-    shared_ptr<System> system)
+GeneralizedLangevinThermostat::GeneralizedLangevinThermostat(shared_ptr<System> system)
     : Extension(system) {
   type = Extension::Thermostat;
 
   // LOG4ESPP_INFO(theLogger, "GeneralizedLangevinThermostat constructed");
 }
 
-GeneralizedLangevinThermostat::~GeneralizedLangevinThermostat() {
-  disconnect();
-}
+GeneralizedLangevinThermostat::~GeneralizedLangevinThermostat() { disconnect(); }
 
 void GeneralizedLangevinThermostat::disconnect() {
   _integrate.disconnect();
@@ -54,15 +51,14 @@ void GeneralizedLangevinThermostat::disconnect() {
 }
 
 void GeneralizedLangevinThermostat::connect() {
-  _integrate = integrator->aftIntP.connect(
-      boost::bind(&GeneralizedLangevinThermostat::integrate, this));
+  _integrate =
+      integrator->aftIntP.connect(boost::bind(&GeneralizedLangevinThermostat::integrate, this));
 
-  _friction = integrator->aftCalcF.connect(
-      boost::bind(&GeneralizedLangevinThermostat::friction, this));
+  _friction =
+      integrator->aftCalcF.connect(boost::bind(&GeneralizedLangevinThermostat::friction, this));
 }
 
-void GeneralizedLangevinThermostat::addCoeffs(int itype, const char* _filename,
-                                              int type) {
+void GeneralizedLangevinThermostat::addCoeffs(int itype, const char* _filename, int type) {
   boost::mpi::communicator world;
   filename = _filename;
   Table table;
@@ -113,8 +109,7 @@ void GeneralizedLangevinThermostat::integrate() {
         c = table->getForce(weight);
         t = table->getEnergy(weight);
         vp.extVar() = vp.extVar() * (1.0 - timestep / t) -
-                      (timestep / t) * c * vp.lambdaDeriv() * vp.lambdaDeriv() *
-                          vp.velocity()[0];
+                      (timestep / t) * c * vp.lambdaDeriv() * vp.lambdaDeriv() * vp.velocity()[0];
       } /*else {
             std::cout << "ERROR: In Generalized Langevin Thermostat Extension
       weight is out of [0.0, 1.0] interval: " << weight <<  std::endl;
@@ -141,8 +136,7 @@ void GeneralizedLangevinThermostat::friction() {
 
   // iterate over CG particles
   CellList cells = system.storage->getRealCells();
-  shared_ptr<FixedTupleListAdress> fixedtupleList =
-      system.storage->getFixedTuples();
+  shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
   FixedTupleListAdress::iterator it2;
   for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
     Particle& vp = *cit;
@@ -153,17 +147,14 @@ void GeneralizedLangevinThermostat::friction() {
                                          // for calculation.
       std::vector<Particle*> atList;
       atList = it2->second;
-      for (std::vector<Particle*>::iterator it3 = atList.begin();
-           it3 != atList.end(); ++it3) {
+      for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
         Particle& at = **it3;
-        at.force()[0] +=
-            vp.extVar() * at.mass() / vp.mass();  // GOES BACK IN !!!
+        at.force()[0] += vp.extVar() * at.mass() / vp.mass();  // GOES BACK IN !!!
       }
       // vp.drift() += vp.lambdaDeriv() * fforce;
     } else {  // If not, use CG particle itself for calculation.
       std::cout << "Particle " << vp.id()
-                << " not found in tuples! (Error triggered in GLE extension)"
-                << std::endl;
+                << " not found in tuples! (Error triggered in GLE extension)" << std::endl;
       exit(1);
       return;
     }
@@ -177,9 +168,8 @@ void GeneralizedLangevinThermostat::friction() {
 void GeneralizedLangevinThermostat::registerPython() {
   using namespace espressopp::python;
 
-  class_<GeneralizedLangevinThermostat,
-         shared_ptr<GeneralizedLangevinThermostat>, bases<Extension> >(
-      "integrator_GeneralizedLangevinThermostat", init<shared_ptr<System> >())
+  class_<GeneralizedLangevinThermostat, shared_ptr<GeneralizedLangevinThermostat>,
+         bases<Extension> >("integrator_GeneralizedLangevinThermostat", init<shared_ptr<System> >())
       .add_property("filename", &GeneralizedLangevinThermostat::getFilename)
       .def("connect", &GeneralizedLangevinThermostat::connect)
       .def("disconnect", &GeneralizedLangevinThermostat::disconnect)

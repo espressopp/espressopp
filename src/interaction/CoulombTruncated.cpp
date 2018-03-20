@@ -36,8 +36,7 @@
 
 namespace espressopp {
 namespace interaction {
-typedef class VerletListInteractionTemplate<CoulombTruncated>
-    VerletListCoulombTruncated;
+typedef class VerletListInteractionTemplate<CoulombTruncated> VerletListCoulombTruncated;
 typedef class FixedPairListTypesInteractionTemplate<CoulombTruncated>
     FixedPairListTypesCoulombTruncated;
 
@@ -47,14 +46,12 @@ typedef class FixedPairListTypesInteractionTemplate<CoulombTruncated>
 void CoulombTruncated::registerPython() {
   using namespace espressopp::python;
 
-  class_<CoulombTruncated, bases<Potential> >("interaction_CoulombTruncated",
-                                              init<>())
+  class_<CoulombTruncated, bases<Potential> >("interaction_CoulombTruncated", init<>())
       .def(init<real, real>())
-      .add_property("prefactor", &CoulombTruncated::getPrefactor,
-                    &CoulombTruncated::setPrefactor);
+      .add_property("prefactor", &CoulombTruncated::getPrefactor, &CoulombTruncated::setPrefactor);
 
-  class_<VerletListCoulombTruncated, bases<Interaction> >(
-      "interaction_VerletListCoulombTruncated", init<shared_ptr<VerletList> >())
+  class_<VerletListCoulombTruncated, bases<Interaction> >("interaction_VerletListCoulombTruncated",
+                                                          init<shared_ptr<VerletList> >())
       .def("setPotential", &VerletListCoulombTruncated::setPotential)
       .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr);
 

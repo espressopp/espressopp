@@ -55,16 +55,16 @@ VerletList::VerletList(shared_ptr<System> system, real _cut, bool rebuildVL)
   if (rebuildVL) rebuild();  // not called if exclutions are provided
 
   // make a connection to System to invoke rebuild on resort
-  connectionResort = system->storage->onParticlesChanged.connect(
-      boost::bind(&VerletList::rebuild, this));
+  connectionResort =
+      system->storage->onParticlesChanged.connect(boost::bind(&VerletList::rebuild, this));
 }
 
 real VerletList::getVerletCutoff() { return cutVerlet; }
 
 void VerletList::connect() {
   // make a connection to System to invoke rebuild on resort
-  connectionResort = getSystem()->storage->onParticlesChanged.connect(
-      boost::bind(&VerletList::rebuild, this));
+  connectionResort =
+      getSystem()->storage->onParticlesChanged.connect(boost::bind(&VerletList::rebuild, this));
 }
 
 void VerletList::disconnect() {
@@ -87,15 +87,13 @@ void VerletList::rebuild() {
   for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
     checkPair(*it->first, *it->second);
     LOG4ESPP_DEBUG(theLogger,
-                   "checking particles " << it->first->id() << " and "
-                                         << it->second->id());
+                   "checking particles " << it->first->id() << " and " << it->second->id());
   }
 
   builds++;
-  LOG4ESPP_DEBUG(
-      theLogger,
-      "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
-                                   << " local size = " << vlPairs.size());
+  LOG4ESPP_DEBUG(theLogger,
+                 "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
+                                              << " local size = " << vlPairs.size());
 }
 
 /*-------------------------------------------------------------*/
@@ -105,9 +103,8 @@ void VerletList::checkPair(Particle& pt1, Particle& pt2) {
   real distsq = d.sqr();
 
   LOG4ESPP_TRACE(theLogger,
-                 "p1: " << pt1.id() << " @ " << pt1.position()
-                        << " - p2: " << pt2.id() << " @ " << pt2.position()
-                        << " -> distsq = " << distsq);
+                 "p1: " << pt1.id() << " @ " << pt1.position() << " - p2: " << pt2.id() << " @ "
+                        << pt2.position() << " -> distsq = " << distsq);
 
   if (distsq > cutsq) return;
 
@@ -136,12 +133,10 @@ int VerletList::localSize() const {
 
 python::tuple VerletList::getPair(int i) {
   if (i <= 0 || i > vlPairs.size()) {
-    std::cout << "ERROR VerletList pair " << i << " does not exists"
-              << std::endl;
+    std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
     return python::make_tuple();
   } else {
-    return python::make_tuple(vlPairs[i - 1].first->id(),
-                              vlPairs[i - 1].second->id());
+    return python::make_tuple(vlPairs[i - 1].first->id(), vlPairs[i - 1].second->id());
   }
 }
 
@@ -168,11 +163,9 @@ VerletList::~VerletList() {
 void VerletList::registerPython() {
   using namespace espressopp::python;
 
-  bool (VerletList::*pyExclude)(longint pid1, longint pid2) =
-      &VerletList::exclude;
+  bool (VerletList::*pyExclude)(longint pid1, longint pid2) = &VerletList::exclude;
 
-  class_<VerletList, shared_ptr<VerletList> >(
-      "VerletList", init<shared_ptr<System>, real, bool>())
+  class_<VerletList, shared_ptr<VerletList> >("VerletList", init<shared_ptr<System>, real, bool>())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)

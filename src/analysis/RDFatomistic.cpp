@@ -56,8 +56,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
   real histogram[rdfN];
   for (int i = 0; i < rdfN; i++) histogram[i] = 0;
 
-  real dr =
-      Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
+  real dr = Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
   // should use for Li_half[XXX] the shortest side length. Currently using L_y
 
   int num_part = 0;
@@ -65,8 +64,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
   for (int rank_i = 0; rank_i < nprocs; rank_i++) {
     map<size_t, data> conf;
     if (rank_i == myrank) {
-      shared_ptr<FixedTupleListAdress> fixedtupleList =
-          system.storage->getFixedTuples();
+      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -78,8 +76,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
                                              // use those for calculation.
           std::vector<Particle *> atList;
           atList = it2->second;
-          for (std::vector<Particle *>::iterator it3 = atList.begin();
-               it3 != atList.end(); ++it3) {
+          for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
             Particle &at = **it3;
             int id = at.id();
             data tmp = {at.position(), at.type(), vp.id(), vp.lambda()};
@@ -98,8 +95,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
     boost::mpi::broadcast(*system.comm, conf, rank_i);
 
     // for simplicity we will number the particles from 0
-    for (map<size_t, data>::iterator itr = conf.begin(); itr != conf.end();
-         ++itr) {
+    for (map<size_t, data>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
       data p = itr->second;
       config[num_part] = p;
       num_part++;
@@ -126,8 +122,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
     real resolutionP1 = config[i].resolution;
 
     if (spanbased == true) {
-      if ((coordP1[0] < Li_half[0] + span) &&
-          (coordP1[0] > Li_half[0] - span)) {
+      if ((coordP1[0] < Li_half[0] + span) && (coordP1[0] > Li_half[0] - span)) {
         for (int j = i + 1; j < num_part; j++) {
           Real3D coordP2 = config[j].pos;
           int typeP2 = config[j].type;
@@ -178,8 +173,7 @@ python::list RDFatomistic::computeArray(int rdfN) const {
   }
 
   real totHistogram[rdfN];
-  boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram,
-                         plus<real>());
+  boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
 
   int tot_num_pairs = 0;
   boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
@@ -204,8 +198,8 @@ real RDFatomistic::compute() const { return -1.0; }
 
 void RDFatomistic::registerPython() {
   using namespace espressopp::python;
-  class_<RDFatomistic, bases<Observable> >(
-      "analysis_RDFatomistic", init<shared_ptr<System>, int, int, bool, real>())
+  class_<RDFatomistic, bases<Observable> >("analysis_RDFatomistic",
+                                           init<shared_ptr<System>, int, int, bool, real>())
       .def("compute", &RDFatomistic::computeArray);
 }
 }

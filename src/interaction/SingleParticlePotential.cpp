@@ -38,16 +38,14 @@ LOG4ESPP_LOGGER(SingleParticlePotential::theLogger, "SingleParticlePotential");
 void SingleParticlePotential::registerPython() {
   using namespace espressopp::python;
 
-  real (SingleParticlePotential::*computeEnergy)(const Particle& p,
-                                                 const bc::BC& bc) const =
+  real (SingleParticlePotential::*computeEnergy)(const Particle& p, const bc::BC& bc) const =
       &SingleParticlePotential::computeEnergy;
 
-  Real3D (SingleParticlePotential::*computeForce)(const Particle& p,
-                                                  const bc::BC& bc) const =
+  Real3D (SingleParticlePotential::*computeForce)(const Particle& p, const bc::BC& bc) const =
       &SingleParticlePotential::computeForce;
 
-  class_<SingleParticlePotential, boost::noncopyable>(
-      "interaction_SingleParticlePotential", no_init)
+  class_<SingleParticlePotential, boost::noncopyable>("interaction_SingleParticlePotential",
+                                                      no_init)
       .def("computeEnergy", pure_virtual(computeEnergy))
       .def("computeForce", pure_virtual(computeForce));
 }

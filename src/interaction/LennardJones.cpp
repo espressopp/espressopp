@@ -33,8 +33,7 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListInteractionTemplate<LennardJones>
-    VerletListLennardJones;
+typedef class VerletListInteractionTemplate<LennardJones> VerletListLennardJones;
 typedef class VerletListAdressInteractionTemplate<LennardJones, Tabulated>
     VerletListAdressLennardJones;
 typedef class VerletListAdressInteractionTemplate<LennardJones, LennardJones>
@@ -43,12 +42,9 @@ typedef class VerletListHadressInteractionTemplate<LennardJones, Tabulated>
     VerletListHadressLennardJones;
 typedef class VerletListHadressInteractionTemplate<LennardJones, LennardJones>
     VerletListHadressLennardJones2;
-typedef class CellListAllPairsInteractionTemplate<LennardJones>
-    CellListLennardJones;
-typedef class FixedPairListInteractionTemplate<LennardJones>
-    FixedPairListLennardJones;
-typedef class FixedPairListTypesInteractionTemplate<LennardJones>
-    FixedPairListTypesLennardJones;
+typedef class CellListAllPairsInteractionTemplate<LennardJones> CellListLennardJones;
+typedef class FixedPairListInteractionTemplate<LennardJones> FixedPairListLennardJones;
+typedef class FixedPairListTypesInteractionTemplate<LennardJones> FixedPairListTypesLennardJones;
 LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
 // LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
@@ -58,18 +54,16 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
 void LennardJones::registerPython() {
   using namespace espressopp::python;
 
-  class_<LennardJones, bases<Potential> >("interaction_LennardJones",
-                                          init<real, real, real>())
+  class_<LennardJones, bases<Potential> >("interaction_LennardJones", init<real, real, real>())
       .def(init<real, real, real, real>())
       .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
-      .add_property("epsilon", &LennardJones::getEpsilon,
-                    &LennardJones::setEpsilon)
+      .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
       .def_pickle(LennardJones_pickle())
 
       ;
 
-  class_<VerletListLennardJones, bases<Interaction> >(
-      "interaction_VerletListLennardJones", init<shared_ptr<VerletList> >())
+  class_<VerletListLennardJones, bases<Interaction> >("interaction_VerletListLennardJones",
+                                                      init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListLennardJones::getVerletList)
       .def("setPotential", &VerletListLennardJones::setPotential)
       .def("getPotential", &VerletListLennardJones::getPotentialPtr);
@@ -102,17 +96,15 @@ void LennardJones::registerPython() {
       .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
   ;
 
-  class_<CellListLennardJones, bases<Interaction> >(
-      "interaction_CellListLennardJones", init<shared_ptr<storage::Storage> >())
+  class_<CellListLennardJones, bases<Interaction> >("interaction_CellListLennardJones",
+                                                    init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListLennardJones::setPotential);
   ;
 
   class_<FixedPairListLennardJones, bases<Interaction> >(
       "interaction_FixedPairListLennardJones",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<LennardJones> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
-                shared_ptr<LennardJones> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones> >())
+      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJones> >())
       .def("setPotential", &FixedPairListLennardJones::setPotential)
       .def("getPotential", &FixedPairListLennardJones::getPotential)
       .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
@@ -122,10 +114,8 @@ void LennardJones::registerPython() {
       "interaction_FixedPairListTypesLennardJones",
       init<shared_ptr<System>, shared_ptr<FixedPairList> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
-      .def("setFixedPairList",
-           &FixedPairListTypesLennardJones::setFixedPairList)
-      .def("getFixedPairList",
-           &FixedPairListTypesLennardJones::getFixedPairList)
+      .def("setFixedPairList", &FixedPairListTypesLennardJones::setFixedPairList)
+      .def("getFixedPairList", &FixedPairListTypesLennardJones::getFixedPairList)
       .def("setPotential", &FixedPairListTypesLennardJones::setPotential)
       .def("getPotential", &FixedPairListTypesLennardJones::getPotentialPtr);
 }

@@ -61,8 +61,7 @@ python::list AdressDensity::computeArray(int splitN) const {
   int id = 0;
   int bin = 0;
   if (system.storage->getFixedTuples()) {
-    shared_ptr<FixedTupleListAdress> fixedtupleList =
-        system.storage->getFixedTuples();
+    shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     CellList realCells = system.storage->getRealCells();
 
     for (CellListIterator cit(realCells); !cit.isDone();
@@ -76,8 +75,7 @@ python::list AdressDensity::computeArray(int splitN) const {
                                            // those for calculation.
         std::vector<Particle*> atList;
         atList = it2->second;
-        for (std::vector<Particle*>::iterator it3 = atList.begin();
-             it3 != atList.end(); ++it3) {
+        for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
           Particle& at = **it3;
           pos = at.position();
           id = at.id();
@@ -87,9 +85,8 @@ python::list AdressDensity::computeArray(int splitN) const {
                 verletList->getAdrPositions().begin();  // get positions
             Real3D pa = **it2;
             Real3D dist3D;
-            bc.getMinimumImageVectorBox(
-                dist3D, pos,
-                pa);  // calculate vector between particle and first center
+            bc.getMinimumImageVectorBox(dist3D, pos,
+                                        pa);  // calculate vector between particle and first center
             real distmin = sqrt(dist3D.sqr());  // calculate absolute distance
 
             ++it2;
@@ -129,17 +126,15 @@ python::list AdressDensity::computeArray(int splitN) const {
               verletList->getAdrPositions().begin();  // get positions
           Real3D pa = **it2;
           Real3D dist3D;
-          bc.getMinimumImageVectorBox(
-              dist3D, pos,
-              pa);  // calculate vector between particle and first center
+          bc.getMinimumImageVectorBox(dist3D, pos,
+                                      pa);    // calculate vector between particle and first center
           real distmin = sqrt(dist3D.sqr());  // calculate absolute distance
 
           ++it2;
           for (; it2 != verletList->getAdrPositions().end(); ++it2) {
             pa = **it2;
-            bc.getMinimumImageVectorBox(
-                dist3D, pos,
-                pa);  // calculate vector between particle and other centers
+            bc.getMinimumImageVectorBox(dist3D, pos,
+                                        pa);  // calculate vector between particle and other centers
             if (sqrt(dist3D.sqr()) < distmin) distmin = sqrt(dist3D.sqr());
           }
 
@@ -173,17 +168,15 @@ python::list AdressDensity::computeArray(int splitN) const {
             verletList->getAdrPositions().begin();  // get positions
         Real3D pa = **it2;
         Real3D dist3D;
-        bc.getMinimumImageVectorBox(
-            dist3D, pos,
-            pa);  // calculate vector between particle and first center
+        bc.getMinimumImageVectorBox(dist3D, pos,
+                                    pa);    // calculate vector between particle and first center
         real distmin = sqrt(dist3D.sqr());  // calculate absolute distance
 
         ++it2;
         for (; it2 != verletList->getAdrPositions().end(); ++it2) {
           pa = **it2;
-          bc.getMinimumImageVectorBox(
-              dist3D, pos,
-              pa);  // calculate vector between particle and other centers
+          bc.getMinimumImageVectorBox(dist3D, pos,
+                                      pa);  // calculate vector between particle and other centers
           if (sqrt(dist3D.sqr()) < distmin) distmin = sqrt(dist3D.sqr());
         }
 
@@ -212,8 +205,7 @@ python::list AdressDensity::computeArray(int splitN) const {
   totHistogram = new real[splitN];
   for (int i = 0; i < splitN; i++) totHistogram[i] = 0.0;
 
-  boost::mpi::all_reduce(*mpiWorld, histogram, splitN, totHistogram,
-                         std::plus<real>());
+  boost::mpi::all_reduce(*mpiWorld, histogram, splitN, totHistogram, std::plus<real>());
   boost::mpi::all_reduce(*mpiWorld, num_part, total_num_part, std::plus<int>());
 
   // normalizing
@@ -244,8 +236,7 @@ using namespace boost::python;
 void AdressDensity::registerPython() {
   using namespace espressopp::python;
   class_<AdressDensity, bases<Observable> >(
-      "analysis_AdressDensity",
-      init<shared_ptr<System>, shared_ptr<VerletListAdress> >())
+      "analysis_AdressDensity", init<shared_ptr<System>, shared_ptr<VerletListAdress> >())
       .def("addExclpid", &AdressDensity::addExclpid)
       .def("compute", &AdressDensity::computeArray);
 }

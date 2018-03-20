@@ -41,9 +41,7 @@ InterpolationCubic::InterpolationCubic() {
   allocated = false;
 }
 
-InterpolationCubic::~InterpolationCubic() {
-  LOG4ESPP_INFO(theLogger, "~InterpolationCubic");
-}
+InterpolationCubic::~InterpolationCubic() { LOG4ESPP_INFO(theLogger, "~InterpolationCubic"); }
 
 // public functions
 
@@ -89,8 +87,7 @@ void InterpolationCubic::readRaw(mpi::communicator comm, const char *file) {
   delta = (outer - inner) / nbins;
 
   LOG4ESPP_INFO(theLogger,
-                "tab file has range " << inner << " - " << outer
-                                      << ", delta = " << delta);
+                "tab file has range " << inner << " - " << outer << ", delta = " << delta);
 
   invdelta = 1.0 / delta;
   deltasq6 = delta * delta / 6.0;
@@ -159,8 +156,7 @@ int InterpolationCubic::readFile(const char *file, bool dummy) {
 }  // readfile
 
 /** Spline read-in values. */
-void InterpolationCubic::spline(const real *x, const real *y, int n, real yp1,
-                                real ypn, real *y2) {
+void InterpolationCubic::spline(const real *x, const real *y, int n, real yp1, real ypn, real *y2) {
   real *u = new real[n];
 
   if (yp1 > 0.99e30) {
@@ -176,8 +172,7 @@ void InterpolationCubic::spline(const real *x, const real *y, int n, real yp1,
     real p = sig * y2[i - 1] + 2.0;
 
     y2[i] = (sig - 1.0) / p;
-    u[i] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) -
-           (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
+    u[i] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
     u[i] = (6.0 * u[i] / (x[i + 1] - x[i - 1]) - sig * u[i - 1]) / p;
   }
 
@@ -188,8 +183,7 @@ void InterpolationCubic::spline(const real *x, const real *y, int n, real yp1,
     un = 0.0;
   } else {
     qn = 0.5;
-    un = (3.0 / (x[n - 1] - x[n - 2])) *
-         (ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2]));
+    un = (3.0 / (x[n - 1] - x[n - 2])) * (ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2]));
   }
 
   y2[n - 1] = (un - qn * u[n - 2]) / (qn * y2[n - 2] + 1.0);

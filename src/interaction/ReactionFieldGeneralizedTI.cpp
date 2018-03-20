@@ -33,8 +33,7 @@ namespace interaction {
 // typedef class VerletListInteractionTemplate<ReactionFieldGeneralizedTI>
 //   VerletListReactionFieldGeneralizedTI;
 
-typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralizedTI,
-                                                  Tabulated>
+typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralizedTI, Tabulated>
     VerletListAdressReactionFieldGeneralizedTI;
 
 // typedef class
@@ -47,12 +46,10 @@ typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralizedTI,
 void ReactionFieldGeneralizedTI::registerPython() {
   using namespace espressopp::python;
 
-  void (ReactionFieldGeneralizedTI::*pyAddPid)(longint pid) =
-      &ReactionFieldGeneralizedTI::addPid;
+  void (ReactionFieldGeneralizedTI::*pyAddPid)(longint pid) = &ReactionFieldGeneralizedTI::addPid;
 
   class_<ReactionFieldGeneralizedTI, bases<Potential> >(
-      "interaction_ReactionFieldGeneralizedTI",
-      init<real, real, real, real, real, real, bool>())
+      "interaction_ReactionFieldGeneralizedTI", init<real, real, real, real, real, real, bool>())
       .def_pickle(ReactionFieldGeneralizedTI_pickle())
       .def("addPid", pyAddPid)
       .add_property("prefactor", &ReactionFieldGeneralizedTI::getPrefactor,
@@ -70,10 +67,8 @@ void ReactionFieldGeneralizedTI::registerPython() {
   class_<VerletListAdressReactionFieldGeneralizedTI, bases<Interaction> >(
       "interaction_VerletListAdressReactionFieldGeneralizedTI",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressReactionFieldGeneralizedTI::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressReactionFieldGeneralizedTI::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressReactionFieldGeneralizedTI::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressReactionFieldGeneralizedTI::setPotentialCG);
   ;
 
   // class_<VerletListHadressReactionFieldGeneralizedTI, bases<Interaction> >

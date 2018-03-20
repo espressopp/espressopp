@@ -68,8 +68,7 @@ bool FixedPairDistList::add(longint pid1, longint pid2) {
   } else {
     if (!p2) {
       std::stringstream msg;
-      msg << "bond particle p2 " << pid2
-          << " does not exists here and cannot be added";
+      msg << "bond particle p2 " << pid2 << " does not exists here and cannot be added";
       // std::runtime_error(err.str());
       err.setException(msg.str());
     }
@@ -97,8 +96,7 @@ bool FixedPairDistList::add(longint pid1, longint pid2) {
 python::list FixedPairDistList::getPairs() {
   python::tuple pair;
   python::list pairs;
-  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end();
-       it++) {
+  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end(); it++) {
     pair = python::make_tuple(it->first, it->second.first);
     pairs.append(pair);
   }
@@ -109,8 +107,7 @@ python::list FixedPairDistList::getPairs() {
 python::list FixedPairDistList::getPairsDist() {
   python::tuple pair;
   python::list pairs;
-  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end();
-       it++) {
+  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end(); it++) {
     pair = python::make_tuple(it->first, it->second.first, it->second.second);
     pairs.append(pair);
   }
@@ -150,16 +147,15 @@ void FixedPairDistList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pid = pit->id();
 
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pid << ", find pairs");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 
     // find all pairs that involve this particle
 
     int n = pairsDist.count(pid);
 
     if (n > 0) {
-      std::pair<PairsDist::const_iterator, PairsDist::const_iterator>
-          equalRange = pairsDist.equal_range(pid);
+      std::pair<PairsDist::const_iterator, PairsDist::const_iterator> equalRange =
+          pairsDist.equal_range(pid);
 
       // first write the pid of the first particle
       // then the number of partners
@@ -168,8 +164,7 @@ void FixedPairDistList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
       toSendReal.reserve(toSendReal.size() + n);
       toSendInt.push_back(pid);
       toSendInt.push_back(n);
-      for (PairsDist::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (PairsDist::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSendInt.push_back(it->second.first);
         toSendReal.push_back(it->second.second);
       }
@@ -206,13 +201,11 @@ void FixedPairDistList::afterRecvParticles(ParticleList& pl, InBuffer& buf) {
     for (; n > 0; --n) {
       pid2 = receivedInt[i++];
       distVal = receivedReal[j++];
-      it = pairsDist.insert(
-          it, std::make_pair(pid1, std::make_pair(pid2, distVal)));
+      it = pairsDist.insert(it, std::make_pair(pid1, std::make_pair(pid2, distVal)));
     }
   }
   if (i != size) {
-    LOG4ESPP_ERROR(theLogger,
-                   "ATTETNTION:  recv particles might have read garbage\n");
+    LOG4ESPP_ERROR(theLogger, "ATTETNTION:  recv particles might have read garbage\n");
   }
   LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
 }
@@ -227,8 +220,7 @@ void FixedPairDistList::onParticlesChanged() {
   longint lastpid1 = -1;
   Particle* p1;
   Particle* p2;
-  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end();
-       ++it) {
+  for (PairsDist::const_iterator it = pairsDist.begin(); it != pairsDist.end(); ++it) {
     if (it->first != lastpid1) {
       p1 = storage->lookupRealParticle(it->first);
       if (p1 == NULL) {
@@ -249,8 +241,7 @@ void FixedPairDistList::onParticlesChanged() {
     this->add(p1, p2);
   }
   err.checkException();
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed pair list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
 }
 
 /****************************************************
@@ -260,12 +251,11 @@ void FixedPairDistList::onParticlesChanged() {
 void FixedPairDistList::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedPairDistList::*pyAdd)(longint pid1, longint pid2) =
-      &FixedPairDistList::add;
+  bool (FixedPairDistList::*pyAdd)(longint pid1, longint pid2) = &FixedPairDistList::add;
   // bool (FixedPairDistList::*pyAdd)(pvec pids) = &FixedPairDistList::add;
 
-  class_<FixedPairDistList, shared_ptr<FixedPairDistList> >(
-      "FixedPairDistList", init<shared_ptr<storage::Storage> >())
+  class_<FixedPairDistList, shared_ptr<FixedPairDistList> >("FixedPairDistList",
+                                                            init<shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedPairDistList::size)
       .def("getPairs", &FixedPairDistList::getPairs)

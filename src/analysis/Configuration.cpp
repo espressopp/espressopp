@@ -35,10 +35,7 @@ namespace espressopp {
 namespace analysis {
 
 Configuration::Configuration(bool _pos, bool _vel, bool _force, bool _radius)
-    : gatherPos(_pos),
-      gatherVel(_vel),
-      gatherForce(_force),
-      gatherRadius(_radius) {}
+    : gatherPos(_pos), gatherVel(_vel), gatherForce(_force), gatherRadius(_radius) {}
 
 Configuration::Configuration() {
   gatherPos = true;
@@ -53,8 +50,7 @@ void Configuration::set(size_t index, real x, real y, real z) {
   if (gatherPos)
     coordinates[index] = Real3D(x, y, z);
   else {
-    std::cout << "Error: This configuration does not store coordinates"
-              << std::endl;
+    std::cout << "Error: This configuration does not store coordinates" << std::endl;
   }
 }
 
@@ -62,8 +58,7 @@ void Configuration::setCoordinates(size_t index, Real3D _pos) {
   if (gatherPos)
     coordinates[index] = _pos;
   else {
-    std::cout << "Error: This configuration does not store coordinates"
-              << std::endl;
+    std::cout << "Error: This configuration does not store coordinates" << std::endl;
   }
 }
 
@@ -71,8 +66,7 @@ void Configuration::setVelocities(size_t index, Real3D _vel) {
   if (gatherVel)
     velocities[index] = _vel;
   else {
-    std::cout << "Error: This configuration does not store velocities"
-              << std::endl;
+    std::cout << "Error: This configuration does not store velocities" << std::endl;
   }
 }
 
@@ -96,9 +90,7 @@ Real3D Configuration::getCoordinates(size_t index) {
   if (gatherPos)
     return coordinates[index];
   else {
-    std::cout
-        << "Error: This configuration has no information about coordinates"
-        << std::endl;
+    std::cout << "Error: This configuration has no information about coordinates" << std::endl;
     return Real3D(0, 0, 0);
   }
 }
@@ -107,8 +99,7 @@ Real3D Configuration::getVelocities(size_t index) {
   if (gatherVel)
     return velocities[index];
   else {
-    std::cout << "Error: This configuration has no information about velocities"
-              << std::endl;
+    std::cout << "Error: This configuration has no information about velocities" << std::endl;
     return Real3D(0, 0, 0);
   }
 }
@@ -117,8 +108,7 @@ Real3D Configuration::getForces(size_t index) {
   if (gatherForce)
     return forces[index];
   else {
-    std::cout << "Error: This configuration has no information about forces"
-              << std::endl;
+    std::cout << "Error: This configuration has no information about forces" << std::endl;
     return Real3D(0, 0, 0);
   }
 }
@@ -127,8 +117,7 @@ real Configuration::getRadius(size_t index) {
   if (gatherRadius)
     return radii[index];
   else {
-    std::cout << "Error: This configuration has no information about radii"
-              << std::endl;
+    std::cout << "Error: This configuration has no information about radii" << std::endl;
     return 0;
   }
 }

@@ -36,9 +36,7 @@ InterpolationAkima::InterpolationAkima() {
   force = NULL;
 }
 
-InterpolationAkima::~InterpolationAkima() {
-  LOG4ESPP_INFO(theLogger, "~InterpolcationAkima");
-}
+InterpolationAkima::~InterpolationAkima() { LOG4ESPP_INFO(theLogger, "~InterpolcationAkima"); }
 
 // public functions
 
@@ -85,8 +83,7 @@ void InterpolationAkima::readRaw(mpi::communicator comm, const char* file) {
   invdelta = 1.0 / delta;
 
   LOG4ESPP_INFO(theLogger,
-                "tab file has range " << inner << " - " << outer
-                                      << ", delta = " << delta);
+                "tab file has range " << inner << " - " << outer << ", delta = " << delta);
 
   spline(radius, energy, N, p0e, p1e, p2e, p3e);
   spline(radius, force, N, p0f, p1f, p2f, p3f);
@@ -131,8 +128,8 @@ int InterpolationAkima::readFile(const char* file, bool dummy) {
 }  // readFile
 
 // Akima spline method adapted from The VOTCA project (http://www.votca.org)
-void InterpolationAkima::spline(const real* x, const real* y, int N, real* p0,
-                                real* p1, real* p2, real* p3) {
+void InterpolationAkima::spline(const real* x, const real* y, int N, real* p0, real* p1, real* p2,
+                                real* p3) {
   real m1, m2, m3, m4, m5;
   real temp, g0, g1, g2, x1, x2, y1, y2, x4, x5, y4, y5;
   real* t = new real[N];
@@ -145,8 +142,7 @@ void InterpolationAkima::spline(const real* x, const real* y, int N, real* p0,
   temp = (x[1] - x[0]) / (x[2] - x[0]);
   temp = temp * temp;
   g0 = y[0];
-  g1 = ((y[1] - y[0]) - temp * (y[2] - y[0])) /
-       ((x[1] - x[0]) - temp * (x[2] - x[0]));
+  g1 = ((y[1] - y[0]) - temp * (y[2] - y[0])) / ((x[1] - x[0]) - temp * (x[2] - x[0]));
   g2 = ((y[2] - y[0]) - g1 * (x[2] - x[0])) / ((x[2] - x[0]) * (x[2] - x[0]));
   x1 = x[0] - (x[2] - x[0]);
   x2 = x[1] - (x[2] - x[0]);
@@ -196,8 +192,7 @@ void InterpolationAkima::spline(const real* x, const real* y, int N, real* p0,
     p0[i] = y[i];
     p1[i] = t[i];
     p2[i] =
-        (3.0 * (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - 2.0 * t[i] - t[i + 1]) /
-        (x[i + 1] - x[i]);
+        (3.0 * (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - 2.0 * t[i] - t[i + 1]) / (x[i + 1] - x[i]);
     p3[i] = (t[i] + t[i + 1] - 2.0 * (y[i + 1] - y[i]) / (x[i + 1] - x[i])) /
             ((x[i + 1] - x[i]) * (x[i + 1] - x[i]));
   }

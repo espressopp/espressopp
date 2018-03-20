@@ -35,12 +35,10 @@ namespace interaction {
 typedef class VerletListInteractionTemplate<ReactionFieldGeneralized>
     VerletListReactionFieldGeneralized;
 
-typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralized,
-                                                  Tabulated>
+typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralized, Tabulated>
     VerletListAdressReactionFieldGeneralized;
 
-typedef class VerletListHadressInteractionTemplate<ReactionFieldGeneralized,
-                                                   Tabulated>
+typedef class VerletListHadressInteractionTemplate<ReactionFieldGeneralized, Tabulated>
     VerletListHadressReactionFieldGeneralized;
 
 typedef class CellListAllPairsInteractionTemplate<ReactionFieldGeneralized>
@@ -55,42 +53,34 @@ typedef class CellListAllPairsInteractionTemplate<ReactionFieldGeneralized>
 void ReactionFieldGeneralized::registerPython() {
   using namespace espressopp::python;
 
-  class_<ReactionFieldGeneralized, bases<Potential> >(
-      "interaction_ReactionFieldGeneralized",
-      init<real, real, real, real, real>())
+  class_<ReactionFieldGeneralized, bases<Potential> >("interaction_ReactionFieldGeneralized",
+                                                      init<real, real, real, real, real>())
       .def(init<real, real, real, real, real, real>())
       .def_pickle(ReactionFieldGeneralized_pickle())
       .add_property("prefactor", &ReactionFieldGeneralized::getPrefactor,
                     &ReactionFieldGeneralized::setPrefactor);
 
   class_<VerletListReactionFieldGeneralized, bases<Interaction> >(
-      "interaction_VerletListReactionFieldGeneralized",
-      init<shared_ptr<VerletList> >())
+      "interaction_VerletListReactionFieldGeneralized", init<shared_ptr<VerletList> >())
       .def("setPotential", &VerletListReactionFieldGeneralized::setPotential)
-      .def("getPotential",
-           &VerletListReactionFieldGeneralized::getPotentialPtr);
+      .def("getPotential", &VerletListReactionFieldGeneralized::getPotentialPtr);
 
   class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >(
       "interaction_VerletListAdressReactionFieldGeneralized",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressReactionFieldGeneralized::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressReactionFieldGeneralized::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressReactionFieldGeneralized::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressReactionFieldGeneralized::setPotentialCG);
   ;
 
   class_<VerletListHadressReactionFieldGeneralized, bases<Interaction> >(
       "interaction_VerletListHadressReactionFieldGeneralized",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListHadressReactionFieldGeneralized::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListHadressReactionFieldGeneralized::setPotentialCG);
+      .def("setPotentialAT", &VerletListHadressReactionFieldGeneralized::setPotentialAT)
+      .def("setPotentialCG", &VerletListHadressReactionFieldGeneralized::setPotentialCG);
   ;
 
   class_<CellListReactionFieldGeneralized, bases<Interaction> >(
-      "interaction_CellListReactionFieldGeneralized",
-      init<shared_ptr<storage::Storage> >())
+      "interaction_CellListReactionFieldGeneralized", init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListReactionFieldGeneralized::setPotential);
   ;
 

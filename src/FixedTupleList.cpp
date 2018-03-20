@@ -45,8 +45,8 @@ FixedTupleList::FixedTupleList(shared_ptr<storage::Storage> _storage)
       boost::bind(&FixedTupleList::beforeSendParticles, this, _1, _2));
   con2 = storage->afterRecvParticles.connect(
       boost::bind(&FixedTupleList::afterRecvParticles, this, _1, _2));
-  con3 = storage->onParticlesChanged.connect(
-      boost::bind(&FixedTupleList::onParticlesChanged, this));
+  con3 =
+      storage->onParticlesChanged.connect(boost::bind(&FixedTupleList::onParticlesChanged, this));
 }
 
 FixedTupleList::~FixedTupleList() {
@@ -110,12 +110,10 @@ bool FixedTupleList::addTuple(boost::python::list& tuple) {
 python::list FixedTupleList::getTuples() {
   python::list tuple;
   python::list alltuples;
-  for (GlobalTuples::iterator it = globalTuples.begin();
-       it != globalTuples.end(); it++) {
+  for (GlobalTuples::iterator it = globalTuples.begin(); it != globalTuples.end(); it++) {
     python::list tuple;
     tuple.append((*it).first);  // key is also part of the tuple!
-    for (tuple::iterator it2 = (*it).second.begin(); it2 != (*it).second.end();
-         it2++) {
+    for (tuple::iterator it2 = (*it).second.begin(); it2 != (*it).second.end(); it2++) {
       tuple.append(*it2);
     }
     alltuples.append(tuple);
@@ -129,8 +127,7 @@ void FixedTupleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   // loop over the particle list
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pidK = pit->id();
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pidK << ", find tuples");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find tuples");
 
     // find particle that involves this particle id
     GlobalTuples::const_iterator it = globalTuples.find(pidK);
@@ -144,8 +141,7 @@ void FixedTupleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
       toSend.reserve(s);
 
       // iterate through vector and add pids
-      for (tuple::const_iterator it2 = it->second.begin();
-           it2 != it->second.end(); ++it2) {
+      for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
         Particle* tp = storage->lookupLocalParticle(*it2);
         buf.write(*tp);
         toSend.push_back(*it2);
@@ -199,8 +195,7 @@ void FixedTupleList::onParticlesChanged() {
     }
 
     // iterate through vector in map
-    for (tuple::const_iterator it2 = it->second.begin();
-         it2 != it->second.end(); ++it2) {
+    for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
       at = storage->lookupRealParticle(*it2);
       if (at == NULL) {
         std::stringstream msg;
@@ -227,8 +222,8 @@ void FixedTupleList::registerPython() {
   // bool (FixedTupleList::*pyAdd)(pvec pids)
   //      = &FixedTupleList::add;
 
-  class_<FixedTupleList, shared_ptr<FixedTupleList> >(
-      "FixedTupleList", init<shared_ptr<storage::Storage> >())
+  class_<FixedTupleList, shared_ptr<FixedTupleList> >("FixedTupleList",
+                                                      init<shared_ptr<storage::Storage> >())
       .def("addTuple", &FixedTupleList::addTuple)
       .def("getTuples", &FixedTupleList::getTuples)
       .def("size", &FixedTupleList::size);

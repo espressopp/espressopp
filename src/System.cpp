@@ -68,8 +68,7 @@ System::System(python::object _pyobj) {
   // in version >= mpi4py.1.2.2 this has to be:
   PyMPICommObject* pyMPIComm = (PyMPICommObject*)pyobj;
   MPI_Comm* comm_p = &pyMPIComm->ob_mpi;
-  shared_ptr<mpi::communicator> newcomm =
-      make_shared<mpi::communicator>(*comm_p, mpi::comm_attach);
+  shared_ptr<mpi::communicator> newcomm = make_shared<mpi::communicator>(*comm_p, mpi::comm_attach);
 
   comm = newcomm;
   maxCutoff = 0.0;
@@ -99,8 +98,8 @@ void System::addInteraction(shared_ptr<interaction::Interaction> ia) {
   // check if the cutoff of this interaction is bigger then maxCutoff
   real cut = ia->getMaxCutoff();
 
-  bool isCutoffInf = std::numeric_limits<real>::has_infinity &&
-                     cut == std::numeric_limits<real>::infinity();
+  bool isCutoffInf =
+      std::numeric_limits<real>::has_infinity && cut == std::numeric_limits<real>::infinity();
 
   if (!isCutoffInf && cut > maxCutoff) maxCutoff = cut;
 }

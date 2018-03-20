@@ -58,8 +58,7 @@ void BC::unfoldPosition(Real3D& pos, Int3D& imageBox) const {
   for (int i = 0; i < 3; ++i) unfoldCoordinate(pos, imageBox, i);
 }
 
-boost::python::tuple BC::getFoldedPosition(const Real3D& pos,
-                                           const Int3D& imageBox) const {
+boost::python::tuple BC::getFoldedPosition(const Real3D& pos, const Int3D& imageBox) const {
   Real3D foldedPos = pos;
   Int3D foldedImageBox = imageBox;
   foldPosition(foldedPos, foldedImageBox);
@@ -91,17 +90,17 @@ void BC::registerPython() {
   // routines
   // no_init must be used as the abstract class BC has no constructor
 
-  Real3D (BC::*pygetMinimumImageVector)(const Real3D& pos1, const Real3D& pos2)
-      const = &BC::getMinimumImageVector;
+  Real3D (BC::*pygetMinimumImageVector)(const Real3D& pos1, const Real3D& pos2) const =
+      &BC::getMinimumImageVector;
 
-  boost::python::tuple (BC::*pygetFoldedPosition1)(
-      const Real3D& pos, const Int3D& imageBox) const = &BC::getFoldedPosition;
+  boost::python::tuple (BC::*pygetFoldedPosition1)(const Real3D& pos, const Int3D& imageBox) const =
+      &BC::getFoldedPosition;
 
   boost::python::tuple (BC::*pygetFoldedPosition2)(const Real3D& pos) const =
       &BC::getFoldedPosition;
 
-  Real3D (BC::*pygetUnfoldedPosition)(const Real3D& pos, const Int3D& imageBox)
-      const = &BC::getUnfoldedPosition;
+  Real3D (BC::*pygetUnfoldedPosition)(const Real3D& pos, const Int3D& imageBox) const =
+      &BC::getUnfoldedPosition;
 
   Real3D (BC::*pygetRandomPos)() const = &BC::getRandomPos;
 

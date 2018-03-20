@@ -58,8 +58,7 @@ python::list XPressure::computeArray(int n) const {
   for (int i = 0; i < n; i++) vvlocal[i] = 0.0;
 
   // compute the kinetic contribution (2/3 \sum 1/2mv^2)
-  shared_ptr<FixedTupleListAdress> fixedtupleList =
-      system.storage->getFixedTuples();
+  shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
   CellList realCells = system.storage->getRealCells();
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     Particle& vp = *cit;
@@ -74,8 +73,7 @@ python::list XPressure::computeArray(int n) const {
       std::vector<Particle*> atList;
       atList = it2->second;
       Real3D vel(0.0, 0.0, 0.0);
-      for (std::vector<Particle*>::iterator it3 = atList.begin();
-           it3 != atList.end(); ++it3) {
+      for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
         Particle& at = **it3;
         vel += at.mass() * at.velocity()[0];
       }
@@ -181,8 +179,7 @@ using namespace boost::python;
 
 void XPressure::registerPython() {
   using namespace espressopp::python;
-  class_<XPressure, bases<Observable> >("analysis_XPressure",
-                                        init<shared_ptr<System> >())
+  class_<XPressure, bases<Observable> >("analysis_XPressure", init<shared_ptr<System> >())
       .def("compute", &XPressure::computeArray);
 }
 }

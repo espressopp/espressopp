@@ -28,8 +28,7 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListVSphereInteractionTemplate<VSpherePair>
-    VerletListVSpherePair;
+typedef class VerletListVSphereInteractionTemplate<VSpherePair> VerletListVSpherePair;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -37,15 +36,13 @@ typedef class VerletListVSphereInteractionTemplate<VSpherePair>
 void VSpherePair::registerPython() {
   using namespace espressopp::python;
 
-  class_<VSpherePair, bases<Potential> >("interaction_VSpherePair",
-                                         init<real, real>())
+  class_<VSpherePair, bases<Potential> >("interaction_VSpherePair", init<real, real>())
       .def(init<real, real, real>())
-      .add_property("epsilon", &VSpherePair::getEpsilon,
-                    &VSpherePair::setEpsilon)
+      .add_property("epsilon", &VSpherePair::getEpsilon, &VSpherePair::setEpsilon)
       .def_pickle(VSpherePair_pickle());
 
-  class_<VerletListVSpherePair, bases<Interaction> >(
-      "interaction_VerletListVSpherePair", init<shared_ptr<VerletList> >())
+  class_<VerletListVSpherePair, bases<Interaction> >("interaction_VerletListVSpherePair",
+                                                     init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListVSpherePair::getVerletList)
       .def("setPotential", &VerletListVSpherePair::setPotential)
       .def("getPotential", &VerletListVSpherePair::getPotentialPtr);

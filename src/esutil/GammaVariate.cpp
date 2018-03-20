@@ -28,8 +28,7 @@ using namespace boost;
 
 namespace espressopp {
 namespace esutil {
-GammaVariate::GammaVariate(shared_ptr<RNG> _rng, const int alpha,
-                           const real beta)
+GammaVariate::GammaVariate(shared_ptr<RNG> _rng, const int alpha, const real beta)
     : Super(*(_rng->getBoostRNG()), DistType(alpha, beta)), rng(_rng) {}
 
 //////////////////////////////////////////////////
@@ -40,8 +39,7 @@ void GammaVariate::registerPython() {
 
   real (GammaVariate::*pyCall)() = &GammaVariate::operator();
 
-  class_<GammaVariate>("esutil_GammaVariate", init<shared_ptr<RNG> >())
-      .def("__call__", pyCall);
+  class_<GammaVariate>("esutil_GammaVariate", init<shared_ptr<RNG> >()).def("__call__", pyCall);
 }
 }
 }

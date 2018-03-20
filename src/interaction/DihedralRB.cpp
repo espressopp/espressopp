@@ -29,20 +29,17 @@ namespace interaction {
 void DihedralRB::registerPython() {
   using namespace espressopp::python;  // NOLINT
 
-  class_<DihedralRB, bases<DihedralPotential> >(
-      "interaction_DihedralRB", init<real, real, real, real, real, real>());
+  class_<DihedralRB, bases<DihedralPotential> >("interaction_DihedralRB",
+                                                init<real, real, real, real, real, real>());
 
-  typedef class FixedQuadrupleListInteractionTemplate<DihedralRB>
-      FixedQuadrupleListDihedralRB;
+  typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
   class_<FixedQuadrupleListDihedralRB, bases<Interaction> >(
       "interaction_FixedQuadrupleListDihedralRB",
-      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>,
-           shared_ptr<DihedralRB> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
-                shared_ptr<DihedralRB> >())
+      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralRB> >())
+      .def(
+          init<shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>, shared_ptr<DihedralRB> >())
       .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
-      .def("getFixedQuadrupleList",
-           &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
+      .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
 
   typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralRB>
       FixedQuadrupleListTypesDihedralRB;
@@ -51,10 +48,8 @@ void DihedralRB::registerPython() {
       init<shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
       .def("setPotential", &FixedQuadrupleListTypesDihedralRB::setPotential)
       .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
-      .def("setFixedQuadrupleList",
-           &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
-      .def("getFixedQuadrupleList",
-           &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
+      .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
+      .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
 }
 
 }  // end namespace interaction

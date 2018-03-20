@@ -123,9 +123,7 @@ Logger& Logger::getRoot() {
 *  Logger :: getInstance                                            *
 ********************************************************************/
 
-Logger& Logger::getInstance(string name) {
-  return Logger::createInstance<PyLogger>(name);
-}
+Logger& Logger::getInstance(string name) { return Logger::createInstance<PyLogger>(name); }
 
 /********************************************************************
 *  Helper routine for logging via Python                            *
@@ -139,8 +137,8 @@ void PyLogger::log(int level, Location& loc, const string& msg)
 
   object name = pyLogger.attr("name");
 
-  object record = pyLogger.attr("makeRecord")(name, level, loc.filename,
-                                              loc.line, msg, pyNone, pyNone);
+  object record =
+      pyLogger.attr("makeRecord")(name, level, loc.filename, loc.line, msg, pyNone, pyNone);
 
   record.attr("funcName") = loc.funcname;
 
@@ -172,25 +170,17 @@ void PyLogger::log(int level, Location& loc, const string& msg)
 
 */
 
-void PyLogger::trace(Location loc, const string& msg) {
-  log(pyTRACE, loc, msg);
-}
+void PyLogger::trace(Location loc, const string& msg) { log(pyTRACE, loc, msg); }
 
-void PyLogger::debug(Location loc, const string& msg) {
-  log(pyDEBUG, loc, msg);
-}
+void PyLogger::debug(Location loc, const string& msg) { log(pyDEBUG, loc, msg); }
 
 void PyLogger::info(Location loc, const string& msg) { log(pyINFO, loc, msg); }
 
 void PyLogger::warn(Location loc, const string& msg) { log(pyWARN, loc, msg); }
 
-void PyLogger::error(Location loc, const string& msg) {
-  log(pyERROR, loc, msg);
-}
+void PyLogger::error(Location loc, const string& msg) { log(pyERROR, loc, msg); }
 
-void PyLogger::fatal(Location loc, const string& msg) {
-  log(pyFATAL, loc, msg);
-}
+void PyLogger::fatal(Location loc, const string& msg) { log(pyFATAL, loc, msg); }
 
 void PyLogger::setPythonLevel(int pyLevel)
 
@@ -215,8 +205,8 @@ void PyLogger::setPythonLevel(int pyLevel)
   }
 
 #ifdef DEBUG
-  printf("setPythonLevel: level of logger %s is now %d, setflag = %d\n",
-         getFullName().c_str(), myLevel, setFlag);
+  printf("setPythonLevel: level of logger %s is now %d, setflag = %d\n", getFullName().c_str(),
+         myLevel, setFlag);
 #endif
 }
 
@@ -230,8 +220,7 @@ void PyLogger::setPythonLogger(object _pyLogger)
   if (pyLogger == object()) {
     pyLogger = _pyLogger;
   } else if (pyLogger != _pyLogger) {
-    printf("ATTENTION: Python Logger object for %s has changed\n",
-           getFullName().c_str());
+    printf("ATTENTION: Python Logger object for %s has changed\n", getFullName().c_str());
   }
 
   // get the level of this logger and set it correctly

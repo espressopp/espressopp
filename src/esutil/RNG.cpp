@@ -62,8 +62,7 @@ real RNG::normal() { return normalVariate(); }
 
 real RNG::gamma(unsigned int alpha) {
   gamma_distribution<real> gamma_dist(alpha, 1.0);  // scale parameter \beta=1.0
-  variate_generator<RNGType&, gamma_distribution<real> > gamma_var(*boostRNG,
-                                                                   gamma_dist);
+  variate_generator<RNGType&, gamma_distribution<real> > gamma_var(*boostRNG, gamma_dist);
   return gamma_var();
 }
 

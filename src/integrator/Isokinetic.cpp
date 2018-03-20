@@ -59,13 +59,10 @@ void Isokinetic::disconnect() { _aftIntV.disconnect(); }
 
 void Isokinetic::connect() {
   // connection to the signal at the end of the run
-  _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&Isokinetic::rescaleVelocities, this));
+  _aftIntV = integrator->aftIntV.connect(boost::bind(&Isokinetic::rescaleVelocities, this));
 }
 
-void Isokinetic::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void Isokinetic::setTemperature(real _temperature) { temperature = _temperature; }
 
 real Isokinetic::getTemperature() { return temperature; }
 
@@ -101,10 +98,8 @@ void Isokinetic::rescaleVelocities() {
   }
   EKin_local *= 0.5;
 
-  boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin,
-                         std::plus<real>());
-  boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart,
-                         std::plus<int>());
+  boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>());
+  boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart, std::plus<int>());
 
   DegreesOfFreedom = 1.5 * NPart;  // 3.0/2.0
   currentTemperature = EKin / DegreesOfFreedom;
@@ -126,10 +121,8 @@ void Isokinetic::registerPython() {
 
       ("integrator_Isokinetic", init<shared_ptr<System> >())
 
-          .add_property("temperature", &Isokinetic::getTemperature,
-                        &Isokinetic::setTemperature)
-          .add_property("coupling", &Isokinetic::getCoupling,
-                        &Isokinetic::setCoupling)
+          .add_property("temperature", &Isokinetic::getTemperature, &Isokinetic::setTemperature)
+          .add_property("coupling", &Isokinetic::getCoupling, &Isokinetic::setCoupling)
 
           .def("connect", &Isokinetic::connect)
           .def("disconnect", &Isokinetic::disconnect);

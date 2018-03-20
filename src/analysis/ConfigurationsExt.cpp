@@ -44,8 +44,7 @@ LOG4ESPP_LOGGER(ConfigurationsExt::logger, "ConfigurationsExt");
 
 void ConfigurationsExt::setCapacity(int max) {
   if (max < 0) {
-    LOG4ESPP_ERROR(logger,
-                   "number for maximal configurations must be positive");
+    LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
     return;
   }
 
@@ -58,12 +57,9 @@ void ConfigurationsExt::setCapacity(int max) {
   if (maxConfigs < nconfigs) {
     int diff = nconfigs - maxConfigs;
 
-    LOG4ESPP_INFO(
-        logger,
-        "delete " << diff << " configurations due to restricted capacity");
+    LOG4ESPP_INFO(logger, "delete " << diff << " configurations due to restricted capacity");
 
-    configurationsExt.erase(configurationsExt.begin(),
-                            configurationsExt.begin() + diff);
+    configurationsExt.erase(configurationsExt.begin(), configurationsExt.begin() + diff);
   }
 
   unfolded = true;  // by default it writes unfolded coordinates
@@ -87,9 +83,7 @@ ConfigurationExtPtr ConfigurationsExt::get(int stackpos) {
   }
 }
 
-ConfigurationExtPtr ConfigurationsExt::back() {
-  return configurationsExt.back();
-}
+ConfigurationExtPtr ConfigurationsExt::back() { return configurationsExt.back(); }
 
 void ConfigurationsExt::pushConfig(ConfigurationExtPtr config) {
   int nconfs = configurationsExt.size();
@@ -117,9 +111,7 @@ void ConfigurationsExt::gather() {
   boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
   boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());
 
-  LOG4ESPP_INFO(logger,
-                "#Partices: me = " << myN << ", max = " << maxN
-                                   << ", totalN = " << totalN);
+  LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN << ", totalN = " << totalN);
 
   real* coordinates = new real[3 * maxN];  // buffer for gather
   real* velocities = new real[3 * maxN];   // buffer for gather
@@ -199,8 +191,7 @@ void ConfigurationsExt::gather() {
         stat = req.wait();
         nIds = *stat.count<int>();
 
-        req =
-            system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
+        req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
         system.comm->send(iproc, DEFAULT_TAG, 0);
         stat = req.wait();
         nCoords = *stat.count<real>();
@@ -209,13 +200,11 @@ void ConfigurationsExt::gather() {
 
         if (nCoords != 3 * nIds) {
           LOG4ESPP_ERROR(logger,
-                         "serious error collecting data, got "
-                             << nIds << " ids, but " << nCoords
-                             << " coordinates");
+                         "serious error collecting data, got " << nIds << " ids, but " << nCoords
+                                                               << " coordinates");
         }
 
-        req =
-            system.comm->irecv<real>(iproc, DEFAULT_TAG, velocities, 3 * maxN);
+        req = system.comm->irecv<real>(iproc, DEFAULT_TAG, velocities, 3 * maxN);
         system.comm->send(iproc, DEFAULT_TAG, 0);
         stat = req.wait();
         nVelocs = *stat.count<real>();
@@ -224,9 +213,8 @@ void ConfigurationsExt::gather() {
 
         if (nVelocs != 3 * nIds) {
           LOG4ESPP_ERROR(logger,
-                         "serious error collecting data, got "
-                             << nIds << " ids, but " << nVelocs
-                             << " velocities");
+                         "serious error collecting data, got " << nIds << " ids, but " << nVelocs
+                                                               << " velocities");
         }
 
         nother = nIds;
@@ -235,19 +223,17 @@ void ConfigurationsExt::gather() {
         nother = myN;
       }
 
-      LOG4ESPP_INFO(logger,
-                    "add " << nother << " coordinates of proc " << iproc);
+      LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
       for (int i = 0; i < nother; i++) {
         int index = ids[i];
 
-        LOG4ESPP_INFO(
-            logger,
-            "set coordianates of particle with id = "
-                << index << ": " << coordinates[3 * i] << " "
-                << coordinates[3 * i + 1] << " " << coordinates[3 * i + 2]
-                << "and velocities: " << velocities[3 * i] << " "
-                << velocities[3 * i + 1] << " " << velocities[3 * i + 2]);
+        LOG4ESPP_INFO(logger,
+                      "set coordianates of particle with id = "
+                          << index << ": " << coordinates[3 * i] << " " << coordinates[3 * i + 1]
+                          << " " << coordinates[3 * i + 2]
+                          << "and velocities: " << velocities[3 * i] << " " << velocities[3 * i + 1]
+                          << " " << velocities[3 * i + 2]);
 
         RealND _vec(6);  // p[0].p[1].p[2].v[0].v[1].v[2]
 
@@ -303,13 +289,10 @@ void ConfigurationsExt::registerPython() {
   class_<ConfigurationExtList>("_ConfigurationExtList", no_init)
       .def("__iter__", boost::python::iterator<ConfigurationExtList>());
 
-  class_<ConfigurationsExt>("analysis_ConfigurationsExt",
-                            init<shared_ptr<System> >())
+  class_<ConfigurationsExt>("analysis_ConfigurationsExt", init<shared_ptr<System> >())
       .add_property("size", &ConfigurationsExt::getSize)
-      .add_property("capacity", &ConfigurationsExt::getCapacity,
-                    &ConfigurationsExt::setCapacity)
-      .add_property("unfolded", &ConfigurationsExt::getUnfolded,
-                    &ConfigurationsExt::setUnfolded)
+      .add_property("capacity", &ConfigurationsExt::getCapacity, &ConfigurationsExt::setCapacity)
+      .add_property("unfolded", &ConfigurationsExt::getUnfolded, &ConfigurationsExt::setUnfolded)
       .def("gather", &ConfigurationsExt::gather)
       .def("__getitem__", &ConfigurationsExt::get)
       .def("back", &ConfigurationsExt::back)

@@ -41,8 +41,7 @@ LOG4ESPP_LOGGER(Velocities::logger, "Velocities");
 
 void Velocities::setCapacity(int max) {
   if (max < 0) {
-    LOG4ESPP_ERROR(logger,
-                   "number for maximal configurations must be positive");
+    LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
     return;
   }
 
@@ -55,9 +54,7 @@ void Velocities::setCapacity(int max) {
   if (maxConfigs < nconfigs) {
     int diff = nconfigs - maxConfigs;
 
-    LOG4ESPP_INFO(
-        logger,
-        "delete " << diff << " configurations due to restricted capacity");
+    LOG4ESPP_INFO(logger, "delete " << diff << " configurations due to restricted capacity");
 
     configurations.erase(configurations.begin(), configurations.begin() + diff);
   }
@@ -109,9 +106,7 @@ void Velocities::gather() {
   boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
   boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());
 
-  LOG4ESPP_INFO(logger,
-                "#Partices: me = " << myN << ", max = " << maxN
-                                   << ", totalN = " << totalN);
+  LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN << ", totalN = " << totalN);
 
   real* coordinates = new real[3 * maxN];  // buffer for gather
   int* ids = new int[maxN];                // buffer for gather
@@ -165,8 +160,7 @@ void Velocities::gather() {
         stat = req.wait();
         nIds = *stat.count<int>();
 
-        req =
-            system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
+        req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
         system.comm->send(iproc, DEFAULT_TAG, 0);
         stat = req.wait();
         nCoords = *stat.count<real>();
@@ -175,9 +169,8 @@ void Velocities::gather() {
 
         if (nCoords != 3 * nIds) {
           LOG4ESPP_ERROR(logger,
-                         "serious error collecting data, got "
-                             << nIds << " ids, but " << nCoords
-                             << " coordinates");
+                         "serious error collecting data, got " << nIds << " ids, but " << nCoords
+                                                               << " coordinates");
         }
 
         nother = nIds;
@@ -186,20 +179,17 @@ void Velocities::gather() {
         nother = myN;
       }
 
-      LOG4ESPP_INFO(logger,
-                    "add " << nother << " coordinates of proc " << iproc);
+      LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
       for (int i = 0; i < nother; i++) {
         int index = ids[i];
 
         LOG4ESPP_INFO(logger,
                       "set coordianates of particle with id = "
-                          << index << ": " << coordinates[3 * i] << " "
-                          << coordinates[3 * i + 1] << " "
-                          << coordinates[3 * i + 2]);
+                          << index << ": " << coordinates[3 * i] << " " << coordinates[3 * i + 1]
+                          << " " << coordinates[3 * i + 2]);
 
-        config->set(index, coordinates[3 * i], coordinates[3 * i + 1],
-                    coordinates[3 * i + 2]);
+        config->set(index, coordinates[3 * i], coordinates[3 * i + 1], coordinates[3 * i + 2]);
       }
     }
 
@@ -245,8 +235,7 @@ void Velocities::registerPython() {
 
   class_<Velocities>("analysis_Velocities", init<shared_ptr<System> >())
       .add_property("size", &Velocities::getSize)
-      .add_property("capacity", &Velocities::getCapacity,
-                    &Velocities::setCapacity)
+      .add_property("capacity", &Velocities::getCapacity, &Velocities::setCapacity)
       .def("gather", &Velocities::gather)
       .def("__getitem__", &Velocities::get)
       .def("back", &Velocities::back)

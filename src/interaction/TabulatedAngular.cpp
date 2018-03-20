@@ -53,8 +53,7 @@ void TabulatedAngular::setFilename(int itype, const char* _filename) {
   }
 }
 
-typedef class FixedTripleListInteractionTemplate<TabulatedAngular>
-    FixedTripleListTabulatedAngular;
+typedef class FixedTripleListInteractionTemplate<TabulatedAngular> FixedTripleListTabulatedAngular;
 typedef class FixedTripleListTypesInteractionTemplate<TabulatedAngular>
     FixedTripleListTypesTabulatedAngular;
 
@@ -64,30 +63,24 @@ typedef class FixedTripleListTypesInteractionTemplate<TabulatedAngular>
 void TabulatedAngular::registerPython() {
   using namespace espressopp::python;
 
-  class_<TabulatedAngular, bases<AngularPotential> >(
-      "interaction_TabulatedAngular", init<int, const char*>())
-      .add_property("filename", &TabulatedAngular::getFilename,
-                    &TabulatedAngular::setFilename)
+  class_<TabulatedAngular, bases<AngularPotential> >("interaction_TabulatedAngular",
+                                                     init<int, const char*>())
+      .add_property("filename", &TabulatedAngular::getFilename, &TabulatedAngular::setFilename)
       .def_pickle(TabulatedAngular_pickle());
 
   class_<FixedTripleListTabulatedAngular, bases<Interaction> >(
       "interaction_FixedTripleListTabulatedAngular",
-      init<shared_ptr<System>, shared_ptr<FixedTripleList>,
-           shared_ptr<TabulatedAngular> >())
+      init<shared_ptr<System>, shared_ptr<FixedTripleList>, shared_ptr<TabulatedAngular> >())
       .def("setPotential", &FixedTripleListTabulatedAngular::setPotential)
-      .def("getFixedTripleList",
-           &FixedTripleListTabulatedAngular::getFixedTripleList);
+      .def("getFixedTripleList", &FixedTripleListTabulatedAngular::getFixedTripleList);
 
   class_<FixedTripleListTypesTabulatedAngular, bases<Interaction> >(
       "interaction_FixedTripleListTypesTabulatedAngular",
       init<shared_ptr<System>, shared_ptr<FixedTripleList> >())
       .def("setPotential", &FixedTripleListTypesTabulatedAngular::setPotential)
-      .def("getPotential",
-           &FixedTripleListTypesTabulatedAngular::getPotentialPtr)
-      .def("setFixedTripleList",
-           &FixedTripleListTypesTabulatedAngular::setFixedTripleList)
-      .def("getFixedTripleList",
-           &FixedTripleListTypesTabulatedAngular::getFixedTripleList);
+      .def("getPotential", &FixedTripleListTypesTabulatedAngular::getPotentialPtr)
+      .def("setFixedTripleList", &FixedTripleListTypesTabulatedAngular::setFixedTripleList)
+      .def("getFixedTripleList", &FixedTripleListTypesTabulatedAngular::getFixedTripleList);
 }
 
 }  // ns interaction

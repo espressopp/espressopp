@@ -33,8 +33,7 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-LangevinThermostatOnRadius::LangevinThermostatOnRadius(
-    shared_ptr<System> system, real _dampingmass)
+LangevinThermostatOnRadius::LangevinThermostatOnRadius(shared_ptr<System> system, real _dampingmass)
     : Extension(system) {
   type = Extension::Thermostat;
 
@@ -59,9 +58,7 @@ void LangevinThermostatOnRadius::setGamma(real _gamma) { gamma = _gamma; }
 
 real LangevinThermostatOnRadius::getGamma() { return gamma; }
 
-void LangevinThermostatOnRadius::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void LangevinThermostatOnRadius::setTemperature(real _temperature) { temperature = _temperature; }
 
 real LangevinThermostatOnRadius::getTemperature() { return temperature; }
 
@@ -76,17 +73,15 @@ void LangevinThermostatOnRadius::disconnect() {
 
 void LangevinThermostatOnRadius::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostatOnRadius::initialize, this));
+  _initialize =
+      integrator->runInit.connect(boost::bind(&LangevinThermostatOnRadius::initialize, this));
 
-  _heatUp = integrator->recalc1.connect(
-      boost::bind(&LangevinThermostatOnRadius::heatUp, this));
+  _heatUp = integrator->recalc1.connect(boost::bind(&LangevinThermostatOnRadius::heatUp, this));
 
-  _coolDown = integrator->recalc2.connect(
-      boost::bind(&LangevinThermostatOnRadius::coolDown, this));
+  _coolDown = integrator->recalc2.connect(boost::bind(&LangevinThermostatOnRadius::coolDown, this));
 
-  _thermalize = integrator->aftCalcF.connect(
-      boost::bind(&LangevinThermostatOnRadius::thermalize, this));
+  _thermalize =
+      integrator->aftCalcF.connect(boost::bind(&LangevinThermostatOnRadius::thermalize, this));
 }
 
 void LangevinThermostatOnRadius::thermalize() {
@@ -158,9 +153,8 @@ void LangevinThermostatOnRadius::coolDown() {
 void LangevinThermostatOnRadius::registerPython() {
   using namespace espressopp::python;
 
-  class_<LangevinThermostatOnRadius, shared_ptr<LangevinThermostatOnRadius>,
-         bases<Extension> >("integrator_LangevinThermostatOnRadius",
-                            init<shared_ptr<System>, real>())
+  class_<LangevinThermostatOnRadius, shared_ptr<LangevinThermostatOnRadius>, bases<Extension> >(
+      "integrator_LangevinThermostatOnRadius", init<shared_ptr<System>, real>())
       .def("connect", &LangevinThermostatOnRadius::connect)
       .def("disconnect", &LangevinThermostatOnRadius::disconnect)
       .def("addExclpid", &LangevinThermostatOnRadius::addExclpid)

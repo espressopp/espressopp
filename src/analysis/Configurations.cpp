@@ -42,8 +42,7 @@ LOG4ESPP_LOGGER(Configurations::logger, "Configurations");
 
 void Configurations::setCapacity(int max) {
   if (max < 0) {
-    LOG4ESPP_ERROR(logger,
-                   "number for maximal configurations must be positive");
+    LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
     return;
   }
 
@@ -56,9 +55,7 @@ void Configurations::setCapacity(int max) {
   if (maxConfigs < nconfigs) {
     int diff = nconfigs - maxConfigs;
 
-    LOG4ESPP_INFO(
-        logger,
-        "delete " << diff << " configurations due to restricted capacity");
+    LOG4ESPP_INFO(logger, "delete " << diff << " configurations due to restricted capacity");
 
     configurations.erase(configurations.begin(), configurations.begin() + diff);
   }
@@ -110,9 +107,7 @@ void Configurations::gather() {
   boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
   boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());
 
-  LOG4ESPP_INFO(logger,
-                "#Partices: me = " << myN << ", max = " << maxN
-                                   << ", totalN = " << totalN);
+  LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN << ", totalN = " << totalN);
 
   int* ids = new int[maxN];  // buffer for gather
   Real3D* coordinates;
@@ -173,29 +168,25 @@ void Configurations::gather() {
         stat = req.wait();
         nIds = *stat.count<int>();
         if (gatherPos) {
-          req =
-              system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, coordinates, maxN);
+          req = system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, coordinates, maxN);
           system.comm->send(iproc, DEFAULT_TAG, 0);
           stat = req.wait();
           nVals = *stat.count<Real3D>();
           if (nVals != nIds) {
             LOG4ESPP_ERROR(logger,
-                           "serious error collecting data, got "
-                               << nIds << " ids, but " << nVals
-                               << " coordinates");
+                           "serious error collecting data, got " << nIds << " ids, but " << nVals
+                                                                 << " coordinates");
           }
         }
         if (gatherVel) {
-          req =
-              system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, velocities, maxN);
+          req = system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, velocities, maxN);
           system.comm->send(iproc, DEFAULT_TAG, 0);
           stat = req.wait();
           nVals = *stat.count<Real3D>();
           if (nVals != nIds) {
             LOG4ESPP_ERROR(logger,
-                           "serious error collecting data, got "
-                               << nIds << " ids, but " << nVals
-                               << " velocities");
+                           "serious error collecting data, got " << nIds << " ids, but " << nVals
+                                                                 << " velocities");
           }
         }
         if (gatherForce) {
@@ -205,8 +196,8 @@ void Configurations::gather() {
           nVals = *stat.count<Real3D>();
           if (nVals != nIds) {
             LOG4ESPP_ERROR(logger,
-                           "serious error collecting data, got "
-                               << nIds << " ids, but " << nVals << " forces");
+                           "serious error collecting data, got " << nIds << " ids, but " << nVals
+                                                                 << " forces");
           }
         }
         if (gatherRadius) {
@@ -215,9 +206,9 @@ void Configurations::gather() {
           stat = req.wait();
           nVals = *stat.count<real>();
           if (nVals != nIds) {
-            LOG4ESPP_ERROR(logger,
-                           "serious error collecting data, got "
-                               << nIds << " ids, but " << nVals << " radii");
+            LOG4ESPP_ERROR(
+                logger,
+                "serious error collecting data, got " << nIds << " ids, but " << nVals << " radii");
           }
         }
         nother = nIds;
@@ -225,8 +216,7 @@ void Configurations::gather() {
         nother = myN;
       }
 
-      LOG4ESPP_INFO(logger,
-                    "add " << nother << " coordinates of proc " << iproc);
+      LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
       for (int i = 0; i < nother; i++) {
         // LOG4ESPP_DEBUG(logger, "set coordinates of particle with id = " <<
@@ -300,8 +290,7 @@ void Configurations::registerPython() {
 
   class_<Configurations>("analysis_Configurations", init<shared_ptr<System> >())
       .add_property("size", &Configurations::getSize)
-      .add_property("capacity", &Configurations::getCapacity,
-                    &Configurations::setCapacity)
+      .add_property("capacity", &Configurations::getCapacity, &Configurations::setCapacity)
       .def("gather", &Configurations::gather)
       .def("__getitem__", &Configurations::get)
       .def("back", &Configurations::back)

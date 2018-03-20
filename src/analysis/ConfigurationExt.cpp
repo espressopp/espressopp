@@ -55,9 +55,7 @@ void ConfigurationExt::set(size_t index, RealND vec) {
   // velocities[index] = Real3D(vx, vy, vz);
 }
 
-RealND ConfigurationExt::getProperties(size_t index) {
-  return particleProperties[index];
-}
+RealND ConfigurationExt::getProperties(size_t index) { return particleProperties[index]; }
 /*
 Real3D ConfigurationExt::getCoordinates(size_t index)
 {
@@ -82,8 +80,7 @@ ConfigurationExtIterator ConfigurationExt::getIterator() {
 
 // ConfigurationExtIterator::ConfigurationExtIterator(std::map<size_t, Real3D>&
 // coordinates)
-ConfigurationExtIterator::ConfigurationExtIterator(
-    std::map<size_t, RealND>& particleProperties) {
+ConfigurationExtIterator::ConfigurationExtIterator(std::map<size_t, RealND>& particleProperties) {
   it = particleProperties.begin();
   end = particleProperties.end();
   // it = coordinates.begin();

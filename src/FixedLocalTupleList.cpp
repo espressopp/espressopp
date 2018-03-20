@@ -103,12 +103,10 @@ bool FixedLocalTupleList::addTuple(boost::python::list& tuple) {
 python::list FixedLocalTupleList::getTuples() {
   python::list tuple;
   python::list alltuples;
-  for (GlobalTuples::iterator it = globalTuples.begin();
-       it != globalTuples.end(); it++) {
+  for (GlobalTuples::iterator it = globalTuples.begin(); it != globalTuples.end(); it++) {
     python::list tuple;
     tuple.append((*it).first);  // key is also part of the tuple!
-    for (tuple::iterator it2 = (*it).second.begin(); it2 != (*it).second.end();
-         it2++) {
+    for (tuple::iterator it2 = (*it).second.begin(); it2 != (*it).second.end(); it2++) {
       tuple.append(*it2);
     }
     alltuples.append(tuple);
@@ -117,14 +115,12 @@ python::list FixedLocalTupleList::getTuples() {
   return alltuples;
 }
 
-void FixedLocalTupleList::beforeSendParticles(ParticleList& pl,
-                                              OutBuffer& buf) {
+void FixedLocalTupleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   std::vector<longint> toSend;
   // loop over the particle list
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pidK = pit->id();
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pidK << ", find tuples");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find tuples");
 
     // find particle that involves this particle id
     GlobalTuples::const_iterator it = globalTuples.find(pidK);
@@ -137,8 +133,7 @@ void FixedLocalTupleList::beforeSendParticles(ParticleList& pl,
       toSend.push_back(s);
 
       // iterate through vector and add pids
-      for (tuple::const_iterator it2 = it->second.begin();
-           it2 != it->second.end(); ++it2) {
+      for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
         toSend.push_back(*it2);
       }
       // delete this pid from the global list
@@ -203,8 +198,7 @@ void FixedLocalTupleList::onParticlesChanged() {
     }
 
     // iterate through vector in map
-    for (tuple::const_iterator it2 = it->second.begin();
-         it2 != it->second.end(); ++it2) {
+    for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
       at = storage->lookupLocalParticle(*it2);
       if (at == NULL) {
         std::stringstream msg;

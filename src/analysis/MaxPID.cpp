@@ -44,16 +44,14 @@ real MaxPID::compute() const {
   }
 
   // it was reduce
-  boost::mpi::all_reduce(*getSystem()->comm, myMaxPID, systemMaxPID,
-                         mpi::maximum<long>());
+  boost::mpi::all_reduce(*getSystem()->comm, myMaxPID, systemMaxPID, mpi::maximum<long>());
 
   return 1.0 * systemMaxPID;
 }
 
 void MaxPID::registerPython() {
   using namespace espressopp::python;
-  class_<MaxPID, bases<Observable> >("analysis_MaxPID",
-                                     init<shared_ptr<System> >());
+  class_<MaxPID, bases<Observable> >("analysis_MaxPID", init<shared_ptr<System> >());
 }
 }
 }

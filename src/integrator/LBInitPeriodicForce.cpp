@@ -26,8 +26,8 @@
 
 namespace espressopp {
 namespace integrator {
-LBInitPeriodicForce::LBInitPeriodicForce(
-    shared_ptr<System> system, shared_ptr<LatticeBoltzmann> latticeboltzmann)
+LBInitPeriodicForce::LBInitPeriodicForce(shared_ptr<System> system,
+                                         shared_ptr<LatticeBoltzmann> latticeboltzmann)
     : LBInit(system, latticeboltzmann) {}
 
 /* do nothing with initial populations */
@@ -37,10 +37,9 @@ void LBInitPeriodicForce::createDenVel(real _rho0, Real3D u0) {}
 void LBInitPeriodicForce::setForce(Real3D _force) {
   int _printId = 0;
   int _offset = latticeboltzmann->getHaloSkin();
-  Int3D _Ni = latticeboltzmann->getNi();      // system size in lattice node
-  Int3D _myNi = latticeboltzmann->getMyNi();  // my local nodes
-  Int3D _globIdx =
-      latticeboltzmann->findGlobIdx();  // first lb site global index
+  Int3D _Ni = latticeboltzmann->getNi();             // system size in lattice node
+  Int3D _myNi = latticeboltzmann->getMyNi();         // my local nodes
+  Int3D _globIdx = latticeboltzmann->findGlobIdx();  // first lb site global index
 
   real ampFz = _force[2];  // amplitude of sin force in z-direction
   real perCompX;           // periodicity function with x-dir dependence
@@ -72,10 +71,9 @@ void LBInitPeriodicForce::setForce(Real3D _force) {
 void LBInitPeriodicForce::addForce(Real3D _force) {
   int _printId = 0;
   int _offset = latticeboltzmann->getHaloSkin();
-  Int3D _Ni = latticeboltzmann->getNi();      // system size in lattice node
-  Int3D _myNi = latticeboltzmann->getMyNi();  // my local nodes
-  Int3D _globIdx =
-      latticeboltzmann->findGlobIdx();  // first lb site global index
+  Int3D _Ni = latticeboltzmann->getNi();             // system size in lattice node
+  Int3D _myNi = latticeboltzmann->getMyNi();         // my local nodes
+  Int3D _globIdx = latticeboltzmann->findGlobIdx();  // first lb site global index
 
   bool fOnSite = false, fTot = false;
   real ampFz = _force[2];  // amplitude of sin force in z-direction
@@ -122,12 +120,10 @@ void LBInitPeriodicForce::printForce(Real3D _force, int _printId) {
       cout << "cancelled. It is now zero.\n";
     else if (_printId == 1)
       cout << "set." << endl
-           << "It is a harmonic force with amplitude: " << setprecision(5)
-           << _force << endl;
+           << "It is a harmonic force with amplitude: " << setprecision(5) << _force << endl;
     else
       cout << "added." << endl
-           << "It is a harmonic force with amplitude: " << setprecision(5)
-           << _force << endl;
+           << "It is a harmonic force with amplitude: " << setprecision(5) << _force << endl;
 
     cout << "-------------------------------------" << endl;
 
@@ -140,8 +136,7 @@ void LBInitPeriodicForce::registerPython() {
   using namespace espressopp::python;
 
   class_<LBInitPeriodicForce, bases<LBInit> >(
-      "integrator_LBInit_PeriodicForce",
-      init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
+      "integrator_LBInit_PeriodicForce", init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
       .def("setForce", &LBInitPeriodicForce::setForce)
       .def("addForce", &LBInitPeriodicForce::addForce);
 }

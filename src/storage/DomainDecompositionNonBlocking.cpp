@@ -42,8 +42,9 @@ namespace storage {
 
 const int DD_COMM_TAG = 0xab;
 
-DomainDecompositionNonBlocking::DomainDecompositionNonBlocking(
-    shared_ptr<System> _system, const Int3D &_nodeGrid, const Int3D &_cellGrid)
+DomainDecompositionNonBlocking::DomainDecompositionNonBlocking(shared_ptr<System> _system,
+                                                               const Int3D &_nodeGrid,
+                                                               const Int3D &_cellGrid)
     : DomainDecomposition(_system, _nodeGrid, _cellGrid),
       inBufferL(*_system->comm),
       inBufferR(*_system->comm),
@@ -56,8 +57,7 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
   // std::cout << getSystem()->comm->rank() << ": " << "
   // decomposeRealParticles\n";
 
-  LOG4ESPP_DEBUG(logger,
-                 "starting, expected comm buffer size " << exchangeBufferSize);
+  LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
   // allocate send/recv buffers. We use the size as we need maximally so far, to
   // avoid reallocation
@@ -80,9 +80,8 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
       LOG4ESPP_DEBUG(logger, "starting with direction " << coord);
 
       if (nodeGrid.getGridSize(coord) > 1) {
-        for (std::vector<Cell *>::iterator it = realCells.begin(),
-                                           end = realCells.end();
-             it != end; ++it) {
+        for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end(); it != end;
+             ++it) {
           Cell &cell = **it;
 
           // do not use an iterator here, since we need to take out particles
@@ -100,8 +99,7 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
               --p;
             }
             // check whether the particle is now "right" of the local domain
-            else if (pos[coord] - cellGrid.getMyRight(coord) >=
-                     ROUND_ERROR_PREC) {
+            else if (pos[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
               LOG4ESPP_TRACE(logger, "send particle right " << part.id());
               moveIndexedParticle(sendBufR, cell.particles, p);
               --p;
@@ -119,14 +117,11 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
                                      << " is not inside node domain after "
                                         "neighbor exchange");
                   // isnan function is C99 only, x != x is only true if x == nan
-                  if (pos[0] != pos[0] || pos[1] != pos[1] ||
-                      pos[2] != pos[2]) {
+                  if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
                     // TODO: error handling
                     LOG4ESPP_ERROR(logger,
-                                   "particle "
-                                       << part.id()
-                                       << " has moved to outer space (one or "
-                                          "more coordinates are nan)");
+                                   "particle " << part.id() << " has moved to outer space (one or "
+                                                               "more coordinates are nan)");
                   } else {
                     // particle stays where it is, and will be sorted in the
                     // next round
@@ -146,25 +141,19 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
 
         // Exchange particles, odd-even rule
         if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-          reqs[0] = isendParticles(outBufferL, sendBufL,
-                                   nodeGrid.getNodeNeighborIndex(2 * coord));
-          reqs[1] = irecvParticles_initiate(
-              inBufferR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+          reqs[0] = isendParticles(outBufferL, sendBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
+          reqs[1] =
+              irecvParticles_initiate(inBufferR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
           reqs[2] =
-              isendParticles(outBufferR, sendBufR,
-                             nodeGrid.getNodeNeighborIndex(2 * coord + 1));
-          reqs[3] = irecvParticles_initiate(
-              inBufferL, nodeGrid.getNodeNeighborIndex(2 * coord));
+              isendParticles(outBufferR, sendBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+          reqs[3] = irecvParticles_initiate(inBufferL, nodeGrid.getNodeNeighborIndex(2 * coord));
         } else {
-          reqs[0] = irecvParticles_initiate(
-              inBufferR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
-          reqs[1] = isendParticles(outBufferL, sendBufL,
-                                   nodeGrid.getNodeNeighborIndex(2 * coord));
-          reqs[2] = irecvParticles_initiate(
-              inBufferL, nodeGrid.getNodeNeighborIndex(2 * coord));
+          reqs[0] =
+              irecvParticles_initiate(inBufferR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+          reqs[1] = isendParticles(outBufferL, sendBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
+          reqs[2] = irecvParticles_initiate(inBufferL, nodeGrid.getNodeNeighborIndex(2 * coord));
           reqs[3] =
-              isendParticles(outBufferR, sendBufR,
-                             nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+              isendParticles(outBufferR, sendBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
         }
 
         mpi::wait_all(reqs, reqs + 4);
@@ -178,10 +167,8 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
         }
 
         // sort received particles to cells
-        if (appendParticles(recvBufL, 2 * coord) && coord == 2)
-          finished = false;
-        if (appendParticles(recvBufR, 2 * coord + 1) && coord == 2)
-          finished = false;
+        if (appendParticles(recvBufL, 2 * coord) && coord == 2) finished = false;
+        if (appendParticles(recvBufR, 2 * coord + 1) && coord == 2) finished = false;
 
         // reset send/recv buffers
         sendBufL.resize(0);
@@ -192,19 +179,15 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
       } else {
         /* Single node direction case (no communication)
           Fold particles that have left the box */
-        for (std::vector<Cell *>::iterator it = realCells.begin(),
-                                           end = realCells.end();
-             it != end; ++it) {
+        for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end(); it != end;
+             ++it) {
           Cell &cell = **it;
           // do not use an iterator here, since we have need to take out
           // particles during the loop
           for (size_t p = 0; p < cell.particles.size(); ++p) {
             Particle &part = cell.particles[p];
-            getSystem()->bc->foldCoordinate(part.position(), part.image(),
-                                            coord);
-            LOG4ESPP_TRACE(
-                logger,
-                "folded coordinate " << coord << " of particle " << part.id());
+            getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
+            LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.id());
 
             if (coord == 2) {
               Cell *sortCell = mapPositionToCellChecked(part.position());
@@ -218,13 +201,10 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
                                         "neighbor exchange");
                   const Real3D &pos = part.position();
                   // isnan function is C99 only, x != x is only true if x == nan
-                  if (pos[0] != pos[0] || pos[1] != pos[1] ||
-                      pos[2] != pos[2]) {
+                  if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
                     LOG4ESPP_ERROR(logger,
-                                   "particle "
-                                       << part.id()
-                                       << " has moved to outer space (one or "
-                                          "more coordinates are nan)");
+                                   "particle " << part.id() << " has moved to outer space (one or "
+                                                               "more coordinates are nan)");
                   } else {
                     // particle stays where it is, and will be sorted in the
                     // next round
@@ -244,31 +224,26 @@ void DomainDecompositionNonBlocking::decomposeRealParticles() {
     }
 
     // Communicate wether particle exchange is finished
-    mpi::all_reduce(*getSystem()->comm, finished, allFinished,
-                    std::logical_and<bool>());
+    mpi::all_reduce(*getSystem()->comm, finished, allFinished, std::logical_and<bool>());
   } while (!allFinished);
 
   exchangeBufferSize = std::max(
       exchangeBufferSize,
       std::max(sendBufL.capacity(),
-               std::max(sendBufR.capacity(),
-                        std::max(recvBufL.capacity(), recvBufR.capacity()))));
+               std::max(sendBufR.capacity(), std::max(recvBufL.capacity(), recvBufR.capacity()))));
 
   LOG4ESPP_DEBUG(logger,
-                 "finished exchanging particles, new send/recv buffer size "
-                     << exchangeBufferSize);
+                 "finished exchanging particles, new send/recv buffer size " << exchangeBufferSize);
 
   LOG4ESPP_DEBUG(logger, "done");
 }
 
-void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
-                                                          bool realToGhosts,
+void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst, bool realToGhosts,
                                                           int extradata) {
   LOG4ESPP_DEBUG(logger,
                  "do ghost communication "
                      << (sizesFirst ? "with sizes " : "")
-                     << (realToGhosts ? "reals to ghosts " : "ghosts to reals ")
-                     << extradata);
+                     << (realToGhosts ? "reals to ghosts " : "ghosts to reals ") << extradata);
 
   /* direction loop: x, y, z.
  Here we could in principle build in a one sided ghost
@@ -307,11 +282,10 @@ void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
 
         for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
           if (realToGhosts) {
-            copyRealsToGhosts(*commCells[dir].reals[i],
-                              *commCells[dir].ghosts[i], extradata, shift);
+            copyRealsToGhosts(*commCells[dir].reals[i], *commCells[dir].ghosts[i], extradata,
+                              shift);
           } else {
-            addGhostForcesToReals(*commCells[dir].ghosts[i],
-                                  *commCells[dir].reals[i]);
+            addGhostForcesToReals(*commCells[dir].ghosts[i], *commCells[dir].reals[i]);
           }
         }
       } else {
@@ -332,28 +306,22 @@ void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
           // exchange sizes, odd-even rule
           if (nodeGrid.getNodePosition(coord) % 2 == 0) {
             LOG4ESPP_DEBUG(logger,
-                           "sending to node "
-                               << nodeGrid.getNodeNeighborIndex(dir)
-                               << ", then receiving from node "
-                               << nodeGrid.getNodeNeighborIndex(oppositeDir));
-            reqs[0] = getSystem()->comm->isend(
-                nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG,
-                &(sendSizes[0]), sendSizes.size());
-            reqs[1] = getSystem()->comm->irecv(
-                nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG,
-                &(recvSizes[0]), recvSizes.size());
+                           "sending to node " << nodeGrid.getNodeNeighborIndex(dir)
+                                              << ", then receiving from node "
+                                              << nodeGrid.getNodeNeighborIndex(oppositeDir));
+            reqs[0] = getSystem()->comm->isend(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG,
+                                               &(sendSizes[0]), sendSizes.size());
+            reqs[1] = getSystem()->comm->irecv(nodeGrid.getNodeNeighborIndex(oppositeDir),
+                                               DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
           } else {
             LOG4ESPP_DEBUG(logger,
-                           "receiving from node "
-                               << nodeGrid.getNodeNeighborIndex(oppositeDir)
-                               << ", then sending to node "
-                               << nodeGrid.getNodeNeighborIndex(dir));
-            reqs[0] = getSystem()->comm->irecv(
-                nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG,
-                &(recvSizes[0]), recvSizes.size());
-            reqs[1] = getSystem()->comm->isend(
-                nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG,
-                &(sendSizes[0]), sendSizes.size());
+                           "receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir)
+                                                  << ", then sending to node "
+                                                  << nodeGrid.getNodeNeighborIndex(dir));
+            reqs[0] = getSystem()->comm->irecv(nodeGrid.getNodeNeighborIndex(oppositeDir),
+                                               DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+            reqs[1] = getSystem()->comm->isend(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG,
+                                               &(sendSizes[0]), sendSizes.size());
           }
 
           mpi::wait_all(reqs, reqs + 2);
@@ -372,8 +340,7 @@ void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
           receiver = nodeGrid.getNodeNeighborIndex(dir);
           sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
           for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-            packPositionsEtc(outBufferG, *commCells[dir].reals[i], extradata,
-                             shift);
+            packPositionsEtc(outBufferG, *commCells[dir].reals[i], extradata, shift);
           }
         } else {
           receiver = nodeGrid.getNodeNeighborIndex(oppositeDir);
@@ -412,12 +379,9 @@ void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
   LOG4ESPP_DEBUG(logger, "ghost communication finished");
 }
 
-mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer &data,
-                                                            ParticleList &list,
+mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer &data, ParticleList &list,
                                                             longint node) {
-  LOG4ESPP_DEBUG(logger,
-                 "initiate non blocking isend " << list.size()
-                                                << " particles to " << node);
+  LOG4ESPP_DEBUG(logger, "initiate non blocking isend " << list.size() << " particles to " << node);
   data.reset();
   int size = list.size();
   data.write(size);
@@ -425,22 +389,19 @@ mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer &data,
     removeFromLocalParticles(&(*it));
     data.write(*it);
   }
-  beforeSendParticles(list,
-                      data);  // this also takes care of AdResS AT Particles
+  beforeSendParticles(list, data);  // this also takes care of AdResS AT Particles
   list.clear();
 
   // ... and send
   return data.isend(node, DD_COMM_TAG);
 }
 
-mpi::request DomainDecompositionNonBlocking::irecvParticles_initiate(
-    InBuffer &data, longint node) {
+mpi::request DomainDecompositionNonBlocking::irecvParticles_initiate(InBuffer &data, longint node) {
   LOG4ESPP_DEBUG(logger, "initiate non blocking irecv on " << node);
   return data.irecv(node, DD_COMM_TAG);
 }
 
-void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data,
-                                                           ParticleList &list) {
+void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data, ParticleList &list) {
   LOG4ESPP_DEBUG(logger, "finish non blocking irecv");
   // ... and unpack
   int size;
@@ -457,8 +418,7 @@ void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data,
       updateInLocalParticles(p);
     }
 
-    afterRecvParticles(list,
-                       data);  // this also takes care of AdResS AT Particles
+    afterRecvParticles(list, data);  // this also takes care of AdResS AT Particles
   }
   LOG4ESPP_DEBUG(logger, "done");
 }
@@ -468,8 +428,7 @@ void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data,
 //////////////////////////////////////////////////
 void DomainDecompositionNonBlocking::registerPython() {
   using namespace espressopp::python;
-  class_<DomainDecompositionNonBlocking, bases<DomainDecomposition>,
-         boost::noncopyable>(
+  class_<DomainDecompositionNonBlocking, bases<DomainDecomposition>, boost::noncopyable>(
       "storage_DomainDecompositionNonBlocking",
       init<shared_ptr<System>, const Int3D &, const Int3D &>());
 }

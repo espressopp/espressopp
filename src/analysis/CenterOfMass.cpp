@@ -70,8 +70,7 @@ real CenterOfMass::compute() const { return -1.0; }
 
 void CenterOfMass::registerPython() {
   using namespace espressopp::python;
-  class_<CenterOfMass, bases<Observable> >("analysis_CenterOfMass",
-                                           init<shared_ptr<System> >())
+  class_<CenterOfMass, bases<Observable> >("analysis_CenterOfMass", init<shared_ptr<System> >())
       .def("compute", &CenterOfMass::computeVector);
 }
 }

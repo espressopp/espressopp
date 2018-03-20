@@ -58,8 +58,7 @@ namespace analysis {
 // dqx, dqy, dqz are the cell length of the grid of possible q-vectors
 // dqx = 2*PI/Lx, dqy = 2*PI/Ly, dqz = 2*PI/Lz
 
-python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
-                                         real bin_factor) const {
+python::list StaticStructF::computeArray(int nqx, int nqy, int nqz, real bin_factor) const {
   time_t start;
   time(&start);
   cout << "collective calc starts " << ctime(&start) << "\n";
@@ -90,8 +89,7 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
     boost::mpi::broadcast(*system.comm, conf, rank_i);
 
     // for simplicity we will number the particles from 0
-    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end();
-         ++itr) {
+    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
       size_t id = itr->first;
       Real3D p = itr->second;
       config->set(id, p[0], p[1], p[2]);
@@ -103,8 +101,7 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
     time_t distributed;
     time(&distributed);
     cout << "particles on all CPUs " << ctime(&distributed) << "\n";
-    cout << "distribution to CPUs took " << difftime(distributed, start)
-         << " seconds \n";
+    cout << "distribution to CPUs took " << difftime(distributed, start) << " seconds \n";
   }
   // now all CPUs have all particle coords and num_part is the total number
   // of particles
@@ -124,8 +121,8 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
 
   // calculations for binning
   real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
-  real q_sqr_max = nqx * nqx * dqs[0] * dqs[0] + nqy * nqy * dqs[1] * dqs[1] +
-                   nqz * nqz * dqs[2] * dqs[2];
+  real q_sqr_max =
+      nqx * nqx * dqs[0] * dqs[0] + nqy * nqy * dqs[1] * dqs[1] + nqz * nqz * dqs[2] * dqs[2];
   real q_max = sqrt(q_sqr_max);
   int num_bins = (int)ceil(q_max / bin_size);
   vector<real> sq_bin;
@@ -142,8 +139,8 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
   }
 
   real n_reci = 1. / num_part;
-  real scos_local = 0;  // will store cos-sum on each CPU
-  real ssin_local = 0;  // will store sin-sum on each CPU
+  real scos_local = 0;                             // will store cos-sum on each CPU
+  real ssin_local = 0;                             // will store sin-sum on each CPU
   int ppp = (int)ceil((double)num_part / nprocs);  // particles per proc
 
   Real3D coordP;
@@ -173,8 +170,7 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
         ssin_local = 0;
 
         // loop over particles
-        for (int k = myrank * ppp; k < (1 + myrank) * ppp && k < num_part;
-             k++) {
+        for (int k = myrank * ppp; k < (1 + myrank) * ppp && k < num_part; k++) {
           coordP = config->getCoordinates(k);
           scos_local += cos(q * coordP);
           ssin_local += sin(q * coordP);
@@ -214,8 +210,7 @@ python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
 // this routine is for ordered configurations, e.g. particle 0 to 9
 // belong to chain 1, particle 10 to 19 to chain 2 etc.
 
-python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz,
-                                                    real bin_factor,
+python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz, real bin_factor,
                                                     int chainlength) const {
   // fist the system coords are saved at each CPU
   System& system = getSystemRef();
@@ -240,8 +235,7 @@ python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz,
     boost::mpi::broadcast(*system.comm, conf, rank_i);
 
     // for simplicity we will number the particles from 0
-    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end();
-         ++itr) {
+    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
       size_t id = itr->first;
       Real3D p = itr->second;
       config->set(id, p[0], p[1], p[2]);
@@ -268,8 +262,8 @@ python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz,
 
   // calculations for binning
   real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
-  real q_sqr_max = nqx * nqx * dqs[0] * dqs[0] + nqy * nqy * dqs[1] * dqs[1] +
-                   nqz * nqz * dqs[2] * dqs[2];
+  real q_sqr_max =
+      nqx * nqx * dqs[0] * dqs[0] + nqy * nqy * dqs[1] * dqs[1] + nqz * nqz * dqs[2] * dqs[2];
   real q_max = sqrt(q_sqr_max);
   int num_bins = (int)ceil(q_max / bin_size);
   vector<real> sq_bin;
@@ -329,13 +323,11 @@ python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz,
         singleChain_localSum = 0;
 
         // loop over chains (cid is chain_id)
-        for (int cid = myrank * cpp;
-             cid < (1 + myrank) * cpp && cid < num_chains; cid++) {
+        for (int cid = myrank * cpp; cid < (1 + myrank) * cpp && cid < num_chains; cid++) {
           scos_local = 0;  // resetting the cos sum for the each chain
           ssin_local = 0;  // resetting the sin sum for the each chain
           // loop over particles
-          for (int k = cid * chainlength;
-               k < (1 + cid) * chainlength && k < num_part; k++) {
+          for (int k = cid * chainlength; k < (1 + cid) * chainlength && k < num_part; k++) {
             coordP = config->getCoordinates(k);
             scos_local += cos(q * coordP);
             ssin_local += sin(q * coordP);
@@ -343,19 +335,16 @@ python::list StaticStructF::computeArraySingleChain(int nqx, int nqy, int nqz,
           // the (summation part of the) single chain structure
           // factors are summed up for the averaging at the
           // end (over the chains)
-          singleChain_localSum +=
-              scos_local * scos_local + ssin_local * ssin_local;
+          singleChain_localSum += scos_local * scos_local + ssin_local * ssin_local;
         }
 
         if (myrank != 0) {
-          boost::mpi::reduce(*system.comm, singleChain_localSum, plus<real>(),
-                             0);
+          boost::mpi::reduce(*system.comm, singleChain_localSum, plus<real>(), 0);
         }
 
         if (myrank == 0) {
           real singleChainSum = 0;
-          boost::mpi::reduce(*system.comm, singleChain_localSum, singleChainSum,
-                             plus<real>(), 0);
+          boost::mpi::reduce(*system.comm, singleChain_localSum, singleChainSum, plus<real>(), 0);
           sq_bin[bin_i] += singleChainSum;
         }
       }
@@ -386,8 +375,7 @@ real StaticStructF::compute() const { return -1.0; }
 
 void StaticStructF::registerPython() {
   using namespace espressopp::python;
-  class_<StaticStructF, bases<Observable> >("analysis_StaticStructF",
-                                            init<shared_ptr<System> >())
+  class_<StaticStructF, bases<Observable> >("analysis_StaticStructF", init<shared_ptr<System> >())
       .def("compute", &StaticStructF::computeArray)
       .def("computeSingleChain", &StaticStructF::computeArraySingleChain);
 }

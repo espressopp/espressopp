@@ -33,8 +33,7 @@ namespace interaction {
 void OPLS::registerPython() {
   using namespace espressopp::python;
 
-  class_<OPLS, bases<DihedralPotential> >("interaction_OPLS",
-                                          init<real, real, real, real>())
+  class_<OPLS, bases<DihedralPotential> >("interaction_OPLS", init<real, real, real, real>())
       .add_property("K1", &OPLS::getK1, &OPLS::setK1)
       .add_property("K2", &OPLS::getK2, &OPLS::setK2)
       .add_property("K3", &OPLS::getK3, &OPLS::setK3)
@@ -42,12 +41,10 @@ void OPLS::registerPython() {
       // set all K at once
       ;
 
-  typedef class FixedQuadrupleListInteractionTemplate<OPLS>
-      FixedQuadrupleListOPLS;
+  typedef class FixedQuadrupleListInteractionTemplate<OPLS> FixedQuadrupleListOPLS;
   class_<FixedQuadrupleListOPLS, bases<Interaction> >(
       "interaction_FixedQuadrupleListOPLS",
-      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>,
-           shared_ptr<OPLS> >())
+      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<OPLS> >())
       .def("setPotential", &FixedQuadrupleListOPLS::setPotential);
   ;
 }

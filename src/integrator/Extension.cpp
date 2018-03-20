@@ -39,9 +39,7 @@ Extension::Extension(shared_ptr<System> system) : SystemAccess(system) {
 
 Extension::~Extension() { LOG4ESPP_INFO(theLogger, "~Extension"); }
 
-void Extension::setIntegrator(shared_ptr<MDIntegrator> _integrator) {
-  integrator = _integrator;
-}
+void Extension::setIntegrator(shared_ptr<MDIntegrator> _integrator) { integrator = _integrator; }
 
 /****************************************************
 ** REGISTRATION WITH PYTHON

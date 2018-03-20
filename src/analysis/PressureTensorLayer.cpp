@@ -28,12 +28,10 @@ namespace analysis {
 
 void PressureTensorLayer::registerPython() {
   using namespace espressopp::python;
-  class_<PressureTensorLayer, bases<AnalysisBase> >(
-      "analysis_PressureTensorLayer", init<shared_ptr<System>, real, real>())
-      .add_property("h0", &PressureTensorLayer::getH0,
-                    &PressureTensorLayer::setH0)
-      .add_property("dh", &PressureTensorLayer::getDH,
-                    &PressureTensorLayer::setDH);
+  class_<PressureTensorLayer, bases<AnalysisBase> >("analysis_PressureTensorLayer",
+                                                    init<shared_ptr<System>, real, real>())
+      .add_property("h0", &PressureTensorLayer::getH0, &PressureTensorLayer::setH0)
+      .add_property("dh", &PressureTensorLayer::getDH, &PressureTensorLayer::setDH);
 }
 }
 }

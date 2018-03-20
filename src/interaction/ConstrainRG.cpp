@@ -33,8 +33,7 @@ ConstrainRG::~ConstrainRG(){};
 void ConstrainRG::registerPython() {
   using namespace espressopp::python;
 
-  class_<ConstrainRG, bases<Potential> >("interaction_ConstrainRG",
-                                         init<real>())
+  class_<ConstrainRG, bases<Potential> >("interaction_ConstrainRG", init<real>())
       .add_property("k_rg", &ConstrainRG::getK_rg, &ConstrainRG::setK_rg);
 
   typedef class FixedLocalTupleRgListInteractionTemplate<ConstrainRG>
@@ -42,8 +41,7 @@ void ConstrainRG::registerPython() {
 
   class_<FixedLocalTupleListConstrainRG, bases<Interaction> >(
       "interaction_FixedLocalTupleListConstrainRG",
-      init<shared_ptr<System>, shared_ptr<FixedLocalTupleList>,
-           shared_ptr<ConstrainRG> >())
+      init<shared_ptr<System>, shared_ptr<FixedLocalTupleList>, shared_ptr<ConstrainRG> >())
       .def("getPotential", &FixedLocalTupleListConstrainRG::getPotential)
       .def("setRG", &FixedLocalTupleListConstrainRG::setRG);
 }

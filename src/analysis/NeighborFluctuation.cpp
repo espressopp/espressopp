@@ -124,8 +124,8 @@ real NeighborFluctuation::compute() const { return -1.0; }
 
 void NeighborFluctuation::registerPython() {
   using namespace espressopp::python;
-  class_<NeighborFluctuation, bases<Observable> >(
-      "analysis_NeighborFluctuation", init<shared_ptr<System>, real>())
+  class_<NeighborFluctuation, bases<Observable> >("analysis_NeighborFluctuation",
+                                                  init<shared_ptr<System>, real>())
       .def("compute", &NeighborFluctuation::computeValues);
 }
 }

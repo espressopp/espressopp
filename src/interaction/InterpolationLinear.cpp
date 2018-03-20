@@ -36,9 +36,7 @@ InterpolationLinear::InterpolationLinear() {
   force = NULL;
 }
 
-InterpolationLinear::~InterpolationLinear() {
-  LOG4ESPP_INFO(theLogger, "~InterpolcationLinear");
-}
+InterpolationLinear::~InterpolationLinear() { LOG4ESPP_INFO(theLogger, "~InterpolcationLinear"); }
 
 // public functions
 
@@ -81,8 +79,7 @@ void InterpolationLinear::readRaw(mpi::communicator comm, const char* file) {
   invdelta = 1.0 / delta;
 
   LOG4ESPP_INFO(theLogger,
-                "tab file has range " << inner << " - " << outer
-                                      << ", delta = " << delta);
+                "tab file has range " << inner << " - " << outer << ", delta = " << delta);
 
   spline(radius, energy, N, ae, be);
   spline(radius, force, N, af, bf);
@@ -127,8 +124,7 @@ int InterpolationLinear::readFile(const char* file, bool dummy) {
 }  // readFile
 
 // Linear spline method adapted from The VOTCA project (http://www.votca.org)
-void InterpolationLinear::spline(const real* x, const real* y, int N, real* a,
-                                 real* b) {
+void InterpolationLinear::spline(const real* x, const real* y, int N, real* a, real* b) {
   // calculate a,b for all intervals 0..(N-2), where interval
   // [x(i),x(i+1)] shall have number i (this means that the last interval
   // has number N-2)

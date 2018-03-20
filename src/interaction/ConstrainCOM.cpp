@@ -33,8 +33,7 @@ ConstrainCOM::~ConstrainCOM(){};
 void ConstrainCOM::registerPython() {
   using namespace espressopp::python;
 
-  class_<ConstrainCOM, bases<Potential> >("interaction_ConstrainCOM",
-                                          init<real>())
+  class_<ConstrainCOM, bases<Potential> >("interaction_ConstrainCOM", init<real>())
       .add_property("k_com", &ConstrainCOM::getK_com, &ConstrainCOM::setK_com);
 
   typedef class FixedLocalTupleComListInteractionTemplate<ConstrainCOM>
@@ -42,8 +41,7 @@ void ConstrainCOM::registerPython() {
 
   class_<FixedLocalTupleListConstrainCOM, bases<Interaction> >(
       "interaction_FixedLocalTupleListConstrainCOM",
-      init<shared_ptr<System>, shared_ptr<FixedLocalTupleList>,
-           shared_ptr<ConstrainCOM> >())
+      init<shared_ptr<System>, shared_ptr<FixedLocalTupleList>, shared_ptr<ConstrainCOM> >())
       .def("getPotential", &FixedLocalTupleListConstrainCOM::getPotential)
       .def("setCom", &FixedLocalTupleListConstrainCOM::setCom);
 }

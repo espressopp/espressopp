@@ -64,8 +64,7 @@ void StillingerWeberTripleTerm::registerPython() {
   class_<VerletListStillingerWeberTripleTerm, bases<Interaction> >(
       "interaction_VerletListStillingerWeberTripleTerm",
       init<shared_ptr<System>, shared_ptr<VerletListTriple> >())
-      .def("getVerletListTriple",
-           &VerletListStillingerWeberTripleTerm::getVerletListTriple)
+      .def("getVerletListTriple", &VerletListStillingerWeberTripleTerm::getVerletListTriple)
       .def("setPotential", &VerletListStillingerWeberTripleTerm::setPotential,
            return_value_policy<reference_existing_object>())
       .def("getPotential", &VerletListStillingerWeberTripleTerm::getPotential,
@@ -76,8 +75,7 @@ void StillingerWeberTripleTerm::registerPython() {
       init<shared_ptr<System>, shared_ptr<FixedTripleList>,
            shared_ptr<StillingerWeberTripleTerm> >())
       .def("setPotential", &FixedListStillingerWeberTripleTerm::setPotential)
-      .def("getFixedTripleList",
-           &FixedListStillingerWeberTripleTerm::getFixedTripleList);
+      .def("getFixedTripleList", &FixedListStillingerWeberTripleTerm::getFixedTripleList);
 }
 }
 }

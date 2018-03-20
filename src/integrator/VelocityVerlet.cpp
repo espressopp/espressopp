@@ -48,16 +48,13 @@ using namespace esutil;
 
 LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
-VelocityVerlet::VelocityVerlet(shared_ptr<System> system)
-    : MDIntegrator(system) {
+VelocityVerlet::VelocityVerlet(shared_ptr<System> system) : MDIntegrator(system) {
   LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
   resortFlag = true;
   maxDist = 0.0;
 }
 
-VelocityVerlet::~VelocityVerlet() {
-  LOG4ESPP_INFO(theLogger, "free VelocityVerlet");
-}
+VelocityVerlet::~VelocityVerlet() { LOG4ESPP_INFO(theLogger, "free VelocityVerlet"); }
 
 void VelocityVerlet::run(int nsteps) {
   VT_TRACER("run");
@@ -86,8 +83,7 @@ void VelocityVerlet::run(int nsteps) {
   bool recalcForces = true;  // TODO: more intelligent
 
   if (recalcForces) {
-    LOG4ESPP_INFO(theLogger,
-                  "recalc forces before starting main integration loop");
+    LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
     // signal
     recalc1();
@@ -101,12 +97,10 @@ void VelocityVerlet::run(int nsteps) {
     recalc2();
   }
 
-  LOG4ESPP_INFO(theLogger,
-                "starting main integration loop (nsteps=" << nsteps << ")");
+  LOG4ESPP_INFO(theLogger, "starting main integration loop (nsteps=" << nsteps << ")");
 
   for (int i = 0; i < nsteps; i++) {
-    LOG4ESPP_INFO(theLogger,
-                  "Next step " << i << " of " << nsteps << " starts");
+    LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
     // saveOldPos(); // save particle positions needed for constraints
 
@@ -128,8 +122,7 @@ void VelocityVerlet::run(int nsteps) {
     // signal
     aftIntP();
 
-    LOG4ESPP_INFO(theLogger,
-                  "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
+    LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
     if (maxDist > skinHalf) resortFlag = true;
 
@@ -159,9 +152,8 @@ void VelocityVerlet::run(int nsteps) {
   }
 
   timeRun = timeIntegrate.getElapsedTime();
-  timeLost =
-      timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
-                 timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
+  timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] + timeComm1 +
+                        timeComm2 + timeInt1 + timeInt2 + timeResort);
 
   LOG4ESPP_INFO(theLogger, "finished run");
 }
@@ -181,8 +173,8 @@ using namespace boost::python;
 static object wrapGetTimers(class VelocityVerlet* obj) {
   real tms[10];
   obj->loadTimers(tms);
-  return boost::python::make_tuple(tms[0], tms[1], tms[2], tms[3], tms[4],
-                                   tms[5], tms[6], tms[7], tms[8], tms[9]);
+  return boost::python::make_tuple(tms[0], tms[1], tms[2], tms[3], tms[4], tms[5], tms[6], tms[7],
+                                   tms[8], tms[9]);
 }
 
 void VelocityVerlet::loadTimers(real t[10]) {
@@ -203,8 +195,7 @@ void VelocityVerlet::printTimers() {
   real pct;
 
   cout << endl;
-  cout << "run = " << setiosflags(ios::fixed) << setprecision(1) << timeRun
-       << endl;
+  cout << "run = " << setiosflags(ios::fixed) << setprecision(1) << timeRun << endl;
   pct = 100.0 * (timeForceComp[0] / timeRun);
   cout << "pair (%) = " << timeForceComp[0] << " (" << pct << ")" << endl;
   pct = 100.0 * (timeForceComp[1] / timeRun);
@@ -235,13 +226,10 @@ real VelocityVerlet::integrate1() {
   real maxSqDist = 0.0;  // maximal square distance a particle moves
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     real sqDist = 0.0;
-    LOG4ESPP_INFO(
-        theLogger,
-        "updating first half step of velocities and full step of positions")
+    LOG4ESPP_INFO(theLogger, "updating first half step of velocities and full step of positions")
     LOG4ESPP_DEBUG(theLogger,
                    "Particle " << cit->id() << ", pos = " << cit->position()
-                               << ", v = " << cit->velocity()
-                               << ", f = " << cit->force());
+                               << ", v = " << cit->velocity() << ", f = " << cit->force());
 
     /* more precise for DEBUG:
     printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f
@@ -272,8 +260,7 @@ real VelocityVerlet::integrate1() {
   inIntP(maxSqDist);
 
   real maxAllSqDist;
-  mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist,
-                  boost::mpi::maximum<real>());
+  mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
 
   LOG4ESPP_INFO(theLogger,
                 "moved " << count << " particles in integrate1"
@@ -313,8 +300,7 @@ void VelocityVerlet::calcForces() {
   const InteractionList& srIL = sys.shortRangeInteractions;
 
   for (size_t i = 0; i < srIL.size(); i++) {
-    LOG4ESPP_INFO(theLogger,
-                  "compute forces for srIL " << i << " of " << srIL.size());
+    LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
     real time;
     time = timeIntegrate.getElapsedTime();
     srIL[i]->addForces();
@@ -323,8 +309,7 @@ void VelocityVerlet::calcForces() {
 }
 
 void VelocityVerlet::updateForces() {
-  LOG4ESPP_INFO(theLogger,
-                "update ghosts, calculate forces and collect ghost forces")
+  LOG4ESPP_INFO(theLogger, "update ghosts, calculate forces and collect ghost forces")
   real time;
   storage::Storage& storage = *getSystemRef().storage;
   time = timeIntegrate.getElapsedTime();
@@ -357,8 +342,7 @@ void VelocityVerlet::initForces() {
 
   for (CellListIterator cit(localCells); !cit.isDone(); ++cit) {
     cit->force() = 0.0;
-    cit->drift() =
-        0.0;  // Can in principle be commented, when drift is not used.
+    cit->drift() = 0.0;  // Can in principle be commented, when drift is not used.
   }
 }
 
@@ -377,8 +361,7 @@ void VelocityVerlet::printForces(bool withGhosts) {
   }
 
   for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
-    LOG4ESPP_DEBUG(theLogger,
-                   "Particle " << cit->id() << ", force = " << cit->force());
+    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", force = " << cit->force());
   }
 }
 
@@ -397,9 +380,7 @@ void VelocityVerlet::printPositions(bool withGhosts) {
   }
 
   for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
-    LOG4ESPP_DEBUG(
-        theLogger,
-        "Particle " << cit->id() << ", position = " << cit->position());
+    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", position = " << cit->position());
   }
 }
 
@@ -411,8 +392,8 @@ void VelocityVerlet::registerPython() {
   using namespace espressopp::python;
 
   // Note: use noncopyable and no_init for abstract classes
-  class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable>(
-      "integrator_VelocityVerlet", init<shared_ptr<System> >())
+  class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable>("integrator_VelocityVerlet",
+                                                                  init<shared_ptr<System> >())
       .def("getTimers", &wrapGetTimers)
       .def("resetTimers", &VelocityVerlet::resetTimers);
 }

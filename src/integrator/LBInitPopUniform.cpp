@@ -26,8 +26,8 @@
 namespace espressopp {
 namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitPopUniform::theLogger, "LBInitPopUniform");
-LBInitPopUniform::LBInitPopUniform(
-    shared_ptr<System> system, shared_ptr<LatticeBoltzmann> latticeboltzmann)
+LBInitPopUniform::LBInitPopUniform(shared_ptr<System> system,
+                                   shared_ptr<LatticeBoltzmann> latticeboltzmann)
     : LBInit(system, latticeboltzmann) {}
 
 void LBInitPopUniform::createDenVel(real _rho0, Real3D _u0) {
@@ -47,8 +47,7 @@ void LBInitPopUniform::createDenVel(real _rho0, Real3D _u0) {
   real scalp, value;
   int _offset = latticeboltzmann->getHaloSkin();
   Int3D _Ni = latticeboltzmann->getMyNi();
-  int _numVels =
-      latticeboltzmann->getNumVels();  // number of velocities in the model
+  int _numVels = latticeboltzmann->getNumVels();  // number of velocities in the model
 
   // set initial velocity of the populations from Maxwell's distribution
   for (int i = 0; i < _Ni.getItem(0); i++) {
@@ -80,8 +79,7 @@ void LBInitPopUniform::registerPython() {
   using namespace espressopp::python;
 
   class_<LBInitPopUniform, bases<LBInit> >(
-      "integrator_LBInit_PopUniform",
-      init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
+      "integrator_LBInit_PopUniform", init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
       .def("createDenVel", &LBInitPopUniform::createDenVel);
 }
 }

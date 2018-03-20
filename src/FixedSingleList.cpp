@@ -43,8 +43,8 @@ FixedSingleList::FixedSingleList(shared_ptr<storage::Storage> _storage)
       boost::bind(&FixedSingleList::beforeSendParticles, this, _1, _2));
   con2 = storage->afterRecvParticles.connect(
       boost::bind(&FixedSingleList::afterRecvParticles, this, _1, _2));
-  con3 = storage->onParticlesChanged.connect(
-      boost::bind(&FixedSingleList::onParticlesChanged, this));
+  con3 =
+      storage->onParticlesChanged.connect(boost::bind(&FixedSingleList::onParticlesChanged, this));
 }
 
 FixedSingleList::~FixedSingleList() {
@@ -85,8 +85,7 @@ bool FixedSingleList::add(longint pid1) {
 python::list FixedSingleList::getSingles() {
   python::list sl;
   longint pid;
-  for (GlobalSingles::iterator it = globalSingles.begin();
-       it != globalSingles.end(); it++) {
+  for (GlobalSingles::iterator it = globalSingles.begin(); it != globalSingles.end(); it++) {
     pid = *it;
     sl.append(pid);
   }
@@ -101,9 +100,7 @@ void FixedSingleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     longint pid = pit->id();
     toSend.push_back(pid);
     globalSingles.erase(pid);
-    LOG4ESPP_DEBUG(
-        theLogger,
-        "erase and send particle with pid from FixedSingleList" << pid);
+    LOG4ESPP_DEBUG(theLogger, "erase and send particle with pid from FixedSingleList" << pid);
   }
   // send the list
   buf.write(toSend);
@@ -114,12 +111,10 @@ void FixedSingleList::afterRecvParticles(ParticleList& pl, InBuffer& buf) {
   longint size = pl.size();
   std::vector<longint> received(size);
   buf.read(received);
-  for (std::vector<longint>::iterator it = received.begin();
-       it != received.end(); it++) {
+  for (std::vector<longint>::iterator it = received.begin(); it != received.end(); it++) {
     globalSingles.insert(*it);
   }
-  LOG4ESPP_INFO(theLogger,
-                "received fixed single list after receive particles");
+  LOG4ESPP_INFO(theLogger, "received fixed single list after receive particles");
 }
 
 void FixedSingleList::onParticlesChanged() {
@@ -129,8 +124,7 @@ void FixedSingleList::onParticlesChanged() {
   Particle* p1;
 
   this->clear();
-  for (GlobalSingles::const_iterator it = globalSingles.begin();
-       it != globalSingles.end(); ++it) {
+  for (GlobalSingles::const_iterator it = globalSingles.begin(); it != globalSingles.end(); ++it) {
     p1 = storage->lookupRealParticle(*it);
     if (p1 == NULL) {
       std::stringstream msg;
@@ -141,8 +135,7 @@ void FixedSingleList::onParticlesChanged() {
     this->add(p1);
   }
   err.checkException();
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed single list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed single list from global list");
 }
 
 /****************************************************
@@ -154,8 +147,8 @@ void FixedSingleList::registerPython() {
 
   bool (FixedSingleList::*pyAdd)(longint pid1) = &FixedSingleList::add;
 
-  class_<FixedSingleList, shared_ptr<FixedSingleList> >(
-      "FixedSingleList", init<shared_ptr<storage::Storage> >())
+  class_<FixedSingleList, shared_ptr<FixedSingleList> >("FixedSingleList",
+                                                        init<shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedSingleList::size)
       .def("getSingles", &FixedSingleList::getSingles);

@@ -25,9 +25,8 @@
 namespace espressopp {
 namespace analysis {
 //    LOG4ESPP_LOGGER(LBOutputVzInTime::theLogger, "LBOutputVzInTime");
-LBOutputVzInTime::LBOutputVzInTime(
-    shared_ptr<System> system,
-    shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
+LBOutputVzInTime::LBOutputVzInTime(shared_ptr<System> system,
+                                   shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann)
     : LBOutput(system, latticeboltzmann) {}
 
 void LBOutputVzInTime::writeOutput() {
@@ -36,8 +35,7 @@ void LBOutputVzInTime::writeOutput() {
   int _step = latticeboltzmann->getStepNum();
 
   // test output in a console
-  if (_step == 0)
-    std::cout << "LBOutputVzInTime: Making Vz (t) output\n\n" << std::endl;
+  if (_step == 0) std::cout << "LBOutputVzInTime: Making Vz (t) output\n\n" << std::endl;
 
   real _denLoc = 0.;
   real _jzLoc = 0.;
@@ -55,13 +53,12 @@ void LBOutputVzInTime::writeOutput() {
   // creating a profile based on the current populations
   for (int l = 0; l < _numVels; l++) {
     _denLoc += latticeboltzmann->getPops(Int3D(_i, _j, _k), l);
-    _jzLoc += latticeboltzmann->getPops(Int3D(_i, _j, _k), l) *
-              latticeboltzmann->getCi(l).getItem(2);
+    _jzLoc +=
+        latticeboltzmann->getPops(Int3D(_i, _j, _k), l) * latticeboltzmann->getCi(l).getItem(2);
   }
 
   vzInTimeFile = fopen("vz_in_time.dat", "a");
-  fprintf(vzInTimeFile, "%9d %9.6f %9.6f  \n", _step, _denLoc,
-          _jzLoc / _denLoc);
+  fprintf(vzInTimeFile, "%9d %9.6f %9.6f  \n", _step, _denLoc, _jzLoc / _denLoc);
   fclose(vzInTimeFile);
 }
 

@@ -37,8 +37,7 @@ LOG4ESPP_LOGGER(VerletListTriple::theLogger, "VerletListTriple");
 /*-------------------------------------------------------------*/
 
 // cut is a cutoff (without skin)
-VerletListTriple::VerletListTriple(shared_ptr<System> system, real _cut,
-                                   bool rebuildVL)
+VerletListTriple::VerletListTriple(shared_ptr<System> system, real _cut, bool rebuildVL)
     : SystemAccess(system) {
   LOG4ESPP_INFO(theLogger, "construct VerletListTriple, cut = " << _cut);
 
@@ -54,8 +53,8 @@ VerletListTriple::VerletListTriple(shared_ptr<System> system, real _cut,
   if (rebuildVL) rebuild();  // not called if exclutions are provided
 
   // make a connection to System to invoke rebuild on resort
-  connectionResort = system->storage->onParticlesChanged.connect(
-      boost::bind(&VerletListTriple::rebuild, this));
+  connectionResort =
+      system->storage->onParticlesChanged.connect(boost::bind(&VerletListTriple::rebuild, this));
 }
 
 real VerletListTriple::getVerletCutoff() { return cutVerlet; }
@@ -87,16 +86,14 @@ void VerletListTriple::rebuild() {
   }
 
   builds++;
-  LOG4ESPP_DEBUG(
-      theLogger,
-      "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
-                                   << " local size = " << vlTriples.size());
+  LOG4ESPP_DEBUG(theLogger,
+                 "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
+                                              << " local size = " << vlTriples.size());
 }
 
 /*-------------------------------------------------------------*/
 
-void VerletListTriple::checkTriple(Particle& pt1, Particle& pt2,
-                                   Particle& pt3) {
+void VerletListTriple::checkTriple(Particle& pt1, Particle& pt2, Particle& pt3) {
   // check if central particle is in the exclusion list
   if (exList.count(pt2.id()) > 0) return;
 
@@ -107,11 +104,9 @@ void VerletListTriple::checkTriple(Particle& pt1, Particle& pt2,
   real distsq2 = d2.sqr();
 
   LOG4ESPP_TRACE(theLogger,
-                 "p1: " << pt1.id() << " @ " << pt1.position()
-                        << " - p2: " << pt2.id() << " @ " << pt2.position()
-                        << " - p3: " << pt3.id() << " @ " << pt3.position()
-                        << " -> distsq1 = " << distsq1
-                        << " -> distsq2 = " << distsq2);
+                 "p1: " << pt1.id() << " @ " << pt1.position() << " - p2: " << pt2.id() << " @ "
+                        << pt2.position() << " - p3: " << pt3.id() << " @ " << pt3.position()
+                        << " -> distsq1 = " << distsq1 << " -> distsq2 = " << distsq2);
 
   if (distsq1 > cutsq || distsq2 > cutsq) return;
 
@@ -136,12 +131,10 @@ int VerletListTriple::localSize() const {
 
 python::tuple VerletListTriple::getTriple(int i) {
   if (i <= 0 || i > vlTriples.size()) {
-    std::cout << "Warning! VerletList pair " << i << " does not exists"
-              << std::endl;
+    std::cout << "Warning! VerletList pair " << i << " does not exists" << std::endl;
     return python::make_tuple();
   } else {
-    return python::make_tuple(vlTriples[i - 1].first->id(),
-                              vlTriples[i - 1].second->id(),
+    return python::make_tuple(vlTriples[i - 1].first->id(), vlTriples[i - 1].second->id(),
                               vlTriples[i - 1].third->id());
   }
 }
@@ -176,11 +169,10 @@ void VerletListTriple::registerPython() {
 
   bool (VerletListTriple::*pyExclude)(longint pid) = &VerletListTriple::exclude;
 
-  class_<VerletListTriple, shared_ptr<VerletListTriple> >(
-      "VerletListTriple", init<shared_ptr<System>, real, bool>())
+  class_<VerletListTriple, shared_ptr<VerletListTriple> >("VerletListTriple",
+                                                          init<shared_ptr<System>, real, bool>())
       .add_property("system", &SystemAccess::getSystem)
-      .add_property("builds", &VerletListTriple::getBuilds,
-                    &VerletListTriple::setBuilds)
+      .add_property("builds", &VerletListTriple::getBuilds, &VerletListTriple::setBuilds)
       .def("totalSize", &VerletListTriple::totalSize)
       .def("localSize", &VerletListTriple::localSize)
       .def("getTriple", &VerletListTriple::getTriple)

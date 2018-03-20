@@ -40,8 +40,7 @@ FixedListComm::FixedListComm(shared_ptr<storage::Storage> _storage)
       boost::bind(&FixedListComm::beforeSendParticles, this, _1, _2));
   con2 = storage->afterRecvParticles.connect(
       boost::bind(&FixedListComm::afterRecvParticles, this, _1, _2));
-  con3 = storage->onParticlesChanged.connect(
-      boost::bind(&FixedListComm::onParticlesChanged, this));
+  con3 = storage->onParticlesChanged.connect(boost::bind(&FixedListComm::onParticlesChanged, this));
 }
 
 FixedListComm::~FixedListComm() {
@@ -91,8 +90,7 @@ bool FixedListComm::add(pvec pids) {
     // globalLists.insert(make_pair(pid1, pid2));
     globalLists.insert(make_pair(pidK, pids));
   } else {  // otherwise test whether the pair already exists
-    for (GlobalList::const_iterator it = equalRange.first;
-         it != equalRange.second; ++it) {
+    for (GlobalList::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
       if (it->second == pids) {
         // TODO: Pair already exists, generate error!
       }
@@ -111,14 +109,13 @@ void FixedListComm::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   // loop over the particle list
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pid = pit->id();
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pid << ", find pairs");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 
     // find all particles that involve this particle id
     int n = globalLists.count(pid);
     if (n > 0) {
-      std::pair<GlobalList::const_iterator, GlobalList::const_iterator>
-          equalRange = globalLists.equal_range(pid);
+      std::pair<GlobalList::const_iterator, GlobalList::const_iterator> equalRange =
+          globalLists.equal_range(pid);
 
       // get the length of the vector in the map
       int l = equalRange.first->second.size();
@@ -130,14 +127,11 @@ void FixedListComm::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
       // then the size of the vector
       toSend.push_back(l);
       // and then the pids of the partners
-      for (GlobalList::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalList::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         // iterate through vector to add pids
-        for (pvec::const_iterator it2 = it->second.begin();
-             it2 != it->second.end(); ++it2) {
+        for (pvec::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
           toSend.push_back(*it2);
-          LOG4ESPP_DEBUG(theLogger,
-                         "send global bond: pid " << pid << " and its vector");
+          LOG4ESPP_DEBUG(theLogger, "send global bond: pid " << pid << " and its vector");
         }
       }
 
@@ -165,9 +159,7 @@ void FixedListComm::afterRecvParticles(ParticleList& pl, InBuffer& buf) {
     pid1 = received[i++];
     n = received[i++];
     l = received[i++];
-    LOG4ESPP_DEBUG(
-        theLogger,
-        "recv particle " << pid1 << ", has " << n << " global pairs");
+    LOG4ESPP_DEBUG(theLogger, "recv particle " << pid1 << ", has " << n << " global pairs");
     for (; n > 0; --n) {
       for (tl = l; tl > 0; --tl) {
         pids.push_back(received[i++]);
@@ -181,8 +173,7 @@ void FixedListComm::afterRecvParticles(ParticleList& pl, InBuffer& buf) {
   if (i != size) {
     LOG4ESPP_ERROR(theLogger, "recv particles might have read garbage\n");
   }
-  LOG4ESPP_INFO(theLogger,
-                "received fixed particle list after receive particles");
+  LOG4ESPP_INFO(theLogger, "received fixed particle list after receive particles");
 }
 
 void FixedListComm::onParticlesChanged() {
@@ -212,8 +203,7 @@ void FixedListComm::onParticlesChanged() {
       lastpid1 = it->first;
     }
     // iterate through vector in map
-    for (pvec::const_iterator it2 = it->second.begin(); it2 != it->second.end();
-         ++it2) {
+    for (pvec::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
       p = storage->lookupLocalParticle(*it2);
       if (p == NULL) {
         printf("SERIOUS ERROR: particle %d not available\n", *it2);

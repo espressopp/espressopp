@@ -33,8 +33,7 @@ LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
 //////////////////////////////////////////////////
 void FENE::registerPython() {
   using namespace espressopp::python;
-  class_<FENE, bases<Potential> >("interaction_FENE",
-                                  init<real, real, real, real>())
+  class_<FENE, bases<Potential> >("interaction_FENE", init<real, real, real, real>())
       .def(init<real, real, real, real, real>())
       .add_property("K", &FENE::getK, &FENE::setK)
       .add_property("r0", &FENE::getR0, &FENE::setR0)
@@ -43,8 +42,7 @@ void FENE::registerPython() {
   class_<FixedPairListFENE, bases<Interaction> >(
       "interaction_FixedPairListFENE",
       init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
-                shared_ptr<FENE> >())
+      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
       .def("setPotential", &FixedPairListFENE::setPotential)
       .def("getPotential", &FixedPairListFENE::getPotential)
       .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)

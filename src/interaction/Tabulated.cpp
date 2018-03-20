@@ -58,15 +58,11 @@ void Tabulated::setFilename(int itype, const char* _filename) {
 }
 
 typedef class VerletListInteractionTemplate<Tabulated> VerletListTabulated;
-typedef class VerletListAdressInteractionTemplate<Tabulated, Tabulated>
-    VerletListAdressTabulated;
-typedef class VerletListHadressInteractionTemplate<Tabulated, Tabulated>
-    VerletListHadressTabulated;
+typedef class VerletListAdressInteractionTemplate<Tabulated, Tabulated> VerletListAdressTabulated;
+typedef class VerletListHadressInteractionTemplate<Tabulated, Tabulated> VerletListHadressTabulated;
 typedef class CellListAllPairsInteractionTemplate<Tabulated> CellListTabulated;
-typedef class FixedPairListInteractionTemplate<Tabulated>
-    FixedPairListTabulated;
-typedef class FixedPairListTypesInteractionTemplate<Tabulated>
-    FixedPairListTypesTabulated;
+typedef class FixedPairListInteractionTemplate<Tabulated> FixedPairListTabulated;
+typedef class FixedPairListTypesInteractionTemplate<Tabulated> FixedPairListTypesTabulated;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -74,14 +70,12 @@ typedef class FixedPairListTypesInteractionTemplate<Tabulated>
 void Tabulated::registerPython() {
   using namespace espressopp::python;
 
-  class_<Tabulated, bases<Potential> >("interaction_Tabulated",
-                                       init<int, const char*, real>())
-      .add_property("filename", &Tabulated::getFilename,
-                    &Tabulated::setFilename)
+  class_<Tabulated, bases<Potential> >("interaction_Tabulated", init<int, const char*, real>())
+      .add_property("filename", &Tabulated::getFilename, &Tabulated::setFilename)
       .def_pickle(Tabulated_pickle());
 
-  class_<VerletListTabulated, bases<Interaction> >(
-      "interaction_VerletListTabulated", init<shared_ptr<VerletList> >())
+  class_<VerletListTabulated, bases<Interaction> >("interaction_VerletListTabulated",
+                                                   init<shared_ptr<VerletList> >())
       .def("setPotential", &VerletListTabulated::setPotential)
       .def("getPotential", &VerletListTabulated::getPotentialPtr);
 
@@ -99,17 +93,15 @@ void Tabulated::registerPython() {
       .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG);
   ;
 
-  class_<CellListTabulated, bases<Interaction> >(
-      "interaction_CellListTabulated", init<shared_ptr<storage::Storage> >())
+  class_<CellListTabulated, bases<Interaction> >("interaction_CellListTabulated",
+                                                 init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListTabulated::setPotential);
   ;
 
   class_<FixedPairListTabulated, bases<Interaction> >(
       "interaction_FixedPairListTabulated",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<Tabulated> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
-                shared_ptr<Tabulated> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Tabulated> >())
+      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Tabulated> >())
       .def("setPotential", &FixedPairListTabulated::setPotential)
       .def("setFixedPairList", &FixedPairListTabulated::setFixedPairList)
       .def("getFixedPairList", &FixedPairListTabulated::getFixedPairList);

@@ -37,11 +37,9 @@ using namespace iterator;
 
 namespace integrator {
 
-LOG4ESPP_LOGGER(StochasticVelocityRescaling::theLogger,
-                "StochasticVelocityRescaling");
+LOG4ESPP_LOGGER(StochasticVelocityRescaling::theLogger, "StochasticVelocityRescaling");
 
-StochasticVelocityRescaling::StochasticVelocityRescaling(
-    shared_ptr<System> system)
+StochasticVelocityRescaling::StochasticVelocityRescaling(shared_ptr<System> system)
     : Extension(system) {
   temperature = 0.0;
   coupling = 1;  // tau_t coupling
@@ -76,36 +74,30 @@ void StochasticVelocityRescaling::disconnect() {
 
 void StochasticVelocityRescaling::connect() {
   // connection to initialization
-  _runInit = integrator->runInit.connect(
-      boost::bind(&StochasticVelocityRescaling::initialize, this));
+  _runInit =
+      integrator->runInit.connect(boost::bind(&StochasticVelocityRescaling::initialize, this));
   // connection to the signal at the end of the run
   _aftIntV = integrator->aftIntV.connect(
       boost::bind(&StochasticVelocityRescaling::rescaleVelocities, this));
 }
 
-void StochasticVelocityRescaling::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void StochasticVelocityRescaling::setTemperature(real _temperature) { temperature = _temperature; }
 
 real StochasticVelocityRescaling::getTemperature() { return temperature; }
 
-void StochasticVelocityRescaling::setCoupling(real _coupling) {
-  coupling = _coupling;
-}
+void StochasticVelocityRescaling::setCoupling(real _coupling) { coupling = _coupling; }
 
 real StochasticVelocityRescaling::getCoupling() { return coupling; }
 
 void StochasticVelocityRescaling::initialize() {
   LOG4ESPP_INFO(theLogger,
-                "init, coupling = " << coupling << ", external temperature = "
-                                    << temperature);
+                "init, coupling = " << coupling << ", external temperature = " << temperature);
   real dt = integrator->getTimeStep();
   pref = coupling / dt;
 
   System& system = getSystemRef();
   NPart_local = system.storage->getNRealParticles();
-  boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart,
-                         std::plus<int>());
+  boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart, std::plus<int>());
   DegreesOfFreedom = 3.0 * NPart;  // TODO this is _only_ true for simple system
                                    // without any constraints
   // calculate the reference kinetic energy based on reference temperature
@@ -126,18 +118,15 @@ void StochasticVelocityRescaling::rescaleVelocities() {
 
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     Real3D vel = cit->velocity();
-    EKin_local +=
-        0.5 * cit->mass() * (vel * vel);  // FIXME do not forget that his is
-                                          // only correct for velocity-verlet;
-                                          // leap-frog would require adjustments
+    EKin_local += 0.5 * cit->mass() * (vel * vel);  // FIXME do not forget that his is
+                                                    // only correct for velocity-verlet;
+                                                    // leap-frog would require adjustments
   }
 
-  boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin,
-                         std::plus<real>());
+  boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>());
 
   if (getSystem()->comm->rank() == 0) {
-    EKin_new =
-        stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, pref, rng);
+    EKin_new = stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, pref, rng);
     // it should always be larger than 0
     if (EKin_new <= 0)
       throw std::runtime_error(
@@ -176,8 +165,8 @@ real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
   }
 }
 
-real StochasticVelocityRescaling::stochasticVR_pullEkin(
-    real Ekin, real Ekin_ref, int dof, real taut, shared_ptr<esutil::RNG> rng) {
+real StochasticVelocityRescaling::stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
+                                                        real taut, shared_ptr<esutil::RNG> rng) {
   real factor, rr;
 
   /*
@@ -195,15 +184,11 @@ real StochasticVelocityRescaling::stochasticVR_pullEkin(
   }
   rr = rng->normal();
   return Ekin +
-         (1.0 - factor) *
-             (Ekin_ref * (stochasticVR_sumGaussians(dof - 1) + rr * rr) / dof -
-              Ekin) +
+         (1.0 - factor) * (Ekin_ref * (stochasticVR_sumGaussians(dof - 1) + rr * rr) / dof - Ekin) +
          2.0 * rr * sqrt(Ekin * Ekin_ref / dof * (1.0 - factor) * factor);
 }
 
-real GammaDistributionBoost::drawNumber(const unsigned int ia) {
-  return rng->gamma(ia);
-}
+real GammaDistributionBoost::drawNumber(const unsigned int ia) { return rng->gamma(ia); }
 
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
 real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
@@ -239,8 +224,7 @@ real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
 real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
   real a1, a2, x, v, u;
-  if (ia <= 0)
-    throw std::runtime_error("Error in routine stochasticVR_gammaDeviate3rd");
+  if (ia <= 0) throw std::runtime_error("Error in routine stochasticVR_gammaDeviate3rd");
   a1 = ia - 1.0 / 3.0;
   a2 = 1.0 / sqrt(9.0 * a1);
   do {
@@ -250,8 +234,7 @@ real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
     } while (v <= 0.0);
     v = v * v * v;
     u = (*rng)();
-  } while ((u > 1.0 - 0.331 * x * x * x * x) &&
-           log(u) > 0.5 * x * x + a1 * (1.0 - v + log(v)));
+  } while ((u > 1.0 - 0.331 * x * x * x * x) && log(u) > 0.5 * x * x + a1 * (1.0 - v + log(v)));
   return a1 * v;
 }
 
@@ -262,13 +245,11 @@ real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
 void StochasticVelocityRescaling::registerPython() {
   using namespace espressopp::python;
 
-  class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling>,
-         bases<Extension> >
+  class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling>, bases<Extension> >
 
       ("integrator_StochasticVelocityRescaling", init<shared_ptr<System> >())
 
-          .add_property("temperature",
-                        &StochasticVelocityRescaling::getTemperature,
+          .add_property("temperature", &StochasticVelocityRescaling::getTemperature,
                         &StochasticVelocityRescaling::setTemperature)
           .add_property("coupling", &StochasticVelocityRescaling::getCoupling,
                         &StochasticVelocityRescaling::setCoupling)

@@ -35,8 +35,8 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-LangevinThermostatHybrid::LangevinThermostatHybrid(
-    shared_ptr<System> system, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+LangevinThermostatHybrid::LangevinThermostatHybrid(shared_ptr<System> system,
+                                                   shared_ptr<FixedTupleListAdress> _fixedtupleList)
     : Extension(system), fixedtupleList(_fixedtupleList) {
   type = Extension::Thermostat;
 
@@ -58,9 +58,7 @@ void LangevinThermostatHybrid::setGamma(real _gamma) { gamma = _gamma; }
 
 real LangevinThermostatHybrid::getGamma() { return gamma; }
 
-void LangevinThermostatHybrid::setGammaHybrid(real _gammahy) {
-  gammahy = _gammahy;
-}
+void LangevinThermostatHybrid::setGammaHybrid(real _gammahy) { gammahy = _gammahy; }
 
 real LangevinThermostatHybrid::getGammaHybrid() { return gammahy; }
 
@@ -68,9 +66,7 @@ void LangevinThermostatHybrid::setGammaCG(real _gammacg) { gammacg = _gammacg; }
 
 real LangevinThermostatHybrid::getGammaCG() { return gammacg; }
 
-void LangevinThermostatHybrid::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void LangevinThermostatHybrid::setTemperature(real _temperature) { temperature = _temperature; }
 
 real LangevinThermostatHybrid::getTemperature() { return temperature; }
 
@@ -85,17 +81,15 @@ void LangevinThermostatHybrid::disconnect() {
 
 void LangevinThermostatHybrid::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostatHybrid::initialize, this));
+  _initialize =
+      integrator->runInit.connect(boost::bind(&LangevinThermostatHybrid::initialize, this));
 
-  _heatUp = integrator->recalc1.connect(
-      boost::bind(&LangevinThermostatHybrid::heatUp, this));
+  _heatUp = integrator->recalc1.connect(boost::bind(&LangevinThermostatHybrid::heatUp, this));
 
-  _coolDown = integrator->recalc2.connect(
-      boost::bind(&LangevinThermostatHybrid::coolDown, this));
+  _coolDown = integrator->recalc2.connect(boost::bind(&LangevinThermostatHybrid::coolDown, this));
 
-  _thermalizeAdr = integrator->aftCalcF.connect(
-      boost::bind(&LangevinThermostatHybrid::thermalizeAdr, this));
+  _thermalizeAdr =
+      integrator->aftCalcF.connect(boost::bind(&LangevinThermostatHybrid::thermalizeAdr, this));
 }
 
 void LangevinThermostatHybrid::thermalizeAdr() {
@@ -123,8 +117,7 @@ void LangevinThermostatHybrid::thermalizeAdr() {
     if (it3 != fixedtupleList->end()) {
       std::vector<Particle*> atList;
       atList = it3->second;
-      for (std::vector<Particle*>::iterator it2 = atList.begin();
-           it2 != atList.end(); ++it2) {
+      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
         Particle& at = **it2;
         frictionThermo(at, weight);
       }
@@ -156,8 +149,7 @@ void LangevinThermostatHybrid::initialize() {  // calculate the prefactors
 
   LOG4ESPP_INFO(theLogger,
                 "init, timestep = " << timestep << ", gamma = " << gamma
-                                    << ", gammahy = " << gammahy
-                                    << ", gammacg = " << gammacg
+                                    << ", gammahy = " << gammahy << ", gammacg = " << gammacg
                                     << ", temperature = " << temperature);
 
   pref1 = -gamma;
@@ -208,8 +200,7 @@ void LangevinThermostatHybrid::coolDown() {
 void LangevinThermostatHybrid::registerPython() {
   using namespace espressopp::python;
 
-  class_<LangevinThermostatHybrid, shared_ptr<LangevinThermostatHybrid>,
-         bases<Extension> >(
+  class_<LangevinThermostatHybrid, shared_ptr<LangevinThermostatHybrid>, bases<Extension> >(
       "integrator_LangevinThermostatHybrid",
       init<shared_ptr<System>, shared_ptr<FixedTupleListAdress> >())
       .def("connect", &LangevinThermostatHybrid::connect)

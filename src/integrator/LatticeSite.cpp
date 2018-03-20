@@ -58,8 +58,8 @@ std::vector<real> LBSite::phiLoc(19, 0.);
 
 /*******************************************************************************************/
 
-void LBSite::collision(bool _fluct, bool _extForce, bool _coupling,
-                       Real3D _force, std::vector<real> &_gamma) {
+void LBSite::collision(bool _fluct, bool _extForce, bool _coupling, Real3D _force,
+                       std::vector<real> &_gamma) {
   real m[19];
 
   calcLocalMoments(m);
@@ -78,8 +78,8 @@ void LBSite::collision(bool _fluct, bool _extForce, bool _coupling,
 
 /* CALCULATION OF THE LOCAL MOMENTS */
 void LBSite::calcLocalMoments(real *m) {
-  real f0, f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10, f11p12,
-      f11m12, f13p14, f13m14, f15p16, f15m16, f17p18, f17m18;
+  real f0, f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10, f11p12, f11m12, f13p14,
+      f13m14, f15p16, f15m16, f17p18, f17m18;
 
   /* shorthand functions for "simplified" notation */
   f0 = getF_i(0);
@@ -103,8 +103,7 @@ void LBSite::calcLocalMoments(real *m) {
   f17m18 = getF_i(17) - getF_i(18);
 
   /* mass mode */
-  m[0] = f0 + f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 +
-         f17p18;
+  m[0] = f0 + f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18;
 
   /* momentum modes */
   m[1] = f1m2 + f7m8 + f9m10 + f11m12 + f13m14;
@@ -113,8 +112,7 @@ void LBSite::calcLocalMoments(real *m) {
 
   /* stress modes */
   m[4] = -f0 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18;
-  m[5] = 2. * f1p2 - f3p4 - f5p6 + f7p8 + f9p10 + f11p12 + f13p14 -
-         2. * (f15p16 + f17p18);
+  m[5] = 2. * f1p2 - f3p4 - f5p6 + f7p8 + f9p10 + f11p12 + f13p14 - 2. * (f15p16 + f17p18);
   m[6] = f3p4 - f5p6 + f7p8 + f9p10 - f11p12 - f13p14;
   m[7] = f7p8 - f9p10;
   m[8] = f11p12 - f13p14;
@@ -127,18 +125,15 @@ void LBSite::calcLocalMoments(real *m) {
   m[13] = f7m8 + f9m10 - f11m12 - f13m14;
   m[14] = -f7m8 + f9m10 + f15m16 + f17m18;
   m[15] = f11m12 - f13m14 - f15m16 + f17m18;
-  m[16] = f0 - 2. * (f1p2 + f3p4 + f5p6) + f7p8 + f9p10 + f11p12 + f13p14 +
-          f15p16 + f17p18;
-  m[17] = -2. * f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 -
-          2. * (f15p16 + f17p18);
+  m[16] = f0 - 2. * (f1p2 + f3p4 + f5p6) + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18;
+  m[17] = -2. * f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 - 2. * (f15p16 + f17p18);
   m[18] = -f3p4 + f5p6 + f7p8 + f9p10 - f11p12 - f13p14;
 }
 
 /*******************************************************************************************/
 
 /* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-void LBSite::relaxMoments(real *m, bool _extForce, Real3D _f,
-                          std::vector<real> &_gamma) {
+void LBSite::relaxMoments(real *m, bool _extForce, Real3D _f, std::vector<real> &_gamma) {
   // moments on the site //
   real _invTauLoc = 1. / LatticePar::getTauLoc();
   Real3D jLoc(m[1], m[2], m[3]);
@@ -146,8 +141,7 @@ void LBSite::relaxMoments(real *m, bool _extForce, Real3D _f,
   jLoc *= _invTauLoc;
 
   // if we have external forces then modify the eq.fluxes //
-  if (_extForce)
-    jLoc += 0.5 * _f;  // when doing coupling, the flag is set to 1!
+  if (_extForce) jLoc += 0.5 * _f;  // when doing coupling, the flag is set to 1!
 
   real _invRhoLoc = 1. / m[0];
   real pi_eq[6];
@@ -261,43 +255,43 @@ void LBSite::btranMomToPop(real *m) {
   setF_i(6, m[0] - m[3] - m[5] - m[6] + 2. * (m[12] - m[16]) + m[17] + m[18]);
 
   setF_i(7,
-         m[0] + m[1] + m[2] + m[4] + m[5] + m[6] + m[7] + m[10] + m[11] +
-             m[13] - m[14] + m[16] + m[17] + m[18]);
+         m[0] + m[1] + m[2] + m[4] + m[5] + m[6] + m[7] + m[10] + m[11] + m[13] - m[14] + m[16] +
+             m[17] + m[18]);
   setF_i(8,
-         m[0] - m[1] - m[2] + m[4] + m[5] + m[6] + m[7] - m[10] - m[11] -
-             m[13] + m[14] + m[16] + m[17] + m[18]);
+         m[0] - m[1] - m[2] + m[4] + m[5] + m[6] + m[7] - m[10] - m[11] - m[13] + m[14] + m[16] +
+             m[17] + m[18]);
   setF_i(9,
-         m[0] + m[1] - m[2] + m[4] + m[5] + m[6] - m[7] + m[10] - m[11] +
-             m[13] + m[14] + m[16] + m[17] + m[18]);
+         m[0] + m[1] - m[2] + m[4] + m[5] + m[6] - m[7] + m[10] - m[11] + m[13] + m[14] + m[16] +
+             m[17] + m[18]);
   setF_i(10,
-         m[0] - m[1] + m[2] + m[4] + m[5] + m[6] - m[7] - m[10] + m[11] -
-             m[13] - m[14] + m[16] + m[17] + m[18]);
+         m[0] - m[1] + m[2] + m[4] + m[5] + m[6] - m[7] - m[10] + m[11] - m[13] - m[14] + m[16] +
+             m[17] + m[18]);
 
   setF_i(11,
-         m[0] + m[1] + m[3] + m[4] + m[5] - m[6] + m[8] + m[10] + m[12] -
-             m[13] + m[15] + m[16] + m[17] - m[18]);
+         m[0] + m[1] + m[3] + m[4] + m[5] - m[6] + m[8] + m[10] + m[12] - m[13] + m[15] + m[16] +
+             m[17] - m[18]);
   setF_i(12,
-         m[0] - m[1] - m[3] + m[4] + m[5] - m[6] + m[8] - m[10] - m[12] +
-             m[13] - m[15] + m[16] + m[17] - m[18]);
+         m[0] - m[1] - m[3] + m[4] + m[5] - m[6] + m[8] - m[10] - m[12] + m[13] - m[15] + m[16] +
+             m[17] - m[18]);
   setF_i(13,
-         m[0] + m[1] - m[3] + m[4] + m[5] - m[6] - m[8] + m[10] - m[12] -
-             m[13] - m[15] + m[16] + m[17] - m[18]);
+         m[0] + m[1] - m[3] + m[4] + m[5] - m[6] - m[8] + m[10] - m[12] - m[13] - m[15] + m[16] +
+             m[17] - m[18]);
   setF_i(14,
-         m[0] - m[1] + m[3] + m[4] + m[5] - m[6] - m[8] - m[10] + m[12] +
-             m[13] + m[15] + m[16] + m[17] - m[18]);
+         m[0] - m[1] + m[3] + m[4] + m[5] - m[6] - m[8] - m[10] + m[12] + m[13] + m[15] + m[16] +
+             m[17] - m[18]);
 
   setF_i(15,
-         m[0] + m[2] + m[3] + m[4] - 2. * m[5] + m[9] + m[11] + m[12] + m[14] -
-             m[15] + m[16] - 2. * m[17]);
+         m[0] + m[2] + m[3] + m[4] - 2. * m[5] + m[9] + m[11] + m[12] + m[14] - m[15] + m[16] -
+             2. * m[17]);
   setF_i(16,
-         m[0] - m[2] - m[3] + m[4] - 2. * m[5] + m[9] - m[11] - m[12] - m[14] +
-             m[15] + m[16] - 2. * m[17]);
+         m[0] - m[2] - m[3] + m[4] - 2. * m[5] + m[9] - m[11] - m[12] - m[14] + m[15] + m[16] -
+             2. * m[17]);
   setF_i(17,
-         m[0] + m[2] - m[3] + m[4] - 2. * m[5] - m[9] + m[11] - m[12] + m[14] +
-             m[15] + m[16] - 2. * m[17]);
+         m[0] + m[2] - m[3] + m[4] - 2. * m[5] - m[9] + m[11] - m[12] + m[14] + m[15] + m[16] -
+             2. * m[17]);
   setF_i(18,
-         m[0] - m[2] + m[3] + m[4] - 2. * m[5] - m[9] - m[11] + m[12] - m[14] -
-             m[15] + m[16] - 2. * m[17]);
+         m[0] - m[2] + m[3] + m[4] - 2. * m[5] - m[9] - m[11] + m[12] - m[14] - m[15] + m[16] -
+             2. * m[17]);
 
   /* scale populations with weights */
   for (int i = 0; i < _numVelsLoc; i++) {
@@ -321,8 +315,7 @@ LBMom::~LBMom() {}
 
 /*******************************************************************************************/
 
-LatticePar::LatticePar(shared_ptr<System> system, int _numVelsLoc, real _a,
-                       real _tau) {
+LatticePar::LatticePar(shared_ptr<System> system, int _numVelsLoc, real _a, real _tau) {
   setNumVelsLoc(_numVelsLoc);
   setALoc(_a);
   setTauLoc(_tau);
@@ -426,22 +419,14 @@ LBForce::LBForce() {
   couplForceLoc = Real3D(0.);
 }
 
-void LBForce::setExtForceLoc(Real3D _extForceLoc) {
-  extForceLoc = _extForceLoc;
-}
+void LBForce::setExtForceLoc(Real3D _extForceLoc) { extForceLoc = _extForceLoc; }
 Real3D LBForce::getExtForceLoc() { return extForceLoc; }
 
-void LBForce::setCouplForceLoc(Real3D _couplForceLoc) {
-  couplForceLoc = _couplForceLoc;
-}
+void LBForce::setCouplForceLoc(Real3D _couplForceLoc) { couplForceLoc = _couplForceLoc; }
 Real3D LBForce::getCouplForceLoc() { return couplForceLoc; }
 
-void LBForce::addExtForceLoc(Real3D _extForceLoc) {
-  extForceLoc += _extForceLoc;
-}
-void LBForce::addCouplForceLoc(Real3D _couplForceLoc) {
-  couplForceLoc += _couplForceLoc;
-}
+void LBForce::addExtForceLoc(Real3D _extForceLoc) { extForceLoc += _extForceLoc; }
+void LBForce::addCouplForceLoc(Real3D _couplForceLoc) { couplForceLoc += _couplForceLoc; }
 
 LBForce::~LBForce() {}
 }

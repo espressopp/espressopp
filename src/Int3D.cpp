@@ -26,9 +26,7 @@
 
 namespace espressopp {
 struct int3D_pickle_suite : boost::python::pickle_suite {
-  static python::tuple getinitargs(const Int3D v) {
-    return python::make_tuple(v[0], v[1], v[2]);
-  }
+  static python::tuple getinitargs(const Int3D v) { return python::make_tuple(v[0], v[1], v[2]); }
 };
 
 void Int3D::registerPython() {

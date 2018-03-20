@@ -33,10 +33,8 @@ namespace espressopp {
 namespace interaction {
 
 typedef class VerletListInteractionTemplate<Zero> VerletListZero;
-typedef class VerletListAdressInteractionTemplate<Zero, Tabulated>
-    VerletListAdressZero;
-typedef class VerletListHadressInteractionTemplate<Zero, Tabulated>
-    VerletListHadressZero;
+typedef class VerletListAdressInteractionTemplate<Zero, Tabulated> VerletListAdressZero;
+typedef class VerletListHadressInteractionTemplate<Zero, Tabulated> VerletListHadressZero;
 typedef class CellListAllPairsInteractionTemplate<Zero> CellListZero;
 typedef class FixedPairListInteractionTemplate<Zero> FixedPairListZero;
 
@@ -73,8 +71,8 @@ void Zero::registerPython() {
       .def("setPotentialCG", &VerletListHadressZero::setPotentialCG);
   ;
 
-  class_<CellListZero, bases<Interaction> >(
-      "interaction_CellListZero", init<shared_ptr<storage::Storage> >())
+  class_<CellListZero, bases<Interaction> >("interaction_CellListZero",
+                                            init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListZero::setPotential);
   ;
 

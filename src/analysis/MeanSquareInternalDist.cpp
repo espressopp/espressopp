@@ -56,8 +56,7 @@ python::list MeanSquareInternalDist::compute() const {
   // creating vector which stores particleIDs for each CPU
   vector<longint> localIDs;  // localIDs is a vector with PID of particles in
                              // each CPU and it contains whole chains
-  for (map<size_t, int>::const_iterator itr = idToCpu.begin();
-       itr != idToCpu.end(); ++itr) {
+  for (map<size_t, int>::const_iterator itr = idToCpu.begin(); itr != idToCpu.end(); ++itr) {
     size_t i = itr->first;
     int whichCPU = itr->second;
     if (system.comm->rank() == whichCPU) {
@@ -88,15 +87,13 @@ python::list MeanSquareInternalDist::compute() const {
     for (int j = 0; j < N_chains; j++) {
       real sumdistsq = 0.0;
 
-      for (int i = j * chainlength; i < (j * chainlength) + chainlength - n;
-           i++) {
+      for (int i = j * chainlength; i < (j * chainlength) + chainlength - n; i++) {
         Real3D pos1 = getConf(M - 1)->getCoordinates(
             localIDs[i]);  // compute the MSID of the last added snapshot
         Real3D pos2 = getConf(M - 1)->getCoordinates(
-            localIDs[i + n]);  // compute the MSID of the last added snapshot
-        Real3D delta =
-            pos2 - pos1;  // vector with the distances from i to chainlength-n
-        sumdistsq += delta.sqr();  // dx*dx+dy*dy+dz*dz
+            localIDs[i + n]);        // compute the MSID of the last added snapshot
+        Real3D delta = pos2 - pos1;  // vector with the distances from i to chainlength-n
+        sumdistsq += delta.sqr();    // dx*dx+dy*dy+dz*dz
       }
 
       intdist += sumdistsq / real(chainlength - n);  // sum of the internal
@@ -105,8 +102,7 @@ python::list MeanSquareInternalDist::compute() const {
                                                      // chains in this cpu
     }
 
-    boost::mpi::reduce(*system.comm, intdist, intdist_sum, std::plus<real>(),
-                       0);
+    boost::mpi::reduce(*system.comm, intdist, intdist_sum, std::plus<real>(), 0);
 
     if (system.comm->rank() == 0) {
       int chains_total = num_of_part / chainlength;
@@ -120,10 +116,9 @@ python::list MeanSquareInternalDist::compute() const {
 void MeanSquareInternalDist::registerPython() {
   using namespace espressopp::python;
 
-  class_<MeanSquareInternalDist, bases<ConfigsParticleDecomp> >(
-      "analysis_MeanSquareInternalDist", init<shared_ptr<System>, int>())
-      .add_property("print_progress",
-                    &MeanSquareInternalDist::getPrint_progress,
+  class_<MeanSquareInternalDist, bases<ConfigsParticleDecomp> >("analysis_MeanSquareInternalDist",
+                                                                init<shared_ptr<System>, int>())
+      .add_property("print_progress", &MeanSquareInternalDist::getPrint_progress,
                     &MeanSquareInternalDist::setPrint_progress);
 }
 }

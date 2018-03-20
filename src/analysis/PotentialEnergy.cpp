@@ -39,10 +39,8 @@ real PotentialEnergy::compute_real() const {
 void PotentialEnergy::registerPython() {
   using namespace espressopp::python;  // NOLINT
   class_<PotentialEnergy, bases<Observable> >(
-      "analysis_PotentialEnergy",
-      init<shared_ptr<System>, shared_ptr<interaction::Interaction> >())
-      .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>,
-                bool>())
+      "analysis_PotentialEnergy", init<shared_ptr<System>, shared_ptr<interaction::Interaction> >())
+      .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>, bool>())
       .add_property("value", &PotentialEnergy::compute_real);
 }
 }  // end namespace analysis

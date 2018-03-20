@@ -42,9 +42,8 @@ void VSphereSelf::registerPython() {
       .add_property("a2", &VSphereSelf::geta2, &VSphereSelf::seta2)
       .add_property("Nb", &VSphereSelf::getNb, &VSphereSelf::setNb);
 
-  class_<SelfVSphere, bases<Interaction> >(
-      "interaction_SelfVSphere",
-      init<shared_ptr<System>, shared_ptr<VSphereSelf> >())
+  class_<SelfVSphere, bases<Interaction> >("interaction_SelfVSphere",
+                                           init<shared_ptr<System>, shared_ptr<VSphereSelf> >())
       .def("setPotential", &SelfVSphere::setPotential)
       .def("getPotential", &SelfVSphere::getPotential);
 }

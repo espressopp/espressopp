@@ -59,12 +59,10 @@ void DumpXYZ::dump() {
       Real3D Li = system->bc->getBoxL();
 
       // for noncubic simulation boxes
-      myfile << Li[0] * length_factor << "  0.0  0.0  0.0  "
-             << Li[1] * length_factor << "  0.0  0.0  0.0  "
-             << Li[2] * length_factor;
+      myfile << Li[0] * length_factor << "  0.0  0.0  0.0  " << Li[1] * length_factor
+             << "  0.0  0.0  0.0  " << Li[2] * length_factor;
       // additional info to comment line
-      myfile << "  currentStep " << integrator->getStep() << "  lengthUnit "
-             << length_unit << endl;
+      myfile << "  currentStep " << integrator->getStep() << "  lengthUnit " << length_unit << endl;
 
       ConfigurationExtIterator cei = conf_real->getIterator();
       std::streamsize p = myfile.precision();
@@ -73,9 +71,9 @@ void DumpXYZ::dump() {
           myfile << cei.currentId() << " ";
         }
 
-        myfile << particleIDToType.find(cei.currentId())->second << " " << fixed
-               << setprecision(10) << length_factor * cei.currentProperties()[0]
-               << " " << length_factor * cei.currentProperties()[1] << " "
+        myfile << particleIDToType.find(cei.currentId())->second << " " << fixed << setprecision(10)
+               << length_factor * cei.currentProperties()[0] << " "
+               << length_factor * cei.currentProperties()[1] << " "
                << length_factor * cei.currentProperties()[2];
 
         if (store_velocities) {
@@ -103,19 +101,14 @@ void DumpXYZ::registerPython() {
   using namespace espressopp::python;
 
   class_<DumpXYZ, bases<ParticleAccess>, boost::noncopyable>(
-      "io_DumpXYZ",
-      init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator>,
-           std::string, bool, real, std::string, bool, bool, bool>())
+      "io_DumpXYZ", init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator>, std::string,
+                         bool, real, std::string, bool, bool, bool>())
       .add_property("filename", &DumpXYZ::getFilename, &DumpXYZ::setFilename)
       .add_property("unfolded", &DumpXYZ::getUnfolded, &DumpXYZ::setUnfolded)
-      .add_property("length_factor", &DumpXYZ::getLengthFactor,
-                    &DumpXYZ::setLengthFactor)
-      .add_property("length_unit", &DumpXYZ::getLengthUnit,
-                    &DumpXYZ::setLengthUnit)
-      .add_property("store_pids", &DumpXYZ::getStorePids,
-                    &DumpXYZ::setStorePids)
-      .add_property("store_velocities", &DumpXYZ::getStoreVelocities,
-                    &DumpXYZ::setStoreVelocities)
+      .add_property("length_factor", &DumpXYZ::getLengthFactor, &DumpXYZ::setLengthFactor)
+      .add_property("length_unit", &DumpXYZ::getLengthUnit, &DumpXYZ::setLengthUnit)
+      .add_property("store_pids", &DumpXYZ::getStorePids, &DumpXYZ::setStorePids)
+      .add_property("store_velocities", &DumpXYZ::getStoreVelocities, &DumpXYZ::setStoreVelocities)
       .add_property("append", &DumpXYZ::getAppend, &DumpXYZ::setAppend)
       .def("dump", &DumpXYZ::dump);
 }

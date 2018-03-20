@@ -41,17 +41,11 @@ InterpolationTable::InterpolationTable() {
   allocated = false;
 }
 
-InterpolationTable::~InterpolationTable() {
-  LOG4ESPP_INFO(theLogger, "~InterpolcationTable");
-}
+InterpolationTable::~InterpolationTable() { LOG4ESPP_INFO(theLogger, "~InterpolcationTable"); }
 
-real InterpolationTable::getEnergy(real r) const {
-  return splineInterpolation(r, energy, energy2);
-}
+real InterpolationTable::getEnergy(real r) const { return splineInterpolation(r, energy, energy2); }
 
-real InterpolationTable::getForce(real r) const {
-  return splineInterpolation(r, force, force2);
-}
+real InterpolationTable::getForce(real r) const { return splineInterpolation(r, force, force2); }
 
 // this is called by the created InterpolationTable object
 void InterpolationTable::read(mpi::communicator comm, const char *file) {
@@ -96,8 +90,7 @@ void InterpolationTable::read(mpi::communicator comm, const char *file) {
   delta = (outer - inner) / nbins;
 
   LOG4ESPP_INFO(theLogger,
-                "tab file has range " << inner << " - " << outer
-                                      << ", delta = " << delta);
+                "tab file has range " << inner << " - " << outer << ", delta = " << delta);
 
   invdelta = 1.0 / delta;
   deltasq6 = delta * delta / 6.0;
@@ -164,8 +157,7 @@ int InterpolationTable::readFile(const char *file, bool dummy) {
 }  // readfile
 
 /** Spline read-in values. */
-void InterpolationTable::spline(const real *x, const real *y, int n, real yp1,
-                                real ypn, real *y2) {
+void InterpolationTable::spline(const real *x, const real *y, int n, real yp1, real ypn, real *y2) {
   real *u = new real[n];
 
   if (yp1 > 0.99e30) {
@@ -181,8 +173,7 @@ void InterpolationTable::spline(const real *x, const real *y, int n, real yp1,
     real p = sig * y2[i - 1] + 2.0;
 
     y2[i] = (sig - 1.0) / p;
-    u[i] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) -
-           (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
+    u[i] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
     u[i] = (6.0 * u[i] / (x[i + 1] - x[i - 1]) - sig * u[i - 1]) / p;
   }
 
@@ -193,8 +184,7 @@ void InterpolationTable::spline(const real *x, const real *y, int n, real yp1,
     un = 0.0;
   } else {
     qn = 0.5;
-    un = (3.0 / (x[n - 1] - x[n - 2])) *
-         (ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2]));
+    un = (3.0 / (x[n - 1] - x[n - 2])) * (ypn - (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2]));
   }
 
   y2[n - 1] = (un - qn * u[n - 2]) / (qn * y2[n - 2] + 1.0);
@@ -210,27 +200,25 @@ void InterpolationTable::spline(const real *x, const real *y, int n, real yp1,
 *                                                                         *
 **************************************************************************/
 
-real InterpolationTable::splineInterpolation(real r, const real *fn,
-                                             const real *fn2) const {
+real InterpolationTable::splineInterpolation(real r, const real *fn, const real *fn2) const {
   int index = static_cast<int>((r - inner) * invdelta);
 
   if (index < 0) {
-    LOG4ESPP_ERROR(theLogger,
-                   "distance " << r << " out of range " << inner << " - "
-                               << inner + (N - 1) * delta);
+    LOG4ESPP_ERROR(
+        theLogger,
+        "distance " << r << " out of range " << inner << " - " << inner + (N - 1) * delta);
     index = 0;
   } else if (index >= N) {
-    LOG4ESPP_ERROR(theLogger,
-                   "distance " << r << " out of range " << inner << " - "
-                               << inner + (N - 1) * delta);
+    LOG4ESPP_ERROR(
+        theLogger,
+        "distance " << r << " out of range " << inner << " - " << inner + (N - 1) * delta);
     index = N - 1;
   }
 
   real b = (r - radius[index]) * invdelta;
   real a = 1.0 - b;
   real f = a * fn[index] + b * fn[index + 1] +
-           ((a * a * a - a) * fn2[index] + (b * b * b - b) * fn2[index + 1]) *
-               deltasq6;
+           ((a * a * a - a) * fn2[index] + (b * b * b - b) * fn2[index + 1]) * deltasq6;
 
   // printf("interpoloate %f, a = %f, b = %f, fn = %f - %f, fn2 = %f - %f\n",
   //        r, a, b, fn[index], fn[index+1], fn2[index], fn2[index+1]);

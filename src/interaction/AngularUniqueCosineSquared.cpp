@@ -34,18 +34,15 @@ void AngularUniqueCosineSquared::registerPython() {
 
   class_<AngularUniqueCosineSquared, bases<AngularUniquePotential> >(
       "interaction_AngularUniqueCosineSquared", init<real>())
-      .add_property("K", &AngularUniqueCosineSquared::getK,
-                    &AngularUniqueCosineSquared::setK);
+      .add_property("K", &AngularUniqueCosineSquared::getK, &AngularUniqueCosineSquared::setK);
 
-  typedef class FixedTripleAngleListInteractionTemplate<
-      AngularUniqueCosineSquared>
+  typedef class FixedTripleAngleListInteractionTemplate<AngularUniqueCosineSquared>
       FixedTripleAngleListAngularUniqueCosineSquared;
   class_<FixedTripleAngleListAngularUniqueCosineSquared, bases<Interaction> >(
       "interaction_FixedTripleAngleListAngularUniqueCosineSquared",
       init<shared_ptr<System>, shared_ptr<FixedTripleAngleList>,
            shared_ptr<AngularUniqueCosineSquared> >())
-      .def("setPotential",
-           &FixedTripleAngleListAngularUniqueCosineSquared::setPotential)
+      .def("setPotential", &FixedTripleAngleListAngularUniqueCosineSquared::setPotential)
       .def("getFixedTripleList",
            &FixedTripleAngleListAngularUniqueCosineSquared::getFixedTripleList);
 }

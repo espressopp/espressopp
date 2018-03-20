@@ -30,8 +30,7 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListInteractionTemplate<CoulombRSpace>
-    VerletListCoulombRSpace;
+typedef class VerletListInteractionTemplate<CoulombRSpace> VerletListCoulombRSpace;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -39,15 +38,13 @@ typedef class VerletListInteractionTemplate<CoulombRSpace>
 void CoulombRSpace::registerPython() {
   using namespace espressopp::python;
 
-  class_<CoulombRSpace, bases<Potential> >("interaction_CoulombRSpace",
-                                           init<>())
+  class_<CoulombRSpace, bases<Potential> >("interaction_CoulombRSpace", init<>())
       .def(init<real, real, real>())
       .add_property("alpha", &CoulombRSpace::getAlpha, &CoulombRSpace::setAlpha)
-      .add_property("prefactor", &CoulombRSpace::getPrefactor,
-                    &CoulombRSpace::setPrefactor);
+      .add_property("prefactor", &CoulombRSpace::getPrefactor, &CoulombRSpace::setPrefactor);
 
-  class_<VerletListCoulombRSpace, bases<Interaction> >(
-      "interaction_VerletListCoulombRSpace", init<shared_ptr<VerletList> >())
+  class_<VerletListCoulombRSpace, bases<Interaction> >("interaction_VerletListCoulombRSpace",
+                                                       init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListCoulombRSpace::getVerletList)
       .def("setPotential", &VerletListCoulombRSpace::setPotential,
            return_value_policy<reference_existing_object>())

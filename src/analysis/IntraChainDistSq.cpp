@@ -49,8 +49,7 @@ python::list IntraChainDistSq::compute() {
   // 	R2N.append(python::make_tuple(id, p.r[0], p.r[1], p.r[2]));
   //}
 
-  for (FixedPairList::GlobalPairs::const_iterator it =
-           fpl->getGlobalPairs()->begin();
+  for (FixedPairList::GlobalPairs::const_iterator it = fpl->getGlobalPairs()->begin();
        it != fpl->getGlobalPairs()->end(); it++) {
     R2N.append(python::make_tuple(it->first, it->second));
   }
@@ -62,8 +61,7 @@ void IntraChainDistSq::registerPython() {
   using namespace espressopp::python;
 
   class_<IntraChainDistSq, bases<AllParticlePos> >(
-      "analysis_IntraChainDistSq",
-      init<shared_ptr<System>, shared_ptr<FixedPairList> >())
+      "analysis_IntraChainDistSq", init<shared_ptr<System>, shared_ptr<FixedPairList> >())
       .def("compute", &IntraChainDistSq::compute);
 }
 }

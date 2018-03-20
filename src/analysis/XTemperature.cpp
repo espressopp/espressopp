@@ -67,8 +67,7 @@ python::list XTemperature::computeArray(int n) const {
   }
 
   // compute the kinetic contribution (2/3 \sum 1/2mv^2)
-  shared_ptr<FixedTupleListAdress> fixedtupleList =
-      system.storage->getFixedTuples();
+  shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
   CellList realCells = system.storage->getRealCells();
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     Particle &vp = *cit;
@@ -83,8 +82,7 @@ python::list XTemperature::computeArray(int n) const {
       std::vector<Particle *> atList;
       atList = it2->second;
       // Real3D vel(0.0,0.0,0.0);
-      for (std::vector<Particle *>::iterator it3 = atList.begin();
-           it3 != atList.end(); ++it3) {
+      for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
         Particle &at = **it3;
         Real3D vel = at.velocity();
         Real3D pos = at.position();
@@ -177,16 +175,14 @@ python::list XTemperature::computeArray(int n) const {
   }*/
 
   boost::mpi::all_reduce(*getSystem()->comm, vvlocal, n, vv, std::plus<real>());
-  boost::mpi::all_reduce(*getSystem()->comm, count, n, systemN,
-                         std::plus<int>());
+  boost::mpi::all_reduce(*getSystem()->comm, count, n, systemN, std::plus<int>());
 
   // python::tuple pijz;
   // real wfinal[n];
   python::list XTemperatureResult;
   for (int i = 0; i < n; i++) {
     // wfinal[i] = vv[i]/(2.0*systemN[i]);
-    XTemperatureResult.append(
-        vv[i] / (2.0 * systemN[i]));  // THIS IS FOR SETTLE CONSTAINTS
+    XTemperatureResult.append(vv[i] / (2.0 * systemN[i]));  // THIS IS FOR SETTLE CONSTAINTS
   }
 
   delete[] systemN;
@@ -208,8 +204,7 @@ using namespace boost::python;
 
 void XTemperature::registerPython() {
   using namespace espressopp::python;
-  class_<XTemperature, bases<Observable> >("analysis_XTemperature",
-                                           init<shared_ptr<System> >())
+  class_<XTemperature, bases<Observable> >("analysis_XTemperature", init<shared_ptr<System> >())
       .def("compute", &XTemperature::computeArray);
 }
 }

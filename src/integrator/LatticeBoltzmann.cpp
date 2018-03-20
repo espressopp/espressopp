@@ -48,9 +48,8 @@ namespace integrator {
 LOG4ESPP_LOGGER(LatticeBoltzmann::theLogger, "LatticeBoltzmann");
 
 /* LB Constructor; expects 1 Int3D, 2 reals and 2 integers */
-LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _nodeGrid,
-                                   real _a, real _tau, int _numDims,
-                                   int _numVels)
+LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _nodeGrid, real _a, real _tau,
+                                   int _numDims, int _numVels)
     : Extension(_system),
       nodeGrid(_nodeGrid),
       a(_a),
@@ -89,8 +88,7 @@ LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _nodeGrid,
   setTotNPart(_totNPart);
 
   /* if coupling is present initialise related flags, coefficients and arrays */
-  fOnPart =
-      std::vector<Real3D>(_totNPart + 1, Real3D(0.));  // +1 as id starts with 1
+  fOnPart = std::vector<Real3D>(_totNPart + 1, Real3D(0.));  // +1 as id starts with 1
   if (_totNPart != 0) {
     setDoCoupling(true);  // make LB to MD coupling
     setFricCoeff(5.);     // friction coeffitient
@@ -136,18 +134,14 @@ void LatticeBoltzmann::disconnect() {
 }
 
 void LatticeBoltzmann::connect() {
-  _recalc2 = integrator->recalc2.connect(
-      boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
-  _befIntV = integrator->befIntV.connect(
-      boost::bind(&LatticeBoltzmann::makeLBStep, this));
+  _recalc2 = integrator->recalc2.connect(boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
+  _befIntV = integrator->befIntV.connect(boost::bind(&LatticeBoltzmann::makeLBStep, this));
 }
 
 /*******************************************************************************************/
 
 /* Setter and getter for the parallelisation things */
-void LatticeBoltzmann::setMyNeigh(int _dir, int _rank) {
-  myNeigh[_dir] = _rank;
-}
+void LatticeBoltzmann::setMyNeigh(int _dir, int _rank) { myNeigh[_dir] = _rank; }
 int LatticeBoltzmann::getMyNeigh(int _dir) { return myNeigh[_dir]; }
 
 void LatticeBoltzmann::setNodeGrid(Int3D _nodeGrid) { nodeGrid = _nodeGrid; }
@@ -193,9 +187,7 @@ void LatticeBoltzmann::setNumVels(int _numVels) {
 }
 int LatticeBoltzmann::getNumVels() { return numVels; }
 
-void LatticeBoltzmann::setEqWeight(int _l, real _value) {
-  eqWeight[_l] = _value;
-}
+void LatticeBoltzmann::setEqWeight(int _l, real _value) { eqWeight[_l] = _value; }
 real LatticeBoltzmann::getEqWeight(int _l) { return eqWeight[_l]; }
 
 void LatticeBoltzmann::setCi(int _l, Real3D _vec) { c_i[_l] = _vec; }
@@ -226,16 +218,14 @@ real LatticeBoltzmann::getGammaS() { return getGamma(1); }
 void LatticeBoltzmann::setGammaOdd(real _gamma_odd) { setGamma(2, _gamma_odd); }
 real LatticeBoltzmann::getGammaOdd() { return getGamma(2); }
 
-void LatticeBoltzmann::setGammaEven(real _gamma_even) {
-  setGamma(3, _gamma_even);
-}
+void LatticeBoltzmann::setGammaEven(real _gamma_even) { setGamma(3, _gamma_even); }
 real LatticeBoltzmann::getGammaEven() { return getGamma(3); }
 
 void LatticeBoltzmann::setViscB(real _visc_b) {
   visc_b = _visc_b;
   real _fir = getNumDims() * _visc_b;
-  real _sec = getCs2() * getTau() * convTimeMDtoLB() / getNSteps() *
-              convLenMDtoLB() / convMassMDtoLB();
+  real _sec =
+      getCs2() * getTau() * convTimeMDtoLB() / getNSteps() * convLenMDtoLB() / convMassMDtoLB();
   setGamma(0, (_fir - _sec) / (_fir + _sec));
 }
 real LatticeBoltzmann::getViscB() { return visc_b; }
@@ -243,8 +233,8 @@ real LatticeBoltzmann::getViscB() { return visc_b; }
 void LatticeBoltzmann::setViscS(real _visc_s) {
   visc_s = _visc_s;
   real _fir = 2. * _visc_s;
-  real _sec = getCs2() * getTau() * convTimeMDtoLB() / getNSteps() *
-              convLenMDtoLB() / convMassMDtoLB();
+  real _sec =
+      getCs2() * getTau() * convTimeMDtoLB() / getNSteps() * convLenMDtoLB() / convMassMDtoLB();
   setGamma(1, (_fir - _sec) / (_fir + _sec));
 }
 real LatticeBoltzmann::getViscS() { return visc_s; }
@@ -291,13 +281,9 @@ int LatticeBoltzmann::getPrevDumpStep() { return saveStep; }
 void LatticeBoltzmann::setTotNPart(int _totNPart) { totNPart = _totNPart; }
 int LatticeBoltzmann::getTotNPart() { return totNPart; }
 
-void LatticeBoltzmann::setFOnPart(int _id, Real3D _fOnPart) {
-  fOnPart[_id] = _fOnPart;
-}
+void LatticeBoltzmann::setFOnPart(int _id, Real3D _fOnPart) { fOnPart[_id] = _fOnPart; }
 Real3D LatticeBoltzmann::getFOnPart(int _id) { return fOnPart[_id]; }
-void LatticeBoltzmann::addFOnPart(int _id, Real3D _fOnPart) {
-  fOnPart[_id] += _fOnPart;
-}
+void LatticeBoltzmann::addFOnPart(int _id, Real3D _fOnPart) { fOnPart[_id] += _fOnPart; }
 
 void LatticeBoltzmann::keepLBDump() { setPrevDumpStep(0); }
 
@@ -325,9 +311,7 @@ real LatticeBoltzmann::convMassMDtoLB() { return 1.; }
 
 //#note: need a foolproof in case there is no access to the integrator (and
 // getTimeStep) yet
-real LatticeBoltzmann::convTimeMDtoLB() {
-  return 1. / (integrator->getTimeStep() * getTau());
-}
+real LatticeBoltzmann::convTimeMDtoLB() { return 1. / (integrator->getTimeStep() * getTau()); }
 real LatticeBoltzmann::convLenMDtoLB() {
   return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());
 }
@@ -340,9 +324,7 @@ int LatticeBoltzmann::getProfStep() { return profStep; }
 void LatticeBoltzmann::setStepNum(int _step) { stepNum = _step; }
 int LatticeBoltzmann::getStepNum() { return stepNum; }
 
-void LatticeBoltzmann::setCopyTimestep(real _copyTimestep) {
-  copyTimestep = _copyTimestep;
-}
+void LatticeBoltzmann::setCopyTimestep(real _copyTimestep) { copyTimestep = _copyTimestep; }
 real LatticeBoltzmann::getCopyTimestep() { return copyTimestep; }
 
 void LatticeBoltzmann::setDoRestart(bool _restart) { restart = _restart; }
@@ -453,16 +435,14 @@ void LatticeBoltzmann::initFluctuations() {
     std::cout << "-------------------------------------\n";
   }
 
-  _lbTemp = getLBTemp() * convMassMDtoLB() *
-            pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
+  _lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
   a3 = getA() * getA() * getA();   // a^3
   mu = _lbTemp / (getCs2() * a3);  // thermal mass density
 
   if (_lbTemp <= ROUND_ERROR_PREC) {
     // account for fluctuations being turned off
     setDoFluct(false);
-    if (_myRank == 0)
-      std::cout << "Atermal LB-fluid. No fluctuations!" << std::endl;
+    if (_myRank == 0) std::cout << "Atermal LB-fluid. No fluctuations!" << std::endl;
   } else {
     // account for fluctuations being turned on!
     setDoFluct(true);
@@ -502,8 +482,7 @@ void LatticeBoltzmann::initFluctuations() {
     }
 
     if (_myRank == 0) {
-      std::cout
-          << "The amplitudes phi_i of the fluctuations have been redefined.\n";
+      std::cout << "The amplitudes phi_i of the fluctuations have been redefined.\n";
       std::cout << "-------------------------------------\n";
     }
   }
@@ -530,8 +509,8 @@ void LatticeBoltzmann::makeLBStep() {
   }
 
   if (_stepNum % _profStep == 0 && _stepNum != 0) {
-    printf("CPU %d: colstr took %f sec, comm % f, swapping %f\n",
-           getSystem()->comm->rank(), time_colstr, time_comm, time_sw);
+    printf("CPU %d: colstr took %f sec, comm % f, swapping %f\n", getSystem()->comm->rank(),
+           time_colstr, time_comm, time_sw);
 
     colstream.reset();
     comm.reset();
@@ -569,8 +548,7 @@ void LatticeBoltzmann::makeDecompose() {
     }
   }
 
-  boost::mpi::all_reduce(*system.comm, _myDecompose, decompose,
-                         std::plus<bool>());
+  boost::mpi::all_reduce(*system.comm, _myDecompose, decompose, std::plus<bool>());
 
   if (decompose) {
     system.storage->decompose();
@@ -597,8 +575,7 @@ void LatticeBoltzmann::collideStream() {
   for (int i = _offset; i < _myNi[0] - _offset; i++) {
     for (int j = _offset; j < _myNi[1] - _offset; j++) {
       for (int k = _offset; k < _myNi[2] - _offset; k++) {
-        Real3D _f = (*lbfor)[i][j][k].getExtForceLoc() +
-                    (*lbfor)[i][j][k].getCouplForceLoc();
+        Real3D _f = (*lbfor)[i][j][k].getExtForceLoc() + (*lbfor)[i][j][k].getCouplForceLoc();
 
         (*lbfluid)[i][j][k].collision(_fluct, _extForce, _coupling, _f, gamma);
         streaming(i, j, k);
@@ -749,8 +726,8 @@ void LatticeBoltzmann::calcViscForce(Particle& p) {
         _kp = bin[2] + _k;
 
         // force acting onto the fluid node at the moment (midpoint scheme)
-        Real3D _f = (*lbfor)[_ip][_jp][_kp].getExtForceLoc() +
-                    (*lbfor)[_ip][_jp][_kp].getCouplForceLoc();
+        Real3D _f =
+            (*lbfor)[_ip][_jp][_kp].getExtForceLoc() + (*lbfor)[_ip][_jp][_kp].getCouplForceLoc();
         Real3D _jLoc = Real3D((*lbmom)[_ip][_jp][_kp].getMom_i(1) + _f[0],
                               (*lbmom)[_ip][_jp][_kp].getMom_i(2) + _f[1],
                               (*lbmom)[_ip][_jp][_kp].getMom_i(3) + _f[2]);
@@ -770,8 +747,7 @@ void LatticeBoltzmann::calcViscForce(Particle& p) {
 
   // convert coupl force (LJ units) to mom change on a lattice (LB units)
   Real3D deltaJLoc = Real3D(0.);
-  deltaJLoc -=
-      getFOnPart(p.id()) * _convMassMDtoLB / (_convCoeff * _convTimeMDtoLB);
+  deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB / (_convCoeff * _convTimeMDtoLB);
 
   // loop over neighboring LB nodes
   for (int _i = 0; _i < 2; _i++) {
@@ -863,8 +839,7 @@ void LatticeBoltzmann::zeroMDCMVel() {
 
     if (_myRank == 0) {
       printf("Get rid of the drift velocity per particle of  ");
-      printf("%18.14f %18.14f %18.14f \n", specCmVel[0], specCmVel[1],
-             specCmVel[2]);
+      printf("%18.14f %18.14f %18.14f \n", specCmVel[0], specCmVel[1], specCmVel[2]);
     }
 
     galileanTransf(specCmVel);
@@ -873,8 +848,7 @@ void LatticeBoltzmann::zeroMDCMVel() {
     specCmVel = findCMVelMD();
     if (_myRank == 0) {
       printf("CMvel per particle after Galilean transform is ");
-      printf("%18.14f %18.14f %18.14f \n", specCmVel[0], specCmVel[1],
-             specCmVel[2]);
+      printf("%18.14f %18.14f %18.14f \n", specCmVel[0], specCmVel[1], specCmVel[2]);
       printf("-------------------------------------\n");
     }
   } else if (_step != 0 && _coupling && _restart) {
@@ -928,8 +902,7 @@ void LatticeBoltzmann::readLBConf(int _mode) {
     // set restart folder and check its existence
     std::string dirRestart = "dump";
 
-    if (getStepNum() != 0 &&
-        boost::filesystem::is_directory(dirRestart) == false) {
+    if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
       std::cout << "Sorry, the restart directory is missing! "
                 << "Something is wrong!!!" << std::endl;
     }
@@ -1000,8 +973,7 @@ void LatticeBoltzmann::readLBConf(int _mode) {
     } else {
       if (getStepNum() != 0) {
         std::cout << "!!! Attention !!! no file with coupling forces"
-                  << "acting onto MD particles found for step " << convert.str()
-                  << std::endl;
+                  << "acting onto MD particles found for step " << convert.str() << std::endl;
       }
     }
 
@@ -1056,10 +1028,9 @@ void LatticeBoltzmann::readLBConf(int _mode) {
       int _i, _j, _k;
       real _fi[_numVels];
 
-      while (popsFile >> _i >> _j >> _k >> _fi[0] >> _fi[1] >> _fi[2] >>
-             _fi[3] >> _fi[4] >> _fi[5] >> _fi[6] >> _fi[7] >> _fi[8] >>
-             _fi[9] >> _fi[10] >> _fi[11] >> _fi[12] >> _fi[13] >> _fi[14] >>
-             _fi[15] >> _fi[16] >> _fi[17] >> _fi[18]) {
+      while (popsFile >> _i >> _j >> _k >> _fi[0] >> _fi[1] >> _fi[2] >> _fi[3] >> _fi[4] >>
+             _fi[5] >> _fi[6] >> _fi[7] >> _fi[8] >> _fi[9] >> _fi[10] >> _fi[11] >> _fi[12] >>
+             _fi[13] >> _fi[14] >> _fi[15] >> _fi[16] >> _fi[17] >> _fi[18]) {
         // read in the populations on the site _i, _j, _k
         for (int _l = 0; _l < _numVels; _l++) {
           setPops(Int3D(_i, _j, _k), _l, _fi[_l]);
@@ -1076,8 +1047,8 @@ void LatticeBoltzmann::readLBConf(int _mode) {
 
     // timer //
     real timeEnd = timeReadLBConf.getElapsedTime() - timeStart;
-    printf("step %lld, CPU %d: read LB-conf and MD forces in %f seconds\n",
-           integrator->getStep(), getSystem()->comm->rank(), timeEnd);
+    printf("step %lld, CPU %d: read LB-conf and MD forces in %f seconds\n", integrator->getStep(),
+           getSystem()->comm->rank(), timeEnd);
   }
 }
 
@@ -1134,9 +1105,8 @@ void LatticeBoltzmann::saveLBConf() {
 
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     long int _id = cit->id();
-    fprintf(couplForcesFile, "%ld %15.10f %15.10f %15.10f \n", _id,
-            getFOnPart(_id).getItem(0), getFOnPart(_id).getItem(1),
-            getFOnPart(_id).getItem(2));
+    fprintf(couplForcesFile, "%ld %15.10f %15.10f %15.10f \n", _id, getFOnPart(_id).getItem(0),
+            getFOnPart(_id).getItem(1), getFOnPart(_id).getItem(2));
   }
 
   // write forces acting onto LB-sites (incl. ghost region) //
@@ -1149,9 +1119,8 @@ void LatticeBoltzmann::saveLBConf() {
         if (_couplForceLoc.sqr() < ROUND_ERROR_PREC) {
           // see definition of ROUND ERROR in src/include/esconfig.hpp
         } else {
-          fprintf(couplForcesFile, "%d %d %d %15.10f %15.10f %15.10f \n", _i,
-                  _j, _k, _couplForceLoc[0], _couplForceLoc[1],
-                  _couplForceLoc[2]);
+          fprintf(couplForcesFile, "%d %d %d %15.10f %15.10f %15.10f \n", _i, _j, _k,
+                  _couplForceLoc[0], _couplForceLoc[1], _couplForceLoc[2]);
         }
       }
     }
@@ -1187,8 +1156,8 @@ void LatticeBoltzmann::saveLBConf() {
         fprintf(fluidFile, "%d %d %d %15.10f %15.10f %15.10f %15.10f\n",
                 _myPos[0] * (_myNi[0] - 2 * _offset) + _i - 1,
                 _myPos[1] * (_myNi[1] - 2 * _offset) + _j - 1,
-                _myPos[2] * (_myNi[2] - 2 * _offset) + _k - 1, _rho, _jx / _rho,
-                _jy / _rho, _jz / _rho);
+                _myPos[2] * (_myNi[2] - 2 * _offset) + _k - 1, _rho, _jx / _rho, _jy / _rho,
+                _jz / _rho);
       }
     }
   }
@@ -1233,8 +1202,8 @@ void LatticeBoltzmann::saveLBConf() {
 
   // timer //
   real timeEnd = timeSaveLBConf.getElapsedTime() - timeStart;
-  printf("step %lld, CPU %d: saved LB-conf and MD forces in %f seconds\n",
-         integrator->getStep(), system.comm->rank(), timeEnd);
+  printf("step %lld, CPU %d: saved LB-conf and MD forces in %f seconds\n", integrator->getStep(),
+         system.comm->rank(), timeEnd);
 }
 
 /*******************************************************************************************/
@@ -1266,8 +1235,7 @@ void LatticeBoltzmann::findMyNeighbours() {
 
       // right
       _myNeighPos[_dim] = _myPos[_dim] + 1;
-      if (_myNeighPos[_dim] >= _nodeGrid[_dim])
-        _myNeighPos[_dim] -= _nodeGrid[_dim];
+      if (_myNeighPos[_dim] >= _nodeGrid[_dim]) _myNeighPos[_dim] -= _nodeGrid[_dim];
       setMyNeigh(2 * _dim + 1, grid.mapPositionToIndex(_myNeighPos));
     } else {
       setMyNeigh(2 * _dim, grid.mapPositionToIndex(_myPos));
@@ -1296,8 +1264,7 @@ void LatticeBoltzmann::assignMyLattice() {
   for (int _dim = 0; _dim < getNumDims(); ++_dim) {
     _Ni[_dim] = (int)(_L[_dim] / getA());
     _myLeft[_dim] = floor(_myPos[_dim] * _L[_dim] / (_nodeGrid[_dim] * getA()));
-    _numSites[_dim] = (int)(floor((_myPos[_dim] + 1) * _L[_dim] /
-                                  (_nodeGrid[_dim] * getA()))) -
+    _numSites[_dim] = (int)(floor((_myPos[_dim] + 1) * _L[_dim] / (_nodeGrid[_dim] * getA()))) -
                       (int)_myLeft[_dim] + 2 * _haloSkin;
   }
   setNi(_Ni);
@@ -1655,8 +1622,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[1] * k + j * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1679,8 +1645,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (k = 0; k < _myNi[2]; k++) {
     for (j = 0; j < _myNi[1]; j++) {
       idx = numForceComp * _myNi[1] * k + j * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -1696,8 +1661,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[1] * k + j * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1720,8 +1684,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (k = 0; k < _myNi[2]; k++) {
     for (j = 0; j < _myNi[1]; j++) {
       idx = numForceComp * _myNi[1] * k + j * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -1744,8 +1707,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[0] * k + i * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1768,8 +1730,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (k = 0; k < _myNi[2]; k++) {
     for (i = 0; i < _myNi[0]; i++) {
       idx = numForceComp * _myNi[0] * k + i * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -1785,8 +1746,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[0] * k + i * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1809,8 +1769,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (k = 0; k < _myNi[2]; k++) {
     for (i = 0; i < _myNi[0]; i++) {
       idx = numForceComp * _myNi[0] * k + i * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -1833,8 +1792,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[0] * j + i * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1857,8 +1815,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (j = 0; j < _myNi[1]; j++) {
     for (i = 0; i < _myNi[0]; i++) {
       idx = numForceComp * _myNi[0] * j + i * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -1874,8 +1831,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
       idx = numForceComp * _myNi[0] * j + i * numForceComp;
 
       for (int _dir = 0; _dir < 3; ++_dir) {
-        bufToSend[idx + _dir] =
-            (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
+        bufToSend[idx + _dir] = (*lbfor)[i][j][k].getCouplForceLoc().getItem(_dir);
       }
     }
   }
@@ -1898,8 +1854,7 @@ void LatticeBoltzmann::copyForcesFromHalo() {
   for (j = 0; j < _myNi[1]; j++) {
     for (i = 0; i < _myNi[0]; i++) {
       idx = numForceComp * _myNi[0] * j + i * numForceComp;
-      _addForce =
-          Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
+      _addForce = Real3D(bufToRecv[idx], bufToRecv[idx + 1], bufToRecv[idx + 2]);
       (*lbfor)[i][j][k].addCouplForceLoc(_addForce);
     }
   }
@@ -2201,37 +2156,24 @@ void LatticeBoltzmann::registerPython() {
   using namespace espressopp::python;
   class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
-      ("integrator_LatticeBoltzmann",
-       init<shared_ptr<System>, Int3D, real, real, int, int>())
-          .add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid,
-                        &LatticeBoltzmann::setNodeGrid)
+      ("integrator_LatticeBoltzmann", init<shared_ptr<System>, Int3D, real, real, int, int>())
+          .add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid, &LatticeBoltzmann::setNodeGrid)
           .add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
-          .add_property("tau", &LatticeBoltzmann::getTau,
-                        &LatticeBoltzmann::setTau)
-          .add_property("numDims", &LatticeBoltzmann::getNumDims,
-                        &LatticeBoltzmann::setNumDims)
-          .add_property("numVels", &LatticeBoltzmann::getNumVels,
-                        &LatticeBoltzmann::setNumVels)
-          .add_property("visc_b", &LatticeBoltzmann::getViscB,
-                        &LatticeBoltzmann::setViscB)
-          .add_property("visc_s", &LatticeBoltzmann::getViscS,
-                        &LatticeBoltzmann::setViscS)
-          .add_property("gamma_b", &LatticeBoltzmann::getGammaB,
-                        &LatticeBoltzmann::setGammaB)
-          .add_property("gamma_s", &LatticeBoltzmann::getGammaS,
-                        &LatticeBoltzmann::setGammaS)
-          .add_property("gamma_odd", &LatticeBoltzmann::getGammaOdd,
-                        &LatticeBoltzmann::setGammaOdd)
+          .add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)
+          .add_property("numDims", &LatticeBoltzmann::getNumDims, &LatticeBoltzmann::setNumDims)
+          .add_property("numVels", &LatticeBoltzmann::getNumVels, &LatticeBoltzmann::setNumVels)
+          .add_property("visc_b", &LatticeBoltzmann::getViscB, &LatticeBoltzmann::setViscB)
+          .add_property("visc_s", &LatticeBoltzmann::getViscS, &LatticeBoltzmann::setViscS)
+          .add_property("gamma_b", &LatticeBoltzmann::getGammaB, &LatticeBoltzmann::setGammaB)
+          .add_property("gamma_s", &LatticeBoltzmann::getGammaS, &LatticeBoltzmann::setGammaS)
+          .add_property("gamma_odd", &LatticeBoltzmann::getGammaOdd, &LatticeBoltzmann::setGammaOdd)
           .add_property("gamma_even", &LatticeBoltzmann::getGammaEven,
                         &LatticeBoltzmann::setGammaEven)
-          .add_property("lbTemp", &LatticeBoltzmann::getLBTemp,
-                        &LatticeBoltzmann::setLBTemp)
+          .add_property("lbTemp", &LatticeBoltzmann::getLBTemp, &LatticeBoltzmann::setLBTemp)
           .add_property("fricCoeff", &LatticeBoltzmann::getFricCoeff,
                         &LatticeBoltzmann::setFricCoeff)
-          .add_property("nSteps", &LatticeBoltzmann::getNSteps,
-                        &LatticeBoltzmann::setNSteps)
-          .add_property("profStep", &LatticeBoltzmann::getProfStep,
-                        &LatticeBoltzmann::setProfStep)
+          .add_property("nSteps", &LatticeBoltzmann::getNSteps, &LatticeBoltzmann::setNSteps)
+          .add_property("profStep", &LatticeBoltzmann::getProfStep, &LatticeBoltzmann::setProfStep)
           .add_property("getMyNi", &LatticeBoltzmann::getMyNi)
           .def("getLBMom", &LatticeBoltzmann::getLBMom)
           .def("setLBMom", &LatticeBoltzmann::setLBMom)

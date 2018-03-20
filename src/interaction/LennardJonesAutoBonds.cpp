@@ -32,13 +32,10 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListInteractionTemplate<LennardJonesAutoBonds>
-    VerletListLennardJonesAutoBonds;
-typedef class VerletListAdressInteractionTemplate<LennardJonesAutoBonds,
-                                                  Tabulated>
+typedef class VerletListInteractionTemplate<LennardJonesAutoBonds> VerletListLennardJonesAutoBonds;
+typedef class VerletListAdressInteractionTemplate<LennardJonesAutoBonds, Tabulated>
     VerletListAdressLennardJonesAutoBonds;
-typedef class VerletListHadressInteractionTemplate<LennardJonesAutoBonds,
-                                                   Tabulated>
+typedef class VerletListHadressInteractionTemplate<LennardJonesAutoBonds, Tabulated>
     VerletListHadressLennardJonesAutoBonds;
 typedef class CellListAllPairsInteractionTemplate<LennardJonesAutoBonds>
     CellListLennardJonesAutoBonds;
@@ -52,19 +49,16 @@ void LennardJonesAutoBonds::registerPython() {
   using namespace espressopp::python;
 
   class_<LennardJonesAutoBonds, bases<Potential> >(
-      "interaction_LennardJonesAutoBonds",
-      init<real, real, real, shared_ptr<FixedPairList>, int>())
+      "interaction_LennardJonesAutoBonds", init<real, real, real, shared_ptr<FixedPairList>, int>())
       .def(init<real, real, real, real, shared_ptr<FixedPairList>, int>())
-      .add_property("sigma", &LennardJonesAutoBonds::getSigma,
-                    &LennardJonesAutoBonds::setSigma)
+      .add_property("sigma", &LennardJonesAutoBonds::getSigma, &LennardJonesAutoBonds::setSigma)
       .add_property("epsilon", &LennardJonesAutoBonds::getEpsilon,
                     &LennardJonesAutoBonds::setEpsilon)
       .add_property("max_crosslinks", &LennardJonesAutoBonds::getMaxCrosslinks,
                     &LennardJonesAutoBonds::setMaxCrosslinks);
 
   class_<VerletListLennardJonesAutoBonds, bases<Interaction> >(
-      "interaction_VerletListLennardJonesAutoBonds",
-      init<shared_ptr<VerletList> >())
+      "interaction_VerletListLennardJonesAutoBonds", init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListLennardJonesAutoBonds::getVerletList)
       .def("setPotential", &VerletListLennardJonesAutoBonds::setPotential,
            return_value_policy<reference_existing_object>())
@@ -74,31 +68,25 @@ void LennardJonesAutoBonds::registerPython() {
   class_<VerletListAdressLennardJonesAutoBonds, bases<Interaction> >(
       "interaction_VerletListAdressLennardJonesAutoBonds",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListAdressLennardJonesAutoBonds::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListAdressLennardJonesAutoBonds::setPotentialCG);
+      .def("setPotentialAT", &VerletListAdressLennardJonesAutoBonds::setPotentialAT)
+      .def("setPotentialCG", &VerletListAdressLennardJonesAutoBonds::setPotentialCG);
   ;
 
   class_<VerletListHadressLennardJonesAutoBonds, bases<Interaction> >(
       "interaction_VerletListHadressLennardJonesAutoBonds",
       init<shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
-      .def("setPotentialAT",
-           &VerletListHadressLennardJonesAutoBonds::setPotentialAT)
-      .def("setPotentialCG",
-           &VerletListHadressLennardJonesAutoBonds::setPotentialCG);
+      .def("setPotentialAT", &VerletListHadressLennardJonesAutoBonds::setPotentialAT)
+      .def("setPotentialCG", &VerletListHadressLennardJonesAutoBonds::setPotentialCG);
   ;
 
   class_<CellListLennardJonesAutoBonds, bases<Interaction> >(
-      "interaction_CellListLennardJonesAutoBonds",
-      init<shared_ptr<storage::Storage> >())
+      "interaction_CellListLennardJonesAutoBonds", init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListLennardJonesAutoBonds::setPotential);
   ;
 
   class_<FixedPairListLennardJonesAutoBonds, bases<Interaction> >(
       "interaction_FixedPairListLennardJonesAutoBonds",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<LennardJonesAutoBonds> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesAutoBonds> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
                 shared_ptr<LennardJonesAutoBonds> >())
       .def("setPotential", &FixedPairListLennardJonesAutoBonds::setPotential);

@@ -63,9 +63,7 @@ CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce,
 
 CapForce::CapForce(shared_ptr<System> system, real _absCapForce,
                    shared_ptr<ParticleGroup> _particleGroup)
-    : Extension(system),
-      absCapForce(_absCapForce),
-      particleGroup(_particleGroup) {
+    : Extension(system), absCapForce(_absCapForce), particleGroup(_particleGroup) {
   LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
   allParticles = false;
   absCapping = true;
@@ -77,13 +75,11 @@ void CapForce::disconnect() { _aftCalcF.disconnect(); }
 void CapForce::connect() {
   // connection to initialisation
   if (!allParticles) {
-    _aftCalcF = integrator->aftCalcF.connect(
-        boost::bind(&CapForce::applyForceCappingToGroup, this),
-        boost::signals2::at_back);
+    _aftCalcF = integrator->aftCalcF.connect(boost::bind(&CapForce::applyForceCappingToGroup, this),
+                                             boost::signals2::at_back);
   } else {
-    _aftCalcF = integrator->aftCalcF.connect(
-        boost::bind(&CapForce::applyForceCappingToAll, this),
-        boost::signals2::at_back);
+    _aftCalcF = integrator->aftCalcF.connect(boost::bind(&CapForce::applyForceCappingToAll, this),
+                                             boost::signals2::at_back);
   }
 }
 
@@ -116,16 +112,12 @@ shared_ptr<ParticleGroup> CapForce::getParticleGroup() {
 
 void CapForce::applyForceCappingToGroup() {
   LOG4ESPP_DEBUG(theLogger,
-                 "applying force capping to particle group of size "
-                     << particleGroup->size());
+                 "applying force capping to particle group of size " << particleGroup->size());
 
   if (absCapping) {
     real capfsq = absCapForce * absCapForce;
-    for (ParticleGroup::iterator it = particleGroup->begin();
-         it != particleGroup->end(); it++) {
-      LOG4ESPP_DEBUG(
-          theLogger,
-          "applying scalar force capping to particle " << it->getId());
+    for (ParticleGroup::iterator it = particleGroup->begin(); it != particleGroup->end(); it++) {
+      LOG4ESPP_DEBUG(theLogger, "applying scalar force capping to particle " << it->getId());
       real fsq = it->force().sqr();
       if (fsq > capfsq) {
         real scaling = sqrt(capfsq / fsq);
@@ -136,11 +128,8 @@ void CapForce::applyForceCappingToGroup() {
       }
     }
   } else {
-    for (ParticleGroup::iterator it = particleGroup->begin();
-         it != particleGroup->end(); it++) {
-      LOG4ESPP_DEBUG(
-          theLogger,
-          "applying vector force capping to particle " << it->getId());
+    for (ParticleGroup::iterator it = particleGroup->begin(); it != particleGroup->end(); it++) {
+      LOG4ESPP_DEBUG(theLogger, "applying vector force capping to particle " << it->getId());
       Real3D& f = it->force();
       for (int dir = 0; dir < 3; dir++) {
         if (f[dir] > 0 && f[dir] > capForce[dir]) {
@@ -186,8 +175,8 @@ void CapForce::applyForceCappingToAll() {
   if (adress && absCapping) {
     real capfsq2 = absCapForce * absCapForce;
     ParticleList& adrATparticles = system.storage->getAdrATParticles();
-    for (std::vector<Particle>::iterator it = adrATparticles.begin();
-         it != adrATparticles.end(); it++) {
+    for (std::vector<Particle>::iterator it = adrATparticles.begin(); it != adrATparticles.end();
+         it++) {
       real fsq2 = it->force().sqr();
       if (fsq2 > capfsq2) {
         real scaling2 = sqrt(capfsq2 / fsq2);
@@ -211,11 +200,9 @@ void CapForce::registerPython() {
 
       ("integrator_CapForce", init<shared_ptr<System>, const Real3D&>())
           .def(init<shared_ptr<System>, real>())
-          .def(init<shared_ptr<System>, const Real3D&,
-                    shared_ptr<ParticleGroup> >())
+          .def(init<shared_ptr<System>, const Real3D&, shared_ptr<ParticleGroup> >())
           .def(init<shared_ptr<System>, real, shared_ptr<ParticleGroup> >())
-          .add_property("particleGroup", &CapForce::getParticleGroup,
-                        &CapForce::setParticleGroup)
+          .add_property("particleGroup", &CapForce::getParticleGroup, &CapForce::setParticleGroup)
           .add_property("adress", &CapForce::getAdress, &CapForce::setAdress)
           .def("getCapForce", &CapForce::getCapForce,
                return_value_policy<reference_existing_object>())

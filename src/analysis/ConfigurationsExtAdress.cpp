@@ -42,8 +42,7 @@ LOG4ESPP_LOGGER(ConfigurationsExtAdress::logger, "ConfigurationsExtAdress");
 
 void ConfigurationsExtAdress::setCapacity(int max) {
   if (max < 0) {
-    LOG4ESPP_ERROR(logger,
-                   "number for maximal configurations must be positive");
+    LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
     return;
   }
 
@@ -56,9 +55,7 @@ void ConfigurationsExtAdress::setCapacity(int max) {
   if (maxConfigs < nconfigs) {
     int diff = nconfigs - maxConfigs;
 
-    LOG4ESPP_INFO(
-        logger,
-        "delete " << diff << " configurations due to restricted capacity");
+    LOG4ESPP_INFO(logger, "delete " << diff << " configurations due to restricted capacity");
 
     configurationsExtAdress.erase(configurationsExtAdress.begin(),
                                   configurationsExtAdress.begin() + diff);
@@ -69,13 +66,9 @@ void ConfigurationsExtAdress::setCapacity(int max) {
 
 int ConfigurationsExtAdress::getCapacity() { return maxConfigs; }
 
-int ConfigurationsExtAdress::getSize() {
-  return configurationsExtAdress.size();
-}
+int ConfigurationsExtAdress::getSize() { return configurationsExtAdress.size(); }
 
-ConfigurationExtList ConfigurationsExtAdress::all() {
-  return configurationsExtAdress;
-}
+ConfigurationExtList ConfigurationsExtAdress::all() { return configurationsExtAdress; }
 
 /** Get a configuration from stack */
 
@@ -89,9 +82,7 @@ ConfigurationExtPtr ConfigurationsExtAdress::get(int stackpos) {
   }
 }
 
-ConfigurationExtPtr ConfigurationsExtAdress::back() {
-  return configurationsExtAdress.back();
-}
+ConfigurationExtPtr ConfigurationsExtAdress::back() { return configurationsExtAdress.back(); }
 
 void ConfigurationsExtAdress::pushConfig(ConfigurationExtPtr config) {
   int nconfs = configurationsExtAdress.size();
@@ -119,9 +110,7 @@ void ConfigurationsExtAdress::gather() {
   boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
   boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());
 
-  LOG4ESPP_INFO(logger,
-                "#Partices: me = " << myN << ", max = " << maxN
-                                   << ", totalN = " << totalN);
+  LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN << ", totalN = " << totalN);
 
   real* coordinates = new real[3 * maxN];  // buffer for gather
   real* velocities = new real[3 * maxN];   // buffer for gather
@@ -134,16 +123,15 @@ void ConfigurationsExtAdress::gather() {
   int i = 0;
 
   if (unfolded) {
-    for (CellListIterator cit(realCells); !cit.isDone();
-         ++cit) {  // loop over virtual particles
+    for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // loop over virtual particles
 
       FixedTupleListAdress::iterator it3;
       it3 = fixedTupleList->find(&(*cit));
       if (it3 != fixedTupleList->end()) {
         std::vector<Particle*> atList1;
         atList1 = it3->second;
-        for (std::vector<Particle*>::iterator itv = atList1.begin();
-             itv != atList1.end(); ++itv) {  // loop over atomistic particles
+        for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
+             ++itv) {  // loop over atomistic particles
 
           Particle& at = **itv;
           ids[i] = at.id();
@@ -171,8 +159,8 @@ void ConfigurationsExtAdress::gather() {
       if (it3 != fixedTupleList->end()) {
         std::vector<Particle*> atList1;
         atList1 = it3->second;
-        for (std::vector<Particle*>::iterator itv = atList1.begin();
-             itv != atList1.end(); ++itv) {  // loop over atomistic particles
+        for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
+             ++itv) {  // loop over atomistic particles
 
           Particle& at = **itv;
           ids[i] = at.id();
@@ -223,8 +211,7 @@ void ConfigurationsExtAdress::gather() {
         stat = req.wait();
         nIds = *stat.count<int>();
 
-        req =
-            system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
+        req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3 * maxN);
         system.comm->send(iproc, DEFAULT_TAG, 0);
         stat = req.wait();
         nCoords = *stat.count<real>();
@@ -233,13 +220,11 @@ void ConfigurationsExtAdress::gather() {
 
         if (nCoords != 3 * nIds) {
           LOG4ESPP_ERROR(logger,
-                         "serious error collecting data, got "
-                             << nIds << " ids, but " << nCoords
-                             << " coordinates");
+                         "serious error collecting data, got " << nIds << " ids, but " << nCoords
+                                                               << " coordinates");
         }
 
-        req =
-            system.comm->irecv<real>(iproc, DEFAULT_TAG, velocities, 3 * maxN);
+        req = system.comm->irecv<real>(iproc, DEFAULT_TAG, velocities, 3 * maxN);
         system.comm->send(iproc, DEFAULT_TAG, 0);
         stat = req.wait();
         nVelocs = *stat.count<real>();
@@ -248,9 +233,8 @@ void ConfigurationsExtAdress::gather() {
 
         if (nVelocs != 3 * nIds) {
           LOG4ESPP_ERROR(logger,
-                         "serious error collecting data, got "
-                             << nIds << " ids, but " << nVelocs
-                             << " velocities");
+                         "serious error collecting data, got " << nIds << " ids, but " << nVelocs
+                                                               << " velocities");
         }
 
         nother = nIds;
@@ -259,19 +243,17 @@ void ConfigurationsExtAdress::gather() {
         nother = myN;
       }
 
-      LOG4ESPP_INFO(logger,
-                    "add " << nother << " coordinates of proc " << iproc);
+      LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
       for (int i = 0; i < nother; i++) {
         int index = ids[i];
 
-        LOG4ESPP_INFO(
-            logger,
-            "set coordianates of particle with id = "
-                << index << ": " << coordinates[3 * i] << " "
-                << coordinates[3 * i + 1] << " " << coordinates[3 * i + 2]
-                << "and velocities: " << velocities[3 * i] << " "
-                << velocities[3 * i + 1] << " " << velocities[3 * i + 2]);
+        LOG4ESPP_INFO(logger,
+                      "set coordianates of particle with id = "
+                          << index << ": " << coordinates[3 * i] << " " << coordinates[3 * i + 1]
+                          << " " << coordinates[3 * i + 2]
+                          << "and velocities: " << velocities[3 * i] << " " << velocities[3 * i + 1]
+                          << " " << velocities[3 * i + 2]);
 
         RealND _vec(6);
         for (int k = 0; k < 3; k++) _vec.setItem(k, coordinates[3 * i + k]);
@@ -323,9 +305,8 @@ void ConfigurationsExtAdress::registerPython() {
   //      .def("__iter__", boost::python::iterator<ConfigurationExtList>())
   //      ;
 
-  class_<ConfigurationsExtAdress>(
-      "analysis_ConfigurationsExtAdress",
-      init<shared_ptr<System>, shared_ptr<FixedTupleListAdress> >())
+  class_<ConfigurationsExtAdress>("analysis_ConfigurationsExtAdress",
+                                  init<shared_ptr<System>, shared_ptr<FixedTupleListAdress> >())
       .add_property("size", &ConfigurationsExtAdress::getSize)
       .add_property("capacity", &ConfigurationsExtAdress::getCapacity,
                     &ConfigurationsExtAdress::setCapacity)

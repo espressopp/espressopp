@@ -66,8 +66,7 @@ void SlabBC::scaleVolume(Real3D s) {
 }
 
 /* Returns the minimum image vector between two positions */
-void SlabBC::getMinimumImageVector(Real3D& dist, const Real3D& pos1,
-                                   const Real3D& pos2) const {
+void SlabBC::getMinimumImageVector(Real3D& dist, const Real3D& pos1, const Real3D& pos2) const {
   dist = pos1;
   dist -= pos2;
 
@@ -79,8 +78,7 @@ void SlabBC::getMinimumImageVector(Real3D& dist, const Real3D& pos1,
 }
 
 /* Returns the minimum image vector between two positions */
-void SlabBC::getMinimumImageVectorBox(Real3D& dist, const Real3D& pos1,
-                                      const Real3D& pos2) const {
+void SlabBC::getMinimumImageVectorBox(Real3D& dist, const Real3D& pos1, const Real3D& pos2) const {
   dist = pos1;
   dist -= pos2;
 
@@ -108,8 +106,7 @@ void SlabBC::getMinimumDistance(Real3D& dist) const {
 }
 
 /* Returns the minimum image vector between two positions */
-void SlabBC::getMinimumImageVectorX(real dist[3], const real pos1[3],
-                                    const real pos2[3]) const {
+void SlabBC::getMinimumImageVectorX(real dist[3], const real pos1[3], const real pos2[3]) const {
   for (int i = 0; i < 3; i++) {
     if (i != slabDir) {
       dist[i] = pos1[i];
@@ -156,8 +153,8 @@ void SlabBC::getRandomPos(Real3D& res) const {
 
 void SlabBC::registerPython() {
   using namespace espressopp::python;
-  class_<SlabBC, bases<BC>, boost::noncopyable>(
-      "bc_SlabBC", init<shared_ptr<esutil::RNG>, Real3D&>())
+  class_<SlabBC, bases<BC>, boost::noncopyable>("bc_SlabBC",
+                                                init<shared_ptr<esutil::RNG>, Real3D&>())
       .add_property("boxL", &SlabBC::getBoxL, &SlabBC::setBoxL);
 }
 }

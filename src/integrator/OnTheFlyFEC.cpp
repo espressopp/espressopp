@@ -58,8 +58,7 @@ OnTheFlyFEC::~OnTheFlyFEC() { disconnect(); }
 
 // Connect & Disconnect
 void OnTheFlyFEC::connect() {
-  _gatherStats =
-      integrator->aftIntV.connect(boost::bind(&OnTheFlyFEC::gatherStats, this));
+  _gatherStats = integrator->aftIntV.connect(boost::bind(&OnTheFlyFEC::gatherStats, this));
 }
 
 void OnTheFlyFEC::disconnect() {
@@ -110,8 +109,7 @@ void OnTheFlyFEC::gatherStats() {
     if (counter < (steps / gap)) {
       // iterate over CG particles
       CellList cells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList =
-          system.storage->getFixedTuples();
+      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       FixedTupleListAdress::iterator it2;
       for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
         Particle& vp = *cit;
@@ -179,10 +177,8 @@ python::list OnTheFlyFEC::writeFEC() {
   // (real*)&EnergyDiffTotal, std::plus<real>(),0);
   // boost::mpi::reduce(*mpiWorld, (int*)&NumbersAtoms, bins,
   // (int*)&NumbersAtomsTotal, std::plus<int>(),0);
-  boost::mpi::all_reduce(*mpiWorld, EnergyDiff, bins, EnergyDiffTotal,
-                         std::plus<real>());
-  boost::mpi::all_reduce(*mpiWorld, NumbersAtoms, bins, NumbersAtomsTotal,
-                         std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, EnergyDiff, bins, EnergyDiffTotal, std::plus<real>());
+  boost::mpi::all_reduce(*mpiWorld, NumbersAtoms, bins, NumbersAtomsTotal, std::plus<int>());
 
   // normalizing
   // int nconfigs = 1; //config - 1
@@ -223,8 +219,7 @@ python::list OnTheFlyFEC::writeFEC() {
       // << "\n";
     } else {
       pyli.append(0.0);
-      std::cout << "Warning: No sampling for OnTheFlyFEC in bin " << i
-                << " done. Appended 0.0\n";
+      std::cout << "Warning: No sampling for OnTheFlyFEC in bin " << i << " done. Appended 0.0\n";
     }
   }
   // std::cout << "Last Loop done " << "\n";
@@ -243,9 +238,7 @@ python::list OnTheFlyFEC::writeFEC() {
   return pyli;
 }
 
-void OnTheFlyFEC::setCenter(real x, real y, real z) {
-  center = Real3D(x, y, z);
-}
+void OnTheFlyFEC::setCenter(real x, real y, real z) { center = Real3D(x, y, z); }
 
 /****************************************************
 ** REGISTRATION WITH PYTHON
@@ -254,8 +247,8 @@ void OnTheFlyFEC::setCenter(real x, real y, real z) {
 void OnTheFlyFEC::registerPython() {
   using namespace espressopp::python;
 
-  class_<OnTheFlyFEC, shared_ptr<OnTheFlyFEC>, bases<Extension> >(
-      "integrator_OnTheFlyFEC", init<shared_ptr<System> >())
+  class_<OnTheFlyFEC, shared_ptr<OnTheFlyFEC>, bases<Extension> >("integrator_OnTheFlyFEC",
+                                                                  init<shared_ptr<System> >())
       .add_property("bins", &OnTheFlyFEC::getBins, &OnTheFlyFEC::setBins)
       .add_property("steps", &OnTheFlyFEC::getSteps, &OnTheFlyFEC::setSteps)
       .add_property("gap", &OnTheFlyFEC::getGap, &OnTheFlyFEC::setGap)

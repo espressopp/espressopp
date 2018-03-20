@@ -50,10 +50,8 @@ void LBInitPopWave::createDenVel(real _rho0, Real3D _u0) {
   Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
   Int3D _Ni = latticeboltzmann->getNi();      // system size in lattice node
   Int3D _myNi = latticeboltzmann->getMyNi();  // my local nodes
-  Int3D _globalNi = Int3D(
-      0, 0, 0);  // index of the first real node in cpu in the global lattice
-  int _numVels =
-      latticeboltzmann->getNumVels();  // number of velocities in the model
+  Int3D _globalNi = Int3D(0, 0, 0);  // index of the first real node in cpu in the global lattice
+  int _numVels = latticeboltzmann->getNumVels();  // number of velocities in the model
 
   for (int _dim = 0; _dim < 3; _dim++) {
     _globalNi[_dim] = floor(_myPos[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
@@ -65,8 +63,7 @@ void LBInitPopWave::createDenVel(real _rho0, Real3D _u0) {
   for (int i = _offset; i < _myNi.getItem(0) - _offset; i++) {
     // test the damping of a sin-like initial velocities:
     _u0 = Real3D(vel.getItem(0), vel.getItem(1),
-                 vel.getItem(2) *
-                     sin(2. * M_PI * (_globalNi[0] + i - _offset) / _Ni[0]));
+                 vel.getItem(2) * sin(2. * M_PI * (_globalNi[0] + i - _offset) / _Ni[0]));
     real trace = _u0 * _u0 * invCs2;
     for (int j = _offset; j < _myNi.getItem(1) - _offset; j++) {
       for (int k = _offset; k < _myNi.getItem(2) - _offset; k++) {
@@ -96,9 +93,8 @@ void LBInitPopWave::addForce(Real3D _force) {}
 void LBInitPopWave::registerPython() {
   using namespace espressopp::python;
 
-  class_<LBInitPopWave, bases<LBInit> >(
-      "integrator_LBInit_PopWave",
-      init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
+  class_<LBInitPopWave, bases<LBInit> >("integrator_LBInit_PopWave",
+                                        init<shared_ptr<System>, shared_ptr<LatticeBoltzmann> >())
       .def("createDenVel", &LBInitPopWave::createDenVel);
 }
 }

@@ -38,15 +38,12 @@ void AnalysisBase::registerPython() {
 
   // class_< AnalysisBase, boost::noncopyable >("analysis_AnalysisBase",
   // no_init)
-  class_<AnalysisBase, bases<ParticleAccess>, boost::noncopyable>(
-      "analysis_AnalysisBase", no_init)
-      .def("performMeasurement",
-           pure_virtual(&AnalysisBase::performMeasurement))
+  class_<AnalysisBase, bases<ParticleAccess>, boost::noncopyable>("analysis_AnalysisBase", no_init)
+      .def("performMeasurement", pure_virtual(&AnalysisBase::performMeasurement))
       .def("reset", pure_virtual(&AnalysisBase::reset))
       .def("compute", pure_virtual(&AnalysisBase::compute))
       .def("getAverageValue", pure_virtual(&AnalysisBase::getAverageValue))
-      .def("getNumberOfMeasurements",
-           pure_virtual(&AnalysisBase::getNumberOfMeasurements));
+      .def("getNumberOfMeasurements", pure_virtual(&AnalysisBase::getNumberOfMeasurements));
 }
 }
 }

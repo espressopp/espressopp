@@ -40,9 +40,8 @@ using namespace interaction;
 using namespace iterator;
 using namespace esutil;
 
-VelocityVerletOnGroup::VelocityVerletOnGroup(
-    shared_ptr<System> system,
-    shared_ptr<class espressopp::ParticleGroup> group_)
+VelocityVerletOnGroup::VelocityVerletOnGroup(shared_ptr<System> system,
+                                             shared_ptr<class espressopp::ParticleGroup> group_)
     : MDIntegrator(system), group(group_) {
   LOG4ESPP_INFO(theLogger, "construct VelocityVerletOnGroup");
 
@@ -58,8 +57,7 @@ VelocityVerletOnGroup::~VelocityVerletOnGroup() {
 
 /*****************************************************************************/
 
-void VelocityVerletOnGroup::setLangevin(
-    shared_ptr<LangevinThermostat> _langevin) {
+void VelocityVerletOnGroup::setLangevin(shared_ptr<LangevinThermostat> _langevin) {
   LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
   langevin = _langevin;
 }
@@ -116,15 +114,13 @@ void VelocityVerletOnGroup::run(int nsteps) {
   real skinHalf = 0.5 * system.getSkin();
 
   for (int i = 0; i < nsteps; i++) {
-    LOG4ESPP_INFO(theLogger,
-                  "Next step " << i << " of " << nsteps << " starts");
+    LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
     time = timeIntegrate.getElapsedTime();
     maxDist += integrate1();
     timeInt1 += timeIntegrate.getElapsedTime() - time;
 
-    LOG4ESPP_INFO(theLogger,
-                  "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
+    LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
     if (maxDist > skinHalf) resortFlag = true;
 
@@ -163,13 +159,10 @@ void VelocityVerletOnGroup::resetTimers() {
 }
 
 void VelocityVerletOnGroup::printTimers() {
-  std::cout << "time: run = " << timeIntegrate
-            << ", pair = " << timeForceComp[0]
-            << ", FENE = " << timeForceComp[1]
-            << ", angle = " << timeForceComp[2] << ", comm1 = " << timeComm1
-            << ", comm2 = " << timeComm2 << ", int1 = " << timeInt1
-            << ", int2 = " << timeInt2 << ", resort = " << timeResort
-            << std::endl;
+  std::cout << "time: run = " << timeIntegrate << ", pair = " << timeForceComp[0]
+            << ", FENE = " << timeForceComp[1] << ", angle = " << timeForceComp[2]
+            << ", comm1 = " << timeComm1 << ", comm2 = " << timeComm2 << ", int1 = " << timeInt1
+            << ", int2 = " << timeInt2 << ", resort = " << timeResort << std::endl;
 }
 
 /*****************************************************************************/
@@ -183,14 +176,12 @@ real VelocityVerletOnGroup::integrate1() {
 
   real maxSqDist = 0.0;  // maximal square distance a particle moves
 
-  for (ParticleGroup::iterator cit(group->begin()); cit != group->end();
-       ++cit) {
+  for (ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
     real sqDist = 0.0;
 
     LOG4ESPP_DEBUG(theLogger,
                    "Particle " << cit->id() << ", pos = " << cit->position()
-                               << ", v = " << cit->velocity()
-                               << ", f = " << cit->force());
+                               << ", v = " << cit->velocity() << ", f = " << cit->force());
 
     /* more precise for DEBUG:
 
@@ -218,8 +209,7 @@ real VelocityVerletOnGroup::integrate1() {
 
   real maxAllSqDist;
 
-  mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist,
-                  boost::mpi::maximum<real>());
+  mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
 
   LOG4ESPP_INFO(theLogger,
                 "moved " << count << " particles in integrate1"
@@ -236,8 +226,7 @@ void VelocityVerletOnGroup::integrate2() {
 
   // loop over all particles of the local cells
 
-  for (ParticleGroup::iterator cit(group->begin()); cit != group->end();
-       ++cit) {
+  for (ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
     real dtfm = 0.5 * dt / cit->mass();
 
     /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
@@ -276,8 +265,7 @@ void VelocityVerletOnGroup::calcForces() {
   const InteractionList& srIL = sys.shortRangeInteractions;
 
   for (size_t i = 0; i < srIL.size(); i++) {
-    LOG4ESPP_INFO(theLogger,
-                  "compute forces for srIL " << i << " of " << srIL.size());
+    LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
 
     real time;
     time = timeIntegrate.getElapsedTime();
@@ -339,8 +327,7 @@ void VelocityVerletOnGroup::printForces(bool withGhosts) {
   }
 
   for (CellListIterator cit(cells); !cit.isDone(); ++cit) {
-    LOG4ESPP_DEBUG(theLogger,
-                   "Particle " << cit->id() << ", force = " << cit->force());
+    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", force = " << cit->force());
   }
 }
 
@@ -361,11 +348,8 @@ void VelocityVerletOnGroup::printPositions(bool withGhosts) {
     LOG4ESPP_DEBUG(theLogger, "real positions");
   }
 
-  for (ParticleGroup::iterator cit(group->begin()); cit != group->end();
-       ++cit) {
-    LOG4ESPP_DEBUG(
-        theLogger,
-        "Particle " << cit->id() << ", position = " << cit->position());
+  for (ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
+    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", position = " << cit->position());
   }
 }
 
@@ -379,8 +363,7 @@ void VelocityVerletOnGroup::registerPython() {
   // Note: use noncopyable and no_init for abstract classes
 
   class_<VelocityVerletOnGroup, bases<MDIntegrator>, boost::noncopyable>(
-      "integrator_VelocityVerletOnGroup",
-      init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
+      "integrator_VelocityVerletOnGroup", init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
 
       .add_property("langevin", &VelocityVerletOnGroup::getLangevin,
                     &VelocityVerletOnGroup::setLangevin);

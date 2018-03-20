@@ -27,8 +27,7 @@
 namespace espressopp {
 namespace interaction {
 
-typedef class VerletListInteractionTemplate<GravityTruncated>
-    VerletListGravityTruncated;
+typedef class VerletListInteractionTemplate<GravityTruncated> VerletListGravityTruncated;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -36,14 +35,12 @@ typedef class VerletListInteractionTemplate<GravityTruncated>
 void GravityTruncated::registerPython() {
   using namespace espressopp::python;
 
-  class_<GravityTruncated, bases<Potential> >("interaction_GravityTruncated",
-                                              init<>())
+  class_<GravityTruncated, bases<Potential> >("interaction_GravityTruncated", init<>())
       .def(init<real, real>())
-      .add_property("prefactor", &GravityTruncated::getPrefactor,
-                    &GravityTruncated::setPrefactor);
+      .add_property("prefactor", &GravityTruncated::getPrefactor, &GravityTruncated::setPrefactor);
 
-  class_<VerletListGravityTruncated, bases<Interaction> >(
-      "interaction_VerletListGravityTruncated", init<shared_ptr<VerletList> >())
+  class_<VerletListGravityTruncated, bases<Interaction> >("interaction_VerletListGravityTruncated",
+                                                          init<shared_ptr<VerletList> >())
       .def("getVerletList", &VerletListGravityTruncated::getVerletList)
       .def("setPotential", &VerletListGravityTruncated::setPotential,
            return_value_policy<reference_existing_object>())

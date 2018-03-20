@@ -36,8 +36,7 @@ LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 CellGridIllegal::CellGridIllegal()
     : std::runtime_error("cell grid dimensions have to be positive") {}
 
-CellGrid::CellGrid(const Int3D& _size, const real _myLeft[3],
-                   const real _myRight[3], int _frame)
+CellGrid::CellGrid(const Int3D& _size, const real _myLeft[3], const real _myRight[3], int _frame)
     : Grid(_size[0] + 2 * _frame, _size[1] + 2 * _frame, _size[2] + 2 * _frame),
       frame(_frame),
       extraSize(2 * frame) {
@@ -53,8 +52,7 @@ CellGrid::CellGrid(const Int3D& _size, const real _myLeft[3],
     invCellSize[i] = 1.0 / cellSize[i];
   }
 
-  smallestCellDiameter =
-      std::min(std::min(cellSize[0], cellSize[1]), cellSize[2]);
+  smallestCellDiameter = std::min(std::min(cellSize[0], cellSize[1]), cellSize[2]);
 }
 
 longint CellGrid::getNumberOfInnerCells() const {
@@ -122,8 +120,7 @@ longint CellGrid::mapPositionToCellChecked(const Real3D& pos) const {
   return mapPositionToIndex(cpos);
 }
 
-bool CellGrid::mapPositionToCellCheckedAndClipped(longint& cell,
-                                                  const Real3D& pos) const {
+bool CellGrid::mapPositionToCellCheckedAndClipped(longint& cell, const Real3D& pos) const {
   int cpos[3];
   bool outside = false;
 
@@ -152,10 +149,9 @@ bool CellGrid::mapPositionToCellCheckedAndClipped(longint& cell,
   cell = mapPositionToIndex(cpos);
 
   LOG4ESPP_TRACE(logger,
-                 "mapping position (" << pos[0] << ", " << pos[1] << ", "
-                                      << pos[2] << ") to grid position ("
-                                      << cpos[0] << ", " << cpos[1] << ", "
-                                      << cpos[2] << ") <-> " << cell);
+                 "mapping position (" << pos[0] << ", " << pos[1] << ", " << pos[2]
+                                      << ") to grid position (" << cpos[0] << ", " << cpos[1]
+                                      << ", " << cpos[2] << ") <-> " << cell);
 
   return outside;
 }

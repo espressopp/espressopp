@@ -79,9 +79,7 @@ void MDIntegrator::addExtension(shared_ptr<integrator::Extension> extension) {
 
 int MDIntegrator::getNumberOfExtensions() { return exList.size(); }
 
-shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) {
-  return exList[k];
-}
+shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) { return exList[k]; }
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -92,8 +90,7 @@ void MDIntegrator::registerPython() {
 
   // Note: use noncopyable and no_init for abstract classes
   class_<MDIntegrator, boost::noncopyable>("integrator_MDIntegrator", no_init)
-      .add_property("dt", &MDIntegrator::getTimeStep,
-                    &MDIntegrator::setTimeStep)
+      .add_property("dt", &MDIntegrator::getTimeStep, &MDIntegrator::setTimeStep)
       .add_property("step", &MDIntegrator::getStep, &MDIntegrator::setStep)
       .add_property("system", &SystemAccess::getSystem)
       .def("run", &MDIntegrator::run)

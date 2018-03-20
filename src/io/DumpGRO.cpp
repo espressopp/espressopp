@@ -96,9 +96,7 @@ void DumpGRO::dump() {
         ss << particleIDToType.find(i + 1)->second;
         myfile << setiosflags(ios::right) << setw(5) << (string("T") + ss.str())
                << resetiosflags(ios::right);
-        myfile
-            << setw(5)
-            << i + 1;  // NOTE this is the actual atom number - wrapped at 99999
+        myfile << setw(5) << i + 1;  // NOTE this is the actual atom number - wrapped at 99999
         // while get token
         // print with setw(8) << setprecision(3)
         // if more than 3
@@ -119,9 +117,9 @@ void DumpGRO::dump() {
         myfile << endl;
       }
       Real3D Li = system->bc->getBoxL();
-      myfile << setw(10) << setprecision(5) << Li[0] * length_factor << setw(10)
-             << setprecision(5) << Li[1] * length_factor << setw(10)
-             << setprecision(5) << Li[2] * length_factor << endl;
+      myfile << setw(10) << setprecision(5) << Li[0] * length_factor << setw(10) << setprecision(5)
+             << Li[1] * length_factor << setw(10) << setprecision(5) << Li[2] * length_factor
+             << endl;
       myfile.close();
     } else
       cout << "Unable to open file: " << file_name << endl;
@@ -135,16 +133,13 @@ void DumpGRO::registerPython() {
   using namespace espressopp::python;
 
   class_<DumpGRO, bases<ParticleAccess>, boost::noncopyable>(
-      "io_DumpGRO",
-      init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator>,
-           std::string, bool, real, std::string, bool>())
+      "io_DumpGRO", init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator>, std::string,
+                         bool, real, std::string, bool>())
       .add_property("filename", &DumpGRO::getFilename, &DumpGRO::setFilename)
       .add_property("unfolded", &DumpGRO::getUnfolded, &DumpGRO::setUnfolded)
       .add_property("append", &DumpGRO::getAppend, &DumpGRO::setAppend)
-      .add_property("length_factor", &DumpGRO::getLengthFactor,
-                    &DumpGRO::setLengthFactor)
-      .add_property("length_unit", &DumpGRO::getLengthUnit,
-                    &DumpGRO::setLengthUnit)
+      .add_property("length_factor", &DumpGRO::getLengthFactor, &DumpGRO::setLengthFactor)
+      .add_property("length_unit", &DumpGRO::getLengthUnit, &DumpGRO::setLengthUnit)
       .def("dump", &DumpGRO::dump);
 }
 }

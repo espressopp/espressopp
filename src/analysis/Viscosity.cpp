@@ -53,8 +53,7 @@ python::list Viscosity::compute(real t0, real dt, real T) {
 
   if (this_node == 0) {
     for (int i = 0; i < len(auto_pxy_pxy_py); ++i) {
-      auto_pxy_pxy_py[i] =
-          V_T * boost::python::extract<double>(auto_pxy_pxy_py[i]);
+      auto_pxy_pxy_py[i] = V_T * boost::python::extract<double>(auto_pxy_pxy_py[i]);
     }
   }
 

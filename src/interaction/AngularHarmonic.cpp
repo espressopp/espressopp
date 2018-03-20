@@ -32,24 +32,20 @@ namespace interaction {
 void AngularHarmonic::registerPython() {
   using namespace espressopp::python;
 
-  class_<AngularHarmonic, bases<AngularPotential> >(
-      "interaction_AngularHarmonic", init<real, real>())
+  class_<AngularHarmonic, bases<AngularPotential> >("interaction_AngularHarmonic",
+                                                    init<real, real>())
       .add_property("K", &AngularHarmonic::getK, &AngularHarmonic::setK)
-      .add_property("theta0", &AngularHarmonic::getTheta0,
-                    &AngularHarmonic::setTheta0);
+      .add_property("theta0", &AngularHarmonic::getTheta0, &AngularHarmonic::setTheta0);
 
-  typedef class FixedTripleListInteractionTemplate<AngularHarmonic>
-      FixedTripleListAngularHarmonic;
+  typedef class FixedTripleListInteractionTemplate<AngularHarmonic> FixedTripleListAngularHarmonic;
 
   class_<FixedTripleListAngularHarmonic, bases<Interaction> >(
       "interaction_FixedTripleListAngularHarmonic",
-      init<shared_ptr<System>, shared_ptr<FixedTripleList>,
-           shared_ptr<AngularHarmonic> >())
+      init<shared_ptr<System>, shared_ptr<FixedTripleList>, shared_ptr<AngularHarmonic> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedTripleListAdress>,
                 shared_ptr<AngularHarmonic> >())
       .def("setPotential", &FixedTripleListAngularHarmonic::setPotential)
-      .def("getFixedTripleList",
-           &FixedTripleListAngularHarmonic::getFixedTripleList);
+      .def("getFixedTripleList", &FixedTripleListAngularHarmonic::getFixedTripleList);
   ;
 }
 }

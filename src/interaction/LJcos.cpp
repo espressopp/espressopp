@@ -32,10 +32,8 @@ namespace espressopp {
 namespace interaction {
 
 typedef class VerletListInteractionTemplate<LJcos> VerletListLJcos;
-typedef class VerletListAdressInteractionTemplate<LJcos, Tabulated>
-    VerletListAdressLJcos;
-typedef class VerletListHadressInteractionTemplate<LJcos, Tabulated>
-    VerletListHadressLJcos;
+typedef class VerletListAdressInteractionTemplate<LJcos, Tabulated> VerletListAdressLJcos;
+typedef class VerletListHadressInteractionTemplate<LJcos, Tabulated> VerletListHadressLJcos;
 typedef class CellListAllPairsInteractionTemplate<LJcos> CellListLJcos;
 typedef class FixedPairListInteractionTemplate<LJcos> FixedPairListLJcos;
 
@@ -72,16 +70,15 @@ void LJcos::registerPython() {
       .def("setPotentialCG", &VerletListHadressLJcos::setPotentialCG);
   ;
 
-  class_<CellListLJcos, bases<Interaction> >(
-      "interaction_CellListLJcos", init<shared_ptr<storage::Storage> >())
+  class_<CellListLJcos, bases<Interaction> >("interaction_CellListLJcos",
+                                             init<shared_ptr<storage::Storage> >())
       .def("setPotential", &CellListLJcos::setPotential);
   ;
 
   class_<FixedPairListLJcos, bases<Interaction> >(
       "interaction_FixedPairListLJcos",
       init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LJcos> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
-                shared_ptr<LJcos> >())
+      .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LJcos> >())
       .def("setPotential", &FixedPairListLJcos::setPotential)
       .def("setFixedPairList", &FixedPairListLJcos::setFixedPairList)
       .def("getFixedPairList", &FixedPairListLJcos::getFixedPairList);

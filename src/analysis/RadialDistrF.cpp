@@ -55,8 +55,7 @@ python::list RadialDistrF::computeArray(int rdfN) const {
   real histogram[rdfN];
   for (int i = 0; i < rdfN; i++) histogram[i] = 0;
 
-  real dr =
-      Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
+  real dr = Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
   // should use for Li_half[XXX] the shortest side length
 
   int num_part = 0;
@@ -74,8 +73,7 @@ python::list RadialDistrF::computeArray(int rdfN) const {
     boost::mpi::broadcast(*system.comm, conf, rank_i);
 
     // for simplicity we will number the particles from 0
-    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end();
-         ++itr) {
+    for (map<size_t, Real3D>::iterator itr = conf.begin(); itr != conf.end(); ++itr) {
       // size_t id = itr->first;
       Real3D p = itr->second;
       config->set(num_part, p[0], p[1], p[2]);
@@ -119,17 +117,14 @@ python::list RadialDistrF::computeArray(int rdfN) const {
     if (print_progress && system.comm->rank() == 0) {
       perc = (int)((i - mini) * denom);
       if (perc % 5 == 0) {
-        cout << "calculation progress (radial distr. func.): " << perc << " %\r"
-             << flush;
+        cout << "calculation progress (radial distr. func.): " << perc << " %\r" << flush;
       }
     }
   }
-  if (system.comm->rank() == 0)
-    cout << "calculation progress (radial distr. func.): 100 %" << endl;
+  if (system.comm->rank() == 0) cout << "calculation progress (radial distr. func.): 100 %" << endl;
 
   real totHistogram[rdfN];
-  boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram,
-                         plus<real>());
+  boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
 
   // normalizing
   int nconfigs = 1;  // config - 1
@@ -154,8 +149,7 @@ real RadialDistrF::compute() const { return -1.0; }
 
 void RadialDistrF::registerPython() {
   using namespace espressopp::python;
-  class_<RadialDistrF, bases<Observable> >("analysis_RadialDistrF",
-                                           init<shared_ptr<System> >())
+  class_<RadialDistrF, bases<Observable> >("analysis_RadialDistrF", init<shared_ptr<System> >())
       .add_property("print_progress", &RadialDistrF::getPrint_progress,
                     &RadialDistrF::setPrint_progress)
       .def("compute", &RadialDistrF::computeArray);

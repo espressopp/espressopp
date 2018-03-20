@@ -38,8 +38,7 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-DPDThermostat::DPDThermostat(shared_ptr<System> system,
-                             shared_ptr<VerletList> _verletList)
+DPDThermostat::DPDThermostat(shared_ptr<System> system, shared_ptr<VerletList> _verletList)
     : Extension(system), verletList(_verletList) {
   type = Extension::Thermostat;
 
@@ -66,9 +65,7 @@ void DPDThermostat::setTGamma(real _tgamma) { tgamma = _tgamma; }
 
 real DPDThermostat::getTGamma() { return tgamma; }
 
-void DPDThermostat::setTemperature(real _temperature) {
-  temperature = _temperature;
-}
+void DPDThermostat::setTemperature(real _temperature) { temperature = _temperature; }
 
 real DPDThermostat::getTemperature() { return temperature; }
 
@@ -83,17 +80,13 @@ void DPDThermostat::disconnect() {
 
 void DPDThermostat::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&DPDThermostat::initialize, this));
+  _initialize = integrator->runInit.connect(boost::bind(&DPDThermostat::initialize, this));
 
-  _heatUp =
-      integrator->recalc1.connect(boost::bind(&DPDThermostat::heatUp, this));
+  _heatUp = integrator->recalc1.connect(boost::bind(&DPDThermostat::heatUp, this));
 
-  _coolDown =
-      integrator->recalc2.connect(boost::bind(&DPDThermostat::coolDown, this));
+  _coolDown = integrator->recalc2.connect(boost::bind(&DPDThermostat::coolDown, this));
 
-  _thermalize = integrator->aftInitF.connect(
-      boost::bind(&DPDThermostat::thermalize, this));
+  _thermalize = integrator->aftInitF.connect(boost::bind(&DPDThermostat::thermalize, this));
 }
 
 void DPDThermostat::thermalize() {
@@ -159,20 +152,20 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2) {
 
     // Calculate matrix product of projector and veldiff vector:
     // P dv = (I - r r_T) dv
-    f_damp[0] = (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] -
-                r[0] * r[2] * veldiff[2];
-    f_damp[1] = (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] -
-                r[1] * r[2] * veldiff[2];
-    f_damp[2] = (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] -
-                r[2] * r[1] * veldiff[1];
+    f_damp[0] =
+        (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] - r[0] * r[2] * veldiff[2];
+    f_damp[1] =
+        (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] - r[1] * r[2] * veldiff[2];
+    f_damp[2] =
+        (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] - r[2] * r[1] * veldiff[1];
 
     // Same with random vector
-    f_rand[0] = (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] -
-                r[0] * r[2] * noisevec[2];
-    f_rand[1] = (1.0 - r[1] * r[1]) * noisevec[1] - r[1] * r[0] * noisevec[0] -
-                r[1] * r[2] * noisevec[2];
-    f_rand[2] = (1.0 - r[2] * r[2]) * noisevec[2] - r[2] * r[0] * noisevec[0] -
-                r[2] * r[1] * noisevec[1];
+    f_rand[0] =
+        (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] - r[0] * r[2] * noisevec[2];
+    f_rand[1] =
+        (1.0 - r[1] * r[1]) * noisevec[1] - r[1] * r[0] * noisevec[0] - r[1] * r[2] * noisevec[2];
+    f_rand[2] =
+        (1.0 - r[2] * r[2]) * noisevec[2] - r[2] * r[0] * noisevec[0] - r[2] * r[1] * noisevec[1];
 
     f_damp *= pref3 * omega2;
     f_rand *= pref4 * omega;
@@ -191,8 +184,7 @@ void DPDThermostat::initialize() {
   real timestep = integrator->getTimeStep();
 
   LOG4ESPP_INFO(theLogger,
-                "init, timestep = " << timestep << ", gamma = " << gamma
-                                    << ", tgamma = " << tgamma
+                "init, timestep = " << timestep << ", gamma = " << gamma << ", tgamma = " << tgamma
                                     << ", temperature = " << temperature);
 
   pref1 = gamma;
@@ -236,15 +228,12 @@ void DPDThermostat::coolDown() {
 void DPDThermostat::registerPython() {
   using namespace espressopp::python;
   class_<DPDThermostat, shared_ptr<DPDThermostat>, bases<Extension> >(
-      "integrator_DPDThermostat",
-      init<shared_ptr<System>, shared_ptr<VerletList> >())
+      "integrator_DPDThermostat", init<shared_ptr<System>, shared_ptr<VerletList> >())
       .def("connect", &DPDThermostat::connect)
       .def("disconnect", &DPDThermostat::disconnect)
       .add_property("gamma", &DPDThermostat::getGamma, &DPDThermostat::setGamma)
-      .add_property("tgamma", &DPDThermostat::getTGamma,
-                    &DPDThermostat::setTGamma)
-      .add_property("temperature", &DPDThermostat::getTemperature,
-                    &DPDThermostat::setTemperature);
+      .add_property("tgamma", &DPDThermostat::getTGamma, &DPDThermostat::setTGamma)
+      .add_property("temperature", &DPDThermostat::getTemperature, &DPDThermostat::setTemperature);
 }
 }
 }

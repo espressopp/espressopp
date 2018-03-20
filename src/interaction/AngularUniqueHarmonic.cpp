@@ -32,10 +32,9 @@ namespace interaction {
 void AngularUniqueHarmonic::registerPython() {
   using namespace espressopp::python;
 
-  class_<AngularUniqueHarmonic, bases<AngularUniquePotential> >(
-      "interaction_AngularUniqueHarmonic", init<real>())
-      .add_property("K", &AngularUniqueHarmonic::getK,
-                    &AngularUniqueHarmonic::setK);
+  class_<AngularUniqueHarmonic, bases<AngularUniquePotential> >("interaction_AngularUniqueHarmonic",
+                                                                init<real>())
+      .add_property("K", &AngularUniqueHarmonic::getK, &AngularUniqueHarmonic::setK);
 
   typedef class FixedTripleAngleListInteractionTemplate<AngularUniqueHarmonic>
       FixedTripleAngleListAngularUniqueHarmonic;
@@ -44,8 +43,7 @@ void AngularUniqueHarmonic::registerPython() {
       "interaction_FixedTripleAngleListAngularUniqueHarmonic",
       init<shared_ptr<System>, shared_ptr<FixedTripleAngleList>,
            shared_ptr<AngularUniqueHarmonic> >())
-      .def("setPotential",
-           &FixedTripleAngleListAngularUniqueHarmonic::setPotential);
+      .def("setPotential", &FixedTripleAngleListAngularUniqueHarmonic::setPotential);
   ;
 }
 }

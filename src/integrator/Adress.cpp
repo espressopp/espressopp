@@ -40,10 +40,8 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-Adress::Adress(shared_ptr<System> _system,
-               shared_ptr<VerletListAdress> _verletList,
-               shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI,
-               int _regionupdates)
+Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList,
+               shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates)
     : Extension(_system),
       verletList(_verletList),
       fixedtupleList(_fixedtupleList),
@@ -81,16 +79,16 @@ void Adress::disconnect() {
 
 void Adress::connect() {
   // connection to after runInit()
-  _SetPosVel = integrator->runInit.connect(
-      boost::bind(&Adress::SetPosVel, this), boost::signals2::at_front);
+  _SetPosVel =
+      integrator->runInit.connect(boost::bind(&Adress::SetPosVel, this), boost::signals2::at_front);
 
   // connection to after initForces()
-  _initForces = integrator->aftInitF.connect(
-      boost::bind(&Adress::initForces, this), boost::signals2::at_front);
+  _initForces = integrator->aftInitF.connect(boost::bind(&Adress::initForces, this),
+                                             boost::signals2::at_front);
 
   // connection to inside of integrate1()
-  _integrate1 = integrator->inIntP.connect(
-      boost::bind(&Adress::integrate1, this, _1), boost::signals2::at_front);
+  _integrate1 = integrator->inIntP.connect(boost::bind(&Adress::integrate1, this, _1),
+                                           boost::signals2::at_front);
 
   // // connection to inside of integrate1()
   // _inIntP = integrator->inIntP.connect(
@@ -98,8 +96,8 @@ void Adress::connect() {
   //         boost::signals2::at_front);
 
   // connection to after integrate2()
-  _integrate2 = integrator->aftIntV.connect(
-      boost::bind(&Adress::integrate2, this), boost::signals2::at_front);
+  _integrate2 = integrator->aftIntV.connect(boost::bind(&Adress::integrate2, this),
+                                            boost::signals2::at_front);
 
   // Note: Both this extension as well as Langevin Thermostat access singal
   // aftCalcF. This might lead to undefined behavior.
@@ -110,12 +108,12 @@ void Adress::connect() {
   //        boost::bind(&Adress::aftCalcF, this));
 
   // connection to after _recalc2()
-  _recalc2 = integrator->recalc2.connect(boost::bind(&Adress::aftCalcF, this),
-                                         boost::signals2::at_front);
+  _recalc2 =
+      integrator->recalc2.connect(boost::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
 
   // connection to after _befIntV()
-  _befIntV = integrator->befIntV.connect(boost::bind(&Adress::aftCalcF, this),
-                                         boost::signals2::at_front);
+  _befIntV =
+      integrator->befIntV.connect(boost::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
 }
 
 void Adress::SetPosVel() {
@@ -136,8 +134,7 @@ void Adress::SetPosVel() {
       // Compute center of mass
       Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
       Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-      for (std::vector<Particle*>::iterator it2 = atList.begin();
-           it2 != atList.end(); ++it2) {
+      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
         Particle& at = **it2;
         cmp += at.mass() * at.position();
         cmv += at.mass() * at.velocity();
@@ -151,20 +148,17 @@ void Adress::SetPosVel() {
 
       if (KTI == false) {
         // calculate distance to nearest adress particle or center
-        std::vector<Real3D*>::iterator it2 =
-            verletList->getAdrPositions().begin();
+        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
         Real3D pa = **it2;  // position of adress particle
         Real3D d1(0.0, 0.0, 0.0);
-        verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(),
-                                                           pa);
+        verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
         real min1sq;
         if (verletList->getAdrRegionType()) {  // spherical adress region
           min1sq = d1.sqr();                   // set min1sq before loop
           ++it2;
           for (; it2 != verletList->getAdrPositions().end(); ++it2) {
             pa = **it2;
-            verletList->getSystem()->bc->getMinimumImageVector(
-                d1, vp.position(), pa);
+            verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
             real distsq1 = d1.sqr();
             if (distsq1 < min1sq) min1sq = distsq1;
           }
@@ -173,8 +167,7 @@ void Adress::SetPosVel() {
           ++it2;
           for (; it2 != verletList->getAdrPositions().end(); ++it2) {
             pa = **it2;
-            verletList->getSystem()->bc->getMinimumImageVector(
-                d1, vp.position(), pa);
+            verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
             real distsq1 = d1[0] * d1[0];
             if (distsq1 < min1sq) min1sq = distsq1;
           }
@@ -188,8 +181,7 @@ void Adress::SetPosVel() {
       }
 
     } else {  // this should not happen
-      std::cout << " VP particle " << vp.id() << "-" << vp.ghost()
-                << " not found in tuples ";
+      std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
       std::cout << " (" << vp.position() << ")\n";
       exit(1);
       return;
@@ -202,16 +194,15 @@ void Adress::initForces() {
 
   // AT reals
   ParticleList& adrATparticles = system.storage->getAdrATParticles();
-  for (std::vector<Particle>::iterator it = adrATparticles.begin();
-       it != adrATparticles.end(); ++it) {
+  for (std::vector<Particle>::iterator it = adrATparticles.begin(); it != adrATparticles.end();
+       ++it) {
     it->force() = 0.0;
   }
 
   // AT ghosts
   typedef std::list<ParticleList> ParticleListAdr;
   ParticleListAdr& adrATparticlesG = system.storage->getAdrATParticlesG();
-  for (ParticleListAdr::iterator it = adrATparticlesG.begin();
-       it != adrATparticlesG.end(); ++it) {
+  for (ParticleListAdr::iterator it = adrATparticlesG.begin(); it != adrATparticlesG.end(); ++it) {
     for (ParticleList::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
       it2->force() = 0.0;
       it2->drift() = 0.0;
@@ -224,8 +215,8 @@ void Adress::integrate1(real& maxSqDist) {
   real dt = integrator->getTimeStep();
 
   ParticleList& adrATparticles = system.storage->getAdrATParticles();
-  for (std::vector<Particle>::iterator it = adrATparticles.begin();
-       it != adrATparticles.end(); it++) {
+  for (std::vector<Particle>::iterator it = adrATparticles.begin(); it != adrATparticles.end();
+       it++) {
     real sqDist = 0.0;
     real dtfm = 0.5 * dt / it->mass();
 
@@ -255,8 +246,7 @@ void Adress::integrate1(real& maxSqDist) {
       // Compute center of mass
       Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
       Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-      for (std::vector<Particle*>::iterator it2 = atList.begin();
-           it2 != atList.end(); ++it2) {
+      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
         Particle& at = **it2;
         cmp += at.mass() * at.position();
         cmv += at.mass() * at.velocity();
@@ -269,8 +259,7 @@ void Adress::integrate1(real& maxSqDist) {
       vp.velocity() = cmv;
 
     } else {  // this should not happen
-      std::cout << " VP particle " << vp.id() << "-" << vp.ghost()
-                << " not found in tuples ";
+      std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
       std::cout << " (" << vp.position() << ")\n";
       exit(1);
       return;
@@ -291,20 +280,17 @@ void Adress::integrate1(real& maxSqDist) {
 
       if (it3 != fixedtupleList->end()) {
         // calculate distance to nearest adress particle or center
-        std::vector<Real3D*>::iterator it2 =
-            verletList->getAdrPositions().begin();
+        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
         Real3D pa = **it2;  // position of adress particle
         Real3D d1(0.0, 0.0, 0.0);
         real min1sq;
-        verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(),
-                                                           pa);
+        verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
         if (verletList->getAdrRegionType()) {  // spherical adress region
           min1sq = d1.sqr();                   // set min1sq before loop
           ++it2;
           for (; it2 != verletList->getAdrPositions().end(); ++it2) {
             pa = **it2;
-            verletList->getSystem()->bc->getMinimumImageVector(
-                d1, vp.position(), pa);
+            verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
             real distsq1 = d1.sqr();
             if (distsq1 < min1sq) min1sq = distsq1;
           }
@@ -313,8 +299,7 @@ void Adress::integrate1(real& maxSqDist) {
           ++it2;
           for (; it2 != verletList->getAdrPositions().end(); ++it2) {
             pa = **it2;
-            verletList->getSystem()->bc->getMinimumImageVector(
-                d1, vp.position(), pa);
+            verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
             real distsq1 = d1[0] * d1[0];
             if (distsq1 < min1sq) min1sq = distsq1;
           }
@@ -336,8 +321,7 @@ void Adress::integrate1(real& maxSqDist) {
         }*/
 
       } else {  // this should not happen
-        std::cout << " VP particle " << vp.id() << "-" << vp.ghost()
-                  << " not found in tuples ";
+        std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
         std::cout << " (" << vp.position() << ")\n";
         exit(1);
         return;
@@ -352,8 +336,8 @@ void Adress::integrate2() {
 
   // propagete real AT particles
   ParticleList& adrATparticles = system.storage->getAdrATParticles();
-  for (std::vector<Particle>::iterator it = adrATparticles.begin();
-       it != adrATparticles.end(); ++it) {
+  for (std::vector<Particle>::iterator it = adrATparticles.begin(); it != adrATparticles.end();
+       ++it) {
     real dtfm = 0.5 * dt / it->mass();
 
     // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
@@ -373,8 +357,7 @@ void Adress::integrate2() {
       atList = it3->second;
 
       Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-      for (std::vector<Particle*>::iterator it2 = atList.begin();
-           it2 != atList.end(); ++it2) {
+      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
         Particle& at = **it2;
         cmv += at.mass() * at.velocity();
       }
@@ -382,8 +365,7 @@ void Adress::integrate2() {
       vp.velocity() = cmv;
 
     } else {  // this should not happen
-      std::cout << " VP particle " << vp.id() << "-" << vp.ghost()
-                << " not found in tuples ";
+      std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
       std::cout << " (" << vp.position() << ")\n";
       exit(1);
       return;
@@ -425,8 +407,7 @@ void Adress::communicateAdrPositions() {
       if (verletList->getAdrList().size() == 1) {
         // Old Version (works only for single moving region but is faster than
         // below)
-        CellList realcells =
-            getSystem()->storage->getRealCells();  // should be realcells
+        CellList realcells = getSystem()->storage->getRealCells();  // should be realcells
         int root, mayberoot, lroot;
         lroot = 0;
         verletList->adrPositions.clear();
@@ -442,8 +423,7 @@ void Adress::communicateAdrPositions() {
           }
         }
         mayberoot = (lroot ? lroot : 0);
-        boost::mpi::all_reduce(*getSystem()->comm, mayberoot, root,
-                               boost::mpi::maximum<int>());
+        boost::mpi::all_reduce(*getSystem()->comm, mayberoot, root, boost::mpi::maximum<int>());
         mpi::broadcast(*getSystem()->comm, verletList->adrPositions, root);
 
       } else if (verletList->getAdrList().size() > 1) {
@@ -465,14 +445,11 @@ void Adress::communicateAdrPositions() {
         }
 
         std::vector<std::vector<Real3D*> > procAdrPositionsAll;
-        boost::mpi::all_gather(*system.comm, procAdrPositions,
-                               procAdrPositionsAll);
+        boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
 
-        for (std::vector<std::vector<Real3D*> >::iterator itr =
-                 procAdrPositionsAll.begin();
+        for (std::vector<std::vector<Real3D*> >::iterator itr = procAdrPositionsAll.begin();
              itr != procAdrPositionsAll.end(); ++itr) {
-          for (std::vector<Real3D*>::iterator itr2 = (*itr).begin();
-               itr2 != (*itr).end(); ++itr2) {
+          for (std::vector<Real3D*>::iterator itr2 = (*itr).begin(); itr2 != (*itr).end(); ++itr2) {
             verletList->adrPositions.push_back(*itr2);
           }
         }
@@ -504,8 +481,7 @@ real Adress::weight(real distanceSqr) {
     real argument = sqrt(distanceSqr) - dex;
     // return 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument,
     // 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
-    return pow(cos(pidhy2 * argument),
-               2.0);  // for cosine squared weighting function
+    return pow(cos(pidhy2 * argument), 2.0);  // for cosine squared weighting function
   }
 }
 real Adress::weightderivative(real distanceSqr) {
@@ -537,15 +513,13 @@ void Adress::aftCalcF() {
 
       // update force of AT particles belonging to a VP
       Real3D vpfm = vp.force() / vp.getMass();
-      for (std::vector<Particle*>::iterator it2 = atList.begin();
-           it2 != atList.end(); ++it2) {
+      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
         Particle& at = **it2;
 
         at.force() += at.mass() * vpfm;
       }
     } else {  // this should not happen
-      std::cout << " particle " << vp.id() << "-" << vp.ghost()
-                << " not found in tuples ";
+      std::cout << " particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
       std::cout << " (" << vp.position() << ")\n";
       exit(1);
       return;
@@ -561,9 +535,8 @@ void Adress::registerPython() {
   using namespace espressopp::python;
 
   class_<Adress, shared_ptr<Adress>, bases<Extension> >(
-      "integrator_Adress",
-      init<shared_ptr<System>, shared_ptr<VerletListAdress>,
-           shared_ptr<FixedTupleListAdress>, bool, int>())
+      "integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>,
+                                shared_ptr<FixedTupleListAdress>, bool, int>())
       .def("connect", &Adress::connect)
       .def("disconnect", &Adress::disconnect);
 }

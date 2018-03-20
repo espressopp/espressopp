@@ -40,8 +40,7 @@ real NPart::compute_real() const {
 
 void NPart::registerPython() {
   using namespace espressopp::python;
-  class_<NPart, bases<Observable> >("analysis_NPart",
-                                    init<shared_ptr<System> >());
+  class_<NPart, bases<Observable> >("analysis_NPart", init<shared_ptr<System> >());
 }
 }
 }

@@ -28,8 +28,7 @@
 
 namespace espressopp {
 namespace interaction {
-typedef class FixedPairListInteractionTemplate<MirrorLennardJones>
-    FixedPairListMirrorLennardJones;
+typedef class FixedPairListInteractionTemplate<MirrorLennardJones> FixedPairListMirrorLennardJones;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -37,26 +36,21 @@ typedef class FixedPairListInteractionTemplate<MirrorLennardJones>
 void MirrorLennardJones::registerPython() {
   using namespace espressopp::python;
 
-  class_<MirrorLennardJones, bases<Potential> >(
-      "interaction_MirrorLennardJones", init<real, real>())
+  class_<MirrorLennardJones, bases<Potential> >("interaction_MirrorLennardJones",
+                                                init<real, real>())
       .def(init<real, real>())
-      .add_property("epsilon", &MirrorLennardJones::getEpsilon,
-                    &MirrorLennardJones::setEpsilon)
-      .add_property("sigma", &MirrorLennardJones::getSigma,
-                    &MirrorLennardJones::setSigma);
+      .add_property("epsilon", &MirrorLennardJones::getEpsilon, &MirrorLennardJones::setEpsilon)
+      .add_property("sigma", &MirrorLennardJones::getSigma, &MirrorLennardJones::setSigma);
 
   class_<FixedPairListMirrorLennardJones, bases<Interaction> >(
       "interaction_FixedPairListMirrorLennardJones",
-      init<shared_ptr<System>, shared_ptr<FixedPairList>,
-           shared_ptr<MirrorLennardJones> >())
+      init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<MirrorLennardJones> >())
       .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
                 shared_ptr<MirrorLennardJones> >())
       .def("setPotential", &FixedPairListMirrorLennardJones::setPotential)
       .def("getPotential", &FixedPairListMirrorLennardJones::getPotential)
-      .def("setFixedPairList",
-           &FixedPairListMirrorLennardJones::setFixedPairList)
-      .def("getFixedPairList",
-           &FixedPairListMirrorLennardJones::getFixedPairList);
+      .def("setFixedPairList", &FixedPairListMirrorLennardJones::setFixedPairList)
+      .def("getFixedPairList", &FixedPairListMirrorLennardJones::getFixedPairList);
 }
 }
 }

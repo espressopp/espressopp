@@ -47,8 +47,7 @@ namespace espressopp {
 
 LOG4ESPP_LOGGER(FixedQuadrupleAngleList::theLogger, "FixedQuadrupleAngleList");
 
-FixedQuadrupleAngleList::FixedQuadrupleAngleList(
-    shared_ptr<storage::Storage> _storage)
+FixedQuadrupleAngleList::FixedQuadrupleAngleList(shared_ptr<storage::Storage> _storage)
     : storage(_storage), quadruplesAngles() {
   LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleAngleList");
 
@@ -68,8 +67,7 @@ FixedQuadrupleAngleList::~FixedQuadrupleAngleList() {
   con3.disconnect();
 }
 
-bool FixedQuadrupleAngleList::add(longint pid1, longint pid2, longint pid3,
-                                  longint pid4) {
+bool FixedQuadrupleAngleList::add(longint pid1, longint pid2, longint pid3, longint pid4) {
   bool returnVal = true;
   System &system = storage->getSystemRef();
   esutil::Error err(system.comm);
@@ -143,9 +141,7 @@ bool FixedQuadrupleAngleList::add(longint pid1, longint pid2, longint pid3,
       cos_phi = -1.0;
 
     quadruplesAngles.insert(std::make_pair(
-        pid2,
-        std::make_pair(Triple<longint, longint, longint>(pid1, pid3, pid4),
-                       acos(cos_phi))));
+        pid2, std::make_pair(Triple<longint, longint, longint>(pid1, pid3, pid4), acos(cos_phi))));
   }
   LOG4ESPP_INFO(theLogger, "added fixed quadruple to global quadruple list");
 
@@ -156,11 +152,10 @@ bool FixedQuadrupleAngleList::add(longint pid1, longint pid2, longint pid3,
 python::list FixedQuadrupleAngleList::getQuadruples() {
   python::tuple quadruple;
   python::list quadruples;
-  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
-       it != quadruplesAngles.end(); it++) {
-    quadruple =
-        python::make_tuple(it->second.first.first, it->first,
-                           it->second.first.second, it->second.first.third);
+  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin(); it != quadruplesAngles.end();
+       it++) {
+    quadruple = python::make_tuple(it->second.first.first, it->first, it->second.first.second,
+                                   it->second.first.third);
     quadruples.append(quadruple);
   }
 
@@ -171,10 +166,9 @@ python::list FixedQuadrupleAngleList::getQuadruples() {
 python::list FixedQuadrupleAngleList::getQuadruplesAngles() {
   python::tuple quadruple;
   python::list quadruples;
-  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
-       it != quadruplesAngles.end(); it++) {
-    quadruple = python::make_tuple(it->second.first.first, it->first,
-                                   it->second.first.second,
+  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin(); it != quadruplesAngles.end();
+       it++) {
+    quadruple = python::make_tuple(it->second.first.first, it->first, it->second.first.second,
                                    it->second.first.third, it->second.second);
     quadruples.append(quadruple);
   }
@@ -208,8 +202,7 @@ real FixedQuadrupleAngleList::getAngle(int pid1, int pid2, int pid3, int pid4) {
   return returnVal;
 }
 
-void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl,
-                                                  OutBuffer &buf) {
+void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf) {
   std::vector<longint> toSendInt;
   std::vector<real> toSendReal;
   // loop over the particle list
@@ -220,9 +213,8 @@ void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl,
     int n = quadruplesAngles.count(pid);
 
     if (n > 0) {
-      std::pair<QuadruplesAngles::const_iterator,
-                QuadruplesAngles::const_iterator>
-          equalRange = quadruplesAngles.equal_range(pid);
+      std::pair<QuadruplesAngles::const_iterator, QuadruplesAngles::const_iterator> equalRange =
+          quadruplesAngles.equal_range(pid);
 
       // first write the pid of this particle
       // then the number of partners (n)
@@ -231,8 +223,7 @@ void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl,
       toSendReal.reserve(toSendReal.size() + n);
       toSendInt.push_back(pid);
       toSendInt.push_back(n);
-      for (QuadruplesAngles::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (QuadruplesAngles::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSendInt.push_back(it->second.first.first);
         toSendInt.push_back(it->second.first.second);
         toSendInt.push_back(it->second.first.third);
@@ -246,12 +237,10 @@ void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl,
   // send the list
   buf.write(toSendInt);
   buf.write(toSendReal);
-  LOG4ESPP_INFO(theLogger,
-                "prepared fixed quadruple list before send particles");
+  LOG4ESPP_INFO(theLogger, "prepared fixed quadruple list before send particles");
 }
 
-void FixedQuadrupleAngleList::afterRecvParticles(ParticleList &pl,
-                                                 InBuffer &buf) {
+void FixedQuadrupleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf) {
   std::vector<longint> receivedInt;
   std::vector<real> receivedReal;
   int n;
@@ -276,16 +265,14 @@ void FixedQuadrupleAngleList::afterRecvParticles(ParticleList &pl,
       // add the quadruple to the global list
       it = quadruplesAngles.insert(
           it,
-          std::make_pair(pid2, std::make_pair(Triple<longint, longint, longint>(
-                                                  pid1, pid3, pid4),
-                                              angleVal)));
+          std::make_pair(
+              pid2, std::make_pair(Triple<longint, longint, longint>(pid1, pid3, pid4), angleVal)));
     }
   }
   if (i != size) {
     printf("ATTETNTION:  recv particles might have read garbage\n");
   }
-  LOG4ESPP_INFO(theLogger,
-                "received fixed quadruple list after receive particles");
+  LOG4ESPP_INFO(theLogger, "received fixed quadruple list after receive particles");
 }
 
 void FixedQuadrupleAngleList::onParticlesChanged() {
@@ -299,8 +286,8 @@ void FixedQuadrupleAngleList::onParticlesChanged() {
   Particle *p2;
   Particle *p3;
   Particle *p4;
-  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
-       it != quadruplesAngles.end(); ++it) {
+  for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin(); it != quadruplesAngles.end();
+       ++it) {
     if (it->first != lastpid2) {
       p2 = storage->lookupRealParticle(it->first);
       if (p2 == NULL) {
@@ -314,23 +301,20 @@ void FixedQuadrupleAngleList::onParticlesChanged() {
     p1 = storage->lookupLocalParticle(it->second.first.first);
     if (p1 == NULL) {
       std::stringstream msg;
-      msg << "quadruple particle p1 " << it->second.first.first
-          << " does not exists here";
+      msg << "quadruple particle p1 " << it->second.first.first << " does not exists here";
       err.setException(msg.str());
     }
 
     p3 = storage->lookupLocalParticle(it->second.first.second);
     if (p3 == NULL) {
       std::stringstream msg;
-      msg << "quadruple particle p3 " << it->second.first.second
-          << " does not exists here";
+      msg << "quadruple particle p3 " << it->second.first.second << " does not exists here";
       err.setException(msg.str());
     }
     p4 = storage->lookupLocalParticle(it->second.first.third);
     if (p4 == NULL) {
       std::stringstream msg;
-      msg << "quadruple particle p4 " << it->second.first.third
-          << " does not exists here";
+      msg << "quadruple particle p4 " << it->second.first.third << " does not exists here";
       err.setException(msg.str());
     }
 
@@ -338,8 +322,7 @@ void FixedQuadrupleAngleList::onParticlesChanged() {
   }
   err.checkException();
 
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed quadruple list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
 }
 
 /****************************************************
@@ -349,8 +332,7 @@ void FixedQuadrupleAngleList::onParticlesChanged() {
 void FixedQuadrupleAngleList::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedQuadrupleAngleList::*pyAdd)(longint pid1, longint pid2,
-                                         longint pid3, longint pid4) =
+  bool (FixedQuadrupleAngleList::*pyAdd)(longint pid1, longint pid2, longint pid3, longint pid4) =
       &FixedQuadrupleAngleList::add;
 
   class_<FixedQuadrupleAngleList, shared_ptr<FixedQuadrupleAngleList> >(

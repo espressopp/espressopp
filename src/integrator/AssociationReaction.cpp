@@ -43,9 +43,10 @@ using namespace storage;
 
 LOG4ESPP_LOGGER(AssociationReaction::theLogger, "AssociationReaction");
 
-AssociationReaction::AssociationReaction(
-    shared_ptr<System> system, shared_ptr<VerletList> _verletList,
-    shared_ptr<FixedPairList> _fpl, shared_ptr<DomainDecomposition> _domdec)
+AssociationReaction::AssociationReaction(shared_ptr<System> system,
+                                         shared_ptr<VerletList> _verletList,
+                                         shared_ptr<FixedPairList> _fpl,
+                                         shared_ptr<DomainDecomposition> _domdec)
     : Extension(system), verletList(_verletList), fpl(_fpl), domdec(_domdec) {
   type = Extension::Reaction;
 
@@ -96,9 +97,7 @@ void AssociationReaction::setDeltaB(int _deltaB) { deltaB = _deltaB; }
 
 int AssociationReaction::getDeltaB() { return deltaB; }
 
-void AssociationReaction::setStateAMin(int _stateAMin) {
-  stateAMin = _stateAMin;
-}
+void AssociationReaction::setStateAMin(int _stateAMin) { stateAMin = _stateAMin; }
 
 int AssociationReaction::getStateAMin() { return stateAMin; }
 
@@ -115,11 +114,9 @@ void AssociationReaction::disconnect() {
 
 void AssociationReaction::connect() {
   // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      boost::bind(&AssociationReaction::initialize, this));
+  _initialize = integrator->runInit.connect(boost::bind(&AssociationReaction::initialize, this));
 
-  _react = integrator->aftIntV.connect(
-      boost::bind(&AssociationReaction::react, this));
+  _react = integrator->aftIntV.connect(boost::bind(&AssociationReaction::react, this));
 }
 
 /** Performs all steps of the reactive scheme.
@@ -163,26 +160,23 @@ void AssociationReaction::reactPair(Particle& p1, Particle& p2) {
   bool found;
   found = false;
   if ((dist2 < cutoff_sqr) && ((*rng)() < rate * dt * interval)) {
-    if ((p1.type() == typeA) && (p2.type() == typeB) &&
-        (p1.state() >= stateAMin) && (p2.state() == 0)) {
+    if ((p1.type() == typeA) && (p2.type() == typeB) && (p1.state() >= stateAMin) &&
+        (p2.state() == 0)) {
       Alist.insert(std::make_pair(p1.id(), p2.id()));
-    } else if ((p2.type() == typeA) && (p1.type() == typeB) &&
-               (p2.state() >= stateAMin) && (p1.state() == 0)) {
+    } else if ((p2.type() == typeA) && (p1.type() == typeB) && (p2.state() >= stateAMin) &&
+               (p1.state() == 0)) {
       Alist.insert(std::make_pair(p2.id(), p1.id()));
     }
   }
 }
 
-void AssociationReaction::initialize() {
-  LOG4ESPP_INFO(theLogger, "init AssociationReaction");
-}
+void AssociationReaction::initialize() { LOG4ESPP_INFO(theLogger, "init AssociationReaction"); }
 
 /** Performs two-way parallel communication to consolidate mm between
     neighbours. The parallel scheme is taken from
     DomainDecomposition::doGhostCommunication
 */
-void AssociationReaction::sendMultiMap(
-    boost::unordered_multimap<longint, longint>& mm) {
+void AssociationReaction::sendMultiMap(boost::unordered_multimap<longint, longint>& mm) {
   LOG4ESPP_INFO(theLogger, "Entering sendMultiMap");
 
   InBuffer inBuffer0(*getSystem()->comm);
@@ -209,8 +203,8 @@ void AssociationReaction::sendMultiMap(
     // fill outBuffer from mm
     int tmp = mm.size();
     outBuffer.write(tmp);
-    for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin();
-         it != mm.end(); it++) {
+    for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin(); it != mm.end();
+         it++) {
       tmp = it->first;
       outBuffer.write(tmp);
       tmp = it->second;
@@ -290,8 +284,7 @@ void AssociationReaction::sendMultiMap(
     each id1 and return it in place. In addition, only pairs for which
     id1 is local are kept.
 */
-void AssociationReaction::uniqueA(
-    boost::unordered_multimap<longint, longint>& mm) {
+void AssociationReaction::uniqueA(boost::unordered_multimap<longint, longint>& mm) {
   // Collect indices
   boost::unordered_set<longint> idxSet;
   boost::unordered_multimap<longint, longint> idxList;
@@ -303,8 +296,8 @@ void AssociationReaction::uniqueA(
   idxList.clear();
   // Create idxList, containing (idx1, idx2) pairs
   // Create idxSet, containing each idx1 only once
-  for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin();
-       it != mm.end(); it++) {
+  for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin(); it != mm.end();
+       it++) {
     idx1 = it->first;
     idx2 = it->second;
     idxList.insert(std::make_pair(idx1, idx2));
@@ -314,8 +307,7 @@ void AssociationReaction::uniqueA(
   uniqueList.clear();
   // For each active idx1, pick a partner
   if (idxSet.size() > 0) {
-    for (boost::unordered_set<longint>::iterator it = idxSet.begin();
-         it != idxSet.end(); it++) {
+    for (boost::unordered_set<longint>::iterator it = idxSet.begin(); it != idxSet.end(); it++) {
       idx1 = *it;
       Particle* p = system.storage->lookupLocalParticle(idx1);
       if (p == NULL) continue;
@@ -328,8 +320,7 @@ void AssociationReaction::uniqueA(
             candidates;
         candidates = idxList.equal_range(idx1);
         int i = 0;
-        for (boost::unordered_multimap<longint, longint>::iterator
-                 jt = candidates.first;
+        for (boost::unordered_multimap<longint, longint>::iterator jt = candidates.first;
              jt != candidates.second; jt++, i++) {
           if (i == pick) {
             uniqueList.insert(std::make_pair(jt->first, jt->second));
@@ -347,9 +338,8 @@ void AssociationReaction::uniqueA(
     each id2 and return it in place. In addition, only pairs for which
     id2 is local are kept.
 */
-void AssociationReaction::uniqueB(
-    boost::unordered_multimap<longint, longint>& mm,
-    boost::unordered_multimap<longint, longint>& nn) {
+void AssociationReaction::uniqueB(boost::unordered_multimap<longint, longint>& mm,
+                                  boost::unordered_multimap<longint, longint>& nn) {
   // Collect indices
   boost::unordered_set<longint> idxSet;
   boost::unordered_multimap<longint, longint> idxList;
@@ -361,8 +351,8 @@ void AssociationReaction::uniqueB(
   idxList.clear();
   // Create idxList, containing (idx2, idx1) pairs
   // Create idxSet, containing each idx2 only once
-  for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin();
-       it != mm.end(); it++) {
+  for (boost::unordered_multimap<longint, longint>::iterator it = mm.begin(); it != mm.end();
+       it++) {
     idx1 = it->first;
     idx2 = it->second;
     idxList.insert(std::make_pair(idx2, idx1));
@@ -372,8 +362,7 @@ void AssociationReaction::uniqueB(
   uniqueList.clear();
   if (idxSet.size() > 0) {
     // For each active idx1, pick a partner
-    for (boost::unordered_set<longint>::iterator it = idxSet.begin();
-         it != idxSet.end(); it++) {
+    for (boost::unordered_set<longint>::iterator it = idxSet.begin(); it != idxSet.end(); it++) {
       idx2 = *it;
       Particle* p = system.storage->lookupLocalParticle(idx2);
       if (p == NULL) continue;
@@ -386,8 +375,7 @@ void AssociationReaction::uniqueB(
             candidates;
         candidates = idxList.equal_range(idx2);
         int i = 0;
-        for (boost::unordered_multimap<longint, longint>::iterator
-                 jt = candidates.first;
+        for (boost::unordered_multimap<longint, longint>::iterator jt = candidates.first;
              jt != candidates.second; jt++, i++) {
           if (i == pick) {
             uniqueList.insert(std::make_pair(jt->first, jt->second));
@@ -410,8 +398,8 @@ void AssociationReaction::applyAR() {
 
   LOG4ESPP_INFO(theLogger, "Entering applyAR");
 
-  for (boost::unordered_multimap<longint, longint>::iterator it = Blist.begin();
-       it != Blist.end(); it++) {
+  for (boost::unordered_multimap<longint, longint>::iterator it = Blist.begin(); it != Blist.end();
+       it++) {
     A = it->second;
     B = it->first;
     // Change the state of A and B.
@@ -438,25 +426,18 @@ void AssociationReaction::applyAR() {
 
 void AssociationReaction::registerPython() {
   using namespace espressopp::python;
-  class_<AssociationReaction, shared_ptr<AssociationReaction>,
-         bases<Extension> >(
+  class_<AssociationReaction, shared_ptr<AssociationReaction>, bases<Extension> >(
       "integrator_AssociationReaction",
-      init<shared_ptr<System>, shared_ptr<VerletList>,
-           shared_ptr<FixedPairList>, shared_ptr<DomainDecomposition> >())
+      init<shared_ptr<System>, shared_ptr<VerletList>, shared_ptr<FixedPairList>,
+           shared_ptr<DomainDecomposition> >())
       .def("connect", &AssociationReaction::connect)
       .def("disconnect", &AssociationReaction::disconnect)
-      .add_property("rate", &AssociationReaction::getRate,
-                    &AssociationReaction::setRate)
-      .add_property("cutoff", &AssociationReaction::getCutoff,
-                    &AssociationReaction::setCutoff)
-      .add_property("typeA", &AssociationReaction::getTypeA,
-                    &AssociationReaction::setTypeA)
-      .add_property("typeB", &AssociationReaction::getTypeB,
-                    &AssociationReaction::setTypeB)
-      .add_property("deltaA", &AssociationReaction::getDeltaA,
-                    &AssociationReaction::setDeltaA)
-      .add_property("deltaB", &AssociationReaction::getDeltaB,
-                    &AssociationReaction::setDeltaB)
+      .add_property("rate", &AssociationReaction::getRate, &AssociationReaction::setRate)
+      .add_property("cutoff", &AssociationReaction::getCutoff, &AssociationReaction::setCutoff)
+      .add_property("typeA", &AssociationReaction::getTypeA, &AssociationReaction::setTypeA)
+      .add_property("typeB", &AssociationReaction::getTypeB, &AssociationReaction::setTypeB)
+      .add_property("deltaA", &AssociationReaction::getDeltaA, &AssociationReaction::setDeltaA)
+      .add_property("deltaB", &AssociationReaction::getDeltaB, &AssociationReaction::setDeltaB)
       .add_property("stateAMin", &AssociationReaction::getStateAMin,
                     &AssociationReaction::setStateAMin)
       .add_property("interval", &AssociationReaction::getInterval,

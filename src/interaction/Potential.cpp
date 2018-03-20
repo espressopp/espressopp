@@ -35,14 +35,11 @@ LOG4ESPP_LOGGER(Potential::theLogger, "Potential");
 void Potential::registerPython() {
   using namespace espressopp::python;
 
-  real (Potential::*computeEnergy1)(const Real3D& dist) const =
-      &Potential::computeEnergy;
+  real (Potential::*computeEnergy1)(const Real3D& dist) const = &Potential::computeEnergy;
 
-  real (Potential::*computeEnergy2)(real dist) const =
-      &Potential::computeEnergy;
+  real (Potential::*computeEnergy2)(real dist) const = &Potential::computeEnergy;
 
-  Real3D (Potential::*computeForce)(const Real3D& dist) const =
-      &Potential::computeForce;
+  Real3D (Potential::*computeForce)(const Real3D& dist) const = &Potential::computeForce;
 
   class_<Potential, boost::noncopyable>("interaction_Potential", no_init)
       .add_property("cutoff", &Potential::getCutoff, &Potential::setCutoff)

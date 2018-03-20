@@ -36,9 +36,8 @@ namespace integrator {
 
 LOG4ESPP_LOGGER(Settle::theLogger, "Settle");
 
-Settle::Settle(shared_ptr<System> _system,
-               shared_ptr<FixedTupleListAdress> _fixedTupleList, real _mO,
-               real _mH, real _distHH, real _distOH)
+Settle::Settle(shared_ptr<System> _system, shared_ptr<FixedTupleListAdress> _fixedTupleList,
+               real _mO, real _mH, real _distHH, real _distOH)
     : Extension(_system),
       fixedTupleList(_fixedTupleList),
       mO(_mO),
@@ -90,12 +89,10 @@ void Settle::disconnect() {
 
 void Settle::connect() {
   // connection to initialisation
-  _befIntP =
-      integrator->befIntP.connect(boost::bind(&Settle::saveOldPos, this));
-  _aftIntP =
-      integrator->aftIntP.connect(boost::bind(&Settle::applyConstraints, this));
-  _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&Settle::correctVelocities, this));  // OUT AGAIN?
+  _befIntP = integrator->befIntP.connect(boost::bind(&Settle::saveOldPos, this));
+  _aftIntP = integrator->aftIntP.connect(boost::bind(&Settle::applyConstraints, this));
+  _aftIntV =
+      integrator->aftIntV.connect(boost::bind(&Settle::correctVelocities, this));  // OUT AGAIN?
 }
 
 void Settle::saveOldPos() {
@@ -112,8 +109,7 @@ void Settle::saveOldPos() {
 
       oldPos.insert(std::make_pair(
           cit->id(),
-          Triple<Real3D, Real3D, Real3D>((it->second.at(0))->getPos(),
-                                         (it->second.at(1))->getPos(),
+          Triple<Real3D, Real3D, Real3D>((it->second.at(0))->getPos(), (it->second.at(1))->getPos(),
                                          (it->second.at(2))->getPos())));
     }
   }
@@ -187,8 +183,7 @@ void Settle::settlep(longint molID) {
 
   // new center of mass
   // present positions OHH
-  Real3D d0 =
-      O->position() * mOrmT + ((H1->position() + H2->position()) * mHrmT);
+  Real3D d0 = O->position() * mOrmT + ((H1->position() + H2->position()) * mHrmT);
 
   Real3D a1 = O->position() - d0;
   Real3D b1 = H1->position() - d0;
@@ -205,10 +200,8 @@ void Settle::settlep(longint molID) {
   n1 = n1 / n1.abs();
   n2 = n2 / n2.abs();
 
-  b0 = Real3D(n1 * b0, n2 * b0,
-              n0 * b0);  // note: b0.z is never referenced again
-  c0 = Real3D(n1 * c0, n2 * c0,
-              n0 * c0);  // note: c0.z is never referenced again
+  b0 = Real3D(n1 * b0, n2 * b0, n0 * b0);  // note: b0.z is never referenced again
+  c0 = Real3D(n1 * c0, n2 * c0, n0 * c0);  // note: c0.z is never referenced again
 
   // shuffle the order of operations around from the normal algorithm so
   // that we can double pump sqrt() with n2 and cosphi at the same time
@@ -249,11 +242,9 @@ void Settle::settlep(longint molID) {
 
   Real3D a3(-a2[1] * sintheta, a2[1] * costheta, A1Z);
 
-  Real3D b3(b2[0] * costheta - b2[1] * sintheta,
-            b2[0] * sintheta + b2[1] * costheta, b1[2]);
+  Real3D b3(b2[0] * costheta - b2[1] * sintheta, b2[0] * sintheta + b2[1] * costheta, b1[2]);
 
-  Real3D c3(-b2[0] * costheta - c2[1] * sintheta,
-            -b2[0] * sintheta + c2[1] * costheta, c1[2]);
+  Real3D c3(-b2[0] * costheta - c2[1] * sintheta, -b2[0] * sintheta + c2[1] * costheta, c1[2]);
 
   // --- Step5 A3 ---
   // undo the transformation; generate new normal vectors from the transpose.
@@ -268,9 +259,8 @@ void Settle::settlep(longint molID) {
 
   // get unconstrained velocities at v(t+dt)
   Real3D displ1, displ2, displ3;
-  bc.getMinimumImageVectorBox(
-      displ1, O->getPos(),
-      pos->second.first);  // pos after settle - pos at prev timestep
+  bc.getMinimumImageVectorBox(displ1, O->getPos(),
+                              pos->second.first);  // pos after settle - pos at prev timestep
   Real3D vO = displ1 * invdt;
   bc.getMinimumImageVectorBox(displ2, H1->getPos(), pos->second.second);
   Real3D vH1 = displ2 * invdt;
@@ -337,30 +327,25 @@ void Settle::settlev(longint molID) {
   real vbc0 = ebc * vbc0r;
   real vca0 = eca * vca0r;
 
-  real cosA = (rca2 + rab2 - rbc2) /
-              (2 * rca_abs * rab_abs);  // angles depend on constrained geom, no
-                                        // need to recalc, rewrite code to just
-                                        // do it once
-  real cosB =
-      (rbc2 + rab2 - rca2) / (2 * rbc_abs * rab_abs);  // A=109.527, B=C=35.2819
+  real cosA =
+      (rca2 + rab2 - rbc2) / (2 * rca_abs * rab_abs);  // angles depend on constrained geom, no
+                                                       // need to recalc, rewrite code to just
+                                                       // do it once
+  real cosB = (rbc2 + rab2 - rca2) / (2 * rbc_abs * rab_abs);  // A=109.527, B=C=35.2819
   real cosC = (rbc2 + rca2 - rab2) / (2 * rbc_abs * rca_abs);
-  real interm1 = 2 * mOmH2 + twicemO * mH * cosA * cosB * cosC -
-                 2 * mH2 * cosA * cosA -
+  real interm1 = 2 * mOmH2 + twicemO * mH * cosA * cosB * cosC - 2 * mH2 * cosA * cosA -
                  mO * mOmH * (cosB * cosB + cosC * cosC);
   real d = dt * interm1 / (twicemH);
 
-  real interm2 = vab0 * (2 * mOmH - mO * cosC * cosC) +
-                 vbc0 * (mH * cosC * cosA - mOmH * cosB) +
+  real interm2 = vab0 * (2 * mOmH - mO * cosC * cosC) + vbc0 * (mH * cosC * cosA - mOmH * cosB) +
                  vca0 * (mO * cosB * cosC - twicemH * cosA);
   real tauab = mO * interm2 / d;
 
-  real interm3 = vbc0 * (mOmH2 - mH2 * cosA * cosA) +
-                 vca0 * mO * (mH * cosA * cosB - mOmH * cosC) +
+  real interm3 = vbc0 * (mOmH2 - mH2 * cosA * cosA) + vca0 * mO * (mH * cosA * cosB - mOmH * cosC) +
                  vab0 * mO * (mH * cosC * cosA - mOmH * cosB);
   real taubc = interm3 / d;
 
-  real interm4 = vca0 * (2 * mOmH - mO * cosB * cosB) +
-                 vab0 * (mO * cosB * cosC - twicemH * cosA) +
+  real interm4 = vca0 * (2 * mOmH - mO * cosB * cosB) + vab0 * (mO * cosB * cosC - twicemH * cosA) +
                  vbc0 * (mH * cosA * cosB - mOmH * cosC);
   real tauca = mO * interm4 / d;
 
@@ -384,8 +369,7 @@ void Settle::registerPython() {
 
   class_<Settle, shared_ptr<Settle>, bases<Extension> >(
       "integrator_Settle",
-      init<shared_ptr<System>, shared_ptr<FixedTupleListAdress>, real, real,
-           real, real>())
+      init<shared_ptr<System>, shared_ptr<FixedTupleListAdress>, real, real, real, real>())
       .def("add", pyAdd);
 }
 }

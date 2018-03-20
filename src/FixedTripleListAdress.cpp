@@ -39,9 +39,8 @@ namespace espressopp {
 
 LOG4ESPP_LOGGER(FixedTripleListAdress::theLogger, "FixedTripleListAdress");
 
-FixedTripleListAdress::FixedTripleListAdress(
-    shared_ptr<storage::Storage> _storage,
-    shared_ptr<FixedTupleListAdress> _fixedtupleList)
+FixedTripleListAdress::FixedTripleListAdress(shared_ptr<storage::Storage> _storage,
+                                             shared_ptr<FixedTupleListAdress> _fixedtupleList)
     : FixedTripleList(_storage), fixedtupleList(_fixedtupleList) {
   LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
 
@@ -84,16 +83,14 @@ bool FixedTripleListAdress::add(longint pid1, longint pid2, longint pid3) {
   } else {
     if (!p1) {
       std::stringstream msg;
-      msg << "atomistic triple particle p1 " << pid1
-          << " does not exists here and cannot be added";
+      msg << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
       msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
       err.setException(msg.str());
     }
 
     if (!p3) {
       std::stringstream msg;
-      msg << "atomistic triple particle p3 " << pid3
-          << " does not exists here and cannot be added";
+      msg << "atomistic triple particle p3 " << pid3 << " does not exists here and cannot be added";
       msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
       err.setException(msg.str());
     }
@@ -106,50 +103,44 @@ bool FixedTripleListAdress::add(longint pid1, longint pid2, longint pid3) {
 
     // ADD THE GLOBAL TRIPLET
     // see whether the particle already has triples
-    std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator>
-        equalRange = globalTriples.equal_range(pid2);
+    std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange =
+        globalTriples.equal_range(pid2);
     if (equalRange.first == globalTriples.end()) {
       // if it hasn't, insert the new triple
-      globalTriples.insert(
-          std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      globalTriples.insert(std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
     } else {
       // otherwise test whether the triple already exists
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it)
+      for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
         if (it->second == std::pair<longint, longint>(pid1, pid3))
           // TODO: Triple already exists, generate error!
           ;
       // if not, insert the new triple
-      globalTriples.insert(
-          equalRange.first,
-          std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      globalTriples.insert(equalRange.first,
+                           std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
     }
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
   }
   return returnVal;
 }
 
-void FixedTripleListAdress::beforeSendATParticles(std::vector<longint>& atpl,
-                                                  OutBuffer& buf) {
+void FixedTripleListAdress::beforeSendATParticles(std::vector<longint>& atpl, OutBuffer& buf) {
   // std::cout << "beforeSendATParticles() fixed pl (size " << atpl.size() <<
   // ")\n";
 
   std::vector<longint> toSend;
 
   // loop over the VP particle list
-  for (std::vector<longint>::iterator it = atpl.begin(); it != atpl.end();
-       ++it) {
+  for (std::vector<longint>::iterator it = atpl.begin(); it != atpl.end(); ++it) {
     longint pid = *it;
 
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pid << ", find pairs");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 
     // find all triples that involve this particle
     int n = globalTriples.count(pid);
 
     if (n > 0) {
-      std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator>
-          equalRange = globalTriples.equal_range(pid);
+      std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange =
+          globalTriples.equal_range(pid);
 
       // first write the pid of this particle
       // then the number of partners (n)
@@ -157,8 +148,7 @@ void FixedTripleListAdress::beforeSendATParticles(std::vector<longint>& atpl,
       toSend.reserve(toSend.size() + 2 * n + 1);
       toSend.push_back(pid);
       toSend.push_back(n);
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSend.push_back(it->second.first);
         toSend.push_back(it->second.second);
       }
@@ -174,8 +164,7 @@ void FixedTripleListAdress::beforeSendATParticles(std::vector<longint>& atpl,
 }
 
 // override parent function, this one should be empty
-void FixedTripleListAdress::beforeSendParticles(ParticleList& pl,
-                                                OutBuffer& buf) {
+void FixedTripleListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   // std::cout << storage->getSystem()->comm->rank() << ": beforeSendParticles()
   // fixed pl (size " << pl.size() << ")\n";
 }
@@ -193,8 +182,7 @@ void FixedTripleListAdress::onParticlesChanged() {
   Particle* p2;
   Particle* p3;
 
-  for (GlobalTriples::const_iterator it = globalTriples.begin();
-       it != globalTriples.end(); ++it) {
+  for (GlobalTriples::const_iterator it = globalTriples.begin(); it != globalTriples.end(); ++it) {
     // printf("lookup global triple %d %d %d\n", it->first, it->second.first,
     // it->second.second);
 
@@ -202,8 +190,7 @@ void FixedTripleListAdress::onParticlesChanged() {
       p2 = storage->lookupAdrATParticle(it->first);
       if (p2 == NULL) {
         std::stringstream msg;
-        msg << "atomistic triple particle p2 " << it->first
-            << " does not exists here";
+        msg << "atomistic triple particle p2 " << it->first << " does not exists here";
         err.setException(msg.str());
       }
       lastpid2 = it->first;
@@ -211,23 +198,20 @@ void FixedTripleListAdress::onParticlesChanged() {
     p1 = storage->lookupAdrATParticle(it->second.first);
     if (p1 == NULL) {
       std::stringstream msg;
-      msg << "atomistic triple particle p1 " << it->second.first
-          << " does not exists here";
+      msg << "atomistic triple particle p1 " << it->second.first << " does not exists here";
       err.setException(msg.str());
     }
     p3 = storage->lookupAdrATParticle(it->second.second);
     if (p3 == NULL) {
       std::stringstream msg;
-      msg << "atomistic triple particle p3 " << it->second.second
-          << " does not exists here";
+      msg << "atomistic triple particle p3 " << it->second.second << " does not exists here";
       err.setException(msg.str());
     }
 
     this->add(p1, p2, p3);
   }
   err.checkException();
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed pair list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
 }
 
 void FixedTripleListAdress::remove(void) {
@@ -247,8 +231,8 @@ void FixedTripleListAdress::remove(void) {
 void FixedTripleListAdress::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedTripleListAdress::*pyAdd)(
-      longint pid1, longint pid2, longint pid3) = &FixedTripleListAdress::add;
+  bool (FixedTripleListAdress::*pyAdd)(longint pid1, longint pid2, longint pid3) =
+      &FixedTripleListAdress::add;
 
   class_<FixedTripleListAdress, shared_ptr<FixedTripleListAdress> >(
       "FixedTripleListAdress",

@@ -35,32 +35,26 @@ namespace interaction {
 void DihedralHarmonic::registerPython() {
   using namespace espressopp::python;
 
-  class_<DihedralHarmonic, bases<DihedralPotential> >(
-      "interaction_DihedralHarmonic", init<real, real>())
+  class_<DihedralHarmonic, bases<DihedralPotential> >("interaction_DihedralHarmonic",
+                                                      init<real, real>())
       .add_property("K", &DihedralHarmonic::getK, &DihedralHarmonic::setK)
-      .add_property("phi0", &DihedralHarmonic::getPhi0,
-                    &DihedralHarmonic::setPhi0);
+      .add_property("phi0", &DihedralHarmonic::getPhi0, &DihedralHarmonic::setPhi0);
 
   typedef class FixedQuadrupleListInteractionTemplate<DihedralHarmonic>
       FixedQuadrupleListDihedralHarmonic;
   class_<FixedQuadrupleListDihedralHarmonic, bases<Interaction> >(
       "interaction_FixedQuadrupleListDihedralHarmonic",
-      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>,
-           shared_ptr<DihedralHarmonic> >())
+      init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralHarmonic> >())
       .def("setPotential", &FixedQuadrupleListDihedralHarmonic::setPotential)
-      .def("getFixedQuadrupleList",
-           &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList);
+      .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList);
   typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonic>
       FixedQuadrupleListTypesDihedralHarmonic;
   class_<FixedQuadrupleListTypesDihedralHarmonic, bases<Interaction> >(
       "interaction_FixedQuadrupleListTypesDihedralHarmonic",
       init<shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
-      .def("setPotential",
-           &FixedQuadrupleListTypesDihedralHarmonic::setPotential)
-      .def("getPotential",
-           &FixedQuadrupleListTypesDihedralHarmonic::getPotentialPtr)
-      .def("setFixedQuadrupleList",
-           &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)
+      .def("setPotential", &FixedQuadrupleListTypesDihedralHarmonic::setPotential)
+      .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonic::getPotentialPtr)
+      .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)
       .def("getFixedQuadrupleList",
            &FixedQuadrupleListTypesDihedralHarmonic::getFixedQuadrupleList);
 }

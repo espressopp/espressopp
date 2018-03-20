@@ -55,8 +55,7 @@ real Pressure::compute() const {
                                            // distinguish between CG and AT
                                            // particles.
 
-    shared_ptr<FixedTupleListAdress> fixedtupleList =
-        system.storage->getFixedTuples();
+    shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
       Particle& vp = *cit;
       FixedTupleListAdress::iterator it2;
@@ -67,8 +66,7 @@ real Pressure::compute() const {
                                            // those for calculation.
         std::vector<Particle*> atList;
         atList = it2->second;
-        for (std::vector<Particle*>::iterator it3 = atList.begin();
-             it3 != atList.end(); ++it3) {
+        for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3) {
           Particle& at = **it3;
           v2 += at.mass() * (at.velocity() * at.velocity());
         }
@@ -116,8 +114,7 @@ real Pressure::compute() const {
 
 void Pressure::registerPython() {
   using namespace espressopp::python;
-  class_<Pressure, bases<Observable> >("analysis_Pressure",
-                                       init<shared_ptr<System> >());
+  class_<Pressure, bases<Observable> >("analysis_Pressure", init<shared_ptr<System> >());
 }
 }
 }

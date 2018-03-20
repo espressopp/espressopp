@@ -41,8 +41,7 @@ namespace espressopp {
 
 LOG4ESPP_LOGGER(FixedTupleListAdress::theLogger, "FixedTupleListAdress");
 
-FixedTupleListAdress::FixedTupleListAdress(
-    shared_ptr<storage::Storage> _storage)
+FixedTupleListAdress::FixedTupleListAdress(shared_ptr<storage::Storage> _storage)
     : storage(_storage), globalTuples() {
   LOG4ESPP_INFO(theLogger, "construct FixedTupleListAdress");
 
@@ -85,8 +84,7 @@ bool FixedTupleListAdress::addT(tuple pids) {
       at = storage->lookupAdrATParticle(*it);
       if (!at) {  // Particle does not exist here, return false
         std::stringstream msg;
-        msg << "ERROR: AT particle " << *it
-            << " not found in localAdrATParticles \n";
+        msg << "ERROR: AT particle " << *it << " not found in localAdrATParticles \n";
         err.setException(msg.str());
         returnVal = false;
         break;
@@ -116,15 +114,13 @@ bool FixedTupleListAdress::addT(tuple pids) {
 }
 
 /* send global tuple information */
-void FixedTupleListAdress::beforeSendParticles(ParticleList& pl,
-                                               OutBuffer& buf) {
+void FixedTupleListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   std::vector<longint> atpl;
 
   // loop over the particle list
   for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
     longint pidK = pit->id();
-    LOG4ESPP_DEBUG(theLogger,
-                   "send particle with pid " << pidK << ", find tuples");
+    LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find tuples");
 
     // find particle that involves this particle id
     GlobalTuples::const_iterator it = globalTuples.find(pidK);
@@ -143,8 +139,7 @@ void FixedTupleListAdress::beforeSendParticles(ParticleList& pl,
 
       // iterate through vector and add pids
       // std::cout << storage->getRank() << ": removing AT particles ";
-      for (tuple::const_iterator it2 = it->second.begin();
-           it2 != it->second.end(); ++it2) {
+      for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
         // toSend.push_back(*it2);
         // std::cout << " write pid "<< *it2 << " (";
 
@@ -309,8 +304,7 @@ void FixedTupleListAdress::onParticlesChanged() {
 
     // iterate through vector in map
     // std::cout << storage->getRank() << ": loopup for AT particle: ";
-    for (tuple::const_iterator it2 = it->second.begin();
-         it2 != it->second.end(); ++it2) {
+    for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
       at = storage->lookupAdrATParticle(*it2);
       if (at == NULL) {
         printf("SERIOUS ERROR: AT particle %d not available\n", *it2);
@@ -361,9 +355,8 @@ void FixedTupleListAdress::registerPython() {
 
   void (FixedTupleListAdress::*pyAdd)(longint pid) = &FixedTupleListAdress::add;
 
-  class_<FixedTupleListAdress, shared_ptr<FixedTupleListAdress>,
-         boost::noncopyable>("FixedTupleListAdress",
-                             init<shared_ptr<storage::Storage> >())
+  class_<FixedTupleListAdress, shared_ptr<FixedTupleListAdress>, boost::noncopyable>(
+      "FixedTupleListAdress", init<shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("addTs", &FixedTupleListAdress::addTs);
 }

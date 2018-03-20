@@ -50,8 +50,8 @@ FixedTripleList::FixedTripleList(shared_ptr<storage::Storage> _storage)
       boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
   sigAfterRecv = storage->afterRecvParticles.connect(
       boost::bind(&FixedTripleList::afterRecvParticles, this, _1, _2));
-  sigOnParticleChanged = storage->onParticlesChanged.connect(
-      boost::bind(&FixedTripleList::onParticlesChanged, this));
+  sigOnParticleChanged =
+      storage->onParticlesChanged.connect(boost::bind(&FixedTripleList::onParticlesChanged, this));
 }
 
 FixedTripleList::~FixedTripleList() {
@@ -126,25 +126,22 @@ bool FixedTripleList::add(longint pid1, longint pid2, longint pid3) {
 
     // ADD THE GLOBAL TRIPLET
     // see whether the particle already has triples
-    std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator>
-        equalRange = globalTriples.equal_range(pid2);
+    std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange =
+        globalTriples.equal_range(pid2);
     if (equalRange.first == globalTriples.end()) {
       // if it hasn't, insert the new triple
-      globalTriples.insert(
-          std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      globalTriples.insert(std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
     } else {
       // otherwise test whether the triple already exists
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         if (it->second == std::pair<longint, longint>(pid1, pid3)) {
           // TODO: Triple already exists, generate error!
           ;
         }
       }
       // if not, insert the new triple
-      globalTriples.insert(
-          equalRange.first,
-          std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      globalTriples.insert(equalRange.first,
+                           std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
     }
     LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
   }
@@ -154,8 +151,7 @@ bool FixedTripleList::add(longint pid1, longint pid2, longint pid3) {
 python::list FixedTripleList::getTriples() {
   python::tuple triple;
   python::list triples;
-  for (GlobalTriples::const_iterator it = globalTriples.begin();
-       it != globalTriples.end(); it++) {
+  for (GlobalTriples::const_iterator it = globalTriples.begin(); it != globalTriples.end(); it++) {
     triple = python::make_tuple(it->second.first, it->first, it->second.second);
     triples.append(triple);
   }
@@ -180,8 +176,8 @@ void FixedTripleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf) {
     // mpiWorld->rank(), pid, n);
 
     if (n > 0) {
-      std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator>
-          equalRange = globalTriples.equal_range(pid);
+      std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange =
+          globalTriples.equal_range(pid);
 
       // first write the pid of this particle
       // then the number of partners (n)
@@ -189,8 +185,7 @@ void FixedTripleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf) {
       toSend.reserve(toSend.size() + 2 * n + 1);
       toSend.push_back(pid);
       toSend.push_back(n);
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it) {
+      for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
         toSend.push_back(it->second.first);
         toSend.push_back(it->second.second);
         // printf ("send global triple: pid %d and partner %d\n", pid,
@@ -229,15 +224,13 @@ void FixedTripleList::afterRecvParticles(ParticleList &pl, InBuffer &buf) {
       // add the triple to the global list
       // printf("received triple %d %d %d, add triple to global list\n", pid1,
       // pid2, pid3);
-      it = globalTriples.insert(
-          it, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      it = globalTriples.insert(it, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
     }
   }
   if (i != size) {
     printf("ATTETNTION:  recv particles might have read garbage\n");
   }
-  LOG4ESPP_INFO(theLogger,
-                "received fixed triple list after receive particles");
+  LOG4ESPP_INFO(theLogger, "received fixed triple list after receive particles");
 }
 
 void FixedTripleList::onParticlesChanged() {
@@ -251,8 +244,7 @@ void FixedTripleList::onParticlesChanged() {
   Particle *p1;
   Particle *p2;
   Particle *p3;
-  for (GlobalTriples::const_iterator it = globalTriples.begin();
-       it != globalTriples.end(); ++it) {
+  for (GlobalTriples::const_iterator it = globalTriples.begin(); it != globalTriples.end(); ++it) {
     // printf("lookup global triple %d %d %d\n", it->first, it->second.first,
     // it->second.second);
     if (it->first != lastpid2) {
@@ -267,23 +259,20 @@ void FixedTripleList::onParticlesChanged() {
     p1 = storage->lookupLocalParticle(it->second.first);
     if (p1 == NULL) {
       std::stringstream msg;
-      msg << "triple particle p1 " << it->second.first
-          << " does not exists here";
+      msg << "triple particle p1 " << it->second.first << " does not exists here";
       err.setException(msg.str());
     }
     p3 = storage->lookupLocalParticle(it->second.second);
     if (p3 == NULL) {
       std::stringstream msg;
-      msg << "triple particle p3 " << it->second.second
-          << " does not exists here";
+      msg << "triple particle p3 " << it->second.second << " does not exists here";
       err.setException(msg.str());
     }
     this->add(p1, p2, p3);
   }
   err.checkException();
 
-  LOG4ESPP_INFO(theLogger,
-                "regenerated local fixed triple list from global list");
+  LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
 }
 
 void FixedTripleList::remove() {
@@ -300,13 +289,12 @@ void FixedTripleList::remove() {
 void FixedTripleList::registerPython() {
   using namespace espressopp::python;
 
-  bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3) =
-      &FixedTripleList::add;
+  bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3) = &FixedTripleList::add;
   // bool (FixedTripleList::*pyAdd)(pvec pids)
   //      = &FixedTripleList::add;
 
-  class_<FixedTripleList, shared_ptr<FixedTripleList> >(
-      "FixedTripleList", init<shared_ptr<storage::Storage> >())
+  class_<FixedTripleList, shared_ptr<FixedTripleList> >("FixedTripleList",
+                                                        init<shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
       .def("remove", &FixedTripleList::remove)
