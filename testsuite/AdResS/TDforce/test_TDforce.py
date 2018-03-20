@@ -1,3 +1,25 @@
+#!/usr/bin/env python2
+#
+#  Copyright (C) 2013-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# -*- coding: utf-8 -*-
+
 import sys
 import time
 import espressopp
@@ -13,8 +35,8 @@ class TestTDforce(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, 1.5, 0.3)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
         system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
         self.system = system
 
@@ -282,6 +304,24 @@ class TestTDforce(unittest.TestCase):
         self.assertAlmostEqual(after[2], 6.393199, places=5)
         self.assertEqual(before[3], after[3])
         self.assertEqual(before[4], after[4])
+
+    def test_force_value(self):
+        # set up TD force
+        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
+                                dEx=1.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        thdforce = espressopp.integrator.TDforce(self.system,vl)
+        thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 1.52920, places=5)
+
+    def test_switch_table(self):
+        # set up TD force
+        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
+                                dEx=1.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        thdforce = espressopp.integrator.TDforce(self.system,vl)
+        thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 1.52920, places=5)
+        thdforce.addForce(itype=3,filename="table_tf2.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 9.89, places=3)  # New table new value
 
 
 if __name__ == '__main__':

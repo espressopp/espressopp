@@ -38,7 +38,7 @@ RUN if [ "${CODESTYLE}" = ON ]; then \
       cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ${COVERAGE:+-DUSE_GCOV=ON} .. && \
       make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf} && \
       ccache -s && \
-      make test && \
+      make test CTEST_OUTPUT_ON_FAILURE=1 && \
       make install DESTDIR=${PWD} && \
       cd .. && \
       if [ ${COVERAGE} ]; then \
