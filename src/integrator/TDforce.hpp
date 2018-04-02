@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
+  Copyright (C) 2017,2018
+      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -30,7 +32,7 @@
 #include "SystemAccess.hpp"
 #include "VerletListAdress.hpp"
 #include "interaction/Interpolation.hpp"
-#include <map>
+#include <unordered_map>
 
 
 #include "Extension.hpp"
@@ -68,12 +70,13 @@ namespace espressopp {
 
         void connect();
         void disconnect();
+        real getForce(longint type_id, real dist);
 
         Real3D center; // center of adress zone, from verletlistadress (assumes only one point as center)
         bool sphereAdr; // true: adress region is spherical centered on point x,y,z or particle pid; false: adress region is slab centered on point x or particle pid, from verletlistadres
         std::string filename;
         typedef shared_ptr <interaction::Interpolation> Table;
-        std::map<int, Table> forces; // map type to force
+        std::unordered_map<int, Table> forces; // map type to force
 
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };

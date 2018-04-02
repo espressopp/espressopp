@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
+  Copyright (C) 2017,2018
+      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -93,7 +95,25 @@ namespace espressopp {
             table->read(world, _filename);
         }
 
-        forces.insert(std::make_pair(type,table));
+        if (forces.count(type) == 0) {
+          forces.insert(std::make_pair(type,table));
+        } else {
+          forces[type].reset();  // decrease use_counter by one
+          forces[type] = table;
+        }
+    }
+
+
+    real TDforce::getForce(longint type_id, real dist) {
+      std::unordered_map<int, Table>::iterator tableIt;
+      tableIt = forces.find(type_id);
+      Table table;
+      if (tableIt != forces.end())
+        table = tableIt->second;
+      if (table)
+        return table->getForce(dist);
+      else
+        throw std::runtime_error("Table not found");
     }
 
 
@@ -103,13 +123,14 @@ namespace espressopp {
           System& system = getSystemRef();
           const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
+          std::unordered_map<int, Table>::iterator tableIt;
+          Table table;
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-
-              Table table;
-              if (forces.find(cit->getType())!=forces.end()) { //because there may be CG particles to which TD force is not applied
-                table = forces.find(cit->getType())->second; //TODO shouldn't do find twice
+              tableIt = forces.find(cit->getType());
+              if (tableIt != forces.end()) { //because there may be CG particles to which TD force is not applied
+                table = tableIt->second;
               }
 
               if (table) {
@@ -343,6 +364,7 @@ namespace espressopp {
         .def("disconnect", &TDforce::disconnect)
         .def("addForce", pyAddForce)
         .def("computeTDEnergy", &TDforce::computeTDEnergy)
+        .def("getForce", &TDforce::getForce)
         ;
     }
 
