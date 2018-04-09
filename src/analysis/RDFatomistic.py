@@ -24,13 +24,18 @@ r"""
 espressopp.analysis.RDFatomistic
 ********************************
 
-Class to compute radial distribution functions in adaptive resolution simulations in subregions of the box.
+Class to compute radial distribution functions in adaptive resolution simulations in subregions of the box. Can be used for regular atomistic/coarse-grained (AT/CG) adaptive resolution simulations as well as path integral-based adaptive resolution simulations. The two functions (compute, computePathIntegral) exhibit different behavior.
+
+The regular compute function is used for regular AT/CG simulations and there are two options:
 
 Option 1 (spanbased = True): the RDF can be calculated in a cuboid region in the center of the box (periodic in y,z, limited in x). In this case, particle pairs are considered for which at least one of them is in the defined cuboid region. This can be useful when the high resolution region has a slab geometry. No further normalization should be required.
 
 Option 2 (spanbased = False): the routine can also calculate unnormalized RDFs using particle pairs with both particles being in the high resolution region (based on the resolution value lambda, the span parameter is not used then). This can be useful when atomistic region has complicated or spherical geometries.
 
 In any case, only pairs of atomistic particles belonging to two different coarse-grained particles are considered. Furthermore, note that the routine uses L_y / half (L_y is the box length in y-direction) as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Hence, L_y should be the shortest box side (or, equally short as L_x and/or L_z).
+
+
+The computePathIntegral function is used for path integral-based adaptive resolution functions. It calculates the radial distribution functions over pairs of particles between different atoms or coarse-grained beads. Note, however, that in these types of quantum/classical adaptive resolution simulations, regular coarse-grained espressopp particles are associated with each atom and the additional "AdResS" atomistic particles correspond to the different Trotter beads. This means that the routine will, for molecules consisting of multiple atoms, calculate intramolecular rdfs, averaging over the Trotter bead pairs of the ring polymers, which represent the atoms. In doing so, it considers only particles pair with matching Trotter number and with the correct atomistic types. The results are averaged over all Trotter beads. Also in this case L_y / half (L_y is the box length in y-direction) is used as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Furthermore, the calculation is always "spanbased" in x direction (the function ignores the spanbased flag), but in such a fashion that BOTH particles need to be in the defined cuboid region. Normalization is performed as derived in R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info.
 
 Examples:
 
@@ -59,6 +64,12 @@ Examples:
                 :param rdfN: number of bins
                 :type rdfN: int
                 :rtype: list of reals
+
+.. function:: espressopp.analysis.RDFatomistic.computePathIntegral(rdfN)
+
+                :param rdfN: number of bins
+                :type rdfN: int
+                :rtype: list of reals
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -68,17 +79,20 @@ from _espressopp import analysis_RDFatomistic
 
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
 
-  def __init__(self, system, type1, type2, spanbased = True, span = 1.0):
+  def __init__(self, system, type1, type2, span = 1.0, spanbased = True):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_RDFatomistic, system, type1, type2, spanbased, span)
+      cxxinit(self, analysis_RDFatomistic, system, type1, type2, span, spanbased)
 
   def compute(self, rdfN):
     return self.cxxclass.compute(self, rdfN)
+
+  def computePathIntegral(self, rdfN):
+    return self.cxxclass.computePathIntegral(self, rdfN)
 
 if pmi.isController :
   class RDFatomistic(Observable):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      pmicall = [ "compute" ],
+      pmicall = [ "compute", "computePathIntegral" ],
       cls = 'espressopp.analysis.RDFatomisticLocal'
     )

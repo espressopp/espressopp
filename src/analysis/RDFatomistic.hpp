@@ -33,33 +33,49 @@ namespace espressopp {
   namespace analysis {
     /** Class to compute the radial distribution function of the system. */
     class RDFatomistic : public Observable {
-    public:
-      RDFatomistic(shared_ptr< System > system, int type1, int type2, bool _spanbased = true, real _span = 1.0) : Observable(system), target1(type1), target2(type2), spanbased(_spanbased), span(_span) {}
-      ~RDFatomistic() {}
-      virtual real compute() const;
-      virtual python::list computeArray(int) const;
+      public:
+        RDFatomistic(shared_ptr< System > system, int type1, int type2, real _span = 1.0, bool _spanbased = true) : Observable(system), target1(type1), target2(type2), span(_span), spanbased(_spanbased) {}
+        ~RDFatomistic() {}
+        virtual real compute() const;
+        virtual python::list computeArray(int) const;
+        virtual python::list computeArrayPathIntegral(int) const;
 
-      static void registerPython();
+        static void registerPython();
 
-      class data {
-        public:
-        Real3D pos;
-        size_t type;
-        size_t molecule;
-        real resolution;
-        friend class boost::serialization::access;
-        template<class Archive> void serialize(Archive & ar, const unsigned int version) {
-          ar & pos;
-          ar & type;
-          ar & molecule;
-          ar & resolution;
-        }
-      };
+        class data {
+          public:
+            Real3D pos;
+            size_t type;
+            size_t molecule;
+            real resolution;
+            friend class boost::serialization::access;
+            template<class Archive> void serialize(Archive & ar, const unsigned int version) {
+              ar & pos;
+              ar & type;
+              ar & molecule;
+              ar & resolution;
+            }
+        };
 
-      int target1;
-      int target2;
-      real span;
-      bool spanbased;
+        class dataPathIntegral {
+          public:
+            Real3D pos;
+            size_t type;
+            size_t molecule;
+            size_t pib;
+            friend class boost::serialization::access;
+            template<class Archive> void serialize(Archive & ar, const unsigned int version) {
+              ar & pos;
+              ar & type;
+              ar & molecule;
+              ar & pib;
+            }
+        };
+
+        int target1;
+        int target2;
+        real span;
+        bool spanbased;
 
     };
   }
