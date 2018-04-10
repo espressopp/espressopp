@@ -48,6 +48,8 @@ Examples:
 
 .. function:: espressopp.analysis.RDFatomistic(system, type1, type2, spanbased, span)
 
+                Constructs the RDFatomistic object.
+
                 :param system: system object
                 :param type1: type of atom 1
                 :param type2: type of atom 2
@@ -61,11 +63,15 @@ Examples:
 
 .. function:: espressopp.analysis.RDFatomistic.compute(rdfN)
 
+                Calculates the atomistic RDF assuming a regular atomistic/coarse-grained adaptive resolution setup.
+
                 :param rdfN: number of bins
                 :type rdfN: int
                 :rtype: list of reals
 
 .. function:: espressopp.analysis.RDFatomistic.computePathIntegral(rdfN)
+
+                Calculates the path integral-based RDF averaging over all Trotter bead pairs with the same Trotter bead number between different ring polymers assuming a path integral-based quantum/classical adaptive resolution setup.
 
                 :param rdfN: number of bins
                 :type rdfN: int

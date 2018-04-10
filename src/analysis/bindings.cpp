@@ -53,6 +53,7 @@
 #include "XTemperature.hpp"
 #include "XPressure.hpp"
 #include "AdressDensity.hpp"
+#include "RadGyrXProfilePI.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
 
@@ -106,6 +107,7 @@ namespace espressopp {
       XTemperature::registerPython();
       XPressure::registerPython();
       AdressDensity::registerPython();
+      RadGyrXProfilePI::registerPython();
       Test::registerPython();
       ParticleRadiusDistribution::registerPython();
 

@@ -60,6 +60,7 @@ from espressopp.analysis.XDensity import *
 from espressopp.analysis.XTemperature import *
 from espressopp.analysis.XPressure import *
 from espressopp.analysis.AdressDensity import *
+from espressopp.analysis.RadGyrXProfilePI import *
 from espressopp.analysis.Test import *
 from espressopp.analysis.ParticleRadiusDistribution import *
 
