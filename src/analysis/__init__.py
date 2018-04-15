@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2014,2015,2016
+#  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -35,6 +35,7 @@ from espressopp.analysis.ConfigurationsExtAdress import *
 from espressopp.analysis.Velocities import *
 from espressopp.analysis.CenterOfMass import *
 from espressopp.analysis.NPart import *
+from espressopp.analysis.NPartSubregion import *
 from espressopp.analysis.MaxPID import *
 from espressopp.analysis.AllParticlePos import *
 from espressopp.analysis.IntraChainDistSq import *

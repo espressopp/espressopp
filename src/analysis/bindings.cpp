@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -36,6 +36,7 @@
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
+#include "NPartSubregion.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
 #include "CMVelocity.hpp"
@@ -89,6 +90,7 @@ namespace espressopp {
       Velocities::registerPython();
       CenterOfMass::registerPython();
       NPart::registerPython();
+      NPartSubregion::registerPython();
       MaxPID::registerPython();
       AllParticlePos::registerPython();
       IntraChainDistSq::registerPython();
