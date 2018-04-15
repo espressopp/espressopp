@@ -60,7 +60,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_NPartSubregion
 
 class NPartSubregionLocal(ObservableLocal, analysis_NPartSubregion):
-    'The (local) compute of the number of particles of the system.'
+    'The (local) class for computing the number of particles in a subregion of the system.'
     def __init__(self, system, parttype, span, geometry, center):
         if geometry not in [0,1,2,3]:
             raise ValueError('Error: Geometry must be either 0 (spherical geometry), 1 (bounded in x-direction), 2 (bounded in y-direction), 3 (bounded in z-direction). Your input: {}'.format(geometry))
