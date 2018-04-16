@@ -36,6 +36,7 @@ from espressopp.analysis.Velocities import *
 from espressopp.analysis.CenterOfMass import *
 from espressopp.analysis.NPart import *
 from espressopp.analysis.NPartSubregion import *
+from espressopp.analysis.SubregionTracking import *
 from espressopp.analysis.MaxPID import *
 from espressopp.analysis.AllParticlePos import *
 from espressopp.analysis.IntraChainDistSq import *

@@ -37,6 +37,7 @@
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
 #include "NPartSubregion.hpp"
+#include "SubregionTracking.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
 #include "CMVelocity.hpp"
@@ -91,6 +92,7 @@ namespace espressopp {
       CenterOfMass::registerPython();
       NPart::registerPython();
       NPartSubregion::registerPython();
+      SubregionTracking::registerPython();
       MaxPID::registerPython();
       AllParticlePos::registerPython();
       IntraChainDistSq::registerPython();
