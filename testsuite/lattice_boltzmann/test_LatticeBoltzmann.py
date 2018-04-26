@@ -27,7 +27,7 @@ from espressopp import Real3D
 
 import unittest
 
-runSteps = 500
+runSteps = 600
 temperature = 1.0
 Nx = 32
 Ny = Nz = 4
