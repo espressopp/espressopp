@@ -350,7 +350,7 @@ from _espressopp import integrator_PIAdressIntegrator
 import numpy as np
 
 class PIAdressIntegratorLocal(MDIntegratorLocal, integrator_PIAdressIntegrator):
-    'The (local) Velocity Verlet Integrator.'
+    'The (local) PIAdress Integrator.'
     def __init__(self, system, verletlist, timestep = 0.0, sSteps = 1, mSteps = 1, nTrotter = 32, realKinMass = True, constKinMass = False, temperature = 2.494353, gamma = 1.0, centroidThermostat = True, CMDparameter = 1.0, PILE = True, PILElambda = 0.5, CLmassmultiplier = 100.0, speedup = True, KTI = False):
         if mSteps <= 0 or sSteps <= 0:
             raise ValueError('mSteps and sSteps must be larger than zero. Your inputs: mSteps={}, sSteps={}'.format(mSteps, sSteps))
