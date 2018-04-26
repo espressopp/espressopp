@@ -22,7 +22,7 @@ r"""
 espressopp.integrator.PIAdressIntegrator
 **************************************
 
-The PIAdressIntegrator implements the integration method for Hamiltonian Adaptive Resolution Path Integral Simulations proposed in arXiv:1710.02982 (PI-AdResS). It can be used to run path integral molecular dynamics as well as ring polymer and centroid molecular dynamics in a quantum-classical adaptive resolution fashion, using different empirial force fields. To facilitate an efficient integration, the integrator uses a 3-layer RESPA multiple timestepping scheme (inner level: intraatomic spring forces between the Trotter beads. medium level: interatomic bonded forces. outer level: interatomic non-bonded forces). Importantly, the integrator should only be used in combination with PI-AdResS interactions. Furthermore, the integrator has its own thermostat (Langevin), and the only extensions that should be used with it are the Free Energy Compensation (FreeEnergyCompensation) and the Thermodynamic Force (TDforce).
+The PIAdressIntegrator implements the integration method for Hamiltonian Adaptive Resolution Path Integral Simulations proposed in J. Chem. Phys 147, 244104 (2017) (PI-AdResS). It can be used to run path integral molecular dynamics as well as ring polymer and centroid molecular dynamics in a quantum-classical adaptive resolution fashion, using different empirial force fields. To facilitate an efficient integration, the integrator uses a 3-layer RESPA multiple timestepping scheme (inner level: intraatomic spring forces between the Trotter beads. medium level: interatomic bonded forces. outer level: interatomic non-bonded forces). Importantly, the integrator should only be used in combination with PI-AdResS interactions. Furthermore, the integrator has its own thermostat (Langevin), and the only extensions that should be used with it are the Free Energy Compensation (FreeEnergyCompensation) and the Thermodynamic Force (TDforce).
 
 Example:
 
@@ -30,7 +30,7 @@ Example:
 >>> ...
 >>> integrator.run(nsteps)
 
-.. function:: espressopp.integrator.PIAdressIntegrator(system, verletlist, timestep , sSteps, mSteps, nTrotter, realKinMass, constKinMass, temperature, gamma, centroidThermostat, CMDparameter, PILE, PILElambda, CLmassmultiplier, speedup, KTI):
+.. function:: espressopp.integrator.PIAdressIntegrator(system, verletlist, timestep ,sSteps, mSteps, nTrotter, realKinMass, constKinMass, temperature, gamma, centroidThermostat, CMDparameter, PILE, PILElambda, CLmassmultiplier, speedup, KTI):
 
         Constructs the PIAdressIntegrator object. Note that all parameters can also be set and fetched via setter and getter functions. Additionally, all parameters except the system and the Verletlist are implemented as class variables that can be directly accessed and modified.
 
@@ -40,8 +40,8 @@ Example:
         :param sSteps: (default: 1) multiplier to construct medium timestep (interatomic bonded forces) as mediumstep = sSteps * timestep
         :param mSteps: (default: 1) multiplier to construct longest timestep (interatomic non-bonded forces) as longstep = mSteps * sSteps * timestep
         :param nTrotter: (default: 32) Trotter number. Should be even and greather than zero.
-        :param realKinMass: (default: True) Flag to choose whether to use real kinetic masses. If False, the higher modes' kinetic masses are multiplied with their corresponding eigenvalues of the normal mode transformation. In this way, all higher modes oscillate with the same frequency. If True, we use the kinetic masses for the higher modes which corresponding to the real dynamics (see arXiv:1710.02982 for details)
-        :param constKinMass: (default: False) If False, the higher modes' kinetic masses also adaptively change (AKM scheme in arXiv:1710.02982). If True, the higher modes' kinetic masses are constant throughout the system (CKM scheme in arXiv:1710.02982)
+        :param realKinMass: (default: True) Flag to choose whether to use real kinetic masses. If False, the higher modes' kinetic masses are multiplied with their corresponding eigenvalues of the normal mode transformation. In this way, all higher modes oscillate with the same frequency. If True, we use the kinetic masses for the higher modes which corresponding to the real dynamics (see J. Chem. Phys 147, 244104 (2017) for details)
+        :param constKinMass: (default: False) If False, the higher modes' kinetic masses also adaptively change (AKM scheme in J. Chem. Phys 147, 244104 (2017)). If True, the higher modes' kinetic masses are constant throughout the system (CKM scheme in J. Chem. Phys 147, 244104 (2017))
         :param temperature: (default: 2.494353 - this corresponds to 300 Kelvin) the temperature in gromacs units (Boltzmann constant kb is 1)
         :param gamma: (default: 1.0) the Langevin thermostat's friction parameter in 1/ps
         :param centroidThermostat: (default: True) If True, the centroid mode is also thermostated, otherwise only the higher modes' (relevant for centroid molecular dynamics)
@@ -323,7 +323,7 @@ Example:
 
 .. function:: espressopp.integrator.PIAdressIntegrator.computePositionDrift(parttype)
 
-        Calculates the average drift force due to the position-dependent spring masses (see Section 5.C. Eq. 63 in arXiv:1710.02982) on particles of type parttype. To be used during KTI for construction of free energy compensation.
+        Calculates the average drift force due to the position-dependent spring masses (see Section 5.C. Eq. 63 in J. Chem. Phys 147, 244104 (2017)) on particles of type parttype. To be used during KTI for construction of free energy compensation.
 
         :param parttype: the particle or atom type
         :type parttype: int
@@ -332,7 +332,7 @@ Example:
 
 .. function:: espressopp.integrator.PIAdressIntegrator.computeMomentumDrift(parttype)
 
-        Calculates the average drift force due to the position-dependent kinetic masses (see Section 5.C. Eq. 62 in arXiv:1710.02982) on particles of type parttype. To be used during KTI for construction of free energy compensation.
+        Calculates the average drift force due to the position-dependent kinetic masses (see Section 5.C. Eq. 62 in J. Chem. Phys 147, 244104 (2017)) on particles of type parttype. To be used during KTI for construction of free energy compensation.
 
         :param parttype: the particle or atom type
         :type parttype: int
