@@ -104,8 +104,8 @@ class TestPureLB(unittest.TestCase):
 
             self.assertAlmostEqual(av_den, initDen, places=2)
             self.assertAlmostEqual(av_j[0], _v, places=2)
-            self.assertAlmostEqual(av_j[1], _v, places=2)
-            self.assertAlmostEqual(av_j[2], _v, places=2)
+            self.assertAlmostEqual(av_j[1], _v, places=1)
+            self.assertAlmostEqual(av_j[2], _v, places=1)
 
             av_den = 0.
             av_j = Real3D(0.)
