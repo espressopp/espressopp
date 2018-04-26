@@ -29,7 +29,8 @@ import unittest
 
 runSteps = 500
 temperature = 1.0
-Ni = 5
+Nx = 32
+Ny = Nz = 4
 initDen = 1.
 initVel = 0.
 initVelSin = 0.1
@@ -38,7 +39,7 @@ class TestPureLB(unittest.TestCase):
     def setUp(self):
         # set up system
         global temperature
-        system, integrator = espressopp.standard_system.LennardJones(0, box=(Ni, Ni, Ni), temperature=temperature)
+        system, integrator = espressopp.standard_system.LennardJones(0, box=(Nx, Ny, Nz), temperature=temperature)
         nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 
         # set up LB fluid
