@@ -37,7 +37,7 @@ initVelSin = 0.1
 class TestPureLB(unittest.TestCase):
     def setUp(self):
         # set up system
-        global Ni, temperature
+        global temperature
         system, integrator = espressopp.standard_system.LennardJones(0, box=(Ni, Ni, Ni), temperature=temperature)
         nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 
