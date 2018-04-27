@@ -26,10 +26,11 @@ r"""
 espressopp.interaction.TabulatedSubEnsAngular
 ***************************************
 
-.. function:: espressopp.interaction.TabulatedSubEnsAngular(itype, filename)
+.. function:: espressopp.interaction.TabulatedSubEnsAngular(dim, itype, filenames)
 
+		:param dim: Number of potentials to be used for this interaction
 		:param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filename: The tabulated potential filename.
+		:param filenames: The tabulated potential filenames.
 		:type itype: int
 		:type filename: str
 
@@ -83,7 +84,7 @@ from _espressopp import interaction_TabulatedSubEnsAngular, \
 class TabulatedSubEnsAngularLocal(AngularPotentialLocal, interaction_TabulatedSubEnsAngular):
     def __init__(self, itype, filename):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TabulatedSubEnsAngular, itype, filename)
+            cxxinit(self, interaction_TabulatedSubEnsAngular, dim, itype, filenames)
 
 class FixedTripleListTabulatedSubEnsAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedSubEnsAngular):
 
@@ -93,7 +94,7 @@ class FixedTripleListTabulatedSubEnsAngularLocal(InteractionLocal, interaction_F
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, potential) 
+            self.cxxclass.setPotential(self, potential)
 
 
 class FixedTripleListTypesTabulatedSubEnsAngularLocal(InteractionLocal, interaction_FixedTripleListTypesTabulatedSubEnsAngular):
@@ -123,7 +124,7 @@ if pmi.isController:
         'The TabulatedSubEnsAngular potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedSubEnsAngularLocal',
-            pmiproperty = ['itype', 'filename']
+            pmiproperty = ['dim' 'itype', 'filename']
             )
 
     class FixedTripleListTabulatedSubEnsAngular(Interaction):

@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -32,6 +32,13 @@
 
 namespace espressopp {
   namespace interaction {
+    struct cv_angle {
+        real b1;
+        real b2;
+        real theta;
+        real size;
+    };
+
     class AngularPotential {
     public:
       virtual real computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3) const = 0;
@@ -47,6 +54,11 @@ namespace espressopp {
 
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
+
+      virtual void setColVar(cv_angle cv) = 0;
+      virtual void setColVar(const Real3D& dist12, const Real3D& dist32) = 0;
+      virtual cv_angle getColVar() const = 0;
+      virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32) = 0;
 
       static void registerPython();
 
@@ -82,7 +94,12 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
 
-      // Implements the non-virtual interface 
+      virtual void setColVar(cv_angle cv);
+      virtual void setColVar(const Real3D& dist12, const Real3D& dist32);
+      virtual cv_angle getColVar() const;
+      virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
+
+      // Implements the non-virtual interface
       // (used by e.g. the Interaction templates)
       real _computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3) const;
       real _computeEnergy(const Real3D& dist12, const Real3D& dist32) const;
@@ -90,7 +107,7 @@ namespace espressopp {
 
       void _computeForce(Real3D& force12, Real3D& force32,
 			 const Particle &p1, const Particle &p2, const Particle &p3) const;
-      
+
       bool _computeForce(Real3D& force12, Real3D& force32,
 			 const Real3D& dist12, const Real3D& dist32) const;
 
@@ -98,7 +115,7 @@ namespace espressopp {
       // real _computeEnergySqrRaw(real distSqr) const;
       // bool _computeForceRaw(const Real3D& dist, Real3D& force) const;
 
-      // void _computeForce(const Particle &p1, const Particle &p2, 
+      // void _computeForce(const Particle &p1, const Particle &p2,
       //                    Real3D& force) const {
       // 	Real3D dist = p1.r.p - p2.r.p;
       // 	derived_this()->_computeForce(dist, force);
@@ -107,6 +124,8 @@ namespace espressopp {
     protected:
       real cutoff;
       real cutoffSqr;
+      // Collective variables: bond1, bond2, angle
+      cv_angle colVar;
 
       Derived* derived_this() {
         return static_cast< Derived* >(this);
@@ -120,12 +139,16 @@ namespace espressopp {
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
-    template < class Derived > 
+    template < class Derived >
     inline
     AngularPotentialTemplate< Derived >::
-    AngularPotentialTemplate() 
-      : cutoff(infinity), cutoffSqr(infinity)
-    {}
+    AngularPotentialTemplate()
+      : cutoff(infinity), cutoffSqr(infinity) {
+          colVar.b1 = 0.;
+          colVar.b2 = 0.;
+          colVar.theta = 0.;
+          colVar.size = infinity;
+      }
 
     // Shift/cutoff handling
     template < class Derived >
@@ -141,6 +164,40 @@ namespace espressopp {
     AngularPotentialTemplate< Derived >::
     getCutoff() const
     { return cutoff; }
+
+    // Collective variables
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    setColVar(cv_angle cv)
+    { colVar = cv; }
+
+        // Collective variables
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    setColVar(const Real3D& dist12, const Real3D& dist32) {
+        real dist12_sqr = dist12 * dist12;
+        real dist32_sqr = dist32 * dist32;
+        colVar.b1 = sqrt(dist12_sqr);
+        colVar.b2 = sqrt(dist32_sqr);
+        real dist1232 = colVar.b1 * colVar.b2;
+        real cos_theta = dist12 * dist32 / dist1232;
+        colVar.theta = acos(cos_theta);
+    }
+
+    template < class Derived >
+    inline cv_angle
+    AngularPotentialTemplate< Derived >::
+    getColVar() const
+    { return colVar; }
+
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    computeColVarWeights(const Real3D& dist12, const Real3D& dist32) {
+        // in general do nothing
+    }
 
     // Energy computation
     template < class Derived >
@@ -163,14 +220,14 @@ namespace espressopp {
     }
 
     template < class Derived >
-    inline real 
+    inline real
     AngularPotentialTemplate< Derived >::
     computeEnergy(real theta) const {
       return _computeEnergy(theta); // a bug was here (it was: return computeEnergy(theta);)
     }
-    
-    template < class Derived > 
-    inline real 
+
+    template < class Derived >
+    inline real
     AngularPotentialTemplate< Derived >::
     _computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3) const {
       Real3D dist12 = p1.position() - p2.position();
@@ -193,13 +250,13 @@ namespace espressopp {
       }
     }
 
-    template < class Derived > 
+    template < class Derived >
     inline real
     AngularPotentialTemplate< Derived >::
     _computeEnergy(real theta) const {
       return derived_this()->_computeEnergyRaw(theta);
     }
-    
+
     // Force computation
     template < class Derived >
     inline void
@@ -240,10 +297,10 @@ namespace espressopp {
                   Real3D& force32,
                   const Real3D& dist12,
                   const Real3D& dist32) const {
-      
+
       return derived_this()->_computeForceRaw(force12, force32, dist12, dist32);
     }
-    
+
     // used for generating tabular angular potential
     template < class Derived >
     inline real
@@ -251,7 +308,7 @@ namespace espressopp {
     computeForce(real theta) const {
       return derived_this()->_computeForceRaw(theta);
     }
-    
+
   }
 }
 

@@ -27,7 +27,7 @@
 #define _INTERACTION_TABULATEDSUBENSANGULAR_HPP
 
 #include "AngularPotential.hpp"
-#include "Interpolation.hpp" 
+#include "Interpolation.hpp"
 
 namespace espressopp {
     namespace interaction {
@@ -36,26 +36,17 @@ namespace espressopp {
 
             private:
                 int numInteractions;
-                char** filenames;
+                std::vector<std::string> filenames;
                 std::vector<shared_ptr <Interpolation>> tables;
                 int interpolationType;
                 // Reference values of the collective variable centers
-                std::vector<std::array<real, 4>> colVarRef;
-
-                // Collective variables--3 of them + 1 dummy
-                std::array<real, 4> colVarInst = {};
+                std::vector<cv_angle> colVarRef;
                 // Weights of each table
                 std::vector<real> weights;
                 // Scaling factor for the weight
                 real alpha = 1.0;
 
             public:
-                void setDimension(int _dim) {
-                  numInteractions = _dim;
-                  tables.resize( numInteractions );
-                }
-                int getDimension() const { return numInteractions; }
-
                 static void registerPython();
 
                 TabulatedSubEnsAngular() {
@@ -63,50 +54,55 @@ namespace espressopp {
                     //std::cout << "using default tabulated potential ...\n";
                 }
 
-                TabulatedSubEnsAngular(int dim, int itype, char** filenames) {
+                TabulatedSubEnsAngular(int dim, int itype, std::vector<std::string> filenames) {
                     setDimension(dim);
-                    setFilename(itype, filenames);
+                    setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
                     colVarRef.resize(dim);
                     weights.resize(dim);
                 }
 
-                TabulatedSubEnsAngular(int dim, int itype, char** filenames, real cutoff) {
+                TabulatedSubEnsAngular(int dim, int itype, std::vector<std::string> filenames, real cutoff) {
                     setDimension(dim);
-                    setFilename(itype, filenames);
+                    setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
                     colVarRef.resize(dim);
                     weights.resize(dim);
                     setCutoff(cutoff);
-                    std::cout << "using tabulated potentials " << filenames << "\n";
+                    std::cout << "using tabulated potentials \n";
+                    for (int i=0; i<dim; ++i)
+                        std::cout << "  " << filenames[i] << "\n";
                 }
+                void setDimension(int _dim) {
+                  numInteractions = _dim;
+                  tables.resize( numInteractions );
+                }
+
+                int getDimension() const { return numInteractions; }
+
                 /** Setter for the interpolation type */
                 void setInterpolationType(int itype) { interpolationType = itype; }
 
                 /** Getter for the interpolation type */
                 int getInterpolationType() const { return interpolationType; }
 
+                real getWeightScalingFactor() const { return alpha; }
+
                 void setWeightScalingFactor(real factor) { alpha = factor; }
 
-                void setFilename(int itype, char** _filenames);
+                cv_angle getColVarRef(int i) const { return colVarRef[i]; }
 
-                void setColVarRef(std::vector<std::array<real, 4>> cvRefs);
+                void setColVarRef(std::vector< cv_angle > cvRefs);
 
-                double distColVars(std::array<real, 4> cv1, std::array<real, 4> cv2);
+                double distColVars(cv_angle cv1, cv_angle cv2);
 
-                const char* getFilename(int i) const {
-                    return filenames[i];
-                }
+                std::vector<std::string> getFilenames() const { return filenames; }
 
-                void setColVarInst(real cv1, real cv2, real cv3) {
-                    // Set the instantaneous value of the collective variables
-                    colVarInst[0] = cv1;
-                    colVarInst[1] = cv2;
-                    colVarInst[2] = cv3;
-                    computeWeights();
-                }
+                void setFilenames(int dim, int itype, std::vector<std::string> _filenames);
 
-                void computeWeights();
+                std::vector<real> getWeights() const { return weights; };
+
+                void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
 
                 real _computeEnergyRaw(real theta) const {
                     real e = 0.;
@@ -164,16 +160,18 @@ namespace espressopp {
         // provide pickle support
         struct TabulatedSubEnsAngular_pickle : boost::python::pickle_suite {
             static boost::python::tuple getinitargs(TabulatedSubEnsAngular const& pot) {
-
                 int itp = pot.getInterpolationType();
                 std::vector<std::string> fns;
+                std::vector<cv_angle> cvrefs;
                 int dim = pot.getDimension();
-                fns.resize(dim);
+                fns = pot.getFilenames();
+                cvrefs.resize(dim);
                 for (int i=0; i<dim; ++i) {
-                  fns[i] = pot.getFilename(i);
+                  cvrefs[i] = pot.getColVarRef(i);
                 }
+                real alp = pot.getWeightScalingFactor();
                 real rc = pot.getCutoff();
-                return boost::python::make_tuple(itp, fns, rc);
+                return boost::python::make_tuple(dim, itp, fns, cvrefs, alp, rc);
             }
         };
 
@@ -182,16 +180,3 @@ namespace espressopp {
 } //ns espressopp
 
 #endif
-                // int numInteractions;
-                // char** filenames;
-                // std::vector<shared_ptr <Interpolation>> tables;
-                // int interpolationType;
-                // // Reference values of the collective variable centers
-                // std::vector<std::array<real, 4>> colVarRef;
-                //
-                // // Collective variables--3 of them + 1 dummy
-                // std::array<real, 4> colVarInst = {};
-                // // Weights of each table
-                // std::vector<real> weights;
-                // // Scaling factor for the weight
-                // real alpha = 1.0;

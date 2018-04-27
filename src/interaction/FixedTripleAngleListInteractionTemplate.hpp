@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -45,10 +45,10 @@ namespace espressopp {
   namespace interaction {
     template < typename _AngularPotential >
     class FixedTripleAngleListInteractionTemplate : public Interaction, SystemAccess {
-        
+
     protected:
       typedef _AngularPotential Potential;
-      
+
     public:
       FixedTripleAngleListInteractionTemplate
       (shared_ptr < System > _system,
@@ -68,7 +68,7 @@ namespace espressopp {
         fixedtripleList = _fixedtripleList;
       }
 
-      shared_ptr < FixedTripleAngleList > 
+      shared_ptr < FixedTripleAngleList >
       getFixedTripleList() {
         return fixedtripleList;
       }
@@ -92,8 +92,8 @@ namespace espressopp {
       virtual real computeEnergy();
       virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
-      virtual real computeEnergyCG();      
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
+      virtual real computeEnergyCG();
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
       virtual void computeVirialTensor(Tensor& w, real z);
@@ -124,7 +124,7 @@ namespace espressopp {
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        
+
         real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
         potential->_computeForce(force12, force32, dist12, dist32, currentAngle);
@@ -148,37 +148,37 @@ namespace espressopp {
         //const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        
+
         real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
-        
+
         e += potential->_computeEnergy(dist12, dist32, currentAngle);
       }
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
-    
+
     template < typename _AngularPotential > inline real
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeEnergyDeriv() {
       std::cout << "Warning! At the moment computeEnergyDeriv() in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
-    
+
     template < typename _AngularPotential > inline real
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeEnergyAA() {
       std::cout << "Warning! At the moment computeEnergyAA() in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
-    
+
     template < typename _AngularPotential > inline real
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeEnergyCG() {
       std::cout << "Warning! At the moment computeEnergyCG() in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
-    
+
     template < typename _AngularPotential >
     inline void
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
@@ -205,7 +205,7 @@ namespace espressopp {
         Real3D force12, force32;
 
         real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
-        
+
         potential->_computeForce(force12, force32, dist12, dist32, currentAngle);
         w += dist12 * force12 + dist32 * force32;
       }
@@ -232,23 +232,23 @@ namespace espressopp {
         Real3D force12, force32;
 
         real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
-        
+
         potential->_computeForce(force12, force32, r12, r32, currentAngle);
         wlocal += Tensor(r12, force12) + Tensor(r32, force32);
       }
-      
+
       // reduce over all CPUs
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal,6, (double*)&wsum, std::plus<double>());
       w += wsum;
     }
 
-    
+
     template < typename _AngularPotential > inline void
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(Tensor& w, real z) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
-      
+
       std::cout << "Warning! At the moment IK computeVirialTensor for fixed triples does'n work"<<std::endl;
       /*
       Tensor wlocal(0.0);
@@ -257,11 +257,11 @@ namespace espressopp {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
-        
+
         Real3D p2pos = p2.position();
-        
-        if(  (p2pos[0]>xmin && p2pos[0]<xmax && 
-              p2pos[1]>ymin && p2pos[1]<ymax && 
+
+        if(  (p2pos[0]>xmin && p2pos[0]<xmax &&
+              p2pos[1]>ymin && p2pos[1]<ymax &&
               p2pos[2]>zmin && p2pos[2]<zmax) ){
           Real3D r12, r32;
           bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
@@ -269,12 +269,12 @@ namespace espressopp {
           Real3D force12, force32;
 
           real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
-        
+
           potential->_computeForce(force12, force32, r12, r32, currentAngle);
           wlocal += Tensor(r12, force12) + Tensor(r32, force32);
         }
       }
-      
+
       // reduce over all CPUs
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
@@ -286,10 +286,10 @@ namespace espressopp {
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(Tensor *w, int n) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
-      
+
       std::cout << "Warning! At the moment IK computeVirialTensor for fixed triples does'n work"<<std::endl;
     }
-    
+
     template < typename _AngularPotential >
     inline real
     FixedTripleAngleListInteractionTemplate< _AngularPotential >::
