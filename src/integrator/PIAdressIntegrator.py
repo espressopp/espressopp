@@ -30,7 +30,7 @@ Example:
 >>> ...
 >>> integrator.run(nsteps)
 
-.. function:: espressopp.integrator.PIAdressIntegrator(system, verletlist, timestep ,sSteps, mSteps, nTrotter, realKinMass, constKinMass, temperature, gamma, centroidThermostat, CMDparameter, PILE, PILElambda, CLmassmultiplier, speedup, KTI):
+.. function:: espressopp.integrator.PIAdressIntegrator(system, verletlist, timestep, sSteps, mSteps, nTrotter, realKinMass, constKinMass, temperature, gamma, centroidThermostat, CMDparameter, PILE, PILElambda, CLmassmultiplier, speedup, KTI)
 
         Constructs the PIAdressIntegrator object. Note that all parameters can also be set and fetched via setter and getter functions. Additionally, all parameters except the system and the Verletlist are implemented as class variables that can be directly accessed and modified.
 

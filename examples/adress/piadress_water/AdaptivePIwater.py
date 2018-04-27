@@ -67,8 +67,8 @@ centroidthermostat = True # thermostat also the centroid (for CMD)?
 CMDparameter = 1.0 # adiabatic decoupling gamma^2 for CMD
 KTI = False # Kirkwood Thermodynamic Integration flag
 
-speedupInterAtom = True # speedup in classical region for interatomic interactions (centroids instead of all beads)?
-speedupFreezeRings = False # speedup in classical region by freezing rings (skipping internal ring motion integration)?
+speedupInterAtom = True # speedup in classical region for interatomic interactions (use centroids instead of all beads)?
+speedupFreezeRings = False # speedup in classical region by freezing rings (skipping internal ring motion integration)? Note that, if set to True, the temperature will not be correct anymore, because freezing the rings in the CL region effectively reduces the number of degrees of freedom in the system
 
 ######################
 #  2. read in coordinates  #
