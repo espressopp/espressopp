@@ -34,24 +34,25 @@ namespace espressopp {
     namespace interaction {
 
         void TabulatedSubEnsAngular::setFilenames(int dim,
-            int itype, std::vector<std::string> _filenames) {
+            int itype, boost::python::list _filenames) {
             boost::mpi::communicator world;
-            filenames = _filenames;
+            filenames.resize(dim);
             numInteractions = dim;
             for (int i=0; i<dim; ++i) {
+              filenames[i] = boost::python::extract<std::string>(_filenames[i]);
               if (itype == 1) { // create a new InterpolationLinear
                   tables[i] = make_shared <InterpolationLinear> ();
-                  tables[i]->read(world, _filenames[i].c_str());
+                  tables[i]->read(world, filenames[i].c_str());
               }
 
               else if (itype == 2) { // create a new InterpolationAkima
                   tables[i] = make_shared <InterpolationAkima> ();
-                  tables[i]->read(world, _filenames[i].c_str());
+                  tables[i]->read(world, filenames[i].c_str());
               }
 
               else if (itype == 3) { // create a new InterpolationCubic
                   tables[i] = make_shared <InterpolationCubic> ();
-                  tables[i]->read(world, _filenames[i].c_str());
+                  tables[i]->read(world, filenames[i].c_str());
               }
           }
         }
@@ -109,7 +110,7 @@ namespace espressopp {
             using namespace espressopp::python;
 
             class_ <TabulatedSubEnsAngular, bases <AngularPotential> >
-                ("interaction_TabulatedSubEnsAngular", init <int, int, std::vector<std::string>>())
+                ("interaction_TabulatedSubEnsAngular", init <int, int, boost::python::list>())
                 .add_property("numInteractions", &TabulatedSubEnsAngular::getDimension, &TabulatedSubEnsAngular::setDimension)
                 .add_property("filenames", &TabulatedSubEnsAngular::getFilenames, &TabulatedSubEnsAngular::setFilenames)
                 .add_property("colVarRef", &TabulatedSubEnsAngular::getColVarRef, &TabulatedSubEnsAngular::setColVarRef)

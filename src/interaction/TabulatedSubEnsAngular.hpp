@@ -54,7 +54,7 @@ namespace espressopp {
                     //std::cout << "using default tabulated potential ...\n";
                 }
 
-                TabulatedSubEnsAngular(int dim, int itype, std::vector<std::string> filenames) {
+                TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames) {
                     setDimension(dim);
                     setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
@@ -62,7 +62,7 @@ namespace espressopp {
                     weights.resize(dim);
                 }
 
-                TabulatedSubEnsAngular(int dim, int itype, std::vector<std::string> filenames, real cutoff) {
+                TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames, real cutoff) {
                     setDimension(dim);
                     setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
@@ -98,7 +98,9 @@ namespace espressopp {
 
                 std::vector<std::string> getFilenames() const { return filenames; }
 
-                void setFilenames(int dim, int itype, std::vector<std::string> _filenames);
+                std::string getFilename(int i) const { return filenames[i]; }
+
+                void setFilenames(int dim, int itype, boost::python::list _filenames);
 
                 std::vector<real> getWeights() const { return weights; };
 

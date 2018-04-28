@@ -82,7 +82,7 @@ from _espressopp import interaction_TabulatedSubEnsAngular, \
 
 
 class TabulatedSubEnsAngularLocal(AngularPotentialLocal, interaction_TabulatedSubEnsAngular):
-    def __init__(self, itype, filename):
+    def __init__(self, dim, itype, filenames):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedSubEnsAngular, dim, itype, filenames)
 
@@ -124,7 +124,7 @@ if pmi.isController:
         'The TabulatedSubEnsAngular potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedSubEnsAngularLocal',
-            pmiproperty = ['dim' 'itype', 'filename']
+            pmiproperty = ['dim' 'itype', 'filenames']
             )
 
     class FixedTripleListTabulatedSubEnsAngular(Interaction):
