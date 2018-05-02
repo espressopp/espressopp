@@ -27,8 +27,6 @@ from espressopp import Real3D
 
 import unittest
 
-runSteps = 600
-temperature = 1.0
 Nx = 32
 Ny = Nz = 4
 initDen = 1.
@@ -38,7 +36,9 @@ initVelSin = 0.1
 class TestPureLB(unittest.TestCase):
     def setUp(self):
         # set up system
-        global temperature
+        temperature = 1.0
+        runSteps = 600
+
         system, integrator = espressopp.standard_system.LennardJones(0, box=(Nx, Ny, Nz), temperature=temperature)
         nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 
@@ -50,22 +50,23 @@ class TestPureLB(unittest.TestCase):
         self.lb = lb
         self.integrator = integrator
 
+        self.temperature = temperature
+        self.runSteps = runSteps
+
     def test_purelb(self):
         print "Checking athermal LB fluid"
-        global runSteps
 
         # set initial populations
         global initDen, initVel
         initPop = espressopp.integrator.LBInitPopUniform(self.system,self.lb)
         initPop.createDenVel(initDen, Real3D(initVel))
 
-        self.integrator.run(runSteps)
+        self.integrator.run(self.runSteps)
 
         self.check_averages(initVel)
 
     def test_thermallb(self):
         print "Checking stochastic LB fluid with sin-wave initialization"
-        global runSteps
 
         # set initial populations
         global initDen, initVel, initVelSin
@@ -73,8 +74,8 @@ class TestPureLB(unittest.TestCase):
         initPop.createDenVel(initDen, Real3D(initVel, initVel, initVelSin))
 
         # set temperature 
-        self.lb.lbTemp = temperature
-        self.integrator.run(runSteps)
+        self.lb.lbTemp = self.temperature
+        self.integrator.run(self.runSteps)
 
         self.check_averages(initVel) # sin-like wave is killed by temperature
 
