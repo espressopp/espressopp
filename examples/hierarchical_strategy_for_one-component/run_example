@@ -1,0 +1,11 @@
+#!/bin/sh
+
+ulimit -l unlimited
+
+mpirun -np 16 python generate_microscopic-c.py > out_g 2> err_g
+mpirun -np 8 python softblobs_100.py > out_n100 2> err_n100
+mpirun -np 8 python softblobs_50.py > out_n50 2> err_n50
+mpirun -np 12 python softblobs_25.py > out_n25 2> err_n25
+mpirun -np 12 python reinsertion_300.py > out_r 2> err_r
+mpirun -np 16 python fbloop.py > out_fbloop 2> err_fbloop
+mpirun -np 16 python polymer_melt_from_restart.py > out 2> err
