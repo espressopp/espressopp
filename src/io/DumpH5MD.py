@@ -128,8 +128,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                  email='xxx',
                  chunk_size=256,
                  is_single_prec=False,
-                 do_sort=True,
-                 collective_write=False):
+                 do_sort=True):
         """
         Args:
             system: The system object.
@@ -152,13 +151,12 @@ class DumpH5MDLocal(io_DumpH5MD):
             chunk_size: The size of data chunk. (default: 128)
             is_single_prec: Use single precision instead of double.
             do_sort: If set to True then HDF5 will be sorted on close.
-            collective_write: If set to True then use collective write.
         """
         if not pmi.workerIsActive():
             return
         cxxinit(self, io_DumpH5MD, system, is_adress)
 
-        self.h5md_filename = filename
+        self.filename = filename
         self.group_name = group_name
         self.store_position = store_position
         self.store_species = store_species
@@ -173,7 +171,6 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.chunk_size = chunk_size
         self.do_sort = do_sort
         self.single_prec = is_single_prec
-        self.collective_write = collective_write
 
         self.system = system
 
@@ -184,39 +181,43 @@ class DumpH5MDLocal(io_DumpH5MD):
                 new_filename = '{}/{}_{}'.format(dirname, int(py_time.time()), os.path.basename(filename))
                 os.rename(filename, new_filename)
                 print('File {} exists, moved to {}'.format(filename, new_filename))
-
-        self.h5md_file = pyh5md.File(
-            filename, 'w',
-            creator='espressopp',
-            creator_version=espressopp.VersionLocal().info(),
-            author=author,
-            author_email=email,
-            driver='mpio',
-            comm=MPI.COMM_WORLD)
+        try: 
+            self.file = pyh5md.File(
+                filename, 'w',
+                creator='espressopp',
+                creator_version=espressopp.VersionLocal().info(),
+                author=author,
+                author_email=email,
+                driver='mpio',
+                comm=MPI.COMM_WORLD)
+        except NameError:
+            self.file = pyh5md.File(
+                filename, 'w',
+                creator='espressopp',
+                creator_version=espressopp.VersionLocal().info(),
+                author=author,
+                author_email=email)
 
         self._system_data()
 
         self.float_type = np.float32 if is_single_prec else np.float64
         self.int_type = np.int32 if is_single_prec else np.int
 
-        part = self.h5md_file.particles_group(self.group_name)
+        part = self.file.particles_group(self.group_name)
         self.particle_group = part
 
         if self.static_box:
-            self.box = part.create_box(
+            part.create_box(
                 dimension=3,
                 boundary=['periodic', 'periodic', 'periodic'],
                 store='fixed',
                 data=np.array([ed_i for ed_i in self.system.bc.boxL], dtype=self.float_type))
         else:
-            self.box = part.create_box(
+            part.create_box(
                 dimension=3,
                 boundary=['periodic', 'periodic', 'periodic'],
-                store='time',
-                shape=(3, ),
-                dtype=self.float_type,
-                fillvalue=0,
-                time=True)
+                store='time', time=True,
+                data=np.zeros(3, dtype=self.float_type))
 
         self.id_e = pyh5md.element(part, 'id', store='time', time=True, shape=(self.chunk_size,), maxshape=(None, ),
                                    dtype=self.int_type, fillvalue=-1)
@@ -283,15 +284,15 @@ class DumpH5MDLocal(io_DumpH5MD):
 
     def set_parameters(self, paramters):
         if pmi.workerIsActive():
-            if 'parameters' not in self.h5md_file:
-                self.h5md_file.create_group('parameters')
-            g_params = self.h5md_file['parameters']
+            if 'parameters' not in self.file:
+                self.file.create_group('parameters')
+            g_params = self.file['parameters']
             for k, v in paramters.iteritems():
                 g_params.attrs[k] = v
 
     def get_file(self):
         if pmi.workerIsActive():
-            return self.h5md_file
+            return self.file
 
     def update(self):
         if pmi.workerIsActive():
@@ -368,7 +369,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         idx_1 = idx_0+NLocal
         self.commTimer += (py_time.time() - time0)
 
-        collective_write = self.collective_write
+        collective_write = False
         isResized = False
 
         time0 = py_time.time()
@@ -381,7 +382,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         # Store box values at every time step
         if not self.static_box:
-            self.box.edges.append(
+            self.particle_group.box.edges.append(
                 np.array([edge_i for edge_i in self.system.bc.boxL], dtype=self.float_type),
                 step,
                 time, collective=collective_write)
@@ -473,13 +474,13 @@ class DumpH5MDLocal(io_DumpH5MD):
     def close(self):
         if pmi.workerIsActive():
             time0 = py_time.time()
-            self.h5md_file.close()
+            self.file.close()
             self.closeTimer += (py_time.time() - time0)
 
     def flush(self):
         if pmi.workerIsActive():
             time0 = py_time.time()
-            self.h5md_file.flush()
+            self.file.flush()
             self.flushTimer += (py_time.time() - time0)
 
 
@@ -517,7 +518,7 @@ if pmi.isController:
             pmi.call(self.pmiobject, "close")
             # Sort file if flag is set to true.
             if self.pmiobject.do_sort:
-                h5 = h5py.File(self.pmiobject.h5md_filename, 'r+')
+                h5 = h5py.File(self.pmiobject.filename, 'r+')
                 print('Sorting file, please wait...')
                 sort_file(h5)
                 print('File sorted')

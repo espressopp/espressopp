@@ -255,4 +255,3 @@ class ParticlesGroup(h5py.Group):
             self.box.attrs['boundary'] = np.string_(boundary)
         if len(kwargs)>0:
             self.box.edges = element(self.box, 'edges', **kwargs)
-        return self.box
