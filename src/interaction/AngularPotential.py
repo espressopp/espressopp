@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -28,20 +28,21 @@ This is an abstract class, only needed to be inherited from.
 
 .. function:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
 
-		:param \*args: 
-		:type \*args: 
-		:rtype: 
+		:param \*args:
+		:type \*args:
+		:rtype:
 
 .. function:: espressopp.interaction.AngularPotential.computeForce(\*args)
 
-		:param \*args: 
-		:type \*args: 
-		:rtype: 
+		:param \*args:
+		:type \*args:
+		:rtype:
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi
 from espressopp import toReal3DFromVector
 from _espressopp import interaction_AngularPotential
+from espressopp import esutil
 
 # Python base class for angular potentials
 class AngularPotentialLocal(object):
@@ -66,5 +67,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
-            pmiproperty = [ 'cutoff' ]
+            pmiproperty = [ 'cutoff', 'colVar' ]
             )

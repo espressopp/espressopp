@@ -29,6 +29,7 @@
 #include "InterpolationCubic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedTripleListTypesInteractionTemplate.hpp"
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 namespace espressopp {
     namespace interaction {
@@ -37,9 +38,11 @@ namespace espressopp {
             int itype, boost::python::list _filenames) {
             boost::mpi::communicator world;
             filenames.resize(dim);
+            colVarRef.setDimension(dim);
             numInteractions = dim;
             for (int i=0; i<dim; ++i) {
               filenames[i] = boost::python::extract<std::string>(_filenames[i]);
+              colVarRef[i].setDimension(4);
               if (itype == 1) { // create a new InterpolationLinear
                   tables[i] = make_shared <InterpolationLinear> ();
                   tables[i]->read(world, filenames[i].c_str());
@@ -57,19 +60,40 @@ namespace espressopp {
           }
         }
 
+        void TabulatedSubEnsAngular::addInteraction(int itype,
+            boost::python::str fname, const RealND& _cvref) {
+            boost::mpi::communicator world;
+            int i = numInteractions;
+            numInteractions += 1;
+            colVarRef.push_back(_cvref);
+            filenames.push_back(boost::python::extract<std::string>(fname));
+            weights.push_back(0.);
+            if (itype == 1) { // create a new InterpolationLinear
+                  tables.push_back(make_shared <InterpolationLinear> ());
+                  tables[i]->read(world, filenames[i].c_str());
+              }
+              else if (itype == 2) { // create a new InterpolationAkima
+                  tables.push_back(make_shared <InterpolationAkima> ());
+                  tables[i]->read(world, filenames[i].c_str());
+              }
+              else if (itype == 3) { // create a new InterpolationCubic
+                  tables.push_back(make_shared <InterpolationCubic> ());
+                  tables[i]->read(world, filenames[i].c_str());
+              }
+        }
+
         double TabulatedSubEnsAngular::distColVars(
-            cv_angle cv1, cv_angle cv2){
+            const RealND& cv1, const RealND& cv2){
             // Compute distance between colvars cv1 and cv2
             // Metric is euclidean distance
             real dist = 0.;
-            dist = pow(cv1.b1 - cv2.b1, 2)
-                 + pow(cv1.b2 - cv2.b2, 2)
-                 + pow(cv1.theta - cv2.theta, 2);
+            for (int i = 0; i<3; ++i)
+                dist += pow(cv1[i] - cv2[i], 2);
             return sqrt(dist);
         }
 
         void TabulatedSubEnsAngular::setColVarRef(
-            std::vector< cv_angle > cvRefs){
+            const RealNDs& cvRefs){
             // Set the reference values of the collective variables
             // aka cluster centers
             for (int i=0; i<numInteractions; ++i)
@@ -86,7 +110,8 @@ namespace espressopp {
                 // Distance between inst and ref_i
                 real d_i = distColVars(colVar, colVarRef[i]);
                 // Lengthscale of the cluster i
-                real length_ci = colVarRef[i].size;
+                real length_ci = 0.; // !!!! colVarRef[i][3];
+                // ! !!!! FIX
                 if (d_i < length_ci) weights[i] = 1.;
                 else weights[i] = exp(- d_i / (alpha * length_ci));
                 normalization += weights[i];
@@ -109,13 +134,25 @@ namespace espressopp {
         void TabulatedSubEnsAngular::registerPython() {
             using namespace espressopp::python;
 
+            class_<VectorStrings>("VectorStrings")
+                .def(vector_indexing_suite<VectorStrings>() );
+
             class_ <TabulatedSubEnsAngular, bases <AngularPotential> >
-                ("interaction_TabulatedSubEnsAngular", init <int, int, boost::python::list>())
-                .add_property("numInteractions", &TabulatedSubEnsAngular::getDimension, &TabulatedSubEnsAngular::setDimension)
-                .add_property("filenames", &TabulatedSubEnsAngular::getFilenames, &TabulatedSubEnsAngular::setFilenames)
-                .add_property("colVarRef", &TabulatedSubEnsAngular::getColVarRef, &TabulatedSubEnsAngular::setColVarRef)
-                .add_property("weights", &TabulatedSubEnsAngular::getWeights)
-                .add_property("alpha", &TabulatedSubEnsAngular::getWeightScalingFactor, &TabulatedSubEnsAngular::setWeightScalingFactor)
+                ("interaction_TabulatedSubEnsAngular", init <>())
+                .def("dimension_get", &TabulatedSubEnsAngular::getDimension)
+                .def("filenames_get", &TabulatedSubEnsAngular::getFilenames)
+                .def("filename_get", &TabulatedSubEnsAngular::getFilename)
+                .def("filename_set", &TabulatedSubEnsAngular::setFilename)
+                .def("alpha_get", &TabulatedSubEnsAngular::getWeightScalingFactor)
+                .def("alpha_set", &TabulatedSubEnsAngular::setWeightScalingFactor)
+                .def("weight_get", &TabulatedSubEnsAngular::getWeights)
+                .def("weight_set", &TabulatedSubEnsAngular::setWeight)
+                .def("addInteraction", &TabulatedSubEnsAngular::addInteraction)
+                .def("colVarRefs_get", &TabulatedSubEnsAngular::getColVarRefs)
+                .def("colVarRef_get", &TabulatedSubEnsAngular::getColVarRef)
+                // .add_property("colVarRef", &TabulatedSubEnsAngular::getColVarRefs, &TabulatedSubEnsAngular::setColVarRefs)
+                // .add_property("weights", &TabulatedSubEnsAngular::getWeights, &TabulatedSubEnsAngular::setWeights)
+                // .add_property("alpha", &TabulatedSubEnsAngular::getWeightScalingFactor, &TabulatedSubEnsAngular::setWeightScalingFactor)
                 .def_pickle(TabulatedSubEnsAngular_pickle())
                 ;
 

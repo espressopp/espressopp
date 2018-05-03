@@ -80,11 +80,10 @@ from _espressopp import interaction_TabulatedSubEnsAngular, \
                         interaction_FixedTripleListTabulatedSubEnsAngular, \
                         interaction_FixedTripleListTypesTabulatedSubEnsAngular
 
-
 class TabulatedSubEnsAngularLocal(AngularPotentialLocal, interaction_TabulatedSubEnsAngular):
-    def __init__(self, dim, itype, filenames):
+    def __init__(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TabulatedSubEnsAngular, dim, itype, filenames)
+            cxxinit(self, interaction_TabulatedSubEnsAngular)
 
 class FixedTripleListTabulatedSubEnsAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedSubEnsAngular):
 
@@ -122,9 +121,15 @@ class FixedTripleListTypesTabulatedSubEnsAngularLocal(InteractionLocal, interact
 if pmi.isController:
     class TabulatedSubEnsAngular(AngularPotential):
         'The TabulatedSubEnsAngular potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedSubEnsAngularLocal',
-            pmiproperty = ['dim' 'itype', 'filenames']
+            # pmiproperty = ['numInteractions', 'filenames', 'colVarRef',
+	        # 					'weights', 'alpha']
+            pmicall = ['alpha_get', 'alpha_set', 'weight_get', 'weight_set',
+						'dimension_get', 'filenames_get', 'filename_get',
+						'filename_set', 'addInteraction', 'colVarRefs_get',
+						'colVarRef_get']
             )
 
     class FixedTripleListTabulatedSubEnsAngular(Interaction):

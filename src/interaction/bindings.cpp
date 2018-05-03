@@ -127,7 +127,7 @@ namespace espressopp {
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
-      TabulatedSubEnsAngular::registerPython(); 
+      TabulatedSubEnsAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularUniqueHarmonic::registerPython();

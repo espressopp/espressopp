@@ -26,18 +26,13 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
+#include "RealND.hpp"
 #include "Particle.hpp"
 #include <cmath>
 #include "logging.hpp"
 
 namespace espressopp {
   namespace interaction {
-    struct cv_angle {
-        real b1;
-        real b2;
-        real theta;
-        real size;
-    };
 
     class AngularPotential {
     public:
@@ -55,9 +50,9 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
 
-      virtual void setColVar(cv_angle cv) = 0;
+      virtual void setColVar(const RealND& cv) = 0;
       virtual void setColVar(const Real3D& dist12, const Real3D& dist32) = 0;
-      virtual cv_angle getColVar() const = 0;
+      virtual RealND getColVar() const = 0;
       virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32) = 0;
 
       static void registerPython();
@@ -94,9 +89,9 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
 
-      virtual void setColVar(cv_angle cv);
+      virtual void setColVar(const RealND& cv);
       virtual void setColVar(const Real3D& dist12, const Real3D& dist32);
-      virtual cv_angle getColVar() const;
+      virtual RealND getColVar() const;
       virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
 
       // Implements the non-virtual interface
@@ -125,7 +120,7 @@ namespace espressopp {
       real cutoff;
       real cutoffSqr;
       // Collective variables: bond1, bond2, angle
-      cv_angle colVar;
+      RealND colVar;
 
       Derived* derived_this() {
         return static_cast< Derived* >(this);
@@ -143,12 +138,7 @@ namespace espressopp {
     inline
     AngularPotentialTemplate< Derived >::
     AngularPotentialTemplate()
-      : cutoff(infinity), cutoffSqr(infinity) {
-          colVar.b1 = 0.;
-          colVar.b2 = 0.;
-          colVar.theta = 0.;
-          colVar.size = infinity;
-      }
+      : cutoff(infinity), cutoffSqr(infinity), colVar(4, 0.) { }
 
     // Shift/cutoff handling
     template < class Derived >
@@ -169,7 +159,7 @@ namespace espressopp {
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    setColVar(cv_angle cv)
+    setColVar(const RealND& cv)
     { colVar = cv; }
 
         // Collective variables
@@ -179,15 +169,15 @@ namespace espressopp {
     setColVar(const Real3D& dist12, const Real3D& dist32) {
         real dist12_sqr = dist12 * dist12;
         real dist32_sqr = dist32 * dist32;
-        colVar.b1 = sqrt(dist12_sqr);
-        colVar.b2 = sqrt(dist32_sqr);
-        real dist1232 = colVar.b1 * colVar.b2;
+        colVar[0] = sqrt(dist12_sqr);
+        colVar[1] = sqrt(dist32_sqr);
+        real dist1232 = colVar[0] * colVar[1];
         real cos_theta = dist12 * dist32 / dist1232;
-        colVar.theta = acos(cos_theta);
+        colVar[2] = acos(cos_theta);
     }
 
     template < class Derived >
-    inline cv_angle
+    inline RealND
     AngularPotentialTemplate< Derived >::
     getColVar() const
     { return colVar; }

@@ -1,10 +1,10 @@
 /*
   Copyright (C) 2016
-      Max Planck Institute for Polymer Research & JGU Mainz
+  Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
+  Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
 
@@ -29,7 +29,9 @@
 #include <vector>
 #include <sstream>
 #include "types.hpp"
-
+#include <boost/python/list.hpp>
+#include <boost/python/extract.hpp>
+#include <boost/python/numeric.hpp>
 
 namespace espressopp {
 
@@ -66,6 +68,7 @@ namespace espressopp {
     RealND(const RealND& v);
     //RealND(const real v[3]);
     RealND(const int _dim, const std::vector<real>& v);
+    RealND(const boost::python::list& l);
 
     // assignment is not the same as initialization
     RealND& operator=(const RealND& v);
@@ -110,13 +113,52 @@ namespace espressopp {
     const real* get() const { return &data[0]; }
     real* get() { return &data[0]; }
 
+    void push_back(real r);
+
     static void registerPython();
   };
+
+  class RealNDs {
+    std::vector<shared_ptr <RealND>> data;
+  private:
+    int dimension;
+  public:
+    void setDimension(int _dim) {
+      for (int i = dimension; i<_dim; ++i) {
+        data.push_back(boost::make_shared<RealND>());
+      }
+      dimension = _dim;
+    }
+    int getDimension() const { return dimension; }
+
+    RealNDs();
+    RealNDs(const boost::python::numeric::array& n);
+
+    // assignment is not the same as initialization
+    RealNDs& operator=(const RealNDs& v);
+
+    RealND& operator[](int i);
+    const RealND& operator[] (int i) const;
+
+    RealND& at(int i);
+    const RealND& at(int i) const;
+
+    void setItem(int i, const RealND& v);
+    RealND getItem(int i) const;
+
+    void push_back(const RealND& v);
+
+    static void registerPython();
+
+  };
+
+
 
   //////////////////////////////////////////////////
   // Global operators
   RealND operator*(real s, const RealND& v);
   std::ostream &operator<<(std::ostream &out, const RealND& v);
+  std::ostream &operator<<(std::ostream &out, const RealNDs& v);
 
   //////////////////////////////////////////////////
   // INLINE IMPLEMENTATION
@@ -141,25 +183,29 @@ namespace espressopp {
 
   inline RealND::RealND(const int _dim, const std::vector<real>& v) {
     if ( v.size() != _dim ) { // BEWARE: compare types of different signs (unsigned and signed, done in ~120 places in E++)
-    std::ostringstream msg;
-    msg << "Dimension expected to be set " << _dim <<
+      std::ostringstream msg;
+      msg << "Dimension expected to be set " << _dim <<
         " does not equal dimension of passed vector which is " << v.size() << std::endl;
-    throw std::runtime_error(msg.str());
+      throw std::runtime_error(msg.str());
     }
     setDimension(_dim);
     for (int i = 0; i < _dim; i++)
       data[i] = v[i];
   }
 
+  inline RealND::RealND(const boost::python::list &l) {
+    setDimension(len(l));
+    for (int i = 0; i < len(l); i++)
+      data[i] = boost::python::extract<double>(l[i]);
+  }
+
   inline RealND &RealND::operator=(const RealND &v) {
     if( dimension != v.getDimension() )
       std::cout<<"Warning!!! Current dimension if RealND vector "<<dimension<<
-              " was changed to "<< v.getDimension() << std::endl;
-
+        " was changed to "<< v.getDimension() << std::endl;
     setDimension( v.getDimension() );
     for (int i = 0; i < v.getDimension(); i++)
       data[i] = v[i];
-
     return *this;
   }
 
@@ -192,7 +238,7 @@ namespace espressopp {
     if( dimension != v.getDimension() ){
       std::ostringstream msg;
       msg << "Dimension of current vector "<< dimension <<
-              " does not fit dimension of added vector "<< v.getDimension() << std::endl;
+        " does not fit dimension of added vector "<< v.getDimension() << std::endl;
       throw std::runtime_error( msg.str() );
     }
     for (int i = 0; i < dimension; i++) data[i] += v.data[i]; return *this;
@@ -202,7 +248,7 @@ namespace espressopp {
     if( dimension != v.getDimension() ){
       std::ostringstream msg;
       msg << "Dimension of current vector "<< dimension <<
-              " does not fit dimension of added vector "<< v.getDimension() << std::endl;
+        " does not fit dimension of added vector "<< v.getDimension() << std::endl;
       throw std::runtime_error( msg.str() );
     }
     for (int i = 0; i < dimension; i++) data[i] -= v.data[i]; return *this;
@@ -255,8 +301,8 @@ namespace espressopp {
     if( dimension != v.getDimension() ){
       std::ostringstream msg;
       msg << "Dimension of current vector "<< dimension <<
-              " does not fit dimension of added vector "<< v.getDimension() <<
-              "\nOne can not multiply vectors of different dimension." << std::endl;
+        " does not fit dimension of added vector "<< v.getDimension() <<
+        "\nOne can not multiply vectors of different dimension." << std::endl;
       throw std::runtime_error( msg.str() );
     }
     real res = 0.0;
@@ -267,11 +313,11 @@ namespace espressopp {
   }
 
   /** Cross product of two RealND.
-  inline RealND RealND::cross(const RealND& v) const {
-    return RealND(data[1]*v[2] - data[2]*v[1],
-          data[2]*v[0] - data[0]*v[2],
-          data[0]*v[1] - data[1]*v[0]);
-  }*/
+      inline RealND RealND::cross(const RealND& v) const {
+      return RealND(data[1]*v[2] - data[2]*v[1],
+      data[2]*v[0] - data[0]*v[2],
+      data[0]*v[1] - data[1]*v[0]);
+      }*/
 
   inline real RealND::sqr() const{
     real res = 0.0;
@@ -286,19 +332,77 @@ namespace espressopp {
   inline RealND::iterator RealND::begin() { return &data[0]; }
   inline RealND::iterator RealND::end() { return &data[0]+dimension; }
 
+  inline void RealND::push_back(real r) {
+      setDimension(getDimension()+1);
+      data[getDimension()-1] = r;
+  }
+
   //////////////////////////////////////////////////
   // Global operators
   inline RealND operator*(real s, const RealND &v)
   { return RealND(v)*s; }
 
   inline std::ostream &operator<<(std::ostream &out,
-                  const RealND &v) {
+                                  const RealND &v) {
     for (int i = 0; i < v.getDimension(); i++)
       out << v[i] << ' ';
-//    for (RealND::iterator ii = v.begin(); ii != v.end(); ii++)
-//      out << *ii << ' '; //FIXME some issue with the const-ness of v
+    return out;
+  }
+
+  inline RealNDs::RealNDs() : dimension(0) { }
+
+  inline RealNDs::RealNDs(const boost::python::numeric::array &n) {
+    setDimension(len(n));
+    for (int i = 0; i < len(n); i++)
+      *data[i] = boost::python::extract<RealND>(n[i]);
+  }
+
+  inline RealNDs &RealNDs::operator=(const RealNDs &v) {
+    setDimension( v.getDimension() );
+    for (int i = 0; i < v.getDimension(); i++)
+      *data[i] = v[i];
+    return *this;
+  }
+
+  inline RealND &RealNDs::operator[](int i)
+  { return *data[i]; }
+
+  inline const RealND &RealNDs::operator[](int i) const
+  { return *data[i]; }
+
+  inline RealND &RealNDs::at(int i) {
+    if (i < 0 || i > getDimension())
+      throw std::out_of_range("RealND::at");
+    return (*this)[i];
+  }
+
+  inline const RealND &RealNDs::at(int i) const {
+    if (i < 0 || i > getDimension())
+      throw std::out_of_range("RealND::at");
+    return (*this)[i];
+  }
+
+  inline void RealNDs::setItem(int i, const RealND& v)
+  { this->at(i) = v; }
+
+  inline RealND RealNDs::getItem(int i) const
+  { return this->at(i); }
+
+  inline void RealNDs::push_back(const RealND& v) {
+      data.push_back(boost::make_shared<RealND>(v));
+      setDimension(getDimension()+1);
+  }
+
+  inline std::ostream &operator<<(std::ostream &out,
+                                  const RealNDs &v) {
+    for (int i = 0; i < v.getDimension(); i++) {
+      for (int j = 0; j < v[i].getDimension(); ++j)
+        out << v[i][j] << ' ';
+      out << '\n';
+    }
     return out;
   }
 
 }
+
 #endif

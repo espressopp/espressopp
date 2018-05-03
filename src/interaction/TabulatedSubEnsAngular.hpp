@@ -28,54 +28,65 @@
 
 #include "AngularPotential.hpp"
 #include "Interpolation.hpp"
+#include "RealND.hpp"
 
 namespace espressopp {
     namespace interaction {
+
+        typedef std::vector<std::string> VectorStrings;
 
         class TabulatedSubEnsAngular: public AngularPotentialTemplate <TabulatedSubEnsAngular> {
 
             private:
                 int numInteractions;
-                std::vector<std::string> filenames;
+                VectorStrings filenames;
                 std::vector<shared_ptr <Interpolation>> tables;
                 int interpolationType;
                 // Reference values of the collective variable centers
-                std::vector<cv_angle> colVarRef;
+                RealNDs colVarRef;
                 // Weights of each table
-                std::vector<real> weights;
+                RealND weights;
                 // Scaling factor for the weight
                 real alpha = 1.0;
 
             public:
                 static void registerPython();
 
-                TabulatedSubEnsAngular() {
-                    //setCutoff(infinity);
-                    //std::cout << "using default tabulated potential ...\n";
+                TabulatedSubEnsAngular() : numInteractions(0) {
+                    setCutoff(infinity);
+                    weights = RealND();
+                    colVarRef = RealNDs();
                 }
 
                 TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames) {
                     setDimension(dim);
                     setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
-                    colVarRef.resize(dim);
-                    weights.resize(dim);
+                    colVarRef.setDimension(dim);
+                    weights.setDimension(dim);
                 }
 
                 TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames, real cutoff) {
                     setDimension(dim);
                     setFilenames(dim, itype, filenames);
                     setInterpolationType(itype);
-                    colVarRef.resize(dim);
-                    weights.resize(dim);
+                    colVarRef.setDimension(dim);
+                    weights.setDimension(dim);
                     setCutoff(cutoff);
                     std::cout << "using tabulated potentials \n";
                     for (int i=0; i<dim; ++i)
                         std::cout << "  " << filenames[i] << "\n";
                 }
+
+                void addInteraction(int itype, boost::python::str fname,
+                                    const RealND& _cvref);
+
                 void setDimension(int _dim) {
                   numInteractions = _dim;
+                  colVarRef.setDimension( numInteractions );
                   tables.resize( numInteractions );
+                  filenames.resize( numInteractions );
+                  weights.setDimension( numInteractions );
                 }
 
                 int getDimension() const { return numInteractions; }
@@ -90,19 +101,47 @@ namespace espressopp {
 
                 void setWeightScalingFactor(real factor) { alpha = factor; }
 
-                cv_angle getColVarRef(int i) const { return colVarRef[i]; }
+                RealND getColVarRef(int i) const { return colVarRef[i]; }
 
-                void setColVarRef(std::vector< cv_angle > cvRefs);
+                RealNDs getColVarRefs() const { return colVarRef; }
 
-                double distColVars(cv_angle cv1, cv_angle cv2);
+                void setColVarRef(const RealNDs& cvRefs);
 
-                std::vector<std::string> getFilenames() const { return filenames; }
+                void setColVarRefs(const RealNDs& c) { colVarRef = c; }
 
-                std::string getFilename(int i) const { return filenames[i]; }
+                double distColVars(const RealND& cv1, const RealND& cv2);
+
+                boost::python::list getFilenames() const {
+                    return boost::python::list(filenames); }
+
+                boost::python::list getFilename(int index) const {
+                    return boost::python::list(filenames[index]);
+                }
+
+                void setFilename(int index, boost::python::list _f) {
+                    filenames[index] = boost::python::extract<std::string>(_f);
+                }
 
                 void setFilenames(int dim, int itype, boost::python::list _filenames);
 
-                std::vector<real> getWeights() const { return weights; };
+                // boost::python::list getWeights() const {
+                //     return boost::python::list(weights); };
+
+                // void setWeights(boost::python::list _w) {
+                //     weights = boost::python::extract<RealND>(_w);
+                // }
+
+                RealND getWeights() const { return weights; }
+
+                void setWeights(const RealND& r) { weights = r; }
+
+                real getWeight(int index) const {
+                    return weights.getItem(index);
+                }
+
+                void setWeight(int index, real _w) {
+                    return weights.setItem(index, _w);
+                }
 
                 void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
 
@@ -163,14 +202,10 @@ namespace espressopp {
         struct TabulatedSubEnsAngular_pickle : boost::python::pickle_suite {
             static boost::python::tuple getinitargs(TabulatedSubEnsAngular const& pot) {
                 int itp = pot.getInterpolationType();
-                std::vector<std::string> fns;
-                std::vector<cv_angle> cvrefs;
+                boost::python::list fns;
+                RealNDs cvrefs = pot.getColVarRefs();
                 int dim = pot.getDimension();
                 fns = pot.getFilenames();
-                cvrefs.resize(dim);
-                for (int i=0; i<dim; ++i) {
-                  cvrefs[i] = pot.getColVarRef(i);
-                }
                 real alp = pot.getWeightScalingFactor();
                 real rc = pot.getCutoff();
                 return boost::python::make_tuple(dim, itp, fns, cvrefs, alp, rc);
