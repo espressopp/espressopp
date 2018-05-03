@@ -35,8 +35,5 @@ try:
 except ImportError:
     pass
 
-try:
-    from espressopp.io.DumpH5MD import *
-    from espressopp.io.DumpTopology import *
-except ImportError as ex:
-    pass
+from espressopp.io.DumpH5MD import *
+from espressopp.io.DumpTopology import *

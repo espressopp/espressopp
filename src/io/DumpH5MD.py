@@ -1,4 +1,4 @@
-# Copyright (c) 2015,2016
+# Copyright (c) 2015-2018
 #     Jakub Krajniak (jkrajniak at gmail.com)
 #
 # Copyright (c) 2015
@@ -66,7 +66,7 @@ Example
 +++++++
 
 >>> traj_file = espressopp.io.DumpH5MD(
-        system, output_file,
+        system, integrator, output_file,
         group_name='atoms',
         static_box=False,
         author='xxx',
@@ -112,7 +112,7 @@ import time as py_time
 
 
 class DumpH5MDLocal(io_DumpH5MD):
-    def __init__(self, system, filename, group_name='atoms',
+    def __init__(self, system, integrator, filename, group_name='atoms',
                  store_position=True,
                  store_species=True,
                  store_state=False,
@@ -132,6 +132,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         """
         Args:
             system: The system object.
+            integrator: The integrator.
             filename: The name of hdf file name.
             group_name: The name of atom groups. (default: 'atoms').
             store_position: If set to True then position will be stored. (default: True)
@@ -173,6 +174,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.single_prec = is_single_prec
 
         self.system = system
+        self.integrator = integrator
 
         if pmi.isController:
             if os.path.exists(filename):
@@ -191,6 +193,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 driver='mpio',
                 comm=MPI.COMM_WORLD)
         except NameError:
+            # h5py in serial mode.
             self.file = pyh5md.File(
                 filename, 'w',
                 creator='espressopp',
@@ -250,7 +253,6 @@ class DumpH5MDLocal(io_DumpH5MD):
         if self.store_res_id:
             self.res_id = pyh5md.element(part, 'res_id', store='time', time=True, maxshape=(None, ),
                                          shape=(self.chunk_size, ), dtype=self.int_type,  fillvalue=-1)
-        self._system_data()
 
         self.commTimer = 0.0
         self.updateTimer = 0.0
@@ -258,7 +260,6 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.flushTimer = 0.0
         self.closeTimer = 0.0
         self.resizeCounter = 0
-
 
     def _system_data(self):
         """Stores specific information about simulation."""
@@ -268,8 +269,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             'rng-seed': self.system.rng.get_seed(),
             'skin': self.system.skin,
         }
-        if self.system.integrator is not None:
-            parameters['dt'] = self.system.integrator.dt
+        parameters['dt'] = self.integrator.dt
         self.set_parameters(parameters)
 
     def getTimers(self):
@@ -351,9 +351,8 @@ class DumpH5MDLocal(io_DumpH5MD):
             return
 
         # Take it directly from integrator;
-        integrator = self.system.integrator
-        step = integrator.step
-        time = step*integrator.dt
+        step = self.integrator.step
+        time = step*self.integrator.dt
 
         time0 = py_time.time()
         self.update()
@@ -398,7 +397,6 @@ class DumpH5MDLocal(io_DumpH5MD):
             data_image = self.getImage()
             if data_image is None:
                 image = np.asarray(None, dtype=self.float_type)
-                print('idx_0 {} idx_1 {}'.format(idx_0, idx_1))
             else:
                 image = np.asarray(data_image, dtype=self.int_type)
             if total_size > self.image.value.shape[1]:
@@ -468,6 +466,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 self.res_id.value.resize(total_size, axis=1)
             self.res_id.append(res_id, step, time, region=(idx_0, idx_1), collective=collective_write)
         self.writeTimer += (py_time.time() - time0)
+
         if isResized:
             self.resizeCounter += 1
 

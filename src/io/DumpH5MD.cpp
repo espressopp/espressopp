@@ -1,9 +1,9 @@
 /*
+  Copyright (c) 2015-2018
+      Jakub Krajniak (jkrajniak at gmail.com)
+
   Copyright (c) 2015
       Pierre de Buyl
-
-  Copyright (c) 2015,2016
-      Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
 
@@ -144,7 +144,7 @@ namespace espressopp {
 
       CellList realCells = system.storage->getRealCells();
 
-      int i=0;
+      int i = 0;
       if (is_adress_) {
         shared_ptr<FixedTupleListAdress> ftpl = system.storage->getFixedTuples();
         FixedTupleListAdress::iterator it3;
