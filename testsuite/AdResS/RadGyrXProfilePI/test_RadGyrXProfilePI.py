@@ -37,30 +37,30 @@ class TestRadGyrXProfilePI(unittest.TestCase):
         self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
 
         particle_list = [
-            (1, 1, 0, espressopp.Real3D(3.0, 5.0, 5.0), 1.0, 0, 0),
-            (2, 1, 0, espressopp.Real3D(3.0, 4.9, 5.0), 1.0, 1, 1),
-            (3, 1, 0, espressopp.Real3D(3.0, 5.0, 4.9), 1.0, 1, 2),
-            (4, 1, 0, espressopp.Real3D(3.0, 5.1, 5.0), 1.0, 1, 3),
-            (5, 1, 0, espressopp.Real3D(3.0, 5.0, 5.1), 1.0, 1, 4),
-            (6, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 1.0, 0, 0),
-            (7, 1, 0, espressopp.Real3D(6.0, 4.8, 5.0), 1.0, 1, 1),
-            (8, 1, 0, espressopp.Real3D(6.0, 5.0, 4.8), 1.0, 1, 2),
-            (9, 1, 0, espressopp.Real3D(6.0, 5.2, 5.0), 1.0, 1, 3),
-            (10, 1, 0, espressopp.Real3D(6.0, 5.0, 5.2), 1.0, 1, 4),
-            (11, 1, 0, espressopp.Real3D(7.0, 5.0, 5.0), 1.0, 0, 0),
-            (12, 1, 0, espressopp.Real3D(7.0, 4.8, 5.0), 1.0, 1, 1),
-            (13, 1, 0, espressopp.Real3D(7.0, 5.0, 4.8), 1.0, 1, 2),
-            (14, 1, 0, espressopp.Real3D(7.0, 5.2, 5.0), 1.0, 1, 3),
-            (15, 1, 0, espressopp.Real3D(7.0, 5.0, 5.2), 1.0, 1, 4),
-            (16, 0, 0, espressopp.Real3D(9.0, 5.0, 5.0), 1.0, 0, 0),
-            (17, 0, 0, espressopp.Real3D(9.0, 4.8, 5.0), 1.0, 1, 1),
-            (18, 0, 0, espressopp.Real3D(9.0, 5.0, 4.8), 1.0, 1, 2),
-            (19, 0, 0, espressopp.Real3D(9.0, 5.2, 5.0), 1.0, 1, 3),
-            (20, 0, 0, espressopp.Real3D(9.0, 5.0, 5.2), 1.0, 1, 4)
+            (1, 1, espressopp.Real3D(3.0, 5.0, 5.0), 0, 0),
+            (2, 1, espressopp.Real3D(3.0, 4.9, 5.0), 1, 1),
+            (3, 1, espressopp.Real3D(3.0, 5.0, 4.9), 1, 2),
+            (4, 1, espressopp.Real3D(3.0, 5.1, 5.0), 1, 3),
+            (5, 1, espressopp.Real3D(3.0, 5.0, 5.1), 1, 4),
+            (6, 1, espressopp.Real3D(6.0, 5.0, 5.0), 0, 0),
+            (7, 1, espressopp.Real3D(6.0, 4.8, 5.0), 1, 1),
+            (8, 1, espressopp.Real3D(6.0, 5.0, 4.8), 1, 2),
+            (9, 1, espressopp.Real3D(6.0, 5.2, 5.0), 1, 3),
+            (10, 1, espressopp.Real3D(6.0, 5.0, 5.2), 1, 4),
+            (11, 1, espressopp.Real3D(7.0, 5.0, 5.0), 0, 0),
+            (12, 1, espressopp.Real3D(7.0, 4.8, 5.0), 1, 1),
+            (13, 1, espressopp.Real3D(7.0, 5.0, 4.8), 1, 2),
+            (14, 1, espressopp.Real3D(7.0, 5.2, 5.0), 1, 3),
+            (15, 1, espressopp.Real3D(7.0, 5.0, 5.2), 1, 4),
+            (16, 0, espressopp.Real3D(9.0, 5.0, 5.0), 0, 0),
+            (17, 0, espressopp.Real3D(9.0, 4.8, 5.0), 1, 1),
+            (18, 0, espressopp.Real3D(9.0, 5.0, 4.8), 1, 2),
+            (19, 0, espressopp.Real3D(9.0, 5.2, 5.0), 1, 3),
+            (20, 0, espressopp.Real3D(9.0, 5.0, 5.2), 1, 4)
         ]
 
         tuples = [(1,2,3,4,5),(6,7,8,9,10),(11,12,13,14,15),(16,17,18,19,20)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat', 'pib')
+        self.system.storage.addParticles(particle_list, 'id', 'type', 'pos', 'adrat', 'pib')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
