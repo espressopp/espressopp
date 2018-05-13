@@ -20,7 +20,6 @@
 #
 # -*- coding: utf-8 -*-
 
-import sys
 import espressopp
 import mpi4py.MPI as MPI
 from espressopp import Real3D

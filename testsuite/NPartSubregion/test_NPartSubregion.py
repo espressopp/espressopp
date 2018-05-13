@@ -22,7 +22,6 @@
 
 import espressopp
 import mpi4py.MPI as MPI
-from espressopp import Real3D
 
 import unittest
 
