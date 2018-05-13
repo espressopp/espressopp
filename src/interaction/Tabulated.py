@@ -244,16 +244,14 @@ espressopp.interaction.Tabulated
         :return: the speedup flag
         :rtype: bool
 
-.. function:: espressopp.interaction.VerletListPIadressTabulated(system, vl, fixedtupleList, ntrotter, speedup)
+.. function:: espressopp.interaction.VerletListPIadressTabulated(vl, fixedtupleList, ntrotter, speedup)
 
         Defines a non-bonded interaction using an adaptive resolution VerletList in the context of Path Integral AdResS. Two different tabulated potentials can be specified: one, which is used in the quantum region, the other one in the classical region. The interpolation proceeds according to the Path Integral AdResS scheme (see J. Chem. Phys 147, 244104 (2017)). When the speedup flag is set,it will use only the centroids in the classical region, otherwise all Trotter beads. In the quantum region, always all Trotter beads are used.
 
-        :param system: The Espresso++ system object.
         :param vl: The AdResS VerletList.
         :param fixedtupleList: The FixedTupleListAdress object.
         :param ntrotter: The Trotter number.
         :param speedup: Boolean flag to decide whether to use centroids in classical region or all Trotter beads
-        :type system: espressopp.System
         :type vl: espressopp.VerletListAdress
         :type fixedtupleList: espressopp.FixedTupleListAdress
         :type ntrotter: int
@@ -329,16 +327,14 @@ espressopp.interaction.Tabulated
         :return: the speedup flag
         :rtype: bool
 
-.. function:: espressopp.interaction.VerletListPIadressTabulatedLJ(system, vl, fixedtupleList, ntrotter, speedup)
+.. function:: espressopp.interaction.VerletListPIadressTabulatedLJ(vl, fixedtupleList, ntrotter, speedup)
 
         Defines a non-bonded interaction using an adaptive resolution VerletList in the context of Path Integral AdResS. Two different potentials can be specified: one, which is used in the quantum region (tabulated), the other one in the classical region (Lennard-Jones type). The interpolation proceeds according to the Path Integral AdResS scheme (see J. Chem. Phys 147, 244104 (2017)). When the speedup flag is set,it will use only the centroids in the classical region, otherwise all Trotter beads. In the quantum region, always all Trotter beads are used.
 
-        :param system: The Espresso++ system object.
         :param vl: The AdResS VerletList.
         :param fixedtupleList: The FixedTupleListAdress object.
         :param ntrotter: The Trotter number.
         :param speedup: Boolean flag to decide whether to use centroids in classical region or all Trotter beads
-        :type system: espressopp.System
         :type vl: espressopp.VerletListAdress
         :type fixedtupleList: espressopp.FixedTupleListAdress
         :type ntrotter: int
@@ -414,16 +410,14 @@ espressopp.interaction.Tabulated
         :return: the speedup flag
         :rtype: bool
 
-.. function:: espressopp.interaction.VerletListPIadressNoDriftTabulated(system, vl, fixedtupleList, ntrotter, speedup)
+.. function:: espressopp.interaction.VerletListPIadressNoDriftTabulated(vl, fixedtupleList, ntrotter, speedup)
 
         Defines a non-bonded interaction using an adaptive resolution VerletList in the context of Path Integral AdResS. One tabulated potential can be specified, which is used thoughout the whole system. Hence, only the quantumness of the particles changes, but not the forcefield (see J. Chem. Phys 147, 244104 (2017)). When the speedup flag is set,it will use only the centroids in the classical region, otherwise all Trotter beads. In the quantum region, always all Trotter beads are used.
 
-        :param system: The Espresso++ system object.
         :param vl: The AdResS VerletList.
         :param fixedtupleList: The FixedTupleListAdress object.
         :param ntrotter: The Trotter number.
         :param speedup: Boolean flag to decide whether to use centroids in classical region or all Trotter beads
-        :type system: espressopp.System
         :type vl: espressopp.VerletListAdress
         :type fixedtupleList: espressopp.FixedTupleListAdress
         :type ntrotter: int
