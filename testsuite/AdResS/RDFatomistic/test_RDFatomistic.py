@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 #
-#  Copyright (C) 2013-2017(H)
+#  Copyright (C) 2013-2018
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
