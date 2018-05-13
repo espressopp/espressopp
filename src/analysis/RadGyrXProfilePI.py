@@ -29,7 +29,7 @@ Examples:
 >>> gyrationprofile_instance = espressopp.analysis.RadGyrXProfilePI(system=system)
 >>> # creates instance of the class for calculating the radius of gyration profile
 
->>> gyrationprofile_list = gyrationprofile.compute(bins=100, ntrotter=32, ptype=2)
+>>> gyrationprofile_list = gyrationprofile_instance.compute(bins=100, ntrotter=32, ptype=2)
 >>> # computes the radius of gyration profile for particles of type 2 using 100 bins. The system uses 32 Trotter beads.
 
 .. function:: espressopp.analysis.RadGyrXProfilePI(system)
