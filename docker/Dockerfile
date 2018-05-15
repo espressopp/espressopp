@@ -36,9 +36,9 @@ RUN make test CTEST_OUTPUT_ON_FAILURE=1
 RUN make install DESTDIR=${PWD}
 RUN cd .. && if [ ${COVERAGE} ]; then \
   if [ ${CC} = clang ]; then \
-    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
+    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov" 2>&1 | grep -v "has arcs"; \
   else \
-    $HOME/.local/bin/codecov; \
+    $HOME/.local/bin/codecov 2>&1 | grep -v "has arcs"; \
   fi; \
 fi && cd -
 USER root
