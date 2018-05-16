@@ -105,22 +105,24 @@ namespace espressopp {
             // Compute the weights for each force field
             // given the reference and instantaneous values of ColVars
             setColVar(dist12, dist32);
-            real normalization = 0.;
-            for (int i=0; i<numInteractions; ++i) {
+            real sumWeights = 0.;
+            // Compute weights up to next to last FF
+            for (int i=0; i<numInteractions-1; ++i) {
                 // Distance between inst and ref_i
                 real d_i = distColVars(colVar, colVarRef[i]);
                 // Lengthscale of the cluster i
-                real length_ci = 0.; // !!!! colVarRef[i][3];
-                // ! !!!! FIX
+                real length_ci = colVarRef[i][3];
                 if (d_i < length_ci) weights[i] = 1.;
                 else weights[i] = exp(- d_i / (alpha * length_ci));
-                normalization += weights[i];
+                sumWeights += weights[i];
             }
-            // Normalize
-            for (int i=0; i<numInteractions; ++i) {
-                if (weights[i] > 0.)
-                    weights[i] /= normalization;
+            if (sumWeights > 1.) {
+                std::ostringstream msg;
+                msg << "Sum of FF weights larger than 1: "<< sumWeights << std::endl;
+                throw std::runtime_error( msg.str() );
             }
+            // Last FF gets the rest of the contribution
+            weights[numInteractions-1] = 1. - sumWeights;
         }
 
         typedef class FixedTripleListInteractionTemplate <TabulatedSubEnsAngular>
