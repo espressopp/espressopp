@@ -4,4 +4,5 @@ coverage:
   range: "70...100"
 ignore:
   - contrib/
-  - testsuite/ 
+  - testsuite/
+  - /usr/include/
