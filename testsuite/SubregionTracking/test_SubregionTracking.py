@@ -58,25 +58,25 @@ class SubregionTracking(unittest.TestCase):
         self.system.storage.decompose()
         self.tracklist = [1,2,3,4,5,6,11,15,16]
 
-    def test_geometry_0(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry=0, pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+    def test_geometry_spherical(self):
+        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='spherical', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
         number_of_particles = subregiontracking.compute()
-        self.assertEqual(number_of_particles, 3.0)
+        self.assertEqual(number_of_particles, 3)
 
-    def test_geometry_1(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry=1, pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+    def test_geometry_xbounded(self):
+        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-x', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
         number_of_particles = subregiontracking.compute()
-        self.assertEqual(number_of_particles, 6.0)
+        self.assertEqual(number_of_particles, 6)
 
-    def test_geometry_2(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry=2, pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+    def test_geometry_ybounded(self):
+        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-y', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
         number_of_particles = subregiontracking.compute()
-        self.assertEqual(number_of_particles, 8.0)
+        self.assertEqual(number_of_particles, 8)
 
-    def test_geometry_3(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry=3, pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+    def test_geometry_zbounded(self):
+        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-z', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
         number_of_particles = subregiontracking.compute()
-        self.assertEqual(number_of_particles, 7.0)
+        self.assertEqual(number_of_particles, 7)
 
 
 if __name__ == '__main__':

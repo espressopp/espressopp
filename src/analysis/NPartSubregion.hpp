@@ -32,17 +32,19 @@ namespace espressopp {
     class NPartSubregion : public Observable {
       public:
         NPartSubregion(shared_ptr< System > system, int parttype, real span, int geometry) : Observable(system), parttype(parttype), span(span), geometry(geometry) {
-          result_type=real_scalar;
+          result_type=int_scalar;
         }
         virtual ~NPartSubregion() {}
-        virtual real compute_real() const;
+        virtual int compute_int() const;
 
         static void registerPython();
 
         void setCenter(real x, real y, real z);
 
-        int parttype;
+        enum GeometryStates {spherical=0, x_bounded=1, y_bounded=2, z_bounded=3};
+
         int geometry;
+        int parttype;
         real span;
         Real3D center;
     };

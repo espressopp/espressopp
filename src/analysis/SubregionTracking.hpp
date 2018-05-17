@@ -32,12 +32,14 @@ namespace espressopp {
     class SubregionTracking : public Observable {
       public:
         SubregionTracking(shared_ptr< System > system, real span, int geometry) : Observable(system), span(span), geometry(geometry) {
-          result_type=real_scalar;
+          result_type=int_scalar;
         }
         virtual ~SubregionTracking() {}
-        virtual real compute_real() const;
+        virtual int compute_int() const;
 
         static void registerPython();
+
+        enum GeometryStates {spherical=0, x_bounded=1, y_bounded=2, z_bounded=3};
 
         int parttype;
         int geometry;

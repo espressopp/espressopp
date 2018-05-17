@@ -57,25 +57,25 @@ class TestRadGyrXProfilePI(unittest.TestCase):
         self.system.storage.addParticles(particle_list, 'id', 'type', 'pos')
         self.system.storage.decompose()
 
-    def test_geometry_0(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry=0, center=[5.0, 5.0, 5.0])
+    def test_geometry_spherical(self):
+        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='spherical', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
-        self.assertEqual(number_of_particles, 6.0)
+        self.assertEqual(number_of_particles, 6)
 
-    def test_geometry_1(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry=1, center=[5.0, 5.0, 5.0])
+    def test_geometry_xbounded(self):
+        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-x', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
-        self.assertEqual(number_of_particles, 9.0)
+        self.assertEqual(number_of_particles, 9)
 
-    def test_geometry_2(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry=2, center=[5.0, 5.0, 5.0])
+    def test_geometry_ybounded(self):
+        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-y', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
-        self.assertEqual(number_of_particles, 8.0)
+        self.assertEqual(number_of_particles, 8)
 
-    def test_geometry_3(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry=3, center=[5.0, 5.0, 5.0])
+    def test_geometry_zbounded(self):
+        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-z', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
-        self.assertEqual(number_of_particles, 11.0)
+        self.assertEqual(number_of_particles, 11)
 
 
 if __name__ == '__main__':

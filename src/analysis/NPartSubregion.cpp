@@ -29,7 +29,7 @@ using namespace iterator;
 
 namespace espressopp {
   namespace analysis {
-    real NPartSubregion::compute_real() const {
+    int NPartSubregion::compute_int() const {
 
       int myN, systemN;
       myN = 0;
@@ -42,24 +42,27 @@ namespace espressopp {
         if(vp.type() == parttype) {
           Real3D dist(0.0, 0.0, 0.0);
           system.bc->getMinimumImageVector(dist, vp.position(), center);
-          if(geometry == 0) {
+          if(geometry == spherical) {
             if (dist.abs() <= span) myN += 1;
           }
-          else if(geometry == 1) {
+          else if(geometry == x_bounded) {
             if (fabs(dist[0]) <= span) myN += 1;
           }
-          else if(geometry == 2) {
+          else if(geometry == y_bounded) {
             if (fabs(dist[1]) <= span) myN += 1;
           }
-          else {
+          else if(geometry == z_bounded) {
             if (fabs(dist[2]) <= span) myN += 1;
+          }
+          else {
+            throw std::invalid_argument("Invalid geometry parameter.");
           }
         }
 
       }
 
       boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
-      return 1.0*systemN;
+      return systemN;
     }
 
     void NPartSubregion::setCenter(real x, real y, real z) {

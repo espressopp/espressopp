@@ -35,7 +35,25 @@ Option 2 (spanbased = False): the routine can also calculate unnormalized RDFs u
 In any case, only pairs of atomistic particles belonging to two different coarse-grained particles are considered. Furthermore, note that the routine uses L_y / half (L_y is the box length in y-direction) as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Hence, L_y should be the shortest box side (or, equally short as L_x and/or L_z).
 
 
-The computePathIntegral function is used for path integral-based adaptive resolution functions. It calculates the radial distribution functions over pairs of particles between different atoms or coarse-grained beads. Note, however, that in these types of quantum/classical adaptive resolution simulations, regular coarse-grained espressopp particles are associated with each atom and the additional "AdResS" atomistic particles correspond to the different Trotter beads. This means that the routine will, for molecules consisting of multiple atoms, calculate intramolecular rdfs, averaging over the Trotter bead pairs of the ring polymers, which represent the atoms. In doing so, it considers only particles pair with matching Trotter number and with the correct atomistic types. The results are averaged over all Trotter beads. Also in this case L_y / half (L_y is the box length in y-direction) is used as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Furthermore, the calculation is always "spanbased" in x direction (the function ignores the spanbased flag), but in such a fashion that BOTH particles need to be in the defined cuboid region. Normalization is performed as derived in R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info.
+The computePathIntegral function is used for path integral-based adaptive resolution functions. It calculates the radial distribution functions over pairs of particles between different atoms or coarse-grained beads. Note, however, that in these types of quantum/classical adaptive resolution simulations, regular coarse-grained espressopp particles are associated with each atom and the additional "AdResS" atomistic particles correspond to the different Trotter beads. This means that the routine will, for molecules consisting of multiple atoms, calculate intramolecular rdfs, averaging over the Trotter bead pairs of the ring polymers, which represent the atoms. In doing so, it considers only particles pair with matching Trotter number and with the correct atomistic types. The results are averaged over all Trotter beads. Also in this case L_y / half (L_y is the box length in y-direction) is used as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Furthermore, the calculation is always "spanbased" in x direction (the function ignores the spanbased flag), but in such a fashion that BOTH particles need to be in the defined cuboid region. Normalization is performed as derived in R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info. This means that, considering only particles with matching Trotter numbers, the computePathIntegral function calculates the RDF between particles of type A and B within a region bounded in x-direction by :math:`X_{min}` and :math:`X_{max}` as
+
+.. math::
+
+    g_{slab}^{ab}(r^{AB}) = \sum_{a \in N^A} \sum_{b \in N^B} \frac{1}{ N^A N^B} \frac{\delta_\Delta(|\mathbf{r}_a - \mathbf{r}_b| - r)}{v(\mathbf{r}_a)/V_{slab}}
+
+    \delta_\Delta(r) = \begin{cases} 1 \quad \textrm{for} \quad r<\Delta \\ 0 \quad \textrm{otherwise} \end{cases}
+
+    v(\mathbf{r}_a)=2\pi\Delta \; r_a(2r_a-h(\mathbf{r}_a))
+
+    h(\mathbf{r}_a) = (r_a - X^+)\theta(r_a - X^+) - (r_a - X^-)\theta(r_a - X^-)
+
+    X^+ = X_{max} -x_a
+
+    X^- = x_a - X_{min}
+
+    \theta(r) = \begin{cases} 1 \quad \textrm{for} \quad r>0 \\ 0 \quad \textrm{otherwise} \end{cases}
+
+where :math:`N^A` and :math:`N^B` are the number of particles of type A and B in the relevant subregion for the RDF calculation and :math:`V_{slab}` is the total volume of this subregion. Furthermore, :math:`r_a` denotes the radius of the spherical shell for the RDF calculation around particle :math:`a`, and :math:`x_a` is the :math:`x` coordinate of particle :math:`a`. The final result is an average over all imaginary time slices (Trotter numbers).
 
 Examples:
 
