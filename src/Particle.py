@@ -83,10 +83,6 @@ The Particle class. Particles are used to model atoms, coarse-grained beads, etc
 
         variable mass (for path integral-based adaptive resolution simulations)
 
-.. py:data:: real espressopp.Particle.varmass
-
-        variable mass (for path integral-based adaptive resolution simulations)
-
 .. py:data:: real espressopp.Particle.radius
 
         particle radius

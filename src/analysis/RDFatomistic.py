@@ -53,7 +53,7 @@ The computePathIntegral function is used for path integral-based adaptive resolu
 
     \theta(r) = \begin{cases} 1 \quad \textrm{for} \quad r>0 \\ 0 \quad \textrm{otherwise} \end{cases}
 
-where :math:`N^A` and :math:`N^B` are the number of particles of type A and B in the relevant subregion for the RDF calculation and :math:`V_{slab}` is the total volume of this subregion. Furthermore, :math:`r_a` denotes the radius of the spherical shell for the RDF calculation around particle :math:`a`, and :math:`x_a` is the :math:`x` coordinate of particle :math:`a`. The final result is an average over all imaginary time slices (Trotter numbers).
+where :math:`N^A` and :math:`N^B` are the number of particles of type A and B in the relevant subregion for the RDF calculation and :math:`V_{slab}` is the total volume of this subregion. Furthermore, :math:`r_a` denotes the radius of the spherical shell for the RDF calculation around particle :math:`a`, :math:`\Delta` is the thickness of the shell, and :math:`x_a` is the :math:`x` coordinate of particle :math:`a`. The final result is an average over all imaginary time slices (Trotter numbers).
 
 Examples:
 
