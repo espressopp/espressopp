@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2014,2015,2016
+#  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,7 +24,7 @@ r"""
 espressopp.integrator.FreeEnergyCompensation
 ********************************************
 
-Free Energy Compensation used in Hamiltonian Adaptive Resolution Simulations (H-AdResS). This works for spherical or slab adaptive resolution geometries. However, it only works for fixed, non-moving atomistic region (otherwise, H-AdResS is not properly defined).
+Free Energy Compensation used in Hamiltonian Adaptive Resolution Simulations (H-AdResS) or Path Integral Adaptive Resolution Simulations (PI-AdResS). This works for spherical or slab adaptive resolution geometries. However, it only works for fixed, non-moving atomistic region (otherwise, H-AdResS is not properly defined).
 
 Example:
 
@@ -35,14 +35,16 @@ Example:
 >>> integrator.addExtension(fec)
 >>> # add to previously defined integrator
 
-.. function:: espressopp.integrator.FreeEnergyCompensation(system, center, sphereAdr)
+.. function:: espressopp.integrator.FreeEnergyCompensation(system, center, sphereAdr, ntrotter)
 
         :param system: system object
         :param center: (default: [], corresponds to (0.0, 0.0, 0.0) position) center of high resolution region
         :param sphereAdr: (default: False) Spherical AdResS region (True) vs. slab geometry with resolution change in x-direction (False)
+        :param ntrotter: (default: 1) Trotter number when used in Path Integral AdResS. Default leads to normal non-PI-AdResS behaviour.
         :type system: shared_ptr<System>
         :type center: list of reals
         :type sphereAdr: bool
+        :type ntrotter: int
 
 .. function:: espressopp.integrator.FreeEnergyCompensation.addForce(itype, filename, type)
 
@@ -65,9 +67,9 @@ from _espressopp import integrator_FreeEnergyCompensation
 
 class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
 
-    def __init__(self, system, center=[], sphereAdr = False):
+    def __init__(self, system, center=[], sphereAdr = False, ntrotter = 1):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_FreeEnergyCompensation, system, sphereAdr)
+            cxxinit(self, integrator_FreeEnergyCompensation, system, sphereAdr, ntrotter)
 
             # set center of FreeEnergyCompensation force
             if (center != []):
