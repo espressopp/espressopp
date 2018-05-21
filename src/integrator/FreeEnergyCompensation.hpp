@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -45,7 +45,8 @@ namespace espressopp {
 
       public:
         bool sphereAdr;
-        FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr = false);
+        int ntrotter;
+        FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr = false, int _ntrotter = 1);
         virtual ~FreeEnergyCompensation();
 
         /** Setter for the filename, will read in the table. */
