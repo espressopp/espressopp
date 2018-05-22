@@ -41,13 +41,19 @@ namespace espressopp {
 
     public:
       ExtPlumed(shared_ptr < System >, python::object, std::string, std::string, real);
-      void applyForceToAll();
+      void applyForce();
       void updatePlumed();
       real getBias();
-      void setUnitStyle(std::string);
+      // void setUnitStyle(std::string);
+      void setRealPrecision(int);
+      void setMDChargeUnits(real);
+      void setMDMassUnits(real);
+      void setRestart(int);
+      void readInputLine(std::string);
       void setTimeUnit(real);
       void setEnergyUnit(real);
       void setLengthUnit(real);
+      void setKbT(real);
       void Init();
       bool getChargeState();
       void setChargeState(bool);

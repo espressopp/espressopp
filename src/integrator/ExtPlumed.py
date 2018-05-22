@@ -27,7 +27,7 @@ espressopp.integrator.ExtPlumed
 usage:
 
 plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.005)
-plumed.setUnitStyle("Natural")
+plumed.setKbT(0.438)
 plumed.Init()
 integrator.addExtension(plumed)
 
@@ -37,7 +37,7 @@ plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.0
 plumed.setTimeUnit(1.0)
 plumed.setEnergyUnit(1.0)
 plumed.setLengthUnit(1.0)
-plumed.setChargeState(True)
+plumed.setKbT(kbT)
 plumed.Init()
 integrator.addExtension(plumed)
 
@@ -75,5 +75,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtPlumedLocal',
-            pmicall = ['setChargeState', 'getChargeState', 'setLengthUnit', 'setTimeUnit', 'setEnergyUnit', 'setUnitStyle', 'Init', 'getBias']
+            pmicall = ['setChargeState', 'getChargeState', 'setLengthUnit', 'setTimeUnit', 'setEnergyUnit', 'setKbT', 'Init', 'getBias', 'setRealPrecison', 'setMDChargeUnit', 'setMDMassUnit', 'setRestart', 'readInputLine']
             )

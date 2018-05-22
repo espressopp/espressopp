@@ -20,14 +20,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
-#include <iostream>
 #include <string>
 #include "python.hpp"
 #include "types.hpp"
 #include "Real3D.hpp"
 #include "System.hpp"
-#include "Buffer.hpp"
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "iterator/CellListIterator.hpp"
@@ -88,27 +85,45 @@ namespace espressopp {
       return bias;
     }
 
-    void ExtPlumed::setUnitStyle(string _unit) {
-      if (_unit == "Natural") p->cmd("setNaturalUnits");
-      return;
-    }
+    // void ExtPlumed::setUnitStyle(string _unit) {
+    //   if (_unit == "Natural") p->cmd("setNaturalUnits");
+    //   return;
+    // }
 
     void ExtPlumed::setTimeUnit(real _factor) {
-      real timeUnit = _factor;
-      p->cmd("setMDTimeUnits",&timeUnit);
-      return;
+      p->cmd("setMDTimeUnits",&_factor);
     }
 
     void ExtPlumed::setLengthUnit(real _factor) {
-      real lengthUnit = _factor;
-      p->cmd("setMDLengthUnits",&lengthUnit);
-      return;
+      p->cmd("setMDLengthUnits",&_factor);
     }
 
     void ExtPlumed::setEnergyUnit(real _factor) {
-      real energyUnit = _factor;
-      p->cmd("setMDEnergyUnits", &energyUnit);
-      return;
+      p->cmd("setMDEnergyUnits", &_factor);
+    }
+
+    void ExtPlumed::setKbT(real _kbt) {
+      p->cmd("setKbT", &_kbt);
+    }
+
+    void ExtPlumed::setRealPrecision(int _size) {
+      p->cmd("setRealPrecision", &_size);
+    }
+
+    void ExtPlumed::setMDChargeUnits(real _factor) {
+      p->cmd("setMDChargeUnits", &_factor);
+    }
+
+    void ExtPlumed::setMDMassUnits(real _factor) {
+      p->cmd("setMDMassUnits", &_factor);
+    }
+
+    void ExtPlumed::setRestart(int _res) {
+      p->cmd("setRestart", &_res);
+    }
+
+    void ExtPlumed::readInputLine(string _input) {
+      p->cmd("readInputLine", _input.c_str());
     }
 
     void ExtPlumed::Init() {
@@ -129,11 +144,11 @@ namespace espressopp {
     }
 
     void ExtPlumed::connect() {
-      _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::applyForceToAll, this));
+      _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::applyForce, this));
       _aftIntV   = integrator->aftIntV.connect( boost::bind(&ExtPlumed::updatePlumed, this));
     }
 
-    void ExtPlumed::applyForceToAll() {
+    void ExtPlumed::applyForce() {
       int update_gatindex=0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
@@ -256,10 +271,16 @@ namespace espressopp {
         .def("getChargeState", &ExtPlumed::getChargeState)
         .def("setChargeState", &ExtPlumed::setChargeState)
         .def("getBias", &ExtPlumed::getBias)
-        .def("setUnitStyle", &ExtPlumed::setUnitStyle)
+        // .def("setUnitStyle", &ExtPlumed::setUnitStyle)
         .def("setTimeUnit", &ExtPlumed::setTimeUnit)
         .def("setEnergyUnit", &ExtPlumed::setEnergyUnit)
         .def("setLengthUnit", &ExtPlumed::setLengthUnit)
+        .def("setKbT", &ExtPlumed::setKbT)
+        .def("setRealPrecision", &ExtPlumed::setRealPrecision)
+        .def("setMDChargeUnit", &ExtPlumed::setMDChargeUnits)
+        .def("setMDMassUnit", &ExtPlumed::setMDMassUnits)
+        .def("setRestart", &ExtPlumed::setRestart)
+        .def("readInputLine", &ExtPlumed::readInputLine)
         .def("Init", &ExtPlumed::Init)
         .def("connect", &ExtPlumed::connect)
         .def("disconnect", &ExtPlumed::disconnect)
