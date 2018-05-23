@@ -46,8 +46,11 @@ namespace espressopp {
                 RealNDs colVarRef;
                 // Weights of each table
                 RealND weights;
-                // Scaling factor for the weight
-                real alpha = 1.0;
+                // Renormalize collective variables: mean and std
+                RealND colVarMu;
+                RealND colVarSd;
+                // characteristic decay length of the interpolation
+                real alpha;
 
             public:
                 static void registerPython();
@@ -55,7 +58,10 @@ namespace espressopp {
                 TabulatedSubEnsAngular() : numInteractions(0) {
                     setCutoff(infinity);
                     weights = RealND();
+                    colVarMu.setDimension(3);
+                    colVarSd.setDimension(3);
                     colVarRef = RealNDs();
+                    alpha = 1.;
                 }
 
                 TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames) {
@@ -64,6 +70,9 @@ namespace espressopp {
                     setInterpolationType(itype);
                     colVarRef.setDimension(dim);
                     weights.setDimension(dim);
+                    colVarMu.setDimension(3);
+                    colVarSd.setDimension(3);
+                    alpha = 1.;
                 }
 
                 TabulatedSubEnsAngular(int dim, int itype, boost::python::list filenames, real cutoff) {
@@ -72,7 +81,10 @@ namespace espressopp {
                     setInterpolationType(itype);
                     colVarRef.setDimension(dim);
                     weights.setDimension(dim);
+                    colVarMu.setDimension(3);
+                    colVarSd.setDimension(3);
                     setCutoff(cutoff);
+                    alpha = 1.;
                     std::cout << "using tabulated potentials \n";
                     for (int i=0; i<dim; ++i)
                         std::cout << "  " << filenames[i] << "\n";
@@ -97,9 +109,17 @@ namespace espressopp {
                 /** Getter for the interpolation type */
                 int getInterpolationType() const { return interpolationType; }
 
-                real getWeightScalingFactor() const { return alpha; }
+                RealND getColVarMus() const { return colVarMu; }
 
-                void setWeightScalingFactor(real factor) { alpha = factor; }
+                void setColVarMu(int index, real _r) {
+                    return colVarMu.setItem(index, _r);
+                }
+
+                RealND getColVarSds() const { return colVarSd; }
+
+                void setColVarSd(int index, real _r) {
+                    return colVarSd.setItem(index, _r);
+                }
 
                 RealND getColVarRef(int i) const { return colVarRef[i]; }
 
@@ -109,7 +129,7 @@ namespace espressopp {
 
                 void setColVarRefs(const RealNDs& c) { colVarRef = c; }
 
-                double distColVars(const RealND& cv1, const RealND& cv2);
+                double distColVars(const RealND& cv1, const RealND& cv2, int i);
 
                 boost::python::list getFilenames() const {
                     return boost::python::list(filenames); }
@@ -143,19 +163,35 @@ namespace espressopp {
                     return weights.setItem(index, _w);
                 }
 
+                real getAlpha() const { return alpha; }
+
+                void setAlpha(real _r) { alpha = _r; }
+
                 void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
 
                 real _computeEnergyRaw(real theta) const {
                     real e = 0.;
-                    for (int i=0; i<numInteractions; ++i) {
-                        if (tables[i]) {
-                            e += weights[i] * tables[i]->getEnergy(theta);
-                        } else {
-                            LOG4ESPP_DEBUG(theLogger,
-                                "Tabulated angular potential table not available.");
-                            return 0.0;
+                    int argmin = 0;
+                    int	emin = 1e6;
+                    int ecur = 0.;
+                    for	(int i=0; i<numInteractions; ++i) {
+                        // Only non-zero weights
+                        ecur = tables[i]->getEnergy(theta);
+                        if (weights[i] > 1e-2 && ecur < emin) {
+                            argmin = i;
+                            emin = ecur;
                         }
                     }
+                    e += tables[argmin]->getEnergy(theta);
+                    // for (int i=0; i<numInteractions; ++i) {
+                    //     if (tables[i]) {
+                    //         e += weights[i] * tables[i]->getEnergy(theta);
+                    //     } else {
+                    //         LOG4ESPP_DEBUG(theLogger,
+                    //             "Tabulated angular potential table not available.");
+                    //         return 0.0;
+                    //     }
+                    // }
                     return e;
                 }
 
@@ -168,15 +204,27 @@ namespace espressopp {
                     real theta = acos(cos_theta);
 
                     real a = 0.;
-                    for (int i=0; i<numInteractions; ++i) {
-                        if (tables[i])
-                            a += weights[i] * tables[i]->getForce(acos(cos_theta));
-                        else {
-                            LOG4ESPP_DEBUG(theLogger,
-                                "Tabulated angular potential table not available.");
-                            return false;
+                    int argmin = 0;
+                    int	emin = 1e6;
+                    int ecur = 0.;
+                    for	(int i=0; i<numInteractions; ++i) {
+                        // Only non-zero weights
+                        ecur = tables[i]->getEnergy(theta);
+                        if (weights[i] > 1e-2 && ecur < emin) {
+                            argmin = i;
+            		        emin = ecur;
                         }
                     }
+                    a += tables[argmin]->getForce(theta);
+                    // for (int i=0; i<numInteractions; ++i) {
+                    //     if (tables[i])
+                    //         a += weights[i] * tables[i]->getForce(acos(cos_theta));
+                    //     else {
+                    //         LOG4ESPP_DEBUG(theLogger,
+                    //             "Tabulated angular potential table not available.");
+                    //         return false;
+                    //     }
+                    // }
 
                     a*=1.0/(sqrt(1.0-cos_theta*cos_theta));
 
@@ -191,8 +239,20 @@ namespace espressopp {
 
                 real _computeForceRaw(real theta) const {
                     real f = 0.;
-                    for (int i=0; i<numInteractions; ++i)
-                        f += weights[i] * tables[i]->getForce(theta);
+                    int argmin = 0;
+                    int	emin = 1e6;
+                    int ecur = 0.;
+                    for	(int i=0; i<numInteractions; ++i) {
+                        // Only non-zero weights
+                        ecur = tables[i]->getEnergy(theta);
+                        if (weights[i] > 1e-2 && ecur < emin) {
+                            argmin = i;
+            		        emin = ecur;
+        		      }
+                    }
+                    f += tables[argmin]->getForce(theta);
+                    // for (int i=0; i<numInteractions; ++i)
+                    //    f += weights[i] * tables[i]->getForce(theta);
                     return f;
                 }
 
@@ -206,9 +266,12 @@ namespace espressopp {
                 RealNDs cvrefs = pot.getColVarRefs();
                 int dim = pot.getDimension();
                 fns = pot.getFilenames();
-                real alp = pot.getWeightScalingFactor();
+                RealND cvmu = pot.getColVarMus();
+                RealND cvsd = pot.getColVarSds();
                 real rc = pot.getCutoff();
-                return boost::python::make_tuple(dim, itp, fns, cvrefs, alp, rc);
+                real alp = pot.getAlpha();
+                return boost::python::make_tuple(dim, itp, fns, cvrefs,
+                                                 cvmu, cvsd, alp, rc);
             }
         };
 

@@ -138,7 +138,7 @@ namespace espressopp {
     inline
     AngularPotentialTemplate< Derived >::
     AngularPotentialTemplate()
-      : cutoff(infinity), cutoffSqr(infinity), colVar(4, 0.) { }
+      : cutoff(infinity), cutoffSqr(infinity), colVar(3, 0.) { }
 
     // Shift/cutoff handling
     template < class Derived >

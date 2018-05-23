@@ -389,8 +389,8 @@ namespace espressopp {
   { return this->at(i); }
 
   inline void RealNDs::push_back(const RealND& v) {
-      data.push_back(boost::make_shared<RealND>(v));
       setDimension(getDimension()+1);
+      setItem(getDimension()-1, v);
   }
 
   inline std::ostream &operator<<(std::ostream &out,
