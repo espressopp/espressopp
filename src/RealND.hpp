@@ -31,7 +31,6 @@
 #include "types.hpp"
 #include <boost/python/list.hpp>
 #include <boost/python/extract.hpp>
-#include <boost/python/numeric.hpp>
 
 namespace espressopp {
 
@@ -132,7 +131,6 @@ namespace espressopp {
     int getDimension() const { return dimension; }
 
     RealNDs();
-    RealNDs(const boost::python::numeric::array& n);
 
     // assignment is not the same as initialization
     RealNDs& operator=(const RealNDs& v);
@@ -201,7 +199,7 @@ namespace espressopp {
 
   inline RealND &RealND::operator=(const RealND &v) {
     if( dimension != v.getDimension() )
-      std::cout<<"Warning!!! Current dimension if RealND vector "<<dimension<<
+      std::cout<<"Warning!!! Current dimension of RealND vector "<<dimension<<
         " was changed to "<< v.getDimension() << std::endl;
     setDimension( v.getDimension() );
     for (int i = 0; i < v.getDimension(); i++)
@@ -350,12 +348,6 @@ namespace espressopp {
   }
 
   inline RealNDs::RealNDs() : dimension(0) { }
-
-  inline RealNDs::RealNDs(const boost::python::numeric::array &n) {
-    setDimension(len(n));
-    for (int i = 0; i < len(n); i++)
-      *data[i] = boost::python::extract<RealND>(n[i]);
-  }
 
   inline RealNDs &RealNDs::operator=(const RealNDs &v) {
     setDimension( v.getDimension() );

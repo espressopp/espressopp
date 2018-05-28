@@ -52,6 +52,7 @@
 #include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
+#include "TabulatedSubEns.hpp"
 #include "TabulatedAngular.hpp"
 #include "TabulatedSubEnsAngular.hpp"
 
@@ -113,6 +114,7 @@ namespace espressopp {
       ReactionFieldGeneralizedTI::registerPython();
       SoftCosine::registerPython();
       Tabulated::registerPython();
+      TabulatedSubEns::registerPython();
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();

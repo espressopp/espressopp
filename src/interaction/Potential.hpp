@@ -26,8 +26,10 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
+#include "RealND.hpp"
 #include "Particle.hpp"
 #include "logging.hpp"
+#include "FixedTripleList.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -44,6 +46,15 @@ namespace espressopp {
 
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
+
+      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl) = 0;
+      virtual shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
+
+      virtual void setColVar(const RealND& cv) = 0;
+      virtual void setColVar(const Real3D& dist, const bc::BC& bc) = 0;
+      virtual RealND getColVar() const = 0;
+
+      virtual void computeColVarWeights(const Real3D& dist, const bc::BC& bc) = 0;
 
       virtual void setShift(real _shift) = 0;
       virtual real getShift() const = 0;
@@ -84,6 +95,15 @@ namespace espressopp {
       virtual real setAutoShift();
       void updateAutoShift();
 
+      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl);
+      virtual shared_ptr<FixedTripleList> getColVarAngleList() const;
+
+      virtual void setColVar(const RealND& cv);
+      virtual void setColVar(const Real3D& dist, const bc::BC& bc);
+      virtual RealND getColVar() const;
+
+      virtual void computeColVarWeights(const Real3D& dist, const bc::BC& bc);
+
       // Implements the non-virtual interface
       // (used by e.g. the Interaction templates)
       real _computeEnergy(const Particle &p1, const Particle &p2) const;
@@ -119,6 +139,10 @@ namespace espressopp {
       real cutoffSqr;
       real shift;
       bool autoShift;
+      // List of angle that correlate with the bond potential
+      shared_ptr<FixedTripleList> colVarAngleList;
+      // Collective variables: first itself, then angles
+      RealND colVar;
 
       Derived* derived_this() {
         return static_cast< Derived* >(this);
@@ -153,7 +177,8 @@ namespace espressopp {
     //////////////////////////////////////////////////
     template < class Derived >
     inline
-    PotentialTemplate< Derived >::PotentialTemplate() : cutoff(infinity), cutoffSqr(infinity), shift(0.0), autoShift(false){
+    PotentialTemplate< Derived >::PotentialTemplate() : cutoff(infinity),
+      cutoffSqr(infinity), shift(0.0), autoShift(false), colVar(1, 0.) {
     }
 
     // Shift/cutoff handling
@@ -204,6 +229,49 @@ namespace espressopp {
     PotentialTemplate< Derived >::
     updateAutoShift() {
       if (autoShift) setAutoShift();
+    }
+
+    // Pair list for collective variables
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    setColVarAngleList(const shared_ptr < FixedTripleList >& _fpl) {
+      colVarAngleList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedTripleList >
+    PotentialTemplate< Derived >::
+    getColVarAngleList() const
+    { return colVarAngleList; }
+
+    // Collective variables
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    setColVar(const RealND& cv)
+    { colVar = cv; }
+
+    // Collective variables
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    setColVar(const Real3D& dist, const bc::BC& bc)
+    {
+      // In general, do nothing
+    }
+
+    template < class Derived >
+    inline RealND
+    PotentialTemplate< Derived >::
+    getColVar() const
+    { return colVar; }
+
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    computeColVarWeights(const Real3D& dist, const bc::BC& bc) {
+        // in general do nothing
     }
 
     // Energy computation

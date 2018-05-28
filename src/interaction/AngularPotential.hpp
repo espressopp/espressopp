@@ -30,6 +30,7 @@
 #include "Particle.hpp"
 #include <cmath>
 #include "logging.hpp"
+#include "FixedPairList.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -50,10 +51,16 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
 
+      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl) = 0;
+      virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
+
       virtual void setColVar(const RealND& cv) = 0;
-      virtual void setColVar(const Real3D& dist12, const Real3D& dist32) = 0;
+      virtual void setColVar(const Real3D& dist12,
+          const Real3D& dist32, const bc::BC& bc) = 0;
       virtual RealND getColVar() const = 0;
-      virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32) = 0;
+
+      virtual void computeColVarWeights(const Real3D& dist12,
+          const Real3D& dist32, const bc::BC& bc) = 0;
 
       static void registerPython();
 
@@ -89,10 +96,16 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
 
+      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl);
+      virtual shared_ptr<FixedPairList> getColVarBondList() const;
+
       virtual void setColVar(const RealND& cv);
-      virtual void setColVar(const Real3D& dist12, const Real3D& dist32);
+      virtual void setColVar(const Real3D& dist12,
+          const Real3D& dist32, const bc::BC& bc);
       virtual RealND getColVar() const;
-      virtual void computeColVarWeights(const Real3D& dist12, const Real3D& dist32);
+
+      virtual void computeColVarWeights(const Real3D& dist12,
+          const Real3D& dist32, const bc::BC& bc);
 
       // Implements the non-virtual interface
       // (used by e.g. the Interaction templates)
@@ -119,7 +132,9 @@ namespace espressopp {
     protected:
       real cutoff;
       real cutoffSqr;
-      // Collective variables: bond1, bond2, angle
+      // List of bonds that correlate with the angle potential
+      shared_ptr<FixedPairList> colVarBondList;
+      // Collective variables: first itself, then bonds
       RealND colVar;
 
       Derived* derived_this() {
@@ -138,7 +153,7 @@ namespace espressopp {
     inline
     AngularPotentialTemplate< Derived >::
     AngularPotentialTemplate()
-      : cutoff(infinity), cutoffSqr(infinity), colVar(3, 0.) { }
+      : cutoff(infinity), cutoffSqr(infinity), colVar(1, 0.) { }
 
     // Shift/cutoff handling
     template < class Derived >
@@ -155,6 +170,20 @@ namespace espressopp {
     getCutoff() const
     { return cutoff; }
 
+    // Pair list for collective variables
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    setColVarBondList(const shared_ptr < FixedPairList >& _fpl) {
+      colVarBondList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedPairList >
+    AngularPotentialTemplate< Derived >::
+    getColVarBondList() const
+    { return colVarBondList; }
+
     // Collective variables
     template < class Derived >
     inline void
@@ -162,18 +191,14 @@ namespace espressopp {
     setColVar(const RealND& cv)
     { colVar = cv; }
 
-        // Collective variables
+    // Collective variables
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    setColVar(const Real3D& dist12, const Real3D& dist32) {
-        real dist12_sqr = dist12 * dist12;
-        real dist32_sqr = dist32 * dist32;
-        colVar[0] = sqrt(dist12_sqr);
-        colVar[1] = sqrt(dist32_sqr);
-        real dist1232 = colVar[0] * colVar[1];
-        real cos_theta = dist12 * dist32 / dist1232;
-        colVar[2] = acos(cos_theta);
+    setColVar(const Real3D& dist12,
+        const Real3D& dist32, const bc::BC& bc)
+    {
+      // In general, do nothing
     }
 
     template < class Derived >
@@ -185,7 +210,8 @@ namespace espressopp {
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    computeColVarWeights(const Real3D& dist12, const Real3D& dist32) {
+    computeColVarWeights(const Real3D& dist12,
+        const Real3D& dist32, const bc::BC& bc) {
         // in general do nothing
     }
 

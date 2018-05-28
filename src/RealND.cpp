@@ -24,7 +24,6 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "python.hpp"
 #include "RealND.hpp"
-#include <boost/python/numeric.hpp>
 
 namespace espressopp {
   struct realND_pickle_suite : boost::python::pickle_suite {
@@ -94,7 +93,7 @@ namespace espressopp {
         .def("__setitem__", &RealNDs::setItem)
         .add_property("dimension", &RealNDs::getDimension,
                                    &RealNDs::setDimension)
-        .def_pickle(realNDs_pickle_suite())                
+        .def_pickle(realNDs_pickle_suite())
         ;
 
   }

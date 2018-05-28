@@ -67,5 +67,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
-            pmiproperty = [ 'cutoff', 'colVar' ]
+            pmiproperty = [ 'cutoff', 'colVarBondList', 'colVar' ]
             )

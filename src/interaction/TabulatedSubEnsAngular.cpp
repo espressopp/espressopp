@@ -29,7 +29,6 @@
 #include "InterpolationCubic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedTripleListTypesInteractionTemplate.hpp"
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 namespace espressopp {
     namespace interaction {
@@ -42,7 +41,7 @@ namespace espressopp {
             numInteractions = dim;
             for (int i=0; i<dim; ++i) {
               filenames[i] = boost::python::extract<std::string>(_filenames[i]);
-              colVarRef[i].setDimension(6);
+              colVarRef[i].setDimension(4);
               if (itype == 1) { // create a new InterpolationLinear
                   tables[i] = make_shared <InterpolationLinear> ();
                   tables[i]->read(world, filenames[i].c_str());
@@ -65,7 +64,10 @@ namespace espressopp {
             boost::mpi::communicator world;
             int i = numInteractions;
             numInteractions += 1;
-            colVarRef.push_back(_cvref);
+            colVarRef.setDimension(numInteractions);
+            // Dimension 6: angle, bond, dihed, sd_angle, sd_bond, sd_dihed
+            colVarRef[i].setDimension(6);
+            colVarRef[i] = _cvref;
             filenames.push_back(boost::python::extract<std::string>(fname));
             weights.push_back(0.);
             if (itype == 1) { // create a new InterpolationLinear
@@ -82,19 +84,6 @@ namespace espressopp {
               }
         }
 
-        double TabulatedSubEnsAngular::distColVars(
-            const RealND& cv1, const RealND& cv2, int i){
-            // Compute distance between colvars cv1 and cv2
-            // in renormalized space
-            // Metric is euclidean distance
-            real dist = 0.;
-            // Try with only one bond and one angle
-            // for (int i = 0; i<3; ++i)
-            //     dist += pow((cv1[i] - cv2[i]) / colVarSd[i], 2);
-            // return sqrt(dist);
-            return abs((cv1[i] - cv2[i]) / colVarSd[i]);
-        }
-
         void TabulatedSubEnsAngular::setColVarRef(
             const RealNDs& cvRefs){
             // Set the reference values of the collective variables
@@ -104,45 +93,50 @@ namespace espressopp {
         }
 
         void TabulatedSubEnsAngular::computeColVarWeights(
-            const Real3D& dist12, const Real3D& dist32){
+            const Real3D& dist12, const Real3D& dist32, const bc::BC& bc){
             // Compute the weights for each force field
             // given the reference and instantaneous values of ColVars
-            std::ostringstream msg;
-            setColVar(dist12, dist32);
-            real sumWeights = 0.;
+            setColVar(dist12, dist32, bc);
             // Compute weights up to next to last FF
             for (int i=0; i<numInteractions-1; ++i) {
                 weights[i] = 1.;
-                for (int j=0; j<3; ++j) {
+                for (int j=0; j<colVar.getDimension(); ++j) {
+                    int k = 0;
+                    // Choose between angle, bond, and dihed
+                    if (j == 0) k = 0;
+                    else if (j>0 && j<1+colVarBondList->size()) k = 1;
+                    else k = 2;
                     // Lengthscale of the cluster i
-                    real length_ci = colVarRef[i][3+j];
+                    real length_ci = colVarRef[i][3+k];
                     // Distance between inst and ref_i
-                    real d_i = distColVars(colVar, colVarRef[i], j);
+                    real d_i = abs((colVar[j] - colVarRef[i][k]) / colVarSd[k]);
                     if (d_i > length_ci)
                         weights[i] *= exp(- (d_i - length_ci) / alpha);
                 }
 
-                real d_i = distColVars(colVar, colVarRef[i], 0);
-                real length_ci = colVarRef[i][3];
-                // if (d_i < length_ci) 
-                //   weights[i] = 1.;
-                // else weights[i] = exp(- (d_i - length_ci) / ( alpha ));
-                // std::cout << "length_ci " << length_ci << " weight " << i
-                //     << " " << weights[i] << " di " << d_i << std::endl;
-                sumWeights += weights[i];
             }
-            // real sumWeightsNew = sumWeights;
-            // if (sumWeights > 1.) {
-            //   // Rescale down
-            //   sumWeightsNew = 0.;
-            //   for (int j=0; j<numInteractions-1; ++j) {
-            //     weights[j] = std::max(0., weights[j]-(sumWeights-1.)/(numInteractions-1));
-            //     sumWeightsNew += weights[j];
-            //   }
-            // }
-            // Last FF gets the rest of the contribution
-            // weights[numInteractions-1] = 1. - sumWeightsNew;
             weights[numInteractions-1] = 1.;
+        }
+
+        // Collective variables
+        void TabulatedSubEnsAngular::setColVar(const Real3D& dist12,
+              const Real3D& dist32, const bc::BC& bc) {
+            colVar.setDimension(1+colVarBondList->size());
+            real dist12_sqr = dist12 * dist12;
+            real dist32_sqr = dist32 * dist32;
+            real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
+            real cos_theta = dist12 * dist32 / dist1232;
+            colVar[0] = acos(cos_theta);
+            // Now all bonds in colVarBondList
+            int i=1;
+            for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
+              Particle &p1 = *it->first;
+              Particle &p2 = *it->second;
+              Real3D dist12;
+              bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+              colVar[i] = sqrt(dist12 * dist12);
+              i+=1;
+            }
         }
 
         typedef class FixedTripleListInteractionTemplate <TabulatedSubEnsAngular>
@@ -155,9 +149,6 @@ namespace espressopp {
         //////////////////////////////////////////////////
         void TabulatedSubEnsAngular::registerPython() {
             using namespace espressopp::python;
-
-            class_<VectorStrings>("VectorStrings")
-                .def(vector_indexing_suite<VectorStrings>() );
 
             class_ <TabulatedSubEnsAngular, bases <AngularPotential> >
                 ("interaction_TabulatedSubEnsAngular", init <>())

@@ -21,7 +21,6 @@
 */
 
 #include "python.hpp"
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "AngularPotential.hpp"
 #include "logging.hpp"
 
@@ -57,8 +56,14 @@ namespace espressopp {
             .add_property("cutoff",
                 &AngularPotential::getCutoff,
                 &AngularPotential::setCutoff)
+            .add_property("colVarBondList",
+                &AngularPotential::getColVarBondList,
+                &AngularPotential::setColVarBondList)
             .add_property("colVar",
                 &AngularPotential::getColVar)
+            .add_property("addCVBond",
+                &AngularPotential::getColVarBondList,
+                &AngularPotential::setColVarBondList)
             .def("computeEnergy", pure_virtual(computeEnergy1))
             .def("computeEnergy", pure_virtual(computeEnergy2))
             .def("computeForce", pure_virtual(computeForce1))

@@ -123,7 +123,7 @@ FixedTripleListTypesInteractionTemplate<_Potential>::addForces() {
     bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
     bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
     Real3D force12, force32;
-    potential.computeColVarWeights(dist12, dist32);
+    potential.computeColVarWeights(dist12, dist32, bc);
     potential._computeForce(force12, force32, dist12, dist32);
     p1.force() += force12;
     p2.force() -= force12 + force32;
@@ -151,7 +151,7 @@ computeEnergy() {
 
     Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
     Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-    potential.computeColVarWeights(dist12, dist32);
+    potential.computeColVarWeights(dist12, dist32, bc);
     e += potential._computeEnergy(dist12, dist32);
     LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2="
         << p2.id() << " id3=" << p3.id() << " potential energy=" << e);
@@ -213,7 +213,7 @@ computeVirial() {
     bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
     bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
     Real3D force12, force32;
-    potential.computeColVarWeights(dist12, dist32);
+    potential.computeColVarWeights(dist12, dist32, bc);
     potential._computeForce(force12, force32, dist12, dist32);
     w += dist12 * force12 + dist32 * force32;
   }
@@ -243,7 +243,7 @@ FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor 
     bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
     bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
     Real3D force12, force32;
-    potential.computeColVarWeights(r12, r32);
+    potential.computeColVarWeights(r12, r32, bc);
     potential._computeForce(force12, force32, r12, r32);
     wlocal += Tensor(r12, force12) + Tensor(r32, force32);
   }

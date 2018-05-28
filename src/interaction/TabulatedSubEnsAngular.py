@@ -126,10 +126,10 @@ if pmi.isController:
             cls = 'espressopp.interaction.TabulatedSubEnsAngularLocal',
             pmicall = ['colVarMu_get', 'colVarMu_set', 'weight_get', 'weight_set',
                        'alpha_get', 'alpha_set',
-		       'colVarSd_get', 'colVarSd_set',
-		       'dimension_get', 'filenames_get', 'filename_get',
-		       'filename_set', 'addInteraction', 'colVarRefs_get',
-		       'colVarRef_get']
+				       'colVarSd_get', 'colVarSd_set',
+				       'dimension_get', 'filenames_get', 'filename_get',
+				       'filename_set', 'addInteraction', 'colVarRefs_get',
+				       'colVarRef_get']
             )
 
     class FixedTripleListTabulatedSubEnsAngular(Interaction):
