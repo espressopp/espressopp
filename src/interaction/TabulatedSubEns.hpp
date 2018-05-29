@@ -145,9 +145,9 @@ namespace espressopp {
             void setColVar(const Real3D& dist, const bc::BC& bc);
 
             real _computeEnergySqrRaw(real distSqr) const {
-              // real e = 0.;
+              real e = 0.;
               // int argmin = 0;
-              real	emin = 1e6;
+              // real	emin = 1e6;
               // real ecur = 0.;
               for	(int i=0; i<numInteractions; ++i) {
                   // Only non-zero weights
@@ -156,16 +156,16 @@ namespace espressopp {
                   //     argmin = i;
                   //     emin = ecur;
                   // }
-                  emin += weights[i] * tables[i]->getEnergy(sqrt(distSqr));
+                  e += weights[i] * tables[i]->getEnergy(sqrt(distSqr));
               }
-              return emin;
+              return e;
             }
 
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
                 // int argmin = 0;
                 // real	emin = 1e6;
                 // real ecur = 0.;
-                real ffactor;
+                real ffactor = 0;
                 real distrt = sqrt(distSqr);
                 for	(int i=0; i<numInteractions; ++i) {
                     // Only non-zero weights

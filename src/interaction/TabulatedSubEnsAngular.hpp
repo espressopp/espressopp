@@ -139,9 +139,9 @@ namespace espressopp {
                     const Real3D& dist32, const bc::BC& bc);
 
                 real _computeEnergyRaw(real theta) const {
-                    // real e = 0.;
+                    real e = 0.;
                     // int argmin = 0;
-                    real	emin = 1e6;
+                    // real	emin = 1e6;
                     // real ecur = 0.;
                     for	(int i=0; i<numInteractions; ++i) {
                         // Only non-zero weights
@@ -150,9 +150,9 @@ namespace espressopp {
                         //     argmin = i;
                         //     emin = ecur;
                         // }
-                        emin += weights[i] * tables[i]->getEnergy(theta);
+                        e += weights[i] * tables[i]->getEnergy(theta);
                     }
-                    return emin;
+                    return e;
                 }
 
                 bool _computeForceRaw(Real3D& force12, Real3D& force32,
