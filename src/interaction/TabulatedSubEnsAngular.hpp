@@ -139,17 +139,18 @@ namespace espressopp {
                     const Real3D& dist32, const bc::BC& bc);
 
                 real _computeEnergyRaw(real theta) const {
-                    real e = 0.;
-                    int argmin = 0;
+                    // real e = 0.;
+                    // int argmin = 0;
                     real	emin = 1e6;
-                    real ecur = 0.;
+                    // real ecur = 0.;
                     for	(int i=0; i<numInteractions; ++i) {
                         // Only non-zero weights
-                        ecur = tables[i]->getEnergy(theta);
-                        if (weights[i] > 1e-2 && ecur < emin) {
-                            argmin = i;
-                            emin = ecur;
-                        }
+                        // ecur = tables[i]->getEnergy(theta);
+                        // if (weights[i] > 1e-2 && ecur < emin) {
+                        //     argmin = i;
+                        //     emin = ecur;
+                        // }
+                        emin += weights[i] * tables[i]->getEnergy(theta);
                     }
                     return emin;
                 }
@@ -163,18 +164,19 @@ namespace espressopp {
                     real theta = acos(cos_theta);
 
                     real a = 0.;
-                    int argmin = 0;
-                    real	emin = 1e6;
-                    real ecur = 0.;
+                    // int argmin = 0;
+                    // real	emin = 1e6;
+                    // real ecur = 0.;
                     for	(int i=0; i<numInteractions; ++i) {
                         // Only non-zero weights
-                        ecur = tables[i]->getEnergy(theta);
-                        if (weights[i] > 1e-2 && ecur < emin) {
-                          argmin = i;
-            		          emin = ecur;
-                        }
+                        // ecur = tables[i]->getEnergy(theta);
+                        // if (weights[i] > 1e-2 && ecur < emin) {
+                        //   argmin = i;
+            		        //   emin = ecur;
+                        // }
+                        a += weights[i] * tables[i]->getForce(theta);
                     }
-                    a += tables[argmin]->getForce(theta);
+                    // a += tables[argmin]->getForce(theta);
 
                     a*=1.0/(sqrt(1.0-cos_theta*cos_theta));
 
@@ -189,18 +191,19 @@ namespace espressopp {
 
                 real _computeForceRaw(real theta) const {
                     real f = 0.;
-                    int argmin = 0;
-                    real	emin = 1e6;
-                    real ecur = 0.;
+                    // int argmin = 0;
+                    // real	emin = 1e6;
+                    // real ecur = 0.;
                     for	(int i=0; i<numInteractions; ++i) {
                         // Only non-zero weights
-                        ecur = tables[i]->getEnergy(theta);
-                        if (weights[i] > 1e-2 && ecur < emin) {
-                            argmin = i;
-            		        emin = ecur;
-        		      }
+                        // ecur = tables[i]->getEnergy(theta);
+                        // if (weights[i] > 1e-2 && ecur < emin) {
+                        //     argmin = i;
+                		    //     emin = ecur;
+              		      // }
+                      f += weights[i] * tables[i]->getForce(theta);
                     }
-                    f += tables[argmin]->getForce(theta);
+                    // f += tables[argmin]->getForce(theta);
                     return f;
                 }
 

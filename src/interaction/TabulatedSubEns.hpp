@@ -145,36 +145,38 @@ namespace espressopp {
             void setColVar(const Real3D& dist, const bc::BC& bc);
 
             real _computeEnergySqrRaw(real distSqr) const {
-              real e = 0.;
-              int argmin = 0;
+              // real e = 0.;
+              // int argmin = 0;
               real	emin = 1e6;
-              real ecur = 0.;
+              // real ecur = 0.;
               for	(int i=0; i<numInteractions; ++i) {
                   // Only non-zero weights
-                  ecur = tables[i]->getEnergy(sqrt(distSqr));
-                  if (weights[i] > 1e-2 && ecur < emin) {
-                      argmin = i;
-                      emin = ecur;
-                  }
+                  // ecur = tables[i]->getEnergy(sqrt(distSqr));
+                  // if (weights[i] > 1e-2 && ecur < emin) {
+                  //     argmin = i;
+                  //     emin = ecur;
+                  // }
+                  emin += weights[i] * tables[i]->getEnergy(sqrt(distSqr));
               }
               return emin;
             }
 
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
-                int argmin = 0;
-                real	emin = 1e6;
-                real ecur = 0.;
+                // int argmin = 0;
+                // real	emin = 1e6;
+                // real ecur = 0.;
                 real ffactor;
                 real distrt = sqrt(distSqr);
                 for	(int i=0; i<numInteractions; ++i) {
                     // Only non-zero weights
-                    ecur = tables[i]->getEnergy(distrt);
-                    if (weights[i] > 1e-2 && ecur < emin) {
-                      argmin = i;
-                      emin = ecur;
-                    }
+                    // ecur = tables[i]->getEnergy(distrt);
+                    // if (weights[i] > 1e-2 && ecur < emin) {
+                    //   argmin = i;
+                    //   emin = ecur;
+                    // }
+                    ffactor += weights[i] * tables[i]->getForce(distrt) / distrt;
                 }
-                ffactor = tables[argmin]->getForce(distrt) / distrt;
+                // ffactor = tables[argmin]->getForce(distrt) / distrt;
                 force = dist * ffactor;
                 return true;
             }

@@ -98,6 +98,7 @@ namespace espressopp {
             // given the reference and instantaneous values of ColVars
             setColVar(dist12, dist32, bc);
             // Compute weights up to next to last FF
+            real sumWeights = 0.;
             for (int i=0; i<numInteractions-1; ++i) {
                 weights[i] = 1.;
                 for (int j=0; j<colVar.getDimension(); ++j) {
@@ -113,9 +114,11 @@ namespace espressopp {
                     if (d_i > length_ci)
                         weights[i] *= exp(- (d_i - length_ci) / alpha);
                 }
-
+                sumWeights += weights[i];
             }
-            weights[numInteractions-1] = 1.;
+            if (sumWeights > 1.)
+              throw std::runtime_error("Sum of weights larger than 1.");
+            weights[numInteractions-1] = 1. - sumWeights;
         }
 
         // Collective variables
