@@ -122,8 +122,10 @@ namespace espressopp {
             }
             sumWeights += weights[i];
         }
-        if (sumWeights > 1.)
-          throw std::runtime_error("Sum of weights larger than 1.");
+        if (sumWeights >= 1.) {
+          for (int i=0; i<numInteractions-1; ++i)
+            weights[i] /= sumWeights;
+        }
         weights[numInteractions-1] = 1. - sumWeights;
     }
 
