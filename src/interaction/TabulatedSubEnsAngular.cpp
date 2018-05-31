@@ -100,20 +100,26 @@ namespace espressopp {
             // Compute weights up to next to last FF
             real sumWeights = 0.;
             for (int i=0; i<numInteractions-1; ++i) {
-                weights[i] = 1.;
+                weights[i]    = 1.;
+                real norm_d_i = 0.;
+                real norm_l_i = 0.;
                 for (int j=0; j<colVar.getDimension(); ++j) {
                     int k = 0;
                     // Choose between angle, bond, and dihed
                     if (j == 0) k = 0;
                     else if (j>0 && j<1+colVarBondList->size()) k = 1;
                     else k = 2;
-                    // Lengthscale of the cluster i
-                    real length_ci = colVarRef[i][3+k];
-                    // Distance between inst and ref_i
-                    real d_i = abs((colVar[j] - colVarRef[i][k]) / colVarSd[k]);
-                    if (d_i > length_ci)
-                        weights[i] *= exp(- (d_i - length_ci) / alpha);
+                    // // Lengthscale of the cluster i
+                    // real length_ci = colVarRef[i][3+k];
+                    // // Distance between inst and ref_i
+                    // real d_i = abs((colVar[j] - colVarRef[i][k]) / colVarSd[k]);
+                    // if (d_i > length_ci)
+                    //     weights[i] *= exp(- (d_i - length_ci) / alpha);
+                    norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                    norm_l_i += pow(colVarRef[i][3+k], 2);
                 }
+                if (norm_d_i > norm_l_i)
+                  weights[i] = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
                 sumWeights += weights[i];
             }
             if (sumWeights >= 1.) {
