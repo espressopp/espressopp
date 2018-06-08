@@ -36,11 +36,9 @@
 namespace espressopp {
 
   using namespace iterator;
-  using namespace std;
+  using std::string;
 
   namespace integrator {
-
-    LOG4ESPP_LOGGER(ExtPlumed::theLogger, "ExtPlumed");
 
     ExtPlumed::ExtPlumed(shared_ptr<System> _system, python::object _pyobj, string _plumedfile, string _plumedlog, real _dt):
       Extension(_system),
@@ -64,10 +62,9 @@ namespace espressopp {
       p->cmd("setMPIComm", comm_p);
       p->cmd("setPlumedDat",plumedfile.c_str());
       p->cmd("setLogFile",plumedlog.c_str());
-      p->cmd("setMDEngine","ESPRESSO++");
+      p->cmd("setMDEngine","ESPResSo++");
       longint nReal = system.storage->getNRealParticles();
-      boost::mpi::all_reduce(*system.comm, nReal, natoms, plus<longint>());
-      LOG4ESPP_DEBUG(theLogger, "The total number of atoms is " << natoms);
+      boost::mpi::all_reduce(*system.comm, nReal, natoms, std::plus<longint>());
       p->cmd("setTimestep",&dt); // check type
       p->cmd("setNatoms",&natoms);  // check type
     }
@@ -177,7 +174,7 @@ namespace espressopp {
         }
       }
 
-      boost::mpi::all_reduce(*system.comm, update_gatindex, plus<int>());
+      boost::mpi::all_reduce(*system.comm, update_gatindex, std::plus<int>());
       if(update_gatindex) {
         int i=0;
         for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {

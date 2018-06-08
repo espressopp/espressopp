@@ -31,7 +31,7 @@
 #include "boost/signals2.hpp"
 #include "mpi.hpp"
 #include "Particle.hpp"
-#include "../../Plumed.h"
+#include "Plumed.h"
 
 namespace espressopp {
   namespace integrator {

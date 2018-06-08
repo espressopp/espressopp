@@ -28,7 +28,6 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
-option(WITH_PLUMED "Build with ExtPlumed class (requires libplumed)" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
   message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -93,13 +92,31 @@ endif()
 #Process Plumed settings
 ########################################################################
 
-if(WITH_PLUMED)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plumed.cmake" AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plumed.h" AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plumed.inc")
-    add_definitions( -DHAS_PLUMED)
-  else()
-    message(WARNING "Relevant PLUMED files are missing.")
-  endif()
+set(PLUMED_LINK_TYPES runtime shared static)
+set(PLUMED_LINK_TYPE "runtime" CACHE STRING "3 ways to link PLUMED: runtime, static, shared")
+set_property(CACHE PLUMED_LINK_TYPE PROPERTY STRINGS ${PLUMED_LINK_TYPES})
+
+if ("${PLUMED_LINK_TYPE}" STREQUAL "runtime")
+  set(EXTERNAL_PLUMED OFF)
+else()
+  set(EXTERNAL_PLUMED ON)
 endif()
+
+if (EXTERNAL_PLUMED)
+  if (DEFINED PLUMED_HOME)
+    find_path(PLUMED_INSTALL_DIR NAMES lib/plumed/src/lib/Plumed.cmake PATHS ${PLUMED_HOME} DOC "Directory plumed is installed to. Should contain lib/plumed/src/lib/Plumed.cmake")
+  else(DEFINED PLUMED_HOME)
+    find_path(PLUMED_INSTALL_DIR NAMES lib/plumed/src/lib/Plumed.cmake DOC "Directory plumed is installed to. Should contain lib/plumed/src/lib/Plumed.cmake")
+  endif(DEFINED PLUMED_HOME)
+  include(${PLUMED_INSTALL_DIR}/lib/plumed/src/lib/Plumed.cmake)
+  if("${PLUMED_LINK_TYPE}" STREQUAL "static")
+    set(PLUMED_LIBRARIES ${PLUMED_STATIC_LOAD})
+  elseif("${PLUMED_LINK_TYPE}" STREQUAL "shared")
+    set(PLUMED_LIBRARIES ${PLUMED_SHARED_LOAD})
+  endif()
+else(EXTERNAL_PLUMED)
+  set(PLUMED_LIBRARIES espressopp_plumed)
+endif(EXTERNAL_PLUMED)
 
 ########################################################################
 #Process Python settings

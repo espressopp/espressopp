@@ -61,9 +61,7 @@
 #include "MinimizeEnergy.hpp"
 
 #include "EmptyExtension.hpp"
-#ifdef HAS_PLUMED
 #include "ExtPlumed.hpp"
-#endif
 
 #include "ConstMuMD.hpp"
 
@@ -107,9 +105,7 @@ namespace espressopp {
       AssociationReaction::registerPython();
       MinimizeEnergy::registerPython();
       EmptyExtension::registerPython();
-#ifdef HAS_PLUMED
       ExtPlumed::registerPython();
-#endif
       ConstMuMD::registerPython();
     }
   }
