@@ -98,7 +98,8 @@ namespace espressopp {
             // given the reference and instantaneous values of ColVars
             setColVar(dist12, dist32, bc);
             // Compute weights up to next to last FF
-            real sumWeights = 0.;
+            real maxWeight = 0.;
+            int maxWeightI = 0;
             for (int i=0; i<numInteractions-1; ++i) {
                 weights[i]    = 1.;
                 real norm_d_i = 0.;
@@ -120,13 +121,16 @@ namespace espressopp {
                 }
                 if (norm_d_i > norm_l_i)
                   weights[i] = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
-                sumWeights += weights[i];
+                if (weights[i] > maxWeight) {
+                  maxWeight = weights[i];
+                  maxWeightI = i;
+                }
             }
-            if (sumWeights >= 1.) {
-              for (int i=0; i<numInteractions-1; ++i)
-                weights[i] /= sumWeights;
+            for (int i=0; i<numInteractions-1; ++i) {
+              if (i != maxWeightI)
+                weights[i] = 0.;
             }
-            weights[numInteractions-1] = 1. - sumWeights;
+            weights[numInteractions-1] = 1. - maxWeight;
         }
 
         // Collective variables
