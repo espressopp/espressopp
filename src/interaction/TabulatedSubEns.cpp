@@ -65,7 +65,7 @@ namespace espressopp {
     }
 
     void TabulatedSubEns::addInteraction(int itype,
-        boost::python::str fname, const RealND& _cvref) {
+        boost::python::str fname, const RealND& _cvref, real _offset) {
         boost::mpi::communicator world;
         int i = numInteractions;
         numInteractions += 1;
@@ -73,8 +73,11 @@ namespace espressopp {
         // Dimension 6: angle, bond, dihed, sd_angle, sd_bond, sd_dihed
         colVarRef[i].setDimension(6);
         colVarRef[i] = _cvref;
+        offsets.setDimension(numInteractions);
+        offsets[i] = _offset;
         filenames.push_back(boost::python::extract<std::string>(fname));
         weights.push_back(0.);
+        dweights.push_back(0.);
         if (itype == 1) { // create a new InterpolationLinear
               tables.push_back(make_shared <InterpolationLinear> ());
               tables[i]->read(world, filenames[i].c_str());
@@ -107,6 +110,7 @@ namespace espressopp {
         int maxWeightI = 0;
         for (int i=0; i<numInteractions-1; ++i) {
             weights[i]    = 1.;
+            dweights[i]   = 0.;
             real norm_d_i = 0.;
             real norm_l_i = 0.;
             for (int j=0; j<colVar.getDimension(); ++j) {
@@ -115,28 +119,27 @@ namespace espressopp {
                 if (j == 0) k = 0;
                 else if (j>0 && j<1+colVarAngleList->size()) k = 1;
                 else k = 2;
-                // // Lengthscale of the cluster i
-                // real length_ci = colVarRef[i][3+k];
-                // // Distance between inst and ref_i
-                // real d_i = abs((colVar[j] - colVarRef[i][k]) / colVarSd[k]);
-                // if (d_i > length_ci)
-                //     weights[i] *= exp(- (d_i - length_ci) / alpha);
-                // // std::cout << i << " " << j << " " << k << " " << weights[i] << std::endl;
                 norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
                 norm_l_i += pow(colVarRef[i][3+k], 2);
             }
-            if (norm_d_i > norm_l_i)
-              weights[i] = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
+            if (norm_d_i > norm_l_i) {
+              weights[i]  = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
+              dweights[i] = - weights[i]/(alpha * sqrt(norm_d_i)) *
+                (colVar[0] -  colVarRef[i][0]) / colVarSd[0];
+            }
             if (weights[i] > maxWeight) {
               maxWeight = weights[i];
               maxWeightI = i;
             }
         }
         for (int i=0; i<numInteractions-1; ++i) {
-          if (i != maxWeightI)
+          if (i != maxWeightI) {
             weights[i] = 0.;
+            dweights[i] = 0.;
+          }
         }
         weights[numInteractions-1] = 1. - maxWeight;
+        dweights[numInteractions-1] = 0.;
     }
 
     // Collective variables
@@ -186,8 +189,13 @@ namespace espressopp {
             .def("colVarSd_set", &TabulatedSubEns::setColVarSd)
             .def("weight_get", &TabulatedSubEns::getWeights)
             .def("weight_set", &TabulatedSubEns::setWeight)
+            .def("dweight_get", &TabulatedSubEns::getDWeights)
+            .def("dweight_set", &TabulatedSubEns::setDWeight)
+            .def("computeForceNorm", &TabulatedSubEns::computeForceNorm)
             .def("alpha_get", &TabulatedSubEns::getAlpha)
             .def("alpha_set", &TabulatedSubEns::setAlpha)
+            .def("offset_get", &TabulatedSubEns::getOffsets)
+            .def("offset_set", &TabulatedSubEns::setOffset)
             .def("addInteraction", &TabulatedSubEns::addInteraction)
             .def("colVarRefs_get", &TabulatedSubEns::getColVarRefs)
             .def("colVarRef_get", &TabulatedSubEns::getColVarRef)
