@@ -1,5 +1,5 @@
-#  Copyright (C) 2017
-#      Jakub Krajniak (jkrajniak at gmail.com)
+#  Copyright (C) 2017,2018
+#      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
 #  Copyright (C) 2012,2013,2014,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -57,12 +57,20 @@ Example - how to turn on thermodynamic force for multiple moving spherical regio
 
 .. function:: espressopp.integrator.TDforce.addForce(itype, filename, type)
 
+        Adds a thermodynamic force acting on particles of type "type".
+
         :param itype: interpolation type 1: linear, 2: Akima, 3: Cubic
         :param filename: filename for TD force file
         :param type: particle type on which the TD force needs to be applied
         :type itype: int
         :type filename: string
         :type type: int
+
+.. function:: espressopp.integrator.TDforce.computeTDEnergy()
+
+        Computes the energy corresponding to the thermodynamics force (summing over all different particle types and thermodynamic forces on them).
+
+        :rtype: real
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -83,11 +91,15 @@ class TDforceLocal(integrator_TDforce):
             if pmi.workerIsActive():
                 self.cxxclass.addForce(self, itype, filename, type)
 
+    def computeTDEnergy(self):
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+              return self.cxxclass.computeTDEnergy(self)
+
 if pmi.isController :
     class TDforce(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.TDforceLocal',
             pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addForce', 'getForce']
+            pmicall = ['addForce', 'getForce', 'computeTDEnergy']
             )

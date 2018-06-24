@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -38,8 +38,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FreeEnergyCompensation::theLogger, "FreeEnergyCompensation");
 
-    FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr)
-    :Extension(system), sphereAdr(_sphereAdr) {
+    FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr, int _ntrotter)
+    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter) {
 
         type = Extension::FreeEnergyCompensation;
 
@@ -129,10 +129,10 @@ namespace espressopp {
                                     Particle &at = **it3;
 
                                     if(sphereAdr){
-                                      at.force() += vp.lambdaDeriv() * at.mass() * dist3D / vp.mass();
+                                      at.force() += vp.lambdaDeriv() * at.mass() * dist3D / (vp.mass() * ntrotter);
                                     }
                                     else{
-                                      at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
+                                      at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / (vp.mass() * ntrotter);
                                     }
 
                                 }
@@ -194,7 +194,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>, bases<Extension> >
-        ("integrator_FreeEnergyCompensation", init< shared_ptr<System>, bool >())
+        ("integrator_FreeEnergyCompensation", init< shared_ptr<System>, bool, int >())
         .add_property("filename", &FreeEnergyCompensation::getFilename)
         .def("connect", &FreeEnergyCompensation::connect)
         .def("disconnect", &FreeEnergyCompensation::disconnect)
