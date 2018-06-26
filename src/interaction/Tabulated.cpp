@@ -32,7 +32,9 @@
 #include "InterpolationCubic.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListAdressCGInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
+#include "VerletListHadressCGInteractionTemplate.hpp"
 #include "VerletListPIadressInteractionTemplate.hpp"
 #include "VerletListPIadressNoDriftInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
@@ -66,7 +68,9 @@ namespace espressopp {
 
     typedef class VerletListInteractionTemplate <Tabulated> VerletListTabulated;
     typedef class VerletListAdressInteractionTemplate <Tabulated, Tabulated> VerletListAdressTabulated;
+    typedef class VerletListAdressCGInteractionTemplate <Tabulated> VerletListAdressCGTabulated;
     typedef class VerletListHadressInteractionTemplate <Tabulated, Tabulated> VerletListHadressTabulated;
+    typedef class VerletListHadressCGInteractionTemplate <Tabulated> VerletListHadressCGTabulated;
     typedef class VerletListPIadressInteractionTemplate <Tabulated, Tabulated> VerletListPIadressTabulated;
     typedef class VerletListPIadressInteractionTemplate <Tabulated, LennardJones> VerletListPIadressTabulatedLJ;
     typedef class VerletListPIadressNoDriftInteractionTemplate <Tabulated> VerletListPIadressNoDriftTabulated;
@@ -93,6 +97,15 @@ namespace espressopp {
             .def("getPotential", &VerletListTabulated::getPotentialPtr)
         ;
 
+      class_< VerletListAdressCGTabulated, bases< Interaction > >
+        ("interaction_VerletListAdressCGTabulated",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleListAdress> >())
+        .def("getVerletList", &VerletListAdressCGTabulated::getVerletList)
+        .def("setPotential", &VerletListAdressCGTabulated::setPotential)
+        .def("getPotential", &VerletListAdressCGTabulated::getPotentialPtr)
+      ;
+
       class_ <VerletListAdressTabulated, bases <Interaction> >
         ("interaction_VerletListAdressTabulated",
            init <shared_ptr<VerletListAdress>,
@@ -101,6 +114,15 @@ namespace espressopp {
             .def("setPotentialAT", &VerletListAdressTabulated::setPotentialAT)
             .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG);
         ;
+
+      class_< VerletListHadressCGTabulated, bases< Interaction > >
+        ("interaction_VerletListHadressCGTabulated",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleListAdress> >())
+        .def("getVerletList", &VerletListHadressCGTabulated::getVerletList)
+        .def("setPotential", &VerletListHadressCGTabulated::setPotential)
+        .def("getPotential", &VerletListHadressCGTabulated::getPotentialPtr)
+      ;
 
       class_ <VerletListHadressTabulated, bases <Interaction> >
         ("interaction_VerletListHadressTabulated",

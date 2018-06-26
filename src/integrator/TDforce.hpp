@@ -51,7 +51,8 @@ namespace espressopp {
         real startdist;
         real enddist;
         int edgeweightmultiplier;
-        TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1);
+        bool slow;
+        TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1, bool _slow = false);
 
         ~TDforce();
 
