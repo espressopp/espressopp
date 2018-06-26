@@ -267,8 +267,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedSubEnsLocal',
             pmicall = ['colVarMu_get', 'colVarMu_set', 'weight_get', 'weight_set',
-                       'alpha_get', 'alpha_set', 'dweight_get', 'dweight_set',
-					   'offsets_get', 'offsets_set', 'computeForceNorm',
+                       'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
 				       'colVarSd_get', 'colVarSd_set',
 				       'dimension_get', 'filenames_get', 'filename_get',
 				       'filename_set', 'addInteraction', 'colVarRefs_get',

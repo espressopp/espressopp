@@ -51,16 +51,18 @@ namespace espressopp {
             int interpolationType;
             // Reference values of the collective variable centers
             RealNDs colVarRef;
-            // Weights and derivatives of each table
+            // Weights of each table
             RealND weights;
-            RealND dweights;
+            // Target probability of each table
+            RealND targetProb;
+            // Running sum of each weight and number of counts
+            RealND weightSum;
+            int weightCounts;
             // Renormalize collective variables: mean and std
             RealND colVarMu;
             RealND colVarSd;
             // characteristic decay length of the interpolation
             real alpha;
-            // offset free energy of each table
-            RealND offsets;
 
         public:
             static void registerPython();
@@ -69,16 +71,17 @@ namespace espressopp {
               numInteractions(0) {
               setCutoff(infinity);
               weights.setDimension(0);
-              dweights.setDimension(0);
+              weightSum.setDimension(0);
+              targetProb.setDimension(0);
+              weightCounts = 0;
               colVarMu.setDimension(3);
               colVarSd.setDimension(3);
               colVarRef.setDimension(0);
               alpha = 1.;
-              offsets.setDimension(0);
             }
 
             void addInteraction(int itype, boost::python::str fname,
-                                const RealND& _cvref, real _offset);
+                                const RealND& _cvref);
 
             void setDimension(int _dim) {
               numInteractions = _dim;
@@ -86,8 +89,8 @@ namespace espressopp {
               tables.resize( numInteractions );
               filenames.resize( numInteractions );
               weights.setDimension( numInteractions );
-              dweights.setDimension( numInteractions );
-              offsets.setDimension( numInteractions );
+              weightSum.setDimension( numInteractions );
+              targetProb.setDimension( numInteractions );
             }
 
             int getDimension() const { return numInteractions; }
@@ -97,6 +100,12 @@ namespace espressopp {
 
             /** Getter for the interpolation type */
             int getInterpolationType() const { return interpolationType; }
+
+            RealND getTargetProb() const { return targetProb; }
+
+            void setTargetProb(int index, real _r) {
+                return targetProb.setItem(index, _r);
+            }
 
             RealND getColVarMus() const { return colVarMu; }
 
@@ -143,18 +152,6 @@ namespace espressopp {
                 return weights.setItem(index, _w);
             }
 
-            RealND getDWeights() const { return dweights; }
-
-            void setDWeight(int index, real _dw) {
-                return dweights.setItem(index, _dw);
-            }
-
-            RealND getOffsets() const { return offsets; }
-
-            void setOffset(int index, real _o) {
-                return offsets.setItem(index, _o);
-            }
-
             real getAlpha() const { return alpha; }
 
             void setAlpha(real _r) { alpha = _r; }
@@ -165,10 +162,8 @@ namespace espressopp {
 
             real _computeEnergySqrRaw(real distSqr) const {
               real e = 0.;
-              for	(int i=0; i<numInteractions; ++i) {
-                  e += weights[i] * (tables[i]->getEnergy(sqrt(distSqr))
-                          + offsets[i]);
-              }
+              for (int i=0; i<numInteractions; ++i)
+                  e += weights[i] * tables[i]->getEnergy(sqrt(distSqr));
               return e;
             }
 
@@ -176,22 +171,9 @@ namespace espressopp {
                 real ffactor = 0;
                 real distrt = sqrt(distSqr);
                 for	(int i=0; i<numInteractions; ++i)
-                    ffactor += weights[i] * tables[i]->getForce(distrt) / distrt
-                              - offsets[i] * dweights[i] / distrt;
+                    ffactor += weights[i] * tables[i]->getForce(distrt) / distrt;
                 force = dist * ffactor;
                 return true;
-            }
-
-            real computeForceNorm(real d, RealND w, RealND dw) {
-              weights = w;
-              dweights = dw;
-              real ffactor = 0;
-              real distrt = d;
-              for	(int i=0; i<numInteractions; ++i)
-                  ffactor += weights[i] * tables[i]->getForce(distrt)
-                            - offsets[i] * dweights[i];
-                  // ffactor += - offsets[i] * dweights[i];
-              return ffactor;
             }
 
     };//class

@@ -29,6 +29,7 @@
 #include "RealND.hpp"
 #include "Particle.hpp"
 #include "logging.hpp"
+#include "FixedPairList.hpp"
 #include "FixedTripleList.hpp"
 
 namespace espressopp {
@@ -47,6 +48,8 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
 
+      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl) = 0;
+      virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
       virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl) = 0;
       virtual shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
 
@@ -95,6 +98,8 @@ namespace espressopp {
       virtual real setAutoShift();
       void updateAutoShift();
 
+      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl);
+      virtual shared_ptr<FixedPairList> getColVarBondList() const;
       virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl);
       virtual shared_ptr<FixedTripleList> getColVarAngleList() const;
 
@@ -139,7 +144,9 @@ namespace espressopp {
       real cutoffSqr;
       real shift;
       bool autoShift;
-      // List of angle that correlate with the bond potential
+      // List of bonds that correlate with the bond potential
+      shared_ptr<FixedPairList> colVarBondList;
+      // List of angles that correlate with the bond potential
       shared_ptr<FixedTripleList> colVarAngleList;
       // Collective variables: first itself, then angles
       RealND colVar;
@@ -230,6 +237,20 @@ namespace espressopp {
     updateAutoShift() {
       if (autoShift) setAutoShift();
     }
+
+    // Pair list for collective variables
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    setColVarBondList(const shared_ptr < FixedPairList >& _fpl) {
+      colVarBondList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedPairList >
+    PotentialTemplate< Derived >::
+    getColVarBondList() const
+    { return colVarBondList; }
 
     // Pair list for collective variables
     template < class Derived >

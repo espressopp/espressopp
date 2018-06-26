@@ -23,10 +23,10 @@
 */
 
 // ESPP_CLASS
-#ifndef _INTERACTION_TABULATEDSUBENSANGULAR_HPP
-#define _INTERACTION_TABULATEDSUBENSANGULAR_HPP
+#ifndef _INTERACTION_TABULATEDSUBENSDIHEDRAL_HPP
+#define _INTERACTION_TABULATEDSUBENSDIHEDRAL_HPP
 
-#include "AngularPotential.hpp"
+#include "DihedralPotential.hpp"
 #include "Interpolation.hpp"
 #include "RealND.hpp"
 #include "bc/BC.hpp"
@@ -34,7 +34,7 @@
 namespace espressopp {
     namespace interaction {
 
-        class TabulatedSubEnsAngular: public AngularPotentialTemplate<TabulatedSubEnsAngular> {
+        class TabulatedSubEnsDihedral: public DihedralPotentialTemplate <TabulatedSubEnsDihedral> {
 
             private:
                 int numInteractions;
@@ -59,7 +59,7 @@ namespace espressopp {
             public:
                 static void registerPython();
 
-                TabulatedSubEnsAngular() :
+                TabulatedSubEnsDihedral() :
                     numInteractions(0) {
                     setCutoff(infinity);
                     weights.setDimension(0);
@@ -148,70 +148,133 @@ namespace espressopp {
 
                 void setAlpha(real _r) { alpha = _r; }
 
-                void computeColVarWeights(const Real3D& dist12,
-                    const Real3D& dist32, const bc::BC& bc);
+                void computeColVarWeights(const Real3D& dist21, const Real3D& dist32,
+                                const Real3D& dist43, const bc::BC& bc);
 
-                void setColVar(const Real3D& dist12,
-                    const Real3D& dist32, const bc::BC& bc);
+                void setColVar(const Real3D& dist21, const Real3D& dist32,
+                                const Real3D& dist43, const bc::BC& bc);
 
-                real _computeEnergyRaw(real theta) const {
+                real _computeEnergyRaw(real phi) const {
                     real e = 0.;
                     for	(int i=0; i<numInteractions; ++i)
-                        e += weights[i] * tables[i]->getEnergy(theta);
+                        e += weights[i] * tables[i]->getEnergy(phi);
                     return e;
                 }
 
-                bool _computeForceRaw(Real3D& force12, Real3D& force32,
-                                      const Real3D& dist12, const Real3D& dist32) const {
-                    real dist12_sqr = dist12 * dist12;
+                void _computeForceRaw(Real3D& force1,
+                                        Real3D& force2,
+                                        Real3D& force3,
+                                        Real3D& force4,
+                                        const Real3D& dist21,
+                                        const Real3D& dist32,
+                                        const Real3D& dist43) const {
+                    real dist21_sqr = dist21 * dist21;
                     real dist32_sqr = dist32 * dist32;
-                    real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
-                    real cos_theta = dist12 * dist32 / dist1232;
-                    real theta = acos(cos_theta);
+                    real dist43_sqr = dist43 * dist43;
+                    real dist21_magn = sqrt(dist21_sqr);
+                    real dist32_magn = sqrt(dist32_sqr);
+                    real dist43_magn = sqrt(dist43_sqr);
 
+                    // cos0
+                    real sb1 = 1.0 / dist21_sqr;
+                    real sb2 = 1.0 / dist32_sqr;
+                    real sb3 = 1.0 / dist43_sqr;
+                    real rb1 = sqrt(sb1);
+                    real rb3 = sqrt(sb3);
+                    real c0 = dist21 * dist43 * rb1 * rb3;
+
+
+                    // 1st and 2nd angle
+                    real ctmp = dist21 * dist32;
+                    real r12c1 = 1.0 / (dist21_magn * dist32_magn);
+                    real c1mag = ctmp * r12c1;
+
+                    ctmp = (-1.0 * dist32) * dist43;
+                    real r12c2 = 1.0 / (dist32_magn * dist43_magn);
+                    real c2mag = ctmp * r12c2;
+
+
+                    //cos and sin of 2 angles and final cos
+                    real sin2 = 1.0 - c1mag * c1mag;
+                    if (sin2 < 0) sin2 = 0.0;
+                    real sc1 = sqrt(sin2);
+                    sc1 = 1.0 / sc1;
+
+                    sin2 = 1.0 - c2mag * c2mag;
+                    if (sin2 < 0) sin2 = 0.0;
+                    real sc2 = sqrt(sin2);
+                    sc2 = 1.0 / sc2;
+
+                    real s1 = sc1 * sc1;
+                    real s2 = sc2 * sc2;
+                    real s12 = sc1 * sc2;
+                    real c = (c0 + c1mag * c2mag) * s12;
+
+                    Real3D cc = dist21.cross(dist32);
+                    real cmag = sqrt(cc * cc);
+                    real dx = cc * dist43 / cmag / dist43_magn;
+
+                    if (c > 1.0) c = 1.0;
+                    else if (c < -1.0) c = -1.0;
+
+                    // phi
+                    real phi = acos(c);
+                    if (dx < 0.0) phi *= -1.0;
+
+                    // read table
                     real a = 0.;
                     for	(int i=0; i<numInteractions; ++i)
-                        a += weights[i] * tables[i]->getForce(theta);
+                        a += weights[i] * tables[i]->getForce(phi);
 
-                    a*=1.0/(sqrt(1.0-cos_theta*cos_theta));
+                    c = c * a;
+                    s12 = s12 * a;
 
-                    real a11 = a * cos_theta / dist12_sqr;
-                    real a12 = -a / dist1232;
-                    real a22 = a * cos_theta / dist32_sqr;
+                    real a11 = c * sb1 * s1;
+                    real a22 = -sb2 * (2.0 * c0 * s12 - c * (s1 + s2));
+                    real a33 = c * sb3 * s2;
+                    real a12 = -r12c1 * (c1mag * c * s1 + c2mag * s12);
+                    real a13 = -rb1 * rb3 * s12;
+                    real a23 = r12c2 * (c2mag * c * s2 + c1mag * s12);
 
-                    force12 = a11 * dist12 + a12 * dist32;
-                    force32 = a22 * dist32 + a12 * dist12;
-                    return true;
+                    Real3D sf2 = a12 * dist21 + a22 * dist32 + a23 * dist43;
+
+                    force1 = a11 * dist21 + a12 * dist32 + a13 * dist43;
+                    force2 = (-1.0 * sf2) - force1;
+                    force4 = a13 * dist21 + a23 * dist32 + a33 * dist43;
+                    force3 = sf2 - force4;
+
                 }
 
-                real _computeForceRaw(real theta) const {
+                real _computeForceRaw(real phi) const {
                     real f = 0.;
                     for	(int i=0; i<numInteractions; ++i)
-                        f += weights[i] * tables[i]->getForce(theta);
+                        f += weights[i] * tables[i]->getForce(phi);
                     return f;
                 }
 
         }; // class
-
         // provide pickle support
-        struct TabulatedSubEnsAngular_pickle : boost::python::pickle_suite {
-            static boost::python::tuple getinitargs(TabulatedSubEnsAngular const& pot) {
-                int itp = pot.getInterpolationType();
-                boost::python::list fns;
-                RealNDs cvrefs = pot.getColVarRefs();
-                int dim = pot.getDimension();
-                fns = pot.getFilenames();
-                RealND cvmu = pot.getColVarMus();
-                RealND cvsd = pot.getColVarSds();
-                real rc = pot.getCutoff();
-                real alp = pot.getAlpha();
-                return boost::python::make_tuple(dim, itp, fns, cvrefs,
-                                                 cvmu, cvsd, alp, rc);
-            }
+        struct TabulatedSubEnsDihedral_pickle : boost::python::pickle_suite
+        {
+          static
+          boost::python::tuple
+          getinitargs(TabulatedSubEnsDihedral const& pot)
+          {
+              int itp = pot.getInterpolationType();
+              boost::python::list fns;
+              RealNDs cvrefs = pot.getColVarRefs();
+              int dim = pot.getDimension();
+              fns = pot.getFilenames();
+              RealND cvmu = pot.getColVarMus();
+              RealND cvsd = pot.getColVarSds();
+              real rc = pot.getCutoff();
+              real alp = pot.getAlpha();
+              return boost::python::make_tuple(dim, itp, fns, cvrefs,
+                                                cvmu, cvsd, alp, rc);
+          }
         };
 
-    } // ns interaction
+    } //ns espressopp
 
-} //ns espressopp
-
+}
 #endif

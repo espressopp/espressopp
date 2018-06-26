@@ -23,17 +23,18 @@
 */
 
 #include "python.hpp"
-#include "TabulatedSubEnsAngular.hpp"
+#include "TabulatedSubEnsDihedral.hpp"
 #include "InterpolationLinear.hpp"
 #include "InterpolationAkima.hpp"
 #include "InterpolationCubic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
-#include "FixedTripleListTypesInteractionTemplate.hpp"
+#include "FixedQuadrupleListInteractionTemplate.hpp"
+#include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
 namespace espressopp {
     namespace interaction {
 
-        void TabulatedSubEnsAngular::setFilenames(int dim,
+        void TabulatedSubEnsDihedral::setFilenames(int dim,
             int itype, boost::python::list _filenames) {
             boost::mpi::communicator world;
             filenames.resize(dim);
@@ -56,10 +57,10 @@ namespace espressopp {
                   tables[i] = make_shared <InterpolationCubic> ();
                   tables[i]->read(world, filenames[i].c_str());
               }
-          }
+            }
         }
 
-        void TabulatedSubEnsAngular::addInteraction(int itype,
+        void TabulatedSubEnsDihedral::addInteraction(int itype,
             boost::python::str fname, const RealND& _cvref) {
             boost::mpi::communicator world;
             int i = numInteractions;
@@ -86,7 +87,7 @@ namespace espressopp {
               }
         }
 
-        void TabulatedSubEnsAngular::setColVarRef(
+        void TabulatedSubEnsDihedral::setColVarRef(
             const RealNDs& cvRefs){
             // Set the reference values of the collective variables
             // aka cluster centers
@@ -94,11 +95,12 @@ namespace espressopp {
                 colVarRef[i] = cvRefs[i];
         }
 
-        void TabulatedSubEnsAngular::computeColVarWeights(
-            const Real3D& dist12, const Real3D& dist32, const bc::BC& bc){
+        void TabulatedSubEnsDihedral::computeColVarWeights(
+            const Real3D& dist21, const Real3D& dist32,
+            const Real3D& dist43, const bc::BC& bc){
             // Compute the weights for each force field
             // given the reference and instantaneous values of ColVars
-            setColVar(dist12, dist32, bc);
+            setColVar(dist21, dist32, dist43, bc);
             // Compute weights up to next to last FF
             real maxWeight = 0.;
             int maxWeightI = 0;
@@ -123,7 +125,7 @@ namespace espressopp {
                     real norm_l_i = 0.;
                     for (int j=0; j<colVar.getDimension(); ++j) {
                         int k = 0;
-                        // Choose between angle, bond, and dihed
+                        // Choose between dihed, bond, and angle
                         if (j == 0) k = 0;
                         else if (j>0 && j<1+colVarBondList->size()) k = 1;
                         else k = 2;
@@ -161,14 +163,64 @@ namespace espressopp {
         }
 
         // Collective variables
-        void TabulatedSubEnsAngular::setColVar(const Real3D& dist12,
-              const Real3D& dist32, const bc::BC& bc) {
-            colVar.setDimension(1+colVarBondList->size());
-            real dist12_sqr = dist12 * dist12;
+        void TabulatedSubEnsDihedral::setColVar(
+            const Real3D& dist21, const Real3D& dist32,
+            const Real3D& dist43, const bc::BC& bc) {
+            colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
+            // compute phi
+            real dist21_sqr = dist21 * dist21;
             real dist32_sqr = dist32 * dist32;
-            real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
-            real cos_theta = dist12 * dist32 / dist1232;
-            colVar[0] = acos(cos_theta);
+            real dist43_sqr = dist43 * dist43;
+            real dist21_magn = sqrt(dist21_sqr);
+            real dist32_magn = sqrt(dist32_sqr);
+            real dist43_magn = sqrt(dist43_sqr);
+
+            // cos0
+            real sb1 = 1.0 / dist21_sqr;
+            real sb2 = 1.0 / dist32_sqr;
+            real sb3 = 1.0 / dist43_sqr;
+            real rb1 = sqrt(sb1);
+            real rb3 = sqrt(sb3);
+            real c0 = dist21 * dist43 * rb1 * rb3;
+
+
+            // 1st and 2nd angle
+            real ctmp = dist21 * dist32;
+            real r12c1 = 1.0 / (dist21_magn * dist32_magn);
+            real c1mag = ctmp * r12c1;
+
+            ctmp = (-1.0 * dist32) * dist43;
+            real r12c2 = 1.0 / (dist32_magn * dist43_magn);
+            real c2mag = ctmp * r12c2;
+
+
+            //cos and sin of 2 angles and final cos
+            real sin2 = 1.0 - c1mag * c1mag;
+            if (sin2 < 0) sin2 = 0.0;
+            real sc1 = sqrt(sin2);
+            sc1 = 1.0 / sc1;
+
+            sin2 = 1.0 - c2mag * c2mag;
+            if (sin2 < 0) sin2 = 0.0;
+            real sc2 = sqrt(sin2);
+            sc2 = 1.0 / sc2;
+
+            real s1 = sc1 * sc1;
+            real s2 = sc2 * sc2;
+            real s12 = sc1 * sc2;
+            real c = (c0 + c1mag * c2mag) * s12;
+
+            Real3D cc = dist21.cross(dist32);
+            real cmag = sqrt(cc * cc);
+            real dx = cc * dist43 / cmag / dist43_magn;
+
+            if (c > 1.0) c = 1.0;
+            else if (c < -1.0) c = -1.0;
+
+            // phi
+            real phi = acos(c);
+            if (dx < 0.0) phi *= -1.0;
+            colVar[0] = phi;
             // Now all bonds in colVarBondList
             int i=1;
             for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
@@ -179,56 +231,74 @@ namespace espressopp {
               colVar[i] = sqrt(dist12 * dist12);
               i+=1;
             }
+            // Now all angles in colVarAngleList
+            for (FixedTripleList::TripleList::Iterator it(*colVarAngleList); it.isValid(); ++it) {
+              Particle &p1 = *it->first;
+              Particle &p2 = *it->second;
+              Particle &p3 = *it->third;
+              Real3D dist12, dist32;
+              bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+              bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+              real dist12_sqr = dist12 * dist12;
+              real dist32_sqr = dist32 * dist32;
+              real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
+              real cos_theta = dist12 * dist32 / dist1232;
+              colVar[i] = acos(cos_theta);
+              i+=1;
+            }
         }
 
-        typedef class FixedTripleListInteractionTemplate <TabulatedSubEnsAngular>
-                FixedTripleListTabulatedSubEnsAngular;
-        typedef class FixedTripleListTypesInteractionTemplate<TabulatedSubEnsAngular>
-            FixedTripleListTypesTabulatedSubEnsAngular;
+
+        typedef class FixedQuadrupleListInteractionTemplate <TabulatedSubEnsDihedral>
+            FixedQuadrupleListTabulatedSubEnsDihedral;
+
+        typedef class FixedQuadrupleListTypesInteractionTemplate<TabulatedSubEnsDihedral>
+            FixedQuadrupleListTypesTabulatedSubEnsDihedral;
 
         //////////////////////////////////////////////////
         // REGISTRATION WITH PYTHON
         //////////////////////////////////////////////////
-        void TabulatedSubEnsAngular::registerPython() {
+        void TabulatedSubEnsDihedral::registerPython() {
             using namespace espressopp::python;
 
-            class_ <TabulatedSubEnsAngular, bases <AngularPotential> >
-                ("interaction_TabulatedSubEnsAngular", init <>())
-                .def("dimension_get", &TabulatedSubEnsAngular::getDimension)
-                .def("filenames_get", &TabulatedSubEnsAngular::getFilenames)
-                .def("filename_get", &TabulatedSubEnsAngular::getFilename)
-                .def("filename_set", &TabulatedSubEnsAngular::setFilename)
-                .def("targetProb_get", &TabulatedSubEnsAngular::getTargetProb)
-                .def("targetProb_set", &TabulatedSubEnsAngular::setTargetProb)
-                .def("colVarMu_get", &TabulatedSubEnsAngular::getColVarMus)
-                .def("colVarMu_set", &TabulatedSubEnsAngular::setColVarMu)
-                .def("colVarSd_get", &TabulatedSubEnsAngular::getColVarSds)
-                .def("colVarSd_set", &TabulatedSubEnsAngular::setColVarSd)
-                .def("weight_get", &TabulatedSubEnsAngular::getWeights)
-                .def("weight_set", &TabulatedSubEnsAngular::setWeight)
-                .def("alpha_get", &TabulatedSubEnsAngular::getAlpha)
-                .def("alpha_set", &TabulatedSubEnsAngular::setAlpha)
-                .def("addInteraction", &TabulatedSubEnsAngular::addInteraction)
-                .def("colVarRefs_get", &TabulatedSubEnsAngular::getColVarRefs)
-                .def("colVarRef_get", &TabulatedSubEnsAngular::getColVarRef)
-                .def_pickle(TabulatedSubEnsAngular_pickle())
+            class_ <TabulatedSubEnsDihedral, bases <DihedralPotential> >
+                ("interaction_TabulatedSubEnsDihedral", init <>())
+                .def("dimension_get", &TabulatedSubEnsDihedral::getDimension)
+                .def("filenames_get", &TabulatedSubEnsDihedral::getFilenames)
+                .def("filename_get", &TabulatedSubEnsDihedral::getFilename)
+                .def("filename_set", &TabulatedSubEnsDihedral::setFilename)
+                .def("targetProb_get", &TabulatedSubEnsDihedral::getTargetProb)
+                .def("targetProb_set", &TabulatedSubEnsDihedral::setTargetProb)
+                .def("colVarMu_get", &TabulatedSubEnsDihedral::getColVarMus)
+                .def("colVarMu_set", &TabulatedSubEnsDihedral::setColVarMu)
+                .def("colVarSd_get", &TabulatedSubEnsDihedral::getColVarSds)
+                .def("colVarSd_set", &TabulatedSubEnsDihedral::setColVarSd)
+                .def("weight_get", &TabulatedSubEnsDihedral::getWeights)
+                .def("weight_set", &TabulatedSubEnsDihedral::setWeight)
+                .def("alpha_get", &TabulatedSubEnsDihedral::getAlpha)
+                .def("alpha_set", &TabulatedSubEnsDihedral::setAlpha)
+                .def("addInteraction", &TabulatedSubEnsDihedral::addInteraction)
+                .def("colVarRefs_get", &TabulatedSubEnsDihedral::getColVarRefs)
+                .def("colVarRef_get", &TabulatedSubEnsDihedral::getColVarRef)
+                .def_pickle(TabulatedSubEnsDihedral_pickle())
                 ;
 
-            class_ <FixedTripleListTabulatedSubEnsAngular, bases <Interaction> >
-                ("interaction_FixedTripleListTabulatedSubEnsAngular",
-                init <shared_ptr<System>,
-                      shared_ptr <FixedTripleList>,
-                      shared_ptr <TabulatedSubEnsAngular> >())
-                .def("setPotential", &FixedTripleListTabulatedSubEnsAngular::setPotential)
-                .def("getFixedTripleList", &FixedTripleListTabulatedSubEnsAngular::getFixedTripleList);
+            class_ <FixedQuadrupleListTabulatedSubEnsDihedral, bases <Interaction> >
+                ("interaction_FixedQuadrupleListTabulatedSubEnsDihedral",
+                        init <shared_ptr<System>,
+                              shared_ptr<FixedQuadrupleList>,
+                              shared_ptr<TabulatedSubEnsDihedral> >())
+                .def("setPotential", &FixedQuadrupleListTabulatedSubEnsDihedral::setPotential)
+                .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedSubEnsDihedral::getFixedQuadrupleList);
 
-            class_< FixedTripleListTypesTabulatedSubEnsAngular, bases< Interaction > >
-                ("interaction_FixedTripleListTypesTabulatedSubEnsAngular",
-                 init< shared_ptr<System>, shared_ptr<FixedTripleList> >())
-                .def("setPotential", &FixedTripleListTypesTabulatedSubEnsAngular::setPotential)
-                .def("getPotential", &FixedTripleListTypesTabulatedSubEnsAngular::getPotentialPtr)
-                .def("setFixedTripleList", &FixedTripleListTypesTabulatedSubEnsAngular::setFixedTripleList)
-                .def("getFixedTripleList", &FixedTripleListTypesTabulatedSubEnsAngular::getFixedTripleList);
+            class_< FixedQuadrupleListTypesTabulatedSubEnsDihedral, bases< Interaction > >
+                ("interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral",
+                 init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+                .def("setPotential", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::setPotential)
+                .def("getPotential", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::getPotentialPtr)
+                .def("setFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::setFixedQuadrupleList)
+                .def("getFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::getFixedQuadrupleList);
+
         }
 
     } // ns interaction

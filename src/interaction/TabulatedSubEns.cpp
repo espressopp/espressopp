@@ -65,7 +65,7 @@ namespace espressopp {
     }
 
     void TabulatedSubEns::addInteraction(int itype,
-        boost::python::str fname, const RealND& _cvref, real _offset) {
+        boost::python::str fname, const RealND& _cvref) {
         boost::mpi::communicator world;
         int i = numInteractions;
         numInteractions += 1;
@@ -73,11 +73,10 @@ namespace espressopp {
         // Dimension 6: angle, bond, dihed, sd_angle, sd_bond, sd_dihed
         colVarRef[i].setDimension(6);
         colVarRef[i] = _cvref;
-        offsets.setDimension(numInteractions);
-        offsets[i] = _offset;
         filenames.push_back(boost::python::extract<std::string>(fname));
         weights.push_back(0.);
-        dweights.push_back(0.);
+        weightSum.push_back(0.);
+        targetProb.push_back(0.);
         if (itype == 1) { // create a new InterpolationLinear
               tables.push_back(make_shared <InterpolationLinear> ());
               tables[i]->read(world, filenames[i].c_str());
@@ -108,46 +107,79 @@ namespace espressopp {
         // Compute weights up to next to last FF
         real maxWeight = 0.;
         int maxWeightI = 0;
-        for (int i=0; i<numInteractions-1; ++i) {
-            weights[i]    = 1.;
-            dweights[i]   = 0.;
-            real norm_d_i = 0.;
-            real norm_l_i = 0.;
-            for (int j=0; j<colVar.getDimension(); ++j) {
-                int k = 0;
-                // Choose between bond, angle, and dihed
-                if (j == 0) k = 0;
-                else if (j>0 && j<1+colVarAngleList->size()) k = 1;
-                else k = 2;
-                norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
-                norm_l_i += pow(colVarRef[i][3+k], 2);
-            }
-            if (norm_d_i > norm_l_i) {
-              weights[i]  = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
-              dweights[i] = - weights[i]/(alpha * sqrt(norm_d_i)) *
-                (colVar[0] -  colVarRef[i][0]) / colVarSd[0];
-            }
+        // Check first whether we're stuck in a surface
+        bool stuck = false;
+        for (int i=0; i<numInteractions; ++i) {
             if (weights[i] > maxWeight) {
-              maxWeight = weights[i];
-              maxWeightI = i;
+                maxWeight = weights[i];
+                maxWeightI = i;
             }
         }
-        for (int i=0; i<numInteractions-1; ++i) {
-          if (i != maxWeightI) {
-            weights[i] = 0.;
-            dweights[i] = 0.;
-          }
+        if (weightCounts > 0 &&
+            maxWeightI < numInteractions-1 &&
+            weightSum[maxWeightI]/weightCounts < 0.98*targetProb[maxWeightI])
+            stuck = true;
+        if (!stuck) {
+            maxWeight = 0.;
+            maxWeightI = numInteractions-1;
+            for (int i=0; i<numInteractions-1; ++i) {
+                weights[i]    = 1.;
+                real norm_d_i = 0.;
+                real norm_l_i = 0.;
+                for (int j=0; j<colVar.getDimension(); ++j) {
+                    int k = 0;
+                    // Choose between bond, angle, and dihed
+                    if (j <= 0+colVarBondList->size()) k = 0;
+                    else if (j>0 && j<1+colVarBondList->size()+colVarAngleList->size()) k = 1;
+                    else k = 2;
+                    norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                    norm_l_i += pow(colVarRef[i][3+k], 2);
+                }
+                if (norm_d_i > norm_l_i)
+                  weights[i]  = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
+                if (weights[i] > maxWeight) {
+                  maxWeight = weights[i];
+                  maxWeightI = i;
+                }
+            }
+            for (int i=0; i<numInteractions-1; ++i) {
+                if (i != maxWeightI)
+                    weights[i] = 0.;
+                else {
+                    if (weightCounts > 0 &&
+                        weights[i] > 0.01 &&
+                        weightSum[i]/weightCounts < 0.98*targetProb[i]) {
+                        weights[i] = 1.0;
+                        maxWeight = weights[i];
+                    }
+                }
+            }
+            if (maxWeightI == numInteractions-1)
+                maxWeight = 1.;
+            weights[numInteractions-1] = 1. - maxWeight;
         }
-        weights[numInteractions-1] = 1. - maxWeight;
-        dweights[numInteractions-1] = 0.;
+
+        // Update weightSum
+        for (int i=0; i<numInteractions; ++i)
+            weightSum[i] += weights[i];
+        weightCounts += 1;
     }
 
     // Collective variables
     void TabulatedSubEns::setColVar(const Real3D& dist, const bc::BC& bc) {
-        colVar.setDimension(1+colVarAngleList->size());
+        colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
         colVar[0] = sqrt(dist*dist);
-        // Now all angles in colVarAngleList
+        // Now all bonds in colVarBondList
         int i=1;
+        for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
+          Particle &p1 = *it->first;
+          Particle &p2 = *it->second;
+          Real3D dist12;
+          bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+          colVar[i] = sqrt(dist12 * dist12);
+          i+=1;
+        }
+        // Now all angles in colVarAngleList
         for (FixedTripleList::TripleList::Iterator it(*colVarAngleList); it.isValid(); ++it) {
           Particle &p1 = *it->first;
           Particle &p2 = *it->second;
@@ -183,19 +215,16 @@ namespace espressopp {
             .def("filenames_get", &TabulatedSubEns::getFilenames)
             .def("filename_get", &TabulatedSubEns::getFilename)
             .def("filename_set", &TabulatedSubEns::setFilename)
+            .def("targetProb_get", &TabulatedSubEns::getTargetProb)
+            .def("targetProb_set", &TabulatedSubEns::setTargetProb)
             .def("colVarMu_get", &TabulatedSubEns::getColVarMus)
             .def("colVarMu_set", &TabulatedSubEns::setColVarMu)
             .def("colVarSd_get", &TabulatedSubEns::getColVarSds)
             .def("colVarSd_set", &TabulatedSubEns::setColVarSd)
             .def("weight_get", &TabulatedSubEns::getWeights)
             .def("weight_set", &TabulatedSubEns::setWeight)
-            .def("dweight_get", &TabulatedSubEns::getDWeights)
-            .def("dweight_set", &TabulatedSubEns::setDWeight)
-            .def("computeForceNorm", &TabulatedSubEns::computeForceNorm)
             .def("alpha_get", &TabulatedSubEns::getAlpha)
             .def("alpha_set", &TabulatedSubEns::setAlpha)
-            .def("offset_get", &TabulatedSubEns::getOffsets)
-            .def("offset_set", &TabulatedSubEns::setOffset)
             .def("addInteraction", &TabulatedSubEns::addInteraction)
             .def("colVarRefs_get", &TabulatedSubEns::getColVarRefs)
             .def("colVarRef_get", &TabulatedSubEns::getColVarRef)

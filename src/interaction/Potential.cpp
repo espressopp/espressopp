@@ -53,14 +53,14 @@ namespace espressopp {
                 &Potential::getShift,
                 &Potential::setShift)
             .def("setAutoShift", pure_virtual(&Potential::setAutoShift))
+            .add_property("colVarBondList",
+                &Potential::getColVarBondList,
+                &Potential::setColVarBondList)
             .add_property("colVarAngleList",
                 &Potential::getColVarAngleList,
                 &Potential::setColVarAngleList)
             .add_property("colVar",
                 &Potential::getColVar)
-            .add_property("addCVAngle",
-                &Potential::getColVarAngleList,
-                &Potential::setColVarAngleList)
             .def("computeEnergy", pure_virtual(computeEnergy1))
             .def("computeEnergy", pure_virtual(computeEnergy2))
             .def("computeForce", pure_virtual(computeForce))

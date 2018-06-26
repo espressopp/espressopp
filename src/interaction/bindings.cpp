@@ -67,6 +67,7 @@
 #include "DihedralPotential.hpp"
 #include "DihedralUniquePotential.hpp"
 #include "TabulatedDihedral.hpp"
+#include "TabulatedSubEnsDihedral.hpp"
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
 #include "DihedralHarmonicUniqueCos.hpp"
@@ -139,6 +140,7 @@ namespace espressopp {
       DihedralPotential::registerPython();
       DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
+      TabulatedSubEnsDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
       DihedralHarmonicUniqueCos::registerPython();
