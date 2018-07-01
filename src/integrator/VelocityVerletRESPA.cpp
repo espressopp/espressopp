@@ -64,21 +64,18 @@ namespace espressopp {
         resortFlag = false;
       }
 
-      for (int i = 0; i < nsteps; i++) {
-        if(i == 0) {
-          updateForces(true);
-          aftCalcSlow(); // signal
-        }
+      updateForces(true);
+      aftCalcSlow(); // signal
 
+      for (int i = 0; i < nsteps; i++) {
         integrate2(true);
         aftIntSlow(); // signal
 
+        recalc1(); // signal
+        updateForces(false);
+        recalc2(); // signal
+
         for (int j = 0; j < multistep; j++) {
-          if(j == 0) {
-            recalc1(); // signal
-            updateForces(false);
-            recalc2(); // signal
-          }
           befIntP(); // signal
 
           maxDist += integrate1();
@@ -167,13 +164,15 @@ namespace espressopp {
       System& sys = getSystemRef();
       const InteractionList& srIL = sys.shortRangeInteractions;
 
-      for (size_t i = 0; i < srIL.size(); i++) {
-        if(slow == true) {
+      if(slow == true) {
+        for (size_t i = 0; i < srIL.size(); i++) {
           if(srIL[i]->bondType() == NonbondedSlow) {
             srIL[i]->addForces();
           }
         }
-        else {
+      }
+      else {
+        for (size_t i = 0; i < srIL.size(); i++) {
           if(srIL[i]->bondType() != NonbondedSlow) {
             srIL[i]->addForces();
           }

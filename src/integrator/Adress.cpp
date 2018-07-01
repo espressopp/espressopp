@@ -376,22 +376,21 @@ namespace espressopp {
         System& system = getSystemRef();
         real dt = integrator->getTimeStep();
 
+        real dtfm = 0.0;
+        if (afterSlowForces) {
+          dtfm = 0.5 * multistep * dt;
+        }
+        else {
+          dtfm = 0.5 * dt;
+        }
+        // real dtfm = 0.5 * dt / it->mass();
+
         // propagete real AT particles
         ParticleList& adrATparticles = system.storage->getAdrATParticles();
         for (std::vector<Particle>::iterator it = adrATparticles.begin();
                 it != adrATparticles.end(); ++it) {
-
-            real dtfm = 0.0;
-            if (afterSlowForces) {
-              dtfm = 0.5 * multistep * dt / it->mass();
-            }
-            else {
-              dtfm = 0.5 * dt / it->mass();
-            }
-            // real dtfm = 0.5 * dt / it->mass();
-
             // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
-            it->velocity() += dtfm * it->force();
+            it->velocity() += dtfm * it->force() / it->mass();
         }
 
         //Update CG velocities
