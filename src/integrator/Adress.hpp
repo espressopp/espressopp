@@ -71,7 +71,8 @@ namespace espressopp {
         void integrate1(real&);
         void initForces();
         void SetPosVel();
-        void integrate2(bool afterSlowForces);
+        void integrate2();
+        void integrateSlow();
         void aftCalcF();
         void communicateAdrPositions();
 

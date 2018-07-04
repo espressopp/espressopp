@@ -96,11 +96,11 @@ namespace espressopp {
 
         // connection to after integrate2()
         _integrate2 = integrator->aftIntV.connect(
-                boost::bind(&Adress::integrate2, this, false), boost::signals2::at_front);
+                boost::bind(&Adress::integrate2, this), boost::signals2::at_front);
 
         // connection to after integrate2()
         _integrateSlow = integrator->aftIntSlow.connect(
-                boost::bind(&Adress::integrate2, this, true), boost::signals2::at_front);
+                boost::bind(&Adress::integrateSlow, this), boost::signals2::at_front);
 
         // Note: Both this extension as well as Langevin Thermostat access singal aftCalcF. This might lead to undefined behavior.
         // Therefore, we use other signals here, to make sure the Thermostat would be always called first, before force distributions take place.
@@ -371,26 +371,75 @@ namespace espressopp {
     }
 
 
-    void Adress::integrate2(bool afterSlowForces) {
+    void Adress::integrate2() {
 
         System& system = getSystemRef();
         real dt = integrator->getTimeStep();
-
-        real dtfm = 0.0;
-        if (afterSlowForces) {
-          dtfm = 0.5 * multistep * dt;
-        }
-        else {
-          dtfm = 0.5 * dt;
-        }
-        // real dtfm = 0.5 * dt / it->mass();
 
         // propagete real AT particles
         ParticleList& adrATparticles = system.storage->getAdrATParticles();
         for (std::vector<Particle>::iterator it = adrATparticles.begin();
                 it != adrATparticles.end(); ++it) {
+
+            real dtfm = 0.5 * dt / it->mass();
+
             // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
-            it->velocity() += dtfm * it->force() / it->mass();
+            it->velocity() += dtfm * it->force();
+        }
+
+        //Update CG velocities
+        CellList localCells = system.storage->getLocalCells();
+        for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+
+              Particle &vp = *cit;
+
+              FixedTupleListAdress::iterator it3;
+              it3 = fixedtupleList->find(&vp);
+
+              if (it3 != fixedtupleList->end()) {
+
+                  std::vector<Particle*> atList;
+                  atList = it3->second;
+
+                  Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+                  for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                       it2 != atList.end(); ++it2) {
+                      Particle &at = **it2;
+                      cmv += at.mass() * at.velocity();
+                  }
+                  cmv /= vp.getMass();
+                  vp.velocity() = cmv;
+
+              }
+              else { // this should not happen
+                  std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+                  std::cout << " (" << vp.position() << ")\n";
+                  exit(1);
+                  return;
+              }
+
+
+        }
+
+
+
+    }
+
+
+    void Adress::integrateSlow() {
+
+        System& system = getSystemRef();
+        real dt = integrator->getTimeStep();
+
+        // propagete real AT particles
+        ParticleList& adrATparticles = system.storage->getAdrATParticles();
+        for (std::vector<Particle>::iterator it = adrATparticles.begin();
+                it != adrATparticles.end(); ++it) {
+
+            real dtfm = 0.5 * multistep * dt / it->mass();
+
+            // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
+            it->velocity() += dtfm * it->force();
         }
 
         //Update CG velocities
