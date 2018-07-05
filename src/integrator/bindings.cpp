@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -25,6 +25,7 @@
 #include "VelocityVerlet.hpp"
 #include "PIAdressIntegrator.hpp"
 #include "VelocityVerletOnGroup.hpp"
+#include "VelocityVerletRESPA.hpp"
 
 #include "Extension.hpp"
 #include "TDforce.hpp"
@@ -70,6 +71,7 @@ namespace espressopp {
       VelocityVerlet::registerPython();
       PIAdressIntegrator::registerPython();
       VelocityVerletOnGroup::registerPython();
+      VelocityVerletRESPA::registerPython();
       Extension::registerPython();
       Adress::registerPython();
       BerendsenBarostat::registerPython();

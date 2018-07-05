@@ -42,18 +42,20 @@ Example - how to turn on thermodynamic force for multiple moving spherical regio
 >>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
 >>> integrator.addExtension(thdforce)
 
-.. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier)
+.. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
 
         :param system: system object
         :param verletlist: verletlist object
         :param startdist: (default: 0.0) starting distance from center at which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
         :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
         :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications (not used for static or single moving region)
+        :param slow: (default: False) When used with RESPA Velocity Verlet, this flag decides whether the TD force is applied together with the slow, less frequently updated forces (slow=True) or with the fast, more frequently updated (slow=False) forces.
         :type system: shared_ptr<System>
         :type verletlist: shared_ptr<VerletListAdress>
         :type startdist: real
         :type enddist: real
         :type edgeweightmultiplier: int
+        :type slow: bool
 
 .. function:: espressopp.integrator.TDforce.addForce(itype, filename, type)
 
@@ -79,9 +81,9 @@ from _espressopp import integrator_TDforce
 
 class TDforceLocal(integrator_TDforce):
 
-    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0, edgeweightmultiplier = 20):
+    def __init__(self, system, verletlist, startdist=0.0, enddist=0.0, edgeweightmultiplier=20, slow=False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier)
+            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
 
     def addForce(self, itype, filename, type):
             """

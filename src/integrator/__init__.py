@@ -1,6 +1,6 @@
-#  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
+#  Copyright (C) 2012-2018
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
+#  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
@@ -29,6 +29,7 @@ try:
 except:
   print 'Warning: numpy module not available. Therefore, espressopp.integrator.PIAdressIntegrator unavailable.'
 from espressopp.integrator.VelocityVerletOnGroup import *
+from espressopp.integrator.VelocityVerletRESPA import *
 from espressopp.integrator.Isokinetic import *
 from espressopp.integrator.StochasticVelocityRescaling import *
 from espressopp.integrator.TDforce import *
