@@ -26,10 +26,12 @@
 
 This module provides a writer for H5MD_ file format.
 
-.. function:: espressopp.io.DumpH5MD(system, filename, *args)
+.. function:: espressopp.io.DumpH5MD(system, integrator, filename, group_name, *args)
 
     :param system: The system object.
     :type system: espressopp.System
+    :param integrator: System integrator.
+    :type integrator: espressopp.integrator.MDIntegrator
     :param filename: The file name.
     :type filename: str
     :param group_name: The name of particle group.
@@ -42,25 +44,21 @@ This module provides a writer for H5MD_ file format.
     :type email: str
     :param chunk_size:
     :type chunk_size: int
-    :param store_*: The flags to decide what is store in the file.
-    :type store_*: bool
     :param static_box: box size written as time-independent variable
     :type static_box: bool
+    :param is_single_prec: Store float values with single precision (default: False)
+    :type is_single_prec: bool
+    :param store_position: Saves postions of particles
+    :param store_species: Saves types of particles.
+    :param store_state: Saves states of particles.
+    :param store_velocity: Saves velocities of particles.
+    :param store_force: Saves forces of particles
+    :param store_charge: Saves charges of particles
+    :param store_lambda: Saves lambdas (AdResS) of particles
+    :param store_res_id: Saves residues id of particles.
+    :param store_mass: Saves masses of particles
 
     :rtype: The DumpH5MD writer.
-
-Flags
-++++++++++++++++++
-
-- store_position: saves position of particles.
-- store_species: saves the type of particles.
-- store_state: saves chemical state of particles.
-- store_velocity: saves velocity
-- store_force: saves force
-- store_charge: saves charge
-- store_lambda: saves the value of lambda parameter (useful in AdResS simulations)
-- store_res_id: saves residue id
-- do_sort: sort the file (see :ref:`sorting-file-label`)
 
 Example
 +++++++
@@ -80,6 +78,12 @@ Example
         integrator.run(int_steps)
         traj_file.dump(s*int_steps, s*int_steps*integrator.dt)
 
+Important note. Within the current approach, this extension is not compatible with ExtAnalyze module.
+Therefore, this code does not work:
+
+>>> ext_analyze = espressopp.integrator.ExtAnalyze(traj_file, 10)
+>>> integrator.addExtension(ext_analyze)
+>>> integrator.run(2000)
 
 .. _sorting-file-label:
 

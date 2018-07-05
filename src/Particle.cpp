@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016
+  Copyright (C) 2016-2018
     Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research

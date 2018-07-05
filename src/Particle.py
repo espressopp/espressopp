@@ -1,6 +1,6 @@
 #  Copyright (C) 2017,2018
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2016
+#  Copyright (C) 2016,2018
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & JGU Mainz
@@ -68,6 +68,10 @@ The Particle class. Particles are used to model atoms, coarse-grained beads, etc
 .. py:data:: int espressopp.Particle.type
 
         particle type
+
+.. py:data:: int espressopp.Particle.res_id
+
+        molecule id (eg. chain id)
 
 .. py:data:: int espressopp.Particle.pib
 
