@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -38,8 +38,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FreeEnergyCompensation::theLogger, "FreeEnergyCompensation");
 
-    FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr)
-    :Extension(system), sphereAdr(_sphereAdr) {
+    FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr, int _ntrotter, bool _slow)
+    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter), slow(_slow) {
 
         type = Extension::FreeEnergyCompensation;
 
@@ -53,8 +53,14 @@ namespace espressopp {
 
 
     void FreeEnergyCompensation::connect(){
+      if(slow){
+        _applyForce = integrator->aftCalcSlow.connect(
+            boost::bind(&FreeEnergyCompensation::applyForce, this));
+      }
+      else{
         _applyForce = integrator->aftCalcF.connect(
             boost::bind(&FreeEnergyCompensation::applyForce, this));
+      }
     }
 
     void FreeEnergyCompensation::disconnect(){
@@ -91,13 +97,18 @@ namespace espressopp {
 
           System& system = getSystemRef();
 
+          std::unordered_map<int, Table>::iterator tableIt;
+          Table table;
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
           shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           FixedTupleListAdress::iterator it2;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+              tableIt = forces.find(cit->getType());
+              if (tableIt != forces.end()) { //because there may be CG particles to which Free Energy Compensation is not applied
+                table = tableIt->second;
+              }
 
-              Table table = forces.find(cit->getType())->second;
               if (table) {
 
                   Particle &vp = *cit;
@@ -129,10 +140,10 @@ namespace espressopp {
                                     Particle &at = **it3;
 
                                     if(sphereAdr){
-                                      at.force() += vp.lambdaDeriv() * at.mass() * dist3D / vp.mass();
+                                      at.force() += vp.lambdaDeriv() * at.mass() * dist3D / (vp.mass() * ntrotter);
                                     }
                                     else{
-                                      at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
+                                      at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / (vp.mass() * ntrotter);
                                     }
 
                                 }
@@ -144,12 +155,6 @@ namespace espressopp {
                           }
                   }
               }
-              else{
-                  std::cout << "ERROR: Using FEC Extension without providing table." << std::endl;
-                  exit(1);
-                  return;
-              }
-
           }
     }
 
@@ -194,7 +199,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>, bases<Extension> >
-        ("integrator_FreeEnergyCompensation", init< shared_ptr<System>, bool >())
+        ("integrator_FreeEnergyCompensation", init< shared_ptr<System>, bool, int, bool >())
         .add_property("filename", &FreeEnergyCompensation::getFilename)
         .def("connect", &FreeEnergyCompensation::connect)
         .def("disconnect", &FreeEnergyCompensation::disconnect)

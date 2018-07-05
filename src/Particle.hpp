@@ -1,25 +1,25 @@
 /*
-  Copyright (C) 2012,2013,2017
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   Copyright (C) 2017
       Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -44,11 +44,14 @@ namespace espressopp {
   struct ParticleProperties {
     size_t id;
     size_t type;
+    size_t pib;
     real mass;
     real q;
     real lambda;
+    real varmass;
     real drift;
     real lambdaDeriv;
+    Real3D fm;
     int state;
     longint res_id;
   private:
@@ -56,11 +59,15 @@ namespace espressopp {
     template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
+      for (int i = 0; i < 3; ++i)
+        ar & fm[i];
       ar & id;
       ar & type;
+      ar & pib;
       ar & mass;
       ar & q;
       ar & lambda;
+      ar & varmass;
       ar & drift;
       ar & lambdaDeriv;
       ar & state;
@@ -78,6 +85,7 @@ namespace espressopp {
   struct ParticlePosition {
 
     Real3D p;
+    Real3D modepos;
     real radius;
     real extVar;
 
@@ -92,6 +100,8 @@ namespace espressopp {
     void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
         ar & p[i];
+      for (int i = 0; i < 3; ++i)
+        ar & modepos[i];
       ar & radius;
       ar & extVar;
     }
@@ -143,6 +153,7 @@ namespace espressopp {
   struct ParticleMomentum {
 
     Real3D v;
+    Real3D modemom;
     // force associated with first derivative of particle radius
     real vradius;
   private:
@@ -151,6 +162,8 @@ namespace espressopp {
     void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
         ar & v[i];
+      for (int i = 0; i < 3; ++i)
+        ar & modemom[i];
       ar & vradius;
     }
   };
@@ -193,18 +206,22 @@ namespace espressopp {
 
     void init() {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
+      m.modemom[0] = m.modemom[1] = m.modemom[2] = 0.0;
       p.type         = 0;
       p.mass         = 1.0;
       p.q            = 0.0;
       r.radius       = 1.0;
       f.fradius      = 0.0;
+      p.fm           = 0.0;
       m.vradius      = 0.0;
       l.ghost        = false;
       p.lambda       = 0.0;
-      p.drift        = 0.0;      
+      p.varmass       = 0.0;
+      p.drift        = 0.0;
       p.lambdaDeriv  = 0.0;
-      r.extVar       = 0.0;      
+      r.extVar       = 0.0;
       p.state        = 0;
+      p.pib          = 0;
       p.res_id       = 0;
     }
 
@@ -221,6 +238,12 @@ namespace espressopp {
     int getType() const { return p.type; }
     void setType(int type) { p.type = type; }
 
+    // Path Integral bead number (used for adaptive Path Integrals)
+    size_t& pib() { return p.pib; }
+    const size_t& pib() const { return p.pib; }
+    int getPib() const { return p.pib; }
+    void setPib(int pib) { p.pib = pib; }
+
     real& mass() { return p.mass; }
     const real& mass() const { return p.mass; }
     real getMass() const { return p.mass; }
@@ -236,7 +259,7 @@ namespace espressopp {
     const real& radius() const { return r.radius; }
     real getRadius() const { return r.radius; }
     void setRadius(real q) { r.radius = q; }
-    
+
     // Extended Variable for Generalized Langevin Friction
     real& extVar() { return r.extVar; }
     const real& extVar() const { return r.extVar; }
@@ -249,6 +272,12 @@ namespace espressopp {
     const Real3D& position() const { return r.p; }
     Real3D getPos() const { return r.p; }
     void setPos(const Real3D& pos) { r.p = pos; }
+
+    // Position in Modespace (used for adaptive Path Integrals)
+    Real3D& modepos() { return r.modepos; }
+    const Real3D& modepos() const { return r.modepos; }
+    Real3D getModepos() const { return r.modepos; }
+    void setModepos(const Real3D& mp) { r.modepos = mp; }
 
     // All Forces
 
@@ -269,12 +298,23 @@ namespace espressopp {
     real getFRadius() const { return f.fradius; }
     void setFRadius(const real &fr) { f.fradius = fr; }
 
+    Real3D& forcem() { return p.fm; }
+    const Real3D& forcem() const { return p.fm; }
+
+    Real3D getFm() const { return p.fm; }
+    void setFm(const Real3D& force) { p.fm = force; }
+
     // Momentum
 
     Real3D& velocity() { return m.v; }
     const Real3D& velocity() const { return m.v; }
     Real3D getV() const { return m.v; }
     void setV(const Real3D& velocity) { m.v = velocity; }
+
+    Real3D& modemom() { return m.modemom; }
+    const Real3D& modemom() const { return m.modemom; }
+    Real3D getModemom() const { return m.modemom; }
+    void setModemom(const Real3D& mm) { m.modemom = mm; }
 
     real& vradius() { return m.vradius; }
     const real& vradius() const { return m.vradius; }
@@ -293,19 +333,25 @@ namespace espressopp {
     const bool& ghost() const { return l.ghost; }
     bool getGhostStatus() const { return l.ghost; }
     void setGhostStatus(const bool& gs) { l.ghost = gs; }
-    
+
     // weight/lambda (used in H-Adress)
     real& lambda() { return p.lambda; }
     const real& lambda() const { return p.lambda; }
     real getLambda() const { return p.lambda; }
     void setLambda(const real& _lambda) { p.lambda = _lambda; }
-    
+
+    // variable mass (used for adaptive Path Integrals)
+    real& varmass() { return p.varmass; }
+    const real& varmass() const { return p.varmass; }
+    real getVarmass() const { return p.varmass; }
+    void setVarmass(const real& _varmass) { p.varmass = _varmass; }
+
     // drift (used in H-Adress)
     real& drift() { return p.drift; }
     const real& drift() const { return p.drift; }
     real getDrift() const { return p.drift; }
     void setDrift(const real& _drift) { p.drift = _drift; }
-    
+
     // weight/lambda derivative (used in H-Adress)
     real& lambdaDeriv() { return p.lambdaDeriv; }
     const real& lambdaDeriv() const { return p.lambdaDeriv; }
@@ -325,7 +371,7 @@ namespace espressopp {
     void setResId(const int& _res_id) { p.res_id = _res_id; }
 
     static void registerPython();
-  
+
     void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
 
       src.r.copyShifted(r, shift);
@@ -356,8 +402,8 @@ namespace espressopp {
     }
   };
 
-  struct ParticleList 
-    : public esutil::ESPPContainer < std::vector< Particle > > 
+  struct ParticleList
+    : public esutil::ESPPContainer < std::vector< Particle > >
   {};
 
   // singles
@@ -389,14 +435,14 @@ namespace espressopp {
   };
 
   // pairs
-  class ParticlePair 
-    : public std::pair< class Particle*, class Particle* > 
+  class ParticlePair
+    : public std::pair< class Particle*, class Particle* >
   {
   private:
     typedef std::pair< class Particle*, class Particle* > Super;
   public:
     ParticlePair() : Super() {}
-    ParticlePair(Particle* p1, Particle* p2) 
+    ParticlePair(Particle* p1, Particle* p2)
       : Super(p1, p2) {}
     ParticlePair(Particle &p1, Particle &p2)
       : Super(&p1, &p2) {}
@@ -409,7 +455,7 @@ namespace espressopp {
         this->push_back(ParticlePair(p1, p2));
     }
 
-    void add(Particle &p1, Particle &p2) 
+    void add(Particle &p1, Particle &p2)
     { this->add(&p1, &p2); }
 
     void add(std::vector<Particle*> particles) {

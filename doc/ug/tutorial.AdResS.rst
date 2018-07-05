@@ -216,3 +216,97 @@ H-AdResS: Water
 Subfolder: ``hadress_water``. This is a slightly more advanced H-AdResS system in which an atomistic model is coupled to a coarse-grained one, mapping the three water atoms onto single beads.
 
 Questions: Feel free to play around with the system. You could also try to figure out, how the gromacs parsers sets up the interactions and chooses the right H-AdResS interactions.
+
+Adaptive Resolution Simulations with Multiple Time Stepping
+-----------------------------------------------------------------------------------
+
+Coarse-grained (CG) potentials are typically significantly softer than atomistic (AT) force fields and the corresponding equations of motions can be solved using a larger time step. This suggests the use of multiple time stepping (MTS) techniques in adaptive resolution simulations, in which both AT and CG potentials are present simultaneously. For simulations in which the CG region is much larger than the AT one, this promises a significant speed-up compared to calculations in which a single short time step is used for the whole system. ESPResSo++ provides a RESPA-based MTS scheme (J. Chem. Phys. 97, 1990 (1992)), in which the CG interactions are integrated on a slow timescale and all AT interactions (bonded and non-bonded) on a faster timescale. The scheme can be used both with force-based AdResS and energy-based H-AdResS.
+
+Note that MTS within AdResS simulations can be interpreted as spatially adaptive MTS, in which the integration time scales of the different forces within and between molecules depend on its positions in the simulation box. Large time steps are used in one domain while short time steps are used in another domain of the box. This is in contrast to usual MTS applications, in which the same multiple time stepping is applied everywhere in the system and the separation is usually just between bonded and non-bonded interactions, but without any spatial dependency.
+
+AdResS with Multiple Time Stepping: Implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The AdResS-MTS scheme is implemented in ESPResSo++ by two modifications. On the one hand, a new interaction type (*NonbondedSlow*) and a new integrator that implements the RESPA scheme are provided. The integrator calculates all interactions of type *NonbondedSlow* on the long time scale, while all other interactions are treated on the fast timescale. On the other hand, a set of new interaction templates for adaptive resolution interactions are provided. The fast AT and the slow CG adaptive resolution interactions are now implemented in separate interaction templates that have different types (*Nonbonded* and *NonbondedSlow*), which can be exploited by the MTS integrator. Furthermore, the user can specify whether the Thermodynamic Force and the Free Energy Compensation are applied on the slow or fast time scale. Code examples are below:
+
+.. code-block:: python
+
+  # set up the atomistic part of a force-based adaptive resolution interaction. This interaction template incorporates both a Lennard-Jones
+  # term and a Reaction Field term for the force to compute both the Van der Waals and electrostatic forces during one loop over
+  # the atomistic- and hybrid-region particle pairs
+  non_bonded_interaction_at = espressopp.interaction.VerletListAdressATLenJonesReacFieldGen(verletlist, ftpl)
+  potLJ = espressopp.interaction.LennardJones(epsilon=epsilon, sigma=sigma, shift='auto', cutoff=interaction_cutoff_at)
+  potQQ = espressopp.interaction.ReactionFieldGeneralized(prefactor=138.935485, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=interaction_cutoff_at, shift="auto")
+  non_bonded_interaction_at.setPotential1(type1=1, type2=1, potential=potLJ)
+  non_bonded_interaction_at.setPotential2(type1=1, type2=1, potential=potQQ)
+  non_bonded_interaction_at.setPotential2(type1=1, type2=0, potential=potQQ)
+  non_bonded_interaction_at.setPotential2(type1=0, type2=0, potential=potQQ)
+  system.addInteraction(non_bonded_interaction_at)
+
+.. code-block:: python
+
+  # set up the coarse-grained part of a force-based adaptive resolution interaction
+  non_bonded_interaction_cg = espressopp.interaction.VerletListAdressCGTabulated(verletlist, ftpl)
+  potCG = espressopp.interaction.Tabulated(itype=3, filename="table_ibi.dat", cutoff=interaction_cutoff_cg)
+  non_bonded_interaction_cg.setPotential(type1=typeCG, type2=typeCG, potential=potCG)
+  system.addInteraction(non_bonded_interaction_cg)
+
+.. code-block:: python
+
+  # set up the RESPA VelocityVerlet Integrator (timestep is the short time step,
+  # and multistep is an integer multiplier to construct the long time step as the
+  # product of the short time step with the multiplier)
+  integrator = espressopp.integrator.VelocityVerletRESPA(system)
+  integrator.dt = timestep
+  integrator.multistep = multistep
+
+.. code-block:: python
+
+  # add AdResS extension. It also needs to know about the multiple time stepping (multistep parameter)
+  adress = espressopp.integrator.Adress(system, verletlist, ftpl, multistep=multistep)
+  integrator.addExtension(adress)
+
+.. code-block:: python
+
+  # add Thermodynamic Force and specify whether the force is applied
+  # together with the slow (slow=True) or fast (slow=False) forces
+  thdforce = espressopp.integrator.TDforce(system, verletlist, slow=False)
+  thdforce.addForce(itype=3, filename="table_tf.xvg", type=typeCG)
+  integrator.addExtension(thdforce)
+
+AdResS with Multiple Time Stepping: Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Subfolders within the AdResS examples folder: ``multiple_time_stepping_fadress`` for a force-based AdResS MTS simulation and ``multiple_time_stepping_hadress`` for an H-AdResS MTS simulation of liquid water. In both examples, the system is a box of liquid water in which the resolution changes along the x-axis. The atomistic model is the SPC/Fw force field with a Reaction Field approach to treat electrostatics. The force-based AdResS example uses a tabulated iterative Boltzmann inversion-based potential in the CG region, while the H-AdResS example employs a simple truncated Harmonic potential to describe the CG interactions.
+
+Have a look at the examples and modify the different time steps. For example, you can test the effect of different time step configurations on the energy conservation in H-AdResS or you investigate whether it makes a difference to apply the corrections on the slow or fast time scale.
+
+Path Integral-AdResS
+------------------------------------
+
+The path integral (PI) formalism can be used in molecular simulations to account for the quantum mechanical delocalization of light nuclei. It is frequently used, for example, when modeling hydrogen-rich chemical and biological systems, such as proteins or DNA. In the PI methodology, quantum particles are mapped onto classical ring polymers, which represent delocalized wave functions. This renders the PI approach computationally highly expensive (for a detailed introduction see, for example, *M. E. Tuckerman, Statistical Mechanics: Theory and Molecular Simulation*). However, in practice the quantum mechanical description is often only necessary in a small subregion of the overall simulation.
+
+Recently, a PI-based adaptive resolution scheme was developed that allows to include the PI description only locally and to use efficient classical Newtonian mechanics in the rest of the system (*J. Chem. Phys.* **147**, 244104 (2017) and *J. Chem. Theory Comput.* **12**, 3030 (2016)). In this approach the ring polymers are forced to collapse to classical, point-like particles in the classical region. This is achieved by introducing a position-dependent and adaptively changing particle mass which controls the spring constants between the ring polymer beads. Note that this does not necessarily affect the separate "kinietic" masses which are typically introduced in Path Integral Molecular Dyamics.
+
+The method is based on an overall Hamiltonian description and it is consistent with a bottom-up PI quantization procedure. It allows for the calculation of both quantum statistical as well as approximate quantum dynamical quantities in the quantum subregion using ring polymer or centroid molecular dynamics. The methodology is implemented in the ESPResSo++ package and it also makes use of multiple time stepping. For technical details, please see the original publications.
+
+PI-AdResS Implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PI-AdResS is implemented in ESPResSo++ by the addition of further particle properties, this is, a variable mass parameter to control the ring polymers' spring constants and a path integral bead (pib) number indicating which imaginary time slice or Trotter number a particle corresponds to. A system is typically set up in such a way that the physical atoms correspond to the coarse-grained ESPResSo++ particles, while ESPResSo++'s atoms, which are linked to the coarse-grained particles using the fixed tuple list, are the actual beads of the ring polymer. A coarse-grained ESPResSo++ particle then correspond to the ring polymer centroid, which are therefore used for the construction of the Verlet list, and control whether a ring polymer is send to another CPU in parallel simulations.
+
+Furthermore, new interaction templates were implemented to accommodate the calculation of interactions between atoms in a path integral-based manner and a new multiple time stepping integrator was developed (see the user manual for detailed documention of the classes and the example for usage in practice).
+
+.. code-block:: python
+
+  # path integral-based adaptive resolution interaction that employs a tabulated potential for the potential in the
+  # path integral region and a Lennard Jones potential in the classical region (where the ring polymers are collapsed)
+  non_bonded_interaction = espressopp.interaction.VerletListPIadressTabulatedLJ(verletlist, fixedtuplelist, TrotterNumber, speedup_in_CL_region)
+
+.. code-block:: python
+
+  # path integral-based adaptive resolution multiple time stepping integrator
+  integrator = espressopp.integrator.PIAdressIntegrator(system, verletlist, timestep_short, multiplier_short_to_medium, multiplier_medium_to_long, nTrotter, realkinmass, constkinmass, temperature, gamma, centroidThermostat, CMDparameter, PILE, PILElambda, CLmassmultiplier, freezeCLrings, KTI)
+
+PI-AdRresS Example: Liquid Water
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Subfolder: ``piadress_water`` within the AdResS example folder. This system is a box of liquid water and the resolution changes along the x-axis. In the center of the box, the molecules behave quantum mechanically with extended ring polymers, while elsewhere the ring polymers collapse to pointlike particles, making them behave classically and allowing for an efficient force computation. In the PI region, a tabulated potential is used, which was specifically developed for PI-based simulations, while in the classical region a simple WCA potential is employed. The setup is similar to those used in *J. Chem. Phys.* **147**, 244104 (2017).
+
+Have a look at the example and try to understand and play around with the many available options for the PI-based adaptive resolution setup. Use the user manual and the original publication as reference.

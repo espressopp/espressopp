@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2017
-      Jakub Krajniak (jkrajniak at gmail.com)
+  Copyright (C) 2017,2018
+      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
   Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -41,8 +41,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
-    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier)
-    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier) {
+    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier, bool _slow)
+    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier), slow(_slow) {
 
         // startdist & enddist are the distances between which the TD force actually acts.
         // This is usually more or less the thickness of the hybrid region. However, the TD force sometimes is applied in a slighty wider area.
@@ -67,8 +67,14 @@ namespace espressopp {
 
 
     void TDforce::connect(){
+      if(slow){
+        _applyForce = integrator->aftCalcSlow.connect(
+            boost::bind(&TDforce::applyForce, this), boost::signals2::at_front);
+      }
+      else{
         _applyForce = integrator->aftCalcF.connect(
             boost::bind(&TDforce::applyForce, this));
+      }
     }
 
     void TDforce::disconnect(){
@@ -264,6 +270,88 @@ namespace espressopp {
           }
     }
 
+    real TDforce::computeTDEnergy() {
+
+          real TDEnergy = 0.0;
+          real TDEnergySum = 0.0;
+          System& system = getSystemRef();
+          const bc::BC& bc = *getSystemRef().bc;
+
+          CellList cells = system.storage->getRealCells();
+          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+
+              Table table = forces.find(cit->getType())->second;
+              if (table) {
+
+                  if (!(verletList->getAdrCenterSet())) {
+
+                    if (sphereAdr){
+
+                      if(verletList->getAdrList().size() > 1){
+
+                        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+                        Real3D pa = **it2;
+                        Real3D dist3D;
+                        bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa);
+                        Real3D mindist3D = dist3D;
+
+                        // Loop over all other centers
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                              pa = **it2;
+                              verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa);
+                              if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D;
+                        }
+
+                        real mindist3Dabs = sqrt(mindist3D.sqr());
+                         if ( mindist3Dabs >0.0 ) {
+                            TDEnergy += table->getEnergy(mindist3Dabs);
+                         }
+
+                      }
+                      else{
+                         center=**(verletList->adrPositions.begin());
+                         Real3D dist3D;
+                         bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center);
+                         real dist = sqrt(dist3D.sqr());
+
+                         if (dist>0.0) {
+                           TDEnergy += table->getEnergy(dist);
+                         }
+                      }
+
+                    }
+                    else{
+                      std::cout << "In TDforce: Trying to use moving AdResS region with adaptive region slab geometry. This is not implemented and doesn't make much sense anyhow.\n";
+                      exit(1);
+                      return 0.0;
+                    }
+
+                  }
+                  else{
+
+                    if (sphereAdr){
+                       Real3D dist3D;
+                       bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center);
+                       real dist = sqrt(dist3D.sqr());
+
+                       if (dist>0.0) {
+                         TDEnergy += table->getEnergy(dist);
+                       }
+                    } else {
+                       real d1 = cit->getPos()[0] - center[0];
+                       real d1abs = fabs(d1);
+                       TDEnergy += table->getEnergy(d1abs);
+                    }
+
+                  }
+              }
+
+          }
+          mpi::all_reduce(*getSystem()->comm, TDEnergy, TDEnergySum, std::plus<real>());
+          return TDEnergySum;
+    }
+
     /****************************************************
     ** REGISTRATION WITH PYTHON
     ****************************************************/
@@ -276,11 +364,12 @@ namespace espressopp {
                         = &TDforce::addForce;
 
       class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
-        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int >())
+        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int, bool >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)
         .def("addForce", pyAddForce)
+        .def("computeTDEnergy", &TDforce::computeTDEnergy)
         .def("getForce", &TDforce::getForce)
         ;
     }
