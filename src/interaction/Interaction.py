@@ -1,6 +1,6 @@
-#  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
+#  Copyright (C) 2012-2018
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
+#  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
@@ -68,7 +68,7 @@ from espressopp import pmi
 from _espressopp import interaction_Interaction
 
 
-unused, Nonbonded, Single, Pair, Angular, Dihedral = range(6)
+unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = range(7)
 
 class InteractionLocal(object):
 

@@ -51,13 +51,13 @@ namespace espressopp {
         real getTimeStep() { return dt; }
 
         void setmStep(int _mStep);
-        real getmStep() { return mStep; }
+        int getmStep() { return mStep; }
 
         void setsStep(int _sStep);
-        real getsStep() { return sStep; }
+        int getsStep() { return sStep; }
 
         void setNtrotter(int _ntrotter);
-        real getNtrotter() { return ntrotter; }
+        int getNtrotter() { return ntrotter; }
 
         void setTemperature(real _temperature);
         real getTemperature() { return temperature; }
