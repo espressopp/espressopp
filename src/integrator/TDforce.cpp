@@ -41,8 +41,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
-    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier)
-    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier) {
+    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier, bool _slow)
+    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier), slow(_slow) {
 
         // startdist & enddist are the distances between which the TD force actually acts.
         // This is usually more or less the thickness of the hybrid region. However, the TD force sometimes is applied in a slighty wider area.
@@ -67,8 +67,14 @@ namespace espressopp {
 
 
     void TDforce::connect(){
+      if(slow){
+        _applyForce = integrator->aftCalcSlow.connect(
+            boost::bind(&TDforce::applyForce, this), boost::signals2::at_front);
+      }
+      else{
         _applyForce = integrator->aftCalcF.connect(
             boost::bind(&TDforce::applyForce, this));
+      }
     }
 
     void TDforce::disconnect(){
@@ -358,7 +364,7 @@ namespace espressopp {
                         = &TDforce::addForce;
 
       class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
-        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int >())
+        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int, bool >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)

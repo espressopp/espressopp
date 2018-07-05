@@ -36,5 +36,6 @@ integrator
    espressopp.integrator.StochasticVelocityRescaling.rst
    espressopp.integrator.TDforce.rst
    espressopp.integrator.VelocityVerlet.rst
+   espressopp.integrator.VelocityVerletRESPA.rst
    espressopp.integrator.VelocityVerletOnGroup.rst
    espressopp.integrator.VelocityVerletOnRadius.rst

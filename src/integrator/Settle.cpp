@@ -1,23 +1,23 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -63,13 +63,13 @@ namespace espressopp {
 	rra = 1.0 / ra;
 
         // initialise settlev variables
-         
+
         mOmH = mO + mH;
         mOmH2 = mOmH * mOmH;
         twicemO = 2*mO;
         twicemH = 2*mH;
         mH2 = mH*mH;
- 
+
     }
 
     Settle::~Settle() {
@@ -84,6 +84,7 @@ namespace espressopp {
       _befIntP.disconnect();
       _aftIntP.disconnect();
       _aftIntV.disconnect();  // OUT AGAIN?
+      _aftIntSlow.disconnect();
     }
 
     void Settle::connect(){
@@ -91,6 +92,7 @@ namespace espressopp {
       _befIntP  = integrator->befIntP.connect( boost::bind(&Settle::saveOldPos, this));
       _aftIntP  = integrator->aftIntP.connect( boost::bind(&Settle::applyConstraints, this));
       _aftIntV  = integrator->aftIntV.connect( boost::bind(&Settle::correctVelocities, this));   // OUT AGAIN?
+      _aftIntSlow  = integrator->aftIntSlow.connect( boost::bind(&Settle::correctVelocities, this));
     }
 
     void Settle::saveOldPos() {
@@ -280,7 +282,7 @@ namespace espressopp {
         Real3D vH2=displ3*invdt;
         O->setV(vO);
         H1->setV(vH1);
-        H2->setV(vH2);        
+        H2->setV(vH2);
 
     }
 
@@ -312,9 +314,9 @@ namespace espressopp {
         Real3D rbc;
         Real3D rca;
 
-        bc.getMinimumImageVectorBox(rab,H1->getPos(),O->getPos()); 
-        bc.getMinimumImageVectorBox(rbc,H2->getPos(),H1->getPos()); 
-        bc.getMinimumImageVectorBox(rca,O->getPos(),H2->getPos()); 
+        bc.getMinimumImageVectorBox(rab,H1->getPos(),O->getPos());
+        bc.getMinimumImageVectorBox(rbc,H2->getPos(),H1->getPos());
+        bc.getMinimumImageVectorBox(rca,O->getPos(),H2->getPos());
 
         real rab2 = rab.sqr();
         real rbc2 = rbc.sqr();
@@ -347,13 +349,13 @@ namespace espressopp {
         real interm1 = 2*mOmH2 + twicemO*mH*cosA*cosB*cosC - 2*mH2*cosA*cosA - mO*mOmH*(cosB*cosB+cosC*cosC);
         real d = dt * interm1 / (twicemH);
 
-        real interm2 = vab0 * (2*mOmH - mO*cosC*cosC) + 
+        real interm2 = vab0 * (2*mOmH - mO*cosC*cosC) +
                        vbc0 * (mH*cosC*cosA - mOmH*cosB) +
                        vca0 * (mO*cosB*cosC - twicemH*cosA);
         real tauab = mO*interm2/d;
 
         real interm3 = vbc0 * (mOmH2 - mH2*cosA*cosA) +
-                       vca0 * mO * (mH*cosA*cosB - mOmH*cosC) + 
+                       vca0 * mO * (mH*cosA*cosB - mOmH*cosC) +
                        vab0 * mO * (mH*cosC*cosA - mOmH*cosB);
         real taubc = interm3/d;
 
@@ -370,7 +372,7 @@ namespace espressopp {
         H1->setV(newVb);
         H2->setV(newVc);
 
-    }    
+    }
 
 
     /****************************************************

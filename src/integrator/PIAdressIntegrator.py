@@ -104,7 +104,7 @@ Example:
         :param sSteps: multiplier to construct medium timestep
         :type sSteps: int
 
-.. function:: espressopp.integrator.PIAdressIntegrator.getsStep(sSteps)
+.. function:: espressopp.integrator.PIAdressIntegrator.getsStep()
 
         Gets the multiplier to construct medium timestep (interatomic bonded forces) as mediumstep = sSteps * timestep.
 
@@ -118,7 +118,7 @@ Example:
         :param mSteps: multiplier to construct longest timestep
         :type mSteps: int
 
-.. function:: espressopp.integrator.PIAdressIntegrator.getmStep(mSteps)
+.. function:: espressopp.integrator.PIAdressIntegrator.getmStep()
 
         Gets the multiplier to construct longest timestep (interatomic non-bonded forces) as longstep = mSteps * sSteps * timestep.
 
