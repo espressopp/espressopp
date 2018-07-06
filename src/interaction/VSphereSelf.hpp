@@ -121,7 +121,7 @@ namespace espressopp {
         real energy;
         energy  =   e1*pow(1.0L*M_4PI3*sigma2, 1.0L*mth)       \
                   + a1*NbNbNb/(sigma2*sigma2*sigma2) \
-                  + a22dNb*sigma2;
+                  + a2dNb*sigma2;
         return energy;
       }
 

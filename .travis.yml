@@ -10,26 +10,17 @@ env:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
     - DISTRO=ubuntu EXTERNAL=OFF
+    - DISTRO=ubuntu_rolling EXTERNAL=ON
+    - DISTRO=ubuntu_rolling EXTERNAL=OFF
     - DISTRO=ubuntu_mpich EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=ubuntu_mpich EXTERNAL=OFF
     - DISTRO=fedora EXTERNAL=ON
-    - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
+    #- DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
     - DISTRO=fedora_mpich EXTERNAL=ON
-    - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
+    #- DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
-
-matrix:
-  allow_failures: #issue #8, ubuntu gcc is too new for internal boost
-    - compiler: gcc
-      env: DISTRO=ubuntu EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=ubuntu_mpich EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=fedora EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=fedora_mpich EXTERNAL=OFF
 
 script:
  - cp -vr docker ${HOME}
@@ -38,6 +29,7 @@ script:
  - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
  - cp -r $HOME/.ccache ${HOME}/docker/ccache
  - if [[ ${TRAVIS_BRANCH} = master ]]; then DOCKER_TAG=latest; else DOCKER_TAG="${TRAVIS_BRANCH}"; fi
+ - travis_retry timeout 540 docker pull $(sed -n '1s/from //p' ${HOME}/docker/Dockerfile)
  - docker build --build-arg COVERAGE=${COVERAGE} --build-arg EXTERNAL=${EXTERNAL}
                 --build-arg CC=${CC} --build-arg CXX=${CXX} --build-arg BUILD_UG=${BUILD_UG}
                 --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH} --build-arg TRAVIS_JOB_NUMBER=${TRAVIS_JOB_NUMBER}
@@ -63,7 +55,7 @@ after_success:
         mkdir -p html/${TRAVIS_BRANCH};
         mv doc/ug/_build/html/* html/${TRAVIS_BRANCH};
       else
-         rm -rf html/[^v][^1]*
+         rm -rf html/[^v][^1]*;
          mv doc/dg/html html/doxygen;
          mv doc/ug/_build/latex/ESPResSo++.pdf html/;
          mv doc/ug/_build/html/* html/;

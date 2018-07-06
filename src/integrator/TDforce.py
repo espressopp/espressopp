@@ -1,3 +1,5 @@
+#  Copyright (C) 2017,2018
+#      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
 #  Copyright (C) 2012,2013,2014,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -40,20 +42,24 @@ Example - how to turn on thermodynamic force for multiple moving spherical regio
 >>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
 >>> integrator.addExtension(thdforce)
 
-.. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier)
+.. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
 
         :param system: system object
         :param verletlist: verletlist object
         :param startdist: (default: 0.0) starting distance from center at which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
         :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
         :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications (not used for static or single moving region)
+        :param slow: (default: False) When used with RESPA Velocity Verlet, this flag decides whether the TD force is applied together with the slow, less frequently updated forces (slow=True) or with the fast, more frequently updated (slow=False) forces.
         :type system: shared_ptr<System>
         :type verletlist: shared_ptr<VerletListAdress>
         :type startdist: real
         :type enddist: real
         :type edgeweightmultiplier: int
+        :type slow: bool
 
 .. function:: espressopp.integrator.TDforce.addForce(itype, filename, type)
+
+        Adds a thermodynamic force acting on particles of type "type".
 
         :param itype: interpolation type 1: linear, 2: Akima, 3: Cubic
         :param filename: filename for TD force file
@@ -61,6 +67,12 @@ Example - how to turn on thermodynamic force for multiple moving spherical regio
         :type itype: int
         :type filename: string
         :type type: int
+
+.. function:: espressopp.integrator.TDforce.computeTDEnergy()
+
+        Computes the energy corresponding to the thermodynamics force (summing over all different particle types and thermodynamic forces on them).
+
+        :rtype: real
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -69,9 +81,9 @@ from _espressopp import integrator_TDforce
 
 class TDforceLocal(integrator_TDforce):
 
-    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0, edgeweightmultiplier = 20):
+    def __init__(self, system, verletlist, startdist=0.0, enddist=0.0, edgeweightmultiplier=20, slow=False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier)
+            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
 
     def addForce(self, itype, filename, type):
             """
@@ -81,11 +93,15 @@ class TDforceLocal(integrator_TDforce):
             if pmi.workerIsActive():
                 self.cxxclass.addForce(self, itype, filename, type)
 
+    def computeTDEnergy(self):
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+              return self.cxxclass.computeTDEnergy(self)
+
 if pmi.isController :
     class TDforce(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.TDforceLocal',
             pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addForce']
+            pmicall = ['addForce', 'getForce', 'computeTDEnergy']
             )

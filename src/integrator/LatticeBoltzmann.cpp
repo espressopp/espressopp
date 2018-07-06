@@ -1215,8 +1215,8 @@ namespace espressopp {
 
          for (int _dim = 0; _dim < getNumDims(); ++_dim) {
             _Ni[_dim] = (int)(_L[_dim] / getA());
-            _myLeft[_dim] = floor(_myPos[_dim]*_L[_dim]/(_nodeGrid[_dim]*getA()));
-            _numSites[_dim] = (int)( floor((_myPos[_dim]+1)*_L[_dim]/(_nodeGrid[_dim]*getA())) ) - (int)_myLeft[_dim] + 2 * _haloSkin;
+            _myLeft[_dim] = ceil(_myPos[_dim]*_L[_dim]/(_nodeGrid[_dim]*getA()));
+            _numSites[_dim] = (int)( ceil((_myPos[_dim]+1)*_L[_dim]/(_nodeGrid[_dim]*getA())) ) - (int)_myLeft[_dim] + 2 * _haloSkin;
          }
          setNi( _Ni );
          setMyLeft( _myLeft );

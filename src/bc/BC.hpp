@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -147,7 +149,7 @@ namespace espressopp {
 
       // This signal is called whenever the box dimensions did change
       // (e.g. when scaling the Volume or when setting boxL)
-      boost::signals2::signal0 <void> onBoxDimensionsChanged;
+      boost::signals2::signal<void ()> onBoxDimensionsChanged;
 
       static void registerPython();
 

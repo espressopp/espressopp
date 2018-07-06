@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015(H)
+#  Copyright (C) 2012,2013,2015(H),2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -60,6 +60,16 @@ Reference: Gromacs Manual 4.6.1, section 4.2.11 (page 79-80), equation 4.60
 
 		:param potential: 
 		:type potential: 
+
+**Example of usage**
+
+>>> # The following example shows how to add a torsional potential to particles 1,2,3,4
+>>> fql = espressopp.FixedQuadrupleList(system.storage)
+>>> fql.addQuadruples([(1,2,3,4)])
+>>> #phi0 is in radians, IUPAC convention definition
+>>> interaction = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system,fql,potential=espressopp.interaction.DihedralHarmonic(K=1.0,phi0=0.0))
+>>> system.addInteraction(interaction)
+
 """
 
 

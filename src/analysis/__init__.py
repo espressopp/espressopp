@@ -1,6 +1,6 @@
-#  Copyright (C) 2012,2013,2014,2015,2016
+#  Copyright (C) 2012-2018
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
+#  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
@@ -35,6 +35,8 @@ from espressopp.analysis.ConfigurationsExtAdress import *
 from espressopp.analysis.Velocities import *
 from espressopp.analysis.CenterOfMass import *
 from espressopp.analysis.NPart import *
+from espressopp.analysis.NPartSubregion import *
+from espressopp.analysis.SubregionTracking import *
 from espressopp.analysis.MaxPID import *
 from espressopp.analysis.AllParticlePos import *
 from espressopp.analysis.IntraChainDistSq import *
@@ -44,7 +46,7 @@ from espressopp.analysis.LBOutput import *
 from espressopp.analysis.LBOutputScreen import *
 from espressopp.analysis.LBOutputVzInTime import *
 from espressopp.analysis.LBOutputVzOfX import *
-from espressopp.analysis.TotalVelocity import *
+from espressopp.analysis.CMVelocity import *
 
 from espressopp.analysis.ConfigsParticleDecomp import *
 from espressopp.analysis.VelocityAutocorrelation import *
@@ -60,8 +62,10 @@ from espressopp.analysis.XDensity import *
 from espressopp.analysis.XTemperature import *
 from espressopp.analysis.XPressure import *
 from espressopp.analysis.AdressDensity import *
+from espressopp.analysis.RadGyrXProfilePI import *
 from espressopp.analysis.Test import *
 from espressopp.analysis.ParticleRadiusDistribution import *
 
 from espressopp.analysis.SystemMonitor import *
 from espressopp.analysis.PotentialEnergy import *
+from espressopp.analysis.KineticEnergy import *

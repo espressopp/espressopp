@@ -1,26 +1,26 @@
 /*
-  Copyright (C) 2012,2013,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// ESPP_CLASS 
+// ESPP_CLASS
 #ifndef _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 
@@ -52,10 +52,10 @@ namespace espressopp {
   namespace interaction {
     template < typename _Potential >
     class FixedPairListTypesInteractionTemplate: public Interaction, SystemAccess {
-    
+
     protected:
       typedef _Potential Potential;
-    
+
     public:
       FixedPairListTypesInteractionTemplate
           (shared_ptr < System > system,
@@ -101,14 +101,16 @@ namespace espressopp {
       virtual real computeEnergy();
       virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
-      virtual real computeEnergyCG();      
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
+      virtual real computeEnergyCG();
+      virtual real computeEnergyAA(int atomtype);
+      virtual real computeEnergyCG(int atomtype);
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
       virtual void computeVirialTensor(Tensor& w, real z);
       virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
-      virtual int bondType() { return Pair; } 
+      virtual int bondType() { return Pair; }
 
     protected:
       int ntypes;
@@ -148,7 +150,7 @@ namespace espressopp {
         }
       }
     }
-    
+
     template < typename _Potential >
     inline real
     FixedPairListTypesInteractionTemplate < _Potential >::
@@ -195,14 +197,28 @@ namespace espressopp {
       std::cout << "Warning! At the moment computeEnergyAA() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
-    
+
+    template < typename _Potential > inline real
+    FixedPairListTypesInteractionTemplate < _Potential >::
+    computeEnergyAA(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyAA(int atomtype) in FixedPairListTypesInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+
     template < typename _Potential > inline real
     FixedPairListTypesInteractionTemplate < _Potential >::
     computeEnergyCG() {
       std::cout << "Warning! At the moment computeEnergyCG() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
-    
+
+    template < typename _Potential > inline real
+    FixedPairListTypesInteractionTemplate < _Potential >::
+    computeEnergyCG(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyCG(int atomtype) in FixedPairListTypesInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+
     template < typename _Potential >
     inline void
     FixedPairListTypesInteractionTemplate < _Potential >::
@@ -215,14 +231,14 @@ namespace espressopp {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for the Fixed Pair List with types");
       std::cout << "Warning! computeVirial in FixedPairListTypesInteractionTemplate has not been tested." << std::endl;
-      
+
       real w = 0.0;
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {          
-        Particle &p1 = *it->first;                                       
-        Particle &p2 = *it->second;                                      
-        int type1 = p1.type();                                           
+           it.isValid(); ++it) {
+        Particle &p1 = *it->first;
+        Particle &p2 = *it->second;
+        int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
@@ -240,7 +256,7 @@ namespace espressopp {
       // reduce over all CPUs
       real wsum;
       boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
-      return wsum; 
+      return wsum;
     }
 
     template < typename _Potential > inline void
@@ -268,7 +284,7 @@ namespace espressopp {
           wlocal += Tensor(r21, force);
         }
       }
-      
+
       // reduce over all CPUs
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
@@ -292,7 +308,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        
+
         if(  (p1pos[2]>=z && p2pos[2]<=z) ||
              (p1pos[2]<=z && p2pos[2]>=z) ){
           Real3D r21;
@@ -305,13 +321,13 @@ namespace espressopp {
           }
         }
       }
-      
+
       // reduce over all CPUs
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;*/
     }
-    
+
     template < typename _Potential > inline void
     FixedPairListTypesInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n){
@@ -331,13 +347,13 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        
+
         int position1 = (int)( n * p1pos[2]/Li[2]);
         int position2 = (int)( n * p1pos[2]/Li[2]);
-        
+
         int maxpos = std::max(position1, position2);
-        int minpos = std::min(position1, position2); 
-        
+        int minpos = std::min(position1, position2);
+
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force(0.0, 0.0, 0.0);
@@ -347,17 +363,17 @@ namespace espressopp {
           Real3D r21 = p1.position() - p2.position();
           ww += Tensor(r21, force);
         }
-        
+
         int i = minpos + 1;
         while(i<=maxpos){
           wlocal[i] += ww;
           i++;
         }
       }
-      
+
       Tensor *wsum = new Tensor[n];
       boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
-      
+
       for(int j=0; j<n; j++){
         w[j] += wsum[j];
       }
@@ -365,7 +381,7 @@ namespace espressopp {
       delete [] wsum;
       delete [] wlocal;*/
     }
-    
+
     template < typename _Potential >
     inline real
     FixedPairListTypesInteractionTemplate< _Potential >::getMaxCutoff() {
