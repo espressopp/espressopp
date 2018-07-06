@@ -1,4 +1,6 @@
 #  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
+#  Copyright (C) 2017
 #      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)
 #  Copyright (C) 2017
 #      Jakub Krajniak (jkrajniak at gmail.com)
@@ -32,6 +34,7 @@ from espressopp.io.DumpXYZ import *
 
 try:
     from espressopp.io.DumpXTC import *
+    from espressopp.io.DumpXTCAdress import *
 except ImportError:
     pass
 
