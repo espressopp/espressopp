@@ -28,6 +28,8 @@
 #include "DumpXYZ.hpp"
 #include "DumpGRO.hpp"
 #include "DumpGROAdress.hpp"
+#include "DumpH5MD.hpp"
+#include "DumpTopology.hpp"
 #include "FileBackup.hpp"
 
 #ifdef HAS_GROMACS
@@ -41,6 +43,8 @@ namespace espressopp {
       DumpXYZ::registerPython();
       DumpGRO::registerPython();
       DumpGROAdress::registerPython();
+      DumpH5MD::registerPython();
+      DumpTopology::registerPython();
 #ifdef HAS_GROMACS
       DumpXTC::registerPython();
       DumpXTCAdress::registerPython();

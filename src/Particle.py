@@ -1,5 +1,7 @@
 #  Copyright (C) 2017,2018
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2016,2018
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & JGU Mainz
 #  Copyright (C) 2012-2015
@@ -66,6 +68,10 @@ The Particle class. Particles are used to model atoms, coarse-grained beads, etc
 .. py:data:: int espressopp.Particle.type
 
         particle type
+
+.. py:data:: int espressopp.Particle.res_id
+
+        molecule id (eg. chain id)
 
 .. py:data:: int espressopp.Particle.pib
 
@@ -285,6 +291,11 @@ class ParticleLocal(object):
     def state(self): return self.__getTmp().state
     @state.setter
     def state(self, val): self.__getTmp().state = val
+
+    @property
+    def res_id(self): return self.__getTmp().res_id
+    @res_id.setter
+    def res_id(self, val): self.__getTmp().res_id = val
 
     def getLocalData(self, key):
         tmp = self.storage.lookupRealParticle(self.pid)

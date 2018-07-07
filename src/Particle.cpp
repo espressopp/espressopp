@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012-2018
+  Copyright (C) 2016-2018
+    Jakub Krajniak (jkrajniak at gmail.com)
+  Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -49,6 +51,7 @@ namespace espressopp {
       .add_property("lambda_adrd", &Particle::getLambdaDeriv, &Particle::setLambdaDeriv)
       .add_property("varmass", &Particle::getVarmass, &Particle::setVarmass)
       .add_property("state", &Particle::getState, &Particle::setState)
+      .add_property("res_id", &Particle::getResId, &Particle::setResId)
       .add_property("extVar", &Particle::getExtVar, &Particle::setExtVar)
       .add_property("drift_f", &Particle::getDrift, &Particle::setDrift)
       ;

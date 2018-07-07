@@ -9,6 +9,7 @@ env:
   matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu EXTERNAL=ON TEST_H5MD=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
