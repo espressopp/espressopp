@@ -125,10 +125,11 @@ namespace espressopp {
                     real norm_l_i = 0.;
                     for (int j=0; j<colVar.getDimension(); ++j) {
                         int k = 0;
-                        // Choose between dihed, bond, and angle
+                        // Choose between dihed(sin), dihed(cos), bonds, and angles
                         if (j == 0) k = 0;
-                        else if (j>0 && j<1+colVarBondList->size()) k = 1;
-                        else k = 2;
+                        else if (j == 1) k = 1;
+                        else if (j>1 && j<2+colVarBondList->size()) k = 2;
+                        else k = 3;
                         norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
                         norm_l_i += pow(colVarRef[i][3+k], 2);
                     }
@@ -166,7 +167,7 @@ namespace espressopp {
         void TabulatedSubEnsDihedral::setColVar(
             const Real3D& dist21, const Real3D& dist32,
             const Real3D& dist43, const bc::BC& bc) {
-            colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
+            colVar.setDimension(2+colVarBondList->size()+colVarAngleList->size());
             // compute phi
             real dist21_sqr = dist21 * dist21;
             real dist32_sqr = dist32 * dist32;
@@ -220,7 +221,8 @@ namespace espressopp {
             // phi
             real phi = acos(c);
             if (dx < 0.0) phi *= -1.0;
-            colVar[0] = phi;
+            colVar[0] = sin(phi);
+            colVar[1] = cos(phi);
             // Now all bonds in colVarBondList
             int i=1;
             for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {

@@ -123,10 +123,11 @@ namespace espressopp {
                     real norm_l_i = 0.;
                     for (int j=0; j<colVar.getDimension(); ++j) {
                         int k = 0;
-                        // Choose between angle, bond, and dihed
+                        // Choose between angle, bond, and dihed(sin), dihed(cos)
                         if (j == 0) k = 0;
-                        else if (j>0 && j<1+colVarBondList->size()) k = 1;
-                        else k = 2;
+                        else if (j<1+colVarBondList->size()) k = 1;
+                        else if (j<1+colVarBondList->size()+colVarDihedList->size()/2) k = 2;
+                        else k = 3;
                         norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
                         norm_l_i += pow(colVarRef[i][3+k], 2);
                     }

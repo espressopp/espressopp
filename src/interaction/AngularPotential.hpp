@@ -31,6 +31,7 @@
 #include <cmath>
 #include "logging.hpp"
 #include "FixedPairList.hpp"
+#include "FixedQuadrupleList.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -53,6 +54,8 @@ namespace espressopp {
 
       virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl) = 0;
       virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
+      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl) = 0;
+      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const = 0;
 
       virtual void setColVar(const RealND& cv) = 0;
       virtual void setColVar(const Real3D& dist12,
@@ -98,6 +101,8 @@ namespace espressopp {
 
       virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl);
       virtual shared_ptr<FixedPairList> getColVarBondList() const;
+      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl);
+      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const;
 
       virtual void setColVar(const RealND& cv);
       virtual void setColVar(const Real3D& dist12,
@@ -134,7 +139,9 @@ namespace espressopp {
       real cutoffSqr;
       // List of bonds that correlate with the angle potential
       shared_ptr<FixedPairList> colVarBondList;
-      // Collective variables: first itself, then bonds
+      // List of dihedrals that correlate with the angle potential
+      shared_ptr<FixedQuadrupleList> colVarDihedList;
+      // Collective variables: first itself, then bonds and dihedrals
       RealND colVar;
 
       Derived* derived_this() {
@@ -183,6 +190,20 @@ namespace espressopp {
     AngularPotentialTemplate< Derived >::
     getColVarBondList() const
     { return colVarBondList; }
+
+    // Quadruple list for collective variables
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    setColVarDihedList(const shared_ptr < FixedQuadrupleList >& _fpl) {
+      colVarDihedList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedQuadrupleList >
+    AngularPotentialTemplate< Derived >::
+    getColVarDihedList() const
+    { return colVarDihedList; }
 
     // Collective variables
     template < class Derived >
