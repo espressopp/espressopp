@@ -129,7 +129,7 @@ namespace espressopp {
                         else if (j<1+colVarBondList->size()+colVarDihedList->size()/2) k = 2;
                         else k = 3;
                         norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
-                        norm_l_i += pow(colVarRef[i][3+k], 2);
+                        norm_l_i += pow(colVarRef[i][4+k], 2);
                     }
                     if (norm_d_i > norm_l_i)
                       weights[i] = exp(- (sqrt(norm_d_i) - sqrt(norm_l_i)) / alpha);
