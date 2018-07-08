@@ -31,6 +31,7 @@
 #include "logging.hpp"
 #include "FixedPairList.hpp"
 #include "FixedTripleList.hpp"
+#include "FixedQuadrupleList.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -52,6 +53,8 @@ namespace espressopp {
       virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
       virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl) = 0;
       virtual shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
+      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl) = 0;
+      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const = 0;
 
       virtual void setColVar(const RealND& cv) = 0;
       virtual void setColVar(const Real3D& dist, const bc::BC& bc) = 0;
@@ -102,6 +105,8 @@ namespace espressopp {
       virtual shared_ptr<FixedPairList> getColVarBondList() const;
       virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl);
       virtual shared_ptr<FixedTripleList> getColVarAngleList() const;
+      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl);
+      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const;
 
       virtual void setColVar(const RealND& cv);
       virtual void setColVar(const Real3D& dist, const bc::BC& bc);
@@ -148,6 +153,8 @@ namespace espressopp {
       shared_ptr<FixedPairList> colVarBondList;
       // List of angles that correlate with the bond potential
       shared_ptr<FixedTripleList> colVarAngleList;
+      // List of dihedrals that correlate with the angle potential
+      shared_ptr<FixedQuadrupleList> colVarDihedList;
       // Collective variables: first itself, then angles
       RealND colVar;
 
@@ -252,7 +259,7 @@ namespace espressopp {
     getColVarBondList() const
     { return colVarBondList; }
 
-    // Pair list for collective variables
+    // Triple list for collective variables
     template < class Derived >
     inline void
     PotentialTemplate< Derived >::
@@ -265,6 +272,20 @@ namespace espressopp {
     PotentialTemplate< Derived >::
     getColVarAngleList() const
     { return colVarAngleList; }
+
+    // Quadruple list for collective variables
+    template < class Derived >
+    inline void
+    PotentialTemplate< Derived >::
+    setColVarDihedList(const shared_ptr < FixedQuadrupleList >& _fpl) {
+      colVarDihedList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedQuadrupleList >
+    PotentialTemplate< Derived >::
+    getColVarDihedList() const
+    { return colVarDihedList; }
 
     // Collective variables
     template < class Derived >

@@ -31,6 +31,7 @@
 #include <cmath>
 #include "logging.hpp"
 #include "FixedPairList.hpp"
+#include "FixedTripleList.hpp"
 #include "FixedQuadrupleList.hpp"
 
 namespace espressopp {
@@ -54,6 +55,8 @@ namespace espressopp {
 
       virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl) = 0;
       virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
+      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl) = 0;
+      virtual shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
       virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl) = 0;
       virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const = 0;
 
@@ -101,6 +104,8 @@ namespace espressopp {
 
       virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl);
       virtual shared_ptr<FixedPairList> getColVarBondList() const;
+      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl);
+      virtual shared_ptr<FixedTripleList> getColVarAngleList() const;
       virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl);
       virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const;
 
@@ -139,6 +144,8 @@ namespace espressopp {
       real cutoffSqr;
       // List of bonds that correlate with the angle potential
       shared_ptr<FixedPairList> colVarBondList;
+      // List of angles that correlate with the bond potential
+      shared_ptr<FixedTripleList> colVarAngleList;
       // List of dihedrals that correlate with the angle potential
       shared_ptr<FixedQuadrupleList> colVarDihedList;
       // Collective variables: first itself, then bonds and dihedrals
@@ -160,7 +167,7 @@ namespace espressopp {
     inline
     AngularPotentialTemplate< Derived >::
     AngularPotentialTemplate()
-      : cutoff(infinity), cutoffSqr(infinity), colVar(1, 0.) { }
+      : cutoff(infinity), cutoffSqr(infinity), colVar(1, 0.) {   }
 
     // Shift/cutoff handling
     template < class Derived >
@@ -190,6 +197,20 @@ namespace espressopp {
     AngularPotentialTemplate< Derived >::
     getColVarBondList() const
     { return colVarBondList; }
+
+    // Triple list for collective variables
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    setColVarAngleList(const shared_ptr < FixedTripleList >& _fpl) {
+      colVarAngleList = _fpl;
+    }
+
+    template < class Derived >
+    inline shared_ptr < FixedTripleList >
+    AngularPotentialTemplate< Derived >::
+    getColVarAngleList() const
+    { return colVarAngleList; }
 
     // Quadruple list for collective variables
     template < class Derived >

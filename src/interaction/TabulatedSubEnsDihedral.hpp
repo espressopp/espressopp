@@ -66,8 +66,8 @@ namespace espressopp {
                     weightSum.setDimension(0);
                     targetProb.setDimension(0);
                     weightCounts = 0;
-                    colVarMu.setDimension(3);
-                    colVarSd.setDimension(3);
+                    colVarMu.setDimension(4);
+                    colVarSd.setDimension(4);
                     colVarRef.setDimension(0);
                     alpha = 1.;
                 }

@@ -42,7 +42,7 @@ namespace espressopp {
             numInteractions = dim;
             for (int i=0; i<dim; ++i) {
               filenames[i] = boost::python::extract<std::string>(_filenames[i]);
-              colVarRef[i].setDimension(4);
+              colVarRef[i].setDimension(8);
               if (itype == 1) { // create a new InterpolationLinear
                   tables[i] = make_shared <InterpolationLinear> ();
                   tables[i]->read(world, filenames[i].c_str());
@@ -66,8 +66,9 @@ namespace espressopp {
             int i = numInteractions;
             numInteractions += 1;
             colVarRef.setDimension(numInteractions);
-            // Dimension 6: angle, bond, dihed, sd_angle, sd_bond, sd_dihed
-            colVarRef[i].setDimension(6);
+            // Dimension 8: dihed(sin), dihed(cos), bond, angle,
+            // sd_dihed(sin), sd_dihed(cos), sd_bond, sd_angle
+            colVarRef[i].setDimension(8);
             colVarRef[i] = _cvref;
             filenames.push_back(boost::python::extract<std::string>(fname));
             weights.push_back(0.);
@@ -165,66 +166,35 @@ namespace espressopp {
 
         // Collective variables
         void TabulatedSubEnsDihedral::setColVar(
-            const Real3D& dist21, const Real3D& dist32,
-            const Real3D& dist43, const bc::BC& bc) {
+            const Real3D& r21, const Real3D& r32,
+            const Real3D& r43, const bc::BC& bc) {
             colVar.setDimension(2+colVarBondList->size()+colVarAngleList->size());
-            // compute phi
-            real dist21_sqr = dist21 * dist21;
-            real dist32_sqr = dist32 * dist32;
-            real dist43_sqr = dist43 * dist43;
-            real dist21_magn = sqrt(dist21_sqr);
-            real dist32_magn = sqrt(dist32_sqr);
-            real dist43_magn = sqrt(dist43_sqr);
-
-            // cos0
-            real sb1 = 1.0 / dist21_sqr;
-            real sb2 = 1.0 / dist32_sqr;
-            real sb3 = 1.0 / dist43_sqr;
-            real rb1 = sqrt(sb1);
-            real rb3 = sqrt(sb3);
-            real c0 = dist21 * dist43 * rb1 * rb3;
-
-
-            // 1st and 2nd angle
-            real ctmp = dist21 * dist32;
-            real r12c1 = 1.0 / (dist21_magn * dist32_magn);
-            real c1mag = ctmp * r12c1;
-
-            ctmp = (-1.0 * dist32) * dist43;
-            real r12c2 = 1.0 / (dist32_magn * dist43_magn);
-            real c2mag = ctmp * r12c2;
-
-
-            //cos and sin of 2 angles and final cos
-            real sin2 = 1.0 - c1mag * c1mag;
-            if (sin2 < 0) sin2 = 0.0;
-            real sc1 = sqrt(sin2);
-            sc1 = 1.0 / sc1;
-
-            sin2 = 1.0 - c2mag * c2mag;
-            if (sin2 < 0) sin2 = 0.0;
-            real sc2 = sqrt(sin2);
-            sc2 = 1.0 / sc2;
-
-            real s1 = sc1 * sc1;
-            real s2 = sc2 * sc2;
-            real s12 = sc1 * sc2;
-            real c = (c0 + c1mag * c2mag) * s12;
-
-            Real3D cc = dist21.cross(dist32);
-            real cmag = sqrt(cc * cc);
-            real dx = cc * dist43 / cmag / dist43_magn;
-
-            if (c > 1.0) c = 1.0;
-            else if (c < -1.0) c = -1.0;
-
-            // phi
-            real phi = acos(c);
-            if (dx < 0.0) phi *= -1.0;
-            colVar[0] = sin(phi);
-            colVar[1] = cos(phi);
+            Real3D rijjk = r21.cross(r32); // [r21 x r32]
+            Real3D rjkkn = r32.cross(r43); // [r32 x r43]
+            
+            real rijjk_sqr = rijjk.sqr();
+            real rjkkn_sqr = rjkkn.sqr();
+            
+            real rijjk_abs = sqrt(rijjk_sqr);
+            real rjkkn_abs = sqrt(rjkkn_sqr);
+            
+            real inv_rijjk = 1.0 / rijjk_abs;
+            real inv_rjkkn = 1.0 / rjkkn_abs;
+            
+            // cosine between planes
+            real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+            real _phi = acos(cos_phi);
+            if (cos_phi > 1.0) {
+              cos_phi = 1.0;
+              _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
+            } else if (cos_phi < -1.0) {
+              cos_phi = -1.0;
+              _phi = M_PI-1e-10;
+            }
+            colVar[0] = sin(_phi);
+            colVar[1] = cos_phi;
             // Now all bonds in colVarBondList
-            int i=1;
+            int i=2;
             for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
               Particle &p1 = *it->first;
               Particle &p2 = *it->second;

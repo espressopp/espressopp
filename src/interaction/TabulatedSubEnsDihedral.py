@@ -98,9 +98,9 @@ from _espressopp import interaction_TabulatedSubEnsDihedral, \
 
 class TabulatedSubEnsDihedralLocal(DihedralPotentialLocal, interaction_TabulatedSubEnsDihedral):
 
-    def __init__(self, itype, filename):
+    def __init__(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TabulatedSubEnsDihedral, itype, filename)
+            cxxinit(self, interaction_TabulatedSubEnsDihedral)
 
 class FixedQuadrupleListTabulatedSubEnsDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTabulatedSubEnsDihedral):
 
@@ -138,7 +138,7 @@ if pmi.isController:
         'The TabulatedSubEnsDihedral potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedSubEnsDihedralLocal',
-            pmiproperty = ['colVarMu_get', 'colVarMu_set', 'weight_get', 'weight_set',
+            pmicall = ['colVarMu_get', 'colVarMu_set', 'weight_get', 'weight_set',
                        'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
 				       'colVarSd_get', 'colVarSd_set',
 				       'dimension_get', 'filenames_get', 'filename_get',

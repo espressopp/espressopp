@@ -59,6 +59,9 @@ namespace espressopp {
             .add_property("colVarAngleList",
                 &Potential::getColVarAngleList,
                 &Potential::setColVarAngleList)
+            .add_property("colVarDihedList",
+                &Potential::getColVarDihedList,
+                &Potential::setColVarDihedList)
             .add_property("colVar",
                 &Potential::getColVar)
             .def("computeEnergy", pure_virtual(computeEnergy1))

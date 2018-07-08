@@ -59,6 +59,9 @@ namespace espressopp {
             .add_property("colVarBondList",
                 &AngularPotential::getColVarBondList,
                 &AngularPotential::setColVarBondList)
+            .add_property("colVarAngleList",
+                          &AngularPotential::getColVarAngleList,
+                          &AngularPotential::setColVarAngleList)
             .add_property("colVarDihedList",
                 &AngularPotential::getColVarDihedList,
                 &AngularPotential::setColVarDihedList)

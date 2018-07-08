@@ -46,7 +46,7 @@ namespace espressopp {
         numInteractions = dim;
         for (int i=0; i<dim; ++i) {
           filenames[i] = boost::python::extract<std::string>(_filenames[i]);
-          colVarRef[i].setDimension(4);
+          colVarRef[i].setDimension(8);
           if (itype == 1) { // create a new InterpolationLinear
               tables[i] = make_shared <InterpolationLinear> ();
               tables[i]->read(world, filenames[i].c_str());
@@ -70,8 +70,8 @@ namespace espressopp {
         int i = numInteractions;
         numInteractions += 1;
         colVarRef.setDimension(numInteractions);
-        // Dimension 6: angle, bond, dihed, sd_angle, sd_bond, sd_dihed
-        colVarRef[i].setDimension(6);
+        // Dimension 8: bond, angle, dihed(sin), dihed(cos), sd_bond, sd_angle, sd_dihed(sin), sd_dihed(cos)
+        colVarRef[i].setDimension(8);
         colVarRef[i] = _cvref;
         filenames.push_back(boost::python::extract<std::string>(fname));
         weights.push_back(0.);
@@ -131,7 +131,8 @@ namespace espressopp {
                     // Choose between bond, angle, and dihed
                     if (j <= 0+colVarBondList->size()) k = 0;
                     else if (j>0 && j<1+colVarBondList->size()+colVarAngleList->size()) k = 1;
-                    else k = 2;
+                    else if (j%2 == 0) k = 2;
+                    else k = 3;
                     norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
                     norm_l_i += pow(colVarRef[i][3+k], 2);
                 }
@@ -193,6 +194,42 @@ namespace espressopp {
           real cos_theta = dist12 * dist32 / dist1232;
           colVar[i] = acos(cos_theta);
           i+=1;
+        }
+                    // Now all dihedrals in colVarDihedList
+        for (FixedQuadrupleList::QuadrupleList::Iterator it(*colVarDihedList); it.isValid(); ++it) {
+          Particle &p1 = *it->first;
+          Particle &p2 = *it->second;
+          Particle &p3 = *it->third;
+          Particle &p4 = *it->fourth;
+          Real3D r21, r32, r43;
+          bc.getMinimumImageVectorBox(r21, p2.position(), p1.position());
+          bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
+          bc.getMinimumImageVectorBox(r43, p4.position(), p3.position());
+          Real3D rijjk = r21.cross(r32); // [r21 x r32]
+          Real3D rjkkn = r32.cross(r43); // [r32 x r43]
+          
+          real rijjk_sqr = rijjk.sqr();
+          real rjkkn_sqr = rjkkn.sqr();
+          
+          real rijjk_abs = sqrt(rijjk_sqr);
+          real rjkkn_abs = sqrt(rjkkn_sqr);
+          
+          real inv_rijjk = 1.0 / rijjk_abs;
+          real inv_rjkkn = 1.0 / rjkkn_abs;
+          
+          // cosine between planes
+          real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+          real _phi = acos(cos_phi);
+          if (cos_phi > 1.0) {
+            cos_phi = 1.0;
+            _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
+          } else if (cos_phi < -1.0) {
+            cos_phi = -1.0;
+            _phi = M_PI-1e-10;
+          }
+          colVar[i] = sin(_phi);
+          colVar[i+1] = cos_phi;
+          i+=2;
         }
     }
 
