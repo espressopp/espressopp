@@ -29,6 +29,7 @@
 //#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include "boost/serialization/vector.hpp"
 #include "Buffer.hpp"
 
 #include "esutil/Error.hpp"
