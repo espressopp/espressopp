@@ -105,9 +105,11 @@ mark_as_advanced(PYTHON_INCLUDE_PATH)
 message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
 include_directories(${PYTHON_INCLUDE_PATH})
 
+if(NOT PYTHON_INSTDIR)
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
                 OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
                         -c "import sys; print sys.version[:3]"
