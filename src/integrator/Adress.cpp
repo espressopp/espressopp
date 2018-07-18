@@ -28,6 +28,7 @@
 #include "Cell.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
+#include "boost/serialization/vector.hpp"
 #include "bc/BC.hpp"
 #include "FixedTupleListAdress.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
