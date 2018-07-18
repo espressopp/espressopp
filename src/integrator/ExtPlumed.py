@@ -27,21 +27,19 @@ espressopp.integrator.ExtPlumed
 usage:
 
 plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.005)
-plumed.setKbT(0.438)
+plumed.setNaturalUnits()
 plumed.Init()
 integrator.addExtension(plumed)
 
 or:
 
 plumed = espressopp.integrator.ExtPlumed(system, "plumed.dat", "log.plumed", 0.005)
-plumed.setTimeUnit(1.0)
-plumed.setEnergyUnit(1.0)
-plumed.setLengthUnit(1.0)
-plumed.setKbT(kbT)
+plumed.setNaturalUnits()
+plumed.setRestart(1)
 plumed.Init()
 integrator.addExtension(plumed)
 
-.. function:: espressopp.integrator.ExtPlumed(system, cmd, log, dt, unit)
+.. function:: espressopp.integrator.ExtPlumed(system, cmd, log, dt)
 
 		:param system: The Espresso++ system object.
                 :type system: espressopp.System
@@ -74,6 +72,6 @@ if pmi.isController :
     class ExtPlumed(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.ExtPlumedLocal',
-            pmicall = ['setChargeState', 'getChargeState', 'setLengthUnit', 'setTimeUnit', 'setEnergyUnit', 'setKbT', 'Init', 'getBias', 'setRealPrecison', 'setMDChargeUnit', 'setMDMassUnit', 'setRestart', 'readInputLine']
+            cls = 'espressopp.integrator.ExtPlumedLocal',
+            pmicall = ['getBias', 'setNaturalUnits', 'setTimeUnit', 'setEnergyUnit', 'setLengthUnit', 'setKbT', 'setRealPrecison', 'setMDChargeUnit', 'setMDMassUnit', 'setRestart', 'readInputLine', 'Init', ]
             )

@@ -45,8 +45,8 @@ namespace espressopp {
       plumedfile(_plumedfile),
       plumedlog(_plumedlog),
       dt(_dt),
+      step(0),
       nreal(0),
-      chargeState(false),
       gatindex(NULL),
       masses(NULL),
       f(NULL),
@@ -65,8 +65,8 @@ namespace espressopp {
       p->cmd("setMDEngine","ESPResSo++");
       longint nReal = system.storage->getNRealParticles();
       boost::mpi::all_reduce(*system.comm, nReal, natoms, std::plus<longint>());
-      p->cmd("setTimestep",&dt); // check type
-      p->cmd("setNatoms",&natoms);  // check type
+      p->cmd("setTimestep",&dt);
+      p->cmd("setNatoms",&natoms);
     }
 
     ExtPlumed::~ExtPlumed() {
@@ -82,10 +82,9 @@ namespace espressopp {
       return bias;
     }
 
-    // void ExtPlumed::setUnitStyle(string _unit) {
-    //   if (_unit == "Natural") p->cmd("setNaturalUnits");
-    //   return;
-    // }
+    void ExtPlumed::setNaturalUnits() {
+      p->cmd("setNaturalUnits");
+    }
 
     void ExtPlumed::setTimeUnit(real _factor) {
       p->cmd("setMDTimeUnits",&_factor);
@@ -127,25 +126,27 @@ namespace espressopp {
       p->cmd("init");
     }
 
-    bool ExtPlumed::getChargeState() {
-      return chargeState;
-    }
-
-    void ExtPlumed::setChargeState(bool q) {
-      chargeState = q;
-    }
-
     void ExtPlumed::disconnect() {
+      _runInit.disconnect();
+      _aftIntP.disconnect();
       _aftCalcF.disconnect();
-      _aftIntV.disconnect();
     }
 
     void ExtPlumed::connect() {
-      _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::applyForce, this));
-      _aftIntV   = integrator->aftIntV.connect( boost::bind(&ExtPlumed::updatePlumed, this));
+      _runInit = integrator->runInit.connect( boost::bind(&ExtPlumed::setStep, this));
+      _aftIntP = integrator->aftIntP.connect( boost::bind(&ExtPlumed::updateStep, this));
+      _aftCalcF = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::updateForces, this));
     }
 
-    void ExtPlumed::applyForce() {
+    void ExtPlumed::setStep() {
+      step = integrator->getStep();
+    }
+
+    void ExtPlumed::updateStep() {
+      step = integrator->getStep() + 1;
+    }
+
+    void ExtPlumed::updateForces() {
       int update_gatindex=0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
@@ -160,7 +161,7 @@ namespace espressopp {
         nreal = system.storage->getNRealParticles();
         gatindex = new int [nreal];
         masses = new real [nreal];
-        if (chargeState) charges = new real [nreal];
+        charges = new real [nreal];
         pos = new real[nreal*3];
         f = new real[nreal*3];
         update_gatindex=1;
@@ -180,7 +181,7 @@ namespace espressopp {
         for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {
           gatindex[i]=static_cast<int>(cit->id())-1;
           masses[i]=cit->mass();
-          if (chargeState) charges[i]=cit->q();
+          charges[i]=cit->q();
           pos[i*3] = cit->position()[0];
           pos[i*3+1] = cit->position()[1];
           pos[i*3+2] = cit->position()[2];
@@ -192,7 +193,7 @@ namespace espressopp {
         int i = 0;
         for(CellListIterator cit(realCells); !cit.isDone() && i < nreal; ++cit, ++i) {
           masses[i]=cit->mass();
-          if (chargeState) charges[i]=cit->q();
+          charges[i]=cit->q();
           pos[i*3] = cit->position()[0];
           pos[i*3+1] = cit->position()[1];
           pos[i*3+2] = cit->position()[2];
@@ -202,6 +203,7 @@ namespace espressopp {
         }
       }
 
+      p->cmd("setStep",&step);
       p->cmd("setAtomsNlocal",&nreal);
       p->cmd("setAtomsGatindex",&gatindex[0]);
       real box[3][3];
@@ -215,13 +217,11 @@ namespace espressopp {
       real virial[3][3];
       for(int i=0; i<3; ++i) for(int j=0; j<3; ++j) virial[i][j]=0.0;
 
-      int step=integrator->getStep();
-      p->cmd("setStep",&step);
       p->cmd("setPositions", pos);
       p->cmd("setForces", f);
       p->cmd("setBox",&box[0][0]);
       p->cmd("setMasses",masses);
-      if (chargeState) p->cmd("setCharges",charges);
+      p->cmd("setCharges",charges);
       p->cmd("setVirial", &virial[0][0]);
       p->cmd("getBias",&bias);
 
@@ -231,28 +231,16 @@ namespace espressopp {
         pot_energy += srIL[j]->computeEnergy();
       }
 
-      pot_energy /= system.comm->size(); // the way PLUMED defines pe.
+      pot_energy /= system.comm->size(); // PLUMED defines PE this way.
       p->cmd("setEnergy", &pot_energy);
-      p->cmd("prepareCalc");
-      p->cmd("performCalcNoUpdate");
+      p->cmd("calc");
 
-      // modify forces on real particles on each processor.
+      // Modifying forces on real particles on each processor.
       int k = 0;
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit, ++k) {
-        int i = static_cast<int>(cit->id())-1;
-        assert(i==gatindex[k]);
         Real3D F = Real3D(f[k*3], f[k*3+1], f[k*3+2]);
         cit->setF(F);
       }
-    }
-
-    /***********************************************
-     * PLUMED should be updated only once per step.
-     **********************************************/
-    void ExtPlumed::updatePlumed() {
-      int step=integrator->getStep();
-      p->cmd("setStep",&step);
-      p->cmd("update");
     }
 
     /****************************************************
@@ -265,10 +253,8 @@ namespace espressopp {
       class_<ExtPlumed, shared_ptr<ExtPlumed>, bases<Extension> >
 
         ("integrator_ExtPlumed", init< shared_ptr< System >, python::object, string, string, real >())
-        .def("getChargeState", &ExtPlumed::getChargeState)
-        .def("setChargeState", &ExtPlumed::setChargeState)
         .def("getBias", &ExtPlumed::getBias)
-        // .def("setUnitStyle", &ExtPlumed::setUnitStyle)
+        .def("setNaturalUnits", &ExtPlumed::setNaturalUnits)
         .def("setTimeUnit", &ExtPlumed::setTimeUnit)
         .def("setEnergyUnit", &ExtPlumed::setEnergyUnit)
         .def("setLengthUnit", &ExtPlumed::setLengthUnit)
