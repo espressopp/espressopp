@@ -209,7 +209,7 @@ namespace espressopp {
               bc.getMinimumImageVectorBox(r43, p4.position(), p3.position());
               Real3D rijjk = r21.cross(r32); // [r21 x r32]
               Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-
+              
               real rijjk_sqr = rijjk.sqr();
               real rjkkn_sqr = rjkkn.sqr();
               
@@ -221,16 +221,17 @@ namespace espressopp {
               
               // cosine between planes
               real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-              real _phi = acos(cos_phi);
-              if (cos_phi > 1.0) {
-                cos_phi = 1.0;
-                _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
-              } else if (cos_phi < -1.0) {
-                cos_phi = -1.0;
-                _phi = M_PI-1e-10;
-              }
-              colVar[i] = sin(_phi);
-              colVar[i+1] = cos_phi;
+              if (cos_phi > 1.0) cos_phi = 1.0;
+              else if (cos_phi < -1.0) cos_phi = -1.0;
+              
+              real phi = acos(cos_phi);
+              //get sign of phi
+              Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
+              real signcheck = rcross * r32;
+              if (signcheck < 0.0) phi *= -1.0;
+
+              colVar[i] = sin(phi);
+              colVar[i+1] = cos(phi);
               i+=2;
             }
         }

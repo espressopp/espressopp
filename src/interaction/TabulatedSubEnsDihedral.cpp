@@ -183,16 +183,17 @@ namespace espressopp {
             
             // cosine between planes
             real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-            real _phi = acos(cos_phi);
-            if (cos_phi > 1.0) {
-              cos_phi = 1.0;
-              _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
-            } else if (cos_phi < -1.0) {
-              cos_phi = -1.0;
-              _phi = M_PI-1e-10;
-            }
-            colVar[0] = sin(_phi);
-            colVar[1] = cos_phi;
+            if (cos_phi > 1.0) cos_phi = 1.0;
+            else if (cos_phi < -1.0) cos_phi = -1.0;
+            
+            real phi = acos(cos_phi);
+            //get sign of phi
+            Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
+            real signcheck = rcross * r32;
+            if (signcheck < 0.0) phi *= -1.0;
+                        
+            colVar[0] = sin(phi);
+            colVar[1] = cos(phi);
             // Now all bonds in colVarBondList
             int i=2;
             for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
