@@ -132,11 +132,6 @@ namespace espressopp {
         p3.force() += force3;
         p4.force() += force4;
 
-        // std::cout << "F1 " << force1[0] << " " << force1[1] << " " << force1[2]  << std::endl;
-        // std::cout << "F2 " << force2[0] << " " << force2[1] << " " << force2[2]  << std::endl;
-        // std::cout << "F3 " << force3[0] << " " << force3[1] << " " << force3[2]  << std::endl;
-        // std::cout << "F4 " << force4[0] << " " << force4[1] << " " << force4[2]  << std::endl;
-
       }
     }
 

@@ -153,8 +153,6 @@ namespace espressopp {
         if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
         real coef1 = (1.0/sin(_phi)) * (K * diff);
 
-        // std::cout << "PhiHar " << _phi << " " << coef1 << std::endl;
-
         real A1 = inv_rijjk * inv_rjkkn;
         real A2 = inv_rijjk * inv_rijjk;
         real A3 = inv_rjkkn * inv_rjkkn;

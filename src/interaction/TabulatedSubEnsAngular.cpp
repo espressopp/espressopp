@@ -65,9 +65,9 @@ namespace espressopp {
             int i = numInteractions;
             numInteractions += 1;
             colVarRef.setDimension(numInteractions);
-            // Dimension 8: angle, bond, dihed(sin), dihed(cos),
-            // sd_angle, sd_bond, sd_dihed(sin), sd_dihed(cos)
-            colVarRef[i].setDimension(8);
+            // Dimension 6: angle, bond, dihed,
+            // sd_angle, sd_bond, sd_dihed
+            colVarRef[i].setDimension(6);
             colVarRef[i] = _cvref;
             filenames.push_back(boost::python::extract<std::string>(fname));
             weights.push_back(0.);
@@ -127,9 +127,15 @@ namespace espressopp {
                         // Choose between angle, bond, and dihed(sin), dihed(cos)
                         if (j <= 0+colVarAngleList->size()) k = 0;
                         else if (j<1+colVarAngleList->size()+colVarBondList->size()) k = 1;
-                        else if (j%2 == 0) k = 2;
-                        else k = 3;
-                        norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                        else k = 2;
+                        if (k != 2)
+                          norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                        else {
+                          real diff = colVar[j] -  colVarRef[i][2];
+                          if (diff>M_PI) diff -= 2.0*M_PI;
+                          if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+                          norm_d_i += pow(diff / colVarSd[2], 2);
+                        }
                         norm_l_i += pow(colVarRef[i][4+k], 2);
                     }
                     if (norm_d_i > norm_l_i)
@@ -166,7 +172,7 @@ namespace espressopp {
         void TabulatedSubEnsAngular::setColVar(const Real3D& dist12,
               const Real3D& dist32, const bc::BC& bc) {
             colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size()
-                                +2*colVarDihedList->size());
+                                +colVarDihedList->size());
             real dist12_sqr = dist12 * dist12;
             real dist32_sqr = dist32 * dist32;
             real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
@@ -207,32 +213,39 @@ namespace espressopp {
               bc.getMinimumImageVectorBox(r21, p2.position(), p1.position());
               bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
               bc.getMinimumImageVectorBox(r43, p4.position(), p3.position());
+              Real3D retF[4];
+
               Real3D rijjk = r21.cross(r32); // [r21 x r32]
               Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-              
+
               real rijjk_sqr = rijjk.sqr();
               real rjkkn_sqr = rjkkn.sqr();
-              
+
               real rijjk_abs = sqrt(rijjk_sqr);
               real rjkkn_abs = sqrt(rjkkn_sqr);
-              
+
               real inv_rijjk = 1.0 / rijjk_abs;
               real inv_rjkkn = 1.0 / rjkkn_abs;
-              
+
               // cosine between planes
               real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-              if (cos_phi > 1.0) cos_phi = 1.0;
-              else if (cos_phi < -1.0) cos_phi = -1.0;
-              
-              real phi = acos(cos_phi);
+              real _phi = acos(cos_phi);
+              if (cos_phi > 1.0) {
+                cos_phi = 1.0;
+                _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
+              } else if (cos_phi < -1.0) {
+                cos_phi = -1.0;
+                _phi = M_PI-1e-10;
+              }
+
               //get sign of phi
+              //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
               Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
               real signcheck = rcross * r32;
-              if (signcheck < 0.0) phi *= -1.0;
+              if (signcheck < 0.0) _phi *= -1.0;
 
-              colVar[i] = sin(phi);
-              colVar[i+1] = cos(phi);
-              i+=2;
+              colVar[i] = _phi;
+              i+=1;
             }
         }
 

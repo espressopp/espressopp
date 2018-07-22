@@ -66,9 +66,9 @@ namespace espressopp {
             int i = numInteractions;
             numInteractions += 1;
             colVarRef.setDimension(numInteractions);
-            // Dimension 8: dihed(sin), dihed(cos), bond, angle,
-            // sd_dihed(sin), sd_dihed(cos), sd_bond, sd_angle
-            colVarRef[i].setDimension(8);
+            // Dimension 6: dihed,  bond, angle,
+            // sd_dihed, sd_bond, sd_angle
+            colVarRef[i].setDimension(6);
             colVarRef[i] = _cvref;
             filenames.push_back(boost::python::extract<std::string>(fname));
             weights.push_back(0.);
@@ -128,10 +128,16 @@ namespace espressopp {
                         int k = 0;
                         // Choose between dihed(sin), dihed(cos), bonds, and angles
                         if (j == 0) k = 0;
-                        else if (j == 1) k = 1;
-                        else if (j>1 && j<2+colVarBondList->size()) k = 2;
-                        else k = 3;
-                        norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                        else if (j>0 && j<1+colVarBondList->size()) k = 2;
+                        else k = 2;
+                        if (k != 2)
+                          norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                        else {
+                          real diff = colVar[j] -  colVarRef[i][2];
+                          if (diff>M_PI) diff -= 2.0*M_PI;
+                          if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+                          norm_d_i += pow(diff / colVarSd[2], 2);
+                        }
                         norm_l_i += pow(colVarRef[i][3+k], 2);
                     }
                     if (norm_d_i > norm_l_i)
@@ -168,34 +174,41 @@ namespace espressopp {
         void TabulatedSubEnsDihedral::setColVar(
             const Real3D& r21, const Real3D& r32,
             const Real3D& r43, const bc::BC& bc) {
-            colVar.setDimension(2+colVarBondList->size()+colVarAngleList->size());
+            colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
+            Real3D retF[4];
+
             Real3D rijjk = r21.cross(r32); // [r21 x r32]
             Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-            
+
             real rijjk_sqr = rijjk.sqr();
             real rjkkn_sqr = rjkkn.sqr();
-            
+
             real rijjk_abs = sqrt(rijjk_sqr);
             real rjkkn_abs = sqrt(rjkkn_sqr);
-            
+
             real inv_rijjk = 1.0 / rijjk_abs;
             real inv_rjkkn = 1.0 / rjkkn_abs;
-            
+
             // cosine between planes
             real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-            if (cos_phi > 1.0) cos_phi = 1.0;
-            else if (cos_phi < -1.0) cos_phi = -1.0;
-            
-            real phi = acos(cos_phi);
+            real _phi = acos(cos_phi);
+            if (cos_phi > 1.0) {
+              cos_phi = 1.0;
+              _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
+            } else if (cos_phi < -1.0) {
+              cos_phi = -1.0;
+              _phi = M_PI-1e-10;
+            }
+
             //get sign of phi
+            //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
             Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
             real signcheck = rcross * r32;
-            if (signcheck < 0.0) phi *= -1.0;
-                        
-            colVar[0] = sin(phi);
-            colVar[1] = cos(phi);
+            if (signcheck < 0.0) _phi *= -1.0;
+
+            colVar[0] = _phi;
             // Now all bonds in colVarBondList
-            int i=2;
+            int i=1;
             for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
               Particle &p1 = *it->first;
               Particle &p2 = *it->second;

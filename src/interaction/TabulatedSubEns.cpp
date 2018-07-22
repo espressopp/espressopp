@@ -46,7 +46,7 @@ namespace espressopp {
         numInteractions = dim;
         for (int i=0; i<dim; ++i) {
           filenames[i] = boost::python::extract<std::string>(_filenames[i]);
-          colVarRef[i].setDimension(8);
+          colVarRef[i].setDimension(6);
           if (itype == 1) { // create a new InterpolationLinear
               tables[i] = make_shared <InterpolationLinear> ();
               tables[i]->read(world, filenames[i].c_str());
@@ -131,9 +131,15 @@ namespace espressopp {
                     // Choose between bond, angle, and dihed
                     if (j <= 0+colVarBondList->size()) k = 0;
                     else if (j>0 && j<1+colVarBondList->size()+colVarAngleList->size()) k = 1;
-                    else if (j%2 == 0) k = 2;
-                    else k = 3;
-                    norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                    else k = 2;
+                    if (k != 2)
+                      norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
+                    else {
+                      real diff = colVar[j] -  colVarRef[i][2];
+                      if (diff>M_PI) diff -= 2.0*M_PI;
+                      if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+                      norm_d_i += pow(diff / colVarSd[2], 2);
+                    }
                     norm_l_i += pow(colVarRef[i][3+k], 2);
                 }
                 if (norm_d_i > norm_l_i)
@@ -168,7 +174,8 @@ namespace espressopp {
 
     // Collective variables
     void TabulatedSubEns::setColVar(const Real3D& dist, const bc::BC& bc) {
-        colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
+        colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size()
+                            +colVarDihedList->size());
         colVar[0] = sqrt(dist*dist);
         // Now all bonds in colVarBondList
         int i=1;
@@ -205,32 +212,39 @@ namespace espressopp {
           bc.getMinimumImageVectorBox(r21, p2.position(), p1.position());
           bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
           bc.getMinimumImageVectorBox(r43, p4.position(), p3.position());
+          Real3D retF[4];
+
           Real3D rijjk = r21.cross(r32); // [r21 x r32]
           Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-          
+
           real rijjk_sqr = rijjk.sqr();
           real rjkkn_sqr = rjkkn.sqr();
-          
+
           real rijjk_abs = sqrt(rijjk_sqr);
           real rjkkn_abs = sqrt(rjkkn_sqr);
-          
+
           real inv_rijjk = 1.0 / rijjk_abs;
           real inv_rjkkn = 1.0 / rjkkn_abs;
-          
+
           // cosine between planes
           real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-          if (cos_phi > 1.0) cos_phi = 1.0;
-          else if (cos_phi < -1.0) cos_phi = -1.0;
-          
-          real phi = acos(cos_phi);
+          real _phi = acos(cos_phi);
+          if (cos_phi > 1.0) {
+            cos_phi = 1.0;
+            _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
+          } else if (cos_phi < -1.0) {
+            cos_phi = -1.0;
+            _phi = M_PI-1e-10;
+          }
+
           //get sign of phi
+          //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
           Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
           real signcheck = rcross * r32;
-          if (signcheck < 0.0) phi *= -1.0;
-          
-          colVar[i] = sin(phi);
-          colVar[i+1] = cos(phi);
-          i+=2;
+          if (signcheck < 0.0) _phi *= -1.0;
+
+          colVar[i] = _phi;
+          i+=1;
         }
     }
 
