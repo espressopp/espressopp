@@ -12,7 +12,7 @@ endif (MPI4PY_INCLUDES)
 
 if(PYTHON_EXECUTABLE)
   execute_process(COMMAND ${PYTHON_EXECUTABLE} 
-                -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0)"
+      -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0))"
 		OUTPUT_VARIABLE PYTHON_SITEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   execute_process(COMMAND "${PYTHON_EXECUTABLE}" 
@@ -27,18 +27,18 @@ if(PYTHON_EXECUTABLE)
   endif()
 
   execute_process(COMMAND
-      "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print mpi4py.get_include()"
+      "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
       OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-  
+  message(STATUS "MPI4PY_INCLUDE = ${MPI4PY_INCLUDE_DIR}")
 endif(PYTHON_EXECUTABLE)
 
-find_path (MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${PYTHON_SITEDIR}/mpi4py/include )
+find_path(MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${PYTHON_SITEDIR}/mpi4py/include )
 if(NOT MPI4PY_INCLUDES)
   message("     mpi4py.h not found. Please make sure you have installed the developer version of mpi4py")
 endif()
 
-find_file (MPI4PY_LIBRARIES MPI.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${PYTHON_SITEDIR}/mpi4py)
+find_file (MPI4PY_LIBRARIES MPI.cpython-36m-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${PYTHON_SITEDIR}/mpi4py)
 
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE

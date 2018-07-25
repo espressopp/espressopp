@@ -92,10 +92,10 @@ endif()
 #Process Python settings
 ########################################################################
 
-find_package(PythonInterp 2 REQUIRED)
+find_package(PythonInterp 3 REQUIRED)
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_python_inc()"
+                -c "import distutils.sysconfig as cg; print(cg.get_python_inc())"
                 OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -106,28 +106,33 @@ message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
 include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHON_INSTDIR)
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
+    execute_process(COMMAND ${PYTHON_EXECUTABLE}
+                -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
                 OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                        -c "import sys; print sys.version[:3]"
+                        -c "import sys; print(sys.version[:3])"
                         OUTPUT_VARIABLE PYTHON_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_config_var('LIBDIR')"
+                -c "import distutils.sysconfig as cg; print(cg.get_config_var('LIBDIR'))"
                 OUTPUT_VARIABLE PYTHON_LIBDIR
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "PYTHON_LIBDIR = ${PYTHON_LIBDIR}")
 
 find_library(PYTHON_LIBRARIES
-             NAMES python${PYTHON_VERSION}
-             PATHS ${PYTHON_LIBDIR}  )
+             NAMES
+                python${PYTHON_VERSION}
+                python${PYTHON_VERSION}mu
+                python${PYTHON_VERSION}m
+                python${PYTHON_VERSION}u
+             PATHS
+                ${PYTHON_LIBDIR})
 
 if(NOT PYTHON_LIBRARIES)
   message(FATAL_ERROR "Python libraries not found!")
