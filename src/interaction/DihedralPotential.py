@@ -65,6 +65,6 @@ if pmi.isController:
     class DihedralPotential(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            localcall = [ 'computeForce', 'computeEnergy' ],
+            localcall = [ 'computeForce', 'computeEnergy', 'computePhi' ],
             pmiproperty = [ 'cutoff', 'colVarBondList', 'colVarAngleList', 'colVar' ]
             )

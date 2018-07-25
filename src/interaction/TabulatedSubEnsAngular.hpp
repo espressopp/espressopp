@@ -55,6 +55,11 @@ namespace espressopp {
                 RealND colVarSd;
                 // characteristic decay length of the interpolation
                 real alpha;
+                // Size of CV partners
+                int colVarBondListSize;
+                int colVarAngleListSize;
+                int colVarDihedListSize;
+
 
             public:
                 static void registerPython();
@@ -70,6 +75,9 @@ namespace espressopp {
                     colVarSd.setDimension(4);
                     colVarRef.setDimension(0);
                     alpha = 1.;
+                    colVarBondListSize = 0;
+                    colVarAngleListSize = 0;
+                    colVarDihedListSize = 0;
                 }
 
                 void addInteraction(int itype, boost::python::str fname,
@@ -156,7 +164,7 @@ namespace espressopp {
 
                 real _computeEnergyRaw(real theta) const {
                     real e = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
+                    for	(int i=0; i<numInteractions; ++i) 
                         e += weights[i] * tables[i]->getEnergy(theta);
                     return e;
                 }

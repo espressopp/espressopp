@@ -99,6 +99,9 @@ namespace espressopp {
         void TabulatedSubEnsDihedral::computeColVarWeights(
             const Real3D& dist21, const Real3D& dist32,
             const Real3D& dist43, const bc::BC& bc){
+            // Sanity Check
+            if (weights.getDimension() == 0)
+                throw std::runtime_error("TabulatedSubEnsDihedral requires at least one interaction.");
             // Compute the weights for each force field
             // given the reference and instantaneous values of ColVars
             setColVar(dist21, dist32, dist43, bc);
@@ -126,11 +129,11 @@ namespace espressopp {
                     real norm_l_i = 0.;
                     for (int j=0; j<colVar.getDimension(); ++j) {
                         int k = 0;
-                        // Choose between dihed(sin), dihed(cos), bonds, and angles
-                        if (j == 0) k = 0;
-                        else if (j>0 && j<1+colVarBondList->size()) k = 2;
+                        // Choose between dihed, bonds, and angles
+                        if (j <= 0+colVarDihedListSize) k = 0;
+                        else if (j<1+colVarDihedListSize+colVarBondListSize) k = 1;
                         else k = 2;
-                        if (k != 2)
+                        if (k != 0)
                           norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
                         else {
                           real diff = colVar[j] -  colVarRef[i][2];
@@ -174,63 +177,57 @@ namespace espressopp {
         void TabulatedSubEnsDihedral::setColVar(
             const Real3D& r21, const Real3D& r32,
             const Real3D& r43, const bc::BC& bc) {
-            colVar.setDimension(1+colVarBondList->size()+colVarAngleList->size());
-            Real3D retF[4];
-
-            Real3D rijjk = r21.cross(r32); // [r21 x r32]
-            Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-
-            real rijjk_sqr = rijjk.sqr();
-            real rjkkn_sqr = rjkkn.sqr();
-
-            real rijjk_abs = sqrt(rijjk_sqr);
-            real rjkkn_abs = sqrt(rjkkn_sqr);
-
-            real inv_rijjk = 1.0 / rijjk_abs;
-            real inv_rjkkn = 1.0 / rjkkn_abs;
-
-            // cosine between planes
-            real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-            real _phi = acos(cos_phi);
-            if (cos_phi > 1.0) {
-              cos_phi = 1.0;
-              _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
-            } else if (cos_phi < -1.0) {
-              cos_phi = -1.0;
-              _phi = M_PI-1e-10;
-            }
-
-            //get sign of phi
-            //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
-            Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
-            real signcheck = rcross * r32;
-            if (signcheck < 0.0) _phi *= -1.0;
-
-            colVar[0] = _phi;
-            // Now all bonds in colVarBondList
+            colVar.setDimension(1);
+            colVar[0] = computePhi(r21, r32, r43);
             int i=1;
-            for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
-              Particle &p1 = *it->first;
-              Particle &p2 = *it->second;
-              Real3D dist12;
-              bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-              colVar[i] = sqrt(dist12 * dist12);
-              i+=1;
+            if (colVarDihedList != nullptr) {
+                colVarDihedListSize = colVarDihedList->size();
+                // Now all dihedrals in colVarDihedList
+                for (FixedQuadrupleList::QuadrupleList::Iterator it(*colVarDihedList); it.isValid(); ++it) {
+                  colVar.setDimension(i+1);
+                  Particle &p1 = *it->first;
+                  Particle &p2 = *it->second;
+                  Particle &p3 = *it->third;
+                  Particle &p4 = *it->fourth;
+                  Real3D r21, r32, r43;
+                  bc.getMinimumImageVectorBox(r21, p2.position(), p1.position());
+                  bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
+                  bc.getMinimumImageVectorBox(r43, p4.position(), p3.position());
+                  colVar[i] = DihedralPotential::computePhi(r21, r32, r43);
+                  i+=1;
+                }
             }
-            // Now all angles in colVarAngleList
-            for (FixedTripleList::TripleList::Iterator it(*colVarAngleList); it.isValid(); ++it) {
-              Particle &p1 = *it->first;
-              Particle &p2 = *it->second;
-              Particle &p3 = *it->third;
-              Real3D dist12, dist32;
-              bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-              bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-              real dist12_sqr = dist12 * dist12;
-              real dist32_sqr = dist32 * dist32;
-              real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
-              real cos_theta = dist12 * dist32 / dist1232;
-              colVar[i] = acos(cos_theta);
-              i+=1;
+            if (colVarBondList != nullptr) {
+                // Now all bonds in colVarBondList
+                colVarBondListSize = colVarBondList->size();
+                for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it) {
+                  colVar.setDimension(i+1);
+                  Particle &p1 = *it->first;
+                  Particle &p2 = *it->second;
+                  Real3D dist12;
+                  bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+                  colVar[i] = sqrt(dist12 * dist12);
+                  i+=1;
+                }
+            }
+            if (colVarAngleList != nullptr) {
+                // Now all angles in colVarAngleList
+                colVarAngleListSize = colVarAngleList->size();
+                for (FixedTripleList::TripleList::Iterator it(*colVarAngleList); it.isValid(); ++it) {
+                  colVar.setDimension(i+1);
+                  Particle &p1 = *it->first;
+                  Particle &p2 = *it->second;
+                  Particle &p3 = *it->third;
+                  Real3D dist12, dist32;
+                  bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+                  bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+                  real dist12_sqr = dist12 * dist12;
+                  real dist32_sqr = dist32 * dist32;
+                  real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
+                  real cos_theta = dist12 * dist32 / dist1232;
+                  colVar[i] = acos(cos_theta);
+                  i+=1;
+                }
             }
         }
 

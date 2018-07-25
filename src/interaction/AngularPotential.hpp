@@ -146,7 +146,7 @@ namespace espressopp {
       shared_ptr<FixedPairList> colVarBondList;
       // List of angles that correlate with the bond potential
       shared_ptr<FixedTripleList> colVarAngleList;
-      // List of dihedrals that correlate with the angle potential
+      // List of dihedrals that correlate with the dihedral potential
       shared_ptr<FixedQuadrupleList> colVarDihedList;
       // Collective variables: first itself, then bonds and dihedrals
       RealND colVar;

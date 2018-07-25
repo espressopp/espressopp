@@ -26,6 +26,37 @@
 
 namespace espressopp {
   namespace interaction {
+    
+    real
+    DihedralPotential::computePhi(const Real3D& r21,
+                 const Real3D& r32,
+                 const Real3D& r43) {
+      Real3D rijjk = r21.cross(r32); // [r21 x r32]
+      Real3D rjkkn = r32.cross(r43); // [r32 x r43]
+
+      real rijjk_sqr = rijjk.sqr();
+      real rjkkn_sqr = rjkkn.sqr();
+
+      real rijjk_abs = sqrt(rijjk_sqr);
+      real rjkkn_abs = sqrt(rjkkn_sqr);
+
+      real inv_rijjk = 1.0 / rijjk_abs;
+      real inv_rjkkn = 1.0 / rjkkn_abs;
+
+      // cosine between planes
+      real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+      if (cos_phi > 1.0) cos_phi = 1.0;
+      else if (cos_phi < -1.0) cos_phi = -1.0;
+
+      real phi = acos(cos_phi);
+      //get sign of phi
+      //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
+      Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
+      real signcheck = rcross * r32;
+      if (signcheck < 0.0) phi *= -1.0;
+
+      return phi;
+    }
 
     LOG4ESPP_LOGGER(DihedralPotential::theLogger, "DihedralPotential");
 
@@ -70,6 +101,7 @@ namespace espressopp {
             .def("computeEnergy", pure_virtual(computeEnergy2))
             .def("computeForce", pure_virtual(computeForce1))
             .def("computeForce", pure_virtual(computeForce2))
+            .def("computePhi", &DihedralPotential::computePhi)
         ;
     }
   }

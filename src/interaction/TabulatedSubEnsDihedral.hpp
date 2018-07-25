@@ -55,6 +55,10 @@ namespace espressopp {
                 RealND colVarSd;
                 // characteristic decay length of the interpolation
                 real alpha;
+                // Size of CV partners
+                int colVarBondListSize;
+                int colVarAngleListSize;
+                int colVarDihedListSize;
 
             public:
                 static void registerPython();
@@ -70,6 +74,9 @@ namespace espressopp {
                     colVarSd.setDimension(4);
                     colVarRef.setDimension(0);
                     alpha = 1.;
+                    colVarBondListSize = 0;
+                    colVarAngleListSize = 0;
+                    colVarDihedListSize = 0;
                 }
 
                 void addInteraction(int itype, boost::python::str fname,
