@@ -242,11 +242,11 @@ class LennardJonesGenericLocal(PotentialLocal, interaction_LennardJonesGeneric):
         """Initialize the local generic Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
-                print "here without shift"
+                print("here without shift")
                 cxxinit(self, interaction_LennardJonesGeneric, 
                         epsilon, sigma, a, b, cutoff)
             else:
-                print "here with shift"
+                print("here with shift")
                 cxxinit(self, interaction_LennardJonesGeneric, 
                         epsilon, sigma, a, b, cutoff, shift)
 
@@ -365,50 +365,43 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'a', 'b']
             )
 
-    class VerletListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesGenericLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListAdressLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesGenericLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListAdressLennardJonesGeneric2(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesGeneric2(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesGeneric2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesGenericLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressLennardJonesGeneric2(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLennardJonesGeneric2(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesGeneric2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesGenericLocal',
             pmicall = ['setPotential']
             )
         
-    class FixedPairListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesGenericLocal',
             pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ]

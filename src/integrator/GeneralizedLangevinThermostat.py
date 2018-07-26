@@ -69,8 +69,7 @@ class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedL
     #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
-    class GeneralizedLangevinThermostat(Extension):
-        __metaclass__ = pmi.Proxy
+    class GeneralizedLangevinThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.GeneralizedLangevinThermostatLocal',
             pmiproperty = [ 'itype', 'filename'],

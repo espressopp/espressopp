@@ -66,8 +66,7 @@ class LangevinThermostatOnRadiusLocal(ExtensionLocal, integrator_LangevinThermos
                 self.cxxclass.addExclpid(self, pid)
 
 if pmi.isController :
-    class LangevinThermostatOnRadius(Extension):
-        __metaclass__ = pmi.Proxy
+    class LangevinThermostatOnRadius(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostatOnRadiusLocal',
             pmiproperty = [ 'gamma', 'temperature'],

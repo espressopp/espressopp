@@ -50,9 +50,9 @@ def read(fin):
   line = ''
   while not 'xlo' in line:
     line = f.readline()
-  xmin, xmax = map(float, line.split()[0:2])
-  ymin, ymax = map(float, f.readline().split()[0:2])
-  zmin, zmax = map(float, f.readline().split()[0:2])
+  xmin, xmax = list(map(float, line.split()[0:2]))
+  ymin, ymax = list(map(float, f.readline().split()[0:2]))
+  zmin, zmax = list(map(float, f.readline().split()[0:2]))
   Lx = xmax - xmin
   Ly = ymax - ymin
   Lz = zmax - zmin
@@ -70,8 +70,8 @@ def read(fin):
     x = []
     y = []
     z = []
-    for i in xrange(num_particles):
-      rx, ry, rz = map(float, f.readline().split()[rstart:])
+    for i in range(num_particles):
+      rx, ry, rz = list(map(float, f.readline().split()[rstart:]))
       x.append(rx)
       y.append(ry)
       z.append(rz)
@@ -81,8 +81,8 @@ def read(fin):
     x = []
     y = []
     z = []
-    for i in xrange(num_particles):
-      k, rq, rx, ry, rz = map(float, f.readline().split()[2:])
+    for i in range(num_particles):
+      k, rq, rx, ry, rz = list(map(float, f.readline().split()[2:]))
       p_type.append(int(k))
       q.append(rq)
       x.append(rx)
@@ -96,8 +96,8 @@ def read(fin):
       line = f.readline()
     line = f.readline()
     bonds = []
-    for i in xrange(num_bonds):
-      bond_id, bond_type, pid1, pid2 = map(int, f.readline().split())
+    for i in range(num_bonds):
+      bond_id, bond_type, pid1, pid2 = list(map(int, f.readline().split()))
       bonds.append((pid1, pid2))
 
   if(num_angles != 0):
@@ -107,8 +107,8 @@ def read(fin):
       line = f.readline()
     line = f.readline()
     angles = []
-    for i in xrange(num_angles):
-      angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
+    for i in range(num_angles):
+      angle_id, angle_type, pid1, pid2, pid3 = list(map(int, f.readline().split()))
       angles.append((pid1, pid2, pid3))
 
 
@@ -119,8 +119,8 @@ def read(fin):
       line = f.readline()
     line = f.readline()
     dihedrals = []
-    for i in xrange(num_dihedrals):
-      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
+    for i in range(num_dihedrals):
+      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(map(int, f.readline().split()))
       dihedrals.append((pid1, pid2, pid3, pid4))
 
   if(velocities):
@@ -132,8 +132,8 @@ def read(fin):
     vx = []
     vy = []
     vz = []
-    for i in xrange(num_particles):
-      vx_, vy_, vz_ = map(float, f.readline().split()[1:])
+    for i in range(num_particles):
+      vx_, vy_, vz_ = list(map(float, f.readline().split()[1:]))
       vx.append(vx_)
       vy.append(vy_)
       vz.append(vz_)
@@ -187,9 +187,9 @@ def read_charmm(fin):
   line = ''
   while not 'xlo' in line:
     line = f.readline()
-  xmin, xmax = map(float, line.split()[0:2])
-  ymin, ymax = map(float, f.readline().split()[0:2])
-  zmin, zmax = map(float, f.readline().split()[0:2])
+  xmin, xmax = list(map(float, line.split()[0:2]))
+  ymin, ymax = list(map(float, f.readline().split()[0:2]))
+  zmin, zmax = list(map(float, f.readline().split()[0:2]))
   Lx = xmax - xmin
   Ly = ymax - ymin
   Lz = zmax - zmin
@@ -202,7 +202,7 @@ def read_charmm(fin):
   masses = []
   dumm = 0.0
   masses.append(dumm)
-  for i in xrange(num_types):
+  for i in range(num_types):
       rmass = float(f.readline().split()[1])
       masses.append(rmass) 
 
@@ -216,8 +216,8 @@ def read_charmm(fin):
   dumm = 0.0
   epsilon.append(dumm)
   sigma.append(dumm)
-  for i in xrange(num_types):
-      repsilon, rsigma = map(float, f.readline().split()[1:3])
+  for i in range(num_types):
+      repsilon, rsigma = list(map(float, f.readline().split()[1:3]))
       epsilon.append(repsilon) 
       sigma.append(rsigma)
       
@@ -237,8 +237,8 @@ def read_charmm(fin):
     x = []
     y = []
     z = []
-    for i in xrange(num_particles):
-      rx, ry, rz = map(float,f.readline().split()[rstart:])
+    for i in range(num_particles):
+      rx, ry, rz = list(map(float,f.readline().split()[rstart:]))
       x.append(rx)
       y.append(ry)
       z.append(rz)
@@ -248,8 +248,8 @@ def read_charmm(fin):
     x = []
     y = []
     z = []
-    for i in xrange(num_particles):
-      k, rq, rx, ry, rz = map(float, f.readline().split()[2:])
+    for i in range(num_particles):
+      k, rq, rx, ry, rz = list(map(float, f.readline().split()[2:]))
       p_type.append(int(k))
       q.append(rq)
       x.append(rx)
@@ -267,8 +267,8 @@ def read_charmm(fin):
     dumm = 0.0
     K.append(dumm)
     r0.append(dumm)
-    for i in xrange(num_bond_types):
-        rK, rr0 = map(float, f.readline().split()[1:3])
+    for i in range(num_bond_types):
+        rK, rr0 = list(map(float, f.readline().split()[1:3]))
         K.append(rK) 
         r0.append(rr0)
 
@@ -282,8 +282,8 @@ def read_charmm(fin):
     line = f.readline()
     bonds = []
     bonds_type_arr = []
-    for i in xrange(num_bonds):
-      bond_id, bond_type, pid1, pid2 = map(int, f.readline().split())
+    for i in range(num_bonds):
+      bond_id, bond_type, pid1, pid2 = list(map(int, f.readline().split()))
       bonds.append((pid1, pid2))
       bonds_type_arr.append(bond_type)
 
@@ -298,8 +298,8 @@ def read_charmm(fin):
     dumm = 0.0
     Kt.append(dumm)
     t0.append(dumm)
-    for i in xrange(num_bond_types):
-        rKt, rt0 = map(float, f.readline().split()[1:3])
+    for i in range(num_bond_types):
+        rKt, rt0 = list(map(float, f.readline().split()[1:3]))
         Kt.append(rKt) 
         t0.append(rt0)
 
@@ -311,8 +311,8 @@ def read_charmm(fin):
     line = f.readline()
     angles = []
     angles_type_arr = []
-    for i in xrange(num_angles):
-      angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
+    for i in range(num_angles):
+      angle_id, angle_type, pid1, pid2, pid3 = list(map(int, f.readline().split()))
       angles.append((pid1, pid2, pid3))
       angles_type_arr.append(angle_type)
 
@@ -329,8 +329,8 @@ def read_charmm(fin):
     Kdh.append(dumm)
     ndh.append(dumm)
     ph0.append(dumm)
-    for i in xrange(num_bond_types):
-        rKdh, rndh, rph0 = map(float, f.readline().split()[1:4])
+    for i in range(num_bond_types):
+        rKdh, rndh, rph0 = list(map(float, f.readline().split()[1:4]))
         Kdh.append(rKdh) 
         ndh.append(rndh)
         ph0.append(rph0)
@@ -343,8 +343,8 @@ def read_charmm(fin):
     line = f.readline()
     dihedrals = []
     dihedrals_type_arr = []
-    for i in xrange(num_dihedrals):
-      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
+    for i in range(num_dihedrals):
+      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(map(int, f.readline().split()))
       dihedrals.append((pid1, pid2, pid3, pid4))
       dihedrals_type_arr.append(dihedral_type)
 
@@ -357,8 +357,8 @@ def read_charmm(fin):
     vx = []
     vy = []
     vz = []
-    for i in xrange(num_particles):
-      vx_, vy_, vz_ = map(float, f.readline().split()[1:])
+    for i in range(num_particles):
+      vx_, vy_, vz_ = list(map(float, f.readline().split()[1:]))
       vx.append(vx_)
       vy.append(vy_)
       vz.append(vz_)
@@ -402,38 +402,38 @@ def write(fout, system, writeVelocities=False):
   ndihedraltypes = 0
   
   nInteractions = system.getNumberOfInteractions()
-  for i in xrange(nInteractions):
+  for i in range(nInteractions):
       bT = system.getInteraction(i).bondType()
       if   bT == espressopp.interaction.Pair:
              nbondtypes += 1
              bl  = system.getInteraction(i).getFixedPairList().getBonds()
              bln = []
-             for j in xrange(len(bl)):
+             for j in range(len(bl)):
                bln.extend(bl[j])
              bonds.append(bln)
       elif bT == espressopp.interaction.Angular:
              nangletypes += 1
              an  = system.getInteraction(i).getFixedTripleList().getTriples()
              ann = []
-             for j in xrange(len(an)):
+             for j in range(len(an)):
                ann.extend(an[j]) 
              angles.append(ann)
       elif bT == espressopp.interaction.Dihedral:
              ndihedraltypes += 1
              di  = system.getInteraction(i).getFixedQuadrupleList().getQuadruples()
              din = []
-             for j in xrange(len(di)):
+             for j in range(len(di)):
                din.extend(di[j])   
              dihedrals.append(din)
   
   nbonds = 0
-  for i in xrange(len(bonds)):
+  for i in range(len(bonds)):
       nbonds += len(bonds[i])
   nangles = 0
-  for i in xrange(len(angles)):
+  for i in range(len(angles)):
       nangles += len(angles[i])
   ndihedrals = 0
-  for i in xrange(len(dihedrals)):
+  for i in range(len(dihedrals)):
       ndihedrals += len(dihedrals[i])
       
   atomtypes = []
@@ -508,24 +508,24 @@ def write(fout, system, writeVelocities=False):
   if nbonds > 0:      
     file.write('\nBonds\n\n')
     bn = 1
-    for i in xrange(len(bonds)):
-        for j in xrange(len(bonds[i])):
+    for i in range(len(bonds)):
+        for j in range(len(bonds[i])):
             file.write('%d %d %d %d\n' % (bn, i+1, bonds[i][j][0], bonds[i][j][1]))
             bn += 1
 
   if nangles > 0:
     file.write('\nAngles\n\n')
     an = 1
-    for i in xrange(len(angles)):
-        for j in xrange(len(angles[i])):
+    for i in range(len(angles)):
+        for j in range(len(angles[i])):
             file.write('%d %d %d %d %d\n' % (an, i+1, angles[i][j][1], angles[i][j][0], angles[i][j][2]))
             an += 1
 
   if ndihedrals > 0:
     file.write('\nDihedrals\n\n')
     dn = 1
-    for i in xrange(len(dihedrals)):
-        for j in xrange(len(dihedrals[i])):
+    for i in range(len(dihedrals)):
+        for j in range(len(dihedrals[i])):
             file.write('%d %d %d %d %d %d\n' % (dn, i+1, dihedrals[i][j][0], dihedrals[i][j][1], dihedrals[i][j][2], dihedrals[i][j][3]))
             dn += 1
   

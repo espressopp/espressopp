@@ -142,10 +142,9 @@ from espressopp import esutil
 
 # This injects additional methods into the Quaternion class and pulls it
 # into this module 
-class __Quaternion(Quaternion) :
+class __Quaternion(Quaternion, metaclass=esutil.ExtendBaseClass) :
     """Basic quaternion as used by ESPResSo++.
     """
-    __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Quaternion.__init__
     def __init__(self, *args):
@@ -160,13 +159,13 @@ class __Quaternion(Quaternion) :
             elif isinstance(arg0, Real3D):
                 real_part = 0.0
                 unreal_part = arg0
-            elif isinstance(arg0, (int,long,float)):
+            elif isinstance(arg0, (int,float)):
                 real_part = arg0
                 unreal_part = Real3D(0.0)
             # test whether the argument is iterable and has 2 elements,
             # first element is float and second element is a Real3D
             elif hasattr(arg0, '__iter__') and len(arg0) == 2 \
-                 and isinstance(arg0[0], (int,long,float)) \
+                 and isinstance(arg0[0], (int,float)) \
                  and isinstance(arg0[1], Real3D):
                 real_part = arg0[0]
                 unreal_part = arg0[1]
@@ -176,15 +175,15 @@ class __Quaternion(Quaternion) :
                 unreal_part = Real3D(arg0[1], arg0[2], arg0[3])
             else :
                 raise TypeError("Cannot initialize Quaternion from %s" % (args))
-        elif len(args) == 2 and isinstance(args[0], (int,long,float)) \
+        elif len(args) == 2 and isinstance(args[0], (int,float)) \
              and isinstance(args[1], Real3D):
             real_part, unreal_part = args
-        elif len(args) == 2 and isinstance(args[0], (int,long,float)) \
+        elif len(args) == 2 and isinstance(args[0], (int,float)) \
              and hasattr(args[1], '__iter__') \
-             and all(isinstance(elem, (int,long,float)) for elem in args[1]):
+             and all(isinstance(elem, (int,float)) for elem in args[1]):
             real_part = args[0]
             unreal_part = Real3D(args[1])
-        elif len(args) == 4 and all(isinstance(elem, (int,long,float)) for elem in args):
+        elif len(args) == 4 and all(isinstance(elem, (int,float)) for elem in args):
             real_part = args[0]
             unreal_part = Real3D(args[1], args[2], args[3])
         else :

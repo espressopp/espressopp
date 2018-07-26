@@ -244,36 +244,31 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'alpha', 'rMin']
             )
 
-    class VerletListMorse(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListMorseLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class VerletListAdressMorse(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressMorseLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressMorse(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressMorseLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListMorse(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListMorseLocal',
             pmicall = ['setPotential']
             )
 
-    class FixedPairListMorse(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListMorseLocal',
             pmicall = ['setPotential']

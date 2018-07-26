@@ -110,8 +110,7 @@ class MinimizeEnergyLocal(integrator_MinimizeEnergy):
             return self.cxxclass.run(self, niter, verbose)
 
 if pmi.isController:
-    class MinimizeEnergy:
-        __metaclass__ = pmi.Proxy
+    class MinimizeEnergy(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.MinimizeEnergyLocal',
             pmiproperty = ('f_max', 'displacement', 'step'),

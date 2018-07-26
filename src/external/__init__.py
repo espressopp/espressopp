@@ -22,4 +22,4 @@
 try:
   from espressopp.external.transformations import *
 except:
-  print 'Warning: numpy module not available'
+  print('Warning: numpy module not available')

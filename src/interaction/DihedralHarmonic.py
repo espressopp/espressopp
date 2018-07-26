@@ -137,15 +137,13 @@ if pmi.isController:
       pmiproperty=['K', 'phi0']
     )
 
-  class FixedQuadrupleListDihedralHarmonic(Interaction):
-    __metaclass__ = pmi.Proxy
+  class FixedQuadrupleListDihedralHarmonic(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls='espressopp.interaction.FixedQuadrupleListDihedralHarmonicLocal',
       pmicall=['setPotential', 'getFixedQuadrupleList']
     )
 
-  class FixedQuadrupleListTypesDihedralHarmonic(Interaction):
-    __metaclass__ = pmi.Proxy
+  class FixedQuadrupleListTypesDihedralHarmonic(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralHarmonicLocal',
       pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

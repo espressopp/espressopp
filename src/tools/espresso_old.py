@@ -70,7 +70,7 @@ def read(file):
           line = line.replace('{','').replace('}','')
           tmp = line.split()
           if tmp[0] == "box_l":
-            Lx, Ly, Lz = map(float, [tmp[1], tmp[2], tmp[3]])
+            Lx, Ly, Lz = list(map(float, [tmp[1], tmp[2], tmp[3]]))
           continue # goto next line
 
 
@@ -143,7 +143,7 @@ def read(file):
 
           if len(tmp) > 2:
             first = int(tmp[0])
-            for idx in xrange(2, len(tmp), 2):
+            for idx in range(2, len(tmp), 2):
               bondpairs.append((first, int(tmp[idx])))
               
       f.close()

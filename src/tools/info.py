@@ -54,7 +54,7 @@ def getAllBonds(system):
   """
   bonds = []
   nInteractions = system.getNumberOfInteractions()
-  for i in xrange(nInteractions):
+  for i in range(nInteractions):
       if system.getInteraction(i).isBonded():
           try:
               FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()

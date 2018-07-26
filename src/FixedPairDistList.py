@@ -116,8 +116,7 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
           return self.cxxclass.getDist(self, pid1, pid2)
         
 if pmi.isController:
-  class FixedPairDistList(object):
-    __metaclass__ = pmi.Proxy
+  class FixedPairDistList(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
         cls = 'espressopp.FixedPairDistListLocal',
         localcall = [ "add" ],

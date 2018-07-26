@@ -109,7 +109,7 @@ from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import h5py
 import numpy as np
-import pyh5md
+from . import pyh5md
 import os
 
 import time as py_time
@@ -186,7 +186,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 dirname = os.path.dirname(filename)
                 new_filename = '{}/{}_{}'.format(dirname, int(py_time.time()), os.path.basename(filename))
                 os.rename(filename, new_filename)
-                print('File {} exists, moved to {}'.format(filename, new_filename))
+                print(('File {} exists, moved to {}'.format(filename, new_filename)))
         try: 
             self.file = pyh5md.File(
                 filename, 'w',
@@ -291,7 +291,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             if 'parameters' not in self.file:
                 self.file.create_group('parameters')
             g_params = self.file['parameters']
-            for k, v in paramters.iteritems():
+            for k, v in paramters.items():
                 g_params.attrs[k] = v
 
     def get_file(self):
@@ -493,7 +493,7 @@ if pmi.isController:
         atom_groups = [ag for ag in h5['/particles'] if 'id' in h5['/particles/{}/'.format(ag)]]
         T = len(h5['/particles/{}/id/value'.format(atom_groups[0])])
         # Iterate over time frames.
-        for t in xrange(T):
+        for t in range(T):
             for ag in atom_groups:
                 ids = h5['/particles/{}/id/value'.format(ag)]
                 idd = [
@@ -501,13 +501,12 @@ if pmi.isController:
                         [(p_id, col_id) for col_id, p_id in enumerate(ids[t])],
                         key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0]))
                     ]
-                for k in h5['/particles/{}/'.format(ag)].keys():
-                    if 'value' in h5['/particles/{}/{}'.format(ag, k)].keys():
+                for k in list(h5['/particles/{}/'.format(ag)].keys()):
+                    if 'value' in list(h5['/particles/{}/{}'.format(ag, k)].keys()):
                         path = '/particles/{}/{}/value'.format(ag, k)
                         h5[path][t] = h5[path][t][idd]
 
-    class DumpH5MD(object):
-        __metaclass__ = pmi.Proxy
+    class DumpH5MD(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',

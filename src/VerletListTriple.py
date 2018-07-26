@@ -110,15 +110,14 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
         if pmi.workerIsActive():
             triples=[]
             ntriples=self.localSize()
-            for i in xrange(ntriples):
+            for i in range(ntriples):
               triple=self.cxxclass.getTriple(self, i+1)
               triples.append(triple)
             return triples
 
 
 if pmi.isController:
-  class VerletListTriple(object):
-    __metaclass__ = pmi.Proxy
+  class VerletListTriple(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls = 'espressopp.VerletListTripleLocal',
       pmiproperty = [ 'builds' ],

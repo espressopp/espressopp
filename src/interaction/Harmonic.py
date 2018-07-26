@@ -443,50 +443,43 @@ if pmi.isController:
             pmiproperty = ['K', 'r0']
             )
 
-    class FixedPairListHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListHarmonicLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
             )
 
-    class FixedPairListTypesHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesHarmonicLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
             )
 
-    class VerletListAdressATHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressATHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressATHarmonicLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListAdressCGHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressCGHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressCGHarmonicLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListHadressATHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressATHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressATHarmonicLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListHadressCGHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressCGHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressCGHarmonicLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListHarmonicLocal',
             pmicall = ['setPotential','getPotential']

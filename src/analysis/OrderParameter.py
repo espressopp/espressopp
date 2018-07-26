@@ -60,8 +60,7 @@ class OrderParameterLocal(AnalysisBaseLocal, analysis_OrderParameter):
                       ql_low, ql_high)
 
 if pmi.isController :
-    class OrderParameter(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class OrderParameter(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.analysis.OrderParameterLocal'
         )

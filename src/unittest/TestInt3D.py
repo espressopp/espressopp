@@ -100,7 +100,7 @@ class Test0Int3D(unittest.TestCase) :
         v2 = Int3D(1, 2, 3)
         self.assertEqual(v, v2)
         self.assertFalse(v != v2)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
 
     def test7Pickle(self) :
         'Test pickling Int3D.'
@@ -110,7 +110,7 @@ class Test0Int3D(unittest.TestCase) :
         s = pickle.dumps(v)
         # unpickle
         v2 = pickle.loads(s)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
         self.assertEqual(v, v2)
 
 if __name__ == "__main__":

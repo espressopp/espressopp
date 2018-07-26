@@ -127,14 +127,12 @@ if pmi.isController:
             cls = 'espressopp.interaction.CoulombTruncatedLocal',
             pmiproperty = ['prefactor', 'alpha'] 
             )
-    class VerletListCoulombTruncated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListCoulombTruncated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListCoulombTruncatedLocal',
             pmicall = ['setPotential','getPotential']
             )
-    class FixedPairListTypesCoulombTruncated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesCoulombTruncated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesCoulombTruncatedLocal',
             pmicall = ['setPotential']

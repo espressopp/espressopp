@@ -106,8 +106,7 @@ if pmi.isController:
             pmiproperty = ['e1', 'a1', 'a2', 'Nb']
             )
 
-    class SelfVSphere(Interaction):
-        __metaclass__ = pmi.Proxy
+    class SelfVSphere(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.SelfVSphereLocal',
             pmicall = ['setPotential','getPotential']

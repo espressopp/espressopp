@@ -43,8 +43,7 @@ class NPartLocal(ObservableLocal, analysis_NPart):
             cxxinit(self, analysis_NPart, system)
 
 if pmi.isController :
-    class NPart(Observable):
-        __metaclass__ = pmi.Proxy
+    class NPart(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.NPartLocal'
         )

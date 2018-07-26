@@ -107,8 +107,7 @@ class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
         return self.cxxclass.back(self)
 
 if pmi.isController :
-    class Configurations(Observable):
-        __metaclass__ = pmi.Proxy
+    class Configurations(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ConfigurationsLocal',
             pmicall = [ "gather", "clear", "back" ],

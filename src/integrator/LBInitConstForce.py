@@ -51,8 +51,7 @@ class LBInitConstForceLocal(LBInitLocal, integrator_LBInit_ConstForce):
             cxxinit(self, integrator_LBInit_ConstForce, system, latticeboltzmann)
 
 if pmi.isController :
-    class LBInitConstForce(LBInit):
-        __metaclass__ = pmi.Proxy
+    class LBInitConstForce(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LBInitConstForceLocal',
             pmicall = [

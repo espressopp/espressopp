@@ -75,8 +75,7 @@ class LBInitLocal(integrator_LBInit):
             self.cxxclass.addForce(self,force)
         
 if pmi.isController :
-    class LBInit():
-        __metaclass__ = pmi.Proxy
+    class LBInit(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             )
         

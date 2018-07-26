@@ -34,8 +34,7 @@ class UniformOnSphereLocal(esutil_UniformOnSphere):
     pass
 
 if pmi.isController:
-    class UniformOnSphere(object):
-        __metaclass__ = pmi.Proxy
+    class UniformOnSphere(object, metaclass=pmi.Proxy):
         """A random variate that generates 3D vectors that are uniformly 
         distributed on a sphere."""
         pmiproxydefs = dict(

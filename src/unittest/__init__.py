@@ -37,8 +37,7 @@ class TestCase(unittest.TestCase):
         if round(abs(second.x-first.x), places) != 0 or \
                 round(abs(second.y-first.y), places) != 0 or \
                 round(abs(second.z-first.z), places) != 0:
-            raise self.failureException, \
-                (msg or '%r != %r within %r places' % (first, second, places))
+            raise self.failureException(msg or '%r != %r within %r places' % (first, second, places))
 
     def failIfAlmostEqualReal3D(self, first, second, places=7, msg=None):
         """Fail if the two objects are equal as determined by their
@@ -53,8 +52,7 @@ class TestCase(unittest.TestCase):
         if round(abs(second.x-first.x), places) == 0 and \
                 round(abs(second.y-first.y), places) == 0 and \
                 round(abs(second.z-first.z), places) == 0:
-            raise self.failureException, \
-                (msg or '%r == %r within %r places' % (first, second, places))
+            raise self.failureException(msg or '%r == %r within %r places' % (first, second, places))
         
     assertAlmostEqualReal3D = failUnlessAlmostEqualReal3D
     assertNotAlmostEqualReal3D = failIfAlmostEqualReal3D

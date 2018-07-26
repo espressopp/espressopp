@@ -68,8 +68,7 @@ class LangevinThermostatHybridLocal(ExtensionLocal, integrator_LangevinThermosta
 
 
 if pmi.isController :
-    class LangevinThermostatHybrid(Extension):
-        __metaclass__ = pmi.Proxy
+    class LangevinThermostatHybrid(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostatHybridLocal',
             pmiproperty = [ 'gamma', 'gammahy','gammacg','temperature' ]

@@ -103,8 +103,7 @@ if pmi.isController:
           pmiproperty = ['K']
         )
 
-    class FixedPairDistListHarmonicUnique(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairDistListHarmonicUnique(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.interaction.FixedPairDistListHarmonicUniqueLocal',
           pmicall = ['setPotential','setFixedPairList','getFixedPairList']

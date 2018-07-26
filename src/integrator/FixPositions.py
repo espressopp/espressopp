@@ -46,8 +46,7 @@ class FixPositionsLocal(ExtensionLocal, integrator_FixPositions):
             cxxinit(self, integrator_FixPositions, system, particleGroup, fixMask)
 
 if pmi.isController :
-    class FixPositions(Extension):
-        __metaclass__ = pmi.Proxy
+    class FixPositions(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.FixPositionsLocal',
             pmicall = ['setFixMask', 'getFixMask'],

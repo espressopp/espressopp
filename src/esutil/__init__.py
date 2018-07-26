@@ -72,7 +72,7 @@ class ExtendBaseClass (type) :
 
         theClass = bases[0]
         # loop over all items in the class and replace it
-        for k,v in dict.iteritems():
+        for k,v in dict.items():
             setattr(theClass, k, v)
         return theClass
 

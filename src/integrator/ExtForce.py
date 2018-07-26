@@ -49,8 +49,7 @@ class ExtForceLocal(ExtensionLocal, integrator_ExtForce):
               cxxinit(self, integrator_ExtForce, system, extForce, particleGroup)
 
 if pmi.isController :
-    class ExtForce(Extension):
-        __metaclass__ = pmi.Proxy
+    class ExtForce(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtForceLocal',
             pmicall = ['setExtForce', 'getExtForce'],

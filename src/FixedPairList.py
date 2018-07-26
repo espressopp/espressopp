@@ -136,8 +136,7 @@ class FixedPairListLocal(_espressopp.FixedPairList):
             return sqrt(mxsqr)
             
 if pmi.isController:
-    class FixedPairList(object):
-        __metaclass__ = pmi.Proxy
+    class FixedPairList(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListLocal',
             #localcall = [ 'add' ],

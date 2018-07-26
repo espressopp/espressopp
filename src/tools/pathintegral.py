@@ -107,7 +107,7 @@ disableVVL=False
 	ringids.update({pid:[]})
 	allParticlesById.update({pid:p})
 
-    for i in xrange(1,P):
+    for i in range(1,P):
 	for p in allParticles:
 	    pid=p[propDict['id']]
 	    newparticle=copy.deepcopy(p)
@@ -124,15 +124,15 @@ disableVVL=False
     
     if not disableVVL:
 	iVerletLists={}
-	for i in xrange(1,P+1):
+	for i in range(1,P+1):
 	    iVerletLists.update({i:espressopp.VerletList(system, 0, rebuild=False)})
 	    iVerletLists[i].disconnect()
     ## map types to sub-verlet lists using the VirtualVerletList classical
     ## classical types are in types
     ## type at imaginary time i=t+numtypes*i 
-	for i in xrange(1,P+1):
+	for i in range(1,P+1):
 	    tt=[]
-	    for j in xrange(0, numtypes):
+	    for j in range(0, numtypes):
 		pitype=types[j]+numtypes*(i-1)
 		tt.append(pitype)
 	    #print i, "mapped", tt, " to ", iVerletLists[i]
@@ -147,7 +147,7 @@ disableVVL=False
     if not disableVVL:
 	vParticles=[]
 	vptype=numtypes*(P+1)+1 # this is the type assigned to virtual particles
-	for k, v in ringids.iteritems():
+	for k, v in ringids.items():
 	    
 	    cog=allParticlesById[k][propDict['pos']]
 	    for pid in v:
@@ -179,19 +179,19 @@ disableVVL=False
     # expand non-bonded potentials
     numInteraction=system.getNumberOfInteractions()
 
-    for n in xrange(numInteraction):
+    for n in range(numInteraction):
 	interaction=system.getInteraction(n)
 	
 	## TODO: in case of VVL: clone interaction, add potential!
 	
-	print "expanding interaction", interaction
+	print("expanding interaction", interaction)
 	if interaction.bondType() == espressopp.interaction.Nonbonded:
-	    for i in xrange(P):	
-		for j in xrange(numtypes):
-		    for k in xrange(numtypes):
+	    for i in range(P):	
+		for j in range(numtypes):
+		    for k in range(numtypes):
 			pot=interaction.getPotential(j, k)
 			interaction.setPotential(numtypes*i+j, numtypes*i+k, pot)	
-			print "Interaction", numtypes*i+j, numtypes*i+k, pot
+			print("Interaction", numtypes*i+j, numtypes*i+k, pot)
 	    if not disableVVL:
 		vl=interaction.getVerletList()
 		#print "VL has", vl.totalSize(),"disconnecting"
@@ -205,7 +205,7 @@ disableVVL=False
 	    for l in bond_fpl.getBonds():
 		cla_bonds.extend(l)
 	    #print "CLA BONDS", bond_fpl.size()
-	    for i in xrange(1, P):
+	    for i in range(1, P):
 		tmp=0
 		for b in cla_bonds:
 		    # create additional bonds for this imag time
@@ -222,7 +222,7 @@ disableVVL=False
 	    for l in angle_ftl.getTriples():
 		cla_angles.extend(l)
 	    #print "CLA_ANGLES", cla_angles
-	    for i in xrange(1, P):
+	    for i in range(1, P):
 		for a in cla_angles:
 		    # create additional angles for this imag time
 		    angle_ftl.add(a[0]+num_cla_part*i, 
@@ -233,13 +233,13 @@ disableVVL=False
 	    cla_dihedrals=[]
 	    for l in dihedral_fql.getQuadruples():
 		cla_dihedrals.extend(l)
-	    for i in xrange(1, P):
+	    for i in range(1, P):
 		for d in cla_dihedrals:
 		    # create additional dihedrals for this imag time
 		    dihedral_fql.add(d[0]+num_cla_part*i, 
 		    d[1]+num_cla_part*i, d[2]+num_cla_part*i, d[3]+num_cla_part*i)	
     piexcl=[]
-    for i in xrange(1, P):
+    for i in range(1, P):
 	for e in exclusions:
 	# create additional exclusions for this imag time
 	    piexcl.append((e[0]+num_cla_part*i, e[1]+num_cla_part*i))
@@ -264,12 +264,12 @@ disableVVL=False
 	system.addInteraction(interb)
 	kineticTermInteractions.update({m:interb})
 
-    for idcla, idpi in ringids.iteritems():
+    for idcla, idpi in ringids.items():
 	p=allParticlesById[idcla]
 	mass=p[propDict['mass']]
 	interactionList=kineticTermInteractions[mass].getFixedPairList() #find the appropriate interaction based on the mass
 	# harmonic spring between atom at imag-time i and imag-time i+1
-	for i in xrange(len(idpi)-1):
+	for i in range(len(idpi)-1):
 	    interactionList.add(idpi[i],idpi[i+1])
 	#close the ring	
 	interactionList.add(idcla,idpi[0])

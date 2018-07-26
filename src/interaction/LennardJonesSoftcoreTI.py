@@ -159,7 +159,7 @@ class LennardJonesSoftcoreTILocal(PotentialLocal, interaction_LennardJonesSoftco
                  cutoff=infinity, lambdaTI=0.0, annihilate=True):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
            if sigmaB == 0.0:
-             print 'Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0'
+             print('Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0')
              return
            cxxinit(self, interaction_LennardJonesSoftcoreTI, 
                    epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
@@ -227,8 +227,7 @@ if pmi.isController:
     #        pmicall = ['setPotential', 'getPotential', 'getVerletList']
     #        )
 
-    class VerletListAdressLennardJonesSoftcoreTI(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesSoftcoreTI(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesSoftcoreTILocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']

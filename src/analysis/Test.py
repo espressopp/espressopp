@@ -43,8 +43,7 @@ class TestLocal(AnalysisBaseLocal, analysis_Test):
             cxxinit(self, analysis_Test, system)
 
 if pmi.isController :
-    class Test(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class Test(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.TestLocal'
             )

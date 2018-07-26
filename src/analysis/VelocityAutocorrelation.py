@@ -43,8 +43,7 @@ class VelocityAutocorrelationLocal(ConfigsParticleDecompLocal, analysis_Velocity
         cxxinit(self, analysis_VelocityAutocorrelation, system)
 
 if pmi.isController:
-  class VelocityAutocorrelation(ConfigsParticleDecomp):
-    __metaclass__ = pmi.Proxy
+  class VelocityAutocorrelation(ConfigsParticleDecomp, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmiproperty = [ 'print_progress' ],
       cls =  'espressopp.analysis.VelocityAutocorrelationLocal'

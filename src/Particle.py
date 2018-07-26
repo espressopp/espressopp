@@ -132,8 +132,8 @@ The Particle class. Particles are used to model atoms, coarse-grained beads, etc
 """
 
 import _espressopp
-import esutil
-import pmi
+from . import esutil
+from . import pmi
 from espressopp import toReal3DFromVector, toInt3DFromVector
 import mpi4py.MPI as MPI
 from espressopp.Exceptions import ParticleDoesNotExistHere
@@ -309,8 +309,7 @@ class ParticleLocal(object):
         return (tmp is not None)
 
 if pmi.isController:
-    class Particle(object):
-        __metaclass__ = pmi.Proxy
+    class Particle(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.ParticleLocal',
             pmiproperty = [ "id", "storage" ]

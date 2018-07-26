@@ -31,7 +31,7 @@ topology_helper
 
 import espressopp
 import math
-import gromacs
+from . import gromacs
 import os
 
 class FileBuffer():
@@ -81,9 +81,9 @@ def FillFileBuffer(fname, filebuffer):
 
 
 def FindType(proposedtype, typelist):
-    list=[typeid for (typeid,atype) in typelist.iteritems() if atype==proposedtype ]
+    list=[typeid for (typeid,atype) in typelist.items() if atype==proposedtype ]
     if len(list)>1:
-        print "Error: duplicate type definitons", proposedtype.parameters
+        print("Error: duplicate type definitons", proposedtype.parameters)
         exit()
     elif len(list)==0:
         return None
@@ -95,12 +95,12 @@ class InteractionType:
         self.parameters=parameters
     def __eq__(self,other):
         # interaction types are defined to be equal if all parameters are equal
-        for k, v in self.parameters.iteritems():
+        for k, v in self.parameters.items():
             if k not in other.parameters: return False
             if other.parameters[k]!=v: return False
         return True
     def createEspressoInteraction(self, system, fpl):
-        print "WARNING: could not set up interaction for", self.parameters, ": Espresso potential not implemented"
+        print("WARNING: could not set up interaction for", self.parameters, ": Espresso potential not implemented")
         return None
     def automaticExclusion(self):
         #overwrite in derrived class if the particular interaction is automatically excluded
@@ -187,7 +187,7 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
     
 class RyckaertBellemansDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
-        print('RyckaertBellemans: {}'.format(self.parameters))
+        print(('RyckaertBellemans: {}'.format(self.parameters)))
         pot = espressopp.interaction.DihedralRB(**self.parameters)
         return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
 
@@ -214,8 +214,8 @@ def ParseBondTypeParam(line):
     elif btype == "9":
         p=TabulatedBondInteractionType({"tablenr":int(tmp[3]), "k":float(tmp[4])})
     else:
-        print "Unsupported bond type", tmp[2], "in line:"
-        print line
+        print("Unsupported bond type", tmp[2], "in line:")
+        print(line)
         exit()
     return p     
 
@@ -227,8 +227,8 @@ def ParseAngleTypeParam(line):
     elif type == 8:
         p=TabulatedAngleInteractionType({"tablenr":int(tmp[4]),"k":float(tmp[5])})
     else:
-        print "Unsupported angle type", type, "in line:"
-        print line
+        print("Unsupported angle type", type, "in line:")
+        print(line)
         exit()
     return p    
 
@@ -238,15 +238,15 @@ def ParseDihedralTypeParam(line):
     if type == 8:
         p=TabulatedDihedralInteractionType({"tablenr":int(tmp[5]), "k":float(tmp[6])})
     elif type == 3:
-        tmp[5:11] = map(float, tmp[5:11])
+        tmp[5:11] = list(map(float, tmp[5:11]))
         p = RyckaertBellemansDihedralInteractionType(
             {'K0': tmp[5], 'K1': tmp[6], 'K2': tmp[7], 'K3': tmp[8], 'K4': tmp[9], 'K5': tmp[10]}
         )
     elif (type == 1) or (type == 9): 
         p=HarmonicNCosDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5]), "multiplicity":int(tmp[7])})
     else:
-        print "Unsupported dihedral type", type, "in line:"
-        print line
+        print("Unsupported dihedral type", type, "in line:")
+        print(line)
         exit()
     return p    
 
@@ -258,8 +258,8 @@ def ParseImproperTypeParam(line):
     elif type == 2:
         p=HarmonicDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5])})
     else:
-        print "Unsupported improper type", type, "in line:"
-        print line
+        print("Unsupported improper type", type, "in line:")
+        print(line)
         exit()
     return p
 
@@ -275,7 +275,7 @@ class Node():
 def FindNodeById(id, nodes):
     list=[n for n in nodes if n.id==id ]
     if len(list)>1:
-        print "Error: duplicate nodes", id
+        print("Error: duplicate nodes", id)
         exit()
     elif len(list)==0:
         return None

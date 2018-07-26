@@ -49,8 +49,7 @@ class DPDThermostatLocal(ExtensionLocal, integrator_DPDThermostat):
     #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
-    class DPDThermostat(Extension):
-        __metaclass__ = pmi.Proxy
+    class DPDThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.DPDThermostatLocal',
             pmiproperty = [ 'gamma', 'tgamma', 'temperature' ]

@@ -78,8 +78,7 @@ class PotentialUniqueDistLocal(object):
     shift = property(_getShift, _setShift)
 
 if pmi.isController:
-    class PotentialUniqueDist(object):
-        __metaclass__ = pmi.Proxy
+    class PotentialUniqueDist(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = ['cutoff', 'shift']

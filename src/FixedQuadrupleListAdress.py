@@ -102,8 +102,7 @@ class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
           return quadruple 
 
 if pmi.isController:
-    class FixedQuadrupleListAdress(object):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListAdress(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListAdressLocal',
             localcall = [ "add" ],

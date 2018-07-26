@@ -123,8 +123,7 @@ class DumpGROAdressLocal(ParticleAccessLocal, io_DumpGROAdress):
   
   
 if pmi.isController :
-  class DumpGROAdress(ParticleAccess):
-    __metaclass__ = pmi.Proxy
+  class DumpGROAdress(ParticleAccess, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.io.DumpGROAdressLocal',
       pmicall = [ 'dump' ],

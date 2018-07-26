@@ -71,9 +71,8 @@ class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
       return self.cxxclass.compute(self)
 
 if pmi.isController:
-  class ConfigsParticleDecomp(object):
+  class ConfigsParticleDecomp(object, metaclass=pmi.Proxy):
 
-    __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       #cls =  'espressopp.analysis.ConfigsParticleDecompLocal',
       pmicall = [ "gather", "gatherFromFile", "clear", "compute" ],

@@ -86,8 +86,7 @@ if pmi.isController:
             pmiproperty = ['K']
         )
 
-    class FixedTripleAngleListAngularUniqueHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleAngleListAngularUniqueHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleAngleListAngularUniqueHarmonicLocal',
             pmicall = ['setPotential']

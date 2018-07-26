@@ -72,8 +72,7 @@ class SubregionTrackingLocal(ObservableLocal, analysis_SubregionTracking):
         self.cxxclass.addPID(self, pid)
 
 if pmi.isController :
-  class SubregionTracking(Observable):
-    __metaclass__ = pmi.Proxy
+  class SubregionTracking(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls = 'espressopp.analysis.SubregionTrackingLocal'
     )

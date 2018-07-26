@@ -125,8 +125,7 @@ class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
           return self.cxxclass.getAngle(self, pid1, pid2, pid3, pid4)
 
 if pmi.isController:
-  class FixedQuadrupleAngleList(object):
-    __metaclass__ = pmi.Proxy
+  class FixedQuadrupleAngleList(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
         cls = 'espressopp.FixedQuadrupleAngleListLocal',
         localcall = [ "add" ],

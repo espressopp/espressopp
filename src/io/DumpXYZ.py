@@ -128,8 +128,7 @@ class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
 
 
 if pmi.isController :
-  class DumpXYZ(ParticleAccess):
-    __metaclass__ = pmi.Proxy
+  class DumpXYZ(ParticleAccess, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.io.DumpXYZLocal',
       pmicall = [ 'dump' ],

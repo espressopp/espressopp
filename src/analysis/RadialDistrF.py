@@ -52,8 +52,7 @@ class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
     return self.cxxclass.compute(self, rdfN)
 
 if pmi.isController :
-  class RadialDistrF(Observable):
-    __metaclass__ = pmi.Proxy
+  class RadialDistrF(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmiproperty = [ 'print_progress' ],
       pmicall = [ "compute" ],

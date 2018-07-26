@@ -241,36 +241,31 @@ if pmi.isController:
             cls = 'espressopp.interaction.ZeroLocal'
             )
 
-    class VerletListZero(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListZeroLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedTupleList']
             )
 
-    class VerletListAdressZero(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressZero(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListZero(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListZeroLocal',
             pmicall = ['setPotential']
             )
         
-    class FixedPairListZero(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListZeroLocal',
             pmicall = ['setPotential']

@@ -80,8 +80,7 @@ class CMVelocityLocal(AnalysisBaseLocal, analysis_CMVelocity):
           cxxinit(self, analysis_CMVelocity, system)
 
 if pmi.isController :
-    class CMVelocity(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class CMVelocity(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.CMVelocityLocal',
             pmiproperty = ["v"]

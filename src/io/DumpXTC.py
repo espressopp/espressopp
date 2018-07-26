@@ -104,8 +104,7 @@ class DumpXTCLocal(ParticleAccessLocal, io_DumpXTC):
 
 
 if pmi.isController :
-  class DumpXTC(ParticleAccess):
-    __metaclass__ = pmi.Proxy
+  class DumpXTC(ParticleAccess, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.io.DumpXTCLocal',
       pmicall = [ 'dump' ],

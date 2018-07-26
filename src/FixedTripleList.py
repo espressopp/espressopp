@@ -119,8 +119,7 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
           return triples 
 
 if pmi.isController:
-    class FixedTripleList(object):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleList(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],

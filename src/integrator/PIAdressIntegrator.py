@@ -573,8 +573,7 @@ class PIAdressIntegratorLocal(MDIntegratorLocal, integrator_PIAdressIntegrator):
             return self.cxxclass.getVerletlistBuilds(self)
 
 if pmi.isController :
-    class PIAdressIntegrator(MDIntegrator):
-        __metaclass__ = pmi.Proxy
+    class PIAdressIntegrator(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.integrator.PIAdressIntegratorLocal',
           pmiproperty = ['timestep', 'sSteps', 'mSteps', 'nTrotter', 'gamma', 'CMDparameter', 'PILElambda', 'temperature', 'CLmassmultiplier', 'speedup', 'KTI', 'constKinMass', 'verletList', 'centroidThermostat', 'PILE', 'realKinMass', 'verletlistBuilds' ],

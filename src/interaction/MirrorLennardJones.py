@@ -121,8 +121,7 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma']
             )
 
-    class FixedPairListMirrorLennardJones(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListMirrorLennardJones(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListMirrorLennardJonesLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']

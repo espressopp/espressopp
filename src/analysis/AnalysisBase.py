@@ -91,9 +91,8 @@ class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
             return self.cxxclass.getNumberOfMeasurements(self)
 
 if pmi.isController :
-    class AnalysisBase(ParticleAccess):
+    class AnalysisBase(ParticleAccess, metaclass=pmi.Proxy):
 
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "performMeasurement", "reset", "compute", "getAverageValue", "getNumberOfMeasurements" ]
             )

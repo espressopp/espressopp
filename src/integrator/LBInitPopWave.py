@@ -61,8 +61,7 @@ class LBInitPopWaveLocal(LBInitLocal, integrator_LBInit_PopWave):
             cxxinit(self, integrator_LBInit_PopWave, system, latticeboltzmann)
 
 if pmi.isController :
-    class LBInitPopWave(LBInit):
-        __metaclass__ = pmi.Proxy
+    class LBInitPopWave(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LBInitPopWaveLocal',
             pmicall = [

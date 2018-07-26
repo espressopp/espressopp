@@ -156,20 +156,17 @@ if pmi.isController:
             cls = 'espressopp.interaction.CoulombTruncatedUniqueChargeLocal',
             pmiproperty = ['qq']
             )
-    class VerletListCoulombTruncatedUniqueCharge(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential','getPotential']
             )
-    class CellListCoulombTruncatedUniqueCharge(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential']
             )
-    class FixedPairListCoulombTruncatedUniqueCharge(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential']

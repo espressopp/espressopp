@@ -45,8 +45,7 @@ class NeighborFluctuationLocal(ObservableLocal, analysis_NeighborFluctuation):
             cxxinit(self, analysis_NeighborFluctuation, system, radius)
 
 if pmi.isController :
-    class NeighborFluctuation(Observable):
-        __metaclass__ = pmi.Proxy
+    class NeighborFluctuation(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.NeighborFluctuationLocal'
             )

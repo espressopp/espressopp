@@ -52,8 +52,7 @@ class XDensityLocal(ObservableLocal, analysis_XDensity):
     return self.cxxclass.compute(self, rdfN)
 
 if pmi.isController :
-  class XDensity(Observable):
-    __metaclass__ = pmi.Proxy
+  class XDensity(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
       cls = 'espressopp.analysis.XDensityLocal'

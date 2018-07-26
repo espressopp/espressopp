@@ -52,8 +52,7 @@ class XPressureLocal(ObservableLocal, analysis_XPressure):
     return self.cxxclass.compute(self, N)
 
 if pmi.isController :
-  class XPressure(Observable):
-    __metaclass__ = pmi.Proxy
+  class XPressure(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
       cls = 'espressopp.analysis.XPressureLocal'

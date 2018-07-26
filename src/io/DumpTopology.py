@@ -97,7 +97,7 @@ from espressopp.ParticleAccess import *
 from _espressopp import io_DumpTopology
 
 import collections
-import pyh5md
+from . import pyh5md
 import numpy as np
 
 
@@ -298,8 +298,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             self.cxxclass.clear_buffer(self)
 
 if pmi.isController:
-    class DumpTopology(ParticleAccess):
-        __metaclass__ = pmi.Proxy
+    class DumpTopology(ParticleAccess, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.io.DumpTopologyLocal',
             pmicall=['dump', 'clear_buffer', 'observe_tuple', 'observe_triple', 'observe_quadruple', 'update',

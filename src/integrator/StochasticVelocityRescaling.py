@@ -43,8 +43,7 @@ class StochasticVelocityRescalingLocal(ExtensionLocal, integrator_StochasticVelo
             cxxinit(self, integrator_StochasticVelocityRescaling, system)
 
 if pmi.isController :
-    class StochasticVelocityRescaling(Extension):
-        __metaclass__ = pmi.Proxy
+    class StochasticVelocityRescaling(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.StochasticVelocityRescalingLocal',
             pmiproperty = [ 'temperature', 'coupling' ]

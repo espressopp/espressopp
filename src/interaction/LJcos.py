@@ -260,36 +260,31 @@ if pmi.isController:
             pmiproperty = ['phi','sigma']
         )
 
-    class VerletListLJcos(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLJcosLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListAdressLJcos(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLJcosLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressLJcos(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLJcosLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListLJcos(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLJcosLocal',
             pmicall = ['setPotential']
             )
         
-    class FixedPairListLJcos(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLJcosLocal',
             pmicall = ['setPotential', 'setFixedPairList','getFixedPairList' ]

@@ -48,8 +48,7 @@ class LBInitPopUniformLocal(LBInitLocal, integrator_LBInit_PopUniform):
             cxxinit(self, integrator_LBInit_PopUniform, system, latticeboltzmann)
 
 if pmi.isController :
-    class LBInitPopUniform(LBInit):
-        __metaclass__ = pmi.Proxy
+    class LBInitPopUniform(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LBInitPopUniformLocal',
             pmicall = [

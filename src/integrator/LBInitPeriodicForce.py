@@ -62,8 +62,7 @@ class LBInitPeriodicForceLocal(LBInitLocal, integrator_LBInit_PeriodicForce):
             cxxinit(self, integrator_LBInit_PeriodicForce, system, latticeboltzmann)
 
 if pmi.isController :
-    class LBInitPeriodicForce(LBInit):
-        __metaclass__ = pmi.Proxy
+    class LBInitPeriodicForce(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LBInitPeriodicForceLocal',
             pmicall = [

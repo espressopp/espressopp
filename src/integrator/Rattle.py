@@ -94,8 +94,7 @@ class RattleLocal(ExtensionLocal, integrator_Rattle):
             self.cxxclass.addBond(self, blist[0], blist[1], blist[2], blist[3], blist[4])
 
 if pmi.isController:
-    class Rattle(Extension):
-        __metaclass__ = pmi.Proxy
+    class Rattle(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.integrator.RattleLocal',
             pmicall = [ "addConstrainedBonds" ]

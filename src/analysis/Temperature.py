@@ -83,12 +83,11 @@ class TemperatureLocal(ObservableLocal, analysis_Temperature):
         if pmi.workerIsActive():
             ret_val = self.cxxclass.remove_type(self, type_id)
             if not ret_val:
-                print('Warning, type {} not found'.format(type_id))
+                print(('Warning, type {} not found'.format(type_id)))
 
 
 if pmi.isController :
-    class Temperature(Observable):
-        __metaclass__ = pmi.Proxy
+    class Temperature(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.TemperatureLocal',
             pmicall = ['add_type', 'remove_type']

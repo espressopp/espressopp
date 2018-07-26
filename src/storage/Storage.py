@@ -293,10 +293,10 @@ class StorageLocal(object):
               pid = particle[index_id]
               if( self.particleExists(pid) ):
                 doWeAddParticles = False
-                print "WARNING: Particle ", pid, " already exists"
+                print("WARNING: Particle ", pid, " already exists")
 
             if(not doWeAddParticles):
-              print 'WARNING: Some particles already exist. The list of particles was not added.'
+              print('WARNING: Some particles already exist. The list of particles was not added.')
               return
 
             for particle in particleList:
@@ -432,11 +432,10 @@ class StorageLocal(object):
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         for pid in self.getRealParticleIDs():
           p = ParticleLocal(pid,self)
-          print "CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2])
+          print("CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2]))
 
 if pmi.isController:
-    class Storage(object):
-        __metaclass__ = pmi.Proxy
+    class Storage(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
             pmiproperty = [ "system" ],
@@ -449,7 +448,7 @@ if pmi.isController:
         def addParticle(self, pid, pos, checkexist=True):
           if checkexist:
             if( self.particleExists(pid) ):
-              print "WARNING: Particle ", pid, " already exists. Therefore it was not added."
+              print("WARNING: Particle ", pid, " already exists. Therefore it was not added.")
               return None
             else:
               pmi.call(self.pmiobject, 'addParticle', pid, pos)
@@ -460,21 +459,21 @@ if pmi.isController:
         def removeParticle(self, pid):
             n = pmi.reduce(pmi.SUM, self.pmiobject, 'removeParticle', pid)
             if n == 0:
-              print "WARNING: Particle ", pid, " does not exist"
+              print("WARNING: Particle ", pid, " does not exist")
             elif n > 1:
-              print "ERROR: Particle ",pid, " did exist more than once !"
-              print "       This should never happen !!!"
+              print("ERROR: Particle ",pid, " did exist more than once !")
+              print("       This should never happen !!!")
 
         def modifyParticle(self, pid, property, value):
           if (self.particleExists(pid)):
             pmi.call(self.pmiobject, 'modifyParticle', pid, property, value)
           else:
-            print "WARNING: Particle ", pid, " does not exist and was not modified"
+            print("WARNING: Particle ", pid, " does not exist and was not modified")
 
 
         def addAdrATParticle(self, pid, *args):
           if( self.particleExists(pid) ):
-            print "WARNING: Particle ", pid, " already exists. Therefore it was not added."
+            print("WARNING: Particle ", pid, " already exists. Therefore it was not added.")
             return None
           else:
             pmi.call(self.pmiobject, 'addAdrATParticle', pid, *args)
@@ -487,7 +486,7 @@ if pmi.isController:
           if( self.particleExists(pid) ):
             return Particle(pid, self)
           else:
-            print "WARNING: Particle ", pid, " does not exist"
+            print("WARNING: Particle ", pid, " does not exist")
             return None
 
         def savePositions(self, idList):

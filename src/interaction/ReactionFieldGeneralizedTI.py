@@ -201,8 +201,7 @@ if pmi.isController:
     #        pmicall = ['setPotential','getPotential']
     #        )
         
-    class VerletListAdressReactionFieldGeneralizedTI(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressReactionFieldGeneralizedTI(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressReactionFieldGeneralizedTILocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']

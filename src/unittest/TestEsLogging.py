@@ -40,9 +40,9 @@ class Test0Logging(unittest.TestCase) :
       
       f = open(filename, "r")
       s = f.read()
-      self.assert_(s.find("_espressopp.interaction.LennardJones") > 0)
-      self.assert_(s.find("DEBUG") > 0)
-      self.assert_(s.find("TRACE") < 0)
+      self.assertTrue(s.find("_espressopp.interaction.LennardJones") > 0)
+      self.assertTrue(s.find("DEBUG") > 0)
+      self.assertTrue(s.find("TRACE") < 0)
       f.close()
    
 

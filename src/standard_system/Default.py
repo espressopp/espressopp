@@ -51,7 +51,7 @@ def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
   cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
   system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-  print "nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid
+  print("nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid)
 
   integrator     = espressopp.integrator.VelocityVerlet(system)  
   integrator.dt  = dt

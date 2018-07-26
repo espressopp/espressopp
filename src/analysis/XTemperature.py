@@ -52,8 +52,7 @@ class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
     return self.cxxclass.compute(self, N)
 
 if pmi.isController :
-  class XTemperature(Observable):
-    __metaclass__ = pmi.Proxy
+  class XTemperature(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
       cls = 'espressopp.analysis.XTemperatureLocal'

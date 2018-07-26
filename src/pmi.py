@@ -270,7 +270,7 @@ def execfile_(file):
 
 def __workerExecfile_(file):
     log.info("Executing file '%s'", file)
-    execfile(file, globals())
+    exec(compile(open(file).read(), file, 'exec'), globals())
 
 ##################################################
 ## CREATE
@@ -561,7 +561,7 @@ def dump() :
 
 def __workerDump() :
     import pprint
-    print("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
+    print(("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE)))
 
 ##################################################
 ## ACTIVATE
@@ -734,7 +734,7 @@ class Proxy(type):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
-            return map(_backtranslateProxy, invoke(method, *args, **kwds))
+            return list(map(_backtranslateProxy, invoke(method, *args, **kwds)))
 
     class _PropertyLocalGetter(object):
         def __init__(self, propName):
@@ -758,7 +758,7 @@ class Proxy(type):
             return _backtranslateProxy(call(setter, method_self, val))
 
     def __addMethod(cls, methodName, caller):
-        newMethod = types.MethodType(caller, None, cls)
+        newMethod = types.MethodType(caller, cls)
         setattr(cls, methodName, newMethod)
 
     def __init__(cls, name, bases, dict):
@@ -930,7 +930,7 @@ class __CMD(object) :
     def __str__(self):
         sargs = [_CMD[self.cmd][0]]
         if hasattr(self, 'args'):
-            sargs.append(str(map(str, self.args)))
+            sargs.append(str(list(map(str, self.args))))
         if hasattr(self, 'kwds'):
             sargs.append(str(self.kwds))
         return 'PMICMD(%s)' % (', '.join(sargs))
@@ -972,11 +972,11 @@ def _translateClass(cls):
     """
     if cls is None :
         raise UserError("pmi.create expects at least 1 argument on controller")
-    elif isinstance(cls, types.StringTypes) :
+    elif isinstance(cls, (str,)) :
         return eval(cls)
-    elif isinstance(cls, types.TypeType) :
+    elif isinstance(cls, type) :
         return cls
-    elif isinstance(cls, types.ClassType) :
+    elif isinstance(cls, type) :
         raise TypeError("""PMI cannot use old-style classes.
         Please create old style classes via their names.
         """)
@@ -989,9 +989,9 @@ def __mapArgs(func, args, kwds):
     the values of the dict kwds. Used by __translateArgs and
     __backtranslateOIDs.
     """
-    targs = map(func, args)
+    targs = list(map(func, args))
     tkwds = {}
-    for k, v in kwds.iteritems():
+    for k, v in kwds.items():
         tkwds[k] = func(v)
     return targs, tkwds
     
@@ -1034,7 +1034,7 @@ def __translateArgs(args, kwds):
 
     workerKwds={}
     controllerKwds={}
-    for k in kwds.keys():
+    for k in list(kwds.keys()):
         if k.startswith('__pmictr_'):
             knew = k[9:]
             controllerKwds[knew] = kwds[k]
@@ -1078,25 +1078,25 @@ def __backtranslateOIDs(targs, tkwds):
 class __Method(object) :
     def __init__(self, funcname, im_self, im_class=None):
         self.__name__ = funcname
-        self.im_self = _translateProxy(im_self)
+        self.__self__ = _translateProxy(im_self)
         if im_class is None:
-            self.im_class = self.im_self.__class__
+            self.__self__.__class__ = self.__self__.__class__
         else:
-            self.im_class = im_class
+            self.__self__.__class__ = im_class
         self.__determineMethod()
     def __getstate__(self):
         return (self.__name__,
-                _translateOID(self.im_self),
-                self.im_class)
+                _translateOID(self.__self__),
+                self.__self__.__class__)
     def __setstate__(self, state):
-        self.__name__, self.im_self, self.im_class = state
-        self.im_self = _backtranslateOID(self.im_self)
+        self.__name__, self.__self__, self.__self__.__class__ = state
+        self.__self__ = _backtranslateOID(self.__self__)
         self.__determineMethod()
     def __determineMethod(self):
-        for cls in self.im_class.mro():
+        for cls in self.__self__.__class__.mro():
             if hasattr(cls, self.__name__):
                 function = getattr(cls, self.__name__)
-                self.method = function.__get__(self.im_self, cls)
+                self.method = function.__get__(self.__self__, cls)
                 break
     def __call__(self, *args, **kwds):
         return self.method(*args, **kwds)
@@ -1111,7 +1111,7 @@ def __translateFunctionArgs(*args):
     arg0 = args[0]
     if arg0 is None:
         raise TypeError("pmi expects function argument on controller")
-    if isinstance(arg0, types.StringTypes):
+    if isinstance(arg0, (str,)):
         tfunction = arg0
         function = eval(arg0, globals())
         rargs = args[1:]
@@ -1122,14 +1122,14 @@ def __translateFunctionArgs(*args):
         function = tfunction
         rargs = args[1:]
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
-        tfunction = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
+        tfunction = __Method(arg0.__func__.__name__, arg0.__self__, arg0.__self__.__class__)
         function = tfunction
         rargs = args[1:]
     else:
         if len(args) <= 1:
             raise TypeError("got an object as first argument, but nothing as second")
         arg1 = args[1]
-        if isinstance(arg1, types.StringTypes):
+        if isinstance(arg1, (str,)):
             tfunction = __Method(arg1, arg0)
             function = tfunction
             rargs = args[2:]
@@ -1137,7 +1137,7 @@ def __translateFunctionArgs(*args):
     return function, tfunction, rargs
 
 def __backtranslateFunctionArg(arg0):
-    if isinstance(arg0, types.StringTypes):
+    if isinstance(arg0, (str,)):
         return eval(arg0, globals())
     else:
         return arg0
@@ -1161,7 +1161,7 @@ def __backtranslateReduceOpArg(arg0):
 def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :
         arglist = [repr(arg) for arg in args]
-        for k, v in kwds.iteritems():
+        for k, v in kwds.items():
             arglist.append('%s=%r' % (k, repr(v)))
         return ', '.join(arglist)
 
@@ -1187,7 +1187,7 @@ _CMD = [
 _MAXCMD = len(_CMD)
 
 # define the numerical constants to be used
-for i in xrange(len(_CMD)) :
+for i in range(len(_CMD)) :
     exec('_%s=%s' % (_CMD[i][0],i), globals())
 del i
 
@@ -1312,7 +1312,7 @@ class CommunicatorLocal(object) :
     'PMI CommunicatorLocal class'
     def __init__(self, cpugroup=None):
         if not cpugroup :
-            cpugroup = range(0, _MPIcomm.size)
+            cpugroup = list(range(0, _MPIcomm.size))
         self._cpugroup = cpugroup
         self._MPIsubcomm = None
         self._MPIsubcommWithController = None

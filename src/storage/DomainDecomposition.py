@@ -91,7 +91,7 @@ if pmi.isController:
                 else:
                   cellGrid = toInt3DFromVector(cellGrid)
                 # minimum image convention check:
-                for k in xrange(3):
+                for k in range(3):
                   if nodeGrid[k]*cellGrid[k] == 1 :
                     print(("Warning! cellGrid[{}] has been "
                            "adjusted to 2 (was={})".format(k, cellGrid[k])))
@@ -99,4 +99,4 @@ if pmi.isController:
                 self.next_id = 0
                 self.pmiinit(system, nodeGrid, cellGrid)
               else:
-                print 'Error: could not create DomainDecomposition object'
+                print('Error: could not create DomainDecomposition object')

@@ -313,36 +313,31 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
             )
 
-    class VerletListLennardJonesEnergyCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
 
-    class VerletListAdressLennardJonesEnergyCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
             
-    class VerletListHadressLennardJonesEnergyCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesEnergyCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
 
-    class CellListLennardJonesEnergyCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
         
-    class FixedPairListLennardJonesEnergyCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential']

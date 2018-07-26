@@ -131,8 +131,7 @@ if pmi.isController:
             pmiproperty = ['K', 'r0', 'rMax', 'caprad']
             )
 
-    class FixedPairListFENECapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListFENECapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListFENECappedLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']

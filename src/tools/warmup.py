@@ -39,7 +39,7 @@ def warmup(system, integrator, number = 80):
     for a system with a density of 0.85, if it explodes try a higher number
     
   """
-  print "starting warmup"
+  print("starting warmup")
 
   org_dt = integrator.dt
   pot = system.getInteraction(0).clonePotential(0,0)
@@ -51,7 +51,7 @@ def warmup(system, integrator, number = 80):
   force_capping = espressopp.integrator.CapForce(system, 0.0)
   integrator.addExtension(force_capping)
 
-  for k in xrange(11,number):
+  for k in range(11,number):
     force_capping.setAbsCapForce(1000000.0/number*k)
     pot.sigma = final_sigma/number*k
     pot.epsilon = final_epsilon/number*k
@@ -64,10 +64,10 @@ def warmup(system, integrator, number = 80):
   pot.epsilon = final_epsilon
   force_capping.disconnect()
   
-  for k in xrange(11):
+  for k in range(11):
     integrator.run(70)
     espressopp.tools.analyse.info(system, integrator)
 
   integrator.step = 0
 
-  print "warmup finished"
+  print("warmup finished")

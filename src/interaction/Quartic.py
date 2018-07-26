@@ -119,8 +119,7 @@ if pmi.isController:
             pmiproperty = ['K', 'r0']
             )
 
-    class FixedPairListQuartic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListQuartic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListQuarticLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']

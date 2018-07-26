@@ -51,8 +51,7 @@ class IntraChainDistSqLocal(AllParticlePosLocal, analysis_IntraChainDistSq):
         return self.cxxclass.compute(self)
 
 if pmi.isController :
-    class IntraChainDistSq(AllParticlePos):
-        __metaclass__ = pmi.Proxy
+    class IntraChainDistSq(AllParticlePos, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.IntraChainDistSqLocal',
             pmicall = [ "compute" ]

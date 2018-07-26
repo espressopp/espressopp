@@ -72,8 +72,7 @@ class AngularUniquePotentialLocal(object):
       return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
 if pmi.isController:
-  class AngularUniquePotential(object):
-    __metaclass__ = pmi.Proxy
+  class AngularUniquePotential(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       localcall = [ 'computeForce', 'computeEnergy' ],
       pmiproperty = [ 'cutoff' ]

@@ -87,8 +87,7 @@ class PotentialVSpherePairLocal(object):
     shift = property(_getShift, _setShift)
 
 if pmi.isController:
-    class PotentialVSpherePair(object):
-        __metaclass__ = pmi.Proxy
+    class PotentialVSpherePair(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = ['cutoff', 'shift']

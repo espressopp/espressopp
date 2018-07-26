@@ -63,8 +63,7 @@ class ExtensionLocal(object):
       return self.cxxclass.disconnect(self)
 
 if pmi.isController :
-    class Extension(object):
-        __metaclass__ = pmi.Proxy
+    class Extension(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             #cls =  'espressopp.integrator.Extension',
             pmiproperty = [ 'type'],

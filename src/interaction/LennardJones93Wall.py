@@ -125,8 +125,7 @@ if pmi.isController:
             pmicall = ['setParams', 'getParams']
             )
 
-    class SingleParticleLennardJones93Wall(Interaction):
-        __metaclass__ = pmi.Proxy
+    class SingleParticleLennardJones93Wall(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.SingleParticleLennardJones93WallLocal',
             pmicall = ['setPotential']

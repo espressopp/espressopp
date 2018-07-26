@@ -68,8 +68,7 @@ class SettleLocal(ExtensionLocal, integrator_Settle):
             self.cxxclass.add(self, pid)
 
 if pmi.isController:
-    class Settle(Extension):
-        __metaclass__ = pmi.Proxy
+    class Settle(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.integrator.SettleLocal',
             pmicall = [ "addMolecules" ]

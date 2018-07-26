@@ -116,8 +116,7 @@ class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
       cxxinit(self, integrator_BerendsenThermostat, system)
 
 if pmi.isController:
-  class BerendsenThermostat(Extension):
-    __metaclass__ = pmi.Proxy
+  class BerendsenThermostat(Extension, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.integrator.BerendsenThermostatLocal',
       pmiproperty = [ 'tau', 'temperature' ]

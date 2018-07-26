@@ -38,7 +38,7 @@ def info(system, integrator, per_atom=False):
   else:
     tot    = '%5d %10.4f %10.6f %10.6f %12.3f' % (step, T, P, Pij[3], Ek)      
   tt     = ''
-  for k in xrange(system.getNumberOfInteractions()):
+  for k in range(system.getNumberOfInteractions()):
     e       = system.getInteraction(k).computeEnergy()
     Etotal += e
     if per_atom:

@@ -42,8 +42,7 @@ class PressureLocal(ObservableLocal, analysis_Pressure):
           cxxinit(self, analysis_Pressure, system)
 
 if pmi.isController :
-    class Pressure(Observable):
-        __metaclass__ = pmi.Proxy
+    class Pressure(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.PressureLocal'
             )

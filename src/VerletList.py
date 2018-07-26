@@ -104,15 +104,14 @@ class VerletListLocal(_espressopp.VerletList):
         if pmi.workerIsActive():
             pairs=[]
             npairs=self.localSize()
-            for i in xrange(npairs):
+            for i in range(npairs):
               pair=self.cxxclass.getPair(self, i+1)
               pairs.append(pair)
             return pairs 
 
 
 if pmi.isController:
-  class VerletList(object):
-    __metaclass__ = pmi.Proxy
+  class VerletList(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls = 'espressopp.VerletListLocal',
       pmiproperty = [ 'builds' ],
