@@ -1,5 +1,5 @@
 #  Copyright (C) 2017
-#      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -19,7 +19,7 @@
 
 r"""
 *********************************************
-**DumpXTC** - IO Object
+**DumpXTCAdress** - IO Object
 *********************************************
 
 * `dump()`
@@ -45,14 +45,14 @@ usage:
 
 writing down trajectory
 
->>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trajectory.xtc')
+>>> dump_conf_xtc = espressopp.io.DumpXTCAdress(system, ftpl, integrator, filename='trajectory.xtc')
 >>> for i in range (200):
 >>>   integrator.run(10)
 >>>   dump_conf_xtc.dump()
 
 writing down trajectory using ExtAnalyze extension
 
->>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trajectory.xtc')
+>>> dump_conf_xtc = espressopp.io.DumpXTCAdress(system, ftpl, integrator, filename='trajectory.xtc')
 >>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_conf_xtc, 10)
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
@@ -63,51 +63,51 @@ setting up length scale
 
 For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]`
 
->>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trj.xtc', unfolded=False, length_factor=0.34, append=True)
+>>> dump_conf_xtc = espressopp.io.DumpXTCAdress(system, integrator, filename='trj.xtc', unfolded=False, length_factor=0.34, append=True)
 
 will produce trj.xtc with coordinates in nm
 
-.. function:: espressopp.io.DumpXTC(system, integrator, filename, unfolded, length_factor, append)
+.. function:: espressopp.io.DumpXTCAdress(system, integrator, ftpl, filename, unfolded, length_factor, append)
 
-		:param system:
-		:param integrator:
-		:param filename: (default: 'out.xtc')
-		:param unfolded: (default: False)
-		:param length_factor: (default: 1.0)
-		:param append: (default: True)
-		:type system:
-		:type integrator:
-		:type filename:
-		:type unfolded:
-		:type length_factor: real
-		:type append:
+        :param system: The Espressopp system object.
+        :param ftpl: The FixedTupleListAdress object.
+        :param integrator: The MD Integrator.
+        :param filename: The output file name (default: 'out.xtc').
+        :param unfolded: Store unfolded positions (default: False).
+        :param length_factor: The length factor (default: 1.0).
+        :param append: If True then new frames will be append to existing file (default: True).
+        :type system: espressopp.System
+        :type integrator: espressopp.integrator.MDIntegrator
+        :type filename: str
+        :type unfolded: bool
+        :type length_factor: real
+        :type append: bool
 
-.. function:: espressopp.io.DumpXTC.dump()
+.. function:: espressopp.io.DumpXTCAdress.dump()
 
-		:rtype:
+        :rtype:
 """
 
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
 from espressopp.ParticleAccess import *
-from _espressopp import io_DumpXTC
+from _espressopp import io_DumpXTCAdress
 
-class DumpXTCLocal(ParticleAccessLocal, io_DumpXTC):
+class DumpXTCAdressLocal(ParticleAccessLocal, io_DumpXTCAdress):
+    def __init__(self, system, ftpl, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
+        cxxinit(self, io_DumpXTCAdress, system, ftpl, integrator, filename, unfolded, length_factor, append)
 
-  def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
-    cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
-
-  def dump(self):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.dump(self)
+    def dump(self):
+        if pmi.workerIsActive():
+            self.cxxclass.dump(self)
 
 
 if pmi.isController :
-  class DumpXTC(ParticleAccess):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-      cls =  'espressopp.io.DumpXTCLocal',
-      pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
-    )
+    class DumpXTCAdress(ParticleAccess):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.io.DumpXTCAdressLocal',
+            pmicall = ('dump',),
+            pmiproperty = ('filename', 'unfolded', 'length_factor', 'append')
+        )

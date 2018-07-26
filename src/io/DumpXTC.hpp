@@ -65,8 +65,6 @@ namespace espressopp {
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
 
-        std::cerr << "WARNING: espresso++ has been built without gromacs library. The XTC dumper will not produce any output!" << std::endl;
-
       }
       ~DumpXTC() {std::cout << "DumpXTC destructor" << std::endl;} // never called, right?
 

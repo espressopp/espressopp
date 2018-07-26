@@ -1,4 +1,6 @@
-#  Copyright (C) 2012,2013,2015,2016
+#  Copyright (C) 2016
+#      Jakub Krajnika (jkrajniak at gmail.com)
+#  Copyright (C) 2012,2013,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -23,6 +25,7 @@ r"""
 ************************
 espressopp.FixedPairList
 ************************
+
 
 .. function:: espressopp.FixedPairList(storage)
 
@@ -62,6 +65,10 @@ espressopp.FixedPairList
 .. function:: espressopp.FixedPairList.size()
 
 		:rtype: 
+
+.. function:: espressopp.FixedPairList.totalSize()
+
+        :rtype:
 """
 from espressopp import pmi
 import _espressopp 
@@ -87,6 +94,10 @@ class FixedPairListLocal(_espressopp.FixedPairList):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
+    def totalSize(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.totalSize(self)
+
     def addBonds(self, bondlist):
         """
         Each processor takes the broadcasted bondlist and
@@ -109,6 +120,10 @@ class FixedPairListLocal(_espressopp.FixedPairList):
         if pmi.workerIsActive():
           self.cxxclass.remove(self)
 
+    def getAllBonds(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllBonds(self)
+      
     def resetLongtimeMaxBond(self):
 
         if pmi.workerIsActive():
@@ -126,8 +141,8 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListLocal',
             #localcall = [ 'add' ],
-            pmicall = [ 'add', 'addBonds','remove', 'resetLongtimeMaxBond' ],
-            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']
+            pmicall = [ 'add', 'addBonds', 'remove', 'resetLongtimeMaxBond', 'totalSize' ],
+            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal', 'getAllBonds' ]
         )
         
         def getLongtimeMaxBond(self):
