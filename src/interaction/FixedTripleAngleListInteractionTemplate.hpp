@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -93,6 +93,8 @@ namespace espressopp {
       virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
       virtual real computeEnergyCG();
+      virtual real computeEnergyAA(int atomtype);
+      virtual real computeEnergyCG(int atomtype);
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
@@ -126,7 +128,7 @@ namespace espressopp {
         Real3D force12, force32;
 
         real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
-        
+
         potential->_computeForce(force12, force32, dist12, dist32, currentAngle);
         p1.force() += force12;
         p2.force() -= force12 + force32;
@@ -174,8 +176,22 @@ namespace espressopp {
 
     template < typename _AngularPotential > inline real
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
+    computeEnergyAA(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyAA(int atomtype) in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+
+    template < typename _AngularPotential > inline real
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeEnergyCG() {
       std::cout << "Warning! At the moment computeEnergyCG() in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+
+    template < typename _AngularPotential > inline real
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
+    computeEnergyCG(int atomtype) {
+      std::cout << "Warning! At the moment computeEnergyCG(int atomtype) in FixedTripleAngleListInteractionTemplate does not work." << std::endl;
       return 0.0;
     }
 

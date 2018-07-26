@@ -1,23 +1,23 @@
 /*
-  Copyright (C) 2012,2013,2016
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -31,7 +31,7 @@
 namespace espressopp {
   namespace interaction {
 
-    enum bondTypes {unused, Nonbonded, Single, Pair, Angular, Dihedral};
+    enum bondTypes {unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow};
 
     /** Interaction base class. */
 
@@ -44,9 +44,11 @@ namespace espressopp {
       virtual real computeEnergyDeriv() = 0;
       virtual real computeEnergyAA() = 0;
       virtual real computeEnergyCG() = 0;
+      virtual real computeEnergyAA(int atomtype) = 0;
+      virtual real computeEnergyCG(int atomtype) = 0;
       virtual real computeVirial() = 0;
-      virtual void computeVirialTensor(Tensor& w) = 0;      
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins) = 0; 
+      virtual void computeVirialTensor(Tensor& w) = 0;
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins) = 0;
       // this should compute the virial locally around a surface which crosses the box at
       // z (according to the method of Irving and Kirkwood)
       virtual void computeVirialTensor(Tensor& w, real z) = 0;

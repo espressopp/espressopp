@@ -9,6 +9,7 @@ env:
   matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu EXTERNAL=ON TEST_H5MD=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
@@ -16,10 +17,10 @@ env:
     - DISTRO=ubuntu_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=ubuntu_mpich EXTERNAL=OFF
     - DISTRO=fedora EXTERNAL=ON
-    - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
+    #- DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
     - DISTRO=fedora_mpich EXTERNAL=ON
-    - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
+    #- DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
 
 script:
@@ -42,7 +43,7 @@ script:
    docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 
 after_success:
-  - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v1.*) ]] && DEPLOY=yes
+  - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v[12].*) ]] && DEPLOY=yes
   - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
         docker push "espressopp/espressopp:${DOCKER_TAG}";
@@ -50,12 +51,14 @@ after_success:
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
       CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/doc . ;
-      if [[ ${TRAVIS_BRANCH} = v1.* ]]; then
+      if [[ ${TRAVIS_BRANCH} = v[12].* ]]; then
         rm -rf html/${TRAVIS_BRANCH};
         mkdir -p html/${TRAVIS_BRANCH};
-        mv doc/ug/_build/html/* html/${TRAVIS_BRANCH};
+        mv doc/dg/html html/${TRAVIS_BRANCH}/doxygen;
+        mv doc/ug/_build/latex/ESPResSo++.pdf html/${TRAVIS_BRANCH}/;
+        mv doc/ug/_build/html/* html/${TRAVIS_BRANCH}/;
       else
-         rm -rf html/[^v][^1]*;
+         rm -rf html/[^v][^12]*;
          mv doc/dg/html html/doxygen;
          mv doc/ug/_build/latex/ESPResSo++.pdf html/;
          mv doc/ug/_build/html/* html/;
