@@ -5,21 +5,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-
+  
   This file is part of ESPResSo++.
-
+  
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
+  
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-
+  
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
 //#include <iomanip>
@@ -53,7 +53,6 @@ namespace espressopp {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
       resortFlag = true;
       maxDist    = 0.0;
-      recalcForces = true;
     }
 
     VelocityVerlet::~VelocityVerlet()
@@ -86,6 +85,8 @@ namespace espressopp {
         // timeResort += timeIntegrate.getElapsedTime();
       }
 
+      bool recalcForces = true;  // TODO: more intelligent
+
       if (recalcForces) {
         LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
@@ -102,7 +103,7 @@ namespace espressopp {
       }
 
       LOG4ESPP_INFO(theLogger, "starting main integration loop (nsteps=" << nsteps << ")");
-
+  
       for (int i = 0; i < nsteps; i++) {
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
@@ -122,14 +123,14 @@ namespace espressopp {
           cout<<"WARNING!!!!!! huge jump: "<<maxDist<<endl;
           exit(1);
         }*/
-
+        
         // signal
         aftIntP();
 
         LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
         if (maxDist > skinHalf) resortFlag = true;
-
+        
         if (resortFlag) {
             VT_TRACER("resort1");
             time = timeIntegrate.getElapsedTime();
@@ -243,9 +244,9 @@ namespace espressopp {
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real sqDist = 0.0;
         LOG4ESPP_INFO(theLogger, "updating first half step of velocities and full step of positions")
-        LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() <<
+        LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
                 ", pos = " << cit->position() <<
-                ", v = " << cit->velocity() <<
+                ", v = " << cit->velocity() << 
                 ", f = " << cit->force());
 
         /* more precise for DEBUG:
@@ -257,12 +258,12 @@ namespace espressopp {
 
         real dtfm = 0.5 * dt / cit->mass();
 
-        // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
+        // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
         cit->velocity() += dtfm * cit->force();
 
-        // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
+        // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
         Real3D deltaP = cit->velocity();
-
+        
         deltaP *= dt;
         cit->position() += deltaP;
         sqDist += deltaP * deltaP;
@@ -271,7 +272,7 @@ namespace espressopp {
 
         maxSqDist = std::max(maxSqDist, sqDist);
       }
-
+      
       // signal
       inIntP(maxSqDist);
 
@@ -281,7 +282,7 @@ namespace espressopp {
       LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
 		    ", max move local = " << sqrt(maxSqDist) <<
 		    ", global = " << sqrt(maxAllSqDist));
-
+      
       return sqrt(maxAllSqDist);
     }
 
@@ -292,13 +293,13 @@ namespace espressopp {
       CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
-      real half_dt = 0.5 * dt;
+      real half_dt = 0.5 * dt; 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real dtfm = half_dt / cit->mass();
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         cit->velocity() += dtfm * cit->force();
       }
-
+      
       step++;
     }
 
@@ -331,7 +332,7 @@ namespace espressopp {
       real time;
       storage::Storage& storage = *getSystemRef().storage;
       time = timeIntegrate.getElapsedTime();
-      {
+      { 
         VT_TRACER("commF");
         storage.updateGhosts();
       }
@@ -379,7 +380,7 @@ namespace espressopp {
 	    cells = system.storage->getRealCells();
 	    LOG4ESPP_DEBUG(theLogger, "real forces");
       }
-
+  
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 	    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", force = " << cit->force());
       }
@@ -399,25 +400,15 @@ namespace espressopp {
 	    cells = system.storage->getRealCells();
 	    LOG4ESPP_DEBUG(theLogger, "real positions");
       }
-
+  
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 	    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", position = " << cit->position());
       }
     }
 
-    void VelocityVerlet::noReCalcF()
-    {
-      recalcForces = false;
-    }
-
-    void VelocityVerlet::doReCalcF()
-    {
-      recalcForces = true;
-    }
-
     /****************************************************
-     ** REGISTRATION WITH PYTHON
-     ****************************************************/
+    ** REGISTRATION WITH PYTHON
+    ****************************************************/
 
     void VelocityVerlet::registerPython() {
 
@@ -428,8 +419,6 @@ namespace espressopp {
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
-        .def("noReCalcF", &VelocityVerlet::noReCalcF)
-        .def("doReCalcF", &VelocityVerlet::doReCalcF)
         ;
     }
   }

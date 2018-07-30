@@ -43,12 +43,8 @@ namespace espressopp {
 
         virtual ~VelocityVerlet();
 
-        void noReCalcF();
-
-        void doReCalcF();
-
         void run(int nsteps);
-
+        
         /** Load timings in array to export to Python as a tuple. */
         void loadTimers(real t[10]);
 
@@ -59,7 +55,6 @@ namespace espressopp {
 
       protected:
         bool resortFlag;  //!< true implies need for resort of particles
-        bool recalcForces;
         real maxDist;
 
         real maxCut;
