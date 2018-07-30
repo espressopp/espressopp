@@ -128,13 +128,12 @@ namespace espressopp {
 
     void ExtPlumed::disconnect() {
       _runInit.disconnect();
-      _aftIntP.disconnect();
       _aftCalcF.disconnect();
+      delete p;
     }
 
     void ExtPlumed::connect() {
       _runInit = integrator->runInit.connect( boost::bind(&ExtPlumed::setStep, this));
-      _aftIntP = integrator->aftIntP.connect( boost::bind(&ExtPlumed::updateStep, this));
       _aftCalcF = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::updateForces, this));
     }
 
@@ -142,16 +141,12 @@ namespace espressopp {
       step = integrator->getStep();
     }
 
-    void ExtPlumed::updateStep() {
-      step = integrator->getStep() + 1;
-    }
-
     void ExtPlumed::updateForces() {
       int update_gatindex=0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
 
-      // Try to find out if the domain decomposition has been updated:
+      // Try to find out if the domain decomposition has been updated
       if(nreal!=system.storage->getNRealParticles()) {
         if(charges) delete [] charges;
         if(masses) delete [] masses;
@@ -241,6 +236,7 @@ namespace espressopp {
         Real3D F = Real3D(f[k*3], f[k*3+1], f[k*3+2]);
         cit->setF(F);
       }
+      step += 1;
     }
 
     /****************************************************

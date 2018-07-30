@@ -75,12 +75,10 @@ namespace espressopp {
       real * f;
       real bias;
 
-      boost::signals2::connection _runInit, _aftCalcF, _aftIntP;
+      boost::signals2::connection _runInit, _aftCalcF;
       void connect();
       void disconnect();
       void setStep();
-      void updateStep();
-      void applyForce();
       void updateForces();
     };
   }
