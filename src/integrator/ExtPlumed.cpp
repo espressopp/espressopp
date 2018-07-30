@@ -130,6 +130,7 @@ namespace espressopp {
       _runInit.disconnect();
       _aftCalcF.disconnect();
       delete p;
+      p = NULL;
     }
 
     void ExtPlumed::connect() {
