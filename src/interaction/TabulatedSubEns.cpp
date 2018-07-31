@@ -136,14 +136,12 @@ namespace espressopp {
                     if (j <= 0+colVarBondListSize) k = 0;
                     else if (j<1+colVarBondListSize+colVarAngleListSize) k = 1;
                     else k = 2;
-                    if (k != 2)
-                      norm_d_i += pow((colVar[j] -  colVarRef[i][k]) / colVarSd[k], 2);
-                    else {
-                      real diff = colVar[j] -  colVarRef[i][2];
-                      if (diff>M_PI) diff -= 2.0*M_PI;
-                      if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
-                      norm_d_i += pow(diff / colVarSd[2], 2);
+                    real diff = colVar[j] -  colVarRef[i][k];
+                    if (k == 2) {
+                        if (diff>M_PI) diff -= 2.0*M_PI;
+                        if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
                     }
+                    norm_d_i += pow(diff / colVarSd[k], 2);
                     norm_l_i += pow(colVarRef[i][3+k], 2);
                 }
                 if (norm_d_i > norm_l_i)
