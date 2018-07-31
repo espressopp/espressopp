@@ -252,8 +252,6 @@ namespace espressopp {
                 .def("filename_set", &TabulatedSubEnsAngular::setFilename)
                 .def("targetProb_get", &TabulatedSubEnsAngular::getTargetProb)
                 .def("targetProb_set", &TabulatedSubEnsAngular::setTargetProb)
-                .def("colVarMu_get", &TabulatedSubEnsAngular::getColVarMus)
-                .def("colVarMu_set", &TabulatedSubEnsAngular::setColVarMu)
                 .def("colVarSd_get", &TabulatedSubEnsAngular::getColVarSds)
                 .def("colVarSd_set", &TabulatedSubEnsAngular::setColVarSd)
                 .def("weight_get", &TabulatedSubEnsAngular::getWeights)

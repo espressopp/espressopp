@@ -58,8 +58,7 @@ namespace espressopp {
             // Running sum of each weight and number of counts
             RealND weightSum;
             int weightCounts;
-            // Renormalize collective variables: mean and std
-            RealND colVarMu;
+            // Renormalize collective variables: std
             RealND colVarSd;
             // characteristic decay length of the interpolation
             real alpha;
@@ -78,7 +77,6 @@ namespace espressopp {
               weightSum.setDimension(0);
               targetProb.setDimension(0);
               weightCounts = 0;
-              colVarMu.setDimension(3);
               colVarSd.setDimension(3);
               colVarRef.setDimension(0);
               alpha = 1.;
@@ -112,12 +110,6 @@ namespace espressopp {
 
             void setTargetProb(int index, real _r) {
                 return targetProb.setItem(index, _r);
-            }
-
-            RealND getColVarMus() const { return colVarMu; }
-
-            void setColVarMu(int index, real _r) {
-                return colVarMu.setItem(index, _r);
             }
 
             RealND getColVarSds() const { return colVarSd; }
@@ -197,12 +189,11 @@ namespace espressopp {
         RealNDs cvrefs = pot.getColVarRefs();
         int dim = pot.getDimension();
         fns = pot.getFilenames();
-        RealND cvmu = pot.getColVarMus();
         RealND cvsd = pot.getColVarSds();
         real rc = pot.getCutoff();
         real alp = pot.getAlpha();
         return boost::python::make_tuple(dim, itp, fns, cvrefs,
-                                         cvmu, cvsd, alp, rc);
+                                         cvsd, alp, rc);
       }
     };
 

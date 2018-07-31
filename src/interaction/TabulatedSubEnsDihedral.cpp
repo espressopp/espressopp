@@ -252,8 +252,6 @@ namespace espressopp {
                 .def("filename_set", &TabulatedSubEnsDihedral::setFilename)
                 .def("targetProb_get", &TabulatedSubEnsDihedral::getTargetProb)
                 .def("targetProb_set", &TabulatedSubEnsDihedral::setTargetProb)
-                .def("colVarMu_get", &TabulatedSubEnsDihedral::getColVarMus)
-                .def("colVarMu_set", &TabulatedSubEnsDihedral::setColVarMu)
                 .def("colVarSd_get", &TabulatedSubEnsDihedral::getColVarSds)
                 .def("colVarSd_set", &TabulatedSubEnsDihedral::setColVarSd)
                 .def("weight_get", &TabulatedSubEnsDihedral::getWeights)
