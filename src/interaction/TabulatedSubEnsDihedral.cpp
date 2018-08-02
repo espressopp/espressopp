@@ -118,6 +118,7 @@ namespace espressopp {
             }
             if (weightCounts > 0 &&
                 maxWeightI < numInteractions-1 &&
+                maxWeight > 0. &&
                 weightSum[maxWeightI]/weightCounts < 0.98*targetProb[maxWeightI])
                 stuck = true;
             if (!stuck) {
