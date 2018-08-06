@@ -23,7 +23,7 @@ from espressopp.tools import lattice, velocities
 
 particles_per_direction = 32
 num_particles = particles_per_direction**3
-x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho=0.8442, perfect=False)
+x, y, z, Lx, Ly, Lz = lattice.createCubic(num_particles, rho=0.8442, perfect=False)
 vx, vy, vz = velocities.gaussian(T=0.6, N=num_particles, zero_momentum=True)
 
 ###############################################################################
