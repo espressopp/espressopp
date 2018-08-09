@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -26,10 +28,13 @@
 namespace espressopp {
   namespace analysis {
 
+
     void Temperature::registerPython() {
       using namespace espressopp::python;
-      class_<Temperature, bases< AnalysisBase > >
+      class_<Temperature, bases< Observable > >
         ("analysis_Temperature", init< shared_ptr< System > >())
+        .def("add_type", &Temperature::addType)
+        .def("remove_type", &Temperature::removeType)
       ;
     }
   }

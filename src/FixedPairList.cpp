@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -27,6 +29,7 @@
 //#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include "boost/serialization/vector.hpp"
 #include "Buffer.hpp"
 
 #include "esutil/Error.hpp"
@@ -154,6 +157,43 @@ namespace espressopp {
 	return bonds;
   }
 
+  std::vector<longint> FixedPairList::getPairList() {
+    std::vector<longint> ret;
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+      ret.push_back(it->first);
+      ret.push_back(it->second);
+    }
+    return ret;
+  }
+
+  python::list FixedPairList::getAllBonds() {
+    std::vector<longint> local_bonds;
+    std::vector<std::vector<longint> > global_bonds;
+    python::list bonds;
+
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+      local_bonds.push_back(it->first);
+      local_bonds.push_back(it->second);
+    }
+    System& system = storage->getSystemRef();
+    if (system.comm->rank() == 0) {
+      mpi::gather(*system.comm, local_bonds, global_bonds, 0);
+      python::tuple bond;
+
+      for (std::vector<std::vector<longint> >::iterator it = global_bonds.begin();
+           it != global_bonds.end(); ++it) {
+        for (std::vector<longint>::iterator iit = it->begin(); iit != it->end();) {
+          longint pid1 = *(iit++);
+          longint pid2 = *(iit++);
+          bonds.append(python::make_tuple(pid1, pid2));
+        }
+      }
+    } else {
+      mpi::gather(*system.comm, local_bonds, global_bonds, 0);
+    }
+    return bonds;
+  }
+
   void FixedPairList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     std::vector< longint > toSend;
     // loop over the particle list
@@ -265,6 +305,14 @@ namespace espressopp {
       sigOnParticlesChanged.disconnect();
   }
 
+  int FixedPairList::totalSize() {
+    int local_size = globalPairs.size();
+    int global_size;
+    System& system = storage->getSystemRef();
+    mpi::all_reduce(*system.comm, local_size, global_size, std::plus<int>());
+    return global_size;
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -281,8 +329,10 @@ namespace espressopp {
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedPairList::size)
+      .def("totalSize", &FixedPairList::totalSize)
       .def("getBonds",  &FixedPairList::getBonds)
       .def("remove",  &FixedPairList::remove)
+      .def("getAllBonds", &FixedPairList::getAllBonds)
       .def("resetLongtimeMaxBondSqr", &FixedPairList::resetLongtimeMaxBondSqr)
       .def("getLongtimeMaxBondSqr", &FixedPairList::getLongtimeMaxBondSqr)
       ;

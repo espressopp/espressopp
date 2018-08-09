@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ESPResSo++
 ==========
 
@@ -34,16 +33,8 @@ QUICKINSTALL:
 
 ```
 # cd espressopp
-
-```
-To build espressopp with PLUMED, create soft links Plumed.h, Plumed.cmake and Plumed.inc to
-Plumed.h, Plumed.cmake.runtime and Plumed.inc.runtime correspondingly under your installation.
-
-```
-# mkdir build
-# cd build
-# cmake .. -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF
-# make -j4
+# cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
+# make -j2
 # source ESPRC
 ```
 
@@ -60,7 +51,7 @@ Documentation for release versions from v1.9.4.1 onward is at:
 
 http://espressopp.github.io/vXXX
 
-where XXX is the version number, e.g.:
+where XXX is the version number, e.g.: 
 
 http://espressopp.github.io/v1.9.4.1
 
@@ -75,7 +66,3 @@ Report bugs on the [github issues site](https://github.com/espressopp/espressopp
 [![codecov.io](https://codecov.io/github/espressopp/espressopp/coverage.svg?branch=master)](https://codecov.io/github/espressopp/espressopp?branch=master)
 [![Analysis Status](https://scan.coverity.com/projects/8143/badge.svg?flat=1)](https://scan.coverity.com/projects/espressopp-espressopp)
 
-=======
-# xTalGrowth
-asdfasdf
->>>>>>> upstream/master

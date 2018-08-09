@@ -7,3 +7,4 @@ endif(NOT EXTERNAL_MPI4PY)
 if (NOT EXTERNAL_PLUMED)
     add_subdirectory(plumed)
 endif(NOT EXTERNAL_PLUMED)
+

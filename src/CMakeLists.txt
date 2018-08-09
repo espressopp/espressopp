@@ -14,7 +14,7 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 if(NOT WITH_XTC)
-  file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp)
+  file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
   list(REMOVE_ITEM ESPRESSO_SOURCES ${DUMP_XTC_SOURCE})
 endif()
 
@@ -46,6 +46,7 @@ if (WITH_RC_FILES)
 endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 add_library(_espressopp ${ESPRESSO_SOURCES})
 target_include_directories(_espressopp PRIVATE ${CMAKE_SOURCE_DIR}/contrib/plumed)
 target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${PLUMED_LIBRARIES})
@@ -60,3 +61,14 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/esp
     PATTERN "CMakeFiles" EXCLUDE)
 
 add_dependencies(_espressopp gitversion)
+
+find_program(CLANG_FORMAT "clang-format")
+if (CLANG_FORMAT)
+    add_custom_target(
+            format
+            COMMAND ${CLANG_FORMAT}
+            -style=file
+            -i
+            ${ESPRESSO_SOURCES}
+    )
+endif()

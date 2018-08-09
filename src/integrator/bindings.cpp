@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2017
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -23,7 +23,9 @@
 #include "bindings.hpp"
 #include "MDIntegrator.hpp"
 #include "VelocityVerlet.hpp"
+#include "PIAdressIntegrator.hpp"
 #include "VelocityVerletOnGroup.hpp"
+#include "VelocityVerletRESPA.hpp"
 
 #include "Extension.hpp"
 #include "TDforce.hpp"
@@ -63,14 +65,14 @@
 #include "EmptyExtension.hpp"
 #include "ExtPlumed.hpp"
 
-#include "ConstMuMD.hpp"
-
 namespace espressopp {
   namespace integrator {
     void registerPython() {
       MDIntegrator::registerPython();
       VelocityVerlet::registerPython();
+      PIAdressIntegrator::registerPython();
       VelocityVerletOnGroup::registerPython();
+      VelocityVerletRESPA::registerPython();
       Extension::registerPython();
       Adress::registerPython();
       BerendsenBarostat::registerPython();
@@ -106,7 +108,8 @@ namespace espressopp {
       MinimizeEnergy::registerPython();
       EmptyExtension::registerPython();
       ExtPlumed::registerPython();
-      ConstMuMD::registerPython();
     }
   }
 }
+
+
