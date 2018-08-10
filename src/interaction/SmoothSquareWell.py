@@ -16,6 +16,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+r"""
+***************************************
+espressopp.integrator.SmoothSquareWell
+***************************************
+This is an inplementation of the smoothed square-well potential from Leitold and Dellago JCP 141 (2014).
+"""
+
 from espressopp import pmi, infinity
 from espressopp.esutil import *
 
