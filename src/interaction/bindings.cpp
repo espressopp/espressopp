@@ -85,6 +85,7 @@
 #include "SingleParticlePotential.hpp"
 #include "ConstrainCOM.hpp"
 #include "ConstrainRG.hpp"
+#include "SmoothSquareWell.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -154,6 +155,7 @@ namespace espressopp {
 
       ConstrainCOM::registerPython();
       ConstrainRG::registerPython();
+      SmoothSquareWell::registerPython();
     }
   }
 }
