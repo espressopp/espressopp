@@ -18,9 +18,26 @@
 
 r"""
 ***************************************
-espressopp.integrator.SmoothSquareWell
+espressopp.interaction.SmoothSquareWell
 ***************************************
-This is an inplementation of the smoothed square-well potential from Leitold and Dellago JCP 141 (2014).
+This is an implementation of the smoothed square-well potential from `Leitold and Dellago JCP 141, 134901 (2014) <https://doi.org/10.1063/1.4896560>`_ :
+
+.. math::
+
+    V(r) = \frac{\varepsilon}{2} \left\{ \exp\left[\frac{-(r-\sigma)}{a}\right] + \tanh\left[\frac{r-\lambda\sigma}{a}\right] - 1 \right\},
+
+of which :math:`a` dictates the steepness of the slope of the square well, and :math:`{\lambda\sigma}` determines the width of the step, and :math:`{\sigma}` is the bond length of the polymer.
+
+To reproduce the potential in the prior reference, use the code below.
+
+.. code:: python
+
+   pot = espressopp.interaction.SmoothSquareWell(epsilon=1.0,sigma=1.0,cutoff=2.5)
+   pot.a = 0.002
+   pot.Lambda = 1.05
+
+The SmoothSquareWell potential supports VerletListInteraction, FixedPairListInteraction and FixedPairListTypesInteraction.
+
 """
 
 from espressopp import pmi, infinity
@@ -33,8 +50,7 @@ from _espressopp import interaction_SmoothSquareWell, interaction_VerletListSmoo
 
 class SmoothSquareWellLocal(PotentialLocal, interaction_SmoothSquareWell):
 
-    def __init__(self, epsilon=1.0, sigma=0.0,
-                 cutoff=infinity, shift=0.0):
+    def __init__(self, epsilon=1.0, sigma=0.0, cutoff=infinity, shift=0.0):
         """Initialize the local Harmonic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
@@ -83,7 +99,7 @@ if pmi.isController:
         'The SmoothSquareWell potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.SmoothSquareWellLocal',
-            pmiproperty = ['epsilon', 'sigma', 'width', 'a']
+            pmiproperty = ['epsilon', 'sigma', 'Lambda', 'a']
         )
 
     class VerletListSmoothSquareWell(Interaction):

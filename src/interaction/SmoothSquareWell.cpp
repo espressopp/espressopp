@@ -22,13 +22,14 @@
 #include "SmoothSquareWell.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate < SmoothSquareWell > VerletListSmoothSquareWell;
     typedef class FixedPairListInteractionTemplate< SmoothSquareWell > FixedPairListSmoothSquareWell;
-    typedef class FixedPairListTypesInteractionTemplate< SmoothSquareWell > FixedPairTypesSmoothSquareWell;
+    typedef class FixedPairListTypesInteractionTemplate< SmoothSquareWell > FixedPairListTypesSmoothSquareWell;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -41,7 +42,7 @@ namespace espressopp {
         .def(init< real, real, real, real >())
         .add_property("epsilon", &SmoothSquareWell::getEpsilon, &SmoothSquareWell::setEpsilon)
         .add_property("sigma", &SmoothSquareWell::getSigma, &SmoothSquareWell::setSigma)
-        .add_property("width", &SmoothSquareWell::getLambda, &SmoothSquareWell::setLambda)
+        .add_property("Lambda", &SmoothSquareWell::getLambda, &SmoothSquareWell::setLambda)
         .add_property("a", &SmoothSquareWell::getA, &SmoothSquareWell::setA)
         .def_pickle(SmoothSquareWell_pickle())
         ;
@@ -57,6 +58,15 @@ namespace espressopp {
         ("interaction_FixedPairListSmoothSquareWell",
          init< shared_ptr<System>, shared_ptr<FixedPairList>,  shared_ptr<SmoothSquareWell> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<SmoothSquareWell> >())
+        .def("setPotential", &FixedPairListSmoothSquareWell::setPotential)
+        .def("setFixedPairList", &FixedPairListSmoothSquareWell::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListSmoothSquareWell::getFixedPairList)
+        ;
+
+      class_ <FixedPairListTypesSmoothSquareWell, bases <Interaction> >
+        ("interaction_FixedPairListTypesSmoothSquareWell",
+         init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListSmoothSquareWell::setPotential)
         .def("setFixedPairList", &FixedPairListSmoothSquareWell::setFixedPairList)
         .def("getFixedPairList", &FixedPairListSmoothSquareWell::getFixedPairList)
