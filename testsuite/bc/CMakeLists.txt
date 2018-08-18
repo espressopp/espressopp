@@ -1,0 +1,18 @@
+get_filename_component(TEST_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+file(GLOB TESTS "*Test*.cpp")
+foreach(TEST_FILE ${TESTS})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+    add_executable(${TEST_NAME} ${TEST_FILE})
+    add_test(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME})
+    set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${TEST_ENV}")
+    target_link_libraries(${TEST_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} _espressopp)
+endforeach()
+
+file(GLOB TESTS_PY "*.py")
+foreach(TEST_FILE ${TESTS_PY})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+    message("Test ${TEST_NAME}")
+    add_test(${TEST_NAME} ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME})
+    set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${TEST_ENV}")
+endforeach()

@@ -24,7 +24,7 @@
 #include "include/ut.hpp"
 
 #include "mpi.hpp"
-#include "../Error.hpp"
+#include "esutil/Error.hpp"
 
 using namespace espressopp;
 using namespace espressopp::esutil;

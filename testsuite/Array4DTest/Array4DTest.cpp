@@ -21,6 +21,7 @@
 #define BOOST_TEST_MODULE Array4Dtest
 #include <boost/test/included/unit_test.hpp>
 #include "esutil/Array4D.hpp"
+#include "include/ut.hpp"
 
 using namespace espressopp;  // NOLINT
 

@@ -25,7 +25,7 @@
 #include "ut.hpp"
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "../Grid.hpp"
+#include "esutil/Grid.hpp"
 using namespace espressopp;
 using namespace esutil;
 
