@@ -68,6 +68,6 @@ BOOST_AUTO_TEST_CASE(single)
 
 BOOST_AUTO_TEST_CASE(destructor) 
 {
-  BOOST_CHECK_THROW(hangUp(), std::exception);
+  BOOST_CHECK_THROW(hangUp(), std::runtime_error);
 }
 
