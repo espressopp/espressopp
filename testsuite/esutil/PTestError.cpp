@@ -39,8 +39,7 @@ BOOST_AUTO_TEST_CASE(constructor)
   myError.checkException();
 }
 
-static void hangUp()
-{
+void hangUp() {
  Error myError = Error(mpiWorld);
 
  BOOST_TEST_MESSAGE("HangUp - set exception");
@@ -49,9 +48,10 @@ static void hangUp()
 }
 
 // Check for single error
-/*
+
 BOOST_AUTO_TEST_CASE(single) 
 {
+  BOOST_TEST_MESSAGE("Single exception");
   Error myError = Error(mpiWorld);
 
   if (mpiWorld->rank() == 0) {
@@ -60,14 +60,12 @@ BOOST_AUTO_TEST_CASE(single)
  
   }
 
-  BOOST_CHECK_THROW(myError.checkException(), 
-                    std::runtime_error);
-}*/
+  BOOST_CHECK_THROW(myError.checkException(), std::runtime_error);
+}
 
 // Check set and execption at end 
 
-BOOST_AUTO_TEST_CASE(destructor) 
-{
+BOOST_AUTO_TEST_CASE(destructor) {
   BOOST_CHECK_THROW(hangUp(), std::runtime_error);
 }
 
