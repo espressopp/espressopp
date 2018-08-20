@@ -76,7 +76,7 @@ struct Fixture {
 
     real skin   = 0.3;
 
-    ConstReal3DRef boxLRef(boxL);
+    Real3D boxLRef(boxL);
 
     int nodeGrid[3] = { 1, 1, mpiWorld->size() };
     int cellGrid[3] = { 1, 1, 1 };
@@ -96,7 +96,7 @@ struct Fixture {
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
-    system->skin = skin;
+    system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
                                                 cellGrid);
@@ -178,7 +178,7 @@ struct DomainFixture {
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->skin = skin;
+    system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
                                                 cellGrid);
@@ -222,7 +222,7 @@ struct LatticeFixture : DomainFixture {
 
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-      cit->m.v[0] = 1.0;
+      cit->velocity()[0] = 1.0;
     }
 
     domdec->decompose();
