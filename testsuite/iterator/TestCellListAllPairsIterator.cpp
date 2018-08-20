@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(fullCellsNoNeighbors) {
 
   for (int i = 0; i < NCELL; ++i) {
     for (int j = 0; j < NP; ++j) {
-      p.p.id = i*NP+j;
+      p.id() = i*NP+j;
       cells[i].particles.push_back(p);
     }
     cl.push_back(&cells[i]);
@@ -150,12 +150,12 @@ BOOST_AUTO_TEST_CASE(fullCellsNoNeighbors) {
   CellListAllPairsIterator it(cl);
   for (;it.isValid(); ++it) {
     ++steps;
-    int pid1 = it->first->p.id;
-    int pid2 = it->second->p.id;
+    int pid1 = it->first->id();
+    int pid2 = it->second->id();
     ++occupancy[pid1*NP*NCELL+pid2];
     ++occupancy[pid2*NP*NCELL+pid1];
-    BOOST_CHECKPOINT("step " << steps << ", pair: (" << it->first->p.id << ", "
-		     << it->second->p.id << ")");
+    BOOST_TEST_CHECKPOINT("step " << steps << ", pair: (" << it->first->id() << ", "
+		     << it->second->id() << ")");
   }
   BOOST_CHECK(it.isDone());
 
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(fullCellsFullNeighbors) {
 
     // create particles in the cell
     for (int pid = 0; pid < NP; ++pid) {
-      p.p.id = cid*NP+pid;
+      p.id() = cid*NP+pid;
       cell[cid].particles.push_back(p);
     }
 
@@ -231,12 +231,12 @@ BOOST_AUTO_TEST_CASE(fullCellsFullNeighbors) {
   CellListAllPairsIterator it(cl);
   for (;it.isValid(); ++it) {
     ++steps;
-    int pid1 = it->first->p.id;
-    int pid2 = it->second->p.id;
+    int pid1 = it->first->id();
+    int pid2 = it->second->id();
     ++occupancy[pid1*NP*NCELL+pid2];
     ++occupancy[pid2*NP*NCELL+pid1];
-    BOOST_CHECKPOINT("step " << steps << ", pair: (" << it->first->p.id << ", "
-		     << it->second->p.id << ")");
+    BOOST_TEST_CHECKPOINT("step " << steps << ", pair: (" << it->first->id() << ", "
+		     << it->second->id() << ")");
   }
   BOOST_CHECK(it.isDone());
 

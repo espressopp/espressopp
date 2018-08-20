@@ -70,7 +70,7 @@ struct Fixture {
 
     real SIZE = N * density;
 
-    BOOST_MESSAGE("box SIZE = " << SIZE << ", density = " << density);
+    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = " << density);
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
@@ -90,7 +90,7 @@ struct Fixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
+    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
                                  cellGrid[1] << " x " << cellGrid[2]);
 
     system = make_shared< System >();
@@ -98,7 +98,6 @@ struct Fixture {
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
-                                                mpiWorld,
                                                 nodeGrid,
                                                 cellGrid);
     esutil::RNG rng;
@@ -129,7 +128,7 @@ struct Fixture {
 
     system->storage = domdec;
 
-    BOOST_MESSAGE("number of particles in storage =  " << 
+    BOOST_TEST_MESSAGE("number of particles in storage =  " << 
                   domdec->getNRealParticles());
   }
 };
@@ -147,7 +146,7 @@ struct DomainFixture {
 
     SIZE = pow(N * N * N / density, 1.0/3.0) ;
 
-    BOOST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
+    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
@@ -173,7 +172,7 @@ struct DomainFixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
+    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
                                  cellGrid[1] << " x " << cellGrid[2]);
 
     system = make_shared< System >();
@@ -181,7 +180,6 @@ struct DomainFixture {
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
-                                                mpiWorld,
                                                 nodeGrid,
                                                 cellGrid);
     system->storage = domdec;
@@ -207,7 +205,7 @@ struct LatticeFixture : DomainFixture {
           real pos[3] = { x, y, z };
 
           if (mpiWorld->rank() == 0) {
-            BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
+            BOOST_TEST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
             domdec->addParticle(id, pos);
           }
 
@@ -219,7 +217,7 @@ struct LatticeFixture : DomainFixture {
     CellList realCells = domdec->getRealCells();
 
     // loop over all particles of the real cells and set velocity in x - direction
-    BOOST_MESSAGE("before lattice particles in storage = " <<
+    BOOST_TEST_MESSAGE("before lattice particles in storage = " <<
                    domdec->getNRealParticles() << "  rank=" << mpiWorld->rank());
 
 
@@ -231,9 +229,9 @@ struct LatticeFixture : DomainFixture {
     // make analysis object and call compute temperature
     Temperature myT(system);
     real T = myT.compute();
-    if(mpiWorld->rank() == 0) BOOST_MESSAGE("T = " << T);
+    if(mpiWorld->rank() == 0) BOOST_TEST_MESSAGE("T = " << T);
 
-    BOOST_MESSAGE("number of lattice particles in storage = " <<
+    BOOST_TEST_MESSAGE("number of lattice particles in storage = " <<
                    domdec->getNRealParticles() << "  rank=" << mpiWorld->rank());
 
   }

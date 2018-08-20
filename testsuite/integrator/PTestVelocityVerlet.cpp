@@ -57,7 +57,7 @@ struct LoggingFixture {
 static real cutoff1 = 1.4;
 static real cutoff2 = 1.0;
 static int N = 3;
-static real size = N;
+static real nSize = N;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
@@ -73,7 +73,7 @@ struct Fixture {
 
     real SIZE = N * density;
 
-    BOOST_MESSAGE("box SIZE = " << SIZE << ", density = " << density);
+    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = " << density);
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
@@ -91,14 +91,13 @@ struct Fixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid);
+    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->skin = skin;
+    system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
-                                                mpiWorld,
                                                 nodeGrid,
                                                 cellGrid);
     esutil::RNG rng;
@@ -118,7 +117,7 @@ struct Fixture {
       
           if (mpiWorld->rank() == 0) {
           
-            BOOST_MESSAGE("add particle at " << pos);
+            BOOST_TEST_MESSAGE("add particle at " << pos);
             domdec->addParticle(id, pos);
 
           }
@@ -130,7 +129,7 @@ struct Fixture {
 
     system->storage = domdec;
 
-    BOOST_MESSAGE("number of particles in storage =  " << 
+    BOOST_TEST_MESSAGE("number of particles in storage =  " << 
                   domdec->getNRealParticles());
   }
 };
@@ -148,7 +147,7 @@ struct DomainFixture {
 
     SIZE = pow(N * N * N / density, 1.0/3.0) ;
 
-    BOOST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
+    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
@@ -173,14 +172,13 @@ struct DomainFixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid);
+    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->skin = skin;
+    system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
-                                                mpiWorld,
                                                 nodeGrid,
                                                 cellGrid);
     system->storage = domdec;
@@ -207,7 +205,7 @@ struct LatticeFixture : DomainFixture {
           Real3D pos(x, y, z);
 
           if (mpiWorld->rank() == 0) {
-            BOOST_MESSAGE("add particle at pos " << pos);
+            BOOST_TEST_MESSAGE("add particle at pos " << pos);
             domdec->addParticle(id, pos);
           }
 
@@ -224,7 +222,7 @@ struct LatticeFixture : DomainFixture {
       cit->velocity() = Real3D(1.0, 0.0, 0.0);
     }
 
-    BOOST_MESSAGE("number of lattice particles in storage = " <<
+    BOOST_TEST_MESSAGE("number of lattice particles in storage = " <<
                    domdec->getNRealParticles());
 
     domdec->decompose();
@@ -235,7 +233,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 {
   // define a 0 potential, but with a cutoff
 
-  BOOST_MESSAGE("starting to build verlet lists");
+  BOOST_TEST_MESSAGE("starting to build verlet lists");
 
   shared_ptr<MDIntegrator> integrator = 
      make_shared<VelocityVerlet>(system);
@@ -244,7 +242,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
   int niter = N * 100;
 
-  BOOST_MESSAGE("run " << N << " iterations with timestep = 0.01");
+  BOOST_TEST_MESSAGE("run " << N << " iterations with timestep = 0.01");
 
   integrator->run(niter);
 
@@ -262,9 +260,9 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
     const Real3D& pos = cit->position();
 
-    BOOST_CHECK_SMALL((x + 0.5) / N * size - pos[0], 1e-6);
-    BOOST_CHECK_SMALL((y + 0.5) / N * size - pos[1], 1e-6);
-    BOOST_CHECK_SMALL((z + 0.5) / N * size - pos[2], 1e-6);
+    BOOST_CHECK_SMALL((x + 0.5) / N * nSize - pos[0], 1e-6);
+    BOOST_CHECK_SMALL((y + 0.5) / N * nSize - pos[1], 1e-6);
+    BOOST_CHECK_SMALL((z + 0.5) / N * nSize - pos[2], 1e-6);
   }
 
   // make a final reduction to synchronize the processors
