@@ -449,6 +449,7 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   Int3D cellGrid(1);
 
   system = make_shared< System >();
+  system->setSkin(0.0);
   system->rng = make_shared< esutil::RNG >();
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
   domdec = make_shared< DomainDecomposition >(system,
@@ -456,7 +457,7 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
 					      cellGrid);
 
   
-  BOOST_TEST_MESSAGE("Setting up system...");
+  BOOST_TEST_MESSAGE("Setting up system... nodes=" << nodes);
 
   // connect test functions to domdec
   domdec->beforeSendParticles.connect(beforeResort);
