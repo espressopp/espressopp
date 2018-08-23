@@ -24,7 +24,7 @@ Calculates the Cosine potential as:
 
 .. math::
 
-	U = K  (1 + cos(\theta - \theta_0))
+   U = K  (1 + cos(\\theta - \\theta_0))
 
 .. function:: espressopp.interaction.Cosine(K, theta0)
 
