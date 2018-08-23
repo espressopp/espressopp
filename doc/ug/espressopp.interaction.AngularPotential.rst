@@ -7,6 +7,7 @@ espressopp.interaction.AngularPotential
 
    espressopp.interaction.AngularCosineSquared
    espressopp.interaction.AngularHarmonic
+   espressopp.interaction.Cosine
 
 .. rubric:: Details
 

@@ -28,10 +28,8 @@ Calculates the Cosine potential as:
 
 .. function:: espressopp.interaction.Cosine(K, theta0)
 
-		:param K: (default: 1.0)
-		:param theta0: (default: 0.0)
-		:type K: real
-		:type theta0: real
+      :param real K: (default: 1.0)
+      :param real theta0: (default: 0.0)
 
 .. function:: espressopp.interaction.FixedTripleListCosine(system, vl, potential)
 
@@ -81,7 +79,6 @@ class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCo
 
 if pmi.isController:
     class Cosine(AngularPotential):
-        'The Cosine potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CosineLocal',
             pmiproperty = ['K', 'theta0']
