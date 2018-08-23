@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2012,2013,2016,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -19,12 +19,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*****************************
-espressopp.interaction.Cosine
-*****************************
-
-Calculates the Cosine Interaction
+"""
+Calculates the Cosine potential as:
 
 .. math::
 

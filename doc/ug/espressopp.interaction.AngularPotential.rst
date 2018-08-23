@@ -22,3 +22,8 @@ espressopp.interaction.AngularHarmonic
 """"""""""""""""""""""""""""""""""""""
 .. automodule:: espressopp.interaction.AngularHarmonic
    :members:
+
+espressopp.interaction.Cosine
+"""""""""""""""""""""""""""""
+.. automodule:: espressopp.interaction.Cosine
+   :members:
