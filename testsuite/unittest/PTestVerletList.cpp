@@ -45,22 +45,11 @@ using namespace espressopp::iterator;
 *                                                                                  *
 ***********************************************************************************/
 
-struct LoggingFixture {  
-  LoggingFixture() { 
-    LOG4ESPP_CONFIGURE();
-    log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::INFO);
-    log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::INFO);
-  }
-};
-
 static real cutoff = 1.733;  // largest cutoff
 
 static int  N = 6;  // particles in each dimension
 
 static real density = 1.0;
-
-BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 // sets up a storage with particles in a lattice
 
@@ -160,7 +149,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
   BOOST_TEST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
 
-  shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff, false);
+  shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff, true);
 
   PairList pairs = vl->getPairs();
 
@@ -171,11 +160,12 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
                  << ", dist = " << sqrt(getDistSqr(*p1, *p2)));
   }
 
-  int totalPairs1;
+  int totalPairs1 = 0;
+  int pairsSize = pairs.size();
 
-  boost::mpi::all_reduce(*mpiWorld, (int) pairs.size(), totalPairs1, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, pairsSize, totalPairs1, std::plus<int>());
 
-  BOOST_TEST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries");
+  BOOST_TEST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries local = " << pairsSize);
 
   BOOST_TEST_MESSAGE("RandomTest: check cells");
 

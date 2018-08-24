@@ -44,26 +44,17 @@ using namespace iterator;
 using namespace bc;
 using namespace esutil;
 
-struct LoggingFixture {  
-  LoggingFixture() { 
-    LOG4ESPP_CONFIGURE();
-    log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    // log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
-    // log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
-    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::INFO);
-  }
-};
 
 static real cutoff1 = 1.4;
 static real cutoff2 = 1.0;
 static int N = 3;
 static real nSize = N;
 
-BOOST_GLOBAL_FIXTURE(LoggingFixture);
+shared_ptr<DomainDecomposition> domdec;
+shared_ptr<System> esppSystem;
+
 
 struct Fixture {
-  shared_ptr<DomainDecomposition> domdec;
-  shared_ptr<System> system;
 
   Fixture() {
 
@@ -93,11 +84,11 @@ struct Fixture {
 
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
-    system = make_shared< System >();
-    system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(system,
+    esppSystem = make_shared< System >();
+    esppSystem->rng = make_shared< RNG >();
+    esppSystem->bc = make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
+    esppSystem->setSkin(skin);
+    domdec = make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
                                                 cellGrid);
     esutil::RNG rng;
@@ -127,7 +118,7 @@ struct Fixture {
       }
     }
 
-    system->storage = domdec;
+    esppSystem->storage = domdec;
 
     BOOST_TEST_MESSAGE("number of particles in storage =  " << 
                   domdec->getNRealParticles());
@@ -137,9 +128,6 @@ struct Fixture {
 // sets up a storage with particles in a lattice
 
 struct DomainFixture {
-
-  shared_ptr<DomainDecomposition> domdec;
-  shared_ptr<System> system;
 
   real SIZE;
 
@@ -174,14 +162,14 @@ struct DomainFixture {
 
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
-    system = make_shared< System >();
-    system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(system,
+    esppSystem = make_shared< System >();
+    esppSystem->rng = make_shared< RNG >();
+    esppSystem->bc = make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
+    esppSystem->setSkin(skin);
+    domdec = make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
                                                 cellGrid);
-    system->storage = domdec;
+    esppSystem->storage = domdec;
 
   }
 };
@@ -236,7 +224,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
   BOOST_TEST_MESSAGE("starting to build verlet lists");
 
   shared_ptr<MDIntegrator> integrator = 
-     make_shared<VelocityVerlet>(system);
+     make_shared<VelocityVerlet>(esppSystem);
 
   integrator->setTimeStep(0.01);
 
@@ -248,7 +236,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
   // Due to velocity 1.0 particles should be around 
 
-  CellList realCells = system->storage->getRealCells();
+  CellList realCells = esppSystem->storage->getRealCells();
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 

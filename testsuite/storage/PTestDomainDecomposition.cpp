@@ -481,10 +481,4 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   } else {
     BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
   }
-
-  if (mpiWorld->rank() == 0)
-    BOOST_CHECK(beforeResortCalled);
-
-  if (mpiWorld->rank() == lastnode)
-    BOOST_CHECK(afterResortCalled);
 }
