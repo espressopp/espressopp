@@ -72,8 +72,6 @@ namespace espressopp {
               short type = cit->type();
               myParticleIDToTypeMap[id] = type;
           }
-          if (myParticleIDToTypeMap.size() ==0 )
-              throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
 
           //gather all particle ID maps
           std::vector< std::map<long, short> > allParticleIDMaps;
@@ -81,6 +79,9 @@ namespace espressopp {
                   *getSystem()->comm,
                   myParticleIDToTypeMap,
                   allParticleIDMaps);
+
+          if (allParticleIDMaps.size() ==0 )
+            throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
 
           //merge all particle ID maps
           for (std::vector< std::map<long, short> >::iterator it=allParticleIDMaps.begin(); it!=allParticleIDMaps.end(); ++it)
