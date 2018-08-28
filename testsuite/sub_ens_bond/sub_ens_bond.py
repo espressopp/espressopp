@@ -105,7 +105,7 @@ class makeConf(unittest.TestCase):
         # bonds
         fpl = espressopp.FixedPairList(system.storage)
         fpl.addBonds([(0,1)])
-        filenames = ["table_bi0.xvg", "table_bi1.xvg"]
+        filenames = ["table_bi0.txt", "table_bi1.txt"]
         potBond = espressopp.interaction.TabulatedSubEns()
         potBond.addInteraction(1, filenames[0],
             espressopp.RealND([0.262, 0., 0., scaling_cv*0.424, 0., 0.]))

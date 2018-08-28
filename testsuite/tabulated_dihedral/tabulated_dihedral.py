@@ -78,7 +78,7 @@ class TestTabDih(makeConf):
         # bonds
         fpl = espressopp.FixedPairList(self.system.storage)
         fpl.addBonds([(0,1),(1,2),(2,3)])
-        potBond = espressopp.interaction.Tabulated(itype=spline, filename="table_b0.xvg")
+        potBond = espressopp.interaction.Tabulated(itype=spline, filename="table_b0.txt")
         interBond = espressopp.interaction.FixedPairListTabulated(self.system, fpl, potBond)
         self.system.addInteraction(interBond)
 
@@ -89,7 +89,7 @@ class TestTabDih(makeConf):
         low   = -np.pi
         high  =  np.pi
         Nbins =  500
-        table_dih = "table_d_h10.xvg"
+        table_dih = "table_d_h10.txt"
         print "Generating harmonic interaction in file {:s}".format(table_dih)
         print "- spring constant {:.3f} kJ/mol\n- rest dihedral   {:.3f}".format(spring, x_rest)
         outfile = open(table_dih, "w")
