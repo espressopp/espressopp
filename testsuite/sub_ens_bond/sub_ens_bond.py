@@ -56,6 +56,7 @@ tgt_probs = [0.55, 0.45]
 
 dim = 1
 spline = 2
+tabBonds = ["table_bi0.txt", "table_bi1.txt"]
 
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, cutoff):
@@ -63,6 +64,19 @@ def calcNumberCells(size, nodes, cutoff):
     while size / (ncells * nodes) >= cutoff:
        ncells = ncells + 1
     return ncells - 1
+
+# writes the tabulated file
+def writeTabFile(name, k, x0, N, low=0.0, high=2.5):
+    outfile = open(name, "w")
+    delta = (high - low) / (N - 1)
+
+    for i in range(N):
+        r = low + i * delta
+        energy = 0.5*k*(r-x0)**2
+        force  = -k*(r-x0)
+        outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
+
+    outfile.close()
 
 class makeConf(unittest.TestCase):
     def setUp(self):
@@ -103,13 +117,15 @@ class makeConf(unittest.TestCase):
 
         # ATTENTION: auto shift was enabled
         # bonds
+        writeTabFile(tabBonds[0], k=100000, x0=0.26, N=500, low=0.01, high=0.6)
+        writeTabFile(tabBonds[1], k= 50000, x0=0.24, N=500, low=0.01, high=0.6)
+
         fpl = espressopp.FixedPairList(system.storage)
         fpl.addBonds([(0,1)])
-        filenames = ["table_bi0.txt", "table_bi1.txt"]
         potBond = espressopp.interaction.TabulatedSubEns()
-        potBond.addInteraction(1, filenames[0],
+        potBond.addInteraction(1, tabBonds[0],
             espressopp.RealND([0.262, 0., 0., scaling_cv*0.424, 0., 0.]))
-        potBond.addInteraction(1, filenames[1],
+        potBond.addInteraction(1, tabBonds[1],
             espressopp.RealND([0., 0., 0., 0., 0., 0.]))
         potBond.alpha_set(alpha)
         cv_bl = espressopp.FixedPairList(system.storage)
