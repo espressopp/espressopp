@@ -26,6 +26,9 @@ splinetypes = ['Linear','Akima','Cubic']  # implemented spline types
 dim = 1
 spline = 2
 
+tabBond = "table_b0.txt"
+tabDih  = "table_d_h10.txt"
+
 print "Max simulation time: {:d}".format(nsnapshots * nsteps)
 
 def calcNumberCells(size, nodes, cutoff):
@@ -34,6 +37,19 @@ def calcNumberCells(size, nodes, cutoff):
     while size / (ncells * nodes) >= cutoff:
        ncells = ncells + 1
     return ncells - 1
+
+# writes the tabulated file
+def writeTabFile(name, k, x0, N, low=0.0, high=2.5):
+    outfile = open(name, "w")
+    delta = (high - low) / (N - 1)
+
+    for i in range(N):
+        r = low + i * delta
+        energy = 0.5*k*(r-x0)**2
+        force  = -k*(r-x0)
+        outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
+
+    outfile.close()
 
 class makeConf(unittest.TestCase):
     def setUp(self):
@@ -76,36 +92,23 @@ class TestTabDih(makeConf):
 
 
         # bonds
+        writeTabFile(tabBond, k=400000, x0=0.4, N=500, low=0.01, high=0.80)
+
         fpl = espressopp.FixedPairList(self.system.storage)
         fpl.addBonds([(0,1),(1,2),(2,3)])
-        potBond = espressopp.interaction.Tabulated(itype=spline, filename="table_b0.txt")
+        potBond = espressopp.interaction.Tabulated(itype=spline, filename=tabBond)
         interBond = espressopp.interaction.FixedPairListTabulated(self.system, fpl, potBond)
         self.system.addInteraction(interBond)
 
         # dihedral
-        spring = 10.0
+        spring = 10
         x_rest = 0.0
-        # Generate harmonic potential
-        low   = -np.pi
-        high  =  np.pi
-        Nbins =  500
-        table_dih = "table_d_h10.txt"
-        print "Generating harmonic interaction in file {:s}".format(table_dih)
-        print "- spring constant {:.3f} kJ/mol\n- rest dihedral   {:.3f}".format(spring, x_rest)
-        outfile = open(table_dih, "w")
-        delta = (high - low) / (Nbins - 1)
-        for i in range(Nbins):
-            r = low + i * delta
-            energy = 0.5 * spring * (r - x_rest)**2
-            force  = -spring * (r - x_rest)
-            outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
-        outfile.close()
-
+        writeTabFile(tabDih, k=spring, x0=x_rest, N=500, low=-np.pi, high=np.pi)
 
         fql = espressopp.FixedQuadrupleList(self.system.storage)
         fql.addQuadruples([(0,1,2,3)])
         potDihed1 = espressopp.interaction.TabulatedDihedral(itype=spline,
-                                            filename=table_dih)
+                                            filename=tabDih)
         interDihed1 = espressopp.interaction.FixedQuadrupleListTabulatedDihedral(self.system, fql, potDihed1)
         potDihed2 = espressopp.interaction.DihedralHarmonic(spring, x_rest)
         interDihed2 = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(self.system, fql, potDihed2)
