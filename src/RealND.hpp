@@ -1,10 +1,6 @@
 /*
-  Copyright (C) 2016
-  Max Planck Institute for Polymer Research & JGU Mainz
-  Copyright (C) 2012,2013
+  Copyright (C) 2018
   Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-  Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
 
@@ -96,8 +92,6 @@ namespace espressopp {
     RealND operator- (const RealND &v) const;
     RealND operator* (real v) const;
     RealND operator/ (real v) const;
-    /** Cross product of two RealND. */
-    RealND cross(const RealND& v) const;
 
     // binary dot product
     real operator* (const RealND& v) const;
@@ -309,13 +303,6 @@ namespace espressopp {
 
     return res;
   }
-
-  /** Cross product of two RealND.
-      inline RealND RealND::cross(const RealND& v) const {
-      return RealND(data[1]*v[2] - data[2]*v[1],
-      data[2]*v[0] - data[0]*v[2],
-      data[0]*v[1] - data[1]*v[0]);
-      }*/
 
   inline real RealND::sqr() const{
     real res = 0.0;

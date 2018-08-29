@@ -1,8 +1,6 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
 
