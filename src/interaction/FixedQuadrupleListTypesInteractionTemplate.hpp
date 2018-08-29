@@ -128,7 +128,7 @@ addForces() {
     longint type3 = p3.type();
     longint type4 = p4.type();
 
-    const Potential &potential = getPotential(type1, type2, type3, type4);
+    Potential &potential = getPotential(type1, type2, type3, type4);
 
     Real3D dist21, dist32, dist43;
 
@@ -138,6 +138,7 @@ addForces() {
 
     Real3D force1, force2, force3, force4;  // result forces
 
+    potential.computeColVarWeights(dist21, dist32, dist43, bc);
     potential.computeForce(force1, force2, force3, force4,
                            dist21, dist32, dist43);
     p1.force() += force1;
@@ -166,7 +167,7 @@ computeEnergy() {
     longint type3 = p3.type();
     longint type4 = p4.type();
 
-    const Potential &potential = getPotential(type1, type2, type3, type4);
+    Potential &potential = getPotential(type1, type2, type3, type4);
 
     Real3D dist21, dist32, dist43;
 
@@ -174,6 +175,7 @@ computeEnergy() {
     bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
     bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
+    potential.computeColVarWeights(dist21, dist32, dist43, bc);
     e += potential.computeEnergy(dist21, dist32, dist43);
   }
   real esum;
@@ -246,7 +248,7 @@ computeVirial() {
     longint type3 = p3.type();
     longint type4 = p4.type();
 
-    const Potential &potential = getPotential(type1, type2, type3, type4);
+    Potential &potential = getPotential(type1, type2, type3, type4);
 
     Real3D dist21, dist32, dist43;
 
@@ -256,6 +258,7 @@ computeVirial() {
 
     Real3D force1, force2, force3, force4;
 
+    potential.computeColVarWeights(dist21, dist32, dist43, bc);
     potential.computeForce(force1, force2, force3, force4,
                            dist21, dist32, dist43);
 
@@ -289,7 +292,7 @@ computeVirialTensor(Tensor &w) {
     longint type3 = p3.type();
     longint type4 = p4.type();
 
-    const Potential &potential = getPotential(type1, type2, type3, type4);
+    Potential &potential = getPotential(type1, type2, type3, type4);
 
     Real3D dist21, dist32, dist43;
 
@@ -299,6 +302,7 @@ computeVirialTensor(Tensor &w) {
 
     Real3D force1, force2, force3, force4;
 
+    potential.computeColVarWeights(dist21, dist32, dist43, bc);
     potential.computeForce(force1, force2, force3, force4,
                            dist21, dist32, dist43);
 
@@ -336,7 +340,7 @@ computeVirialTensor(Tensor &w, real z) {
     longint type3 = p3.type();
     longint type4 = p4.type();
 
-    const Potential &potential = getPotential(type1, type2, type3, type4);
+    Potential &potential = getPotential(type1, type2, type3, type4);
 
     Real3D dist21, dist32, dist43;
 
@@ -346,6 +350,7 @@ computeVirialTensor(Tensor &w, real z) {
 
     Real3D force1, force2, force3, force4;
 
+    potential.computeColVarWeights(dist21, dist32, dist43, bc);
     potential.computeForce(force1, force2, force3, force4,
                            dist21, dist32, dist43);
 

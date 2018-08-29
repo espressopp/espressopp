@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -52,7 +52,9 @@
 #include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
+#include "TabulatedSubEns.hpp"
 #include "TabulatedAngular.hpp"
+#include "TabulatedSubEnsAngular.hpp"
 
 #include "AngularPotential.hpp"
 #include "AngularUniquePotential.hpp"
@@ -65,6 +67,7 @@
 #include "DihedralPotential.hpp"
 #include "DihedralUniquePotential.hpp"
 #include "TabulatedDihedral.hpp"
+#include "TabulatedSubEnsDihedral.hpp"
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
 #include "DihedralHarmonicUniqueCos.hpp"
@@ -112,6 +115,7 @@ namespace espressopp {
       ReactionFieldGeneralizedTI::registerPython();
       SoftCosine::registerPython();
       Tabulated::registerPython();
+      TabulatedSubEns::registerPython();
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();
@@ -122,26 +126,28 @@ namespace espressopp {
       HarmonicTrap::registerPython();
       LennardJones93Wall::registerPython();
       MirrorLennardJones::registerPython();
-      
+
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
+      TabulatedSubEnsAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
       AngularUniqueCosineSquared::registerPython();
-      
+
       DihedralPotential::registerPython();
       DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
+      TabulatedSubEnsDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
       DihedralHarmonicUniqueCos::registerPython();
       DihedralHarmonicNCos::registerPython();
       DihedralRB::registerPython();
       DihedralHarmonic::registerPython();
-      
+
       CoulombKSpaceEwald::registerPython();
       CoulombRSpace::registerPython();
       StillingerWeberPairTerm::registerPython();
@@ -149,7 +155,7 @@ namespace espressopp {
       StillingerWeberPairTermCapped::registerPython();
       TersoffPairTerm::registerPython();
       TersoffTripleTerm::registerPython();
-      
+
       CoulombKSpaceP3M::registerPython();
 
       ConstrainCOM::registerPython();
