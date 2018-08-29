@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2018
+      Max Planck Institute for Polymer Research
   Copyright (C) 2016
       Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
@@ -116,6 +118,7 @@ namespace espressopp {
                     maxWeightI = i;
                 }
             }
+            // Lock the surface until it's sampled >= 98% of the target prob.
             if (weightCounts > 0 &&
                 maxWeightI < numInteractions-1 &&
                 maxWeight > 0. &&

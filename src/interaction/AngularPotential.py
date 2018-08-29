@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -42,7 +42,6 @@ This is an abstract class, only needed to be inherited from.
 from espressopp import pmi
 from espressopp import toReal3DFromVector
 from _espressopp import interaction_AngularPotential
-from espressopp import esutil
 
 # Python base class for angular potentials
 class AngularPotentialLocal(object):
