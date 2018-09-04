@@ -54,7 +54,7 @@ namespace espressopp {
       DihedralHarmonic(): K(0.0), phi0(0.0) { }
       DihedralHarmonic(real _K, real _phi0):
         K(_K), phi0(_phi0){ }
-      
+
 
       void setK(real _K) { K = _K; }
       real getK() const { return K; }
@@ -206,12 +206,12 @@ namespace espressopp {
 	real sin_phi = sin(phi);
         if (fabs(sin_phi) < 1e-9) {
           if (sin_phi>0.0) sin_phi = 1e-9;
-	  else sin_phi = -1e-9;  	
+	  else sin_phi = -1e-9;
 	}
         real diff = phi - phi0;
         if (diff>M_PI) diff -= 2.0*M_PI;
         if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
-	real coef1 = (1.0/sin_phi) * K * diff; 
+	real coef1 = (1.0/sin_phi) * K * diff;
         return -1.0 * coef1;
       }
 

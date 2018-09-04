@@ -1,22 +1,22 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2012,2013,2016,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # -*- coding: iso-8859-1 -*-
@@ -47,6 +47,7 @@ from espressopp.interaction.ReactionFieldGeneralized import *
 from espressopp.interaction.ReactionFieldGeneralizedTI import *
 from espressopp.interaction.SoftCosine import *
 from espressopp.interaction.Tabulated import *
+from espressopp.interaction.TabulatedSubEns import *
 from espressopp.interaction.FENE import *
 from espressopp.interaction.FENECapped import *
 from espressopp.interaction.Harmonic import *
@@ -66,10 +67,12 @@ from espressopp.interaction.AngularUniquePotential import *
 from espressopp.interaction.Cosine import *
 
 from espressopp.interaction.TabulatedAngular import *
+from espressopp.interaction.TabulatedSubEnsAngular import *
 
 from espressopp.interaction.DihedralPotential import *
 from espressopp.interaction.DihedralUniquePotential import *
 from espressopp.interaction.TabulatedDihedral import *
+from espressopp.interaction.TabulatedSubEnsDihedral import *
 from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *
 from espressopp.interaction.DihedralHarmonicNCos import *
