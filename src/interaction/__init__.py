@@ -96,3 +96,4 @@ from espressopp.interaction.LennardJones93Wall import *
 
 from espressopp.interaction.ConstrainCOM import *
 from espressopp.interaction.ConstrainRG import *
+from espressopp.interaction.SmoothSquareWell import *
