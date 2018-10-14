@@ -3,12 +3,9 @@ if (EXTERNAL_BOOST)
     find_package (Boost COMPONENTS system filesystem python mpi unit_test_framework REQUIRED)
     include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
-    set(Boost_LIBRARIES espressopp_boost)
+    set(Boost_LIBRARIES espressopp_boost_test)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../contrib/boost)
 endif()
-#add_definitions (-DBOOST_TEST_DYN_LINK)
-#add_definitions(-DBOOST_TEST_NO_LIB)
-#add_definitions(-DBOOST_TEST_NO_MAIN)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/include)
 
