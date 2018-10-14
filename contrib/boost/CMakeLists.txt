@@ -1,6 +1,6 @@
 file(GLOB_RECURSE BOOST_SOURCES libs/*.cpp)
 file(GLOB_RECURSE NOT_BOOST_SOURCES
-  libs/test/*
+  #libs/test/*
   "libs/test/src/cpp_main.cpp"
   "libs/test/src/test_main.cpp"
   "libs/serialization/src/basic_text_wiprimitive.cpp"
@@ -37,7 +37,7 @@ if (NOT EXTERNAL_BOOST AND CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     endif()
 endif()
 
-add_library(espressopp_boost STATIC ${BOOST_SOURCES})
+add_library(espressopp_boost SHARED ${BOOST_SOURCES})
 target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
 if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
   set_target_properties(espressopp_boost PROPERTIES COMPILE_FLAGS "-fPIC")
