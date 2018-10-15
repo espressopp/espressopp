@@ -83,4 +83,4 @@ cache:
 
 compiler:
   - gcc
-#  - clang
+  - clang
