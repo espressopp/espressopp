@@ -7,17 +7,17 @@ ARG BUILD_UG
 
 COPY . /home/espressopp/espressopp
 USER root
-#RUN chown -R espressopp:espressopp /home/espressopp/espressopp
-#USER espressopp
+RUN chown -R espressopp:espressopp /home/espressopp/espressopp
+USER espressopp
 
 WORKDIR /home/espressopp/espressopp
 RUN mkdir build
 
 WORKDIR build
 RUN pip install h5py
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON -DCMAKE_CXX_FLAGS_RELEASE=-O0 -g ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ..
 RUN make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf}
-#RUN make test CTEST_OUTPUT_ON_FAILURE=1
-#RUN make install DESTDIR=${PWD}
-#USER root
-#RUN make install
+RUN make test CTEST_OUTPUT_ON_FAILURE=1
+USER root
+RUN make install DESTDIR=${PWD}
+USER espressopp
