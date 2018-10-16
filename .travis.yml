@@ -6,13 +6,16 @@ services:
 - docker
 
 env:
-  - DISTRO=ubuntu
-  - DISTRO=ubuntu_rolling
-  - DISTRO=ubuntu_mpich
-  - DISTRO=fedora
-  - DISTRO=opensuse
-  - EXTERNAL=ON
-  - EXTERNAL=OFF
+  - DISTRO=ubuntu EXTERNAL=ON
+  - DISTRO=ubuntu EXTERNAL=OFF
+  - DISTRO=ubuntu_rolling EXTERNAL=ON
+  - DISTRO=ubuntu_rolling EXTERNAL=OFF
+  - DISTRO=ubuntu_mpich EXTERNAL=ON
+  - DISTRO=ubuntu_mpich EXTERNAL=OFF
+  - DISTRO=fedora EXTERNAL=ON
+  - DISTRO=fedora EXTERNAL=OFF
+  - DISTRO=opensuse EXTERNAL=ON
+  - DISTRO=opensuse EXTERNAL=OFF
 
 script:
  - cp -vr docker ${HOME}
