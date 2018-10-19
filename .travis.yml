@@ -14,6 +14,8 @@ env:
   - DISTRO=ubuntu_mpich EXTERNAL=OFF
   - DISTRO=fedora EXTERNAL=ON
   - DISTRO=fedora EXTERNAL=OFF
+  - DISTRO=fedora_mpich EXTERNAL=ON
+  - DISTRO=fedora_mpich EXTERNAL=OFF
   - DISTRO=opensuse EXTERNAL=ON
   - DISTRO=opensuse EXTERNAL=OFF
 
