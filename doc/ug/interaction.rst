@@ -8,7 +8,6 @@ interaction
    espressopp.interaction.AngularUniqueCosineSquared.rst
    espressopp.interaction.AngularUniqueHarmonic.rst
    espressopp.interaction.AngularUniquePotential.rst
-   espressopp.interaction.Cosine.rst
    espressopp.interaction.CoulombKSpaceEwald.rst
    espressopp.interaction.CoulombKSpaceP3M.rst
    espressopp.interaction.CoulombRSpace.rst
