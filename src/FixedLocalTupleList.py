@@ -18,9 +18,9 @@
 
 
 r"""
-*****************************
+**********************************
 **espressopp.FixedLocalTupleList**
-*****************************
+**********************************
 This class can contain many tuple which store a arbitrary positive number, which should be more than 2, of local (real + ghost) particle id.
 
 For using this class, there is 1 conditions:
