@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016,2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -24,9 +26,6 @@
 #include <sstream>
 #include "FixedQuadrupleList.hpp"
 
-//#include <vector>
-//#include <utility>
-//#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
@@ -154,6 +153,17 @@ namespace espressopp {
     }
 
 	return quadruples;
+  }
+
+  std::vector<longint> FixedQuadrupleList::getQuadrupleList() {
+    std::vector<longint> ret;
+    for (GlobalQuadruples::const_iterator it=globalQuadruples.begin(); it != globalQuadruples.end(); it++) {
+      ret.push_back(it->second.first);
+      ret.push_back(it->first);
+      ret.push_back(it->second.second);
+      ret.push_back(it->second.third);
+    }
+    return ret;
   }
 
   void FixedQuadrupleList::

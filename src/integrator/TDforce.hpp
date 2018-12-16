@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2017
-      Jakub Krajniak (jkrajniak at gmail.com)
+  Copyright (C) 2017,2018
+      Jakub Krajniak (jkrajniak at gmail.com), Max Planck Institute for Polymer Research
   Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -51,7 +51,8 @@ namespace espressopp {
         real startdist;
         real enddist;
         int edgeweightmultiplier;
-        TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1);
+        bool slow;
+        TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1, bool _slow = false);
 
         ~TDforce();
 
@@ -60,6 +61,7 @@ namespace espressopp {
         const char* getFilename() const { return filename.c_str(); }
 
         void applyForce();
+        real computeTDEnergy();
 
         static void registerPython();
 

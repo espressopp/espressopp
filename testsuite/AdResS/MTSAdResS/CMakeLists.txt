@@ -1,0 +1,2 @@
+add_test(MTSAdResS ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_MTSAdResS.py)
+set_tests_properties(MTSAdResS PROPERTIES ENVIRONMENT "${TEST_ENV}")

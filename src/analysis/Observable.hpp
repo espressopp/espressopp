@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2018
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -35,7 +37,15 @@ namespace espressopp {
     public:
       /** Observable can be int, real, scalar or vector */
       enum result_types {old_format=-1, none=0, real_scalar=1, int_scalar=2, real_vector=3, int_vector=4};
-      Observable(shared_ptr< System > system) : SystemAccess(system) {result_type=old_format; };
+      enum ObservableTypes {
+        POTENTIAL_ENERGY,
+        KINETIC_ENERGY,
+        OTHER
+      };
+      Observable(shared_ptr< System > system) : SystemAccess(system) {
+        result_type=old_format;
+        observable_type = OTHER;
+      };
       virtual ~Observable() {};
 
     public:
@@ -65,8 +75,10 @@ namespace espressopp {
 
      protected:
       result_types result_type;
+      ObservableTypes observable_type;
       std::vector< real > result_real_vector;
       std::vector< int > result_int_vector;
+      longint result_vector_size;
 
       static LOG4ESPP_DECL_LOGGER(logger);
 
