@@ -1,25 +1,25 @@
 /*
+  Copyright (C) 2012-2018
+      Max Planck Institute for Polymer Research
   Copyright (C) 2017
       Jakub Krajniak (jkrajniak at gmail.com)
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -37,7 +37,7 @@
 namespace espressopp {
   namespace integrator {
 
-    /** Abstract base class for Molecular Dynamics Integrator. 
+    /** Abstract base class for Molecular Dynamics Integrator.
 
         Note: Class accesses system object for storage, bc, communicator,
               interaction list.
@@ -84,6 +84,7 @@ namespace espressopp {
         // signals to extend the integrator
         boost::signals2::signal<void ()> runInit; // initialization of run()
         boost::signals2::signal<void ()> recalc1; // inside recalc, before updateForces()
+        boost::signals2::signal<void ()> aftCalcSlow; // after calculation of slow forces updateForces(true) in VerlocityVerletRESPA
         boost::signals2::signal<void ()> recalc2; // inside recalc, after  updateForces()
         boost::signals2::signal<void ()> befIntP; // before integrate1()
         boost::signals2::signal<void (real&)> inIntP; // inside end of integrate1()
@@ -92,6 +93,7 @@ namespace espressopp {
         boost::signals2::signal<void ()> aftCalcF; // after calcForces()
         boost::signals2::signal<void ()> befIntV; // before integrate2()
         boost::signals2::signal<void ()> aftIntV; // after  integrate2()
+        boost::signals2::signal<void ()> aftIntSlow; // after integrateSlow() in VerlocityVerletRESPA
 
 
         /** Register this class so it can be used from Python. */

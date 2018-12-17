@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -48,6 +48,7 @@ namespace espressopp {
         shared_ptr<FixedTupleListAdress> fixedtupleList;
         bool KTI;
         int regionupdates;
+        int multistep;
 
         real dhy;
         real pidhy2;
@@ -56,7 +57,7 @@ namespace espressopp {
         real dexdhy;
         real dexdhy2;
 
-        Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false, int _regionupdates = 1);
+        Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false, int _regionupdates = 1, int _multistep = 1);
 
         ~Adress();
 
@@ -65,12 +66,13 @@ namespace espressopp {
 
       private:
 
-        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _inIntP, _integrate2, _recalc2, _befIntV;  //_aftCalcF;
+        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _integrateSlow, _aftCalcSlow, _recalc2, _befIntV;  //_aftCalcF;
 
         void integrate1(real&);
         void initForces();
         void SetPosVel();
         void integrate2();
+        void integrateSlow();
         void aftCalcF();
         void communicateAdrPositions();
 

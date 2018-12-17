@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -58,7 +60,7 @@ namespace espressopp {
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
 		virtual void onParticlesChanged();
-
+		virtual std::vector<longint> getTripleList();
 		python::list getTriples();
 
 	    /** Get the number of triples in the GlobalTriples list */

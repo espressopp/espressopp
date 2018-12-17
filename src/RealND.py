@@ -1,22 +1,20 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2018
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -35,30 +33,31 @@ Description
 
 .. function:: espressopp.__RealND(\*args)
 
-		:param \*args: 
-		:type \*args: 
+        :param \*args:
+        :type \*args:
 
 .. function:: espressopp.toRealNDFromVector(\*args)
 
-		:param \*args: 
-		:type \*args: 
+        :param \*args:
+        :type \*args:
 
 .. function:: espressopp.toRealND(\*args)
 
-		:param \*args: 
-		:type \*args: 
+        :param \*args:
+        :type \*args:
 """
 
 from _espressopp import RealND
+from _espressopp import RealNDs
 from espressopp import esutil
 
 # This injects additional methods into the RealND class and pulls it
-# into this module 
+# into this module
 class __RealND(RealND) :
 
 
     __metaclass__ = esutil.ExtendBaseClass
-    
+
     '''
     __originit = RealND.__init__
     def __init__(self, *args):
@@ -81,7 +80,7 @@ class __RealND(RealND) :
             x, y, z = args
         else :
             raise TypeError("Cannot initialize RealND from %s" % (args))
-        
+
         return self.__originit(x, y, z)
     '''
 
@@ -115,3 +114,18 @@ def toRealND(*args):
         return args[0]
     else:
         return RealND(*args)
+
+class __RealNDs(RealNDs):
+    __metaclass__ = esutil.ExtendBaseClass
+    # string conversion
+    def __str__(self) :
+	arr = []
+	for i in xrange(self.dimension):
+            arr_i = []
+	    for j in xrange(self[i].dimension):
+		arr_i.append(str(self[i][j]))
+            arr.append(arr_i)
+	return str(arr)
+
+    def __repr__(self) :
+        return 'RealNDs' + str(self)
