@@ -75,7 +75,7 @@ class TestCaseCapForce(unittest.TestCase):
 
         particle1 = self.system.storage.getParticle(1)
         particle2 = self.system.storage.getParticle(2)
-        print particle1.f, particle2.f
+        print(particle1.f, particle2.f)
 
         # run checks
         self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
@@ -116,7 +116,7 @@ class TestCaseCapForce(unittest.TestCase):
 
         particle1 = self.system.storage.getParticle(1)
         particle2 = self.system.storage.getParticle(2)
-        print particle1.f, particle2.f
+        print(particle1.f, particle2.f)
 
         # run checks
         self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
@@ -161,7 +161,7 @@ class TestCaseCapForce(unittest.TestCase):
 
         particle1 = self.system.storage.getParticle(1)
         particle2 = self.system.storage.getParticle(2)
-        print particle1.f, particle2.f
+        print(particle1.f, particle2.f)
 
         # run checks
         self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
@@ -206,7 +206,7 @@ class TestCaseCapForce(unittest.TestCase):
 
         particle1 = self.system.storage.getParticle(1)
         particle2 = self.system.storage.getParticle(2)
-        print particle1.f, particle2.f
+        print(particle1.f, particle2.f)
 
         # run checks
         self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")

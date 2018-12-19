@@ -72,7 +72,7 @@ def getSelfExclEnergyReactionField(system,exclusions,prefactor,epsilon1,epsilon2
     if nParticles == 0:
       print('Error! In getSelfExclEnergyReactionField, you supplied neither a list of particles indices (pidlist) nor a maximum particle id (nParticles), so no self or excluded energy is calculated')
       quit()
-    pidlist = range(1,nParticles+1)
+    pidlist = list(range(1,nParticles+1))
   for pid in pidlist:
     part = system.storage.getParticle(pid)
     selfEnergy += part.q*part.q*prefactor*-1*crf
@@ -86,7 +86,7 @@ def getSelfExclEnergyReactionField(system,exclusions,prefactor,epsilon1,epsilon2
       dist = part1.pos - part2.pos
       distSqr = dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]
       if distSqr>rc2:
-        print('Error, PBC problem in getSelfEnergyReactionField with particles ',pid1,pid2)
+        print(('Error, PBC problem in getSelfEnergyReactionField with particles ',pid1,pid2))
         quit()
       exclEnergy += part1.q*part2.q*prefactor*-1.0*(B1_half*distSqr+crf)
 

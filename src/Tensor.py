@@ -26,10 +26,11 @@ espressopp.Tensor
 """
 from _espressopp import Tensor
 from espressopp import esutil
+import six
 
 # This injects additional methods into the Tensor class and pulls it
 # into this module 
-class __Tensor(Tensor, metaclass=esutil.ExtendBaseClass) :
+class __Tensor(six.with_metaclass(esutil.ExtendBaseClass, Tensor)) :
 
 
     __originit = Tensor.__init__

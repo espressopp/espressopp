@@ -84,7 +84,7 @@ class TestExtForceLB(unittest.TestCase):
         av_den /= volume_xyz
         av_j /= volume_xyz
 
-        print av_den, av_j
+        print(av_den, av_j)
 
         self.assertAlmostEqual(av_den, initDen, places=2)
         self.assertAlmostEqual(av_j[0], initVel, places=2)

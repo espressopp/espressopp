@@ -48,7 +48,7 @@ class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquar
           cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)
 
     def strange(self):
-      print(1)
+      print((1))
       return 1
 
 if pmi.isController:

@@ -74,7 +74,7 @@ class TestDumpTopology(ut.TestCase):
         self.dump_h5md.close()
         h5 = h5py.File(self.h5md_file, 'r')
 
-        self.assertEqual(h5['/connectivity'].keys(), ['angles_0', 'bonds_0', 'dihs_0'])
+        self.assertEqual(list(h5['/connectivity'].keys()), ['angles_0', 'bonds_0', 'dihs_0'])
 
 class TestDumpFPL(TestDumpTopology):
     def test_check_dynamic_list(self):
@@ -89,7 +89,7 @@ class TestDumpFPL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for bond_list in h5['/connectivity/bonds_0/value']:
-            self.assertListEqual(sorted(map(tuple, filter(lambda x: -1 not in x, bond_list))), [(1, 2), (2, 3)])
+            self.assertListEqual(sorted(map(tuple, [x for x in bond_list if -1 not in x])), [(1, 2), (2, 3)])
 
     def test_check_dynamic_list_update(self):
         self.integrator.run(5)
@@ -102,17 +102,17 @@ class TestDumpFPL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/bonds_0/step']), range(11))
+        self.assertEqual(list(h5['/connectivity/bonds_0/step']), list(range(11)))
 
         for bond_list in h5['/connectivity/bonds_0/value'][:6]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, bond_list))), 
+                sorted(map(tuple, [x for x in bond_list if -1 not in x])), 
                 [(1, 2), (2, 3)])
         
         # Second part contains added pair (1, 4)
         for bond_list in h5['/connectivity/bonds_0/value'][6:]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, bond_list))), 
+                sorted(map(tuple, [x for x in bond_list if -1 not in x])), 
                 [(1, 2), (1, 4), (2, 3)])
 
 
@@ -129,7 +129,7 @@ class TestDumpFTL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for bond_list in h5['/connectivity/angles_0/value']:
-            self.assertListEqual(sorted(map(tuple, filter(lambda x: -1 not in x, bond_list))), 
+            self.assertListEqual(sorted(map(tuple, [x for x in bond_list if -1 not in x])), 
             [(1, 2, 3)])
 
     def test_check_dynamic_list_update(self):
@@ -143,17 +143,17 @@ class TestDumpFTL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/angles_0/step']), range(11))
+        self.assertEqual(list(h5['/connectivity/angles_0/step']), list(range(11)))
 
         for angle_list in h5['/connectivity/angles_0/value'][:6]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, angle_list))), 
+                sorted(map(tuple, [x for x in angle_list if -1 not in x])), 
                 [(1, 2, 3)])
         
         # Second part contains added pair (1, 4, 3)
         for angle_list in h5['/connectivity/angles_0/value'][6:]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, angle_list))), 
+                sorted(map(tuple, [x for x in angle_list if -1 not in x])), 
                 [(1, 2, 3), (1, 4, 3)])
 
 
@@ -170,7 +170,7 @@ class TestDumpFQL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for plist in h5['/connectivity/dihs_0/value']:
-            self.assertListEqual(sorted(map(tuple, filter(lambda x: -1 not in x, plist))), 
+            self.assertListEqual(sorted(map(tuple, [x for x in plist if -1 not in x])), 
             [(2, 1, 3, 4)])
 
     def test_check_dynamic_list_update(self):
@@ -184,17 +184,17 @@ class TestDumpFQL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/dihs_0/step']), range(11))
+        self.assertEqual(list(h5['/connectivity/dihs_0/step']), list(range(11)))
 
         for plist in h5['/connectivity/dihs_0/value'][:6]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, plist))), 
+                sorted(map(tuple, [x for x in plist if -1 not in x])), 
                 [(2, 1, 3, 4)])
         
         # Second part contains added pair (1, 4, 3)
         for plist in h5['/connectivity/dihs_0/value'][6:]:
             self.assertListEqual(
-                sorted(map(tuple, filter(lambda x: -1 not in x, plist))), 
+                sorted(map(tuple, [x for x in plist if -1 not in x])), 
                 [(2, 1, 3, 4), (4, 1, 3, 2)])
 
 

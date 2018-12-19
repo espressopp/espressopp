@@ -122,14 +122,14 @@ class ParallelTempering(object):
             
     def startDefiningSystem(self,n):
         if not (n in range(0,self._nsystems)):
-            print("ERROR: System number must be between 0 and ",self._nsystems)
+            print(("ERROR: System number must be between 0 and ",self._nsystems))
         else:
             pmi.activate(self._comm[n])
             self._multisystem.beginSystemDefinition()
 
     def endDefiningSystem(self,n):
         if not (n in range(0,self._nsystems)):
-            print("ERROR: System number must be between 0 and ",self._nsystems)
+            print(("ERROR: System number must be between 0 and ",self._nsystems))
         else:
             pmi.deactivate(self._comm[n])
             
@@ -169,8 +169,8 @@ class ParallelTempering(object):
         energies     = self._multisystem.runAnalysisPotential()
         temperatures = self._multisystem.runAnalysisTemperature()
         nparts       = self._multisystem.runAnalysisNPart()
-        print("energies     = ", energies)
-        print("temperatures = ", temperatures)
+        print(("energies     = ", energies))
+        print(("temperatures = ", temperatures))
         for i in range(len(energies)/2):
             m = 2 * i + self._oddeven
             n = m + 1
@@ -190,7 +190,7 @@ class ParallelTempering(object):
                     exyesno = 'yes'
                   else:
                     exyesno = 'no'
-                print("systems %i and %i: dE=%10.5f random=%10.5f ==> exchange: %s" % (m, n, delta, metro, exyesno))
+                print(("systems %i and %i: dE=%10.5f random=%10.5f ==> exchange: %s" % (m, n, delta, metro, exyesno)))
                 if exyesno=='yes':
                     # exchange temperature of system[n] <--> system[m]
                     pmi.activate(self._comm[n])

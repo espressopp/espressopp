@@ -66,12 +66,11 @@ espressopp.Real3D
 """
 from _espressopp import Real3D
 from espressopp import esutil
+import six
 
 # This injects additional methods into the Real3D class and pulls it
 # into this module 
-class __Real3D(Real3D, metaclass=esutil.ExtendBaseClass) :
-
-
+class __Real3D(six.with_metaclass(esutil.ExtendBaseClass, Real3D)) :
     __originit = Real3D.__init__
     def __init__(self, *args):
         if len(args) == 0:

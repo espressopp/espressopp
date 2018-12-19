@@ -139,10 +139,11 @@ Quaternion(-14.0, Real3D(0.0, 0.0, 0.0))
 from _espressopp import Quaternion
 from _espressopp import Real3D
 from espressopp import esutil
+import six
 
 # This injects additional methods into the Quaternion class and pulls it
 # into this module 
-class __Quaternion(Quaternion, metaclass=esutil.ExtendBaseClass) :
+class __Quaternion(six.with_metaclass(esutil.ExtendBaseClass, Quaternion)) :
     """Basic quaternion as used by ESPResSo++.
     """
 

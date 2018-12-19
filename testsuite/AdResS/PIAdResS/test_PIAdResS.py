@@ -45,7 +45,7 @@ class ParametrizedTestCase(unittest.TestCase):
 
 class TestPIAdResS(ParametrizedTestCase):
     def test_PIAdResS(self):
-        print 'param =', self.param
+        print('param =', self.param)
 
         constkinmass = self.param['constkinmass']
         PILE = self.param['PILE']

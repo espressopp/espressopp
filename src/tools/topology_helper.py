@@ -81,9 +81,9 @@ def FillFileBuffer(fname, filebuffer):
 
 
 def FindType(proposedtype, typelist):
-    list=[typeid for (typeid,atype) in typelist.items() if atype==proposedtype ]
+    list=[typeid for (typeid,atype) in list(typelist.items()) if atype==proposedtype ]
     if len(list)>1:
-        print("Error: duplicate type definitons", proposedtype.parameters)
+        print(("Error: duplicate type definitons", proposedtype.parameters))
         exit()
     elif len(list)==0:
         return None
@@ -95,12 +95,12 @@ class InteractionType:
         self.parameters=parameters
     def __eq__(self,other):
         # interaction types are defined to be equal if all parameters are equal
-        for k, v in self.parameters.items():
+        for k, v in list(self.parameters.items()):
             if k not in other.parameters: return False
             if other.parameters[k]!=v: return False
         return True
     def createEspressoInteraction(self, system, fpl):
-        print("WARNING: could not set up interaction for", self.parameters, ": Espresso potential not implemented")
+        print(("WARNING: could not set up interaction for", self.parameters, ": Espresso potential not implemented"))
         return None
     def automaticExclusion(self):
         #overwrite in derrived class if the particular interaction is automatically excluded
@@ -214,7 +214,7 @@ def ParseBondTypeParam(line):
     elif btype == "9":
         p=TabulatedBondInteractionType({"tablenr":int(tmp[3]), "k":float(tmp[4])})
     else:
-        print("Unsupported bond type", tmp[2], "in line:")
+        print(("Unsupported bond type", tmp[2], "in line:"))
         print(line)
         exit()
     return p     
@@ -227,7 +227,7 @@ def ParseAngleTypeParam(line):
     elif type == 8:
         p=TabulatedAngleInteractionType({"tablenr":int(tmp[4]),"k":float(tmp[5])})
     else:
-        print("Unsupported angle type", type, "in line:")
+        print(("Unsupported angle type", type, "in line:"))
         print(line)
         exit()
     return p    
@@ -245,7 +245,7 @@ def ParseDihedralTypeParam(line):
     elif (type == 1) or (type == 9): 
         p=HarmonicNCosDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5]), "multiplicity":int(tmp[7])})
     else:
-        print("Unsupported dihedral type", type, "in line:")
+        print(("Unsupported dihedral type", type, "in line:"))
         print(line)
         exit()
     return p    
@@ -258,7 +258,7 @@ def ParseImproperTypeParam(line):
     elif type == 2:
         p=HarmonicDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5])})
     else:
-        print("Unsupported improper type", type, "in line:")
+        print(("Unsupported improper type", type, "in line:"))
         print(line)
         exit()
     return p
@@ -275,7 +275,7 @@ class Node():
 def FindNodeById(id, nodes):
     list=[n for n in nodes if n.id==id ]
     if len(list)>1:
-        print("Error: duplicate nodes", id)
+        print(("Error: duplicate nodes", id))
         exit()
     elif len(list)==0:
         return None

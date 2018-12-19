@@ -107,7 +107,7 @@ class makeConf(unittest.TestCase):
             system.storage.addParticles(particle_list, 'id', 'type', 'mass', 'pos', 'v')
             system.storage.decompose()
 
-            print "Warm up. Sigma will be increased from 0. to 1."
+            print("Warm up. Sigma will be increased from 0. to 1.")
             new_sigma = sigma
             for k in range(50):
                 integrator.run(100)
@@ -154,13 +154,13 @@ class makeConf(unittest.TestCase):
 
     def tearDown(self):
         if (self.integrator.step == 0):
-            print "continue to restarting test:"
+            print("continue to restarting test:")
         else:
             shutil.rmtree('./dump/')
 
 class TestLBMDCoupling(makeConf):
     def test_lbmdcoupling(self):
-        print "Checking total momentum of LB-MD system:"
+        print("Checking total momentum of LB-MD system:")
 
         global runSteps
 
@@ -174,9 +174,9 @@ class TestLBMDCoupling(makeConf):
     
         self.integrator.step = 0
         # output formatting
-        print "-" * 73
+        print("-" * 73)
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)
@@ -184,7 +184,7 @@ class TestLBMDCoupling(makeConf):
         self.assertAlmostEqual(tot_mom[2], 0., places=10)
 
     def test_restartlbmd(self):
-        print "Checking total momentum of restarted LB-MD system:"
+        print("Checking total momentum of restarted LB-MD system:")
 
         global runSteps
         self.integrator.step = runSteps
@@ -204,9 +204,9 @@ class TestLBMDCoupling(makeConf):
         self.integrator.run(runSteps)
 
         # output formatting
-        print "-" * 73
+        print("-" * 73)
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)

@@ -291,7 +291,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             if 'parameters' not in self.file:
                 self.file.create_group('parameters')
             g_params = self.file['parameters']
-            for k, v in paramters.items():
+            for k, v in list(paramters.items()):
                 g_params.attrs[k] = v
 
     def get_file(self):

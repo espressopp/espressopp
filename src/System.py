@@ -155,7 +155,7 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.removeInteraction(self, interaction_id)
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
-                for k, v in self._interaction2id.items()
+                for k, v in list(self._interaction2id.items())
                 }
             self._interaction_pid = max(self._interaction2id.values()) + 1
 
@@ -200,7 +200,7 @@ class SystemLocal(_espressopp.System):
                 #print args, " has iterator and length 1"
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
               else:
-                print(args, " is invalid")
+                print((args, " is invalid"))
             else:
               #print args, " is scalar"
               self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
@@ -208,7 +208,7 @@ class SystemLocal(_espressopp.System):
             #print args, " is 3 numbers"
             self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
-            print(args, " is invalid")
+            print((args, " is invalid"))
           
     def setTrace(self, switch):
 

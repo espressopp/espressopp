@@ -89,7 +89,7 @@ def _setupProperty():
 
             def setter(self, fset):
                 cls_ns = sys._getframe(1).f_locals
-                for k, v in cls_ns.items():
+                for k, v in list(cls_ns.items()):
                     if v == self:
                         propname = k
                         break
@@ -99,7 +99,7 @@ def _setupProperty():
 
             def deleter(self, fdel):
                 cls_ns = sys._getframe(1).f_locals
-                for k, v in cls_ns.items():
+                for k, v in list(cls_ns.items()):
                     if v == self:
                         propname = k
                         break

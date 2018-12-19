@@ -147,7 +147,7 @@ disableVVL=False
     if not disableVVL:
 	vParticles=[]
 	vptype=numtypes*(P+1)+1 # this is the type assigned to virtual particles
-	for k, v in ringids.items():
+	for k, v in list(ringids.items()):
 	    
 	    cog=allParticlesById[k][propDict['pos']]
 	    for pid in v:
@@ -184,14 +184,14 @@ disableVVL=False
 	
 	## TODO: in case of VVL: clone interaction, add potential!
 	
-	print("expanding interaction", interaction)
+	print(("expanding interaction", interaction))
 	if interaction.bondType() == espressopp.interaction.Nonbonded:
 	    for i in range(P):	
 		for j in range(numtypes):
 		    for k in range(numtypes):
 			pot=interaction.getPotential(j, k)
 			interaction.setPotential(numtypes*i+j, numtypes*i+k, pot)	
-			print("Interaction", numtypes*i+j, numtypes*i+k, pot)
+			print(("Interaction", numtypes*i+j, numtypes*i+k, pot))
 	    if not disableVVL:
 		vl=interaction.getVerletList()
 		#print "VL has", vl.totalSize(),"disconnecting"
@@ -264,7 +264,7 @@ disableVVL=False
 	system.addInteraction(interb)
 	kineticTermInteractions.update({m:interb})
 
-    for idcla, idpi in ringids.items():
+    for idcla, idpi in list(ringids.items()):
 	p=allParticlesById[idcla]
 	mass=p[propDict['mass']]
 	interactionList=kineticTermInteractions[mass].getFixedPairList() #find the appropriate interaction based on the mass

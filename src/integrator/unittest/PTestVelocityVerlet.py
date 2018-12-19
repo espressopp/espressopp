@@ -73,8 +73,8 @@ class TestVerletList(espressopp.unittest.TestCase) :
        for i in range(3):
           cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-       print('NodeGrid = %s'%(nodeGrid,))
-       print('CellGrid = %s'%cellGrid)
+       print(('NodeGrid = %s'%(nodeGrid,)))
+       print(('CellGrid = %s'%cellGrid))
 
        dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
@@ -102,11 +102,11 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
        integrator = espressopp.integrator.VelocityVerlet(system)
 
-       print('integrator.dt = %g, will be set to 0.005'%integrator.dt)
+       print(('integrator.dt = %g, will be set to 0.005'%integrator.dt))
 
        integrator.dt = 0.005
   
-       print('integrator.dt = %g, is now '%integrator.dt)
+       print(('integrator.dt = %g, is now '%integrator.dt))
 
        # now build Verlet List
        # ATTENTION: you have to add the skin explicitly here
@@ -117,7 +117,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
        # ATTENTION: auto shift was enabled
 
-       print("potLJ, shift = %g"%potLJ.shift)
+       print(("potLJ, shift = %g"%potLJ.shift))
 
        interLJ = espressopp.interaction.VerletListLennardJones(vl)
 
@@ -132,8 +132,8 @@ class TestVerletList(espressopp.unittest.TestCase) :
        temperature = temp.compute()
        kineticEnergy = 0.5 * temperature * (3 * N * N * N)
        potentialEnergy = interLJ.computeEnergy()
-       print('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
-                  potentialEnergy, kineticEnergy, temperature))
+       print(('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
+                  potentialEnergy, kineticEnergy, temperature)))
 
        nsteps = 10
 
@@ -144,8 +144,8 @@ class TestVerletList(espressopp.unittest.TestCase) :
           temperature = temp.compute()
           kineticEnergy = 0.5 * temperature * (3 * N * N * N)
           potentialEnergy = interLJ.computeEnergy()
-          print('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
-               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature))
+          print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)))
 
 if __name__ == "__main__":
 

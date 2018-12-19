@@ -220,7 +220,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
         
         FillFileBuffer(top_file, f)
                 
-        print("Reading top file: "+top_file)
+        print(("Reading top file: "+top_file))
         line = ''
         itp_files = []
         a = 0
@@ -257,7 +257,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
             if readdefaults:
                 if line.strip() == "" or '[' in line: # end of defaults section
                     readdefaults=False
-                    print("Defaults: ", defaults)
+                    print(("Defaults: ", defaults))
                 else:
                     fields=line.split()
                     if len(fields)==5: 
@@ -279,7 +279,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
                     atomtype_wildcard = a
                     # prints gromacs type and esp++ type
                     for t in sorted(list(atomtypes.items()), key=itemgetter(1)):
-                        print(" %s: %d"%(t[0],t[1]))
+                        print((" %s: %d"%(t[0],t[1])))
                 else:
                     fields=line.split()
                     attypename = fields[0]
@@ -373,7 +373,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 if ((nextline[4]=='4') or (nextline[4]=='2')): 
                     readimptypes = True
                     readdhtypes = False
-		elif int(nextline[4]) in [1, 3, 8, 9]:
+                elif int(nextline[4]) in [1, 3, 8, 9]:
                     readdhtypes = True
                     readimptypes = False
                     if (nextline[4]=='8'): print('Warning: Assuming dihedraltypes of function type 8 are dihedrals, not impropers')
@@ -449,7 +449,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 if line.strip() == "" or '[' in line: # end of molecules section
                     readmolecules = False
                 else:
-                    print(" "+line.strip('\n'))
+                    print((" "+line.strip('\n')))
                     mol, nrmol = line.split()
                     #we have to check if the same molecules comes multiple times in the molecules section
                     if len(molecules) == 0:
@@ -475,7 +475,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
         f.seek(0) # Now we search for bonds, angles definitions and start from the beginning of the file buffer
 
         for mol in molecules: ### this loop not modified for 1-4 pairs
-            print("Preparing %d %s molecules... " %(mol['count'], mol['name'])) 
+            print(("Preparing %d %s molecules... " %(mol['count'], mol['name']))) 
             print("-----------------------------")
 
             # find and store number of molecules
@@ -524,70 +524,70 @@ def read(gro_file, top_file="", doRegularExcl=True):
         unpackvars.append("defaults")
         params.append(defaults)
     if len(types) != 0:
-        print("Found ", len(types), "types")
+        print(("Found ", len(types), "types"))
         unpackvars.append("types")
         params.append(types)
         unpackvars.append("atomtypes")
         params.append(atomtypes)
     if len(masses) != 0:
-        print("Found ", len(masses), "masses")
+        print(("Found ", len(masses), "masses"))
         unpackvars.append("masses")
         params.append(masses)
     if len(charges) != 0:
-        print("Found ", len(charges), "charges")
+        print(("Found ", len(charges), "charges"))
         unpackvars.append("charges")
         params.append(charges)
     if len(atomtypeparams) !=0:
-        print("Found ", len(atomtypeparams), " atomtypeparameters") 
+        print(("Found ", len(atomtypeparams), " atomtypeparameters")) 
         unpackvars.append("atomtypeparameters")
         params.append(atomtypeparams)
     if len(bonds) != 0:
-        print("Found ", len(bonds), " bond types")
+        print(("Found ", len(bonds), " bond types"))
         unpackvars.append("bondtypes")
         params.append(bonds)
     if len(bondtypeparams) !=0:
-        print("Found ", len(bondtypeparams), " bondtypeparams") 
+        print(("Found ", len(bondtypeparams), " bondtypeparams")) 
         unpackvars.append("bondtypeparams")
         params.append(bondtypeparams)        
     if len(angles) != 0:
-        print("Found ", len(angles), " angle types")
+        print(("Found ", len(angles), " angle types"))
         unpackvars.append("angletypes")
         params.append(angles)
     if len(angletypeparams) != 0:
-        print("Found ", len(angletypeparams), " angle type parameters")
+        print(("Found ", len(angletypeparams), " angle type parameters"))
         unpackvars.append("angletypeparams")
         params.append(angletypeparams)      
     if len(dihedrals) != 0:
         unpackvars.append("dihedraltypes")
-        print("Found ", len(dihedrals), " dihedral types") #doesn't count when several potentials per dihedral
+        print(("Found ", len(dihedrals), " dihedral types")) #doesn't count when several potentials per dihedral
         params.append(dihedrals)
     if len(dihedraltypeparams) != 0:
-        print("Found ", len(dihedraltypeparams), " dihedral type parameters")
+        print(("Found ", len(dihedraltypeparams), " dihedral type parameters"))
         unpackvars.append("dihedraltypeparams")
         params.append(dihedraltypeparams)       
     if len(impropers) != 0:
         unpackvars.append("impropertypes")
-        print("Found ", len(impropers), " improper types")
+        print(("Found ", len(impropers), " improper types"))
         params.append(impropers)
     if len(impropertypeparams) != 0:
-        print("Found ", len(impropertypeparams), " improper type parameters")
+        print(("Found ", len(impropertypeparams), " improper type parameters"))
         unpackvars.append("impropertypeparams")
         params.append(impropertypeparams)
     if len(exclusions) != 0:
-        print("Found ", len(exclusions), "bond exclusions")
+        print(("Found ", len(exclusions), "bond exclusions"))
         unpackvars.append("exclusions")
         params.append(exclusions)  
     if len(onefourpairs) != 0:
-        print("Found ", len(onefourpairs), "1-4 pairs")
+        print(("Found ", len(onefourpairs), "1-4 pairs"))
         unpackvars.append("onefourpairs")
         params.append(onefourpairs)
         
     unpackvars.append("x, y, z")
     params.extend([x, y, z])
-    print("Found Box:", [Lx, Ly, Lz])
+    print(("Found Box:", [Lx, Ly, Lz]))
     if len(vx) != 0:
         params.extend([vx, vy, vz])
-        print("Found ", len(vx), " velocities")
+        print(("Found ", len(vx), " velocities"))
         unpackvars.append("vx, vy, vz")
     params.extend([resname,resid])
     unpackvars.append("resname, resid")
@@ -600,7 +600,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
     for i in range(len(unpackvars)):
         s+=str(unpackvars[i])
         if (i< len(unpackvars)-1): s+=", "
-    print(s, "=gromacs.read( ... )")
+    print((s, "=gromacs.read( ... )"))
     print("DONE parsing")
     
     return tuple(params)
@@ -720,7 +720,7 @@ def storeBonds(f, types, bondtypes, bondtypeparams, bonds, num_atoms_molecule,\
         for b in bonds_tmp:
             pid1, pid2, bdtypeid = b[0:3]
             exclusions_bonds.append((pid1, pid2))   
-        print("Generating Regular exclusions nregxcl=", nregxcl)
+        print(("Generating Regular exclusions nregxcl=", nregxcl))
         print("Warning: this doesn't work for systems containing (1,5)-bonds, i.e. additional bonds between")
         print("particles which are 4 bonds apart along a chain, e.g. some CG polymer models (see gromacs.py for solution)")
         #for systems with (1,5) bonds, use local_exclusions=GenerateRegularExclusions(local_exclusions, nregxcl,local_exclusions)
@@ -919,7 +919,7 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
                                 try:
                                     dihtypeid = impropertypes[t1][t2][t3][t4]
                                 except KeyError:
-                                    print(t1, t2, t3, t4, 'not yet found in impropers')
+                                    print((t1, t2, t3, t4, 'not yet found in impropers'))
                                     quit()
         else:
             #check if we need to make new type
@@ -953,7 +953,7 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
 def setBondedInteractions(system, bonds, bondtypeparams):
     list={}
     bc=0
-    for id, bondlist in bonds.items():
+    for id, bondlist in list(bonds.items()):
         fpl = espressopp.FixedPairList(system.storage)
         fpl.addBonds(bondlist)
         bc+=len(bondlist) 
@@ -966,7 +966,7 @@ def setBondedInteractions(system, bonds, bondtypeparams):
 def setAngleInteractions(system, angles, angletypeparams):
     list={}
     
-    for id, anglelist in angles.items():
+    for id, anglelist in list(angles.items()):
         fpl = espressopp.FixedTripleList(system.storage)
         fpl.addTriples(anglelist)
         angleinteraction=angletypeparams[id].createEspressoInteraction(system, fpl)
@@ -978,7 +978,7 @@ def setAngleInteractions(system, angles, angletypeparams):
 def setDihedralInteractions(system, dihedrals, dihedraltypeparams):
     list={}
     
-    for idlist, dihedrallist in dihedrals.items():
+    for idlist, dihedrallist in list(dihedrals.items()):
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(dihedrallist)
         for i in range(len(idlist)):
@@ -993,7 +993,7 @@ def setDihedralInteractions(system, dihedrals, dihedraltypeparams):
 def setImproperInteractions(system, impropers, impropertypeparams):
     list={}
     
-    for idlist, improperlist in impropers.items():
+    for idlist, improperlist in list(impropers.items()):
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(improperlist)
         for i in range(len(idlist)):
@@ -1008,7 +1008,7 @@ def setImproperInteractions(system, impropers, impropertypeparams):
 def setBondedInteractionsAdress(system, bonds, bondtypeparams,ftpl):
     list={}
     bc=0
-    for id, bondlist in bonds.items():
+    for id, bondlist in list(bonds.items()):
         fpl = espressopp.FixedPairListAdress(system.storage,ftpl)
         fpl.addBonds(bondlist)
         bc+=len(bondlist) 
@@ -1021,7 +1021,7 @@ def setBondedInteractionsAdress(system, bonds, bondtypeparams,ftpl):
 def setAngleInteractionsAdress(system, angles, angletypeparams,ftpl):
     list={}
     
-    for id, anglelist in angles.items():
+    for id, anglelist in list(angles.items()):
         fpl = espressopp.FixedTripleListAdress(system.storage,ftpl)
         fpl.addTriples(anglelist)
         angleinteraction=angletypeparams[id].createEspressoInteraction(system, fpl)
@@ -1033,7 +1033,7 @@ def setAngleInteractionsAdress(system, angles, angletypeparams,ftpl):
 def setDihedralInteractionsAdress(system, dihedrals, dihedraltypeparams,ftpl):
     list={}
     
-    for idlist, dihedrallist in dihedrals.items():
+    for idlist, dihedrallist in list(dihedrals.items()):
         fpl = espressopp.FixedQuadrupleListAdress(system.storage,ftpl)
         fpl.addQuadruples(dihedrallist)
         for i in range(len(idlist)):
@@ -1048,7 +1048,7 @@ def setDihedralInteractionsAdress(system, dihedrals, dihedraltypeparams,ftpl):
 def setImproperInteractionsAdress(system, impropers, impropertypeparams,ftpl):
     list={}
     
-    for idlist, improperlist in impropers.items():
+    for idlist, improperlist in list(impropers.items()):
         fpl = espressopp.FixedQuadrupleListAdress(system.storage,ftpl)
         fpl.addQuadruples(improperlist)
         for i in range(len(idlist)):
@@ -1076,7 +1076,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
     print("# Setting up Lennard-Jones interactions")
     if defaults:
         if int(defaults['combinationrule'])==1:
-            for atnr, at in atomtypeparams.items():
+            for atnr, at in list(atomtypeparams.items()):
                 c6=float(at['sig'])
                 c12=float(at['eps'])
                 if c6==0: continue
@@ -1084,7 +1084,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 eps = 0.25*c6*pow(sig,-6.0)
                 at['sig']=sig
                 at['eps']=eps
-                print("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps)
+                print(("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps))
     
     #for i in xrange(len(atomtypeparams)):
     #    for j in xrange(i, len(atomtypeparams)):
@@ -1102,9 +1102,9 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 #print "# Setting LJ interaction for", i, j, "to sig ", sig, "eps", eps, "cutoff", cutoff
                 ljpot= espressopp.interaction.LennardJones(epsilon=eps, sigma=sig, shift='auto', cutoff=cutoff)
                 if hadress or adress:
-		    interaction.setPotentialAT(type1=i, type2=j, potential=ljpot)
-		else:
-		    interaction.setPotential(type1=i, type2=j, potential=ljpot)
+            interaction.setPotentialAT(type1=i, type2=j, potential=ljpot)
+        else:
+            interaction.setPotential(type1=i, type2=j, potential=ljpot)
     system.addInteraction(interaction)
     return interaction
 
@@ -1127,7 +1127,7 @@ def setLennardJonesInteractionsTI(system, defaults, atomtypeparams, verletlist, 
     print("# Setting up Lennard-Jones interactions")
     if defaults:
         if int(defaults['combinationrule'])==1:
-            for atnr, at in atomtypeparams.items():
+            for atnr, at in list(atomtypeparams.items()):
                 c6=float(at['sig'])
                 c12=float(at['eps'])
                 if c6==0: continue
@@ -1135,7 +1135,7 @@ def setLennardJonesInteractionsTI(system, defaults, atomtypeparams, verletlist, 
                 eps = 0.25*c6*pow(sig,-6.0)
                 at['sig']=sig
                 at['eps']=eps
-                print("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps)
+                print(("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps))
     
     for i in list(atomtypeparams.keys()):
          for j in list(atomtypeparams.keys()):
@@ -1164,7 +1164,7 @@ def setLennardJones14Interactions(system, defaults, atomtypeparams, onefourlist,
     print("# Setting up 1-4 Lennard-Jones interactions")
     if defaults:
         if int(defaults['combinationrule'])==1:
-            for atnr, at in atomtypeparams.items():
+            for atnr, at in list(atomtypeparams.items()):
                 c6=float(at['sig'])
                 c12=float(at['eps'])
                 if c6==0: continue
@@ -1172,10 +1172,10 @@ def setLennardJones14Interactions(system, defaults, atomtypeparams, onefourlist,
                 eps = 0.25*c6*pow(sig,-6.0)
                 at['sig']=sig
                 at['eps']=eps
-                print("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps)
+                print(("WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps))
 
         fudge=float(defaults['fudgeLJ'])
-        print("# Using LJ 1-4 fudge factor ",fudge)
+        print(("# Using LJ 1-4 fudge factor ",fudge))
     else:
         print("Problem with 1-4 interactions. LJ 1-4 fudge factor not defined.")
     
@@ -1231,7 +1231,7 @@ def setCoulombInteractions(system, verletlist, rc, types, epsilon1, epsilon2,kap
 
 def setCoulombInteractionsTI(system, verletlist, rc, types, epsilon1, epsilon2,kappa, lambdaTI, pidlist, annihilate=True, hadress=False, adress=False, ftpl=None):
  
-    print("# Setting up Coulomb reaction field interactions for TI simulation with lambda = ",lambdaTI)
+    print(("# Setting up Coulomb reaction field interactions for TI simulation with lambda = ",lambdaTI))
 
     pref=138.935485 # we want gromacs units, so this is 1/(4 pi eps_0) ins units of kJ mol^-1 e^-2
     
@@ -1267,7 +1267,7 @@ def setCoulombInteractionsTI(system, verletlist, rc, types, epsilon1, epsilon2,k
 def setCoulombInteractionsProtein(system, verletlist, rc, types, epsilon1, epsilonprot,epsilonwat,kappa,otype,htype, hadress=False, adress=False, ftpl=None):
  
     print("# Setting up Coulomb reaction field interactions")
-    print("# Using ",epsilonwat," for water and wat-prot and ",epsilonprot," for protein")
+    print(("# Using ",epsilonwat," for water and wat-prot and ",epsilonprot," for protein"))
 
     pref=138.935485 # we want gromacs units, so this is 1/(4 pi eps_0) ins units of kJ mol^-1 e^-2
     
@@ -1308,7 +1308,7 @@ def setCoulomb14Interactions(system, defaults, onefourlist, rc, types):
 
     if defaults:
         fudge=float(defaults['fudgeQQ'])
-        print("# Using electrostatics 1-4 fudge factor ",fudge)
+        print(("# Using electrostatics 1-4 fudge factor ",fudge))
 
     pref=138.935485*fudge # we want gromacs units, so this is 1/(4 pi eps_0) ins units of kJ mol^-1 e^-2, scaled by fudge factor
 
@@ -1341,7 +1341,7 @@ def setTabulatedInteractions(potentials, particleTypes, system, interaction):
     interaction -- is the interaction to which to add the potentials
     """
     allparticles = []
-    for k, v in particleTypes.items():
+    for k, v in list(particleTypes.items()):
         for i in v:
             allparticles.append((i,k)) # create tuples: (particle, type)
     

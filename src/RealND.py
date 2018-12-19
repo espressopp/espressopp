@@ -51,10 +51,11 @@ Description
 
 from _espressopp import RealND
 from espressopp import esutil
+import six
 
 # This injects additional methods into the RealND class and pulls it
 # into this module 
-class __RealND(RealND, metaclass=esutil.ExtendBaseClass) :
+class __RealND(six.with_metaclass(esutil.ExtendBaseClass, RealND)) :
 
 
     '''

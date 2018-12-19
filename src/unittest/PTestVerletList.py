@@ -63,8 +63,8 @@ class TestVerletList(unittest.TestCase) :
        for i in range(3):
           cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-       print('NodeGrid = %s'%(nodeGrid,))
-       print('CellGrid = %s'%cellGrid)
+       print(('NodeGrid = %s'%(nodeGrid,)))
+       print(('CellGrid = %s'%cellGrid))
 
        system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
        pid = 0

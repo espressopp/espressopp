@@ -232,7 +232,7 @@ def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, s
                 print("HeSpaDDA message: addHsymmetry all tests passed although not all cells are used")
                 wholeNeilListX = halfNeilListX[:]
     else:
-        print("HeSpaDDA message: The distributed cores are not matching the available ones", halfNeilListX)
+        print(("HeSpaDDA message: The distributed cores are not matching the available ones", halfNeilListX))
         halfNeilListX[len(halfNeilListX) - 2] = halfNeilListX[len(halfNeilListX) - 1] + halfNeilListX[len(halfNeilListX) - 2]
         halfNeilListX.pop(len(halfNeilListX) - 1)
         print("HeSpaDDA message: During DD a core has been reduced")
@@ -247,7 +247,7 @@ def adaptNeiList(neiListxin):
     neiListx.append(0)
     [neiListx.append(neiListxin[i] + neiListx[i]) for i in range(len(neiListxin) - 1)]
     neiListx.append(neiListxin[len(neiListxin) - 1] + neiListx[len(neiListx) - 1])
-    print("HeSpaDDA message: Your Cells Neighbor Lists is:", neiListx)
+    print(("HeSpaDDA message: Your Cells Neighbor Lists is:", neiListx))
     return neiListx
 
 # This function distributes the cells into nodes as if they where homogeneous. It also applies to inhomogeneous system whenever there are less than 2 cores per direction: X, Y or Z.
@@ -264,7 +264,7 @@ def reDistCellsHom(node_gridX, sizeX, rc_skin):
             # passing Delta as cellsX-sum(wholeNeiListX)
             wholeNeiListX = redistDeltaRandomly(wholeNeiListX, cellsX - sum(wholeNeiListX), 0)
         else:
-            print("HeSpaDDA message: PASS appears...here, take a look at this value Px/Cx", round((cellsX) / node_gridX - 0.5))
+            print(("HeSpaDDA message: PASS appears...here, take a look at this value Px/Cx", round((cellsX) / node_gridX - 0.5)))
             pass
     else:
         if node_gridX % 2 == 0 and cellsX % 2 != 0:
@@ -287,7 +287,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
     totCellsEH = round(2. * eh_size / rc_skin - 0.5)
     totCellsCG = cellsX - totCellsEH
     totNodesCG, totNodesEH = findNodesMS(node_gridX, totCellsEH, totCellsCG, ratioMS, sizeX, eh_size, idealGas)
-    print("HeSpaDDA message: Cores in Both LR and HR, are:", totNodesCG, totNodesEH)
+    print(("HeSpaDDA message: Cores in Both LR and HR, are:", totNodesCG, totNodesEH))
     if idealGas:	  # This represents the Ideal Gas (IG)!!! (OJO)
         wholeNeiListX_EH = []
         wholeNeiListX_CG = []
@@ -303,7 +303,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
             if int(totCellsEH - sum(wholeNeiListX_EH)) != 0:
                 wholeNeiListX_EH[0:totNodesEH] = redistDeltaRandomly(wholeNeiListX_EH[0:totNodesEH], totCellsEH - sum(wholeNeiListX_EH[0:totNodesEH]), 0)
             else:
-                print("HeSpaDDA message IG: HR region: PASS appears...here, take a look at this value Px/Cx", round(totCellsEH / totNodesEH - 0.5))
+                print(("HeSpaDDA message IG: HR region: PASS appears...here, take a look at this value Px/Cx", round(totCellsEH / totNodesEH - 0.5)))
                 pass
         else:
             if totNodesEH % 2 == 0 and totCellsEH % 2 != 0:
@@ -325,7 +325,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
             if int(totCellsCG - sum(wholeNeiListX_CG)) != 0:
                 wholeNeiListX_CG[0:totNodesCG] = redistDeltaRandomly(wholeNeiListX_CG[0:totNodesCG], totCellsCG - sum(wholeNeiListX_CG[0:totNodesCG]), 0)
             else:
-                print("HeSpaDDA message IG: LR region: PASS appears...here, take a look at this value Px/Cx", round(totCellsCG / totNodesCG - 0.5))
+                print(("HeSpaDDA message IG: LR region: PASS appears...here, take a look at this value Px/Cx", round(totCellsCG / totNodesCG - 0.5)))
                 pass
         else:
             if totNodesCG % 2 == 0 and totCellsCG % 2 != 0:
@@ -341,7 +341,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
 
         # Index of the middle LR region begin of HR
         indCG1 = int((len(wholeNeiListX_CG)) / 2)
-        print("HeSpaDDA message indexing: The CG first subregion index is:", indCG1)
+        print(("HeSpaDDA message indexing: The CG first subregion index is:", indCG1))
         # Index of the start of the second LR region end of HR
         indEH1 = indCG1 + int(totNodesEH)
         # Ensembling the array of Cells Neighbors list
@@ -362,7 +362,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                 totNodesCG = 2  # At least use 2 core for the CG region
                 totNodesEH = node_gridX - totNodesCG
         else:
-            print("HeSpaDDA message indexing: Nodes CG and Nodes EH are respectively,", totNodesCG, totNodesEH)
+            print(("HeSpaDDA message indexing: Nodes CG and Nodes EH are respectively,", totNodesCG, totNodesEH))
         if node_gridX % 2 == 0 and cellsX % 2 == 0:
             wholeNeiListX_EH = [0] * (node_gridX)
             wholeNeiListX_CG = [0] * (node_gridX)
@@ -380,18 +380,18 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                     for i in range(int(ratioMS), int(cellsX + 1)):
                         tempWNL = [0] * (node_gridX)
                         ratioMS2t = round(1. * (cellsX / (1. * pow(i, 1. / 3.))) - 0.5)
-                        print("HeSpaDDA message indexing: the Ratio MS2Cellslot 'cells weight' in the CG region is:", ratioMS2t)
+                        print(("HeSpaDDA message indexing: the Ratio MS2Cellslot 'cells weight' in the CG region is:", ratioMS2t))
                         for j in au1:  # This loop goes over the CG-regions
                             tempWNL[j] = round(ratioMS2t * totCellsCG / totNodesCG - 0.5)
                         totCellsEHtemp = cellsX - sum(tempWNL)
                         if totCellsEHtemp < totNodesEH and totCellsEHtemp > 0:
-                            print("HeSpaDDA message indexing: Error with pass Factor MS-2-Cells, no worries HeSpaDDA will find another for you!", totCellsEHtemp)
+                            print(("HeSpaDDA message indexing: Error with pass Factor MS-2-Cells, no worries HeSpaDDA will find another for you!", totCellsEHtemp))
                         else:
                             # i was not the cubic root... yet
                             preFactCen = pow(i, 1. / 3.)
                             # if int(totCellsEHtemp)-1==int(totNodesEH):
                             #	totCellsCG=totCellsCG+1
-                            print("HeSpaDDA message indexing: The rescaling preFactor for the Cells distribution is...an optimized value, like this:", preFactCen)
+                            print(("HeSpaDDA message indexing: The rescaling preFactor for the Cells distribution is...an optimized value, like this:", preFactCen))
                             break
                             break  # the first value found for preFactCen takes you out of the for
                 # Now redistributing the cells to nodes with a proper dimension factor as a f(dimensions,ratioMS, coresEH, coresCG)
@@ -406,7 +406,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                         wholeNeiListX_CG[i] = round(ratioMS2 * volRatioX * totCellsCG / totNodesCG - 0.5)
                         print("HeSpaDDA message LR: cells dist No IG if cells fit volRatio used...")
                 totCellsEH = cellsX - sum(wholeNeiListX_CG)
-                print("HeSpaDDA message LR: wholeNeiListX_CG is, ", wholeNeiListX_CG)
+                print(("HeSpaDDA message LR: wholeNeiListX_CG is, ", wholeNeiListX_CG))
                 # Now the redist in the EH-region occurs | NHEW-> We still need to check if the cells are enough for the EH cores
                 if totNodesEH % 2 == 0 and totCellsEH >= totNodesEH:
                     for i in range(indCG1, indEH1):
@@ -426,7 +426,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                 au2 = list(range(int(indCG1)))  # 1
                 # no assuming odd totNodesCG, before (indEH1,indEH1+indCG1))
                 au2.extend(list(range(indEH1, indEH1 + indCG1 + 1)))
-                print("HeSpaDDA message: Cells CG wrong", totCellsCG)
+                print(("HeSpaDDA message: Cells CG wrong", totCellsCG))
                 if int(totCellsCG) % int(totNodesCG) == 0:  # NHEW
                     for i in au2:
                         wholeNeiListX_CG[i] = round(1.0 * (totCellsCG) / totNodesCG - 0.5)
@@ -464,7 +464,7 @@ def redistDeltaRandomly(wholeNeiListX, deltaCells, totNodesEH=0, biased=0):
     wholeNeiListXcopy = wholeNeiListX[:]
     index = len(wholeNeiListX) - 1
     indexOut = [0] * int(deltaCells)
-    print("HeSpaDDA message: This are the deltaCells", deltaCells)
+    print(("HeSpaDDA message: This are the deltaCells", deltaCells))
     if deltaCells > 0.5:
         indexOut[-1] = 3  # initialization value for the index of the nodes that will get more cells, so that the random number generator is never punishing the same node with more cells
     else:
@@ -531,7 +531,7 @@ def findNodesMS(node_gridX, totCellsEH, totCellsCG, ratioMS, sizeX, eh_size, ide
     else:  # Applies to all other systems besides the Ideal Gas
         if node_gridX <= (totCellsEH + totCellsCG):
             totNodesEH = round(fRatioEH * node_gridX)
-            print("HeSpaDDA message: According to the theory of HV Guzman article P_{HR} is :", totNodesEH)
+            print(("HeSpaDDA message: According to the theory of HV Guzman article P_{HR} is :", totNodesEH))
             totNodesCG = node_gridX - totNodesEH
             if (totNodesEH + totNodesCG) != node_gridX:
                 # If there are more nodes than cells in EH=> redistribute nodes to EH and CG
