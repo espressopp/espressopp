@@ -19,7 +19,6 @@ Bonded
    espressopp.interaction.FENECapped.rst
    espressopp.interaction.Harmonic.rst
    espressopp.interaction.HarmonicTrap.rst
-   espressopp.interaction.HarmonicUnique.rst
    espressopp.interaction.Morse.rst
    espressopp.interaction.SoftCosine.rst
 

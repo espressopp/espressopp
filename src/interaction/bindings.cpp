@@ -43,7 +43,6 @@
 #include "FENE.hpp"
 #include "FENECapped.hpp"
 #include "Harmonic.hpp"
-#include "HarmonicUnique.hpp"
 #include "Quartic.hpp"
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
