@@ -8,7 +8,6 @@ Angular
    :maxdepth: 2
 
    espressopp.interaction.AngularPotential.rst
-   espressopp.interaction.AngularUniqueCosineSquared.rst
    espressopp.interaction.AngularUniqueHarmonic.rst
    espressopp.interaction.AngularUniquePotential.rst
 
