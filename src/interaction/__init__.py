@@ -63,7 +63,6 @@ from espressopp.interaction.Cosine import *
 from espressopp.interaction.TabulatedAngular import *
 
 from espressopp.interaction.DihedralPotential import *
-from espressopp.interaction.DihedralUniquePotential import *
 from espressopp.interaction.TabulatedDihedral import *
 from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *

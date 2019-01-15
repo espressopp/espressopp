@@ -54,7 +54,6 @@ Dihedral
    espressopp.interaction.DihedralHarmonicNCos.rst
    espressopp.interaction.DihedralPotential.rst
    espressopp.interaction.DihedralRB.rst
-   espressopp.interaction.DihedralUniquePotential.rst
    espressopp.interaction.OPLS.rst
 
 Manybody

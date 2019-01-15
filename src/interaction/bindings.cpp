@@ -59,7 +59,6 @@
 #include "AngularCosineSquared.hpp"
 
 #include "DihedralPotential.hpp"
-#include "DihedralUniquePotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
@@ -128,7 +127,6 @@ namespace espressopp {
       AngularUniqueCosineSquared::registerPython();
       
       DihedralPotential::registerPython();
-      DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
