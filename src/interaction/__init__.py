@@ -27,7 +27,6 @@ from espressopp.interaction.Interaction import *
 
 from espressopp.interaction.Potential import *
 from espressopp.interaction.PotentialVSpherePair import *
-from espressopp.interaction.PotentialUniqueDist import *
 
 from espressopp.interaction.Zero import *
 from espressopp.interaction.LennardJones import *

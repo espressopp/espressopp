@@ -112,7 +112,6 @@ Other
 
    espressopp.interaction.Interaction.rst
    espressopp.interaction.Potential.rst
-   espressopp.interaction.PotentialUniqueDist.rst
    espressopp.interaction.PotentialVSpherePair.rst
    espressopp.interaction.Quartic.rst
    espressopp.interaction.ReactionFieldGeneralized.rst

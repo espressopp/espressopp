@@ -22,7 +22,6 @@
 
 #include "python.hpp"
 #include "bindings.hpp"
-#include "PotentialUniqueDist.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
 #include "LennardJonesAutoBonds.hpp"
@@ -86,7 +85,6 @@ namespace espressopp {
       Interaction::registerPython();
       Potential::registerPython();
       PotentialVSpherePair::registerPython();
-      PotentialUniqueDist::registerPython();
       SingleParticlePotential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
