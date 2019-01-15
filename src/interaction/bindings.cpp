@@ -109,7 +109,6 @@ namespace espressopp {
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();
-      HarmonicUnique::registerPython();
       Quartic::registerPython();
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
@@ -118,19 +117,15 @@ namespace espressopp {
       MirrorLennardJones::registerPython();
       
       AngularPotential::registerPython();
-      AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
-      AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
-      AngularUniqueCosineSquared::registerPython();
       
       DihedralPotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
-      DihedralHarmonicUniqueCos::registerPython();
       DihedralHarmonicNCos::registerPython();
       DihedralRB::registerPython();
       DihedralHarmonic::registerPython();
