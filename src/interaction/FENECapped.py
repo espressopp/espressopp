@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013, 2019
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,7 +24,7 @@ r"""
 espressopp.interaction.FENECapped
 *********************************
 
-A capped FENE potential avoiding calculation of unreasonably large bonded forced. It is usually applied at the
+A capped FENE potential avoiding calculation of unreasonably large bonded forces. It is usually applied at the
 equilibration stage of a simulation and helps a polymer system to relax. After the system has reached
 its equilibrium the capped potential should be substituted by a regular FENE, :py:class:`espressopp.interaction.FENE`.
 
@@ -43,36 +43,46 @@ where
 
 .. py:class:: espressopp.interaction.FENECapped(K = 30.0, r0 = 0.0, rMax = 1.5, cutoff = inf, r_cap = 1.0, shift = 0.0)
 
-    :param real K:
-    :param real r0:
-    :param real rMax:
-    :param real cutoff:
-    :param real r_cap:
-    :param real shift:
+    :param real K: attractive force strength (in :math:`\epsilon / \sigma^2` units)
+    :param real r0: displacement parameter (in :math:`sigma` units)
+    :param real rMax: size parameter (in :math:`sigma` units)
+    :param real cutoff: cutoff radius
+    :param real r_cap: radius of capping (in :math:`sigma` units)
+    :param real shift: shift of the potential
+
+
+After setting up the potential you have to apply it to the particles in the pair list (bondlist):
 
 .. py:class:: espressopp.interaction.FixedPairListFENECapped(system, bondlist, potential)
 
-    :param object system:
-    :param list bondlist:
-    :param object potential:
+    :param object system: system object :func:`espressopp.System`
+    :param list bondlist: list of bonds :func:`espressopp.FixedPairList`
+    :param object potential: bonded potential, in this case :func:`espressopp.interaction.FENECapped`
 
     **Methods**
 
     .. py:method:: getFixedPairList()
 
-        :rtype: A Python list of lists.
+        :rtype: A Python list of pairs (the bondlist)
 
     .. py:method:: getPotential()
 
-        :rtype:
+        :rtype: potential object
 
     .. py:method:: setFixedPairList(bondlist)
 
-        :param list bondlist:
+        :param list bondlist: fixed-pair list (bondlist)
 
     .. py:method:: setPotential(potential)
 
-        :param object potential:
+        :param object potential: a potential applied to all pairs in the bondlist
+
+**Example of usage**
+
+>>> Please, refer to the example of FENE potential
+
+Go to FENE-example :py:class:`espressopp.interaction.FENE`
+
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
