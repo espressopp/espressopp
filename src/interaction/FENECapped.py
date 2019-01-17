@@ -50,10 +50,10 @@ where
     :param real r_cap:
     :param real shift:
 
-.. py:class:: espressopp.interaction.FixedPairListFENECapped(system, vl, potential)
+.. py:class:: espressopp.interaction.FixedPairListFENECapped(system, bondlist, potential)
 
     :param object system:
-    :param list vl:
+    :param list bondlist:
     :param object potential:
 
     **Methods**
@@ -66,9 +66,9 @@ where
 
         :rtype:
 
-    .. py:method:: setFixedPairList(fixedpairlist)
+    .. py:method:: setFixedPairList(bondlist)
 
-        :param list fixedpairlist:
+        :param list bondlist:
 
     .. py:method:: setPotential(potential)
 
@@ -94,9 +94,9 @@ class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
 class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFENECapped):
 
-    def __init__(self, system, vl, potential):
+    def __init__(self, system, bondlist, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENECapped, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListFENECapped, system, bondlist, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
