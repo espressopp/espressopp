@@ -39,7 +39,7 @@ where :math:`D = dist` if
 
 and :math:`D = r_\it{cap}` else.
 
-.. py:class:: espressopp.interaction.FENECapped(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, caprad = 1.0, shift = 0.0)
+.. py:class:: espressopp.interaction.FENECapped(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, r_cap = 1.0, shift = 0.0)
 
     :param real K:
     :param real r0:
@@ -82,13 +82,13 @@ from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECap
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
-                 cutoff=infinity, caprad=1.0, shift=0.0):
+                 cutoff=infinity, r_cap=1.0, shift=0.0):
         """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad)
+                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap)
             else:
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad, shift)
+                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap, shift)
 
 class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFENECapped):
 
@@ -116,7 +116,7 @@ if pmi.isController:
     class FENECapped(Potential):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENECappedLocal',
-            pmiproperty = ['K', 'r0', 'rMax', 'caprad']
+            pmiproperty = ['K', 'r0', 'rMax', 'r_cap']
             )
 
     class FixedPairListFENECapped(Interaction):
