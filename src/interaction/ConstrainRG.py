@@ -35,9 +35,6 @@ This class set 2 conditions on a tuple list. defining subchains.
 1. The length of all tuples must be the same.
 2. int(key particle id / The length of a tuple) must not be redundantly, where key particle id is the smallest particle id in a tuple.
 
-.. [Zhang_2014] G. Zhang, L. A. Moreira, T. Stuehn, K. Ch. Daoulas, and K. Kremer,
-         Equilibration of high molecular weight polymer melts: A hierarchical strategy, Macro Lett., 2014, 3, 198
-
 .. function:: espressopp.interaction.ConstrainRG(k_rg)
 
 		:param k_rg: (default: 100.)
