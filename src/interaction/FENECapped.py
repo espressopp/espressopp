@@ -41,7 +41,7 @@ where
 
     D = min \left(r, r_\it{cap}\right).
 
-.. py:class:: espressopp.interaction.FENECapped(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, r_cap = 1.0, shift = 0.0)
+.. py:class:: espressopp.interaction.FENECapped(K = 30.0, r0 = 0.0, rMax = 1.5, cutoff = inf, r_cap = 1.0, shift = 0.0)
 
     :param real K:
     :param real r0:
@@ -83,7 +83,7 @@ from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECap
 
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
-    def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
+    def __init__(self, K=30.0, r0=0.0, rMax=1.5,
                  cutoff=infinity, r_cap=1.0, shift=0.0):
         """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
