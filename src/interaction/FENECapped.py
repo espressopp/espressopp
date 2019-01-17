@@ -28,16 +28,18 @@ A capped FENE potential avoiding calculation of unreasonably large bonded forced
 equilibration stage of a simulation and helps a polymer system to relax. After the system has reached
 its equilibrium the capped potential should be substituted by a regular FENE, :py:class:`espressopp.interaction.FENE`.
 
+The capped FENE potential is employed as:
+
 .. math::
 
 	U = -\frac{1}{2}r_{max}^2  K \cdot
- 				 log\left(1 - \frac{D - r_{0}}{r_{max}}^2\right)
+                 log \left[1 - \left(\frac{D - r_{0}}{r_{max}}\right)^2\right],
 
-where :math:`D = dist` if 
+where
 
-:math:`{r_\it{cap}}^2 > dist`
+.. math::
 
-and :math:`D = r_\it{cap}` else.
+    D = min \left(r, r_\it{cap}\right).
 
 .. py:class:: espressopp.interaction.FENECapped(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, r_cap = 1.0, shift = 0.0)
 
