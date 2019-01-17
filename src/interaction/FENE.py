@@ -1,4 +1,4 @@
-#  Copyright (C) 2012-2016
+#  Copyright (C) 2012-2016, 2019
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,47 +24,52 @@ r"""
 espressopp.interaction.FENE
 ***************************
 
-Implementation of the Finitely Extensible Non-linear Elastic potential:
+Implementation of the FENE (Finitely Extensible Non-linear Elastic) potential for polymers [Kremer_1986]_.
+It approximates the interaction between the neighboring monomers by non-linear springs. In contrast to some
+other packages, the FENE interaction defined here does NOT include the WCA or LJ terms. They have to be
+specified separately. The FENE interaction is implemented like:
 
 .. math:: 
 
-        U(r) = -\frac{1}{2}r_{\mathrm{max}}^2  K \log\left[1 - \left(\frac{r - r_{0}}{r_{\mathrm{max}}}\right)^2\right]
+    U(r) = -\frac{1}{2}r_{\mathrm{max}}^2  K \log\left[1 - \left(\frac{r - r_{0}}{r_{\mathrm{max}}}\right)^2\right].
 
 
-.. function:: espressopp.interaction.FENE(K, r0, rMax, cutoff, shift)
+.. py:class:: espressopp.interaction.FENE(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, shift = 0.0)
 
-                :param real K: (default: 1.0)
-                :param real r0: (default: 0.0)
-		:param rMax: (default: 1.0)
-		:param cutoff: (default: infinity)
-		:param shift: (default: 0.0)
-		:type rMax: real
-                :type cutoff: real
-		:type shift: real
+    :param real K: attractive force strength (in :math:`\epsilon / \sigma^2` units)
+    :param real r0: displacement parameter (in :math:`sigma` units)
+    :param real rMax: size parameter (in :math:`sigma` units)
+    :param real cutoff: cutoff radius
+    :param real shift: shift of the potential
 
-.. function:: espressopp.interaction.FixedPairListFENE(system, pair_list, potential)
+.. [Kremer_1986] Grest, G. S. and Kremer, K. (1986). Molecular dynamics simulation for polymers in the presence of a heat bath.
+   Physical Review A, 33(5), 3628-3631. https://doi.org/10.1103/PhysRevA.33.3628
 
-                :param object system: your system :func:`espressopp.System`
-                :param object pair_list: list of bonds  :func:`espressopp.FixedPairList`
-                :param object potential: :func:`espressopp.interaction.FENE`
+FENE-potential is applied to all pairs of the fixed-pair list (usually called bond list) via:
 
-.. function:: espressopp.interaction.FixedPairListFENE.getFixedPairList()
+.. py:class:: espressopp.interaction.FixedPairListFENE(system, pair_list, potential)
 
-		:rtype: A Python list of lists.
+    :param object system: your system :func:`espressopp.System`
+    :param list pair_list: list of bonds :func:`espressopp.FixedPairList`
+    :param object potential: pair potential, in this case :func:`espressopp.interaction.FENE`
 
-.. function:: espressopp.interaction.FixedPairListFENE.getPotential()
+    **Methods**
 
-                :rtype: object
+    .. py:method:: getFixedPairList()
 
-.. function:: espressopp.interaction.FixedPairListFENE.setFixedPairList(pair_list)
+        :rtype: A Python list of pairs (the bond list).
 
-                :param pair_list:
-                :type pair_list: fixedpairlist
+    .. py:method:: getPotential()
 
-.. function:: espressopp.interaction.FixedPairListFENE.setPotential(potential)
+        :rtype: potential object
 
-		:param potential: 
-		:type potential: 
+    .. py:method:: setFixedPairList(pair_list)
+
+        :param list pair_list: fixed-pair list (bond list)
+
+    .. py:method:: setPotential(potential)
+
+        :param object potential: a potential applied to all pairs in the fixed-pair list
 
 **Example of usage**
 
