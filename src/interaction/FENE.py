@@ -34,7 +34,7 @@ specified separately. The FENE interaction is implemented like:
     U(r) = -\frac{1}{2}r_{\mathrm{max}}^2  K \log\left[1 - \left(\frac{r - r_{0}}{r_{\mathrm{max}}}\right)^2\right].
 
 
-.. py:class:: espressopp.interaction.FENE(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, shift = 0.0)
+.. py:class:: espressopp.interaction.FENE(K = 30.0, r0 = 0.0, rMax = 1.5, cutoff = inf, shift = 0.0)
 
     :param real K: attractive force strength (in :math:`\epsilon / \sigma^2` units)
     :param real r0: displacement parameter (in :math:`sigma` units)
@@ -97,7 +97,7 @@ from _espressopp import interaction_FENE, interaction_FixedPairListFENE
 
 class FENELocal(PotentialLocal, interaction_FENE):
 
-    def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
+    def __init__(self, K=30.0, r0=0.0, rMax=1.5,
                  cutoff=infinity, shift=0.0):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
