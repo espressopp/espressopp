@@ -45,44 +45,44 @@ specified separately. The FENE interaction is implemented like:
 .. [Kremer_1986] Grest, G. S. and Kremer, K. (1986). Molecular dynamics simulation for polymers in the presence of a heat bath.
    Physical Review A, 33(5), 3628-3631. https://doi.org/10.1103/PhysRevA.33.3628
 
-FENE-potential is applied to all pairs of the fixed-pair list (usually called bond list) via:
+FENE-potential is applied to all pairs of the fixed-pair list (usually called the bondlist) via:
 
-.. py:class:: espressopp.interaction.FixedPairListFENE(system, pair_list, potential)
+.. py:class:: espressopp.interaction.FixedPairListFENE(system, bondlist, potential)
 
     :param object system: your system :func:`espressopp.System`
-    :param list pair_list: list of bonds :func:`espressopp.FixedPairList`
-    :param object potential: pair potential, in this case :func:`espressopp.interaction.FENE`
+    :param list bondlist: list of bonds :func:`espressopp.FixedPairList`
+    :param object potential: bonded potential, in this case :func:`espressopp.interaction.FENE`
 
     **Methods**
 
     .. py:method:: getFixedPairList()
 
-        :rtype: A Python list of pairs (the bond list).
+        :rtype: A Python list of pairs (the bondlist).
 
     .. py:method:: getPotential()
 
         :rtype: potential object
 
-    .. py:method:: setFixedPairList(pair_list)
+    .. py:method:: setFixedPairList(bondlist)
 
-        :param list pair_list: fixed-pair list (bond list)
+        :param list bondlist: fixed-pair list (bondlist)
 
     .. py:method:: setPotential(potential)
 
-        :param object potential: a potential applied to all pairs in the fixed-pair list
+        :param object potential: a potential applied to all pairs of the bondlist
 
 **Example of usage**
 
 >>> # The following example shows how to bond particle 1 to particles 0 and 2 by a FENE potential.
 >>> # We assume the particles are already in the storage of the system
 >>> # Initialize list of pairs that will be bonded by FENE
->>> pair_list = espressopp.FixedPairList(system.storage)
->>> # Set which pairs belong to the pair_list i.e. particle 0 is bonded to particles 1 and 2.
->>> pair_list.addBonds([(0,1),(1,2)])
+>>> bondlist = espressopp.FixedPairList(system.storage)
+>>> # Set which pairs belong to the pair_list i.e. particle 1 is bonded to particles 0 and 2.
+>>> bondlist.addBonds([(0,1),(1,2)])
 >>> # Initialize the potential and set up the parameters.
 >>> potFENE   = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 >>> # Set which system, pair list and potential is the interaction associated with.
->>> interFENE = espressopp.interaction.FixedPairListFENE(system, pair_list, potFENE)
+>>> interFENE = espressopp.interaction.FixedPairListFENE(system, bondlist, potFENE)
 >>> # Add the interaction to the system.
 >>> system.addInteraction(interFENE)
 
@@ -107,9 +107,9 @@ class FENELocal(PotentialLocal, interaction_FENE):
 
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
 
-    def __init__(self, system, vl, potential):
+    def __init__(self, system, bondlist, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENE, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListFENE, system, bondlist, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
