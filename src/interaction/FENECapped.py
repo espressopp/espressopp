@@ -24,6 +24,10 @@ r"""
 espressopp.interaction.FENECapped
 *********************************
 
+A capped FENE potential avoiding calculation of unreasonably large bonded forced. It is usually applied at the
+equilibration stage of a simulation and helps a polymer system to relax. After the system has reached
+its equilibrium the capped potential should be substituted by a regular FENE, :py:class:`espressopp.interaction.FENE`.
+
 .. math::
 
 	U = -\frac{1}{2}r_{max}^2  K \cdot
@@ -31,57 +35,42 @@ espressopp.interaction.FENECapped
 
 where :math:`D = dist` if 
 
-:math:`{cap_{rad}}^2>dist` 
+:math:`{r_\it{cap}}^2 > dist`
 
-and :math:`D = cap_{rad}` else.
+and :math:`D = r_\it{cap}` else.
 
+.. py:class:: espressopp.interaction.FENECapped(K = 1.0, r0 = 0.0, rMax = 1.0, cutoff = inf, caprad = 1.0, shift = 0.0)
 
+    :param real K:
+    :param real r0:
+    :param real rMax:
+    :param real cutoff:
+    :param real r_cap:
+    :param real shift:
 
+.. py:class:: espressopp.interaction.FixedPairListFENECapped(system, vl, potential)
 
+    :param object system:
+    :param list vl:
+    :param object potential:
 
+    **Methods**
 
+    .. py:method:: getFixedPairList()
 
-.. function:: espressopp.interaction.FENECapped(K, r0, rMax, cutoff, caprad, shift)
+        :rtype: A Python list of lists.
 
-		:param K: (default: 1.0)
-		:param r0: (default: 0.0)
-		:param rMax: (default: 1.0)
-		:param cutoff: (default: infinity)
-		:param caprad: (default: 1.0)
-		:param shift: (default: 0.0)
-		:type K: real
-		:type r0: real
-		:type rMax: real
-		:type cutoff: 
-		:type caprad: real
-		:type shift: real
+    .. py:method:: getPotential()
 
-.. function:: espressopp.interaction.FixedPairListFENECapped(system, vl, potential)
+        :rtype:
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+    .. py:method:: setFixedPairList(fixedpairlist)
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.getFixedPairList()
+        :param list fixedpairlist:
 
-		:rtype: A Python list of lists.
+    .. py:method:: setPotential(potential)
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.getPotential()
-
-		:rtype: 
-
-.. function:: espressopp.interaction.FixedPairListFENECapped.setFixedPairList(fixedpairlist)
-
-		:param fixedpairlist: 
-		:type fixedpairlist: 
-
-.. function:: espressopp.interaction.FixedPairListFENECapped.setPotential(potential)
-
-		:param potential: 
-		:type potential: 
+        :param object potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -125,7 +114,6 @@ class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFE
 
 if pmi.isController:
     class FENECapped(Potential):
-        'The FENECapped potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENECappedLocal',
             pmiproperty = ['K', 'r0', 'rMax', 'caprad']
