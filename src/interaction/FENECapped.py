@@ -33,13 +33,13 @@ The capped FENE potential is employed as:
 .. math::
 
 	U = -\frac{1}{2}r_{max}^2  K \cdot
-                 log \left[1 - \left(\frac{D - r_{0}}{r_{max}}\right)^2\right],
+                 log \left[1 - \left(\frac{D - r_0}{r_{max}}\right)^2\right],
 
 where
 
 .. math::
 
-    D = min \left(r, r_\it{cap}\right).
+    D = min \left(r, r_{\it{cap}}\right).
 
 .. py:class:: espressopp.interaction.FENECapped(K = 30.0, r0 = 0.0, rMax = 1.5, cutoff = inf, r_cap = 1.0, shift = 0.0)
 
