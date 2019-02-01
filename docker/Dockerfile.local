@@ -1,25 +1,19 @@
-from espressopp/buildenv:opensuse
+from espressopp/buildenv:ubuntu
 
+ARG COVERAGE
 ARG EXTERNAL
 ARG CC
 ARG CXX
-ARG BUILD_UG
-ARG CPUS=2
 
-COPY . /home/espressopp/espressopp
-USER root
-#RUN chown -R espressopp:espressopp /home/espressopp/espressopp
-#USER espressopp
+COPY . /home/espressopp/espressopp/
 
 WORKDIR /home/espressopp/espressopp
+USER root
+
 RUN mkdir build
 
 WORKDIR build
-RUN pip install h5py
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ..
-USER root
-RUN make VERBOSE=1 -j${CPUS} all ${BUILD_UG:+ug doc ug-pdf}
-#RUN make test CTEST_OUTPUT_ON_FAILURE=1
-#USER root
-#RUN make install DESTDIR=${PWD}
-#USER espressopp
+RUN make -j4 all
+RUN make install
+WORKDIR ../examples

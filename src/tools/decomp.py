@@ -113,16 +113,8 @@ __all__ = [
 
 # WARNING! New arguments are needed! At least...box_size,rc,skin
 	
-def nodeGrid(n=None, box_size=0, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
-    print "################################################# Warning #####################################################"
-    print "This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(n, box_size, rc, skin)"
-    print "If you prefer to use the simple Domain Decomp. algorithm which may affect the performance of your MD simulation"
-    print "then go for the function nodeGridSimple(n), which is also the default one if you give only one argument 'n'.   "
-    print "Important: In case you are aiming to perform Lattice Boltzmann simulations you no need to worry about the per- "
-    print "formance."
-    print "For further details look into ESPResSo++ documentation or H.V. Guzman et. al, Phys. Rev. E, 96, 053311 (2017). "
-    print "###############################################################################################################"
-    if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):					
+def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
+    if isinstance(n, numbers.Number) and not isinstance(box_size, numbers.Number):					
         return nodeGridSimple(n)
     else:
 	    ijkmax = 3 * n * n + 1
