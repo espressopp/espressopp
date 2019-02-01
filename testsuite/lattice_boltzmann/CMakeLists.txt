@@ -1,4 +1,4 @@
-foreach(PROCS 1 2 3) 
+foreach(PROCS 1) 
     add_test(pure_lb_n_${PROCS} ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${PROCS} ${MPIEXEC_PREFLAGS} ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_LatticeBoltzmann.py)
     set_tests_properties(pure_lb_n_${PROCS} PROPERTIES ENVIRONMENT "${TEST_ENV}")
 endforeach(PROCS)

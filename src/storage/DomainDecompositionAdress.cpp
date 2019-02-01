@@ -324,11 +324,13 @@ namespace espressopp {
     clearAdrATParticlesG();
     // clear ghost tuples
     FixedTupleListAdress::iterator it = fixedtupleList->begin();
-    for (;it != fixedtupleList->end(); ++it) {
+    for (;it != fixedtupleList->end();) {
         Particle* vp = it->first;
         if (vp->ghost()) {
             //std::cout << "erasing ghost particle in tuple: " << vp->id() << "-" << vp->ghost() << "\n";
-            fixedtupleList->erase(it);
+            it = fixedtupleList->erase(it);
+        } else {
+            ++it;
         }
     }
   }
