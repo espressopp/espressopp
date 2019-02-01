@@ -72,34 +72,34 @@ class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
     def __init__(self, system, center=[]):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_OnTheFlyFEC, system)
-                        
+
             # set center of OnTheFlyFEC
             if (center != []):
                 self.cxxclass.setCenter(self, center[0], center[1], center[2])
-                
+
     def writeFEC(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.writeFEC(self)
-          
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.writeFEC(self)
+
     def resetCounter(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.resetCounter(self)
-          
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.resetCounter(self)
+
     def makeArrays(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.makeArrays(self)
-          
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.makeArrays(self)
+
     def getBins(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.getBins(self)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getBins(self)
 
     def getSteps(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.getSteps(self)
-          
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getSteps(self)
+
     def getGap(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.getIterations(self)      
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getIterations(self)      
 
 if pmi.isController :
     class OnTheFlyFEC(Extension, metaclass=pmi.Proxy):

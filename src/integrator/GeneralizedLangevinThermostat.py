@@ -58,12 +58,12 @@ class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedL
 
 
     def addCoeffs(self, itype, filename, type):
-            """
-            Each processor takes the broadcasted interpolation type,
-            filename and particle type
-            """
-            if pmi.workerIsActive():
-                self.cxxclass.addCoeffs(self, itype, filename, type)
+        """
+        Each processor takes the broadcasted interpolation type,
+        filename and particle type
+        """
+        if pmi.workerIsActive():
+            self.cxxclass.addCoeffs(self, itype, filename, type)
     #def enableAdress(self):
     #    if pmi.workerIsActive():
     #        self.cxxclass.enableAdress(self);

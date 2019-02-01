@@ -76,7 +76,7 @@ class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
         adds those pairs whose first particle is owned by
         this processor.
         """
-        
+
         if pmi.workerIsActive():
             for triple in triplelist:
                 pid1, pid2, pid3 = triple

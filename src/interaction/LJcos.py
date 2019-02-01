@@ -174,8 +174,8 @@ class LJcosLocal(PotentialLocal, interaction_LJcos):
 
     def __init__(self, phi=1.0):
 
-      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, interaction_LJcos, phi)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_LJcos, phi)
 
 class VerletListLJcosLocal(InteractionLocal, interaction_VerletListLJcos):
 
@@ -208,7 +208,7 @@ class VerletListAdressLJcosLocal(InteractionLocal, interaction_VerletListAdressL
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 class VerletListHadressLJcosLocal(InteractionLocal, interaction_VerletListHadressLJcos):
 
     def __init__(self, vl, fixedtupleList):
@@ -228,7 +228,7 @@ class CellListLJcosLocal(InteractionLocal, interaction_CellListLJcos):
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLJcos, stor)
-        
+
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -238,16 +238,16 @@ class FixedPairListLJcosLocal(InteractionLocal, interaction_FixedPairListLJcos):
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLJcos, system, vl, potential)
-        
+
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
-            
+
     def setFixedPairList(self, fixedpairlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
-    
+
     def getFixedPairList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
@@ -271,7 +271,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressLJcosLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
+
     class VerletListHadressLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLJcosLocal',
@@ -283,7 +283,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.CellListLJcosLocal',
             pmicall = ['setPotential']
             )
-        
+
     class FixedPairListLJcos(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLJcosLocal',

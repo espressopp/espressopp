@@ -92,23 +92,23 @@ if pmi.isController:
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = ['cutoff', 'shift']
             )
-        
 
-        
+
+
 # class PythonPotentialLocal(potential_PythonPotential):
 #     def getCutoffSqr(self):
 #         pass
 
 #     def computeForce(self, *args):
 #         """Override this method to compute the force for a given distance.
-        
+
 #         It should at least be able to handle a Real3D distance input.
 #         """
 #         pass
 
 #     def computeEnergy(self, *args):
 #         """Override this method to compute the energy at a given distance.
-        
+
 #         It should at least be able to handle a Real3D distance input.
 #         """
 #         pass

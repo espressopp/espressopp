@@ -74,7 +74,7 @@ class TemperatureLocal(ObservableLocal, analysis_Temperature):
     def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Temperature, system)
-    
+
     def add_type(self, type_id):
         if pmi.workerIsActive():
             self.cxxclass.add_type(self, type_id)

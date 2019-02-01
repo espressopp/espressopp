@@ -41,8 +41,8 @@ from _espressopp import integrator_VelocityVerletOnGroup
 class VelocityVerletOnGroupLocal(MDIntegratorLocal, integrator_VelocityVerletOnGroup):
 
     def __init__(self, system, group):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, integrator_VelocityVerletOnGroup, system, group)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, integrator_VelocityVerletOnGroup, system, group)
 
 if pmi.isController :
     class VelocityVerletOnGroup(MDIntegrator, metaclass=pmi.Proxy):

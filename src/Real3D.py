@@ -92,7 +92,7 @@ class __Real3D(six.with_metaclass(esutil.ExtendBaseClass, Real3D)) :
             x, y, z = args
         else :
             raise TypeError("Cannot initialize Real3D from %s" % (args))
-        
+
         return self.__originit(x, y, z)
 
     # create setters and getters

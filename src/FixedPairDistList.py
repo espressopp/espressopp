@@ -93,7 +93,7 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
         adds those pairs whose first particle is owned by
         this processor.
         """
-        
+
         if pmi.workerIsActive():
             for bond in bondlist:
                 pid1, pid2 = bond
@@ -102,30 +102,30 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
     def getPairs(self):
 
         if pmi.workerIsActive():
-          bonds=self.cxxclass.getPairs(self)
-          return bonds 
+            bonds=self.cxxclass.getPairs(self)
+            return bonds 
 
     def getPairsDist(self):
 
         if pmi.workerIsActive():
-          bonds=self.cxxclass.getPairsDist(self)
-          return bonds 
-        
+            bonds=self.cxxclass.getPairsDist(self)
+            return bonds 
+
     def getDist(self, pid1, pid2):
         if pmi.workerIsActive():
-          return self.cxxclass.getDist(self, pid1, pid2)
-        
+            return self.cxxclass.getDist(self, pid1, pid2)
+
 if pmi.isController:
-  class FixedPairDistList(object, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-        cls = 'espressopp.FixedPairDistListLocal',
-        localcall = [ "add" ],
-        pmicall = [ "addPairs" ],
-        pmiinvoke = ['getPairs', 'getPairsDist', 'size']
-    )
-    
-    def getDist(self, pid1, pid2):
-      pairs = pmi.invoke(self.pmiobject, 'getDist', pid1, pid2)
-      for i in pairs:
-        if( i != -1 ):
-          return i
+    class FixedPairDistList(object, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls = 'espressopp.FixedPairDistListLocal',
+            localcall = [ "add" ],
+            pmicall = [ "addPairs" ],
+            pmiinvoke = ['getPairs', 'getPairsDist', 'size']
+        )
+
+        def getDist(self, pid1, pid2):
+            pairs = pmi.invoke(self.pmiobject, 'getDist', pid1, pid2)
+            for i in pairs:
+                if( i != -1 ):
+                    return i

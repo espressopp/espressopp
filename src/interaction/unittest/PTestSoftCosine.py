@@ -30,7 +30,7 @@ class TestSoftCosine(espressopp.unittest.TestCase):
         self.assertEqual(sc.A, 1.0)
         self.assertEqual(sc.cutoff, infinity)
         self.assertEqual(sc.shift, 0.0)
-        
+
     def testEnergy(self):
         sc=SoftCosine(A=2.0)
         self.assertAlmostEqual(sc.computeEnergy(0.0), 4.0)

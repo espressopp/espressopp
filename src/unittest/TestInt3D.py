@@ -70,7 +70,7 @@ class Test0Int3D(unittest.TestCase) :
         self.assertEqual(x[0], 1)
         self.assertEqual(x[1], 2)
         self.assertEqual(x[2], 3)
-        
+
     def test3Properties(self) :
         'Test Int3D properties.'
         v = Int3D(1, 2, 3)

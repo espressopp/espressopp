@@ -60,17 +60,17 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_NPartSubregion
 
 class NPartSubregionLocal(ObservableLocal, analysis_NPartSubregion):
-  'The (local) class for computing the number of particles in a subregion of the system.'
-  def __init__(self, system, parttype, span, geometry, center):
-    if geometry not in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']:
-      raise ValueError('Error: Geometry must be in ["spherical", "bounded-x", "bounded-y", "bounded-z"]. Your input: {}'.format(geometry))
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      geometrydict = {'spherical': 0, 'bounded-x': 1, 'bounded-y': 2, 'bounded-z': 3}
-      cxxinit(self, analysis_NPartSubregion, system, parttype, span, geometrydict[geometry])
-      self.cxxclass.setCenter(self, center[0], center[1], center[2])
+    'The (local) class for computing the number of particles in a subregion of the system.'
+    def __init__(self, system, parttype, span, geometry, center):
+        if geometry not in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']:
+            raise ValueError('Error: Geometry must be in ["spherical", "bounded-x", "bounded-y", "bounded-z"]. Your input: {}'.format(geometry))
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            geometrydict = {'spherical': 0, 'bounded-x': 1, 'bounded-y': 2, 'bounded-z': 3}
+            cxxinit(self, analysis_NPartSubregion, system, parttype, span, geometrydict[geometry])
+            self.cxxclass.setCenter(self, center[0], center[1], center[2])
 
 if pmi.isController :
-  class NPartSubregion(Observable, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls =  'espressopp.analysis.NPartSubregionLocal'
-    )
+    class NPartSubregion(Observable, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.analysis.NPartSubregionLocal'
+        )

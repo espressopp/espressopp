@@ -96,7 +96,7 @@ from _espressopp import interaction_CoulombTruncated, \
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
     def __init__(self, prefactor=1.0, cutoff=infinity):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-             cxxinit(self, interaction_CoulombTruncated, prefactor, cutoff)
+            cxxinit(self, interaction_CoulombTruncated, prefactor, cutoff)
 
 class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
     def __init__(self, vl):

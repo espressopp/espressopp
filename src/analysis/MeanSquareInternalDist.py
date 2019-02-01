@@ -44,17 +44,17 @@ from _espressopp import analysis_MeanSquareInternalDist
 class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquareInternalDist):
 
     def __init__(self, system, chainlength):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)
 
     def strange(self):
-      print((1))
-      return 1
+        print((1))
+        return 1
 
 if pmi.isController:
-  class MeanSquareInternalDist(ConfigsParticleDecomp, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
-      pmiproperty = [ 'print_progress' ],
-      pmicall = ['strange']
-    )
+    class MeanSquareInternalDist(ConfigsParticleDecomp, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
+          pmiproperty = [ 'print_progress' ],
+          pmicall = ['strange']
+        )

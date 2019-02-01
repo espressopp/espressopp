@@ -57,7 +57,7 @@ class __Tensor(six.with_metaclass(esutil.ExtendBaseClass, Tensor)) :
             xx, yy, zz, xy, xz, yz = args
         else :
             raise TypeError("Cannot initialize Tensor from %s" % (args))
-        
+
         return self.__originit(xx, yy, zz, xy, xz, yz)
 
     # create setters and getters

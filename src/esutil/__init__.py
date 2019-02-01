@@ -54,7 +54,7 @@ if pmi.isController :
 else:
     def pmiimport(module):
         pass
-        
+
 pmiimport('espressopp.esutil')
 
 from espressopp.esutil.RNG import *

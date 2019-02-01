@@ -37,8 +37,8 @@ from _espressopp import ParticleAccess
 class ParticleAccessLocal(ParticleAccess):
 
     def perform_action(self):
-      if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        self.cxxclass.perform_action(self)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.perform_action(self)
 
 if pmi.isController :
     class ParticleAccess(object, metaclass=pmi.Proxy):

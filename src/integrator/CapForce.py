@@ -59,9 +59,9 @@ class CapForceLocal(ExtensionLocal, integrator_CapForce):
     def __init__(self, system, capForce, particleGroup = None):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if (particleGroup == None) or (particleGroup.size() == 0):
-              cxxinit(self, integrator_CapForce, system, capForce)
+                cxxinit(self, integrator_CapForce, system, capForce)
             else:
-              cxxinit(self, integrator_CapForce, system, capForce, particleGroup)
+                cxxinit(self, integrator_CapForce, system, capForce, particleGroup)
 
 if pmi.isController :
     class CapForce(Extension, metaclass=pmi.Proxy):

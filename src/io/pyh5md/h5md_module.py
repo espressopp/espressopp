@@ -212,7 +212,7 @@ def element(loc, name, **kwargs):
         return TimeElement(loc, name, **kwargs)
     else:
         raise ValueError
-        
+
 class File(h5py.File):
     def __init__(self, name, mode=None, *args, **kwargs):
         if mode=='w':

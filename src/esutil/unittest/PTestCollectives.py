@@ -32,7 +32,7 @@ class TestCollectives(unittest.TestCase):
                 self.assertEqual(res, owner)
             else:
                 collectives.locateItem((owner == MPI.COMM_WORLD.rank))
-        
+
     def testLocateNoOne(self):
         if pmi.isController:        
             self.assertRaises(IndexError, collectives.locateItem, False)
@@ -41,11 +41,11 @@ class TestCollectives(unittest.TestCase):
 
     def testLocateTwo(self):   
         if MPI.COMM_WORLD.size >= 2:
-	    if pmi.isController:        
+            if pmi.isController:        
                 self.assertRaises(RuntimeError, collectives.locateItem, True)
             else:
                 collectives.locateItem(True)
-     
+
 if __name__ == "__main__":
     if pmi.isController :
         pmi.stopWorkerLoop()

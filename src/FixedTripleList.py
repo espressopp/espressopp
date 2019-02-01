@@ -115,8 +115,8 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
     def getTriples(self):
 
         if pmi.workerIsActive():
-          triples = self.cxxclass.getTriples(self)
-          return triples 
+            triples = self.cxxclass.getTriples(self)
+            return triples 
 
 if pmi.isController:
     class FixedTripleList(object, metaclass=pmi.Proxy):

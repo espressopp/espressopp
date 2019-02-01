@@ -57,15 +57,15 @@ class SettleLocal(ExtensionLocal, integrator_Settle):
     def __init__(self, system, fixedtuplelist, mO=16.0, mH=1.0, distHH=1.58, distOH=1.0):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, integrator_Settle, system, fixedtuplelist, mO, mH, distHH, distOH)
+            cxxinit(self, integrator_Settle, system, fixedtuplelist, mO, mH, distHH, distOH)
 
     def addMolecules(self, moleculelist):
         """
         Each processor takes the broadcasted list.
         """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          for pid in moleculelist: 
-            self.cxxclass.add(self, pid)
+            for pid in moleculelist: 
+                self.cxxclass.add(self, pid)
 
 if pmi.isController:
     class Settle(Extension, metaclass=pmi.Proxy):

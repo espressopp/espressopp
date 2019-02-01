@@ -66,36 +66,36 @@ from _espressopp import interaction_DihedralHarmonicUniqueCos, \
 
 class DihedralHarmonicUniqueCosLocal(DihedralUniquePotentialLocal, interaction_DihedralHarmonicUniqueCos):
 
-  def __init__(self, K=0.0):
+    def __init__(self, K=0.0):
 
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, interaction_DihedralHarmonicUniqueCos, K)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_DihedralHarmonicUniqueCos, K)
 
 class FixedQuadrupleAngleListDihedralHarmonicUniqueCosLocal(InteractionLocal, interaction_FixedQuadrupleAngleListDihedralHarmonicUniqueCos):
 
-  def __init__(self, system, fqal, potential):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, interaction_FixedQuadrupleAngleListDihedralHarmonicUniqueCos, system, fqal, potential)
+    def __init__(self, system, fqal, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedQuadrupleAngleListDihedralHarmonicUniqueCos, system, fqal, potential)
 
-  def setPotential(self, potential):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.setPotential(self, potential)
-      
-  def getFixedQuadrupleList(self):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      return self.cxxclass.getFixedQuadrupleAngleList(self)
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+    def getFixedQuadrupleList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedQuadrupleAngleList(self)
 
 
 if pmi.isController:
-  class DihedralHarmonicUniqueCos(DihedralUniquePotential):
-    'The DihedralHarmonicUniqueCos potential.'
-    pmiproxydefs = dict(
-      cls = 'espressopp.interaction.DihedralHarmonicUniqueCosLocal',
-      pmiproperty = ['K']
-    )
+    class DihedralHarmonicUniqueCos(DihedralUniquePotential):
+        'The DihedralHarmonicUniqueCos potential.'
+        pmiproxydefs = dict(
+            cls = 'espressopp.interaction.DihedralHarmonicUniqueCosLocal',
+          pmiproperty = ['K']
+        )
 
-  class FixedQuadrupleAngleListDihedralHarmonicUniqueCos(Interaction, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls =  'espressopp.interaction.FixedQuadrupleAngleListDihedralHarmonicUniqueCosLocal',
-      pmicall = ['setPotential', 'getFixedQuadrupleList']
-    )
+    class FixedQuadrupleAngleListDihedralHarmonicUniqueCos(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedQuadrupleAngleListDihedralHarmonicUniqueCosLocal',
+          pmicall = ['setPotential', 'getFixedQuadrupleList']
+        )

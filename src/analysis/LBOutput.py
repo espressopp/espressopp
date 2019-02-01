@@ -38,15 +38,15 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_LBOutput
 
 class LBOutputLocal(AnalysisBaseLocal, analysis_LBOutput):
-	#    'The (local) compute of LBOutput.'
+        #    'The (local) compute of LBOutput.'
     def writeOutput(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.writeOutput(self)
-            
+
 if pmi.isController :
     class LBOutput(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
 #            cls =  'espressopp.analysis.LBOutputLocal',
 #            pmicall = ["writeOutput"]
             )
-        
+

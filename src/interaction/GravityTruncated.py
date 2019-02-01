@@ -80,40 +80,40 @@ from _espressopp import interaction_GravityTruncated, \
                       interaction_VerletListGravityTruncated
 
 class GravityTruncatedLocal(PotentialLocal, interaction_GravityTruncated):
-  
-  def __init__(self, prefactor=1.0, cutoff=infinity):
+
+    def __init__(self, prefactor=1.0, cutoff=infinity):
 
 
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, interaction_GravityTruncated, prefactor, cutoff)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_GravityTruncated, prefactor, cutoff)
 
 class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGravityTruncated):
-  
-  def __init__(self, vl):
 
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, interaction_VerletListGravityTruncated, vl)
-      
-  def setPotential(self, type1, type2, potential):
+    def __init__(self, vl):
 
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.setPotential(self, type1, type2, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListGravityTruncated, vl)
 
-  def getPotential(self, type1, type2):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      return self.cxxclass.getPotential(self, type1, type2)
+    def setPotential(self, type1, type2, potential):
 
-  def getVerletListLocal(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      return self.cxxclass.getVerletList(self)
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def getVerletListLocal(self):
+
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getVerletList(self)
 
 
 if pmi.isController:
-  
-  class GravityTruncated(Potential):
-    pmiproxydefs = dict( cls = 'espressopp.interaction.GravityTruncatedLocal', pmiproperty = [ 'prefactor' ] )
 
-  class VerletListGravityTruncated(Interaction, metaclass=pmi.Proxy):
-    pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListGravityTruncatedLocal',
-    pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )
+    class GravityTruncated(Potential):
+        pmiproxydefs = dict( cls = 'espressopp.interaction.GravityTruncatedLocal', pmiproperty = [ 'prefactor' ] )
+
+    class VerletListGravityTruncated(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListGravityTruncatedLocal',
+        pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )

@@ -59,13 +59,13 @@ class MDIntegratorLocal(object):
 
     def addExtension(self, extension):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            
+
             # set integrator and connect to it
             extension.cxxclass.setIntegrator(extension, self)
             extension.cxxclass.connect(extension)
-            
+
             return self.cxxclass.addExtension(self, extension)
-        
+
     def getExtension(self, k):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getExtension(self, k)

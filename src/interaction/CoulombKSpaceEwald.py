@@ -144,14 +144,14 @@ class CoulombKSpaceEwaldLocal(PotentialLocal, interaction_CoulombKSpaceEwald):
     def __init__(self, system, prefactor, alpha, kmax):
 
 
-      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, interaction_CoulombKSpaceEwald, system, prefactor, alpha, kmax)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_CoulombKSpaceEwald, system, prefactor, alpha, kmax)
 
 class CellListCoulombKSpaceEwaldLocal(InteractionLocal, interaction_CellListCoulombKSpaceEwald):
     def __init__(self, storage, potential):
 
-      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, interaction_CellListCoulombKSpaceEwald, storage, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_CellListCoulombKSpaceEwald, storage, potential)
 
     def getFixedPairList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -162,14 +162,14 @@ class CellListCoulombKSpaceEwaldLocal(InteractionLocal, interaction_CellListCoul
             return self.cxxclass.getPotential(self)
 
 if pmi.isController:
-  class CoulombKSpaceEwald(Potential):
-    pmiproxydefs = dict(
-      cls = 'espressopp.interaction.CoulombKSpaceEwaldLocal',
-      pmiproperty = ['prefactor', 'alpha', 'kmax']
-      )
+    class CoulombKSpaceEwald(Potential):
+        pmiproxydefs = dict(
+            cls = 'espressopp.interaction.CoulombKSpaceEwaldLocal',
+          pmiproperty = ['prefactor', 'alpha', 'kmax']
+            )
 
-  class CellListCoulombKSpaceEwald(Interaction, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls =  'espressopp.interaction.CellListCoulombKSpaceEwaldLocal',
-      pmicall = ['getFixedPairList','getPotential']
-      )
+    class CellListCoulombKSpaceEwald(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.CellListCoulombKSpaceEwaldLocal',
+          pmicall = ['getFixedPairList','getPotential']
+            )

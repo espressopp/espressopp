@@ -189,7 +189,7 @@ class __Quaternion(six.with_metaclass(esutil.ExtendBaseClass, Quaternion)) :
             unreal_part = Real3D(args[1], args[2], args[3])
         else :
             raise TypeError("Cannot initialize Quaternion from %s" % (args))
-        
+
         return self.__originit(real_part, unreal_part)
 
     # create getters and setters

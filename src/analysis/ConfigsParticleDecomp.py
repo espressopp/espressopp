@@ -56,26 +56,26 @@ from _espressopp import analysis_ConfigsParticleDecomp
 class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
 
     def __init__(self, system):
-      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, analysis_ConfigsParticleDecomp, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_ConfigsParticleDecomp, system)
     def gather(self):
-      return self.cxxclass.gather(self)
+        return self.cxxclass.gather(self)
     def gatherFromFile(self, filename):
-      return self.cxxclass.gatherFromFile(self, filename)
+        return self.cxxclass.gatherFromFile(self, filename)
     def clear(self):
-      return self.cxxclass.clear(self)
+        return self.cxxclass.clear(self)
     def __iter__(self):
-      return self.cxxclass.all(self).__iter__()
+        return self.cxxclass.all(self).__iter__()
 
     def compute(self):
-      return self.cxxclass.compute(self)
+        return self.cxxclass.compute(self)
 
 if pmi.isController:
-  class ConfigsParticleDecomp(object, metaclass=pmi.Proxy):
+    class ConfigsParticleDecomp(object, metaclass=pmi.Proxy):
 
-    pmiproxydefs = dict(
-      #cls =  'espressopp.analysis.ConfigsParticleDecompLocal',
-      pmicall = [ "gather", "gatherFromFile", "clear", "compute" ],
-      localcall = ["__getitem__", "all"],
-      pmiproperty = ["size"]
-    )
+        pmiproxydefs = dict(
+            #cls =  'espressopp.analysis.ConfigsParticleDecompLocal',
+          pmicall = [ "gather", "gatherFromFile", "clear", "compute" ],
+          localcall = ["__getitem__", "all"],
+          pmiproperty = ["size"]
+        )

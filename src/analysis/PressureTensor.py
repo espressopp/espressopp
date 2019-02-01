@@ -82,7 +82,7 @@ from _espressopp import analysis_PressureTensor
 class PressureTensorLocal(AnalysisBaseLocal, analysis_PressureTensor):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensor, system)
 
 if pmi.isController:

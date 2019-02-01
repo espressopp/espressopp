@@ -52,5 +52,5 @@ Example:
 import espressopp
 
 def set(thelogger,level):
-  hw = espressopp.pmi.create('logging.getLogger',thelogger)
-  espressopp.pmi.call(hw,'setLevel',level)
+    hw = espressopp.pmi.create('logging.getLogger',thelogger)
+    espressopp.pmi.call(hw,'setLevel',level)

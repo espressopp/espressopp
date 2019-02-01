@@ -74,7 +74,7 @@ class HarmonicUniqueLocal(PotentialUniqueDistLocal, interaction_HarmonicUnique):
     def __init__(self, K=1.0):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, interaction_HarmonicUnique, K)
+            cxxinit(self, interaction_HarmonicUnique, K)
 
 class FixedPairDistListHarmonicUniqueLocal(InteractionLocal, interaction_FixedPairDistListHarmonicUnique):
 
@@ -90,7 +90,7 @@ class FixedPairDistListHarmonicUniqueLocal(InteractionLocal, interaction_FixedPa
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
-    
+
     def getFixedPairList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
@@ -99,12 +99,12 @@ if pmi.isController:
     class HarmonicUnique(PotentialUniqueDist):
         'The HarmonicUnique potential.'
         pmiproxydefs = dict(
-          cls = 'espressopp.interaction.HarmonicUniqueLocal',
+            cls = 'espressopp.interaction.HarmonicUniqueLocal',
           pmiproperty = ['K']
         )
 
     class FixedPairDistListHarmonicUnique(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.FixedPairDistListHarmonicUniqueLocal',
+            cls =  'espressopp.interaction.FixedPairDistListHarmonicUniqueLocal',
           pmicall = ['setPotential','setFixedPairList','getFixedPairList']
         )

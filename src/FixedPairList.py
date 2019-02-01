@@ -104,7 +104,7 @@ class FixedPairListLocal(_espressopp.FixedPairList):
         adds those pairs whose first particle is owned by
         this processor.
         """
-        
+
         if pmi.workerIsActive():
             for bond in bondlist:
                 pid1, pid2 = bond
@@ -113,28 +113,28 @@ class FixedPairListLocal(_espressopp.FixedPairList):
     def getBonds(self):
 
         if pmi.workerIsActive():
-          bonds=self.cxxclass.getBonds(self)
-          return bonds
+            bonds=self.cxxclass.getBonds(self)
+            return bonds
 
     def remove(self):
         if pmi.workerIsActive():
-          self.cxxclass.remove(self)
+            self.cxxclass.remove(self)
 
     def getAllBonds(self):
         if pmi.workerIsActive():
             return self.cxxclass.getAllBonds(self)
-      
+
     def resetLongtimeMaxBond(self):
 
         if pmi.workerIsActive():
-          self.cxxclass.resetLongtimeMaxBondSqr(self)
-          
+            self.cxxclass.resetLongtimeMaxBondSqr(self)
+
     def getLongtimeMaxBondLocal(self):
 
         if pmi.workerIsActive(): 
             mxsqr = self.cxxclass.getLongtimeMaxBondSqr(self)
             return sqrt(mxsqr)
-            
+
 if pmi.isController:
     class FixedPairList(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
@@ -143,6 +143,6 @@ if pmi.isController:
             pmicall = [ 'add', 'addBonds', 'remove', 'resetLongtimeMaxBond', 'totalSize' ],
             pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal', 'getAllBonds' ]
         )
-        
+
         def getLongtimeMaxBond(self):
             return max(self.getLongtimeMaxBondLocal())

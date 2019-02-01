@@ -187,7 +187,7 @@ def import_(*args) :
     all workers.
 
     Example:
-    
+
     >>> pmi.import_('hello')
     >>> hw = pmi.create('hello.HelloWorld')
     """
@@ -195,7 +195,7 @@ def import_(*args) :
     if isController:
         if len(args) == 0:
             raise UserError('pmi.import_ expects exactly 1 argument on controller!')
-            
+
         # broadcast the statement
         _broadcast(_IMPORT, *args)
         # locally execute the statement
@@ -224,14 +224,14 @@ def exec_(*args) :
     workers.
 
     Example:
-    
+
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     """
     if __checkController(exec_) :
         if len(args) == 0:
             raise UserError('pmi.exec_ expects at least one argument(s) on controller!')
-            
+
         # broadcast the statement
         _broadcast(_EXEC, *args)
         # locally execute the statement
@@ -284,7 +284,7 @@ def create(cls=None, *args, **kwds) :
     have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
-    
+
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> print(hw)
@@ -295,7 +295,7 @@ def create(cls=None, *args, **kwds) :
     Alternative:
     Note that in this case the class has to be imported to the
     calling module *and* via PMI.
-    
+
     >>> import hello
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create(hello.HelloWorld)
@@ -363,15 +363,15 @@ def call(*args, **kwds) :
     returned.
     Only functions that are known to PMI can be used, that is functions
     that have been imported to pmi via `exec_()` or `import_()`.
-    
+
     Example:
-    
+
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> pmi.call(hw.hello)
     >>> # equivalent:
     >>> pmi.call('hello.HelloWorld', hw)
-    
+
     Note, that you can use only functions that are know to PMI when
     `call()` is called, i.e. functions in modules that have 
     been imported via `exec_()`.
@@ -437,7 +437,7 @@ def invoke(*args, **kwds) :
     that have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
-    
+
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> messages = pmi.invoke(hw.hello())
@@ -489,7 +489,7 @@ def reduce(*args, **kwds) :
     must have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
-    
+
     >>> pmi.exec_('import hello')
     >>> pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
     >>> hw = pmi.create('hello.HelloWorld')
@@ -570,7 +570,7 @@ def activate(*args) :
     """Activate"""
     global _MPIcomm, _PMIComm
     if _PMIComm and _PMIComm.isActive() :
-            log.warning( "worker subgroup is already active - deactivate first !")
+        log.warning( "worker subgroup is already active - deactivate first !")
     else :
         if __checkController(activate) :
             pmicomm = args[0]
@@ -891,7 +891,7 @@ def receive(expected=None) :
 ##################################################
 class __OID(object) :
     """Internal class that represents a PMI object id.
-    
+
     An instance of this class can be pickled, so that it can be sent
     via MPI, and it is hashable, so that it can be used as a hash key
     (for OBJECT_CACHE).
@@ -994,11 +994,11 @@ def __mapArgs(func, args, kwds):
     for k, v in list(kwds.items()):
         tkwds[k] = func(v)
     return targs, tkwds
-    
+
 def _translateOID(obj) :
     """Internal function that translates obj into an __OID
     object if it is a PMI object instance.
-        
+
     If the object is not a PMI object, returns obj untouched.
     """
     if hasattr(obj, '__pmioid'):
@@ -1047,12 +1047,12 @@ def __translateArgs(args, kwds):
     targs, tWorkerKwds = __translateOIDs(args, workerKwds)
 
     return args, controllerKwds, targs, tWorkerKwds
-    
+
 
 def _backtranslateOID(obj) :
     """Internal worker function that backtranslates an __OID object
     into the corresponding PMI worker instance.
-    
+
     If the object is not an __OID object, returns the object untouched.
     """
     if type(obj) is __OID:
@@ -1329,14 +1329,14 @@ class CommunicatorLocal(object) :
                 commgroupWithController = _MPIcomm.Get_group()
                 subcommgroupWithController = commgroupWithController.Incl(cpugroupWithController)
                 self._MPIsubcommWithController = _MPIcomm.Create(subcommgroupWithController)
-                
+
     def getMPIsubcomm(self) :
-       'getter for MPIsubcomm'
-       return self._MPIsubcomm
+        'getter for MPIsubcomm'
+        return self._MPIsubcomm
 
     def getMPIsubcommWithController(self) :
-       'getter for MPIsubcomm'
-       return self._MPIsubcommWithController
+        'getter for MPIsubcomm'
+        return self._MPIsubcommWithController
 
     def getMPIcpugroup(self):
         'getter for MPIsubgroup'

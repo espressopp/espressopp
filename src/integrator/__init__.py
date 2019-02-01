@@ -25,9 +25,9 @@ pmiimport('espressopp.integrator')
 from espressopp.integrator.MDIntegrator import *
 from espressopp.integrator.VelocityVerlet import *
 try:
-  from espressopp.integrator.PIAdressIntegrator import *
+    from espressopp.integrator.PIAdressIntegrator import *
 except:
-  print('Warning: numpy module not available. Therefore, espressopp.integrator.PIAdressIntegrator unavailable.')
+    print('Warning: numpy module not available. Therefore, espressopp.integrator.PIAdressIntegrator unavailable.')
 from espressopp.integrator.VelocityVerletOnGroup import *
 from espressopp.integrator.VelocityVerletRESPA import *
 from espressopp.integrator.Isokinetic import *

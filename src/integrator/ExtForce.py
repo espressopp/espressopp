@@ -44,9 +44,9 @@ class ExtForceLocal(ExtensionLocal, integrator_ExtForce):
     def __init__(self, system, extForce, particleGroup = None):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if (particleGroup == None) or (particleGroup.size() == 0):
-              cxxinit(self, integrator_ExtForce, system, extForce)
+                cxxinit(self, integrator_ExtForce, system, extForce)
             else:
-              cxxinit(self, integrator_ExtForce, system, extForce, particleGroup)
+                cxxinit(self, integrator_ExtForce, system, extForce, particleGroup)
 
 if pmi.isController :
     class ExtForce(Extension, metaclass=pmi.Proxy):

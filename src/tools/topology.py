@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 from math import sqrt, pi, cos, sin
@@ -24,119 +24,116 @@ import random
 from espressopp import Real3D
 from espressopp.Exceptions import Error
 
+
 def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, return_dihedrals=False, mindist=None, rng=None):
-	"""
-	Initializes polymers through random walk 
-	"""
-	
-	x         = startpos[0]
-	y         = startpos[1]
-	z         = startpos[2]
-	positions = [ Real3D(x, y, z) ]
-	bonds     = []
-	avecostheta = 0.0
-	if return_angles == True:
-	   angles    = []
-	if return_dihedrals == True:
-	   dihedrals    = []
-	for i in range(numberOfMonomers-1):
-	  if mindist and i > 0:
-		while True:
-		  if rng==None:
-		    nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
-  		    phi   = 2.0*pi*random.uniform(0,1);
-		  else:
-		    nextZ = (2.0*rng()-1.0)*bondlength;
-  		    phi   = 2.0*pi*rng();
-		  rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
-		  nextX = rr*cos(phi);
-		  nextY = rr*sin(phi);				
-		 
-		  ax    = positions[i][0] - positions[i-1][0]
-		  ay    = positions[i][1] - positions[i-1][1]
-		  az    = positions[i][2] - positions[i-1][2]
-		  la    = sqrt(ax*ax + ay*ay + az*az)
-		  
+    """
+    Initializes polymers through random walk 
+    """
 
-		  bx    = - nextX
-		  by    = - nextY
-		  bz    = - nextZ
-		  lb    = sqrt(bx*bx + by*by + bz*bz)
+    x = startpos[0]
+    y = startpos[1]
+    z = startpos[2]
+    positions = [Real3D(x, y, z)]
+    bonds = []
+    avecostheta = 0.0
+    if return_angles == True:
+        angles = []
+    if return_dihedrals == True:
+        dihedrals = []
+    for i in range(numberOfMonomers-1):
+        if mindist and i > 0:
+            while True:
+                if rng == None:
+                    nextZ = (2.0*random.uniform(0, 1)-1.0)*bondlength
+                    phi = 2.0*pi*random.uniform(0, 1)
+                else:
+                    nextZ = (2.0*rng()-1.0)*bondlength
+                    phi = 2.0*pi*rng()
+                rr = sqrt(bondlength*bondlength-nextZ*nextZ)
+                nextX = rr*cos(phi)
+                nextY = rr*sin(phi)
 
-	  
-		  cx    = ax - bx
-		  cy    = ay - by
-		  cz    = az - bz
-		  lc    = sqrt(cx*cx + cy*cy + cz*cz)
-  
-		  if lc > mindist:
-		  	avecostheta += - (ax*bx + ay*by + az*bz) / (la * lb)
-		  	#print "cos theta:", (ax*bx + ay*by + az*bz) / (la * lb)
-		  	break
-		  
-		  	
-	  else:
-		if rng==None:
-		  nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
-  		  phi   = 2.0*pi*random.uniform(0,1);
-		else:
-		  nextZ = (2.0*rng()-1.0)*bondlength;
-  		  phi   = 2.0*pi*rng();
-		rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
-		nextX = rr*cos(phi);
-		nextY = rr*sin(phi);				
+                ax = positions[i][0] - positions[i-1][0]
+                ay = positions[i][1] - positions[i-1][1]
+                az = positions[i][2] - positions[i-1][2]
+                la = sqrt(ax*ax + ay*ay + az*az)
 
- 	  x += nextX
-	  y += nextY
-	  z += nextZ
-	  # update monomer list:
-	  positions.append(Real3D(x, y, z))
-	  # update bond list:
-	  bonds.append((pid+i,pid+i+1))
+                bx = - nextX
+                by = - nextY
+                bz = - nextZ
+                lb = sqrt(bx*bx + by*by + bz*bz)
 
-	  if return_angles == True:
-	    if i < numberOfMonomers-2:
-		  angles.append((pid+i, pid+i+1, pid+i+2))
+                cx = ax - bx
+                cy = ay - by
+                cz = az - bz
+                lc = sqrt(cx*cx + cy*cy + cz*cz)
 
-	  if return_dihedrals == True:
-	    if i < numberOfMonomers-3:
-		  dihedrals.append((pid+i, pid+i+1, pid+i+2, pid+i+3))
+                if lc > mindist:
+                    avecostheta += - (ax*bx + ay*by + az*bz) / (la * lb)
+                    # print "cos theta:", (ax*bx + ay*by + az*bz) / (la * lb)
+                    break
 
-		  
-	if mindist:	  
-	  avecostheta /= (numberOfMonomers-2)
-    
-	if return_angles == True:
+        else:
+            if rng == None:
+                nextZ = (2.0*random.uniform(0, 1)-1.0)*bondlength
+                phi = 2.0*pi*random.uniform(0, 1)
+            else:
+                nextZ = (2.0*rng()-1.0)*bondlength
+                phi = 2.0*pi*rng()
+            rr = sqrt(bondlength*bondlength-nextZ*nextZ)
+            nextX = rr*cos(phi)
+            nextY = rr*sin(phi)
 
-		if return_dihedrals == True:
+        x += nextX
+        y += nextY
+        z += nextZ
+        # update monomer list:
+        positions.append(Real3D(x, y, z))
+        # update bond list:
+        bonds.append((pid+i, pid+i+1))
 
-			if mindist:	
-				return positions, bonds, angles, dihedrals , avecostheta
-			else:
-				return positions, bonds, angles, dihedrals
+        if return_angles == True:
+            if i < numberOfMonomers-2:
+                angles.append((pid+i, pid+i+1, pid+i+2))
 
-		else:
+        if return_dihedrals == True:
+            if i < numberOfMonomers-3:
+                dihedrals.append((pid+i, pid+i+1, pid+i+2, pid+i+3))
 
-			if mindist:	
-				return positions, bonds, angles, avecostheta
-			else:
-				return positions, bonds, angles
+    if mindist:
+        avecostheta /= (numberOfMonomers-2)
 
-	else:
+    if return_angles == True:
 
-		if return_dihedrals == True:
+        if return_dihedrals == True:
 
-			if mindist:
-				return positions, bonds, dihedrals, avecostheta
-			else:	
-				return positions, bonds, dihedrals
-	
-		else: 
+            if mindist:
+                return positions, bonds, angles, dihedrals, avecostheta
+            else:
+                return positions, bonds, angles, dihedrals
 
-			if mindist:
-				return positions, bonds, avecostheta
-			else:	
-				return positions, bonds
+        else:
+
+            if mindist:
+                return positions, bonds, angles, avecostheta
+            else:
+                return positions, bonds, angles
+
+    else:
+
+        if return_dihedrals == True:
+
+            if mindist:
+                return positions, bonds, dihedrals, avecostheta
+            else:
+                return positions, bonds, dihedrals
+
+        else:
+
+            if mindist:
+                return positions, bonds, avecostheta
+            else:
+                return positions, bonds
 
 
 """

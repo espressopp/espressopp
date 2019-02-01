@@ -75,7 +75,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(x[0], 1.0)
         self.assertEqual(x[1], 2.0)
         self.assertEqual(x[2], 3.0)
-        
+
     def test3Properties(self) :
         'Test Real3D properties.'
         v = Real3D(1.0, 2.0, 3.0)

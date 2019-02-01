@@ -49,11 +49,11 @@ class DomainDecompositionNonBlockingLocal(DomainDecompositionLocal, storage_Doma
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecompositionNonBlocking, system, nodeGrid, cellGrid)
-    
+
 if pmi.isController:
     class DomainDecompositionNonBlocking(DomainDecomposition):
         pmiproxydefs = dict(
-          cls = 'espressopp.storage.DomainDecompositionNonBlockingLocal'  
+            cls = 'espressopp.storage.DomainDecompositionNonBlockingLocal'  
         )
         def __init__(self, system, 
                      nodeGrid='auto', 

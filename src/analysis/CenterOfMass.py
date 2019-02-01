@@ -39,8 +39,8 @@ from _espressopp import analysis_CenterOfMass
 class CenterOfMassLocal(ObservableLocal, analysis_CenterOfMass):
 
     def __init__(self, system):
-    	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_CenterOfMass, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_CenterOfMass, system)
 
 if pmi.isController :
     class CenterOfMass(Observable, metaclass=pmi.Proxy):

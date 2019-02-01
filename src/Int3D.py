@@ -68,12 +68,12 @@ from _espressopp import Int3D
 from espressopp import esutil
 import six
 
+
 # This injects additional methods into the Int3D class and pulls it
 # into this module 
-class __Int3D(six.with_metaclass(esutil.ExtendBaseClass, Int3D)) :
-
-
+class __Int3D(Int3D, metaclass=esutil.ExtendBaseClass):
     __originit = Int3D.__init__
+
     def __init__(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
@@ -88,40 +88,47 @@ class __Int3D(six.with_metaclass(esutil.ExtendBaseClass, Int3D)) :
                 x, y, z = arg0
             elif isinstance(arg0, int):
                 x = y = z = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Int3D from %s" % (args))
-        elif len(args) == 3 :
+        elif len(args) == 3:
             x, y, z = args
-        else :
+        else:
             raise TypeError("Cannot initialize Int3D from %s" % (args))
-        
+
         return self.__originit(x, y, z)
 
     # create setters and getters
     @property
-    def x(self): return self[0]
+    def x(self):
+        return self[0]
 
     @x.setter
-    def x(self, v): self[0] = v
+    def x(self, v):
+        self[0] = v
 
     @property
-    def y(self) : return self[1]
+    def y(self):
+        return self[1]
 
     @y.setter
-    def y(self, v) : self[1] = v
+    def y(self, v):
+        self[1] = v
 
     @property
-    def z(self) : return self[2]
+    def z(self):
+        return self[2]
 
     @z.setter
-    def z(self, v) : self[2] = v
+    def z(self, v):
+        self[2] = v
 
     # string conversion
-    def __str__(self) :
+    def __str__(self):
         return str((self[0], self[1], self[2]))
 
-    def __repr__(self) :
+    def __repr__(self):
         return 'Int3D' + str(self)
+
 
 def toInt3DFromVector(*args):
     """Try to convert the arguments to a Int3D.
@@ -138,6 +145,7 @@ def toInt3DFromVector(*args):
         return Int3D(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toInt3D(*args):
     """Try to convert the arguments to a Int3D, returns the argument,

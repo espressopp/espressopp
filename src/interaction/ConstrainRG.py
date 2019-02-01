@@ -68,14 +68,14 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_ConstrainRG, interaction_FixedLocalTupleListConstrainRG
 
 class ConstrainRGLocal(PotentialLocal, interaction_ConstrainRG):
-    
+
     def __init__(self, k_rg=100.):
         """Initialize the local ConstrainRG."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_ConstrainRG, k_rg)
-        
+
 class FixedLocalTupleListConstrainRGLocal(InteractionLocal, interaction_FixedLocalTupleListConstrainRG):
-    
+
     def __init__(self, system, fixedtuplelist, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedLocalTupleListConstrainRG, system, fixedtuplelist, potential)

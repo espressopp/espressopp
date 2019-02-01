@@ -73,9 +73,9 @@ class LBInitLocal(integrator_LBInit):
     def addForce(self,force):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.addForce(self,force)
-        
+
 if pmi.isController :
     class LBInit(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             )
-        
+

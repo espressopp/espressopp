@@ -95,18 +95,18 @@ from _espressopp import io_DumpXTC
 
 class DumpXTCLocal(ParticleAccessLocal, io_DumpXTC):
 
-  def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
-    cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
+    def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
+        cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
 
-  def dump(self):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.dump(self)
+    def dump(self):
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.dump(self)
 
 
 if pmi.isController :
-  class DumpXTC(ParticleAccess, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls =  'espressopp.io.DumpXTCLocal',
-      pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
-    )
+    class DumpXTC(ParticleAccess, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.io.DumpXTCLocal',
+          pmicall = [ 'dump' ],
+          pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
+        )

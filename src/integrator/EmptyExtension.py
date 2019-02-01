@@ -39,7 +39,7 @@ class EmptyExtensionLocal(ExtensionLocal, integrator_EmptyExtension):
 
     def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, integrator_EmptyExtension, system)
+            cxxinit(self, integrator_EmptyExtension, system)
 
 if pmi.isController :
     class EmptyExtension(Extension, metaclass=pmi.Proxy):

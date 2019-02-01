@@ -575,7 +575,7 @@ class PIAdressIntegratorLocal(MDIntegratorLocal, integrator_PIAdressIntegrator):
 if pmi.isController :
     class PIAdressIntegrator(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.PIAdressIntegratorLocal',
+            cls =  'espressopp.integrator.PIAdressIntegratorLocal',
           pmiproperty = ['timestep', 'sSteps', 'mSteps', 'nTrotter', 'gamma', 'CMDparameter', 'PILElambda', 'temperature', 'CLmassmultiplier', 'speedup', 'KTI', 'constKinMass', 'verletList', 'centroidThermostat', 'PILE', 'realKinMass', 'verletlistBuilds' ],
           pmicall = ['setTimeStep', 'setmStep', 'setsStep', 'setNtrotter', 'setTemperature', 'setGamma', 'setCMDparameter', 'setPILElambda', 'setClmassmultiplier', 'setSpeedup', 'setKTI', 'setPILE', 'setRealKinMass', 'setCentroidThermostat', 'setConstKinMass', 'setVerletList', 'computeKineticEnergy', 'computeRingEnergy', 'computeRingEnergyRaw', 'computeMomentumDrift', 'computePositionDrift', 'getTimeStep', 'getmStep', 'getsStep', 'getNtrotter', 'getTemperature', 'getGamma', 'getCMDparameter', 'getPILElambda', 'getClmassmultiplier', 'getSpeedup', 'getKTI', 'getPILE', 'getRealKinMass', 'getCentroidThermostat', 'getConstKinMass', 'getVerletList', 'getVerletlistBuilds']
         )

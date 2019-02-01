@@ -50,7 +50,7 @@ from _espressopp import analysis_LBOutput_VzInTime
 
 class LBOutputVzInTimeLocal(LBOutputLocal, analysis_LBOutput_VzInTime):
     def __init__(self, system, latticeboltzmann):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_VzInTime, system, latticeboltzmann)
 
 if pmi.isController :

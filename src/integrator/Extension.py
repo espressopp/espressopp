@@ -40,11 +40,11 @@ from _espressopp import integrator_Extension
 
 class ExtensionLocal(object):
 
-    
+
     #def __init__(self, integrator):
     #    if pmi.workerIsActive():    
     #        cxxinit(self, integrator)
-            
+
     #        # set center of TD force
     #        if (center != []):
     #            self.cxxclass.setCenter(self, center[0], center[1], center[2])
@@ -56,11 +56,11 @@ class ExtensionLocal(object):
     #        """
     #        if pmi.workerIsActive():
     #            self.cxxclass.addForce(self, itype, filename, type)
-    
+
     def connect(self):
-      return self.cxxclass.connect(self)
+        return self.cxxclass.connect(self)
     def disconnect(self):
-      return self.cxxclass.disconnect(self)
+        return self.cxxclass.disconnect(self)
 
 if pmi.isController :
     class Extension(object, metaclass=pmi.Proxy):

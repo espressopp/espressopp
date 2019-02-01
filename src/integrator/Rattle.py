@@ -83,15 +83,15 @@ class RattleLocal(ExtensionLocal, integrator_Rattle):
 
     def __init__(self, system, maxit = 1000, tol = 1e-6, rptol = 1e-6):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, integrator_Rattle, system, maxit, tol, rptol)
+            cxxinit(self, integrator_Rattle, system, maxit, tol, rptol)
 
     def addConstrainedBonds(self, bondDetailsLists):
         """
         Each processor takes the broadcasted list.
         """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          for blist in bondDetailsLists: #each list contains int pid1, int pid2, real constraintDist, real mass1, real mass2
-            self.cxxclass.addBond(self, blist[0], blist[1], blist[2], blist[3], blist[4])
+            for blist in bondDetailsLists: #each list contains int pid1, int pid2, real constraintDist, real mass1, real mass2
+                self.cxxclass.addBond(self, blist[0], blist[1], blist[2], blist[3], blist[4])
 
 if pmi.isController:
     class Rattle(Extension, metaclass=pmi.Proxy):

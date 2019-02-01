@@ -48,7 +48,7 @@ def _setupLogging():
         log.info('Reading log config file %s', logConfigFile)
     else :
         logging.basicConfig(
-           format = "%(process)d %(asctime)s %(name)s (%(filename)s::%(lineno)s,%(funcName)s) %(levelname)s: %(message)s")
+            format = "%(process)d %(asctime)s %(name)s (%(filename)s::%(lineno)s,%(funcName)s) %(levelname)s: %(message)s")
         log = logging.getLogger('root')
         log.info('Did not find log config file %s, using basic configuration.', logConfigFile)
 

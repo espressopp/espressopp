@@ -45,7 +45,7 @@ def calcNumberCells(size, nodes, cutoff):
     ncells = 1
 
     while size / (ncells * nodes) >= cutoff:
-       ncells = ncells + 1
+        ncells = ncells + 1
 
     return ncells - 1
 
@@ -53,99 +53,99 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
     def test0Build(self) :
 
-       system = espressopp.System()
+        system = espressopp.System()
 
-       rng  = espressopp.esutil.RNG()
+        rng  = espressopp.esutil.RNG()
 
-       SIZE = float(N)
-       box  = Real3D(SIZE)
-       bc   = espressopp.bc.OrthorhombicBC(None, box)
+        SIZE = float(N)
+        box  = Real3D(SIZE)
+        bc   = espressopp.bc.OrthorhombicBC(None, box)
 
-       system.bc = bc
-       system.rng = rng 
-       system.skin = skin
+        system.bc = bc
+        system.rng = rng 
+        system.skin = skin
 
-       comm = espressopp.MPI.COMM_WORLD
+        comm = espressopp.MPI.COMM_WORLD
 
-       nodeGrid = (1, 1, comm.size)
-       cellGrid = [1, 1, 1]
+        nodeGrid = (1, 1, comm.size)
+        cellGrid = [1, 1, 1]
 
-       for i in range(3):
-          cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
+        for i in range(3):
+            cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-       print(('NodeGrid = %s'%(nodeGrid,)))
-       print(('CellGrid = %s'%cellGrid))
+        print(('NodeGrid = %s'%(nodeGrid,)))
+        print(('CellGrid = %s'%cellGrid))
 
-       dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+        dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
-       system.storage = dd
+        system.storage = dd
 
-       id = 0
+        id = 0
 
-       for i in range(N):
-         for j in range(N):
-           for k in range(N):
- 
-             m = (i + 2*j + 3*k) % 11
-             r = 0.45 + m * 0.01
-             x = (i + r) / N * SIZE
-             y = (j + r) / N * SIZE
-             z = (k + r) / N * SIZE
-   
-             dd.addParticle(id, Real3D(x, y, z))
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
 
-             # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
+                    m = (i + 2*j + 3*k) % 11
+                    r = 0.45 + m * 0.01
+                    x = (i + r) / N * SIZE
+                    y = (j + r) / N * SIZE
+                    z = (k + r) / N * SIZE
 
-             id = id + 1
+                    dd.addParticle(id, Real3D(x, y, z))
 
-       dd.decompose()
+                    # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
 
-       integrator = espressopp.integrator.VelocityVerlet(system)
+                    id = id + 1
 
-       print(('integrator.dt = %g, will be set to 0.005'%integrator.dt))
+        dd.decompose()
 
-       integrator.dt = 0.005
-  
-       print(('integrator.dt = %g, is now '%integrator.dt))
+        integrator = espressopp.integrator.VelocityVerlet(system)
 
-       # now build Verlet List
-       # ATTENTION: you have to add the skin explicitly here
+        print(('integrator.dt = %g, will be set to 0.005'%integrator.dt))
 
-       vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
+        integrator.dt = 0.005
 
-       potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
+        print(('integrator.dt = %g, is now '%integrator.dt))
 
-       # ATTENTION: auto shift was enabled
+        # now build Verlet List
+        # ATTENTION: you have to add the skin explicitly here
 
-       print(("potLJ, shift = %g"%potLJ.shift))
+        vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
 
-       interLJ = espressopp.interaction.VerletListLennardJones(vl)
+        potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
 
-       interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
+        # ATTENTION: auto shift was enabled
 
-       # Todo
+        print(("potLJ, shift = %g"%potLJ.shift))
 
-       system.addInteraction(interLJ)
+        interLJ = espressopp.interaction.VerletListLennardJones(vl)
 
-       temp = espressopp.analysis.Temperature(system)
+        interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 
-       temperature = temp.compute()
-       kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-       potentialEnergy = interLJ.computeEnergy()
-       print(('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
-                  potentialEnergy, kineticEnergy, temperature)))
+        # Todo
 
-       nsteps = 10
+        system.addInteraction(interLJ)
 
-       # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
+        temp = espressopp.analysis.Temperature(system)
 
-       for i in range(20):
-          integrator.run(nsteps)
-          temperature = temp.compute()
-          kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-          potentialEnergy = interLJ.computeEnergy()
-          print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
-               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)))
+        temperature = temp.compute()
+        kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+        potentialEnergy = interLJ.computeEnergy()
+        print(('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
+                   potentialEnergy, kineticEnergy, temperature)))
+
+        nsteps = 10
+
+        # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
+
+        for i in range(20):
+            integrator.run(nsteps)
+            temperature = temp.compute()
+            kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+            potentialEnergy = interLJ.computeEnergy()
+            print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+                 kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)))
 
 if __name__ == "__main__":
 

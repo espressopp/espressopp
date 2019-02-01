@@ -31,7 +31,7 @@ class TestLennardJones(espressopp.unittest.TestCase):
         self.assertEqual(lj.sigma, 1.0)
         self.assertEqual(lj.cutoff, infinity)
         self.assertEqual(lj.shift, 0.0)
-        
+
     def testEnergy(self):
         lj=LennardJones(epsilon=2.0, sigma=2.0)
 

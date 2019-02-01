@@ -51,22 +51,22 @@ from _espressopp import analysis_Autocorrelation
 class AutocorrelationLocal(analysis_Autocorrelation):
 
     def __init__(self, system):
-      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, analysis_Autocorrelation, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_Autocorrelation, system)
     def gather(self, value):
-      return self.cxxclass.gather(self, value)
+        return self.cxxclass.gather(self, value)
     def clear(self):
-      return self.cxxclass.clear(self)
+        return self.cxxclass.clear(self)
 
     def compute(self):
-      return self.cxxclass.compute(self)
+        return self.cxxclass.compute(self)
 
 if pmi.isController:
-  class Autocorrelation(object, metaclass=pmi.Proxy):
+    class Autocorrelation(object, metaclass=pmi.Proxy):
 
-    pmiproxydefs = dict(
-      cls =  'espressopp.analysis.AutocorrelationLocal',
-      pmicall = [ "gather", "clear", "compute" ],
-      localcall = ["__getitem__", "all"],
-      pmiproperty = ["size"]
-    )
+        pmiproxydefs = dict(
+            cls =  'espressopp.analysis.AutocorrelationLocal',
+          pmicall = [ "gather", "clear", "compute" ],
+          localcall = ["__getitem__", "all"],
+          pmiproperty = ["size"]
+        )

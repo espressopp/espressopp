@@ -72,32 +72,32 @@ class AngularUniqueCosineSquaredLocal(AngularUniquePotentialLocal, interaction_A
     def __init__(self, K=1.0):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, interaction_AngularUniqueCosineSquared, K)
+            cxxinit(self, interaction_AngularUniqueCosineSquared, K)
 
 class FixedTripleAngleListAngularUniqueCosineSquaredLocal(InteractionLocal, interaction_FixedTripleAngleListAngularUniqueCosineSquared):
 
     def __init__(self, system, ftcl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, interaction_FixedTripleAngleListAngularUniqueCosineSquared, system, ftcl, potential)
+            cxxinit(self, interaction_FixedTripleAngleListAngularUniqueCosineSquared, system, ftcl, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          self.cxxclass.setPotential(self, potential)
-          
+            self.cxxclass.setPotential(self, potential)
+
     def getFixedTripleList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedTripleList(self)
-    
+
 if pmi.isController:
     class AngularUniqueCosineSquared(AngularUniquePotential):
-      'The AngularUniqueCosineSquared potential.'
-      pmiproxydefs = dict(
-        cls = 'espressopp.interaction.AngularUniqueCosineSquaredLocal',
-        pmiproperty = ['K']
-      )
+        'The AngularUniqueCosineSquared potential.'
+        pmiproxydefs = dict(
+            cls = 'espressopp.interaction.AngularUniqueCosineSquaredLocal',
+          pmiproperty = ['K']
+        )
 
     class FixedTripleAngleListAngularUniqueCosineSquared(Interaction, metaclass=pmi.Proxy):
-      pmiproxydefs = dict(
-        cls =  'espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquaredLocal',
-        pmicall = ['setPotential','getFixedTripleList']
-      )
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquaredLocal',
+          pmicall = ['setPotential','getFixedTripleList']
+        )

@@ -31,7 +31,7 @@ from espressopp import pmi
 from _espressopp import esutil_RNG
 
 class RNGLocal(esutil_RNG):
-  pass
+    pass
 
 #    def gamma(self, a=None):
 #          if pmi._PMIComm and pmi._PMIComm.isActive():
@@ -42,7 +42,7 @@ class RNGLocal(esutil_RNG):
 #                    return self.cxxclass.gammaArg(self, a)
 #            else :
 #                pass
-    
+
 if pmi.isController:
     class RNG(object, metaclass=pmi.Proxy):
         'Random number generator.'
@@ -51,4 +51,4 @@ if pmi.isController:
             localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
             pmicall = [ 'seed', 'get_seed' ]
             )
-    
+
