@@ -132,7 +132,7 @@ namespace espressopp {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        Potential &potential = getPotential(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
@@ -144,6 +144,7 @@ namespace espressopp {
         //}
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+        potential.computeColVarWeights(dist, bc);
         if(potential._computeForce(force, p1, p2, dist)) {
           p1.force() += force;
           p2.force() -= force;
@@ -166,12 +167,13 @@ namespace espressopp {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        Potential &potential = getPotential(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         //e   = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
+        potential.computeColVarWeights(r21, bc);
         e = potential._computeEnergy(p1,p2,r21);
         es += e;
         LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
@@ -240,12 +242,13 @@ namespace espressopp {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        Potential &potential = getPotential(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+        potential.computeColVarWeights(r21, bc);
         if(potential._computeForce(force, p1, p2, r21)) {
         // if(potential->_computeForce(force, p1, p2)) {
           //Real3D r21 = p1.position() - p2.position();

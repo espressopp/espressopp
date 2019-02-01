@@ -64,3 +64,4 @@ interaction
    espressopp.interaction.VSpherePair.rst
    espressopp.interaction.VSphereSelf.rst
    espressopp.interaction.Zero.rst
+   espressopp.interaction.SmoothSquareWell.rst

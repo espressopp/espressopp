@@ -126,12 +126,14 @@ namespace espressopp {
 
 	    Real3D force1, force2, force3, force4;  // result forces
 
+        potential->computeColVarWeights(dist21, dist32, dist43, bc);
 	    potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
         p1.force() += force1;
         p2.force() += force2; //p2.force() -= force2;
         p3.force() += force3;
         p4.force() += force4;
+
       }
     }
 
@@ -155,6 +157,7 @@ namespace espressopp {
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
+        potential->computeColVarWeights(dist21, dist32, dist43, bc);
         e += potential->_computeEnergy(dist21, dist32, dist43);
       }
       real esum;
@@ -226,6 +229,7 @@ namespace espressopp {
 
         Real3D force1, force2, force3, force4;
 
+        potential->computeColVarWeights(dist21, dist32, dist43, bc);
         potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 
@@ -262,6 +266,7 @@ namespace espressopp {
 
         Real3D force1, force2, force3, force4;
 
+        potential->computeColVarWeights(dist21, dist32, dist43, bc);
         potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 
@@ -302,6 +307,7 @@ namespace espressopp {
 
         Real3D force1, force2, force3, force4;
 
+        potential->computeColVarWeights(dist21, dist32, dist43, bc);
         potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 

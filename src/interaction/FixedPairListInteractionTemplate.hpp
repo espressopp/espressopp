@@ -122,6 +122,7 @@ namespace espressopp {
         	fixedpairList->setLongtimeMaxBondSqr(d);
         	ltMaxBondSqr = d;
         }
+        potential->computeColVarWeights(dist, bc);
         if(potential->_computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;
@@ -147,6 +148,7 @@ namespace espressopp {
         const Particle &p2 = *it->second;
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+        potential->computeColVarWeights(r21, bc);
         e += potential->_computeEnergy(r21);
       }
       real esum;
@@ -294,6 +296,7 @@ namespace espressopp {
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
+        potential->computeColVarWeights(r21, bc);
         if(potential->_computeForce(force, r21)) {
           w += r21 * force;
         }
@@ -317,6 +320,7 @@ namespace espressopp {
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
+        potential->computeColVarWeights(r21, bc);
         if(potential->_computeForce(force, r21)) {
           wlocal += Tensor(r21, force);
         }
@@ -347,6 +351,7 @@ namespace espressopp {
           Real3D r21;
           bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
           Real3D force;
+          potential->computeColVarWeights(r21, bc);
           if(potential->_computeForce(force, r21)) {
             wlocal += Tensor(r21, force);
           }

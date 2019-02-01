@@ -22,6 +22,7 @@ env:
     - DISTRO=fedora_mpich EXTERNAL=ON
     - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
+    - DISTRO=opensuse EXTERNAL=ON
 
 script:
  - cp -vr docker ${HOME}
