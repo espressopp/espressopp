@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -28,6 +28,7 @@
 #include "Cell.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
+#include "boost/serialization/vector.hpp"
 #include "bc/BC.hpp"
 #include "FixedTupleListAdress.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
@@ -40,8 +41,8 @@ namespace espressopp {
 
     using namespace espressopp::iterator;
 
-    Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates)
-        : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI), regionupdates(_regionupdates){
+    Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates, int _multistep)
+        : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI), regionupdates(_regionupdates), multistep(_multistep){
         LOG4ESPP_INFO(theLogger, "construct Adress");
         type = Extension::Adress;
 
@@ -68,10 +69,12 @@ namespace espressopp {
         _initForces.disconnect();
         _integrate1.disconnect();
         _integrate2.disconnect();
-        _inIntP.disconnect();
+        // _inIntP.disconnect();
         //_aftCalcF.disconnect();
         _recalc2.disconnect();
         _befIntV.disconnect();
+        _integrateSlow.disconnect();
+        _aftCalcSlow.disconnect();
     }
 
     void Adress::connect() {
@@ -96,11 +99,19 @@ namespace espressopp {
         _integrate2 = integrator->aftIntV.connect(
                 boost::bind(&Adress::integrate2, this), boost::signals2::at_front);
 
+        // connection to after integrate2()
+        _integrateSlow = integrator->aftIntSlow.connect(
+                boost::bind(&Adress::integrateSlow, this), boost::signals2::at_front);
+
         // Note: Both this extension as well as Langevin Thermostat access singal aftCalcF. This might lead to undefined behavior.
         // Therefore, we use other signals here, to make sure the Thermostat would be always called first, before force distributions take place.
         // connection to after _aftCalcF()
         //_aftCalcF = integrator->aftCalcF.connect(
         //        boost::bind(&Adress::aftCalcF, this));
+
+        // connection to after aftCalcSlow
+        _aftCalcSlow = integrator->aftCalcSlow.connect(
+                boost::bind(&Adress::aftCalcF, this), boost::signals2::at_back);
 
         // connection to after _recalc2()
         _recalc2 = integrator->recalc2.connect(
@@ -415,6 +426,61 @@ namespace espressopp {
 
     }
 
+
+    void Adress::integrateSlow() {
+
+        System& system = getSystemRef();
+        real dt = integrator->getTimeStep();
+
+        // propagete real AT particles
+        ParticleList& adrATparticles = system.storage->getAdrATParticles();
+        for (std::vector<Particle>::iterator it = adrATparticles.begin();
+                it != adrATparticles.end(); ++it) {
+
+            real dtfm = 0.5 * multistep * dt / it->mass();
+
+            // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
+            it->velocity() += dtfm * it->force();
+        }
+
+        //Update CG velocities
+        CellList localCells = system.storage->getLocalCells();
+        for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+
+              Particle &vp = *cit;
+
+              FixedTupleListAdress::iterator it3;
+              it3 = fixedtupleList->find(&vp);
+
+              if (it3 != fixedtupleList->end()) {
+
+                  std::vector<Particle*> atList;
+                  atList = it3->second;
+
+                  Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+                  for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                       it2 != atList.end(); ++it2) {
+                      Particle &at = **it2;
+                      cmv += at.mass() * at.velocity();
+                  }
+                  cmv /= vp.getMass();
+                  vp.velocity() = cmv;
+
+              }
+              else { // this should not happen
+                  std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+                  std::cout << " (" << vp.position() << ")\n";
+                  exit(1);
+                  return;
+              }
+
+
+        }
+
+
+
+    }
+
     void Adress::communicateAdrPositions(){
        //if adrCenter is not set, the center of adress zone moves along with some particles
        //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
@@ -573,7 +639,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<Adress, shared_ptr<Adress>, bases<Extension> >
-        ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool, int >())
+        ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool, int, int >())
         .def("connect", &Adress::connect)
         .def("disconnect", &Adress::disconnect)
         ;

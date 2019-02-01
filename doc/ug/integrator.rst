@@ -3,7 +3,7 @@ integrator
 
 .. toctree::
    :maxdepth: 2
-   
+
    espressopp.integrator.Adress.rst
    espressopp.integrator.AssociationReaction.rst
    espressopp.integrator.BerendsenBarostat.rst
@@ -30,10 +30,12 @@ integrator
    espressopp.integrator.MDIntegrator.rst
    espressopp.integrator.MinimizeEnergy.rst
    espressopp.integrator.OnTheFlyFEC.rst
+   espressopp.integrator.PIAdressIntegrator.rst
    espressopp.integrator.Rattle.rst
    espressopp.integrator.Settle.rst
    espressopp.integrator.StochasticVelocityRescaling.rst
    espressopp.integrator.TDforce.rst
    espressopp.integrator.VelocityVerlet.rst
+   espressopp.integrator.VelocityVerletRESPA.rst
    espressopp.integrator.VelocityVerletOnGroup.rst
    espressopp.integrator.VelocityVerletOnRadius.rst
