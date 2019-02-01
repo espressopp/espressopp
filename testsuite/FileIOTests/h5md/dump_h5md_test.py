@@ -81,7 +81,7 @@ class TestH5MDNVT(TestH5MD):
 
         for pidx, p in enumerate(positions[1][:len(self.particles)]):
             self.assertListEqual(list(p), list(self.particles[pidx][1]))
-        
+
         ids = h5['/particles/atoms/id/value']
         for id_set in ids:
             self.assertListEqual(filter(lambda x: x != -1, id_set), [p[0] for p in self.particles])
@@ -89,7 +89,7 @@ class TestH5MDNVT(TestH5MD):
         types = h5['/particles/atoms/species/value']
         for type_set in types:
             self.assertListEqual(filter(lambda x: x != -1, type_set), [p[2] for p in self.particles])
-    
+
     def test_check_static_box(self):
         self.dump_h5md.dump()
         self.integrator.run(5)
@@ -127,7 +127,7 @@ class TestH5MDDynamicBox(TestH5MD):
         # Check if the box is saved.
         for edg in h5['/particles/atoms/box/edges/value']:
             self.assertListEqual(list(edg), [10.0, 10.0, 10.0])
-        
+
         self.assertEqual(len(h5['/particles/atoms/box/edges/value']), 2)
 
 
