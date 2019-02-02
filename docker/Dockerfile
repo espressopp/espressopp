@@ -17,6 +17,8 @@ ARG TRAVIS_TAG
 ARG TRAVIS_REPO_SLUG
 ARG TRAVIS_COMMIT
 
+ENV TEST_H5MD ON
+
 RUN rm -rf /home/espressopp/.ccache
 COPY espressopp /home/espressopp/espressopp
 COPY ccache/ /home/espressopp/.ccache
