@@ -22,7 +22,7 @@ env:
 matrix:
   exclude:
     - compiler: clang
-      env: DISTRO=ubuntu EXTERNAL_ON BUILD_UG=ON COVERAGE=ON
+      env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON COVERAGE=ON
 
 
 script:
