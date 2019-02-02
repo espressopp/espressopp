@@ -78,6 +78,11 @@ jobs:
       env:
         - BUILD_UG=ON COVERAGE=ON
 
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+(\.\d+|_rc\d+)?$/
+
 cache:
   - ccache
 
