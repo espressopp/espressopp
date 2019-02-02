@@ -6,7 +6,7 @@ services:
 - docker
 
 env:
-    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON COVERAGE=ON
+    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
@@ -79,10 +79,10 @@ after_success:
       fi;
     fi
 
-branches:
-  only:
-  - master
-  - /^v\d+\.\d+(\.\d+|_rc\d+)?$/
+#branches:
+#  only:
+#  - master
+#  - /^v\d+\.\d+(\.\d+|_rc\d+)?$/
 
 cache:
   - ccache
