@@ -19,6 +19,12 @@ env:
     - DISTRO=opensuse EXTERNAL=ON
     - DISTRO=opensuse EXTERNAL=OFF
 
+matrix:
+  exclude:
+    - compiler: clang
+      env: DISTRO=ubuntu EXTERNAL_ON BUILD_UG=ON COVERAGE=ON
+
+
 script:
  - cp -vr docker ${HOME}
  - sed -i "1s/ubuntu/${DISTRO}/" ${HOME}/docker/Dockerfile
