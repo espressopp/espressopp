@@ -5,8 +5,7 @@ sudo: required
 services:
 - docker
 
-matrix:
-  include:
+env:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON COVERAGE=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
@@ -19,9 +18,6 @@ matrix:
     - DISTRO=fedora_mpich EXTERNAL=OFF
     - DISTRO=opensuse EXTERNAL=ON
     - DISTRO=opensuse EXTERNAL=OFF
-  exclude:
-    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON COVERAGE=ON
-      compiler=clang
 
 script:
  - cp -vr docker ${HOME}
