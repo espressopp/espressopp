@@ -254,10 +254,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
   }
 
   // make a final reduction to synchronize the processors
-
-  int val = 0;
-
-  boost::mpi::all_reduce(*mpiWorld, val, val, std::plus<int>());
+  mpiWorld->barrier();
 
   printf("ready\n");
 }
