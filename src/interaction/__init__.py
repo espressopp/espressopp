@@ -27,7 +27,6 @@ from espressopp.interaction.Interaction import *
 
 from espressopp.interaction.Potential import *
 from espressopp.interaction.PotentialVSpherePair import *
-from espressopp.interaction.PotentialUniqueDist import *
 
 from espressopp.interaction.Zero import *
 from espressopp.interaction.LennardJones import *
@@ -56,28 +55,21 @@ from espressopp.interaction.VSphereSelf import *
 from espressopp.interaction.VSpherePair import *
 from espressopp.interaction.MirrorLennardJones import *
 
-from espressopp.interaction.HarmonicUnique import *
-
 from espressopp.interaction.AngularCosineSquared import *
 from espressopp.interaction.AngularHarmonic import *
 from espressopp.interaction.AngularPotential import *
-from espressopp.interaction.AngularUniqueCosineSquared import *
-from espressopp.interaction.AngularUniqueHarmonic import *
-from espressopp.interaction.AngularUniquePotential import *
 from espressopp.interaction.Cosine import *
 
 from espressopp.interaction.TabulatedAngular import *
 from espressopp.interaction.TabulatedSubEnsAngular import *
 
 from espressopp.interaction.DihedralPotential import *
-from espressopp.interaction.DihedralUniquePotential import *
 from espressopp.interaction.TabulatedDihedral import *
 from espressopp.interaction.TabulatedSubEnsDihedral import *
 from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *
 from espressopp.interaction.DihedralHarmonicNCos import *
 from espressopp.interaction.DihedralHarmonic import *
-from espressopp.interaction.DihedralHarmonicUniqueCos import *
 from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *

@@ -1,4 +1,4 @@
-#  Copyright (C) 2017
+#  Copyright (C) 2018, 2017
 #      Max Planck Institute for Polymer Research
 #  
 #  This file is part of ESPResSo++.
@@ -18,9 +18,9 @@
 
 
 r"""
-********************************************
+****************************************************
 **espressopp.integrator.LangevinThermostatOnRadius**
-********************************************
+****************************************************
 Langevin Thermostat for Radii of Particles
 
 Example:
