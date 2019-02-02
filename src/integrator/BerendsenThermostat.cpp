@@ -88,7 +88,7 @@ namespace espressopp {
       
       static Temperature Tcurrent(getSystem());
       
-      real T = Tcurrent.computeRaw();  // calculating the current temperature in system
+      real T = Tcurrent.compute_real();  // calculating the current temperature in system
       
       real lambda2 = 1 + pref * (T0/T - 1);
       
