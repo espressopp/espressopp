@@ -5,8 +5,8 @@ sudo: required
 services:
 - docker
 
-env:
-  matrix:
+matrix:
+  include:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON COVERAGE=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
