@@ -42,27 +42,27 @@ namespace espressopp {
       real K;
       real r0;
       real rMax;
-      real caprad;
+      real r_cap;
 
     public:
       static void registerPython();
 
       FENECapped()
-        : K(0.0), r0(0.0), rMax(0.0), caprad(0.0) {
+        : K(0.0), r0(0.0), rMax(0.0), r_cap(0.0) {
         setShift(0.0);
         setCutoff(infinity);
       }
 
       FENECapped(real _K, real _r0, real _rMax,
-		   real _cutoff, real _caprad, real _shift)
-        : K(_K), r0(_r0), rMax(_rMax), caprad(_caprad) {
+         real _cutoff, real _r_cap, real _shift)
+        : K(_K), r0(_r0), rMax(_rMax), r_cap(_r_cap) {
         setShift(_shift);
         setCutoff(_cutoff);
       }
 
       FENECapped(real _K, real _r0, real _rMax,
-		   real _cutoff, real _caprad)
-        : K(_K), r0(_r0), rMax(_rMax), caprad(_caprad) {
+         real _cutoff, real _r_cap)
+        : K(_K), r0(_r0), rMax(_rMax), r_cap(_r_cap) {
         autoShift = false;
         setCutoff(_cutoff);
         setAutoShift(); 
@@ -75,11 +75,11 @@ namespace espressopp {
       }
       real getK() const { return K; }
 
-      void setcaprad(real _caprad) {
-        caprad = _caprad;
+      void setRCap(real _r_cap) {
+        r_cap = _r_cap;
         updateAutoShift();
       }
-      real getcaprad() const { return caprad; }
+      real getRCap() const { return r_cap; }
 
       void setR0(real _r0) { 
         r0 = _r0; 
@@ -95,11 +95,11 @@ namespace espressopp {
 
       real _computeEnergySqrRaw(real distSqr) const {
     	real energy;
-    	real caprad2 = caprad * caprad;
-    	if (caprad2 > distSqr) {
+      real r_cap2 = r_cap * r_cap;
+      if (r_cap2 > distSqr) {
           energy = -0.5 * pow(rMax, 2) * K * log(1 - pow((sqrt(distSqr) - r0) / rMax, 2));
     	} else {
-          energy = -0.5 * pow(rMax, 2) * K * log(1 - pow((caprad - r0) / rMax, 2));
+          energy = -0.5 * pow(rMax, 2) * K * log(1 - pow((r_cap - r0) / rMax, 2));
     	}
         return energy;
       }
@@ -109,9 +109,9 @@ namespace espressopp {
 			    real distSqr) const {
 
         real ffactor;
-        real caprad2 = caprad * caprad;
+        real r_cap2 = r_cap * r_cap;
         
-        if (caprad2 > distSqr) {
+        if (r_cap2 > distSqr) {
           if(r0 == 0) {
             real r = sqrt(distSqr);
             ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
@@ -122,11 +122,11 @@ namespace espressopp {
           }
         } else {
           if(r0 == 0) {
-            real r = sqrt(caprad2);
+            real r = sqrt(r_cap2);
             ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
           } else {
               real r0sq = rMax * rMax;
-              real rlogarg = 1.0 - caprad2 / r0sq;
+              real rlogarg = 1.0 - r_cap2 / r0sq;
               ffactor = -K / rlogarg;
           }
         }
