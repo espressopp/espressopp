@@ -40,7 +40,7 @@ namespace espressopp {
     	("interaction_FENECapped", init< real, real, real, real, real >())
 	.def(init< real, real, real, real, real, real >())
 	.add_property("K", &FENECapped::getK, &FENECapped::setK)
-	.add_property("caprad", &FENECapped::getcaprad, &FENECapped::setcaprad)
+   .add_property("r_cap", &FENECapped::getRCap, &FENECapped::setRCap)
 	.add_property("r0", &FENECapped::getR0, &FENECapped::setR0)
 	.add_property("rMax", &FENECapped::getRMax, &FENECapped::setRMax)
     	;
