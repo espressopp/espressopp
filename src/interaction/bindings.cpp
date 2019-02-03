@@ -22,7 +22,6 @@
 
 #include "python.hpp"
 #include "bindings.hpp"
-#include "PotentialUniqueDist.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
 #include "LennardJonesAutoBonds.hpp"
@@ -43,7 +42,6 @@
 #include "FENE.hpp"
 #include "FENECapped.hpp"
 #include "Harmonic.hpp"
-#include "HarmonicUnique.hpp"
 #include "Quartic.hpp"
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
@@ -57,20 +55,15 @@
 #include "TabulatedSubEnsAngular.hpp"
 
 #include "AngularPotential.hpp"
-#include "AngularUniquePotential.hpp"
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
-#include "AngularUniqueHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
-#include "AngularUniqueCosineSquared.hpp"
 
 #include "DihedralPotential.hpp"
-#include "DihedralUniquePotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "TabulatedSubEnsDihedral.hpp"
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
-#include "DihedralHarmonicUniqueCos.hpp"
 #include "DihedralHarmonicNCos.hpp"
 #include "DihedralHarmonic.hpp"
 #include "DihedralRB.hpp"
@@ -96,7 +89,6 @@ namespace espressopp {
       Interaction::registerPython();
       Potential::registerPython();
       PotentialVSpherePair::registerPython();
-      PotentialUniqueDist::registerPython();
       SingleParticlePotential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
@@ -120,7 +112,6 @@ namespace espressopp {
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();
-      HarmonicUnique::registerPython();
       Quartic::registerPython();
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
@@ -129,22 +120,17 @@ namespace espressopp {
       MirrorLennardJones::registerPython();
 
       AngularPotential::registerPython();
-      AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
       TabulatedSubEnsAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
-      AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
-      AngularUniqueCosineSquared::registerPython();
 
       DihedralPotential::registerPython();
-      DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
       TabulatedSubEnsDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
-      DihedralHarmonicUniqueCos::registerPython();
       DihedralHarmonicNCos::registerPython();
       DihedralRB::registerPython();
       DihedralHarmonic::registerPython();
