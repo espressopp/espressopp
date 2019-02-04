@@ -18,10 +18,12 @@
 
 
 r"""
-***********************************************
-**espressopp.interaction.ConstrainRG**
-***********************************************
-This class is for calculating forces of constraining radii of gyration of subchains.
+**********************************
+espressopp.interaction.ConstrainRG
+**********************************
+
+This class calculates forces acting on constrained radii of gyration of subchains [Zhang_2014]_.
+
 Subchains are defined as a tuple list.
 
 .. math:: U = k_{rg} \left(R_{g}^2 - {R_{g}^{ideal}}^2\right)^2
@@ -30,10 +32,8 @@ where :math:`R_{g}^{ideal}` stands for the desired radius of gyration of subchai
 
 This class set 2 conditions on a tuple list. defining subchains.
 
-1. The length of all tuple must be same.
+1. The length of all tuples must be the same.
 2. int(key particle id / The length of a tuple) must not be redundantly, where key particle id is the smallest particle id in a tuple.
-
-Reference: Equilibration of high molecular weight polymer melts: A hierarchical strategy, Macro Lett., 2014, 3, 198
 
 .. function:: espressopp.interaction.ConstrainRG(k_rg)
 

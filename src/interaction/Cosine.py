@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2012,2013,2016,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -19,23 +19,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*****************************
-espressopp.interaction.Cosine
-*****************************
-
-Calculates the Cosine Interaction
+"""
+Calculates the Cosine potential as:
 
 .. math::
 
-	U = K  (1 + cos(\theta - \theta_0))
+   U = K  (1 + cos(\\theta - \\theta_0))
 
 .. function:: espressopp.interaction.Cosine(K, theta0)
 
-		:param K: (default: 1.0)
-		:param theta0: (default: 0.0)
-		:type K: real
-		:type theta0: real
+      :param real K: (default: 1.0)
+      :param real theta0: (default: 0.0)
 
 .. function:: espressopp.interaction.FixedTripleListCosine(system, vl, potential)
 
@@ -85,7 +79,6 @@ class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCo
 
 if pmi.isController:
     class Cosine(AngularPotential):
-        'The Cosine potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CosineLocal',
             pmiproperty = ['K', 'theta0']

@@ -6,23 +6,24 @@ services:
 - docker
 
 env:
-  matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
-    - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
-    - DISTRO=ubuntu EXTERNAL=ON TEST_H5MD=ON
-    - DISTRO=ubuntu EXTERNAL=OFF
+    - DISTRO=ubuntu EXTERNAL=OFF COVERAGE=ON
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
-    - DISTRO=ubuntu_mpich EXTERNAL=ON BUILD_UG=ON
-    - DISTRO=ubuntu_mpich EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu_mpich EXTERNAL=ON
     - DISTRO=ubuntu_mpich EXTERNAL=OFF
     - DISTRO=fedora EXTERNAL=ON
-    - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
     - DISTRO=fedora_mpich EXTERNAL=ON
-    - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
     - DISTRO=opensuse EXTERNAL=ON
+    - DISTRO=opensuse EXTERNAL=OFF
+
+matrix:
+  exclude:
+    - compiler: clang
+      env: DISTRO=ubuntu EXTERNAL=OFF COVERAGE=ON
+
 
 script:
  - cp -vr docker ${HOME}
