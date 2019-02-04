@@ -641,7 +641,7 @@ namespace espressopp {
         //std::cout << getSystem()->comm->rank() << ": buf.read(force) (unpackAndAddForces) \n";
         buf.read(f);
         LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force "
-             << f.f() << " and adding to " << dst->force());
+             << f.f << " and adding to " << dst->force());
         dst->particleForce() += f;
 
 
