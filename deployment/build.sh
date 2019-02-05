@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 #
 # build.sh
 # Copyright (C) 2019 Jakub Krajniak <jkrajniak@gmail.com>
