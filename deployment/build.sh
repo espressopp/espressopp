@@ -13,7 +13,7 @@ cd ../../
 mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
 cp -r $HOME/.ccache ${HOME}/docker/ccache
 if [[ ${TRAVIS_BRANCH} = master ]]; then DOCKER_TAG=latest; else DOCKER_TAG="${TRAVIS_BRANCH}"; fi
-travis_retry timeout 540 docker pull $(sed -n '1s/from //p' ${HOME}/docker/Dockerfile)
+docker pull $(sed -n '1s/from //p' ${HOME}/docker/Dockerfile)
 docker build --build-arg COVERAGE=${COVERAGE} --build-arg EXTERNAL=${EXTERNAL} \
                 --build-arg CC=${CC} --build-arg CXX=${CXX} --build-arg BUILD_UG=${BUILD_UG} \
                 --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH} --build-arg TRAVIS_JOB_NUMBER=${TRAVIS_JOB_NUMBER} \
