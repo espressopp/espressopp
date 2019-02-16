@@ -65,10 +65,10 @@ after_success:
       fi;
     fi
 
-branches:
-  only:
-  - master
-  - /^v\d+\.\d+(\.\d+|_rc\d+)?$/
+    #branches:
+  #only:
+  #- master
+  #- /^v\d+\.\d+(\.\d+|_rc\d+)?$/
 
 cache:
   - ccache
