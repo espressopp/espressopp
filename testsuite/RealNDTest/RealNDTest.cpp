@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2019
+      Jakub Krajniak <jkrajniak at gmail.com>
   Copyright (C) 2016
       Max Planck Institute for Polymer Research & JGU Mainz
 
@@ -21,7 +23,7 @@
 #define BOOST_TEST_MODULE RealNDTest
 
 #include "RealND.hpp"
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 
 using namespace espressopp;  // NOLINT
 

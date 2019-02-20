@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016
+  Copyright (C) 2016,2019
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -19,7 +19,7 @@
 */
 
 #define BOOST_TEST_MODULE Array4Dtest
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include "esutil/Array4D.hpp"
 #include "include/ut.hpp"
 
