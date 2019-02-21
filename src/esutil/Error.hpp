@@ -85,7 +85,7 @@ namespace espressopp {
 
       /** Destructor; will also test for pending exceptions. */
 
-      ~Error();
+      ~Error() noexcept(false);
 
       /** Set an exception. This routine might be called
           individually by one or more processors.

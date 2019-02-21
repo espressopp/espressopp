@@ -25,7 +25,7 @@
 
 #include "mpi.hpp"
 #include <vector>
-#include "../RNG.hpp"
+#include "esutil/RNG.hpp"
 
 using namespace espressopp;
 using namespace espressopp::esutil;

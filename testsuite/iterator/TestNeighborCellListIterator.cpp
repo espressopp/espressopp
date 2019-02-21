@@ -25,7 +25,7 @@
 #include "ut.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
-#include "../NeighborCellListIterator.hpp"
+#include "iterator/NeighborCellListIterator.hpp"
 #include <vector>
 #include <iostream>
 
@@ -57,12 +57,12 @@ BOOST_AUTO_TEST_CASE(ListOfEmptyCells) {
   LocalCellList cl;
   for (int i = 0; i < NCELL; i++)
     cl.push_back(cell);
-  BOOST_CHECKPOINT("after CellList init");
+  BOOST_TEST_CHECKPOINT("after CellList init");
 
   NeighborCellList ncl;
   for (int i = 0; i < NCELL; i++)
     ncl.push_back(NeighborCellInfo(cl[i], (i%2 == 0)));
-  BOOST_CHECKPOINT("after NeighborCellList init");
+  BOOST_TEST_CHECKPOINT("after NeighborCellList init");
 
   NeighborCellListIterator cit(ncl, true);
   BOOST_CHECK(!cit.isValid());
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(FullCellList) {
   for (int i = 0; i < NCELL; ++i) {
     cells.push_back(cell);
     for (int j = 0; j < NP; ++j) {
-      p.p.id = i*NP + j;
+      p.id() = i*NP + j;
       cells.back().particles.push_back(p);
     }
   }
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(FullCellList) {
   for (int i = 0; i < NCELL*NP; ++i) {
     BOOST_CHECK(cit.isValid());
     BOOST_CHECK(!cit.isDone());
-    ++occ[cit->p.id];
+    ++occ[cit->id()];
     ++cit;
   }
 
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(FullCellListAllPairs) {
   for (int i = 0; i < NCELL; ++i) {
     cells.push_back(cell);
     for (int j = 0; j < NP; ++j) {
-      p.p.id = i*NP + j;
+      p.id() = i*NP + j;
       cells.back().particles.push_back(p);
     }
   }
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(FullCellListAllPairs) {
   for (int i = 0; i < (NCELL/2+NCELL%2)*NP; ++i) {
     BOOST_CHECK(cit.isValid());
     BOOST_CHECK(!cit.isDone());
-    ++occ[cit->p.id];
+    ++occ[cit->id()];
     ++cit;
   }
 

@@ -1,6 +1,6 @@
 file(GLOB_RECURSE BOOST_SOURCES libs/*.cpp)
+file(GLOB_RECURSE NOT_BOOST_TESTS "libs/test/*")
 file(GLOB_RECURSE NOT_BOOST_SOURCES
-  libs/test/*
   "libs/test/src/cpp_main.cpp"
   "libs/test/src/test_main.cpp"
   "libs/serialization/src/basic_text_wiprimitive.cpp"
@@ -23,6 +23,9 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 )
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
+set(BOOST_SOURCES_TEST ${BOOST_SOURCES})
+# Remove from the main boost library also tests framework.
+list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_TESTS})
 
 # Apply patch for Intel Compiler; http://stackoverflow.com/a/41188485
 if (NOT EXTERNAL_BOOST AND CMAKE_CXX_COMPILER_ID MATCHES "Intel")
@@ -37,8 +40,12 @@ if (NOT EXTERNAL_BOOST AND CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     endif()
 endif()
 
+# Static boost library for the main _espressopp.so module.
 add_library(espressopp_boost STATIC ${BOOST_SOURCES})
+# Shared libboost library for unit tests.
+add_library(espressopp_boost_test SHARED ${BOOST_SOURCES_TEST})
 target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
 if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
   set_target_properties(espressopp_boost PROPERTIES COMPILE_FLAGS "-fPIC")
+  set_target_properties(espressopp_boost_test PROPERTIES COMPILE_FLAGS "-fPIC")
 endif( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )

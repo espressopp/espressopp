@@ -24,7 +24,7 @@
 #include "ut.hpp"
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "../Timer.hpp"
+#include "esutil/Timer.hpp"
 
 using namespace espressopp::esutil;
 
