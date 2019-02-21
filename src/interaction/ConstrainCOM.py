@@ -1,4 +1,4 @@
-#  Copyright (C) 2017
+#  Copyright (C) 2017, 2019
 #      Max Planck Institute for Polymer Research
 #  
 #  This file is part of ESPResSo++.
@@ -18,22 +18,28 @@
 
 
 r"""
-***********************************************
-**espressopp.interaction.ConstrainCOM**
-***********************************************
-This class is for calculating forces of constraining center of mass of subchains.
+***********************************
+espressopp.interaction.ConstrainCOM
+***********************************
+
+This class is for calculating forces acting on constrained center of mass of subchains [Zhang_2014]_.
+
 Subchains are defined as a tuple list.
 
-.. math:: U = k_{com} \left(\vec{r}_{com} - \vec{R}_{com}\right)^2,
+.. math:: U = k_{com} \left(\vec{r_{com}} - \vec{R_{com}}\right)^2,
 
-where :math:`\vec{r}_{com}` stands for the center of mass of subchain and :math:`\vec{R}_{com}` stands for the desired center of mass of subchain.
+where :math:`\vec{r_{com}}` stands for the center of mass of subchain and :math:`\vec{R_{com}}`
+stands for the desired center of mass of subchain.
 
-This class set 2 conditions on a tuple list defining subchains.
+This class implies 2 conditions on a tuple list defining subchains:
 
-1. The length of all tuple must be same.
-2. int(key particle id / The length of a tuple) must not be redundantly, where key particle id is the smallest particle id in a tuple.
+1. The length of all tuples must be the same.
+2. int(key particle id / The length of a tuple) must not be redundantly, where key particle id
+   is the smallest particle id in a tuple.
 
-Reference: Equilibration of high molecular weight polymer melts: A hierarchical strategy, Macro Lett., 2014, 3, 198
+
+.. [Zhang_2014] G. Zhang, L. A. Moreira, T. Stuehn, K. Ch. Daoulas, and K. Kremer,
+         Equilibration of high molecular weight polymer melts: A hierarchical strategy, Macro Lett., 2014, 3, 198
 
 .. function:: espressopp.interaction.ConstrainCOM(k_com)
 

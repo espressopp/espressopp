@@ -19,45 +19,78 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*******************************************
-espressopp.interaction.AngularCosineSquared
-*******************************************
-
-Calculates the Angular Cosine Squared interaction
+"""
+Calculates the Angular Cosine Squared potential as:
 
 .. math::
 
-	U =  K (cos(\theta) - cos(\theta_{0}))^2
+    U =  K [cos(\\theta) - cos(\\theta_{0})]^2,
+    
+where angle :math:`\\theta` is the planar angle formed by three binded particles
+(triplet or triple). 
 
-.. function:: espressopp.interaction.AngularCosineSquared(K, theta0)
+This potential is employed by:
 
-		:param K: (default: 1.0)
-		:param theta0: (default: 0.0)
-		:type K: real
-		:type theta0: real
+.. py:class:: espressopp.interaction.AngularCosineSquared (K = 1.0, theta0 = 0.0)
 
-.. function:: espressopp.interaction.FixedTripleListAngularCosineSquared(system, vl, potential)
+    :param real K: energy amplitude
+    :param real theta0: angle in radians
+    :rtype: triple potential
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+A triple potential applied to every triple in the system creates an *interaction*.
+This is done via:
 
-.. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.getFixedTripleList()
+.. py:class:: espressopp.interaction.FixedTripleListAngularCosineSquared (system, fixed_triple_list, potential)
 
-		:rtype: A Python list of lists.
+    :param shared_ptr system: system object
+    :param list fixed_triple_list: a fixed list of all triples in the system
+    :param potential: triple potential (in this case, :py:class:`espressopp.interaction.AngularCosineSquared`).
+    :rtype: interaction
 
-.. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.setPotential(type1, type2, potential)
+    **Methods**
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+    .. py:method:: getFixedTripleList()
+
+        :rtype: A Python list of fixed triples (e.g., in the chains).
+
+    .. py:method:: setPotential(type1, type2, potential)
+
+        :param type1: 
+        :param type2: 
+        :param potential: 
+        :type type1: 
+        :type type2: 
+        :type potential: 
+           
+**Example 1.** Creating a fixed triple list by :py:class:`espressopp.FixedTripleList`.    
+    
+    >>> # we assume a polymer solution of n_chains of the length chain_len each.
+    >>> # At first, create a list_of_triples for the system:
+    >>> N = n_chains * chain_len            # number of particles in the system
+    >>> list_of_tripples = []               # empty list of triples
+    >>> for n in range (n_chains):          # loop over chains
+    >>>     for m in range (chain_len):     # loop over chain beads
+    >>>         pid = n * chain_len + m
+    >>>         if (pid > 1) and (pid < N - 1):
+    >>>             list_of_tripples.append( (pid-1, pid, pid+1) )
+    >>>
+    >>> # create fixed triple list
+    >>> fixed_triple_list = espressopp.FixedTripleList(system.storage)
+    >>> fixed_triple_list.addTriples(list_of_triples)
+
+**Example 2.** Employing an Angular Cosine Squared potential.
+
+    >>> # Note, the fixed_triple_list has to be generated in advance! (see Example 1)
+    >>>
+    >>> # set up the potential
+    >>> potAngCosSq = espressopp.interaction.AngularCosineSquared(K=0.5, theta0=0.0)
+    >>>
+    >>> # set up the interaction
+    >>> interAngCosSq = espressopp.interaction.FixedTripleListAngularCosineSquared(system, fixed_triple_list, potAngCosSq)
+    >>>
+    >>> # finally, add the interaction to the system
+    >>> system.addInteraction(interAngCosSq)
+
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -90,7 +123,6 @@ class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_Fix
 
 if pmi.isController:
     class AngularCosineSquared(AngularPotential):
-        'The AngularCosineSquared potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularCosineSquaredLocal',
             pmiproperty = ['K', 'theta0']

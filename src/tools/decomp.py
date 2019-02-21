@@ -101,7 +101,7 @@ from espressopp.Exceptions import Error
 import math
 import time
 import numbers
-from .loadbal import qbicity, changeIndex, halfDecomp, addHsymmetry, adaptNeiList, reDistCellsHom, nodeGridSizeCheck
+from loadbal import qbicity, changeIndex, halfDecomp, addHsymmetry, adaptNeiList, reDistCellsHom, nodeGridSizeCheck
 
 __author__ = 'Dr. Horacio V Guzman'
 __email__ = 'horacio.v.g at gmail dot com'
@@ -112,125 +112,98 @@ __all__ = [
 ]
 
 # WARNING! New arguments are needed! At least...box_size,rc,skin
-
-
-def nodeGrid(n=None, box_size=0, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0, ]):
-    print("################################################# Warning #####################################################")
-    print("This Domain Decomposition algorithm requires minimally, the following arguments nodeGrid(n, box_size, rc, skin)")
-    print("If you prefer to use the simple Domain Decomp. algorithm which may affect the performance of your MD simulation")
-    print("then go for the function nodeGridSimple(n), which is also the default one if you give only one argument 'n'.   ")
-    print("Important: In case you are aiming to perform Lattice Boltzmann simulations you no need to worry about the per- ")
-    print("formance.")
-    print("For further details look into ESPResSo++ documentation or H.V. Guzman et. al, Phys. Rev. E, 96, 053311 (2017). ")
-    print("###############################################################################################################")
-    if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):
+	
+def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
+    if isinstance(n, numbers.Number) and not isinstance(box_size, numbers.Number):					
         return nodeGridSimple(n)
     else:
-        ijkmax = 3 * n * n + 1
-        boxList = [box_size[0], box_size[1], box_size[2]]
-        ratioEH2CG = [(2. * eh_size) / (abs(box_size[0] - (2. * eh_size))), (2. * eh_size)/(
-            abs(box_size[1] - (2. * eh_size))), (2. * eh_size) / (abs(box_size[2] - (2. * eh_size)))]
-        ratioEHCG = min(ratioEH2CG)
-        if not idealGas:  # Non ideal Gas Simulation
-            # This condition checks if the sys is AdResS, if afirmative it resizes box accordingly
-            if ratioMS > 1:  # Spatially heterogeneous simulation
-                # print ratioEHCG
-                # This condition checks if the sys is slab based or cubic and resizes the box accordingly
-                if sum(slabMSDims) > 0.1:
-                    boxList = [slabMSDims[0] * (box_size[0] + (2. * eh_size) * (pow(ratioMS, 0.3333) - 1.)), slabMSDims[1] * (box_size[1] + (
-                        2. * eh_size) * (pow(ratioMS, 0.3333) - 1.)), slabMSDims[2] * (box_size[2] + (2. * eh_size) * (pow(ratioMS, 0.3333) - 1.))]
-                    boxList = [(1 - slabMSDims[0]) * box_size[0] * (pow(ratioMS, 0.3333)) + boxList[0], (1 - slabMSDims[1]) * box_size[1] * (
-                        pow(ratioMS, 0.3333)) + boxList[1], (1 - slabMSDims[2]) * box_size[2] * (pow(ratioMS, 0.3333)) + boxList[2]]  # Flag NOR
+	    ijkmax = 3 * n * n + 1
+	    boxList = [box_size[0], box_size[1], box_size[2]]
+	    ratioEH2CG = [(2. * eh_size) / (abs(box_size[0] - (2. * eh_size))), (2. * eh_size)/(abs(box_size[1] - (2. * eh_size))), (2. * eh_size) / (abs(box_size[2] - (2. * eh_size)))]
+	    ratioEHCG = min(ratioEH2CG)
+	    if not idealGas:  # Non ideal Gas Simulation
+		# This condition checks if the sys is AdResS, if afirmative it resizes box accordingly
+		if ratioMS > 1:  # Spatially heterogeneous simulation
+		    # print ratioEHCG
+		    # This condition checks if the sys is slab based or cubic and resizes the box accordingly
+		    if sum(slabMSDims) > 0.1:
+		        boxList = [slabMSDims[0] * (box_size[0] + (2. * eh_size) * (pow(ratioMS, 0.3333) - 1.)), slabMSDims[1] * (box_size[1] + (2. * eh_size) * (pow(ratioMS, 0.3333) - 1.)), slabMSDims[2] * (box_size[2] + (2. * eh_size) * (pow(ratioMS, 0.3333) - 1.))]
+		        boxList = [(1 - slabMSDims[0]) * box_size[0] * (pow(ratioMS, 0.3333)) + boxList[0], (1 - slabMSDims[1]) * box_size[1] * (pow(ratioMS, 0.3333)) + boxList[1], (1 - slabMSDims[2]) * box_size[2] * (pow(ratioMS, 0.3333)) + boxList[2]]  # Flag NOR
 
-                else:
-                    boxList = [box_size[0] + (2. * eh_size) * (ratioMS - 1.), box_size[1] + (
-                        2. * eh_size) * (ratioMS - 1.), box_size[2] + (2. * eh_size) * (ratioMS - 1.)]
-            else:
-                print(
-                    "HeSpaDDA message: Non AdResS DD...entering Homogeneous DD...3, 2, 1 ")
-        # Ideal Gas HeSpaDDA (idealGas==1)
-        else:
-            if ratioMS > 1:
-                # This condition checks if the sys is slab based or cubic and resizes the box accordingly
-                if sum(slabMSDims) > 0:
-                    if n <= round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) * ratioEHCG / (rc + skin) >= 1.:
-                        boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * (
-                            (2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
-                        boxList = [(1 - slabMSDims[0]) * box_size[0] + boxList[0], (1 - slabMSDims[1])
-                                   * box_size[1] + boxList[1], (1 - slabMSDims[2]) * box_size[2] + boxList[2]]
-                        print(
-                            "HeSpaDDA message: this option ONE of the ideal gas size box your low resolution region is small")
-                    elif n > round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) / (rc + skin) >= 4. and round((2. * eh_size) / (rc + skin) - 0.5 + 2.) > min(boxList) / (rc + skin):
-                        boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * (
-                            (2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
-                        boxList = [(1 - slabMSDims[0]) * box_size[0] * (pow(ratioMS, 0.3333)) + boxList[0], (1 - slabMSDims[1]) * box_size[1] * (
-                            pow(ratioMS, 0.3333)) + boxList[1], (1 - slabMSDims[2]) * box_size[2] * (pow(ratioMS, 0.3333)) + boxList[2]]
-                        # boxList=[box_size[0],box_size[1],box_size[2]]	# UJ is here
-                        print(
-                            "HeSpaDDA message: this option TWO of the ideal gas size box your low resolution region is big")
-                    elif n > round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) / (rc + skin) < 4.:
-                        boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * (
-                            (2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
-                        boxList = [(1 - slabMSDims[0]) * box_size[0] + boxList[0], (1 - slabMSDims[1])
-                                   * box_size[1] + boxList[1], (1 - slabMSDims[2]) * box_size[2] + boxList[2]]
-                        # boxList=[box_size[0],box_size[1],box_size[2]]	# UJ is here
-                        print(
-                            "HeSpaDDA message: this option THREE of the ideal gas size box your low resolution region is just sufficiently big")
-                    else:
-                        print("HeSpaDDA message: No more space for distributing Cores...look if you could use some HalfCells, or reduce the nr. of processors used and try again")
-                else:
-                    boxList = [(2. * eh_size) + 2. * (rc + skin), (2. * eh_size) + 2. * (rc + skin),
-                               (2. * eh_size) + 2. * (rc + skin)]  # IDEA: multiply here by the cells refina
-            else:
-                print("HeSpaDDA message: Non AdResS DD!")
+		    else:
+		        boxList = [box_size[0] + (2. * eh_size) * (ratioMS - 1.), box_size[1] + (
+		            2. * eh_size) * (ratioMS - 1.), box_size[2] + (2. * eh_size) * (ratioMS - 1.)]
+		else:
+		    print "HeSpaDDA message: Non AdResS DD...entering Homogeneous DD...3, 2, 1 "
+	    # Ideal Gas HeSpaDDA (idealGas==1)
+	    else:
+		if ratioMS > 1:
+		    # This condition checks if the sys is slab based or cubic and resizes the box accordingly
+		    if sum(slabMSDims) > 0:
+		        if n <= round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) * ratioEHCG / (rc + skin) >= 1.:
+		            boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
+		            boxList = [(1 - slabMSDims[0]) * box_size[0] + boxList[0], (1 - slabMSDims[1])* box_size[1] + boxList[1], (1 - slabMSDims[2]) * box_size[2] + boxList[2]]
+		            print "HeSpaDDA message: this option ONE of the ideal gas size box your low resolution region is small"			
+		        elif n > round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) / (rc + skin) >= 4. and round((2. * eh_size) / (rc + skin) - 0.5 + 2.) > min(boxList) / (rc + skin):
+		            boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
+		            boxList = [(1 - slabMSDims[0]) * box_size[0] * (pow(ratioMS, 0.3333)) + boxList[0], (1 - slabMSDims[1]) * box_size[1] * (pow(ratioMS, 0.3333)) + boxList[1], (1 - slabMSDims[2]) * box_size[2] * (pow(ratioMS, 0.3333)) + boxList[2]]
+		            # boxList=[box_size[0],box_size[1],box_size[2]]	# UJ is here
+		            print "HeSpaDDA message: this option TWO of the ideal gas size box your low resolution region is big"
+		        elif n > round((2. * eh_size) / (rc + skin) - 0.5 + 2.) and min(boxList) / (rc + skin) < 4.:
+		            boxList = [slabMSDims[0] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[1] * ((2. * eh_size) + 2. * (rc + skin)), slabMSDims[2] * ((2. * eh_size) + 2. * (rc + skin))]
+		            boxList = [(1 - slabMSDims[0]) * box_size[0] + boxList[0], (1 - slabMSDims[1]) * box_size[1] + boxList[1], (1 - slabMSDims[2]) * box_size[2] + boxList[2]]
+		            # boxList=[box_size[0],box_size[1],box_size[2]]	# UJ is here
+		            print "HeSpaDDA message: this option THREE of the ideal gas size box your low resolution region is just sufficiently big"
+		        else:
+		            print "HeSpaDDA message: No more space for distributing Cores...look if you could use some HalfCells, or reduce the nr. of processors used and try again"
+		    else:
+		        boxList = [(2. * eh_size) + 2. * (rc + skin), (2. * eh_size) + 2. * (rc + skin), (2. * eh_size) + 2. * (rc + skin)]  # IDEA: multiply here by the cells refina
+		else:
+		    print "HeSpaDDA message: Non AdResS DD!"
 
-        # Here starts the new Dimensional aware HDD algorithm which. Dependencies: loadbal
-        LoN_Avgmin = sum(boxList)
-        # ima and imi sort values according to the box dimensions
-        ima = boxList.index(max(boxList))
-        imi = boxList.index(min(boxList))
-        dN = [1, 1, 1]
-        fdN = [0, 0, 0]
-        for i in range(1, n + 1):
-            for j in range(i, n + 1):
-                for k in range(j, n + 1):
-                    if (i * j * k == n) and (i * i + j * j + k * k < ijkmax):
-                        dN[0] = k
-                        dN[1] = j
-                        dN[2] = i
-                        ijkmax = i * i + j * j + k * k
-                        # This checks if the system's box is cubic if not add weighted averages
-                        # NOTE: It could be further optimized on a system by system basis as f(deltaCellSize beteween cores) this corresponds to the general version.
-                        if qbicity(box_size, rc, skin) == False:
-                            ndN = changeIndex(dN, ima, imi)[:]
-                            LoN_norm = [boxList[0] / ndN[0],
-                                        boxList[1] / ndN[1], boxList[2] / ndN[2]]
-                            LoN_Avg = sum(LoN_norm) / 3.0
-                            if LoN_Avg <= LoN_Avgmin:
-                                LoN_Avgmin = LoN_Avg
-                                fdN = ndN[:]
-                                ijkmax = fdN[0] * fdN[0] + \
-                                    fdN[1] * fdN[1] + fdN[2] * fdN[2]
-                                print(fdN)
-                            else:
-                                ijkmax = fdN[0] * fdN[0] + \
-                                    fdN[1] * fdN[1] + fdN[2] * fdN[2]
-                                print('HeSpaDDA message: No update of dN req ...')
-                        else:
-                            print('Cubicity check passed -> powered by HeSpaDDA')
-                            fdN = [k, j, i]
-        if abs(box_size[1] - box_size[2]) < (2 * (rc + skin)):
-            if fdN[2] > fdN[1]:
-                aux = fdN[2]
-                fdN[2] = fdN[1]
-                fdN[1] = aux
-                # print 'ordered fdN:',fdN[0],fdN[1],fdN[2]
-            else:
-                print(
-                    'HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!')
-        else:
-            print('HeSpaDDA message: Size Lenghts are different in Y and Z!')
-        return Int3D(fdN[0], fdN[1], fdN[2])
+	    # Here starts the new Dimensional aware HDD algorithm which. Dependencies: loadbal
+	    LoN_Avgmin = sum(boxList)
+	    # ima and imi sort values according to the box dimensions
+	    ima = boxList.index(max(boxList))
+	    imi = boxList.index(min(boxList))
+	    dN = [1, 1, 1]
+	    fdN = [0, 0, 0]
+	    for i in xrange(1, n + 1):
+		for j in xrange(i, n + 1):
+		    for k in xrange(j, n + 1):
+		        if (i * j * k == n) and (i * i + j * j + k * k < ijkmax):
+		            dN[0] = k
+		            dN[1] = j
+		            dN[2] = i
+		            ijkmax = i * i + j * j + k * k
+		            # This checks if the system's box is cubic if not add weighted averages
+		            # NOTE: It could be further optimized on a system by system basis as f(deltaCellSize beteween cores) this corresponds to the general version.
+		            if qbicity(box_size, rc, skin) == False:
+		                ndN = changeIndex(dN, ima, imi)[:]
+		                LoN_norm = [boxList[0] / ndN[0], boxList[1] / ndN[1], boxList[2] / ndN[2]]
+		                LoN_Avg = sum(LoN_norm) / 3.0
+		                if LoN_Avg <= LoN_Avgmin:
+		                    LoN_Avgmin = LoN_Avg
+		                    fdN = ndN[:]
+		                    ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
+		                    print fdN
+		                else:
+		                    ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
+		                    print 'HeSpaDDA message: No update of dN req ...'
+		            else:
+		                print 'Cubicity check passed -> powered by HeSpaDDA'
+		                fdN = [k, j, i]
+	    if abs(box_size[1] - box_size[2]) < (2 * (rc + skin)):
+		if fdN[2] > fdN[1]:
+		    aux = fdN[2]
+		    fdN[2] = fdN[1]
+		    fdN[1] = aux
+		    # print 'ordered fdN:',fdN[0],fdN[1],fdN[2]
+		else:
+		    print 'HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!'
+	    else:
+		print 'HeSpaDDA message: Size Lenghts are different in Y and Z!'
+	    return Int3D(fdN[0], fdN[1], fdN[2])
 
 
 def cellGrid(box_size, node_grid, rc, skin):
@@ -261,9 +234,9 @@ def nodeGridSimple(n):
     d1 = 1
     d2 = 1
     d3 = 1
-    for i in range(1, n + 1):
-        for j in range(i, n + 1):
-            for k in range(j, n + 1):
+    for i in xrange(1, n + 1):
+        for j in xrange(i, n + 1):
+            for k in xrange(j, n + 1):
                 if (i * j * k == n) and (i * i + j * j + k * k < ijkmax):
                     d1 = k
                     d2 = j
@@ -279,21 +252,18 @@ def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, r
     L_s = box_size[indMin]
     L_lHR = 2. * eh_size
     L_lLR = L_l - L_lHR
-    SymFactor = int((L_l + L_lHR * (ratioMS**(1. / 3.) - 1.)) /
-                    (L_s * (ratioMS**(1. / 3.) - 1.)))
+    SymFactor = int((L_l + L_lHR * (ratioMS**(1. / 3.) - 1.)) / (L_s * (ratioMS**(1. / 3.) - 1.)))
     nX = [0] * MnN
     nY = [0] * MnN
     nZ = [0] * MnN
-    procArray = list(range(1 * CpN, (MnN + 1) * CpN, CpN))
-    print(("HeSpaDDA message: Your search array in terms of total number of processors is:", procArray))
-    for i in range(1, MnN + 1):
-        nX[i - 1], nY[i - 1], nZ[i - 1] = nodeGrid(
-            procArray[i - 1], box_size, rc, skin, eh_size, ratioMS, idealGas, slabMSDims)
-    print("HeSpaDDA message: For your Information, we are tackling the following number of processors")
-    print(("HeSpaDDA message: Processors in the x-axis are:", nX,
-           "\nProcessors in the y-axis are:", nY, "\nProcessors in the z-axis are:", nZ))
+    procArray = range(1 * CpN, (MnN + 1) * CpN, CpN)
+    print "HeSpaDDA message: Your search array in terms of total number of processors is:", procArray
+    for i in xrange(1, MnN + 1):
+        nX[i - 1], nY[i - 1], nZ[i - 1] = nodeGrid(procArray[i - 1], box_size, rc, skin, eh_size, ratioMS, idealGas, slabMSDims)
+    print "HeSpaDDA message: For your Information, we are tackling the following number of processors"
+    print "HeSpaDDA message: Processors in the x-axis are:", nX, "\nProcessors in the y-axis are:", nY, "\nProcessors in the z-axis are:", nZ
     pickedP = []
-    for i in range(0, MnN):
+    for i in xrange(0, MnN):
         if (indMax == 0 and indMin == 1) or (indMax == 0 and indMin == 2):
             if nX[i] > (SymFactor - percTol * SymFactor) * nY[i] and nX[i] < (SymFactor + percTol * SymFactor) * nY[i]:
                 pickedP.append(i)
@@ -303,8 +273,7 @@ def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, r
         elif (indMax == 2 and indMin == 0) or (indMax == 2 and indMin == 1):
             if nZ[i] > (SymFactor - percTol * SymFactor) * nX[i] and nZ[i] < (SymFactor + percTol * SymFactor) * nX[i]:
                 pickedP.append(i)
-    print(("HeSpaDDA message: There are a couple of total number of processors that satisfy your requirements: ", [
-          (v+1)*CpN for v in pickedP]))
+    print "HeSpaDDA message: There are a couple of total number of processors that satisfy your requirements: ", [(v+1)*CpN for v in pickedP]
     return [(v+1)*CpN for v in pickedP]
 
 # WARNING! This is a new function to find values for the new neighborList DataStruct for Hom-Sys
@@ -312,7 +281,7 @@ def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, r
 
 def neiListHom(node_grid, box, rc, skin):
     # data structure Initialization
-    print(("HeSpaDDA message: Current homogeneous NodeGrid (X,Y,Z)", node_grid))
+    print "HeSpaDDA message: Current homogeneous NodeGrid (X,Y,Z)", node_grid
     rc_skin = rc + skin
     neiListxin = []
     neiListyin = []
@@ -329,14 +298,13 @@ def neiListHom(node_grid, box, rc, skin):
     neiListy = adaptNeiList(neiListyin)
     neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
     neiListz = adaptNeiList(neiListzin)
-    return list(map(int, neiListx)), list(map(int, neiListy)), list(map(int, neiListz))
+    return map(int, neiListx), map(int, neiListy), map(int, neiListz)
 
 # WARNING! This is a new function to find values for the new neighborList DataStruct for inHom-Sys
 
-
 def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, idealGasFlag=True, sphereAdr=False, slabMSDims=[1, 0, 0]):
     # dataStructure Initialization
-    print(("HeSpaDDA message: Current heterogeneous NodeGrid (X,Y,Z)", node_grid))
+    print "HeSpaDDA message: Current heterogeneous NodeGrid (X,Y,Z)", node_grid
     rc_skin = rc + skin
     # define Neighbor vectors
     neiListx = [0] * (node_grid[0] + 1)
@@ -352,92 +320,77 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
     cellsX = round(cursor[0] / rc_skin - 0.5)
     cellsY = round(cursor[1] / rc_skin - 0.5)
     cellsZ = round(cursor[2] / rc_skin - 0.5)
-    print(("HeSpaDDA message: Current heterogeneous CellGrid (X,Y,Z)",
-           cellsX, cellsY, cellsZ))
+    print "HeSpaDDA message: Current heterogeneous CellGrid (X,Y,Z)", cellsX, cellsY, cellsZ
     # This condition checks if the Sys is a Slab or a Sphere. It should work for any middle based Sys
     if not sphereAdr:
         if slabMSDims[0] == 1:
-            halfneilListx = halfDecomp(adrCenter[0], rc_skin, eh_size, int(
-                round(node_grid[0] / 2. - 0.5)), cellsX, ratioMS, cursor[0], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListx))
+            halfneilListx = halfDecomp(adrCenter[0], rc_skin, eh_size, int(round(node_grid[0] / 2. - 0.5)), cellsX, ratioMS, cursor[0], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListx
             # Next instruction is doubling(by unfolding halfDecomp) the halfspace based DD
-            neiListxin = addHsymmetry(
-                halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin))
+            neiListxin = addHsymmetry(halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin
         else:
             neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin)
         # Contains cores Neighbor List in full format for X
         neiListx = adaptNeiList(neiListxin)
         if slabMSDims[1] == 1:
-            halfneilListy = halfDecomp(adrCenter[1], rc_skin, eh_size, int(
-                round(node_grid[1] / 2. - 0.5)), cellsY, ratioMS, cursor[1], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListy))
+            halfneilListy = halfDecomp(adrCenter[1], rc_skin, eh_size, int(round(node_grid[1] / 2. - 0.5)), cellsY, ratioMS, cursor[1], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListy
             # Next instruction is doubling(by unfolding halfDecomp) the halfspace based DD
-            neiListyin = addHsymmetry(
-                halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin))
+            neiListyin = addHsymmetry(halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin
         else:
             neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin)
         # Contains the homogeneously decomp cores Neighbor List in full format for Y
         neiListy = adaptNeiList(neiListyin)
         if slabMSDims[2] == 1:
-            halfneilListz = halfDecomp(adrCenter[2], rc_skin, eh_size, int(
-                round(node_grid[2] / 2. - 0.5)), cellsZ, ratioMS, cursor[2], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListz))
+            halfneilListz = halfDecomp(adrCenter[2], rc_skin, eh_size, int(round(node_grid[2] / 2. - 0.5)), cellsZ, ratioMS, cursor[2], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListz
             # Next instruction is doubling(by unfolding halfDecomp) the halfspace based DD
-            neiListzin = addHsymmetry(
-                halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin))
+            neiListzin = addHsymmetry(halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin
         else:
             neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
         # Contains the homogeneously decomp cores Neighbor List in full format for Z
         neiListz = adaptNeiList(neiListzin)
         # NOTE that additional DD options for slabs can be furhter added
     elif sphereAdr:
-        flx, fly, flz = nodeGridSizeCheck(
-            node_grid[0], node_grid[1], node_grid[2])
-        print(("HeSpaDDA message: Is it worthy to use an advanced DD? Flags for it in each dir X,Y,Z (0 means OK for heterogenoeus DD)...,", flx, fly, flz))
+        flx, fly, flz = nodeGridSizeCheck(node_grid[0], node_grid[1], node_grid[2])
+        print "HeSpaDDA message: Is it worthy to use an advanced DD? Flags for it in each dir X,Y,Z (0 means OK for heterogenoeus DD)...,", flx, fly, flz
         # on X-axis
         if flx == 0:
-            halfneilListx = halfDecomp(adrCenter[0], rc_skin, eh_size, int(
-                round(node_grid[0] / 2. - 0.5)), cellsX, ratioMS, cursor[0], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListx))
-            neiListxin = addHsymmetry(
-                halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin))
+            halfneilListx = halfDecomp(adrCenter[0], rc_skin, eh_size, int(round(node_grid[0] / 2. - 0.5)), cellsX, ratioMS, cursor[0], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListx
+            neiListxin = addHsymmetry(halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin
         elif flx > 1:
             neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin)
         neiListx = adaptNeiList(neiListxin)
         # on Y-axis
         if fly == 0:
-            halfneilListy = halfDecomp(adrCenter[1], rc_skin, eh_size, int(
-                round(node_grid[1] / 2. - 0.5)), cellsY, ratioMS, cursor[1], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListy))
-            neiListyin = addHsymmetry(
-                halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin))
+            halfneilListy = halfDecomp(adrCenter[1], rc_skin, eh_size, int(round(node_grid[1] / 2. - 0.5)), cellsY, ratioMS, cursor[1], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListy
+            neiListyin = addHsymmetry(halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin
         elif fly > 1:
             neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin)
         neiListy = adaptNeiList(neiListyin)
         # on Z-axis
         if flz == 0:
-            halfneilListz = halfDecomp(adrCenter[2], rc_skin, eh_size, int(
-                round(node_grid[2] / 2. - 0.5)), cellsZ, ratioMS, cursor[2], idealGasFlag)
-            print(("HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListz))
-            neiListzin = addHsymmetry(
-                halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
-            print(("HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin))
+            halfneilListz = halfDecomp(adrCenter[2], rc_skin, eh_size, int(round(node_grid[2] / 2. - 0.5)), cellsZ, ratioMS, cursor[2], idealGasFlag)
+            print "HeSpaDDA message: My halfneilListx called a half decomposition of the first half of the sim box as (algorithm S.1)...,", halfneilListz
+            neiListzin = addHsymmetry(halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
+            print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin
         elif flz > 1:
             neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
         neiListz = adaptNeiList(neiListzin)
-    print(("HeSpaDDA message: neiListX:", list(map(int, neiListx)), "\n neiListY", list(
-        map(int, neiListy)), "\n neiListZ", list(map(int, neiListz))))
-    return Int3D(cellsX, cellsY, cellsZ), list(map(int, neiListx)), list(map(int, neiListy)), list(map(int, neiListz))
+    print "HeSpaDDA message: neiListX:", map(int, neiListx), "\n neiListY", map(int, neiListy), "\n neiListZ", map(int, neiListz)
+    return Int3D(cellsX, cellsY, cellsZ), map(int, neiListx), map(int, neiListy), map(int, neiListz)
 
 
 def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, printInfo=True):
     if printInfo:
-        print('HeSpaDDA message: The tuning is started. It can take some time depending on your system.')
+        print 'HeSpaDDA message: The tuning is started. It can take some time depending on your system.'
 
     fi = (1.0 + math.sqrt(5.0)) / 2.0  # golden ratio
 
@@ -447,15 +400,14 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
     nsteps = int(espressopp.MPI.COMM_WORLD.size * 1000000.0 / float(npart))
 
     if printInfo:
-        print(('CellGrid before tuning: ', system.storage.getCellGrid()))
+        print 'CellGrid before tuning: ', system.storage.getCellGrid()
         sys.stdout.write('\nSteps     = %d\n' % nsteps)
         sys.stdout.write('Precision = %g\n' % precision)
         sys.stdout.write('It runs till deltaSkin<precision\n')
 
     if printInfo:
         prnt_format1 = '\n%9s %10s %10s %10s %14s\n'
-        sys.stdout.write(prnt_format1 % ('time1: ', ' time2: ',
-                                         ' skin1: ', ' skin2: ', ' deltaSkin: '))
+        sys.stdout.write(prnt_format1 % ('time1: ', ' time2: ', ' skin1: ', ' skin2: ', ' deltaSkin: '))
 
     while (maxSkin - minSkin >= precision):
         skin1 = maxSkin - (maxSkin - minSkin) / fi
@@ -482,12 +434,10 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
 
         if printInfo:
             prnt_format2 = '%7.3f %10.3f %11.4f %10.4f %12.6f\n'
-            sys.stdout.write(prnt_format2 % (
-                time1, time2, minSkin, maxSkin, (maxSkin - minSkin)))
+            sys.stdout.write(prnt_format2 % (time1, time2, minSkin, maxSkin, (maxSkin - minSkin)))
 
             sys.stdout.write('\nNew skin: %g\n' % system.skin)
-            sys.stdout.write('\nNew cell grid: %s\n' %
-                             system.storage.getCellGrid())
+            sys.stdout.write('\nNew cell grid: %s\n' % system.storage.getCellGrid())
 
     system.skin = (maxSkin + minSkin) / 2.0
     system.storage.cellAdjust()
@@ -500,10 +450,10 @@ def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep=0.00
     # this is an empirical formula in order to get the appropriate number of steps
     nsteps = int(espressopp.MPI.COMM_WORLD.size * 10000000.0 / float(npart))
 
-    print(('      Calculations is started. It will print out the dependece of time of \n\
+    print '      Calculations is started. It will print out the dependece of time of \n\
       running of %d steps on the skin size into the file \'timeVSskin.dat\'.\n\
       The range of skin sizes is [%g, %g], skin step is %g. It can take some \n\
-      time depending on your system.' % (nsteps, minSkin, maxSkin, skinStep)))
+      time depending on your system.' % (nsteps, minSkin, maxSkin, skinStep)
 
     curSkin = minSkin
 
@@ -524,7 +474,7 @@ def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep=0.00
 
         count = count + 1
         if (count == 20):
-            print(('skin: ', system.skin))
+            print 'skin: ', system.skin
             count = 0
 
         curSkin = curSkin + skinStep

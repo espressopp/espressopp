@@ -1,6 +1,6 @@
 """
 ***********************************
-espressopp.external.Transformations
+espressopp.external.transformations
 ***********************************
 
 Homogeneous Transformation Matrices and Quaternions.

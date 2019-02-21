@@ -324,11 +324,13 @@ namespace espressopp {
     clearAdrATParticlesG();
     // clear ghost tuples
     FixedTupleListAdress::iterator it = fixedtupleList->begin();
-    for (;it != fixedtupleList->end(); ++it) {
+    for (;it != fixedtupleList->end();) {
         Particle* vp = it->first;
         if (vp->ghost()) {
             //std::cout << "erasing ghost particle in tuple: " << vp->id() << "-" << vp->ghost() << "\n";
-            fixedtupleList->erase(it);
+            it = fixedtupleList->erase(it);
+        } else {
+            ++it;
         }
     }
   }
@@ -639,7 +641,7 @@ namespace espressopp {
         //std::cout << getSystem()->comm->rank() << ": buf.read(force) (unpackAndAddForces) \n";
         buf.read(f);
         LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force "
-             << f.f() << " and adding to " << dst->force());
+             << f.f << " and adding to " << dst->force());
         dst->particleForce() += f;
 
 

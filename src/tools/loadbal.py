@@ -69,7 +69,7 @@ loadbal - HeSpaDDA load balancing python functions
     
     It's a function which distributes the remaining DELTA cells into nodes semi-randomly. By default
     the biase applies to the CG-region and it assumes ther cannot be more than 3 extra cells to
-    redistribute, because this is the total number of regions in the simulation box |CG|EH|CG| (by
+    redistribute, because this is the total number of regions in the simulation box `|CG|EH|CG|` (by
     default the cg biased is left this could be updated in the dyn load balancing case!
 
 *  `findNodesMS(node_gridX,totCellsEH,totCellsCG,ratioMS,idealGas)`:

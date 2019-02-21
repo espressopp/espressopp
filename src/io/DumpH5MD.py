@@ -196,7 +196,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 author_email=email,
                 driver='mpio',
                 comm=MPI.COMM_WORLD)
-        except NameError:
+        except (NameError, AttributeError):
             # h5py in serial mode.
             self.file = pyh5md.File(
                 filename, 'w',
