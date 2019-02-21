@@ -21,7 +21,7 @@
 
 import unittest
 from espressopp import pmi
-from espressopp.esutil import collectives
+from espressopp.esutil import Collectives as collectives
 import mpi4py.MPI as MPI
 
 class TestCollectives(unittest.TestCase):

@@ -20,33 +20,26 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#define PARALLEL_TEST_MODULE FixedPairList
+#define BOOST_TEST_MODULE Grid
+
 #include "ut.hpp"
+#include <boost/test/floating_point_comparison.hpp>
 
-#include "FixedPairList.hpp"
-#include "storage/Storage.hpp"
-
+#include "esutil/Grid.hpp"
 using namespace espressopp;
+using namespace esutil;
 
+BOOST_AUTO_TEST_CASE(testGrid) {
+  Grid testGrid(1, 2, 3);
+  BOOST_REQUIRE_EQUAL(testGrid.getNumberOfCells(), int(6));
 
-// a storage that contains two fixed particles
-//class MockStorage1 : public Storage {
-  
+  BOOST_CHECK_EQUAL(testGrid.getGridSize(0), int(1));
+  BOOST_CHECK_EQUAL(testGrid.getGridSize(1), int(2));
+  BOOST_CHECK_EQUAL(testGrid.getGridSize(2), int(3));
 
-//};
-
-// add a bond
-// * on the wrong proc
-// * twice on different procs
-// * twice
-// * in the other order
-// * 
-// delete a bond
-// * on the wrong proc
-// * 
-// move a bond to another proc
-
-
-//BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture) {
-//  
-//}
+  for (int i = 0; i < 6; ++i) {
+    int x, y, z;
+    testGrid.mapIndexToPosition(x, y, z, i);
+    BOOST_CHECK_EQUAL(testGrid.mapPositionToIndex(x, y, z), i);
+  }
+}

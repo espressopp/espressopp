@@ -45,22 +45,11 @@ using namespace espressopp::iterator;
 *                                                                                  *
 ***********************************************************************************/
 
-struct LoggingFixture {  
-  LoggingFixture() { 
-    LOG4ESPP_CONFIGURE();
-    log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::INFO);
-    log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::INFO);
-  }
-};
-
 static real cutoff = 1.733;  // largest cutoff
 
 static int  N = 6;  // particles in each dimension
 
 static real density = 1.0;
-
-BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 // sets up a storage with particles in a lattice
 
@@ -75,7 +64,7 @@ struct DomainFixture {
 
     SIZE = pow(N * N * N / density, 1.0/3.0) ;
 
-    BOOST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
+    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
@@ -101,13 +90,13 @@ struct DomainFixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
+    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
                                  cellGrid[1] << " x " << cellGrid[2]);
 
     system = make_shared< System >();
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->skin = skin;
+    system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system, nodeGrid, cellGrid);
     system->storage = domdec;
     system->rng = make_shared< esutil::RNG >();
@@ -133,7 +122,7 @@ struct RandomFixture : DomainFixture {
       real pos[3] = { x, y, z };
 
       if (mpiWorld->rank() == 0) {
-        BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
+        BOOST_TEST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
         domdec->addParticle(id, pos);
       }
 
@@ -142,7 +131,7 @@ struct RandomFixture : DomainFixture {
 
     system->storage = domdec;
 
-    BOOST_MESSAGE("number of random particles in storage = " <<
+    BOOST_TEST_MESSAGE("number of random particles in storage = " <<
                    domdec->getNRealParticles());
 
     domdec->decompose();
@@ -158,26 +147,27 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 {
   real cutoff = 1.5;
 
-  BOOST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
+  BOOST_TEST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
 
-  shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff);
+  shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff, true);
 
   PairList pairs = vl->getPairs();
 
   for (size_t i = 0; i < pairs.size(); i++) {
      Particle *p1 = pairs[i].first;
      Particle *p2 = pairs[i].second;
-     BOOST_MESSAGE("pair " << i << ": " << p1->id() << " " << p2->id()
+     BOOST_TEST_MESSAGE("pair " << i << ": " << p1->id() << " " << p2->id()
                  << ", dist = " << sqrt(getDistSqr(*p1, *p2)));
   }
 
-  int totalPairs1;
+  int totalPairs1 = 0;
+  int pairsSize = pairs.size();
 
-  boost::mpi::all_reduce(*mpiWorld, (int) pairs.size(), totalPairs1, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, pairsSize, totalPairs1, std::plus<int>());
 
-  BOOST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries");
+  BOOST_TEST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries local = " << pairsSize);
 
-  BOOST_MESSAGE("RandomTest: check cells");
+  BOOST_TEST_MESSAGE("RandomTest: check cells");
 
   // count pairs in a N square loop
 
@@ -186,7 +176,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
   CellList realCells = system->storage->getRealCells();
   CellList localCells = system->storage->getLocalCells();
 
-  real cutoff_skin = cutoff + system->skin;
+  real cutoff_skin = cutoff + system->getSkin();
  
   for(CellListIterator cit1(realCells); !cit1.isDone(); ++cit1) {
 
@@ -198,7 +188,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
       if (distsqr >= cutoff_skin * cutoff_skin) continue;
 
-      BOOST_MESSAGE("pair " << count << ": "
+      BOOST_TEST_MESSAGE("pair " << count << ": "
                  << cit1->id() << " " << cit2->id()
                  << ", dist = " << sqrt(distsqr));
 
