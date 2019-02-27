@@ -103,7 +103,7 @@ namespace espressopp {
 
       bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
         real r = sqrt(distSqr);
-        real ffactor = -halfepsilon/r/a*(-exp((sigma-r)/a)+1-pow(tanh((r-rb)/a), 2));
+        real ffactor = -halfepsilon/r/a*(-exp((sigma-r)/a)+pow(cosh((r-rb)/a), -2));
         force = dist * ffactor;
         return true;
       }
