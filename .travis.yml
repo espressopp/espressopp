@@ -12,7 +12,7 @@ stages:
   - deploy
 
 env:
-    - DISTRO=ubuntu EXTERNAL=ON
+    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
@@ -34,6 +34,7 @@ jobs:
         - stage: coverage
           env: DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
         - stage: deploy
+          if: type != pull_request
           env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
 
 after_success:
