@@ -38,7 +38,7 @@ jobs:
           env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
 
 after_success:
-  - test "${TRAVIS_BUILD_STAGE_NAME}" != "Deploy" || travis_terminate 0
+  - test "${TRAVIS_BUILD_STAGE_NAME}" = "Deploy" || travis_terminate 0
   - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v[12].*) ]] && DEPLOY=yes
   - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
