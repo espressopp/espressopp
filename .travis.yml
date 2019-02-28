@@ -25,7 +25,9 @@ env:
     - DISTRO=opensuse EXTERNAL=ON
     - DISTRO=opensuse EXTERNAL=OFF
 
-script: deployment/build.sh
+script:
+  - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
+  - deployment/build.sh
 
 jobs:
     include:
