@@ -47,6 +47,7 @@ after_success:
         docker push "espressopp/espressopp:${DOCKER_TAG}";
     fi
   - if [[ ${BUILD_UG} = ON ]]; then
+      cd ../..; 
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
       CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/doc . ;
       if [[ ${TRAVIS_BRANCH} = v[12].* ]]; then
