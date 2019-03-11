@@ -25,7 +25,7 @@ Welcome to the user documentation of ESPResSo++
 
 **Please cite this, if you used ESPResSo++ in your research**
 
-| H.V.Guzman, H.Kobayashi, N.Tretyakov, A.C.Fogarty, K.Kreis, J.Krajniak, C.Junghans, K.Kremer, T.Stuehn,
+| H.V.Guzman, N.Tretyakov, H.Kobayashi, A.C.Fogarty, K.Kreis, J.Krajniak, C.Junghans, K.Kremer, T.Stuehn,
 | "ESPResSo++ 2.0: Advanced methods for multiscale molecular simulation",
 | *Computer Physics Communications*, **238** (2019), pp. 66-76
 | `DOI: 10.1016/j.cpc.2018.12.017 <https://doi.org/10.1016/j.cpc.2018.12.017>`_
