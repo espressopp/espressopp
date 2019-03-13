@@ -21,6 +21,10 @@ are different software packages.
 |espp| is free, open-source software published under the GNU General Public License (GPL).
 
 **Please cite this, if you used ESPResSo++ in your research**
+    H. V. Guzman, N. Tretyakov, H. Kobayashi, A. C. Fogarty, K. Kreis, J. Krajniak, C. Junghans, K. Kremer, T. Stuehn, "ESPResSo++ 2.0: Advanced methods for multiscale molecular simulation", Computer Physics Communications, 238 (2019), pp. 66-76 
+    DOI: 10.1016/j.cpc.2018.12.017
+    Online access: https://doi.org/10.1016/j.cpc.2018.12.017
+
     J. D. Halverson, T. Brandes, O. Lenz, A. Arnold, S. Bevc, V. Starchenko, K. Kremer, T. Stuehn, D. Reith, "ESPResSo++: A Modern Multiscale Simulation Package for Soft Matter Systems", Computer Physics Communications, 184 (2013), pp. 1129-1149
     DOI: 10.1016/j.cpc.2012.12.004
     Online access: http://dx.doi.org/10.1016/j.cpc.2012.12.004
