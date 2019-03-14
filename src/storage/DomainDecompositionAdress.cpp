@@ -65,9 +65,10 @@ namespace espressopp {
 
   DomainDecompositionAdress::
   DomainDecompositionAdress(shared_ptr< System > _system,
+          int _halfCellInt,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
-    : Storage(_system), exchangeBufferSize(0) {
+    : Storage(_system, _halfCellInt), exchangeBufferSize(0) {
     LOG4ESPP_INFO(logger, "node grid = "
           << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
           << " cell grid = "
@@ -252,13 +253,13 @@ namespace espressopp {
       LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell()
              << " @ " << m << " " << n << " " << o);
 
-      // there should be always 26 neighbors
-      cell->neighborCells.reserve(26);
+      cell->neighborCells.reserve((2*halfCellInt + 1) * (2*halfCellInt + 1) * (2*halfCellInt + 1) - 1);
 
       // loop all neighbor cells
-      for (int p = o - 1; p <= o + 1; ++p) {
-        for (int q = n - 1; q <= n + 1; ++q) {
-      for (int r = m - 1; r <= m + 1; ++r) {
+      for (int p = o - halfCellInt; p <= o + halfCellInt; ++p) {
+        for (int q = n - halfCellInt; q <= n + halfCellInt; ++q) {
+          for (int r = m - halfCellInt; r <= m + halfCellInt; ++r) {
+
         if (p != o || q != n || r != m) {
           longint cell2Idx = cellGrid.mapPositionToIndex(r, q, p);
           Cell *cell2 = &cells[cell2Idx];
@@ -1168,9 +1169,10 @@ namespace espressopp {
   class PyDomainDecompositionAdress : public DomainDecompositionAdress {
       public:
         PyDomainDecompositionAdress(shared_ptr< System > _system,
+                  int _halfCellInt,
                   const Int3D& _nodeGrid,
                   const Int3D& _cellGrid)
-      : DomainDecompositionAdress(_system, _nodeGrid, _cellGrid)
+      : DomainDecompositionAdress(_system, _halfCellInt, _nodeGrid, _cellGrid)
         {}
       };
 
@@ -1184,7 +1186,7 @@ namespace espressopp {
     using namespace espressopp::python;
     class_< PyDomainDecompositionAdress, bases< Storage >, boost::noncopyable >
   ("storage_DomainDecompositionAdress",
-   init< shared_ptr< System >,
+   init< shared_ptr< System >, int,
    const Int3D&, const Int3D& >())
   .def("mapPositionToNodeClipped", &DomainDecompositionAdress::mapPositionToNodeClipped)
   .def("getCellGrid", &DomainDecompositionAdress::getInt3DCellGrid)

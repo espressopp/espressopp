@@ -206,22 +206,22 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
 	    return Int3D(fdN[0], fdN[1], fdN[2])
 
 
-def cellGrid(box_size, node_grid, rc, skin):
+def cellGrid(box_size, node_grid, rc, skin, halfCellInt = 1):
     rc_skin = rc + skin
     if rc_skin == 0:
         raise Error("interaction range (cutoff + skin) must be larger than 0")
     if (node_grid[0] <= 0 or node_grid[1] <= 0 or node_grid[2] <= 0):
         raise Error("invalid node grid %s" % str(node_grid))
-    ix = box_size[0] / (rc_skin * node_grid[0])
+    ix = (box_size[0] * halfCellInt) / (rc_skin * node_grid[0])
 
     if ix < 1:
         raise Error("local box size in direction 0 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
                  hint: number of CPUs maybe too high or is prime, perhaps you could also try with Halfcells." % (ix, rc_skin))
-    iy = box_size[1] / (rc_skin * node_grid[1])
+    iy = (box_size[1] * halfCellInt) / (rc_skin * node_grid[1])
     if iy < 1:
         raise Error("local box size in direction 1 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
                  hint: number of CPUs maybe too high or is prime, perhaps you could also try with Halfcells." % (iy, rc_skin))
-    iz = box_size[2] / (rc_skin * node_grid[2])
+    iz = (box_size[2] * halfCellInt) / (rc_skin * node_grid[2])
     if iz < 1:
         raise Error("local box size in direction 2 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
                  hint: number of CPUs maybe too high or is prime, perhaps you could also try with Halfcells." % (iz, rc_skin))
@@ -279,7 +279,7 @@ def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, r
 # WARNING! This is a new function to find values for the new neighborList DataStruct for Hom-Sys
 
 
-def neiListHom(node_grid, box, rc, skin):
+def neiListHom(node_grid, box, rc, skin, halfCellInt = 1):
     # data structure Initialization
     print "HeSpaDDA message: Current homogeneous NodeGrid (X,Y,Z)", node_grid
     rc_skin = rc + skin
@@ -292,17 +292,17 @@ def neiListHom(node_grid, box, rc, skin):
     neiListy = [0] * (node_grid[1] + 1)
     neiListz = [0] * (node_grid[2] + 1)
     # It makes use of reDistCellsHom and adaptNeiList form loadbal to find homogenous DD
-    neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin)
+    neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin, halfCellInt)
     neiListx = adaptNeiList(neiListxin)
-    neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin)
+    neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin, halfCellInt)
     neiListy = adaptNeiList(neiListyin)
-    neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
+    neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin, halfCellInt)
     neiListz = adaptNeiList(neiListzin)
     return map(int, neiListx), map(int, neiListy), map(int, neiListz)
 
 # WARNING! This is a new function to find values for the new neighborList DataStruct for inHom-Sys
 
-def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, idealGasFlag=True, sphereAdr=False, slabMSDims=[1, 0, 0]):
+def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, idealGasFlag=True, sphereAdr=False, slabMSDims=[1, 0, 0], halfCellInt=1):
     # dataStructure Initialization
     print "HeSpaDDA message: Current heterogeneous NodeGrid (X,Y,Z)", node_grid
     rc_skin = rc + skin
@@ -317,9 +317,9 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
     # cg_sizeR=adrCenter[0]+eh_size 	# for further devs
     # cg_sizeL=adrCenter[0]-eh_size	# for further devs
     # round(cg_sizeL/rc_skin-0.5)+round((cursor[0]-cg_sizeR)/ rc_skin-0.5)+round((cg_sizeR-cg_sizeL)/rc_skin-0.5) # old implementation rounded # Cells too much!
-    cellsX = round(cursor[0] / rc_skin - 0.5)
-    cellsY = round(cursor[1] / rc_skin - 0.5)
-    cellsZ = round(cursor[2] / rc_skin - 0.5)
+    cellsX = halfCellInt * round(cursor[0] / rc_skin - 0.5)
+    cellsY = halfCellInt * round(cursor[1] / rc_skin - 0.5)
+    cellsZ = halfCellInt * round(cursor[2] / rc_skin - 0.5)
     print "HeSpaDDA message: Current heterogeneous CellGrid (X,Y,Z)", cellsX, cellsY, cellsZ
     # This condition checks if the Sys is a Slab or a Sphere. It should work for any middle based Sys
     if not sphereAdr:
@@ -330,7 +330,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListxin = addHsymmetry(halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin
         else:
-            neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin)
+            neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin, halfCellInt)
         # Contains cores Neighbor List in full format for X
         neiListx = adaptNeiList(neiListxin)
         if slabMSDims[1] == 1:
@@ -340,7 +340,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListyin = addHsymmetry(halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin
         else:
-            neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin)
+            neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin, halfCellInt)
         # Contains the homogeneously decomp cores Neighbor List in full format for Y
         neiListy = adaptNeiList(neiListyin)
         if slabMSDims[2] == 1:
@@ -350,7 +350,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListzin = addHsymmetry(halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin
         else:
-            neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
+            neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin, halfCellInt)
         # Contains the homogeneously decomp cores Neighbor List in full format for Z
         neiListz = adaptNeiList(neiListzin)
         # NOTE that additional DD options for slabs can be furhter added
@@ -364,7 +364,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListxin = addHsymmetry(halfneilListx, eh_size, rc_skin, node_grid[0], cellsX, ratioMS, cursor[0], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListxin
         elif flx > 1:
-            neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin)
+            neiListxin = reDistCellsHom(node_grid[0], cursor[0], rc_skin, halfCellInt)
         neiListx = adaptNeiList(neiListxin)
         # on Y-axis
         if fly == 0:
@@ -373,7 +373,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListyin = addHsymmetry(halfneilListy, eh_size, rc_skin, node_grid[1], cellsY, ratioMS, cursor[1], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListyin
         elif fly > 1:
-            neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin)
+            neiListyin = reDistCellsHom(node_grid[1], cursor[1], rc_skin, halfCellInt)
         neiListy = adaptNeiList(neiListyin)
         # on Z-axis
         if flz == 0:
@@ -382,7 +382,7 @@ def neiListAdress(node_grid, cell_grid, rc, skin, eh_size, adrCenter, ratioMS, i
             neiListzin = addHsymmetry(halfneilListz, eh_size, rc_skin, node_grid[2], cellsZ, ratioMS, cursor[2], idealGasFlag)
             print "HeSpaDDA message: My neiListxin if it make sense your heterogenous system can be splitted in 2 equal parts (algorithm S.2)...,", neiListzin
         elif flz > 1:
-            neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin)
+            neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin, halfCellInt)
         neiListz = adaptNeiList(neiListzin)
     print "HeSpaDDA message: neiListX:", map(int, neiListx), "\n neiListY", map(int, neiListy), "\n neiListZ", map(int, neiListz)
     return Int3D(cellsX, cellsY, cellsZ), map(int, neiListx), map(int, neiListy), map(int, neiListz)

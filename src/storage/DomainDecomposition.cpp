@@ -67,9 +67,10 @@ namespace espressopp {
 
   DomainDecomposition::
   DomainDecomposition(shared_ptr< System > _system,
+          int _halfCellInt,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
-    : Storage(_system), exchangeBufferSize(0) {
+    : Storage(_system, _halfCellInt), exchangeBufferSize(0) {
     LOG4ESPP_INFO(logger, "node grid = "
           << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
           << " cell grid = "
@@ -110,7 +111,7 @@ namespace espressopp {
       myRight[i] = nodeGrid.getMyRight(i);
     }
 
-    cellGrid = CellGrid(_cellGrid, myLeft, myRight, 1);
+    cellGrid = CellGrid(_cellGrid, myLeft, myRight, halfCellInt);
 
     LOG4ESPP_INFO(logger, "local box "
           << myLeft[0] << "-" << myRight[0] << ", "
@@ -298,13 +299,12 @@ namespace espressopp {
           LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell()
                 << " @ " << m << " " << n << " " << o);
 
-          // there should be always 26 neighbors
-          cell->neighborCells.reserve(26);
+          cell->neighborCells.reserve((2*halfCellInt + 1) * (2*halfCellInt + 1) * (2*halfCellInt + 1) - 1);
 
           // loop all neighbor cells
-          for (int p = o - 1; p <= o + 1; ++p) {
-            for (int q = n - 1; q <= n + 1; ++q) {
-              for (int r = m - 1; r <= m + 1; ++r) {
+          for (int p = o - halfCellInt; p <= o + halfCellInt; ++p) {
+            for (int q = n - halfCellInt; q <= n + halfCellInt; ++q) {
+              for (int r = m - halfCellInt; r <= m + halfCellInt; ++r) {
                 if (p != o || q != n || r != m) {
                   longint cell2Idx = cellGrid.mapPositionToIndex(r, q, p);
                   Cell *cell2 = &cells[cell2Idx];
@@ -773,7 +773,7 @@ namespace espressopp {
   void DomainDecomposition::registerPython() {
     using namespace espressopp::python;
     class_< DomainDecomposition, bases< Storage >, boost::noncopyable >
-    ("storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D& >())
+    ("storage_DomainDecomposition", init< shared_ptr< System >, int, const Int3D&, const Int3D& >())
     .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)
     .def("getCellGrid", &DomainDecomposition::getInt3DCellGrid)
     .def("getNodeGrid", &DomainDecomposition::getInt3DNodeGrid)

@@ -53,8 +53,9 @@ namespace espressopp {
     const int Storage::dataOfUpdateGhosts = 0;
     const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
-    Storage::Storage(shared_ptr< System > system)
+    Storage::Storage(shared_ptr< System > system, int halfCellInt)
       : SystemAccess(system),
+        halfCellInt(halfCellInt),
         inBuffer(*system->comm),
         outBuffer(*system->comm)
     {

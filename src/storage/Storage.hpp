@@ -47,7 +47,7 @@ namespace espressopp {
       typedef boost::unordered_map <longint, Particle*> IdParticleMap;
       typedef std::list<Particle> ParticleListAdr;
 
-      Storage(shared_ptr<class System> system);
+      Storage(shared_ptr<class System> system, int halfCellInt);
       virtual ~Storage();
 
       /** Scale Volume, only for Storage. It scales only the particle coord. */
@@ -386,6 +386,9 @@ namespace espressopp {
 
       // move a particle from one list to another, updating localParticles
       Particle* moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
+
+      /** 1 for normal, 2 for half-cell, 3 for third-cell, ... */
+      int halfCellInt;
 
       /** here the local particles are actually stored */
       LocalCellList cells;

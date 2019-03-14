@@ -57,9 +57,9 @@ from espressopp.storage.Storage import *
 class DomainDecompositionAdressLocal(StorageLocal, 
                                storage_DomainDecompositionAdress):
 
-    def __init__(self, system, nodeGrid, cellGrid):
+    def __init__(self, system, halfCellInt, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, storage_DomainDecompositionAdress, system, nodeGrid, cellGrid)
+            cxxinit(self, storage_DomainDecompositionAdress, system, halfCellInt, nodeGrid, cellGrid)
 
 
 if pmi.isController:
@@ -68,10 +68,10 @@ if pmi.isController:
             cls = 'espressopp.storage.DomainDecompositionAdressLocal',
             pmicall = ['getCellGrid', 'cellAdjust']
             )
-        def __init__(self, system, nodeGrid='auto', cellGrid='auto', nocheck=False):
+        def __init__(self, system, halfCellInt, nodeGrid='auto', cellGrid='auto', nocheck=False):
             if nocheck:
                 self.next_id = 0
-                self.pmiinit(system, nodeGrid, cellGrid)
+                self.pmiinit(system, halfCellInt, nodeGrid, cellGrid)
             else:
                 if check.System(system, 'bc'):
                     if nodeGrid == 'auto':
@@ -89,6 +89,6 @@ if pmi.isController:
                                    "adjusted to 2 (was={})".format(k, cellGrid[k])))
                             cellGrid[k] = 2
                     self.next_id = 0
-                    self.pmiinit(system, nodeGrid, cellGrid)
+                    self.pmiinit(system, halfCellInt, nodeGrid, cellGrid)
                 else:
                     raise Exception('Error: could not create DomainDecomposition object')
