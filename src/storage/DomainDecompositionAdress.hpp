@@ -40,9 +40,9 @@ namespace espressopp {
     class DomainDecompositionAdress: public Storage {
     public:
       DomainDecompositionAdress(shared_ptr< System > system,
-              int _halfCellInt,
-			  const Int3D& _nodeGrid,
-			  const Int3D& _cellGrid);
+              const Int3D& _nodeGrid,
+              const Int3D& _cellGrid,
+              int _halfCellInt);
 
       virtual ~DomainDecompositionAdress() {}
       

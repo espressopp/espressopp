@@ -65,9 +65,9 @@ namespace espressopp {
 
   DomainDecompositionAdress::
   DomainDecompositionAdress(shared_ptr< System > _system,
-          int _halfCellInt,
           const Int3D& _nodeGrid,
-          const Int3D& _cellGrid)
+          const Int3D& _cellGrid,
+          int _halfCellInt)
     : Storage(_system, _halfCellInt), exchangeBufferSize(0) {
     LOG4ESPP_INFO(logger, "node grid = "
           << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
@@ -1169,10 +1169,10 @@ namespace espressopp {
   class PyDomainDecompositionAdress : public DomainDecompositionAdress {
       public:
         PyDomainDecompositionAdress(shared_ptr< System > _system,
-                  int _halfCellInt,
                   const Int3D& _nodeGrid,
-                  const Int3D& _cellGrid)
-      : DomainDecompositionAdress(_system, _halfCellInt, _nodeGrid, _cellGrid)
+                  const Int3D& _cellGrid,
+                  int _halfCellInt)
+      : DomainDecompositionAdress(_system, _nodeGrid, _cellGrid, _halfCellInt)
         {}
       };
 
@@ -1186,8 +1186,8 @@ namespace espressopp {
     using namespace espressopp::python;
     class_< PyDomainDecompositionAdress, bases< Storage >, boost::noncopyable >
   ("storage_DomainDecompositionAdress",
-   init< shared_ptr< System >, int,
-   const Int3D&, const Int3D& >())
+   init< shared_ptr< System >,
+   const Int3D&, const Int3D&, int >())
   .def("mapPositionToNodeClipped", &DomainDecompositionAdress::mapPositionToNodeClipped)
   .def("getCellGrid", &DomainDecompositionAdress::getInt3DCellGrid)
   .def("cellAdjust", &DomainDecompositionAdress::cellAdjust)

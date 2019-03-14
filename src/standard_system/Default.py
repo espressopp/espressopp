@@ -49,7 +49,7 @@ def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None, halfCellInt =
   system.skin    = skin
   nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rc,skin)
   cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin, halfCellInt)
-  system.storage = espressopp.storage.DomainDecomposition(system, halfCellInt, nodeGrid, cellGrid)
+  system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
 
   print "nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid, "half cell: ", halfCellInt
 
