@@ -352,13 +352,12 @@ namespace espressopp {
       }
 
 
-      // see whether the array was resized; STL hack
-      Particle *begin = &AdrATParticles.front();
+      int last_capacity = AdrATParticles.capacity();
 
       AdrATParticles.push_back(n);
       Particle* local = &AdrATParticles.back();
 
-      if (begin != &AdrATParticles.front()) {
+      if (last_capacity != AdrATParticles.capacity()) {
           updateLocalParticles(AdrATParticles, true);
       }
       else {
@@ -371,13 +370,12 @@ namespace espressopp {
     // this is called from fixedtuplelist only!
     Particle* Storage::addAdrATParticleFTPL(Particle n) {
 
-	  // see whether the array was resized; STL hack
-	  Particle *begin = &AdrATParticles.front();
+	  int last_capacity = AdrATParticles.capacity();
 
 	  AdrATParticles.push_back(n);
 	  Particle* local = &AdrATParticles.back();
 
-	  if (begin != &AdrATParticles.front()) {
+	  if (last_capacity != AdrATParticles.capacity()) {
 		  updateLocalParticles(AdrATParticles, true);
 	  }
 	  else {
@@ -415,13 +413,12 @@ namespace espressopp {
 
     Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
     {
-      // see whether the array was resized; STL hack
-      Particle *begin = &l.front();
+      int last_capacity = l.capacity();
 
       l.push_back(part);
       Particle *p = &l.back();
 
-      if (begin != &l.front()) {
+      if (last_capacity != l.capacity()) {
           updateLocalParticles(l);
       }
       else {
@@ -434,9 +431,8 @@ namespace espressopp {
     Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
     {
 
-      // see whether the arrays were resized; STL hack
-      Particle *dbegin = &dl.front();
-      Particle *sbegin = &sl.front();
+      int dlast_capacity = dl.capacity();
+      int slast_capacity = sl.capacity();
 
       dl.push_back(sl[i]);
       int newSize = sl.size() - 1;
@@ -446,10 +442,9 @@ namespace espressopp {
       sl.resize(newSize);
 
       Particle *dst = &dl.back();
-      Particle *src = &(sl[i]);
 
       // fix up destination list
-      if (dbegin != &dl.front()) {
+      if (dlast_capacity != dl.capacity()) {
           updateLocalParticles(dl);
       }
       else {
@@ -458,10 +453,11 @@ namespace espressopp {
 
       // fix up resorted source list; due to moving, the last particle
       // might have been moved to the position of the actually moved one
-      if (sbegin != &sl.front()) {
+      if (slast_capacity != sl.capacity()) {
           updateLocalParticles(sl);
       }
       else if (i != newSize) {
+          Particle *src = &(sl[i]);
           updateInLocalParticles(src);
       }
 
