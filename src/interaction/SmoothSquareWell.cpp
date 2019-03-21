@@ -59,6 +59,7 @@ namespace espressopp {
          init< shared_ptr<System>, shared_ptr<FixedPairList>,  shared_ptr<SmoothSquareWell> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<SmoothSquareWell> >())
         .def("setPotential", &FixedPairListSmoothSquareWell::setPotential)
+        .def("getPotential", &FixedPairListSmoothSquareWell::getPotential)
         .def("setFixedPairList", &FixedPairListSmoothSquareWell::setFixedPairList)
         .def("getFixedPairList", &FixedPairListSmoothSquareWell::getFixedPairList)
         ;
@@ -67,9 +68,10 @@ namespace espressopp {
         ("interaction_FixedPairListTypesSmoothSquareWell",
          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
-        .def("setPotential", &FixedPairListSmoothSquareWell::setPotential)
-        .def("setFixedPairList", &FixedPairListSmoothSquareWell::setFixedPairList)
-        .def("getFixedPairList", &FixedPairListSmoothSquareWell::getFixedPairList)
+        .def("setPotential", &FixedPairListTypesSmoothSquareWell::setPotential)
+        .def("getPotential", &FixedPairListTypesSmoothSquareWell::getPotentialPtr)
+        .def("setFixedPairList", &FixedPairListTypesSmoothSquareWell::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListTypesSmoothSquareWell::getFixedPairList)
         ;
     }
   }

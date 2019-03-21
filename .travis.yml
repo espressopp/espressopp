@@ -5,51 +5,49 @@ sudo: required
 services:
 - docker
 
+stages:
+  - canary
+  - test
+  - coverage
+  - deploy
+
 env:
-  matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
-    - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
-    - DISTRO=ubuntu EXTERNAL=ON TEST_H5MD=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
-    - DISTRO=ubuntu_mpich EXTERNAL=ON BUILD_UG=ON
-    - DISTRO=ubuntu_mpich EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu_mpich EXTERNAL=ON
     - DISTRO=ubuntu_mpich EXTERNAL=OFF
     - DISTRO=fedora EXTERNAL=ON
-    #- DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
     - DISTRO=fedora_mpich EXTERNAL=ON
-    #- DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
     - DISTRO=opensuse EXTERNAL=ON
+    - DISTRO=opensuse EXTERNAL=OFF
 
 script:
- - cp -vr docker ${HOME}
- - sed -i "1s/ubuntu/${DISTRO}/" ${HOME}/docker/Dockerfile
- - cd ../../
- - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
- - cp -r $HOME/.ccache ${HOME}/docker/ccache
- - if [[ ${TRAVIS_BRANCH} = master ]]; then DOCKER_TAG=latest; else DOCKER_TAG="${TRAVIS_BRANCH}"; fi
- - travis_retry timeout 540 docker pull $(sed -n '1s/from //p' ${HOME}/docker/Dockerfile)
- - docker build --build-arg COVERAGE=${COVERAGE} --build-arg EXTERNAL=${EXTERNAL}
-                --build-arg CC=${CC} --build-arg CXX=${CXX} --build-arg BUILD_UG=${BUILD_UG}
-                --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH} --build-arg TRAVIS_JOB_NUMBER=${TRAVIS_JOB_NUMBER}
-                --build-arg TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} --build-arg TRAVIS_JOB_ID=${TRAVIS_JOB_ID}
-                --build-arg TRAVIS_TAG=${TRAVIS_TAG} --build-arg TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}
-                --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
-                -t espressopp/espressopp:${DOCKER_TAG} ${HOME}/docker/ &&
-   rm -rf $HOME/.ccache &&
-   CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG} /bin/bash) &&
-   docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
+  - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
+  - deployment/build.sh
+
+jobs:
+    include:
+        - stage: canary
+          env: DISTRO=ubuntu EXTERNAL=ON
+        - stage: coverage
+          env: DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
+        - stage: deploy
+          if: type != pull_request
+          env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
 
 after_success:
+  - test "${TRAVIS_BUILD_STAGE_NAME}" = "Deploy" || travis_terminate 0
   - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v[12].*) ]] && DEPLOY=yes
-  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
         docker push "espressopp/espressopp:${DOCKER_TAG}";
     fi
-  - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - if [[ ${BUILD_UG} = ON ]]; then
+      cd ../..; 
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
       CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/doc . ;
       if [[ ${TRAVIS_BRANCH} = v[12].* ]]; then
@@ -77,6 +75,11 @@ after_success:
         git diff --no-color | head -n 500;
       fi;
     fi
+
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+(\.\d+|_rc\d+)?$/
 
 cache:
   - ccache

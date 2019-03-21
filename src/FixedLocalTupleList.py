@@ -1,4 +1,4 @@
-#  Copyright (C) 2017
+#  Copyright (C) 2018, 2017
 #      Max Planck Institute for Polymer Research
 #  
 #  This file is part of ESPResSo++.
@@ -18,9 +18,9 @@
 
 
 r"""
-*****************************
+**********************************
 **espressopp.FixedLocalTupleList**
-*****************************
+**********************************
 This class can contain many tuple which store a arbitrary positive number, which should be more than 2, of local (real + ghost) particle id.
 
 For using this class, there is 1 conditions:

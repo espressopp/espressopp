@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013, 2019
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,64 +24,65 @@ r"""
 espressopp.interaction.FENECapped
 *********************************
 
+A capped FENE potential avoiding calculation of unreasonably large bonded forces. It is usually applied at the
+equilibration stage of a simulation and helps a polymer system to relax. After the system has reached
+its equilibrium the capped potential should be substituted by a regular FENE, :py:class:`espressopp.interaction.FENE`.
+
+The capped FENE potential is employed as:
+
 .. math::
 
 	U = -\frac{1}{2}r_{max}^2  K \cdot
- 				 log\left(1 - \frac{D - r_{0}}{r_{max}}^2\right)
+                 log \left[1 - \left(\frac{D - r_0}{r_{max}}\right)^2\right],
 
-where :math:`D = dist` if 
+where
 
-:math:`{cap_{rad}}^2>dist` 
+.. math::
 
-and :math:`D = cap_{rad}` else.
+    D = min \left(r, r_{\it{cap}}\right).
+
+.. py:class:: espressopp.interaction.FENECapped(K = 30.0, r0 = 0.0, rMax = 1.5, cutoff = inf, r_cap = 1.0, shift = 0.0)
+
+    :param real K: attractive force strength (in :math:`\epsilon / \sigma^2` units)
+    :param real r0: displacement parameter (in :math:`sigma` units)
+    :param real rMax: size parameter (in :math:`sigma` units)
+    :param real cutoff: cutoff radius
+    :param real r_cap: radius of capping (in :math:`sigma` units)
+    :param real shift: shift of the potential
 
 
+After setting up the potential you have to apply it to the particles in the pair list (bondlist):
 
+.. py:class:: espressopp.interaction.FixedPairListFENECapped(system, bondlist, potential)
 
+    :param object system: system object :func:`espressopp.System`
+    :param list bondlist: list of bonds :func:`espressopp.FixedPairList`
+    :param object potential: bonded potential, in this case :func:`espressopp.interaction.FENECapped`
 
+    **Methods**
 
+    .. py:method:: getFixedPairList()
 
-.. function:: espressopp.interaction.FENECapped(K, r0, rMax, cutoff, caprad, shift)
+        :rtype: A Python list of pairs (the bondlist)
 
-		:param K: (default: 1.0)
-		:param r0: (default: 0.0)
-		:param rMax: (default: 1.0)
-		:param cutoff: (default: infinity)
-		:param caprad: (default: 1.0)
-		:param shift: (default: 0.0)
-		:type K: real
-		:type r0: real
-		:type rMax: real
-		:type cutoff: 
-		:type caprad: real
-		:type shift: real
+    .. py:method:: getPotential()
 
-.. function:: espressopp.interaction.FixedPairListFENECapped(system, vl, potential)
+        :rtype: potential object
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+    .. py:method:: setFixedPairList(bondlist)
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.getFixedPairList()
+        :param list bondlist: fixed-pair list (bondlist)
 
-		:rtype: A Python list of lists.
+    .. py:method:: setPotential(potential)
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.getPotential()
+        :param object potential: a potential applied to all pairs in the bondlist
 
-		:rtype: 
+**Example of usage**
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.setFixedPairList(fixedpairlist)
+>>> Please, refer to the example of FENE potential
 
-		:param fixedpairlist: 
-		:type fixedpairlist: 
+Go to FENE-example :py:class:`espressopp.interaction.FENE`
 
-.. function:: espressopp.interaction.FixedPairListFENECapped.setPotential(potential)
-
-		:param potential: 
-		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -92,20 +93,20 @@ from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECap
 
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
-    def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
-                 cutoff=infinity, caprad=1.0, shift=0.0):
+    def __init__(self, K=30.0, r0=0.0, rMax=1.5,
+                 cutoff=infinity, r_cap=1.0, shift=0.0):
         """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad)
+                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap)
             else:
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad, shift)
+                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap, shift)
 
 class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFENECapped):
 
-    def __init__(self, system, vl, potential):
+    def __init__(self, system, bondlist, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENECapped, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListFENECapped, system, bondlist, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -125,10 +126,9 @@ class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFE
 
 if pmi.isController:
     class FENECapped(Potential):
-        'The FENECapped potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENECappedLocal',
-            pmiproperty = ['K', 'r0', 'rMax', 'caprad']
+            pmiproperty = ['K', 'r0', 'rMax', 'r_cap']
             )
 
     class FixedPairListFENECapped(Interaction):

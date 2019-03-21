@@ -113,8 +113,7 @@ __all__ = [
 
 # WARNING! New arguments are needed! At least...box_size,rc,skin
 	
-def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
-    
+def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):  
     if isinstance(n, numbers.Number) and not isinstance(rc, numbers.Number):
         return nodeGridSimple(n)
     elif eh_size!=0:

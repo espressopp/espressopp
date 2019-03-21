@@ -40,7 +40,7 @@ namespace espressopp {
 
     /********************************************************************/
 
-    Error::~Error()
+    Error::~Error() noexcept(false)
     {
       // final test for any hanging exception
       checkException();
@@ -56,8 +56,8 @@ namespace espressopp {
 
       mpi::all_reduce(*comm, noExceptions, totalExceptions, std::plus<int>());
 
-      //printf("On proc %d: noExceptions = %d, total = %d\n",
-	  //   comm->rank(), noExceptions, totalExceptions);
+      noExceptions = 0;
+      exceptionMessage.clear();
 
       if (totalExceptions > 0) {
 
@@ -70,13 +70,7 @@ namespace espressopp {
           msg <<"\n";
           msg << "On proc "<< comm->rank()<< ": exceptions = "<<noExceptions<<
                   ", total = "<< totalExceptions <<"\n";
- 
-          exceptionMessage.clear();
         }
-
-        // reset exception counter for next time
-
-        noExceptions = 0;
 
         throw std::runtime_error(msg.str());
       }
