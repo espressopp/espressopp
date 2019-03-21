@@ -114,10 +114,11 @@ __all__ = [
 # WARNING! New arguments are needed! At least...box_size,rc,skin
 	
 def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0,]):
-    print "################################################# --> | HeSpaDDA: Domain Decomposition method | <-- #####################################################"
-    if isinstance(n, numbers.Number) and isinstance(box_size, numbers.Number):
+    
+    if isinstance(n, numbers.Number) and not isinstance(rc, numbers.Number):
         return nodeGridSimple(n)
     elif eh_size!=0:
+	    print "########################################## --> | HeSpaDDA: Domain Decomposition method | <-- ################################################"
             ijkmax = 3 * n * n + 1
             boxList = [box_size[0], box_size[1], box_size[2]]
             ratioEH2CG = [(2. * eh_size) / (abs(box_size[0] - (2. * eh_size))), (2. * eh_size)/(abs(box_size[1] - (2. * eh_size))), (2. * eh_size) / (abs(box_size[2] - (2. * eh_size)))]
@@ -207,6 +208,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                 print 'HeSpaDDA message: Size Lenghts are different in Y and Z!'
             return Int3D(fdN[0], fdN[1], fdN[2])
     else:
+	    print "########################################## --> | HeSpaDDA: Domain Decomposition method | <-- ################################################"
             ijkmax = 3 * n * n + 1
             boxList = [box_size[0], box_size[1], box_size[2]]
             # Here starts the new Dimensional aware HDD algorithm which. Dependencies: loadbal
