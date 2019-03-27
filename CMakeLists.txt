@@ -160,7 +160,8 @@ if (EXTERNAL_BOOST)
      find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python27)
   endif()
   
-  list(APPEND ${Boost_LIBS} ${Boost_LIBRARIES})
+  # Append Python library to the list of Boost libraries.
+  list(APPEND Boost_LIBS ${Boost_LIBRARIES})
   set(Boost_LIBRARIES ${Boost_LIBS})
 
   if(NOT Boost_FOUND)
