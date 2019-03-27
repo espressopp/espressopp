@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 project(espressopp)
 
@@ -152,7 +152,18 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if (EXTERNAL_BOOST)
   set(NEEDED_Boost_VERSION 1.58.0)
-  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi python serialization system filesystem)
+  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem)
+  set(Boost_LIBS ${Boost_LIBRARIES})
+  if(${Boost_VERSION} VERSION_LESS 106700)
+     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python)
+  else()
+     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python27)
+  endif()
+  
+  # Append Python library to the list of Boost libraries.
+  list(APPEND Boost_LIBS ${Boost_LIBRARIES})
+  set(Boost_LIBRARIES ${Boost_LIBS})
+
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
