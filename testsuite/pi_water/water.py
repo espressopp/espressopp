@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -47,7 +47,7 @@ def genTabPotentials(tabfilesnb):
         pot = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rc)
         t1, t2 = fg[6], fg[8] # type 1, type 2
         potentials.update({t1+"_"+t2: pot})
-        print("created", t1, t2, fe)
+        print(("created", t1, t2, fe))
     return potentials
 
 # This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file. 
@@ -139,7 +139,7 @@ integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
-print("POT", potentials)
+print(("POT", potentials))
 pathintegral.createPathintegralSystem(allParticles, props, types, system, langevin, potentials, P=16)
 
 system.storage.decompose()
@@ -147,14 +147,14 @@ num_particles  = int(espressopp.analysis.NPart(system).compute())
 
 # print simulation parameters
 print('')
-print('number of particles =', num_particles)
-print('density = %.4f' % (density))
-print('rc =', rc)
-print('dt =', integrator.dt)
-print('skin =', system.skin)
-print('steps =', steps)
-print('NodeGrid = %s' % (nodeGrid,))
-print('CellGrid = %s' % (cellGrid,))
+print(('number of particles =', num_particles))
+print(('density = %.4f' % (density)))
+print(('rc =', rc))
+print(('dt =', integrator.dt))
+print(('skin =', system.skin))
+print(('steps =', steps))
+print(('NodeGrid = %s' % (nodeGrid,)))
+print(('CellGrid = %s' % (cellGrid,)))
 print('')
 
 # analysis

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -119,7 +119,7 @@ class TestCaseConstrainCOM(unittest.TestCase):
                 before[j] += mass[i]*dmy_p[i][j]
         for i in range(3):
             before[i] /= total_mass
-        print("before", before)
+        print(("before", before))
 
         # run twenty thousand steps
         integrator.run(20000)
@@ -151,7 +151,7 @@ class TestCaseConstrainCOM(unittest.TestCase):
                 after[j] += mass[i]*dmy_p[i][j]
         for i in range(3):
             after[i] /= total_mass
-        print("after", after)
+        print(("after", after))
 
         # run checks
         self.assertTrue(fabs(before[0] - after[0]) < 0.04)

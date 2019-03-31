@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -174,9 +174,9 @@ class TestLBMDCoupling(makeConf):
     
         self.integrator.step = 0
         # output formatting
-        print("-" * 73)
+        print(("-" * 73))
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
+        print(("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"))
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)
@@ -204,9 +204,9 @@ class TestLBMDCoupling(makeConf):
         self.integrator.run(runSteps)
 
         # output formatting
-        print("-" * 73)
+        print(("-" * 73))
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
+        print(("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"))
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)

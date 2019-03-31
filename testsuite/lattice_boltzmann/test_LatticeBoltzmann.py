@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -101,7 +101,7 @@ class TestPureLB(unittest.TestCase):
             av_den /= area_yz
             av_j /= area_yz
 
-            print(av_den, av_j)
+            print((av_den, av_j))
 
             self.assertAlmostEqual(av_den, initDen, places=2)
             self.assertAlmostEqual(av_j[0], _v, places=2)

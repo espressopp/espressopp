@@ -61,15 +61,15 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 # create a domain decomposition particle storage with the specified nodeGrid and cellGrid
 system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print "number of particles = ", NPart
-print "box                 = ", box
-print "nodeGrid            = ", nodeGrid
-print "cellGrid            = ", cellGrid
-print "skin                = ", skin
-print "cutoff              = ", rc
-print "timestep            = ", dt
+print("number of particles = ", NPart)
+print("box                 = ", box)
+print("nodeGrid            = ", nodeGrid)
+print("cellGrid            = ", cellGrid)
+print("skin                = ", skin)
+print("cutoff              = ", rc)
+print("timestep            = ", dt)
 
-print "setting up system ..."
+print("setting up system ...")
 # add the particles from the file to the storage of the system
 properties = ['id', 'type', 'pos', 'v']
 particles  = []
@@ -99,9 +99,9 @@ integrator.dt  = dt
 
 integrator.run(1)
 
-print "system setup finished"
+print("system setup finished")
 
-print 'Calculating pressure...'
+print('Calculating pressure...')
 
 n = int(10)         # 10 layers in z direction
 h0 = Lz / float(n)  # z coordinate of initial layer
@@ -113,7 +113,7 @@ pressure_tensor_ml = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 
 n_measurements = 10 # result will be averaged over 10 measurements
 
-print 'result will be averaged over ', n_measurements, ' measurements'
+print('result will be averaged over ', n_measurements, ' measurements')
 
 pij_layers1 = []
 pij_layers2 = []
@@ -121,7 +121,7 @@ Pijtot = espressopp.Tensor(0.0)
 
 for i in range(n_measurements):
   integrator.run(10)
-  print 'measurement Nr: %d of %d' % ( i+1, n_measurements )
+  print('measurement Nr: %d of %d' % ( i+1, n_measurements ))
   
   # compute the total pressure tensor
   Pijtot += espressopp.Tensor( pressure_tensor.compute() )
@@ -145,22 +145,22 @@ for i in range(n):
   pij_layers1[i] /= float(n_measurements)
   pij_layers2[i] /= float(n_measurements)
 
-print '\ntotal pressure tensor'
-print '   Pxx      Pyy      Pzz      Pxy      Pxz      Pyz'
+print('\ntotal pressure tensor')
+print('   Pxx      Pyy      Pzz      Pxy      Pxz      Pyz')
 fmt1 = '%8.4f %8.4f %8.4f %8.4f %8.4f %8.4f'
-print(fmt1 % (Pijtot[0], Pijtot[1], Pijtot[2], Pijtot[3], Pijtot[4], Pijtot[5]))
+print((fmt1 % (Pijtot[0], Pijtot[1], Pijtot[2], Pijtot[3], Pijtot[4], Pijtot[5])))
 
-print '\nPressure tensor by PressureTensorLayer (caculated for each layer separatelly).'
+print('\nPressure tensor by PressureTensorLayer (caculated for each layer separatelly).')
       
-print 'layer number     z coord of layer        pressure tensor'
+print('layer number     z coord of layer        pressure tensor')
 for i in range(n):
-  print ('%4d           %7.3f              ' % (i, i * h0)) , pij_layers1[i]
+  print(('%4d           %7.3f              ' % (i, i * h0)) , pij_layers1[i])
 
-print '\nPressure tensor by PressureTensorMultiLayer (caculated for each layer at once).'
+print('\nPressure tensor by PressureTensorMultiLayer (caculated for each layer at once).')
 
-print 'layer number     z coord of layer        pressure tensor'
+print('layer number     z coord of layer        pressure tensor')
 for i in range(n):
-  print ('%4d           %7.3f              ' % (i, i * h0)) , pij_layers2[i]
+  print(('%4d           %7.3f              ' % (i, i * h0)) , pij_layers2[i])
   
-print 'done'
-print 'both functions should give the same result'
+print('done')
+print('both functions should give the same result')

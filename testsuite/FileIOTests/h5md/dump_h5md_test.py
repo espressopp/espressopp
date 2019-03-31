@@ -84,11 +84,11 @@ class TestH5MDNVT(TestH5MD):
 
         ids = h5['/particles/atoms/id/value']
         for id_set in ids:
-            self.assertListEqual(filter(lambda x: x != -1, id_set), [p[0] for p in self.particles])
+            self.assertListEqual([x for x in id_set if x != -1], [p[0] for p in self.particles])
 
         types = h5['/particles/atoms/species/value']
         for type_set in types:
-            self.assertListEqual(filter(lambda x: x != -1, type_set), [p[2] for p in self.particles])
+            self.assertListEqual([x for x in type_set if x != -1], [p[2] for p in self.particles])
 
     def test_check_static_box(self):
         self.dump_h5md.dump()

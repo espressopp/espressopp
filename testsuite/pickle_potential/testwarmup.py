@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -37,10 +37,10 @@ print("starting warmup")
 org_dt = integrator.dt
 pot = system.getInteraction(0).getPotential(0,0)
 print(pot)
-print("Nint = ", system.getNumberOfInteractions())
+print(("Nint = ", system.getNumberOfInteractions()))
 final_sigma = pot.sigma
 final_epsilon = pot.epsilon
-print("sigma=",pot.sigma, "epsilon=",pot.epsilon)
+print(("sigma=",pot.sigma, "epsilon=",pot.epsilon))
 maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
 N = 1
 number = 50

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -53,8 +53,8 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,system.skin)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
         
-        print('NodeGrid = %s'%(nodeGrid,))
-        print('CellGrid = %s'%cellGrid)
+        print(('NodeGrid = %s'%(nodeGrid,)))
+        print(('CellGrid = %s'%cellGrid))
 
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         pid = 0

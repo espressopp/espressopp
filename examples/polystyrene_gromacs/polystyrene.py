@@ -199,16 +199,16 @@ integrator.dt = timestep
 
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 
 #exit()
@@ -232,9 +232,9 @@ Pij = [0,0,0,0,0,0]
 Ek = 0.5 * T * (3 * num_particles)
 Ep = internb.computeEnergy()
 Eb, Ea, Ed=0,0,0
-for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
-for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
-for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
+for bd in list(bondedinteractions.values()):Eb+=bd.computeEnergy()
+for ang in list(angleinteractions.values()): Ea+=ang.computeEnergy()
+for dih in list(dihedralinteractions.values()): Ed+=dih.computeEnergy()
 
 Etotal = Ek + Ep + Eb + Ea + Ed
 sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair         ebond       eangle       edihedral\n')
@@ -254,9 +254,9 @@ for i in range(check):
     Ep = internb.computeEnergy()
     
     Eb, Ea, Ed=0,0,0
-    for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
-    for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
-    for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
+    for bd in list(bondedinteractions.values()):Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): Ea+=ang.computeEnergy()
+    for dih in list(dihedralinteractions.values()): Ed+=dih.computeEnergy()
     Etotal = Ek + Ep + Eb + Ea + Ed
     sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
     #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)

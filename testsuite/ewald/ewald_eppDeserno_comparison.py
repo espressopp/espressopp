@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -80,11 +80,11 @@ Lx, Ly, Lz, x, y, z, type, q, vx,vy,vz,fx,fy,fz,bondpairs = espresso_old.read('i
 
 # creating the system box
 box = (Lx, Ly, Lz)
-print("System box size:", box)
+print(("System box size:", box))
 # number of particles
 num_particles = len(x)
-print("Number of particles = ", num_particles)
-print("The first particle has coordinates", x[0], y[0], z[0])
+print(("Number of particles = ", num_particles))
+print(("The first particle has coordinates", x[0], y[0], z[0]))
 
 '''
 #  Ewald method suppose to calculate electrostatic interaction dividing it into R space and
@@ -191,6 +191,6 @@ enK = ewaldK_int.computeEnergy()
 enTot = enR + enK
 
 # printing the total energy and the difference with Deserno results
-print('\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno))
+print(('\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno)))
 
 sys.exit()

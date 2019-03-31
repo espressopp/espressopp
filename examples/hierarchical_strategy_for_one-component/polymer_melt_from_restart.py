@@ -71,8 +71,8 @@ box         = (L, L, L)
 
 #random.seed(seed)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 #logging.getLogger("SteepestDescent").setLevel(logging.INFO)
 
@@ -145,7 +145,7 @@ vl      = espressopp.VerletList(system, cutoff = rc_lj)
 potLJ   = espressopp.interaction.LennardJones(epsilon, sigma, cutoff=rc_lj, shift=0)
 #interLJ = espressopp.interaction.VerletListLennardJones(vl)
 #interLJ.setPotential(type1=0, type2=0, potential=potLJ)
-print 'Generating potential files ... (%2s)\n' % (tabfileLJ)
+print('Generating potential files ... (%2s)\n' % (tabfileLJ))
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=rc_lj)
 potTabLJ = espressopp.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc_lj)
 interLJ = espressopp.interaction.VerletListTabulated(vl)
@@ -155,7 +155,7 @@ system.addInteraction(interLJ)
 # FENE bonds
 potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
 #interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
-print 'Generating potential files ... (%2s)\n' % (tabfileFENE)
+print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)
 potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)
 interFENE = espressopp.interaction.FixedPairListTabulated(system, bondlist, potTabFENE)
@@ -171,18 +171,18 @@ espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 #espressopp.tools.pdb.fastwritepdb(filename, system, monomers_per_chain, False)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 

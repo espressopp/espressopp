@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -111,13 +111,13 @@ class TestCaseConstrainRG(unittest.TestCase):
                 before[j] += dmy_p[i][j]
         for i in range(3):
             before[i] /= 5.
-        print("before COM =", before)
+        print(("before COM =", before))
         before_rg = 0.
         for i in range(5):
             for j in range(3):
                 before_rg += (dmy_p[i][j] - before[j])**2
         before_rg = before_rg**0.5
-        print("before Rg =", before_rg)
+        print(("before Rg =", before_rg))
 
         # run twenty thousand steps
         integrator.run(20000)
@@ -144,13 +144,13 @@ class TestCaseConstrainRG(unittest.TestCase):
                 after[j] += dmy_p[i][j]
         for i in range(3):
             after[i] /= 5.
-        print("after  COM =", after)
+        print(("after  COM =", after))
         after_rg = 0.
         for i in range(5):
             for j in range(3):
                 after_rg += (dmy_p[i][j] - after[j])**2
         after_rg = after_rg**0.5
-        print("after  Rg =", after_rg)
+        print(("after  Rg =", after_rg))
 
         # run checks
         self.assertTrue(fabs((before_rg - after_rg)/before_rg) < 0.03)

@@ -136,9 +136,9 @@ bonds = Tetracryst.makebonds(len(x))
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..."
+print("Added tuples and bonds, decomposing now ...")
 system.storage.decompose()
-print "done decomposing"
+print("done decomposing")
 
 # AdResS Verlet list
 vl = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc,
@@ -179,16 +179,16 @@ integrator.addExtension(langevin)
 espressopp.tools.AdressDecomp(system, integrator)
 
 # system information
-print ''
-print 'number of AT particles =', num_particles
-print 'number of CG particles =', num_particlesCG
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of AT particles =', num_particles)
+print('number of CG particles =', num_particlesCG)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)
@@ -209,10 +209,10 @@ EQsteps = 1000
 EQintervals = 100
 EQnsteps = EQsteps/EQintervals
 
-print ''
-print 'Short equilibration'
-print 'Equilibration steps =', EQsteps
-print ''
+print('')
+print('Short equilibration')
+print('Equilibration steps =', EQsteps)
+print('')
 
 # print the data of the intial configuration
 fmt = '%5d %8.4f %10.5f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
@@ -239,9 +239,9 @@ for s in range(1, EQintervals + 1):
   Ecg = interNB.computeEnergyCG()
   sys.stdout.write(fmt % (EQstep, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
 
-print ''
-print 'Equilibration Done'
-print ''
+print('')
+print('Equilibration Done')
+print('')
 
 ### KIRKWOOD TI ###
 # TI parameters
@@ -256,15 +256,15 @@ lambdastep = 1.0/bins
 # specify output filename
 namerawFile = 'KirkwoodTI_rawdata.dat'
 
-print ''
-print 'Starting Kirkwood TI'
-print ''
-print 'Kirkwood TI steps =', bins
-print 'Kirkwood TI stepwidth =', lambdastep
-print 'Integration steps for each lambda =', steps
-print 'Equilibration steps after each lamda switch =', stepsequi
-print 'Intervals for taking data and printing information to screen =', intervals
-print ''
+print('')
+print('Starting Kirkwood TI')
+print('')
+print('Kirkwood TI steps =', bins)
+print('Kirkwood TI stepwidth =', lambdastep)
+print('Integration steps for each lambda =', steps)
+print('Equilibration steps after each lamda switch =', stepsequi)
+print('Intervals for taking data and printing information to screen =', intervals)
+print('')
 
 # print the data of the starting configuration
 fmt = '%5d %8.4f %10.5f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
@@ -277,7 +277,7 @@ Eaa = interNB.computeEnergyAA()
 Ecg = interNB.computeEnergyCG()
 sys.stdout.write(' step      T         P         etotal     enonbonded    ebonded      ekinetic     eallatom        ecg \n')
 sys.stdout.write(fmt % (0, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
-print ''
+print('')
 
 # output arrays
 Energydiff = []
@@ -287,8 +287,8 @@ Pressurediff = []
 for i in range(bins+1):
 
  # change Lambda
- print 'Kirkwood step: %d' %i
- print 'Lambda: %f' %(lambdastep*i)
+ print('Kirkwood step: %d' %i)
+ print('Lambda: %f' %(lambdastep*i))
  for p in range(num_particles + num_particlesCG):
    system.storage.modifyParticle(p, 'lambda_adr', lambdastep*i)
  system.storage.decompose()
@@ -332,8 +332,8 @@ for i in range(bins+1):
  Pressurediff.append(runningP)
 
 # print the raw output to file
-print ''
-print "Kirkwood TI done, printing raw data to %s\n" %namerawFile
+print('')
+print("Kirkwood TI done, printing raw data to %s\n" %namerawFile)
 form = '%12.8f %12.8f %12.8f\n'
 rawFile = open (namerawFile, 'w')
 rawFile.write('lambda  V_CG-V_AA  P(lambda)\n')

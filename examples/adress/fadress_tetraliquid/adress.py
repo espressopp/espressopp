@@ -152,10 +152,10 @@ fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..."
+print("Added tuples and bonds, decomposing now ...")
 system.storage.decompose()
 
-print "done decomposing"
+print("done decomposing")
 
 # AdResS Verlet list
 vl = espressopp.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
@@ -196,17 +196,17 @@ langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
 
 
-print ''
-print 'number of AT particles =', num_particles
-print 'number of CG particles =', num_particlesCG
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of AT particles =', num_particles)
+print('number of CG particles =', num_particlesCG)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)

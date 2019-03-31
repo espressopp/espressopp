@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -62,7 +62,7 @@ class TestLJcos(makeConf):
             self.LJcosInter.setPotential(type1=0, type2=0, potential=LJcos)
 
             Epot = espressopp.analysis.EnergyPot(self.system)
-            print('phi =', phi, 'Epot = ', Epot.compute())
+            print(('phi =', phi, 'Epot = ', Epot.compute()))
 
             self.assertAlmostEqual(Epot.compute(), -phi, places=10)
 

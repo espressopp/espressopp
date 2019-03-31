@@ -111,18 +111,18 @@ dhdlFile = "dhdl.xvg"
 dhdlF = open(dhdlFile,'a')
 dhdlF.write("#(coul-lambda, vdw-lambda) = ("+str(lambdaTICoul)+", "+str(lambdaTIVdwl)+"\n") 
 
-print '# radius of atomistic region = ',ex_size
-print '# thickness of hybrid region = ',hy_size
+print('# radius of atomistic region = ',ex_size)
+print('# thickness of hybrid region = ',hy_size)
 
 # print ESPResSo++ version and compile info
-print '# ',espressopp.Version().info()
+print('# ',espressopp.Version().info())
 # print simulation parameters (useful to have them in a log file)
-print "# nbCutoff           = ", nbCutoff
-print "# skin               = ", skin
-print "# dt                 = ", dt
-print "# nSteps             = ", nSteps
-print "# output every ",nStepsPerOutput," steps"
-print "# trajectory output every ",nStepsPerTrjoutput," steps"
+print("# nbCutoff           = ", nbCutoff)
+print("# skin               = ", skin)
+print("# dt                 = ", dt)
+print("# nSteps             = ", nSteps)
+print("# output every ",nStepsPerOutput," steps")
+print("# trajectory output every ",nStepsPerTrjoutput," steps")
 
 
 ########################################################################
@@ -131,30 +131,30 @@ print "# trajectory output every ",nStepsPerTrjoutput," steps"
 
 ## get info on (complete) atomistic system ##
 
-print '# Reading gromacs top and gro files...'
+print('# Reading gromacs top and gro files...')
 # call gromacs parser for processing the top file (and included files) and the gro file
 defaults, atTypes, atomtypesDict, atMasses, atCharges, atomtypeparameters, atBondtypes, bondtypeparams, atAngletypes, angletypeparams, atDihedraltypes, dihedraltypeparams, impropertypeparams, atExclusions, atOnefourpairslist, atX, atY, atZ, atVX, atVY, atVZ, atResnames, atResid, Lx, Ly, Lz = gromacs.read(inputcrdfile,aatopfile)
 
-reverseAtomtypesDict = dict([(v, k) for k, v in atomtypesDict.iteritems()])
+reverseAtomtypesDict = dict([(v, k) for k, v in atomtypesDict.items()])
 
 # system box size
 box                = (Lx, Ly, Lz)
-print "# Box size          = ", box
+print("# Box size          = ", box)
 
 nParticlesRead = len(atX)
-print "# total number of particles read from atomistic config file = ",nParticlesRead
+print("# total number of particles read from atomistic config file = ",nParticlesRead)
 
-print "# number of atomistic particles in solute = ",nSoluteAtoms
-print "# number of coarse-grained particles in solute = ",nSoluteCgparticles
-print "# number of atomistic particles in solvent = ",nWaterAtoms
-print "# number of coarse-grained particles in solvent = ",nWaterMols
+print("# number of atomistic particles in solute = ",nSoluteAtoms)
+print("# number of coarse-grained particles in solute = ",nSoluteCgparticles)
+print("# number of atomistic particles in solvent = ",nWaterAtoms)
+print("# number of coarse-grained particles in solvent = ",nWaterMols)
 
 nParticlesTotal = nSoluteAtoms + nSoluteCgparticles + nWaterAtoms + nWaterMols
-print "# total number of particles after setup = ",nParticlesTotal 
+print("# total number of particles after setup = ",nParticlesTotal) 
 
 if (nParticlesRead != (nSoluteAtoms+nWaterAtoms)):
-  print "problem: no. particles in crd file != np. of atomistic particles specified"
-  print "values: ",nParticlesRead,nSoluteAtoms+nWaterAtoms
+  print("problem: no. particles in crd file != np. of atomistic particles specified")
+  print("values: ",nParticlesRead,nSoluteAtoms+nWaterAtoms)
   quit()
 
 particleX = []
@@ -193,7 +193,7 @@ cgSoluteParticlesDict = {} #map particlePID of cg particle to original atomistic
 cgSoluteParticlesDict[cgPid] = [] 
 charge = 0.0 #not needed on CG particles
 mass = 0.0
-for j in xrange(nSoluteAtoms):
+for j in range(nSoluteAtoms):
   mass += atMasses[j]
   cgSoluteParticlesDict[cgPid].append(j+1)
 particlePID.append(cgPid)
@@ -226,7 +226,7 @@ for i in range(nWaterMols):
   particleVY.append(atVY[indexO])
   particleVZ.append(atVZ[indexO])
 
-print '# system total charge = ',sum(particleCharges)
+print('# system total charge = ',sum(particleCharges))
 
 ########################################################################
 # 2. setup of the system, random number geneartor and parallelisation  #
@@ -237,7 +237,7 @@ system             = espressopp.System()
 # use the random number generator that is included within the ESPResSo++ package
 xs = time.time()
 seed = int(xs % int(xs) * 10000000000)
-print "RNG Seed:", seed
+print("RNG Seed:", seed)
 rng = espressopp.esutil.RNG()
 rng.seed(seed)
 system.rng = rng
@@ -254,9 +254,9 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, nbCutoff, s
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
-print "# NCPUs              = ", NCPUs
-print "# nodeGrid           = ", nodeGrid
-print "# cellGrid           = ", cellGrid
+print("# NCPUs              = ", NCPUs)
+print("# nodeGrid           = ", nodeGrid)
+print("# cellGrid           = ", cellGrid)
 
 
 
@@ -315,7 +315,7 @@ for i in range(nSoluteCgparticles):
   tuples.append(tmptuple)
 
 
-print '# adding ',len(allParticles),' particles'
+print('# adding ',len(allParticles),' particles')
 system.storage.addParticles(allParticles, *properties)
 
 # create FixedTupleList object
@@ -353,16 +353,16 @@ if (temperature != None):
   thermostat             = espressopp.integrator.LangevinThermostat(system)
   # set Langevin friction constant
   thermostat.gamma       = 10.0 # units ps-1
-  print "# gamma for langevin thermostat = ",thermostat.gamma
+  print("# gamma for langevin thermostat = ",thermostat.gamma)
   # set temperature
   thermostat.temperature = temperature
   # switch on for adres
   thermostat.adress = True
-  print "# thermostat temperature        = ", temperature*temperatureConvFactor
+  print("# thermostat temperature        = ", temperature*temperatureConvFactor)
   # tell the integrator to use this thermostat
   integrator.addExtension(thermostat)
 else:
-  print "#No thermostat"
+  print("#No thermostat")
 
 ########################################################################
 # 6. define atomistic and adres interactions
@@ -371,7 +371,7 @@ else:
 ## adres interactions ##
 
 cm = adresRegionCentreAtIndex
-print '# spherical moving atomistic region for adres centred on atom ',cm,' i.e. cg particle ',mapAtToCgIndex[cm]
+print('# spherical moving atomistic region for adres centred on atom ',cm,' i.e. cg particle ',mapAtToCgIndex[cm])
 verletlist = espressopp.VerletListAdress(system, cutoff=nbCutoff, adrcut=nbCutoff, 
                                 dEx=ex_size, dHy=hy_size, 
                                 pids=[mapAtToCgIndex[cm]], sphereAdr=True)
@@ -412,19 +412,19 @@ dihedralinteractions=gromacs.setDihedralInteractionsAdress(system, atDihedraltyp
 #print '# ',len(cgExclusions),' exclusions'
 
 count = system.getNumberOfInteractions()
-print '# ',count,' interactions defined'
+print('# ',count,' interactions defined')
 
 # settle water
 molidlist=[]
 for wm in range(nWaterMols): 
   molidlist.append(tuples[wm][0]) #assuming water is listed first
-print '#Warning: settle set-up assumes water was listed first when tuples were constructed'
+print('#Warning: settle set-up assumes water was listed first when tuples were constructed')
 
 settlewaters = espressopp.integrator.Settle(system, ftpl, mO=15.9994, mH=1.008, distHH=0.15136, distOH=0.09572)
 settlewaters.addMolecules(molidlist)
 integrator.addExtension(settlewaters)
 
-print '# Settling ',len(molidlist), ' waters'
+print('# Settling ',len(molidlist), ' waters')
 
 # for settle water 
 nconstr = nWaterAtoms
@@ -432,15 +432,15 @@ nAtoms = nWaterAtoms + nSoluteAtoms
 ndof_unconstr = nAtoms*3-3
 ndof_constr = ndof_unconstr-nconstr
 temp_correction_factor = float(ndof_unconstr)/float(ndof_constr)
-print "# Correcting temperature for constraints, using factor: ",temp_correction_factor
-print "# calculated using nAtoms = ",nAtoms, "nconstraints = ",nconstr," and ndof_constr = ",ndof_constr," of which ",3*nWaterMols," are from SETTLE"
+print("# Correcting temperature for constraints, using factor: ",temp_correction_factor)
+print("# calculated using nAtoms = ",nAtoms, "nconstraints = ",nconstr," and ndof_constr = ",ndof_constr," of which ",3*nWaterMols," are from SETTLE")
 
 # add AdResS
 adress = espressopp.integrator.Adress(system,verletlist,ftpl)
 integrator.addExtension(adress)
 
 # distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass 
-print '# Decomposing...'
+print('# Decomposing...')
 espressopp.tools.AdressDecomp(system, integrator)
 
 ########################################################################
@@ -448,12 +448,12 @@ espressopp.tools.AdressDecomp(system, integrator)
 ########################################################################
 
 temperature = espressopp.analysis.Temperature(system)
-print "# starting run..."
+print("# starting run...")
 
 dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename=trjfile, unfolded=False)
 
-print 'Start time: ', str(datetime.now())
-print "i*dt,Eb, EAng, Edih, EImp, ELj, Elj14, EQQ, EQQ14, Epot, T"
+print('Start time: ', str(datetime.now()))
+print("i*dt,Eb, EAng, Edih, EImp, ELj, Elj14, EQQ, EQQ14, Epot, T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 
 integrator.run(0)
@@ -468,9 +468,9 @@ for k in range(nOutput):
   EAng = 0.0
   EDih = 0.0
   EImp = 0.0
-  for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-  for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
-  for dih in dihedralinteractions.values(): EDih+=dih.computeEnergy()
+  for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+  for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
+  for dih in list(dihedralinteractions.values()): EDih+=dih.computeEnergy()
   #for imp in improperinteractions.values(): EImp+=imp.computeEnergy()
   ELj= lj_adres_interaction.computeEnergy()
   ELj14 = lj14interaction.computeEnergy()
@@ -481,7 +481,7 @@ for k in range(nOutput):
   dhdlF.write(str(i*dt)+" "+str(dhdlCoul)+" "+str(dhdlVdwl)+"\n")
   T = temperature.compute()
   Epot = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-  print (fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)),"output"
+  print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)),"output")
   sys.stdout.flush()
   dhdlF.flush()
   integrator.run(nStepsPerOutput)
@@ -491,5 +491,5 @@ for k in range(nOutput):
   if (i > 0) and (i % nStepsPerTrjoutput == 0):
     dump_conf_gro.dump()
 
-print 'End time: ', str(datetime.now())
+print('End time: ', str(datetime.now()))
 
