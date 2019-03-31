@@ -4,20 +4,20 @@
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 #
 ###########################################################################
@@ -74,7 +74,7 @@ print(('nvt =', nvt))
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
-     
+
     for i in range(N):
         r = low + i * delta
         energy = pot.computeEnergy(r)
@@ -83,14 +83,14 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
         else: # this is for 3- and 4-body potentials
             force = pot.computeForce(r)
         outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
-     
+
     outfile.close()
 
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
-       ncells = ncells + 1
+        ncells = ncells + 1
     return ncells - 1
 
 
@@ -113,15 +113,15 @@ for tabulation in [True, False]:
     if tabulation: w = ''
     else: w = 'out'
     print(('Running simulation with%0s tabulated potentials' % w))
-        
+
     print('Setting up ...')
     system = espressopp.System()
     system.rng = espressopp.esutil.RNG(54321)
     system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
     system.skin = skin
-        
+
     comm = MPI.COMM_WORLD
-        
+
     nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
     cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
     #nodeGrid = Int3D(1, 1, comm.size)
@@ -131,13 +131,13 @@ for tabulation in [True, False]:
         #calcNumberCells(size[2], nodeGrid[2], rc)
         #)
     system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
-        
+
     # add particles to the system and then decompose
     for pid in range(num_particles):
         system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
     system.storage.decompose()
-        
-        
+
+
     # Lennard-Jones with Verlet list
     vl = espressopp.VerletList(system, cutoff = rc + system.skin)
     if tabulation:
@@ -147,8 +147,8 @@ for tabulation in [True, False]:
         interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
-        
-        
+
+
     # FENE bonds with Fixed Pair List
     fpl = espressopp.FixedPairList(system.storage)
     fpl.addBonds(bonds)
@@ -159,8 +159,8 @@ for tabulation in [True, False]:
         interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
         #interFENE.setPotential(type1=0, type2=0, potential=potFENE)
     system.addInteraction(interFENE)
-        
-        
+
+
     # Cosine with Fixed Triple List
     ftl = espressopp.FixedTripleList(system.storage)
     ftl.addTriples(angles)
@@ -171,29 +171,29 @@ for tabulation in [True, False]:
         interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
         #interCosine.setPotential(type1=0, type2=0, potential=potCosine)
     system.addInteraction(interCosine)
-        
-        
-        
+
+
+
     # integrator
     integrator = espressopp.integrator.VelocityVerlet(system)
     integrator.dt = timestep
-        
+
     if(nvt):
         langevin = espressopp.integrator.LangevinThermostat(system)
         langevin.gamma = 1.0
         langevin.temperature = 1.0
         integrator.addExtension(langevin)
-        
-        
+
+
     # analysis
     configurations = espressopp.analysis.Configurations(system)
     configurations.gather()
     temperature = espressopp.analysis.Temperature(system)
     pressure = espressopp.analysis.Pressure(system)
     pressureTensor = espressopp.analysis.PressureTensor(system)
-        
+
     fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
-        
+
     T = temperature.compute()
     P = pressure.compute()
     Pij = pressureTensor.compute()
@@ -204,10 +204,10 @@ for tabulation in [True, False]:
     Etotal = Ek + Ep + Eb + Ea
     sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
     sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-        
+
     start_time = time.clock()
     integrator.run(steps)
-        
+
     T = temperature.compute()
     P = pressure.compute()
     Pij = pressureTensor.compute()
@@ -218,7 +218,7 @@ for tabulation in [True, False]:
     Etotal = Ek + Ep + Eb + Ea
     sys.stdout.write(fmt % (steps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
     sys.stdout.write('\n')
-        
+
     end_time = time.clock()
     timers.show(integrator.getTimers(), precision=2)
 

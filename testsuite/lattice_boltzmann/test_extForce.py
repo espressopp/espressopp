@@ -4,20 +4,20 @@
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 import espressopp
@@ -71,7 +71,7 @@ class TestExtForceLB(unittest.TestCase):
         halo = 1
         myNi = self.lb.getMyNi
         volume_xyz = (myNi[0] - 2 * halo) * (myNi[1] - 2 * halo) * (myNi[2] - 2 * halo)
-        
+
         for i in range (halo, myNi[0]-halo):
             for j in range (halo, myNi[1]-halo):
                 for k in range (halo, myNi[2]-halo):

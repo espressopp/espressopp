@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import unittest
@@ -62,7 +62,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
         bc   = espressopp.bc.OrthorhombicBC(None, box)
 
         system.bc = bc
-        system.rng = rng 
+        system.rng = rng
         system.skin = skin
 
         comm = espressopp.MPI.COMM_WORLD
@@ -144,7 +144,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
             temperature = temp.compute()
             kineticEnergy = 0.5 * temperature * (3 * N * N * N)
             potentialEnergy = interLJ.computeEnergy()
-            print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+            print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1),
                  kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)))
 
 if __name__ == "__main__":

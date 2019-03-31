@@ -4,27 +4,27 @@
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 
 '''
-#  This script is an example of calculation of long range interactions (Coulomb interaction) using 
+#  This script is an example of calculation of long range interactions (Coulomb interaction) using
 #  the Ewald summation method.
-#  
+#
 #  The initial data file is 'ini_struct_deserno.dat'. It contains initial information about
 #  the system: the box size, particle id, position and charge.
 #
@@ -37,31 +37,31 @@
 
 # this is an auxiliary function. It reads the results of Deserno from "deserno_ewald.dat"
 def readingDesernoForcesFile():
-  # forces x,y,z
-  fx, fy, fz = [], [], []
-  # energy
-  energy = 0.0
-  
-  # reading the general information
-  file = open("deserno_ewald.dat")
-  i = 0
-  for line in file:
+    # forces x,y,z
+    fx, fy, fz = [], [], []
     # energy
-    if i==6:
-      tmp = line.split()
-      energy = float(tmp[0])
-    
-    # forces
-    if i>=9:
-      line = line.replace('{','').replace('}','')
-      tmp = line.split()
-      fx.append(float(tmp[0]))
-      fy.append(float(tmp[1]))
-      fz.append(float(tmp[2]))
-      
-    i=i+1
-  
-  return energy, fx, fy, fz
+    energy = 0.0
+
+    # reading the general information
+    file = open("deserno_ewald.dat")
+    i = 0
+    for line in file:
+        # energy
+        if i==6:
+            tmp = line.split()
+            energy = float(tmp[0])
+
+        # forces
+        if i>=9:
+            line = line.replace('{','').replace('}','')
+            tmp = line.split()
+            fx.append(float(tmp[0]))
+            fy.append(float(tmp[1]))
+            fz.append(float(tmp[2]))
+
+        i=i+1
+
+    return energy, fx, fy, fz
 # end of the function readingDesernoForcesFile
 
 
@@ -89,10 +89,10 @@ print(("The first particle has coordinates", x[0], y[0], z[0]))
 '''
 #  Ewald method suppose to calculate electrostatic interaction dividing it into R space and
 #  K space part
-#  
+#
 #  alpha - Ewald parameter
 #  rspacecutoff - the cutoff in real space
-#  kspacecutoff - the cutoff in reciprocal space   
+#  kspacecutoff - the cutoff in reciprocal space
 '''
 alpha          = 1.112583061
 rspacecutoff   = 4.9
@@ -118,8 +118,8 @@ system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGr
 props = ['id', 'pos', 'type', 'q']
 new_particles = []
 for i in range(0, num_particles):
-  part = [ i, Real3D(x[i], y[i], z[i]), type[i], q[i] ]
-  new_particles.append(part)
+    part = [ i, Real3D(x[i], y[i], z[i]), type[i], q[i] ]
+    new_particles.append(part)
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
@@ -174,15 +174,15 @@ format1 = '%3s %20s %20s %20s %10s %20s %25s %25s\n'
 print((format1 % ('id', 'fx', 'fy', 'fz', ' ', 'dfx', 'dfy', 'dfz')))
 format2 = '%3d %3s %3.17f %3s %3.17f %3s %3.17f %10s %3.17f %3s %3.17f %3s %3.17f'
 for j in range(0, num_particles):
-  print((format2 % (j, ' ', \
-                       system.storage.getParticle(j).f.x, ' ', \
-                       system.storage.getParticle(j).f.y, ' ', \
-                       system.storage.getParticle(j).f.z, \
-                       ' ', \
-                       abs(system.storage.getParticle(j).f.x-forceX_Deserno[j]), ' ', \
-                       abs(system.storage.getParticle(j).f.y-forceY_Deserno[j]), ' ', \
-                       abs(system.storage.getParticle(j).f.z-forceZ_Deserno[j])) ))
-  
+    print((format2 % (j, ' ', \
+                         system.storage.getParticle(j).f.x, ' ', \
+                         system.storage.getParticle(j).f.y, ' ', \
+                         system.storage.getParticle(j).f.z, \
+                         ' ', \
+                         abs(system.storage.getParticle(j).f.x-forceX_Deserno[j]), ' ', \
+                         abs(system.storage.getParticle(j).f.y-forceY_Deserno[j]), ' ', \
+                         abs(system.storage.getParticle(j).f.z-forceZ_Deserno[j])) ))
+
 # calculating the R space part of electrostatic energy
 enR = coulombR_int.computeEnergy()
 # calculating the K space part of electrostatic energy

@@ -4,20 +4,20 @@
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 
@@ -45,7 +45,7 @@ class TestCaseConstrainCOM(unittest.TestCase):
         self.system = system
         self.L = L
         self.box = box
-	self.skin =system.skin
+        self.skin =system.skin
 
     def test_constrain_com(self):
         # set up normal domain decomposition
@@ -94,7 +94,7 @@ class TestCaseConstrainCOM(unittest.TestCase):
 
         # center of mass of particles before integration
         before = [0., 0., 0.]
-        
+
         particle = self.system.storage.getParticle(1)
         dmy_p = []
         dmy_ele = []
