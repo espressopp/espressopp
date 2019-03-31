@@ -50,44 +50,15 @@ Description
 from _espressopp import RealND
 from _espressopp import RealNDs
 from espressopp import esutil
+import six
 
 # This injects additional methods into the RealND class and pulls it
 # into this module
-class __RealND(RealND) :
-
-
-    __metaclass__ = esutil.ExtendBaseClass
-
-    '''
-    __originit = RealND.__init__
-    def __init__(self, *args):
-        if len(args) == 0:
-            x = y = z = 0.0
-        elif len(args) == 1:
-            arg0 = args[0]
-            if isinstance(arg0, RealND):
-                x = arg0.x
-                y = arg0.y
-                z = arg0.z
-            # test whether the argument is iterable and has 3 elements
-            elif hasattr(arg0, '__iter__') and len(arg0) == 3:
-                x, y, z = arg0
-            elif isinstance(arg0, float) or isinstance(arg0, int):
-                x = y = z = arg0
-            else :
-                raise TypeError("Cannot initialize RealND from %s" % (args))
-        elif len(args) == 3 :
-            x, y, z = args
-        else :
-            raise TypeError("Cannot initialize RealND from %s" % (args))
-
-        return self.__originit(x, y, z)
-    '''
-
+class __RealND(RealND):
     # string conversion
     def __str__(self) :
       arr = []
-      for i in xrange(self.dimension):
+      for i in range(self.dimension):
         arr.append(self[i])
       return str(arr)
 
@@ -116,16 +87,14 @@ def toRealND(*args):
         return RealND(*args)
 
 class __RealNDs(RealNDs):
-    __metaclass__ = esutil.ExtendBaseClass
-    # string conversion
     def __str__(self) :
-	arr = []
-	for i in xrange(self.dimension):
+        arr = []
+        for i in range(self.dimension):
             arr_i = []
-	    for j in xrange(self[i].dimension):
-		arr_i.append(str(self[i][j]))
+            for j in range(self[i].dimension):
+                arr_i.append(str(self[i][j]))
             arr.append(arr_i)
-	return str(arr)
+        return str(arr)
 
     def __repr__(self) :
         return 'RealNDs' + str(self)

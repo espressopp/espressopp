@@ -149,7 +149,7 @@ if (EXTERNAL_BOOST)
   if(${Boost_VERSION} VERSION_LESS 106700)
      find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python)
   else()
-     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python27)
+     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python3)
   endif()
   
   # Append Python library to the list of Boost libraries.
