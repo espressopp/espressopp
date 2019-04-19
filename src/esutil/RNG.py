@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2019
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -49,5 +49,5 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.RNGLocal',
             localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
-            pmicall = [ 'seed', 'get_seed', 'save_state', 'load_state' ]
+            pmicall = [ 'seed', 'get_seed', 'saveState', 'loadState' ]
             )

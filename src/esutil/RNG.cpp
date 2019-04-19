@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2019
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -82,12 +82,10 @@ namespace espressopp {
       return boostRNG;
     }
 
-    void RNG::save_state(int step){
+    void RNG::saveState(int step) {
       std::ostringstream oss;
       oss << *boostRNG;
-      if ( mpiWorld->rank()!=0 ) {
-        boost::mpi::gather(*mpiWorld, oss.str(), 0);
-      } else {
+      if ( mpiWorld->rank()==0 ) {
         std::vector<std::string> oss_str_vec;
         boost::mpi::gather(*mpiWorld, oss.str(), oss_str_vec, 0);
         std::string outfn = "rng." + std::to_string(step);
@@ -98,10 +96,12 @@ namespace espressopp {
           }
         }
         ofs.close();
+      } else {
+        boost::mpi::gather(*mpiWorld, oss.str(), 0);
       }
     }
 
-    void RNG::load_state(const char* fname) {
+    void RNG::loadState(const char* fname) {
       std::ifstream ifs;
       std::string rng_str;
       std::vector<std::string> rng_str_vec;
@@ -140,8 +140,8 @@ namespace espressopp {
         .def("gamma", &RNG::gamma)
         .def("uniformOnSphere", &RNG::uniformOnSphere)
         .def("get_seed", &RNG::get_seed)
-        .def("save_state", &RNG::save_state)
-        .def("load_state", &RNG::load_state);
+        .def("saveState", &RNG::saveState)
+        .def("loadState", &RNG::loadState);
     }
   }
 }
