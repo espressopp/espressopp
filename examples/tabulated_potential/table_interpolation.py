@@ -50,10 +50,10 @@ splinetypes = ['Linear','Akima','Cubic']  # implemented spline types
 ## IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE   ##
 ######################################################################
 
-print '\n-- Tabulated Interpolation Test -- \n'
-print 'Steps: %3s' % nsteps
-print 'Particles: %3s' % numParticles
-print 'Cutoff: %3s' % cutoff
+print('\n-- Tabulated Interpolation Test -- \n')
+print('Steps: %3s' % nsteps)
+print('Particles: %3s' % numParticles)
+print('Cutoff: %3s' % cutoff)
 
 
 # writes the tabulated potential file
@@ -73,7 +73,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile.close()
 
 # write the tabulated file for a LJ potential
-print 'Generating potential file ... (%2s)' % tabfile
+print('Generating potential file ... (%2s)' % tabfile)
 potLJ = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=0.0, cutoff=cutoff)
 writeTabFile(potLJ, tabfile, N=257, low=0.01, high=potLJ.cutoff)
 
@@ -91,7 +91,7 @@ def calcNumberCells(size, nodes, cutoff):
 # run simulation for all interpolation types
 for spline in range(1,len(splinetypes)+1):
     
-    print '\nSpline interpolation (%0d/%0d): %0s'% (spline, len(splinetypes), splinetypes[spline-1])
+    print('\nSpline interpolation (%0d/%0d): %0s'% (spline, len(splinetypes), splinetypes[spline-1]))
         
     # set up system
     system = espressopp.System()
@@ -157,8 +157,8 @@ for spline in range(1,len(splinetypes)+1):
     Ep = interTab.computeEnergy()
         
         
-    print 'Start %5s: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' \
-        % ("", Ek + Ep, Ep, Ek, temperature, p)
+    print('Start %5s: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' \
+        % ("", Ek + Ep, Ep, Ek, temperature, p))
         
     # langevin thermostat
     langevin = espressopp.integrator.LangevinThermostat(system)
@@ -172,12 +172,12 @@ for spline in range(1,len(splinetypes)+1):
     p = press.compute()
     Ek = 0.5 * temperature * (3 * numParticles)
     Ep = interTab.computeEnergy()
-    print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f\n' % \
-            (nsteps, Ek + Ep, Ep, Ek, temperature, p)
+    print('Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f\n' % \
+            (nsteps, Ek + Ep, Ep, Ek, temperature, p))
         
     end_time = time.clock()
     timers.show(integrator.getTimers(), precision=2)
 
 os.system('rm '+tabfile)
-print '\nDone.'
+print('\nDone.')
 

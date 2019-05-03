@@ -5,8 +5,14 @@ sudo: required
 services:
 - docker
 
+stages:
+  - canary
+  - test
+  - coverage
+  - deploy
+
 env:
-    - DISTRO=ubuntu EXTERNAL=ON
+    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=OFF
     - DISTRO=ubuntu_rolling EXTERNAL=ON
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
@@ -19,24 +25,29 @@ env:
     - DISTRO=opensuse EXTERNAL=ON
     - DISTRO=opensuse EXTERNAL=OFF
 
-script: deployment/build.sh
+script:
+  - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
+  - deployment/build.sh
 
 jobs:
     include:
+        - stage: canary
+          env: DISTRO=ubuntu EXTERNAL=ON
         - stage: coverage
           env: DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
-          compiler: gcc
-          script: deployment/build.sh
-        - stage: build
+        - stage: deploy
+          if: type != pull_request
           env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
 
 after_success:
+  - test "${TRAVIS_BUILD_STAGE_NAME}" = "Deploy" || travis_terminate 0
   - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v[12].*) ]] && DEPLOY=yes
-  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
         docker push "espressopp/espressopp:${DOCKER_TAG}";
     fi
-  - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - if [[ ${BUILD_UG} = ON ]]; then
+      cd ../..; 
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
       CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/doc . ;
       if [[ ${TRAVIS_BRANCH} = v[12].* ]]; then

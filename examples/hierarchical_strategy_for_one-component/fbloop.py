@@ -62,8 +62,8 @@ accelerate  = 1
 
 box         = (L, L, L)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
@@ -110,7 +110,7 @@ res_file = open('reinsertion.res')
 # add particles to the system and then decompose
 # do this in chunks of 1000 particles to speed it up
 chain = []
-for i in xrange(num_chains):
+for i in range(num_chains):
   startpos = system.bc.getRandomPos()
   positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
   j = 0
@@ -191,16 +191,16 @@ density = num_particles * 1.0 / (L * L * L)
 #  print "Add constrain2 tuple", tuple
 #  constrainlist2.addTuple(tuple)
 
-print "Init LJ"
+print("Init LJ")
 # Lennard-Jones for various interaction
-print "Init LJ1"
+print("Init LJ1")
 potLJ   = espressopp.interaction.LennardJones(epsilon, sigma, cutoff=rc_lj, shift=0)
 interLJ   = espressopp.interaction.FixedPairListLennardJones(system, bondlist, potLJ)
 system.addInteraction(interLJ)
 
-print "Init LJ2"
-for i in xrange(num_chains):
-  for j in xrange(monomers_per_chain - 2):
+print("Init LJ2")
+for i in range(num_chains):
+  for j in range(monomers_per_chain - 2):
     bondlistNN.add(i*monomers_per_chain + j + 1, i*monomers_per_chain + j + 3)
 capradNN = 1.1*sigma
 potLJNN = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradNN, shift=0)
@@ -208,20 +208,20 @@ interLJNN   = espressopp.interaction.FixedPairListLennardJonesCapped(system, bon
 system.addInteraction(interLJNN)
 interLJNN.setPotential(potLJNN) # that should be reused in feedback loops
 
-print "Init LJ3"
+print("Init LJ3")
 exclusion_list = []
 
-for i in xrange(num_chains):
+for i in range(num_chains):
   #print "Init LJ3:", i
-  for j in xrange(monomers_per_chain):
+  for j in range(monomers_per_chain):
     goal  = min(j + 3, monomers_per_chain)
-    for k in xrange(j + 1, goal):
+    for k in range(j + 1, goal):
       #print "Init LJ3:", i*monomers_per_chain + j, i*monomers_per_chain + k
       dmy_pair = [i*monomers_per_chain + j, i*monomers_per_chain + k]
       exclusion_list.append(dmy_pair)
 capradO = 2.**(1./6.)*sigma
 potLJO  = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradO, shift=0)
-print "Init LJ4"
+print("Init LJ4")
 vl         = espressopp.VerletList(system, cutoff = rc_lj, exclusionlist=exclusion_list)
 interLJO   = espressopp.interaction.VerletListLennardJonesCapped(vl)
 #for i in xrange(num_chains):
@@ -232,7 +232,7 @@ interLJO   = espressopp.interaction.VerletListLennardJonesCapped(vl)
 interLJO.setPotential(type1=0, type2=0, potential=potLJO)# that should be reused in fb loops
 system.addInteraction(interLJO)
 
-print "Init FENE"
+print("Init FENE")
 # FENE bonds
 potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.49999)
 interFENE_All = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
@@ -251,50 +251,50 @@ system.addInteraction(interFENE_All, 'FENE')
 #interRG.setRG(softblobs_chain)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # Calculate the mean square internal distance
 def calculate_msid():
   msid = []
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid.append(0.)
 
-  for i in xrange(num_chains):
+  for i in range(num_chains):
     pid = i*monomers_per_chain + 1
     particle = system.storage.getParticle(pid)
     dmy_p = []
     dmy_ele = []
-    for j in xrange(3):
+    for j in range(3):
       dmy_ele.append(particle.pos[j])
     dmy_p.append(dmy_ele)
-    for j in xrange(1, monomers_per_chain):
+    for j in range(1, monomers_per_chain):
       pid += 1
       particle = system.storage.getParticle(pid)
       diff = []
-      for k in xrange(3):
+      for k in range(3):
         x_i = particle.pos[k] - dmy_p[j - 1][k]
         x_i = x_i - round(x_i/L)*L
         diff.append(x_i + dmy_p[j - 1][k])
       dmy_p.append(diff)
-    for j in xrange(monomers_per_chain):
-      for k in xrange(j + 1, monomers_per_chain):
+    for j in range(monomers_per_chain):
+      for k in range(j + 1, monomers_per_chain):
         dist = 0.
-        for l in xrange(3):
+        for l in range(3):
           dist += (dmy_p[k][l] - dmy_p[j][l])**2
         msid[k - j - 1] += dist
 
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid[i] = msid[i]/(monomers_per_chain - i -1)/num_chains
 
   return msid
@@ -304,16 +304,16 @@ def calculate_signal():
   calcMSID = espressopp.analysis.MeanSquareInternalDist(system, monomers_per_chain)
   calcMSID.gather()
   msid = calcMSID.compute()
-  print "#MSID++ ",
+  print("#MSID++ ", end=' ')
   for r in msid:
-    print r,
-  print "end"
+    print(r, end=' ')
+  print("end")
   calcMSID.clear()
   current = 0.
-  for i in xrange(19, 50):
+  for i in range(19, 50):
     current += msid[i]/(i + 1)
   signal = 51.537 - current # 51.025
-  print "#current signal", current, signal
+  print("#current signal", current, signal)
   if fabs(signal) < 0.0001:
     signal = 0.
   return signal
@@ -336,7 +336,7 @@ calculate_signal()
 #################
 
 espressopp.tools.analyse.info(system, steepest)
-for k in xrange(1):
+for k in range(1):
   steepest.run(200)
   espressopp.tools.analyse.info(system, steepest)
 
@@ -344,7 +344,7 @@ for k in xrange(1):
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, integrator)
-for i in xrange(100/accelerate + 1):
+for i in range(100/accelerate + 1):
   #signal = calculate_signal()
   #print "#INITIAL_SIGNAL", i, signal
   isteps = 50000/t_up
@@ -357,17 +357,17 @@ for i in xrange(100/accelerate + 1):
   capradO -= 0.003225*accelerate
 
   signal = calculate_signal()
-  print "#LAST_SIGNAL", i, signal, capradNN
+  print("#LAST_SIGNAL", i, signal, capradNN)
   if i > 85:
     capradNN -= 0.01*sigma*accelerate
-    print "#step is larger than 85", i, capradNN
+    print("#step is larger than 85", i, capradNN)
   else:
     if signal < 0.:
       capradNN += 0.01*sigma*accelerate
-      print "#signal is negative", i, capradNN
+      print("#signal is negative", i, capradNN)
     if signal > 0.:
       capradNN -= 0.01*sigma*accelerate
-      print "#signal is postive", i, capradNN
+      print("#signal is postive", i, capradNN)
   if capradNN < 0.8*sigma:
     capradNN = 0.8*sigma
     #if signal < 0.1:

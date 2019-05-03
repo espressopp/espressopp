@@ -65,7 +65,7 @@ from espressopp.esutil.GammaVariate import *
 from espressopp.esutil.Grid import *
 
 
-class ExtendBaseClass (type) :
+class ExtendBaseClass(type) :
     def __new__(self, name, bases, dict):
         # del dict['__metaclass__']
         del dict['__module__']

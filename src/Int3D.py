@@ -72,7 +72,6 @@ import six
 # This injects additional methods into the Int3D class and pulls it
 # into this module 
 class __Int3D(Int3D):
-    __metaclass__ = esutil.ExtendBaseClass
     __originit = Int3D.__init__
 
     def __init__(self, *args):

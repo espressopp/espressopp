@@ -1,6 +1,11 @@
 message(STATUS "EXTERNAL_BOOST=${EXTERNAL_BOOST}")
 if (EXTERNAL_BOOST)
-    find_package (Boost COMPONENTS system filesystem python3 mpi unit_test_framework REQUIRED)
+    set(Boost_LIBS ${Boost_LIBRARIES})
+    find_package (Boost COMPONENTS unit_test_framework REQUIRED)
+
+    list(APPEND Boost_LIBS ${Boost_LIBRARIES})
+    set(Boost_LIBRARIES ${Boost_LIBS})
+
     include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
     set(Boost_LIBRARIES espressopp_boost_test)

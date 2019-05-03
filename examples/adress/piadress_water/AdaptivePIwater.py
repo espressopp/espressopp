@@ -34,13 +34,13 @@ from espressopp.tools import decomp
 # The example system is liquid water, modeled using the force field proposed
 # in J. Chem. Theory Comput. 10, 816 (2014). In the classical region a WCA potential
 # between the oxygens is used.The simulation setup is similar to those used in the JCP paper.
-print 'Performing an ESPResSo++ path integral-based quantum/classical adaptive resolution simulation.\n'
+print('Performing an ESPResSo++ path integral-based quantum/classical adaptive resolution simulation.\n')
 
 ########################################################
 #  1. specification of the system setup and simulation parameters  #
 ########################################################
 
-print 'Specifying simulation parameters...'
+print('Specifying simulation parameters...')
 steps =1000 # integration steps (outer steps of the multiple time stepping integrator)
 intervals = 100 # intervals
 timestep_short = 0.002/40.0 # the shortest timestep (interaction between Trotter beads on the ring polymers)
@@ -74,7 +74,7 @@ speedupFreezeRings = False # speedup in classical region by freezing rings (skip
 #  2. read in coordinates  #
 ######################
 
-print 'Reading in coordinates...'
+print('Reading in coordinates...')
 # read equilibrated configuration file
 pid, types, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("input.xyz")
 
@@ -108,7 +108,7 @@ size = (Lx, Ly, Lz) # size
 #  3. set up the system  #
 #####################
 
-print 'Setting up system...'
+print('Setting up system...')
 # System, boundary conditions, skin, communicator, node & cell grids
 system = espressopp.System()
 system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
@@ -129,7 +129,7 @@ system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, 
 #  4. add particles to system  #
 ##########################
 
-print 'Adding particles and tuples...'
+print('Adding particles and tuples...')
 props = ['id', 'pos', 'v', 'f', 'pib', 'type', 'mass', 'adrat']
 allParticlesAT = []
 allParticles = []
@@ -190,7 +190,7 @@ system.storage.decompose()
 #  4. set up structure, interactions, and force field  #
 ###########################################
 
-print 'Setting up interactions and force field...'
+print('Setting up interactions and force field...')
 # create bond lists between atoms
 bondsOH = []
 bondsHH = []
@@ -252,7 +252,7 @@ system.addInteraction(interAngle)
 #  5. set up integration scheme and corrections  #
 #########################################
 
-print 'Setting up integration scheme (path integral-based adaptive resolution multiple time stepping integrator)...'
+print('Setting up integration scheme (path integral-based adaptive resolution multiple time stepping integrator)...')
 # path integral-based adaptive resolution multiple time stepping integrator
 integrator = espressopp.integrator.PIAdressIntegrator(system=system, verletlist=vl, timestep=timestep_short, sSteps=multiplier_short_to_medium, mSteps=multiplier_medium_to_long, nTrotter=nTrotter, realKinMass=realkinmass, constKinMass=constkinmass, temperature=temp, gamma=gamma, centroidThermostat=centroidthermostat, CMDparameter=CMDparameter, PILE=PILE, PILElambda=PILElambda, CLmassmultiplier=clmassmultiplier, speedup=speedupFreezeRings, KTI=KTI)
 
@@ -275,7 +275,7 @@ espressopp.tools.AdressDecomp(system, integrator)
 #  6. set up analysis routines  #
 ##########################
 
-print 'Setting up analysis routines...'
+print('Setting up analysis routines...')
 # radius of gyration profiles
 gyration_array_total_H = []
 gyration_array_total_O = []
@@ -313,39 +313,39 @@ outfile = open("esp.dat", "w")
 #  7. print system information  #
 ###########################
 
-print ''
-print "System setup done, information:"
-print ''
-print 'PI-AdResS Center =', [Lx/2, Ly/2, Lz/2]
-print 'Size of high resolution full path integral region', ex_size
-print 'Size of hybrid region', hy_size
-print 'Trotter number =', integrator.getNtrotter()
-print 'Total number of Trotter beads =', num_Trotter_beads
-print 'Total number of atoms =', num_atoms
-print 'Atomistic density = %.4f' % (num_atoms / (Lx * Ly * Lz))
-print 'Interaction cutoff =', interaction_cutoff
-print 'Potential cutoff =', potential_cutoff
-print 'Skin =', system.skin
-print 'Short timestep =', integrator.getTimeStep()
-print 'Medium timestep =', integrator.getTimeStep() * integrator.getsStep()
-print 'Long timestep =', integrator.getTimeStep() * integrator.getmStep() * integrator.getsStep()
-print 'Outer steps =', steps
-print 'Intervals =', intervals
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print 'Temperature =', integrator.getTemperature()
-print 'Gamma =', integrator.getGamma()
-print 'Classical Mass Multiplier =', integrator.getClmassmultiplier()
-print 'Constant kinetic mass?', integrator.getConstKinMass()
-print 'Using (adaptive or constant) real kinetic masses?', integrator.getRealKinMass()
-print 'Path Integration Langevin Equation thermostating?', integrator.getPILE()
-print 'Path Integration Langevin Equation thermostating lambda =', integrator.getPILElambda()
-print 'Thermostating the centroid?', integrator.getCentroidThermostat()
-print 'CMD adiabadicity parameter =', integrator.getCMDparameter()
-print 'Running Kirkwood Thermodynamic Integration?', integrator.getKTI()
-print 'Using centers of mass in classical region for force calculations?', speedupInterAtom
-print 'Freezing internal ring vibrations in classical region?', integrator.getSpeedup()
-print ''
+print('')
+print("System setup done, information:")
+print('')
+print('PI-AdResS Center =', [Lx/2, Ly/2, Lz/2])
+print('Size of high resolution full path integral region', ex_size)
+print('Size of hybrid region', hy_size)
+print('Trotter number =', integrator.getNtrotter())
+print('Total number of Trotter beads =', num_Trotter_beads)
+print('Total number of atoms =', num_atoms)
+print('Atomistic density = %.4f' % (num_atoms / (Lx * Ly * Lz)))
+print('Interaction cutoff =', interaction_cutoff)
+print('Potential cutoff =', potential_cutoff)
+print('Skin =', system.skin)
+print('Short timestep =', integrator.getTimeStep())
+print('Medium timestep =', integrator.getTimeStep() * integrator.getsStep())
+print('Long timestep =', integrator.getTimeStep() * integrator.getmStep() * integrator.getsStep())
+print('Outer steps =', steps)
+print('Intervals =', intervals)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('Temperature =', integrator.getTemperature())
+print('Gamma =', integrator.getGamma())
+print('Classical Mass Multiplier =', integrator.getClmassmultiplier())
+print('Constant kinetic mass?', integrator.getConstKinMass())
+print('Using (adaptive or constant) real kinetic masses?', integrator.getRealKinMass())
+print('Path Integration Langevin Equation thermostating?', integrator.getPILE())
+print('Path Integration Langevin Equation thermostating lambda =', integrator.getPILElambda())
+print('Thermostating the centroid?', integrator.getCentroidThermostat())
+print('CMD adiabadicity parameter =', integrator.getCMDparameter())
+print('Running Kirkwood Thermodynamic Integration?', integrator.getKTI())
+print('Using centers of mass in classical region for force calculations?', speedupInterAtom)
+print('Freezing internal ring vibrations in classical region?', integrator.getSpeedup())
+print('')
 
 ##################
 #  8. run simulation  #
@@ -356,9 +356,9 @@ nsteps = steps / intervals
 start_time = pytime.clock()
 
 # output format for screen and file
-print 'Starting the integration loop...'
-print ''
-print 'step, time (ps), temperature, E_bonds, E_angles, E_ringpolymer, E_nonbonded, E_kin, E_correction, E_total'
+print('Starting the integration loop...')
+print('')
+print('step, time (ps), temperature, E_bonds, E_angles, E_ringpolymer, E_nonbonded, E_kin, E_correction, E_total')
 fmt = '%8d %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g\n'
 
 # initial configuration analysis
@@ -387,7 +387,7 @@ for s in range(1, intervals + 1):
     Ecorr = fec.computeCompEnergy() + thdf.computeTDEnergy()
     Etotal = Ek+Eb+EAng+ELj+EPI+Ecorr
     outfile.write(fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal))
-    print (fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal))
+    print((fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal)))
 
     if s%10==0:
         rdf_array_OO = rdf_OO.computePathIntegral(rdfgrid)
@@ -486,5 +486,5 @@ rgyr_O_file.close()
 ###########
 
 end_time = pytime.clock()
-print 'Successfully finished simulation.'
-print 'Run time = %.1f seconds' % (end_time - start_time)
+print('Successfully finished simulation.')
+print('Run time = %.1f seconds' % (end_time - start_time))

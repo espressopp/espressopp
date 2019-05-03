@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 project(espressopp)
 
@@ -92,7 +92,7 @@ endif()
 #Process Python settings
 ########################################################################
 
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
+find_package(Python3 COMPONENTS Interpreter Development)
 
 execute_process(COMMAND ${Python3_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print(cg.get_python_inc())"
@@ -117,26 +117,13 @@ execute_process(COMMAND ${Python3_EXECUTABLE}
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
+message(STATUS "PYTHON_LIBDIR = ${Python3_LIBRARY_DIRS}")
 
-execute_process(COMMAND ${Python3_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print(cg.get_config_var('LIBDIR'))"
-                OUTPUT_VARIABLE PYTHON_LIBDIR
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
 
-message(STATUS "PYTHON_LIBDIR = ${PYTHON_LIBDIR}")
-
-find_library(PYTHON_LIBRARIES
-             NAMES
-                python${PYTHON_VERSION}
-                python${PYTHON_VERSION}mu
-                python${PYTHON_VERSION}m
-                python${PYTHON_VERSION}u
-             PATHS
-                ${Python3_LIBRARY_DIRS})
-
-if(NOT PYTHON_LIBRARIES)
+if(NOT Python3_LIBRARIES)
   message(FATAL_ERROR "Python libraries not found!")
-endif(NOT PYTHON_LIBRARIES)
+endif(NOT Python3_LIBRARIES)
 message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
 
 mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
@@ -157,7 +144,18 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if (EXTERNAL_BOOST)
   set(NEEDED_Boost_VERSION 1.58.0)
-  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi python3 serialization system filesystem)
+  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem)
+  set(Boost_LIBS ${Boost_LIBRARIES})
+  if(${Boost_VERSION} VERSION_LESS 106700)
+     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python)
+  else()
+     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python3)
+  endif()
+  
+  # Append Python library to the list of Boost libraries.
+  list(APPEND Boost_LIBS ${Boost_LIBRARIES})
+  set(Boost_LIBRARIES ${Boost_LIBS})
+
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)

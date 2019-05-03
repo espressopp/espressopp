@@ -57,9 +57,9 @@ thermostat.gamma  = 1.0
 thermostat.temperature = temperature
 integrator.addExtension(thermostat)
 
-print 'timestep is ', integrator.dt
-print 'gamma of the thermostat is ', thermostat.gamma
-print 'temperature of the thermostat is ', thermostat.temperature
+print('timestep is ', integrator.dt)
+print('gamma of the thermostat is ', thermostat.gamma)
+print('temperature of the thermostat is ', thermostat.temperature)
 
 props    = ['id', 'type', 'mass', 'pos', 'v']
 vel_zero = espressopp.Real3D(0.0, 0.0, 0.0)
@@ -112,7 +112,7 @@ def main ():
     warmUpFirst()
     warmUpSecond()
 
-    print "Starting simulation" 
+    print("Starting simulation") 
     for k in range(100):
         integrator.run(1000)
     
@@ -128,36 +128,36 @@ def warmUpFirst():
     force_capping = espressopp.integrator.CapForce(system, max_force)
     integrator.addExtension(force_capping)
 
-    print "First phase of the warm up. Sigma will be increased from 0. to 1.0 and timestep to 0.001"
+    print("First phase of the warm up. Sigma will be increased from 0. to 1.0 and timestep to 0.001")
     new_sigma = 0.
     for l in range(4):
-        print "start increasing sigma from ", new_sigma
+        print("start increasing sigma from ", new_sigma)
         for k in range(5):
             new_sigma += 0.05
             nbLJcos.sigma = new_sigma
             nbLJcosInter.setPotential(type1=0, type2=0, potential=nbLJcos)
             integrator.run(1000)
             espressopp.tools.analyse.info(system, integrator)
-        print "increased sigma to ", new_sigma
-        print "increasing timestep from ", integrator.dt
+        print("increased sigma to ", new_sigma)
+        print("increasing timestep from ", integrator.dt)
         dt_step = .20 * integrator.dt
         for k in range(10):
             integrator.dt += dt_step
             integrator.run(1000)
             espressopp.tools.analyse.info(system, integrator)
-        print "increased timestep to ", integrator.dt
+        print("increased timestep to ", integrator.dt)
 
     force_capping.disconnect()
-    print "switching off force capping"
+    print("switching off force capping")
 
-    print "new_sigma is ", new_sigma
+    print("new_sigma is ", new_sigma)
     # FINISHED THE FIRST PHASE OF THE WARM UP
 
 def warmUpSecond():
     # SECOND PHASE OF THE WARM UP
     integrator.step = 0
     integrator.dt = 0.005
-    print "Second phase of the warm up with a production timestep of", integrator.dt, ". Force capping is turned off."
+    print("Second phase of the warm up with a production timestep of", integrator.dt, ". Force capping is turned off.")
     for k in range(100):
         integrator.run(10000)
         espressopp.tools.analyse.info(system, integrator)

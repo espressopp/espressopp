@@ -1,23 +1,23 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 from math import fabs
@@ -91,7 +91,7 @@ class TestCaseConstrainRG(unittest.TestCase):
 
         # radius of gyration of particles before integration
         before = [0., 0., 0.]
-        
+
         particle = self.system.storage.getParticle(1)
         dmy_p = []
         dmy_ele = []
@@ -111,13 +111,13 @@ class TestCaseConstrainRG(unittest.TestCase):
                 before[j] += dmy_p[i][j]
         for i in range(3):
             before[i] /= 5.
-        print("before COM =", before)
+        print(("before COM =", before))
         before_rg = 0.
         for i in range(5):
             for j in range(3):
                 before_rg += (dmy_p[i][j] - before[j])**2
         before_rg = before_rg**0.5
-        print("before Rg =", before_rg)
+        print(("before Rg =", before_rg))
 
         # run twenty thousand steps
         integrator.run(20000)
@@ -144,13 +144,13 @@ class TestCaseConstrainRG(unittest.TestCase):
                 after[j] += dmy_p[i][j]
         for i in range(3):
             after[i] /= 5.
-        print("after  COM =", after)
+        print(("after  COM =", after))
         after_rg = 0.
         for i in range(5):
             for j in range(3):
                 after_rg += (dmy_p[i][j] - after[j])**2
         after_rg = after_rg**0.5
-        print("after  Rg =", after_rg)
+        print(("after  Rg =", after_rg))
 
         # run checks
         self.assertTrue(fabs((before_rg - after_rg)/before_rg) < 0.03)

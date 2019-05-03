@@ -62,8 +62,8 @@ timestep    = 0.005
 
 box         = (L, L, L)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
@@ -234,34 +234,34 @@ espressopp.tools.pdb.pqrwrite(filename, system, monomers_per_chain, False)
 # Calculate the mean square internal distance
 def calculate_msid():
   msid = []
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid.append(0.)
 
-  for i in xrange(num_chains):
+  for i in range(num_chains):
     pid = i*monomers_per_chain + 1
     particle = system.storage.getParticle(pid)
     dmy_p = []
     dmy_ele = []
-    for j in xrange(3):
+    for j in range(3):
       dmy_ele.append(particle.pos[j])
     dmy_p.append(dmy_ele)
-    for j in xrange(1, monomers_per_chain):
+    for j in range(1, monomers_per_chain):
       pid += 1
       particle = system.storage.getParticle(pid)
       diff = []
-      for k in xrange(3):
+      for k in range(3):
         x_i = particle.pos[k] - dmy_p[j - 1][k]
         x_i = x_i - round(x_i/L)*L
         diff.append(x_i + dmy_p[j - 1][k])
       dmy_p.append(diff)
-    for j in xrange(monomers_per_chain):
-      for k in xrange(j + 1, monomers_per_chain):
+    for j in range(monomers_per_chain):
+      for k in range(j + 1, monomers_per_chain):
         dist = 0.
-        for l in xrange(3):
+        for l in range(3):
           dist += (dmy_p[k][l] - dmy_p[j][l])**2
         msid[k - j - 1] += dist
 
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid[i] = msid[i]/(monomers_per_chain - i -1)/num_chains
 
   return msid
@@ -272,20 +272,20 @@ def calculate_signal():
   msid = calculate_msid()
   dev = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
   index = min([monomers_per_chain, 13])
-  for i in xrange(index - 1):
+  for i in range(index - 1):
     dev[i] = (msid[i]/(i + 1) - msid_ideal[i])/msid_ideal[i]
-  for i in xrange(index - 1):
+  for i in range(index - 1):
     msid[i] /= i + 1
-  print "#current msid",
+  print("#current msid", end=' ')
   for r in msid:
-    print r,
-  print "end"
-  print "#current error",
+    print(r, end=' ')
+  print("end")
+  print("#current error", end=' ')
   for r in dev:
-    print r,
-  print "end"
+    print(r, end=' ')
+  print("end")
   signal = 0.
-  for i in xrange(1, index - 1):
+  for i in range(1, index - 1):
     if fabs(dev[i]) > 0.01:
       if fabs(dev[i]) > 0.015 or dev[i] < 0.:
         signal = 1.
@@ -294,19 +294,19 @@ def calculate_signal():
 #############################################
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'timestep            = ', integrator.dt
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('timestep            = ', integrator.dt)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # Start calculation for equilibration
 start_time = time.clock()
