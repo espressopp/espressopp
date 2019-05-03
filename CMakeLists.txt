@@ -92,33 +92,33 @@ endif()
 #Process Python settings
 ########################################################################
 
-find_package(PythonInterp 3 REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
+execute_process(COMMAND ${Python3_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print(cg.get_python_inc())"
                 OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_PATH} CACHE PATH "Python Include Directory")
+set(PYTHON_INCLUDE_PATH ${Python3_INCLUDE_DIRS} CACHE PATH "Python Include Directory")
 mark_as_advanced(PYTHON_INCLUDE_PATH)
 
 message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
 include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHON_INSTDIR)
-    execute_process(COMMAND ${PYTHON_EXECUTABLE}
+    execute_process(COMMAND ${Python3_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
                 OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
+execute_process(COMMAND ${Python3_EXECUTABLE}
                         -c "import sys; print(sys.version[:3])"
                         OUTPUT_VARIABLE PYTHON_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
+execute_process(COMMAND ${Python3_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print(cg.get_config_var('LIBDIR'))"
                 OUTPUT_VARIABLE PYTHON_LIBDIR
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -132,7 +132,7 @@ find_library(PYTHON_LIBRARIES
                 python${PYTHON_VERSION}m
                 python${PYTHON_VERSION}u
              PATHS
-                ${PYTHON_LIBDIR})
+                ${Python3_LIBRARY_DIRS})
 
 if(NOT PYTHON_LIBRARIES)
   message(FATAL_ERROR "Python libraries not found!")
