@@ -706,9 +706,9 @@ class Proxy(type):
             self.pmiobjectclassdef = pmiobjectclassdef
         def __call__(self, method_self, *args, **kwds):
             # # create the pmi object
-            # log.info('PMI.Proxy of type %s is creating pmi object of type %s',
-            #          method_self.__class__.__name__,
-            #          self.pmiobjectclassdef)
+            print('PMI.Proxy of type {} is creating pmi object of type {}'.format(
+                   method_self.__class__.__name__,
+                   self.pmiobjectclassdef))
             # if not _isProxy(method_self):
             method_self.pmiobjectclassdef = self.pmiobjectclassdef
             pmiobjectclass = _translateClass(self.pmiobjectclassdef)
