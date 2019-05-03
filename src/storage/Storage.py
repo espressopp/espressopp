@@ -435,8 +435,7 @@ class StorageLocal(object):
                 print(("CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2])))
 
 if pmi.isController:
-    class Storage(object):
-        __metaclass__ = pmi.Proxy
+    class Storage(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
             pmiproperty = [ "system" ],
