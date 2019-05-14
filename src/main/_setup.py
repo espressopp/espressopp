@@ -110,4 +110,4 @@ def _setupProperty():
         # Now override the property builtin
         builtins.property = property
 
-_setupProperty()
+#_setupProperty()

@@ -706,14 +706,15 @@ class Proxy(type):
             self.pmiobjectclassdef = pmiobjectclassdef
         def __call__(self, method_self, *args, **kwds):
             # # create the pmi object
-            print('PMI.Proxy of type {} is creating pmi object of type {}'.format(
-                   method_self.__class__.__name__,
-                   self.pmiobjectclassdef))
+            #print('PMI.Proxy of type {} is creating pmi object of type {}'.format(
+            #       method_self.__class__.__name__,
+            #       self.pmiobjectclassdef))
             # if not _isProxy(method_self):
             method_self.pmiobjectclassdef = self.pmiobjectclassdef
             pmiobjectclass = _translateClass(self.pmiobjectclassdef)
             method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
             method_self.pmiobject._pmiproxy = method_self
+            print(('_Initializer.__call__.method_self = {}'.format(method_self)))
 
     class _LocalCaller(object):
         def __init__(self, methodName):
@@ -726,6 +727,7 @@ class Proxy(type):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
+            print(('_PMICaller.__call__.method_self = {} self = {}'.format(method_self, self)))
             method = getattr(method_self.pmiobject, self.methodName)
             return _backtranslateProxy(call(method, *args, **kwds))
 
@@ -761,16 +763,31 @@ class Proxy(type):
         newMethod = types.MethodType(caller, cls)
         setattr(cls, methodName, newMethod)
 
-    def __init__(cls, name, bases, dict):
-        if 'pmiproxydefs' in dict:
-            defs = dict['pmiproxydefs']
+    def __init__(cls, name, bases, opts):
+        if name == 'SampleBase' or name == 'DerivedSampleBase':
+            print(('SampleBase cls = {} name = {} bases = {} opts = {} opts_bases={}'.format(cls, name, bases, opts, [x.pmiproxydefs for x in bases])))
+        if 'pmiproxydefs' in opts:
+            defs = opts['pmiproxydefs']
+            from collections import Iterable
+
+            # Merge defs from base classes.
+            for base in bases:
+                if not hasattr(base, 'pmiproxydefs'):
+                    continue
+                for k, v in base.pmiproxydefs.items():
+                    if k == 'cls':
+                        continue
+                    if k in defs:
+                        if isinstance(defs[k], Iterable):
+                            defs[k] = list(defs[k]) + v
+                    else:
+                        defs[k] = v
 
             # now generate the methods of the Proxy object
             if 'cls' in defs:
                 pmiobjectclassdef = defs['cls']
                 log.info('Defining PMI proxy class %s for pmi object class %s.' 
                          % (name, pmiobjectclassdef))
-
                 # define cls.pmiinit
                 cls.__addMethod('pmiinit', Proxy._Initializer(pmiobjectclassdef))
                 if not isinstance(cls.__init__, types.MethodType):
@@ -778,6 +795,7 @@ class Proxy(type):
                     cls.__init__ = cls.pmiinit
             else:
                 log.info('Defining abstract PMI proxy class %s.' % name)
+                return
 
             if 'localcall' in defs:
                 for methodName in defs['localcall']:
@@ -1079,21 +1097,17 @@ class __Method(object) :
     def __init__(self, funcname, im_self, im_class=None):
         self.__name__ = funcname
         self.__self__ = _translateProxy(im_self)
-        if im_class is None:
-            self.__self__.__class__ = self.__self__.__class__
-        else:
+        if im_class is not None:
             self.__self__.__class__ = im_class
         self.__determineMethod()
     def __getstate__(self):
-        return (self.__name__,
-                _translateOID(self.__self__),
-                self.__self__.__class__)
+        return (self.__name__, _translateOID(self.__self__), self.__self__.__class__)
     def __setstate__(self, state):
         self.__name__, self.__self__, self.__self__.__class__ = state
         self.__self__ = _backtranslateOID(self.__self__)
         self.__determineMethod()
     def __determineMethod(self):
-        for cls in self.__self__.__class__.mro():
+        for cls in self.__self__.__class__.__mro__:
             if hasattr(cls, self.__name__):
                 function = getattr(cls, self.__name__)
                 self.method = function.__get__(self.__self__, cls)
