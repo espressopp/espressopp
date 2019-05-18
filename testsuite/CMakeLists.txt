@@ -1,7 +1,7 @@
 message(STATUS "EXTERNAL_BOOST=${EXTERNAL_BOOST}")
 if (EXTERNAL_BOOST)
     set(Boost_LIBS ${Boost_LIBRARIES})
-    find_package (Boost COMPONENTS unit_test_framework REQUIRED)
+    find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
     list(APPEND Boost_LIBS ${Boost_LIBRARIES})
     set(Boost_LIBRARIES ${Boost_LIBS})

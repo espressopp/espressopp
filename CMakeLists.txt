@@ -147,10 +147,12 @@ if (EXTERNAL_BOOST)
   find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem)
   set(Boost_LIBS ${Boost_LIBRARIES})
   if(${Boost_VERSION} VERSION_LESS 106700)
-     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python)
+      find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python${PYTHON_VERSION})
   else()
      find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python3)
   endif()
+
+  message(STATUS "BOOST_LIBS = ${Boost_LIBRARIES}")
   
   # Append Python library to the list of Boost libraries.
   list(APPEND Boost_LIBS ${Boost_LIBRARIES})
@@ -172,7 +174,8 @@ if(EXTERNAL_MPI4PY)
   find_package(MPI4PY 1.3.1 REQUIRED)
   include_directories(${MPI4PY_INCLUDES})
 else(EXTERNAL_MPI4PY)
-  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-2.0.0/src/include)
+  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.0/src/mpi4py/include)
+  message(STATUS "MPI4_PY_INCLDUE = ${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.0/src/mpi4py/include")
   set(MPI4PY_LIBRARIES MPI)
 endif(EXTERNAL_MPI4PY)
 

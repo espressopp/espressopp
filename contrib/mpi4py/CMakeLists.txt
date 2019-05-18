@@ -1,8 +1,19 @@
+cmake_minimum_required(VERSION 3.12)
+
 set(MPI4PY_DIR mpi4py-3.0.0) 
 set(MPI4PY_SOURCES ${MPI4PY_DIR}/src/MPI.c)
 set(DL_SOURCES ${MPI4PY_DIR}/src/dynload.c)
 
+find_package(Python3 COMPONENTS Interpreter Development)
+set(PYTHON_INCLUDE_PATH ${Python3_INCLUDE_DIRS} CACHE PATH "Python Include Directory")
+
+message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
+include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/${MPI4PY_DIR}/src)
+
+find_package(MPI REQUIRED)
+include_directories(${MPI_INCLUDE_PATH})
+message(STATUS "MPI_INCLUDE_PATH = ${MPI_INCLUDE_PATH}")
 
 add_library(MPI ${MPI4PY_SOURCES})
 target_link_libraries(MPI ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES})
