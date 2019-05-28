@@ -79,10 +79,11 @@ decomp - Domain Decomposition python functions
 		 thus less load)
     `sphereAdr` - Geometry of the high-resolution region, if TRUE spherical, otherwise Slab-like
     
-*  `cellGrid(box_size, node_grid, rc, skin)`:
+*  `cellGrid(box_size, node_grid, rc, skin, halfCellInt)`:
 
     It returns an appropriate grid of cells.
-    
+    `halfCellInt` -  controls the use of half-cells (value 2), third-cells (value 3) or higher. Implicit value 1 for full cells (normal functionality).
+
 *  `tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001)`:
 
     It tunes the skin size for the current system
