@@ -1,5 +1,7 @@
 #  Copyright (C) 2017,2018(1H)
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #
 #  This file is part of ESPResSo++ -> Powered by HeSpaDDA algorithm developed by horacio.v.g@gmail.com
 #

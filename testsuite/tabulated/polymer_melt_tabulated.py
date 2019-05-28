@@ -2,6 +2,8 @@
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #
 #  This file is part of ESPResSo++.
 #  

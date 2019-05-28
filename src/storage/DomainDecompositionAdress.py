@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -35,14 +37,16 @@ Example - setting DomainDecompositionAdress:
 >>> system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 
-.. function:: espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+.. function:: espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid, halfCellInt)
 
 		:param system: 
 		:param nodeGrid: 
 		:param cellGrid: 
+		:param halfCellInt: controls the use of half-cells (value 2), third-cells (value 3) or higher. Implicit value 1 for full cells (normal functionality).
 		:type system: 
 		:type nodeGrid: 
 		:type cellGrid: 
+		:type halfCellInt: int
 """
 
 from espressopp import pmi
