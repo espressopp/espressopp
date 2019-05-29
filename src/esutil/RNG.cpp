@@ -24,6 +24,7 @@
 #include "RNG.hpp"
 #include "mpi.hpp"
 #include "types.hpp"
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -105,6 +106,7 @@ namespace espressopp {
       std::ifstream ifs;
       std::string rng_str;
       std::vector<std::string> rng_str_vec;
+      unsigned int rng_size;
       if ( mpiWorld->rank()==0 ) {
         ifs.open(fname, std::ios::in | std::ios::binary);
         std::string token;
@@ -112,8 +114,13 @@ namespace espressopp {
           rng_str_vec.push_back(token);
           token.clear();
         }
-        assert(rng_str_vec.size() == static_cast<unsigned int>(mpiWorld->size()));
+        rng_size = rng_str_vec.size();
         if (ifs.is_open()) ifs.close();
+      }
+      boost::mpi::broadcast(*mpiWorld, rng_size, 0);
+      if (rng_size != static_cast<unsigned int>(mpiWorld->size())) {
+        std::cerr << "# Warning: The number of processes does not match the number of saved random number generators."  << std::endl << "           The old states are not restored.\n";
+        return;
       }
       boost::mpi::scatter(*mpiWorld, rng_str_vec, rng_str, 0);
       std::istringstream iss(rng_str);
