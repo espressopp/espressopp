@@ -2,6 +2,8 @@
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #
 #  This file is part of ESPResSo++.
 #  
@@ -45,6 +47,7 @@ skin = 0.3                                 # skin for Verlet lists
 nvt = True
 timestep = 0.01
 spline  = 2                                # spline interpolation type (1, 2, 3)
+halfCellInt = int(sys.argv[1])
 
 conffile = 'polymer_melt.start' # file with inital configuration
 tabfileLJ = "pot-lj.txt"
@@ -69,6 +72,7 @@ print 'Density = %.4f' % (density)
 print 'dt =', timestep
 print 'Skin =', skin
 print 'nvt =', nvt
+print 'halfCellInt = ', halfCellInt
 
 # writes the tabulated file
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
@@ -123,14 +127,14 @@ for tabulation in [True, False]:
     comm = MPI.COMM_WORLD
         
     nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
-    cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+    cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin, halfCellInt)
     #nodeGrid = Int3D(1, 1, comm.size)
     #cellGrid = Int3D(
         #calcNumberCells(size[0], nodeGrid[0], rc),
         #calcNumberCells(size[1], nodeGrid[1], rc),
         #calcNumberCells(size[2], nodeGrid[2], rc)
         #)
-    system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+    system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
         
     # add particles to the system and then decompose
     for pid in range(num_particles):
