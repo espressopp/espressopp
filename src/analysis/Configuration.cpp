@@ -210,8 +210,8 @@ namespace espressopp {
       .def("__getitem__", &Configuration::getCoordinates)
       .def("getCoordinates", &Configuration::getCoordinates)
       .def("getVelocities", &Configuration::getVelocities)
-      .def("getForces", &Configuration::getCoordinates)
-      .def("getRadius", &Configuration::getCoordinates)
+      .def("getForces", &Configuration::getForces)
+      .def("getRadius", &Configuration::getRadius)
       .def("getIds", &Configuration::getIds)
       // .def("__iter__", &Configuration::getIterator)
       ;
