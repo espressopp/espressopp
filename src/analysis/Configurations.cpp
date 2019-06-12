@@ -173,7 +173,7 @@ namespace espressopp {
 
       if (system.comm->rank() == 0) {
 
-         ConfigurationPtr config = make_shared<Configuration> (); //totalN
+         ConfigurationPtr config = make_shared<Configuration> (gatherPos, gatherVel, gatherForce, gatherRadius); //totalN
 
          // root process collects data from all processors and sets it
 
@@ -309,6 +309,7 @@ namespace espressopp {
 
       class_<Configurations>
         ("analysis_Configurations", init< shared_ptr< System > >())
+      .def(init<shared_ptr< System >,bool,bool,bool,bool,bool>())
       .add_property("size", &Configurations::getSize)
       .add_property("capacity", &Configurations::getCapacity, 
                                 &Configurations::setCapacity)
