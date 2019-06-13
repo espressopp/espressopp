@@ -140,6 +140,23 @@ namespace espressopp {
       return 0;
     }
 
+    boost::python::list Configuration::getIds()
+    {
+      boost::python::list ids;
+
+      size_t sizePos    = coordinates.size();
+      size_t sizeVel    = velocities.size();
+      size_t sizeForce  = forces.size();
+      size_t sizeRadius = radii.size();
+
+      if      (sizePos    > 0) for(auto m: coordinates) ids.append(m.first);
+      else if (sizeVel    > 0) for(auto m: velocities)  ids.append(m.first);
+      else if (sizeForce  > 0) for(auto m: forces)      ids.append(m.first);
+      else if (sizeRadius > 0) for(auto m: radii)       ids.append(m.first);
+
+      return ids;
+    }
+
 /*
     ConfigurationIterator Configuration::getIterator()
     {
@@ -191,6 +208,11 @@ namespace espressopp {
         ("analysis_Configuration", no_init)
       .add_property("size", &Configuration::getSize)
       .def("__getitem__", &Configuration::getCoordinates)
+      .def("getCoordinates", &Configuration::getCoordinates)
+      .def("getVelocities", &Configuration::getVelocities)
+      .def("getForces", &Configuration::getForces)
+      .def("getRadius", &Configuration::getRadius)
+      .def("getIds", &Configuration::getIds)
       // .def("__iter__", &Configuration::getIterator)
       ;
     }
