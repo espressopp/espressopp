@@ -73,7 +73,7 @@ namespace espressopp {
 
       shared_ptr< RNGType > getBoostRNG();
 
-      void saveState(int);
+      void saveState(long long);
 
       void loadState(const char*);
 
