@@ -21,6 +21,13 @@ env:
 
 script: deployment/build.sh
 
+matrix:
+    exclude:
+        - compiler: gcc
+          env: DISTRO=ubuntu_rolling EXTERNAL=ON
+        - compiler: clang
+          env: DISTRO=ubuntu_rolling EXTERNAL=ON
+
 jobs:
     include:
         - stage: coverage
