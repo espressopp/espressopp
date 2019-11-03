@@ -29,6 +29,13 @@ script:
   - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
   - deployment/build.sh
 
+matrix:
+    exclude:
+        - compiler: gcc
+          env: DISTRO=ubuntu_rolling EXTERNAL=ON
+        - compiler: clang
+          env: DISTRO=ubuntu_rolling EXTERNAL=ON
+
 jobs:
     include:
         - stage: canary
