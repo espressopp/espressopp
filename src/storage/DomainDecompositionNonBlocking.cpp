@@ -48,7 +48,7 @@ namespace espressopp {
   DomainDecompositionNonBlocking(shared_ptr< System > _system,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
-    : DomainDecomposition(_system, _nodeGrid, _cellGrid),
+    : DomainDecomposition(_system, _nodeGrid, _cellGrid, 1 /*in DD nonblocking we do not allow halfcell at the moment*/),
       inBufferL(*_system->comm),
       inBufferR(*_system->comm),
       outBufferL(*_system->comm),

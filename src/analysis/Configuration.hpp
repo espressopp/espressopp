@@ -59,6 +59,7 @@ namespace espressopp {
       Real3D getVelocities(size_t id);
       Real3D getForces(size_t id);
       real getRadius(size_t id);
+      boost::python::list getIds();
       size_t getSize();
       void set(size_t id, real x, real y, real z);
       void setCoordinates(size_t id, Real3D _pos);
