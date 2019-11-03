@@ -60,6 +60,8 @@ namespace espressopp {
 
     python::tuple getPair(int i);
     
+    std::uint64_t getMaxType() { return max_type; }
+
     real getVerletCutoff(); // returns cutoff + skin
 
     void connect();
@@ -92,6 +94,7 @@ namespace espressopp {
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
     
+    std::uint64_t max_type;
     real cutsq;
     real cut;
     real cutVerlet;

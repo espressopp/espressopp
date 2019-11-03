@@ -118,12 +118,15 @@ namespace espressopp {
     addForces() {
       LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and add forces");
 
+      int vlmaxtype = verletList->getMaxType();
+      Potential max_pot = potentialArray.at(vlmaxtype,vlmaxtype); // force a resize
+
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential &potential = potentialArray(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
