@@ -1,5 +1,7 @@
 #  Copyright (C) 2017,2018(1H)
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #
 #  This file is part of ESPResSo++ -> Powered by HeSpaDDA algorithm developed by horacio.v.g@gmail.com
 #
@@ -156,12 +158,12 @@ def nodeGridSizeCheck(node_gridX, node_gridY, node_gridZ):
 # This function decomposes half of the box in one Dimension(1D) and it is assuming symmetry in the initial simulation box. Even with irregularities in the box dimension and cell-size relation it will find the half-Box-DD
 
 
-def halfDecomp(adrCenter1D, rc_skin, eh_size, halfCores1D, cellsX, ratioMS, sizeX, idealGas):
+def halfDecomp(adrCenter1D, rc_skin, eh_size, halfCores1D, cellsX, ratioMS, sizeX, idealGas, halfCellInt = 1):
     # this value is only in case the Ideal Gas will in reality improve any calculation or communication (i.e. Improve notoriously the sims parallelization, which is not the case yet)
     pLoadIG = 1
     cellSizes = []
     usedCores = 0
-    totCellsEH = round(2. * eh_size / rc_skin - 0.5)
+    totCellsEH = halfCellInt * round(2. * eh_size / rc_skin - 0.5)
     totCellsCG = cellsX - totCellsEH
     totNodesCG, totNodesEH = findNodesMS(halfCores1D * 2, totCellsEH, totCellsCG, ratioMS, sizeX, eh_size, idealGas)
     for i in xrange(halfCores1D):
@@ -169,33 +171,33 @@ def halfDecomp(adrCenter1D, rc_skin, eh_size, halfCores1D, cellsX, ratioMS, size
         if idealGas:
             if i == 0:
                 # 2do: SuperCell stuff
-                cellSizes.append(round((adrCenter1D - eh_size) / rc_skin - 0.5) + pLoadIG)
+                cellSizes.append(halfCellInt * round((adrCenter1D - eh_size) / rc_skin - 0.5) + pLoadIG)
                 usedCores = 1  # For Ideal Gas purposes only 1 core covers the low-resolution region
             else:
-                [cellSizes.append(round((eh_size) / rc_skin / (halfCores1D - usedCores) - 0.5)) for i in xrange(usedCores, halfCores1D)]  # 2do: SuperCell stuff
-                deltaCells = round((eh_size) / rc_skin - 0.5) - round((eh_size) / rc_skin / (halfCores1D - usedCores) - 0.5) * (halfCores1D - usedCores)  # 2do: SuperCell stuff
+                [cellSizes.append(halfCellInt * round((eh_size) / rc_skin / (halfCores1D - usedCores) - 0.5)) for i in xrange(usedCores, halfCores1D)]  # 2do: SuperCell stuff
+                deltaCells = halfCellInt * round((eh_size) / rc_skin - 0.5) - halfCellInt * round((eh_size) / rc_skin / (halfCores1D - usedCores) - 0.5) * (halfCores1D - usedCores)  # 2do: SuperCell stuff
                 # Both applies a benefit to the usedCores=1 in the sense that will have one cell less loaded to CG-region. But also a penalty to the usedCores=1 that will have to manage any cells non distributed before
                 cellSizes[usedCores] = cellSizes[usedCores] + deltaCells - pLoadIG
                 return cellSizes
 
         else:  # Applies to all other systems besides the Ideal Gas
             if totNodesCG / 2. >= 2.:
-                [cellSizes.append(round((adrCenter1D - eh_size) / rc_skin / totNodesCG / 2. - 0.5)) for j in xrange(int(totNodesCG / 2.))]  # 2do: SuperCell stuff
+                [cellSizes.append(halfCellInt * round((adrCenter1D - eh_size) / rc_skin / totNodesCG / 2. - 0.5)) for j in xrange(int(totNodesCG / 2.))]  # 2do: SuperCell stuff
             else:
                 # 2do: SuperCell stuff
-                cellSizes.append(round((adrCenter1D - eh_size) / rc_skin - 0.5))
+                cellSizes.append(halfCellInt * round((adrCenter1D - eh_size) / rc_skin - 0.5))
             if totNodesEH / 2. >= 2.:
-                [cellSizes.append(round((eh_size) / rc_skin / (totNodesEH / 2.) - 0.5)) for i in xrange(int(totNodesEH / 2.))]  # 2do: SuperCell stuff
+                [cellSizes.append(halfCellInt * round((eh_size) / rc_skin / (totNodesEH / 2.) - 0.5)) for i in xrange(int(totNodesEH / 2.))]  # 2do: SuperCell stuff
             else:
                 # 2do: SuperCell stuff
-                cellSizes.append(round((eh_size) / rc_skin - 0.5))
+                cellSizes.append(halfCellInt * round((eh_size) / rc_skin - 0.5))
             return cellSizes
     return cellSizes
 
 # This function uses the previously decomposed half-box (from halfDecomp) and unfolds it to match the whole Neighbors List. If it does not match the whole neighbor, due to any asymmetry in the number of cores or the number of cells. It will be redistributed region by region by considering the whole simulation box size.
 
 
-def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, sizeX, idealGas):
+def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, sizeX, idealGas, halfCellInt = 1):
     wholeNeilListX = []
     aux = halfNeilListX[:]
     # unfolds halfDecomp and attempts to match the whole neighbor list.
@@ -209,25 +211,27 @@ def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, s
             halfNeilListX.append(round(halfNeilListX[len(halfNeilListX) - 1] / 2. - 0.5))
             halfNeilListX[len(halfNeilListX) - 2] = aux2 - halfNeilListX[len(halfNeilListX) - 1]
             if sum(halfNeilListX) != cellsX:
-                wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+                wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
             else:
                 if any([v == 0 for v in halfNeilListX]):  # Recently added 138, 139 and 140
-                    wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+                    wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
                 else:
                     print "HeSpaDDA message: addHsymmetry all tests passed although not all cells were used"
                     wholeNeilListX = halfNeilListX[:]
         else:
             print "HeSpaDDA message: The distributed cores are not matching the available ones (++ reDistCells())"
-            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+            # in the original implementation of halfCell the halfCellInt was ommited in the following call
+            # I think, however, that it was just forgotten, so I put it here like to all other calls to reDistCells
+            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt) 
             # To be determined if additional reDitsCells should be called!
     elif len(halfNeilListX) == node_gridX and aux2 == 0:
         if sum(halfNeilListX) != cellsX:
             print "HeSpaDDA message: The distributed cells are not matching the available ones"
-            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
         else:
             # Recently added 152, 153 and 154
             if any([v == 0 for v in halfNeilListX]):
-                wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+                wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
             else:
                 print "HeSpaDDA message: addHsymmetry all tests passed although not all cells are used"
                 wholeNeilListX = halfNeilListX[:]
@@ -236,7 +240,7 @@ def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, s
         halfNeilListX[len(halfNeilListX) - 2] = halfNeilListX[len(halfNeilListX) - 1] + halfNeilListX[len(halfNeilListX) - 2]
         halfNeilListX.pop(len(halfNeilListX) - 1)
         print "HeSpaDDA message: During DD a core has been reduced"
-        wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas)
+        wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
     return wholeNeilListX
 
 # This function adapts the number of cells that go into each core into the data structure of left and right cell lists for example for 4 core and 8 cells [3,4,5,8] to [0,3,4,5,8]
@@ -253,9 +257,9 @@ def adaptNeiList(neiListxin):
 # This function distributes the cells into nodes as if they where homogeneous. It also applies to inhomogeneous system whenever there are less than 2 cores per direction: X, Y or Z.
 
 
-def reDistCellsHom(node_gridX, sizeX, rc_skin):
+def reDistCellsHom(node_gridX, sizeX, rc_skin, halfCellInt = 1):
     wholeNeiListX = []
-    cellsX = round(sizeX / rc_skin - 0.5)
+    cellsX = halfCellInt * int(round(sizeX / rc_skin - 0.5))
     if node_gridX % 2 == 0 and cellsX % 2 == 0:
         [wholeNeiListX.append(cellsX / node_gridX) for i in xrange(node_gridX)]
     elif node_gridX % 2 != 0 and cellsX % 2 != 0:
@@ -279,12 +283,12 @@ def reDistCellsHom(node_gridX, sizeX, rc_skin):
 # This This function is matching proportion of cells to the cores on a dual resolution region basis
 
 
-def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas):
+def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt = 1):
     #global preFactCen
     preFactCen = 1.0
     print "HeSpaDDA message: Cells redistribution will improve whenever the Cells1D are at least twice as big as Nodes1D!"
     wholeNeiListX = []
-    totCellsEH = round(2. * eh_size / rc_skin - 0.5)
+    totCellsEH = halfCellInt * round(2. * eh_size / rc_skin - 0.5)
     totCellsCG = cellsX - totCellsEH
     totNodesCG, totNodesEH = findNodesMS(node_gridX, totCellsEH, totCellsCG, ratioMS, sizeX, eh_size, idealGas)
     print "HeSpaDDA message: Cores in Both LR and HR, are:", totNodesCG, totNodesEH

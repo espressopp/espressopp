@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2019
+#      Max Planck Computing and Data Facility
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -25,14 +27,16 @@ espressopp.storage.DomainDecomposition
 **************************************
 
 
-.. function:: espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+.. function:: espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
 
 		:param system: 
 		:param nodeGrid: 
 		:param cellGrid: 
+		:param halfCellInt: controls the use of half-cells (value 2), third-cells (value 3) or higher. Implicit value 1 for full cells (normal functionality).
 		:type system: 
 		:type nodeGrid: 
 		:type cellGrid: 
+		:type halfCellInt: int
 
 .. function:: espressopp.storage.DomainDecomposition.getCellGrid()
 
@@ -54,9 +58,9 @@ from espressopp.storage.Storage import *
 
 class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
 
-    def __init__(self, system, nodeGrid, cellGrid):
+    def __init__(self, system, nodeGrid, cellGrid, halfCellInt):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
+            cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid, halfCellInt)
     
     def getCellGrid(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -75,11 +79,12 @@ if pmi.isController:
         def __init__(self, system, 
                      nodeGrid='auto', 
                      cellGrid='auto',
+                     halfCellInt = 'auto',
                      nocheck=False):
             # do sanity checks for the system first
             if nocheck:
               self.next_id = 0
-              self.pmiinit(system, nodeGrid, cellGrid)                
+              self.pmiinit(system, nodeGrid, cellGrid, halfCellInt)
             else:
               if check.System(system, 'bc'):
                 if nodeGrid == 'auto':
@@ -90,6 +95,8 @@ if pmi.isController:
                   cellGrid = Int3D(2,2,2)
                 else:
                   cellGrid = toInt3DFromVector(cellGrid)
+                if halfCellInt == 'auto':
+                  halfCellInt = 1
                 # minimum image convention check:
                 for k in xrange(3):
                   if nodeGrid[k]*cellGrid[k] == 1 :
@@ -97,6 +104,6 @@ if pmi.isController:
                            "adjusted to 2 (was={})".format(k, cellGrid[k])))
                     cellGrid[k] = 2
                 self.next_id = 0
-                self.pmiinit(system, nodeGrid, cellGrid)
+                self.pmiinit(system, nodeGrid, cellGrid, halfCellInt)
               else:
                 print 'Error: could not create DomainDecomposition object'

@@ -55,6 +55,7 @@ static real cutoff1 = 1.4;
 static real cutoff2 = 1.0;
 static int N = 3;
 static real size = N;
+static int halfCellInt = 1;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
@@ -99,7 +100,8 @@ struct Fixture {
     system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
-                                                cellGrid);
+                                                cellGrid,
+                                                halfCellInt);
     esutil::RNG rng;
 
     int id = 0;
@@ -181,7 +183,8 @@ struct DomainFixture {
     system->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
-                                                cellGrid);
+                                                cellGrid,
+                                                halfCellInt);
     system->storage = domdec;
 
   }

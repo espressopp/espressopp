@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2019
+      Max Planck Computing and Data Facility
   
   This file is part of ESPResSo++.
   
@@ -40,8 +42,9 @@ namespace espressopp {
     class DomainDecompositionAdress: public Storage {
     public:
       DomainDecompositionAdress(shared_ptr< System > system,
-			  const Int3D& _nodeGrid,
-			  const Int3D& _cellGrid);
+              const Int3D& _nodeGrid,
+              const Int3D& _cellGrid,
+              int _halfCellInt);
 
       virtual ~DomainDecompositionAdress() {}
       

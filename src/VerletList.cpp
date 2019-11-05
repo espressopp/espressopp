@@ -51,6 +51,7 @@ namespace espressopp {
     cutVerlet = cut + system -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
+    max_type = 0;
 
     if (rebuildVL) rebuild(); // not called if exclutions are provided
 
@@ -122,6 +123,7 @@ namespace espressopp {
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
     if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
 
+    max_type = std::max(max_type, std::max(pt1.type(), pt2.type()));
     vlPairs.add(pt1, pt2); // add pair to Verlet List
   }
   

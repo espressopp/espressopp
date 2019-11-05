@@ -49,6 +49,7 @@ static real cutoff1 = 1.4;
 static real cutoff2 = 1.0;
 static int N = 3;
 static real nSize = N;
+static int halfCellInt = 1;
 
 shared_ptr<DomainDecomposition> domdec;
 shared_ptr<System> esppSystem;
@@ -90,7 +91,8 @@ struct Fixture {
     esppSystem->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
-                                                cellGrid);
+                                                cellGrid,
+                                                halfCellInt);
     esutil::RNG rng;
 
     int id = 0;
@@ -168,7 +170,8 @@ struct DomainFixture {
     esppSystem->setSkin(skin);
     domdec = make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
-                                                cellGrid);
+                                                cellGrid,
+                                                halfCellInt);
     esppSystem->storage = domdec;
 
   }
