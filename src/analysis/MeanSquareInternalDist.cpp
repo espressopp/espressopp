@@ -106,7 +106,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<MeanSquareInternalDist, bases<ConfigsParticleDecomp> >
-      ("analysis_MeanSquareInternalDist", init< shared_ptr< System >, int >() )
+      ("analysis_MeanSquareInternalDist", init< shared_ptr< System >, int, int >())
       .add_property("print_progress", &MeanSquareInternalDist::getPrint_progress, &MeanSquareInternalDist::setPrint_progress)
       ;
     }
