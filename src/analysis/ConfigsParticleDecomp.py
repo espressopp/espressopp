@@ -32,10 +32,10 @@ espressopp.analysis.ConfigsParticleDecomp
 
 .. function:: espressopp.analysis.ConfigsParticleDecomp(system, chainlength, start_pid)
 
-		:param system:
+                :param system:
                 :param chainlength:
                 :param start_pid:
-		:type system:
+                :type system:
                 :type chainlength:
                 :type start_pid:
 

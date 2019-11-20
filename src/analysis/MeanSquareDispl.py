@@ -27,11 +27,11 @@ espressopp.analysis.MeanSquareDispl
 
 .. function:: espressopp.analysis.MeanSquareDispl(system, chainlength)
 
-		:param system:
-		:param chainlength: (default: None)
+                :param system:
+                :param chainlength: (default: None)
                 :param start_pid: (default: 0)
-		:type system:
-		:type chainlength:
+                :type system:
+                :type chainlength:
                 :type start_pid:
 
 .. function:: espressopp.analysis.MeanSquareDispl.computeG2()

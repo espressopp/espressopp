@@ -144,8 +144,8 @@ namespace espressopp {
        * correspond to different cpu without breaking chains. So the monomers of
        * one chain correspond to one CPU only.
         * 
-        * !! currently only works for particles numbered like 0, 1, 2,... !!
-        * !! with each chain consisting particles with subsequent ids     !!
+        * !! works for particles numbered like 0+start_pid, 1+start_pid, 2+start_pid,... !!
+        * !! with each chain consisting of particles with subsequent ids     !!
        */
       ConfigsParticleDecomp(shared_ptr<System> system, int _chainlength, int _start_pid): SystemAccess (system){
         // by default key = "position", it will store the particle positions
@@ -154,7 +154,7 @@ namespace espressopp {
         
         key = "position";
         chainlength = _chainlength;
-	start_pid = _start_pid;
+        start_pid = _start_pid;
         
         int localN = system -> storage -> getNRealParticles();
         boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
