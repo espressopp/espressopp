@@ -30,6 +30,15 @@ espressopp.analysis.ConfigsParticleDecomp
 		:param system:
 		:type system:
 
+.. function:: espressopp.analysis.ConfigsParticleDecomp(system, chainlength, start_pid)
+
+                :param system:
+                :param chainlength:
+                :param start_pid:
+                :type system:
+                :type chainlength:
+                :type start_pid:
+
 .. function:: espressopp.analysis.ConfigsParticleDecomp.clear()
 
 		:rtype:
@@ -57,7 +66,7 @@ class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
 
     def __init__(self, system):
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, analysis_ConfigsParticleDecomp, system)
+        cxxinit(self, analysis_ConfigsParticleDecomp, system, start_pid=0)
     def gather(self):
       return self.cxxclass.gather(self)
     def gatherFromFile(self, filename):

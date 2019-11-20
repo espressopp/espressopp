@@ -144,16 +144,17 @@ namespace espressopp {
        * correspond to different cpu without breaking chains. So the monomers of
        * one chain correspond to one CPU only.
         * 
-        * !! currently only works for particles numbered like 0, 1, 2,... !!
-        * !! with each chain consisting particles with subsequent ids     !!
+        * !! works for particles numbered like 0+start_pid, 1+start_pid, 2+start_pid,... !!
+        * !! with each chain consisting of particles with subsequent ids     !!
        */
-      ConfigsParticleDecomp(shared_ptr<System> system, int _chainlength): SystemAccess (system){
+      ConfigsParticleDecomp(shared_ptr<System> system, int _chainlength, int _start_pid): SystemAccess (system){
         // by default key = "position", it will store the particle positions
         // (option: "velocity" or "unfolded")
         esutil::Error err(system->comm);
         
         key = "position";
         chainlength = _chainlength;
+        start_pid = _start_pid;
         
         int localN = system -> storage -> getNRealParticles();
         boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
@@ -174,12 +175,12 @@ namespace espressopp {
         }        
         
         //assignment particles to cpus (= filling of map idToCpu)
-        //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
-        //CPU1 will use particles local_num_particles, local_num_particles+1,...        
+        //CPU0 will use particles 0+start_pid, 1+start_pid, 2+start_pid, ... local_num_particles-1+start_pid.
+        //CPU1 will use particles local_num_particles+start_pid, local_num_particles+1+start_pid,...        
         int nodeNum = -1;
         for(long unsigned int id = 0; id < num_of_part ;id++){
             if(id % local_num_part == 0){ ++nodeNum;}
-            idToCpu[id] = nodeNum;
+            idToCpu[id+start_pid] = nodeNum;
             //intId++   //...if loop was with iterator
             //if(intId %)local_num_part == 0) nodeNum++;            
         }
@@ -195,12 +196,12 @@ namespace espressopp {
         
                 
         //connecting particle ids with their chain ids (= filling of map idToCid)
-        //chain 0 consists of particles 0, 1, 2, ... chainlength -1
-        //chain1 consists of particles chainlength, chainlength+1,...        
+        //chain 0 consists of particles 0+start_pid, 1+start_pid, 2+start_pid, ... chainlength -1+start_pid
+        //chain1 consists of particles chainlength+start_pid, chainlength+1+start_pid,...        
         int cid = -1;
         for(long unsigned int id = 0; id < num_of_part ;id++){
             if(id % chainlength == 0){ ++cid;}
-            idToCid[id] = cid;           
+            idToCid[id+start_pid] = cid;           
         }
         //output if the assignment failed
         if (cid >= num_chains) {
@@ -283,6 +284,7 @@ namespace espressopp {
       // all cpus handle defined number of particles
       int num_of_part;
       int chainlength; //for calculations with chains (instead of monomers)
+      int start_pid; //lowest particle id (usually 0)
       map< size_t, int > idToCpu; // binds cpu and particle id
       map< size_t, int > cidToCpu; // binds cpu and chain id
       map< size_t, int > idToCid; // binds cpu and particle id
