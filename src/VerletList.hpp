@@ -29,6 +29,7 @@
 #include "python.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
+#include "esutil/Timer.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
@@ -85,6 +86,10 @@ namespace espressopp {
     /** Set the number of times the Verlet list has been rebuilt */
     void setBuilds(int _builds) { builds = _builds; }
 
+    void resetTimers();
+
+    void loadTimers(real* t);
+
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
@@ -101,6 +106,9 @@ namespace espressopp {
     
     int builds;
     boost::signals2::connection connectionResort;
+
+    esutil::WallTimer timer;
+    real timeRebuild;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

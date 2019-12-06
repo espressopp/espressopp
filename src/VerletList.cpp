@@ -53,6 +53,7 @@ namespace espressopp {
     builds = 0;
     max_type = 0;
 
+    resetTimers();
     if (rebuildVL) rebuild(); // not called if exclutions are provided
 
   
@@ -84,6 +85,9 @@ namespace espressopp {
   
   void VerletList::rebuild()
   {
+    timer.reset();
+    real currTime = timer.getElapsedTime();
+
     //real cutVerlet = cut + getSystem() -> getSkin();
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
@@ -99,6 +103,7 @@ namespace espressopp {
     }
     
     builds++;
+    timeRebuild += timer.getElapsedTime() - currTime;
     LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
                  << " local size = " << vlPairs.size());
   }
@@ -174,6 +179,25 @@ namespace espressopp {
     }
   }
   
+  /*-------------------------------------------------------------*/
+
+  void VerletList::resetTimers()
+  {
+    timeRebuild = 0.0;
+  }
+
+  void VerletList::loadTimers(real* t)
+  {
+    t[0] = timeRebuild;
+  }
+
+  static boost::python::object wrapGetTimers(class VerletList* obj)
+  {
+    real tms[1];
+    obj->loadTimers(tms);
+    return boost::python::make_tuple(tms[0]);
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -198,6 +222,8 @@ namespace espressopp {
       .def("disconnect", &VerletList::disconnect)
     
       .def("getVerletCutoff", &VerletList::getVerletCutoff)
+      .def("resetTimers", &VerletList::resetTimers)
+      .def("getTimers", wrapGetTimers)
       ;
   }
 
