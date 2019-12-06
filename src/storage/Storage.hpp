@@ -242,6 +242,10 @@ namespace espressopp {
       boost::signals2::signal<void (ParticleList&, class InBuffer&)>
         afterRecvParticles;
 
+      /** this signal will be called when the cell structure is modified by a call to cellAdjust.
+          The new cells can be accessed using getLocalCells()
+       */
+      boost::signals2::signal<void ()> onCellAdjust;
 
       // for AdResS
       // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
