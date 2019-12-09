@@ -32,6 +32,7 @@
 #include "esutil/Timer.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
+#include "esutil/Array2D.hpp"
 
 namespace espressopp {
 
@@ -53,7 +54,7 @@ namespace espressopp {
 
     */
 
-    VerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletList(shared_ptr< System >, real cut, bool rebuildVL, bool useBuffers=false, bool useSOA=false);
 
     ~VerletList();
 
@@ -94,6 +95,32 @@ namespace espressopp {
     static void registerPython();
 
   protected:
+
+    std::vector<real> c_x,c_y,c_z;
+    std::vector<Real3D> c_pos;
+    std::vector<Particle*> c_p;
+    std::vector<size_t> c_id, c_type;
+
+    inline void rebuildUsingBuffers(bool useExList, bool useSOA)
+    {
+      if(useExList) {
+        if(useSOA)
+          _rebuildUsingBuffers<true,true>();
+        else
+          _rebuildUsingBuffers<true,false>();
+      } else {
+        if(useSOA)
+          _rebuildUsingBuffers<false,true>();
+        else
+          _rebuildUsingBuffers<false,false>();
+      }
+    }
+
+    template< bool USE_EXCLUSION_LIST, bool USE_SOA >
+    void _rebuildUsingBuffers();
+
+    bool useBuffers = false;
+    bool useSOA = false;
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
