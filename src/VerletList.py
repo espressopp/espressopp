@@ -25,14 +25,18 @@ espressopp.VerletList
 *********************
 
 
-.. function:: espressopp.VerletList(system, cutoff, exclusionlist)
+.. function:: espressopp.VerletList(system, cutoff, exclusionlist, useBuffers, useSOA)
 
 		:param system: 
 		:param cutoff: 
 		:param exclusionlist: (default: [])
+		:param useBuffers: Whether particle neighbors are buffered to improve rebuild times. (default: False)
+		:param useSOA: Whether the alternative structure of arrays form is used for buffers. (default: False)
 		:type system: 
 		:type cutoff: 
 		:type exclusionlist: 
+		:type useBuffers:
+		:type useSOA:
 
 .. function:: espressopp.VerletList.exclude(exclusionlist)
 
