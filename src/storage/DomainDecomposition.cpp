@@ -286,10 +286,6 @@ namespace espressopp {
     }
     
     exchangeGhosts();
-
-    /// modify cell structure first before resorting
-    /// particles and rebuilding neighbor lists
-    onCellAdjust();
     onParticlesChanged();
   }
 
