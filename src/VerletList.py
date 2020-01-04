@@ -64,7 +64,7 @@ from espressopp.esutil import cxxinit
 class VerletListLocal(_espressopp.VerletList):
 
 
-    def __init__(self, system, cutoff, exclusionlist=[], useBuffers=False, useSOA=False):
+    def __init__(self, system, cutoff, exclusionlist=[], useBuffers=True, useSOA=False):
 
         if pmi.workerIsActive():
             if (exclusionlist == []):
