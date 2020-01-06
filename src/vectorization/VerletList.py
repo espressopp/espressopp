@@ -118,6 +118,6 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls = 'espressopp.vectorization.VerletListLocal',
       pmiproperty = [ 'builds' ],
-      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers'],
+      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers','rebuildPairs'],
       pmiinvoke = [ 'getAllPairs','getTimers' ]
     )

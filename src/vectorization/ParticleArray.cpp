@@ -68,7 +68,8 @@ namespace espressopp { namespace vectorization
       {
         throw std::runtime_error("ParticleArray: Given mode not implemented.");
       }
-      std::cout << __FUNCTION__ << ": Reallocated " << total_data_size << std::endl;
+      // std::cout << __FUNCTION__ << ": Reallocated " << total_data_size << std::endl;
+      // TODO: implement as LOG4ESPP_WARN
     }
 
     size_ = total_size;

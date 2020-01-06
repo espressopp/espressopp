@@ -95,16 +95,11 @@ namespace espressopp { namespace vectorization {
 
   /*-------------------------------------------------------------*/
 
-  void VerletList::rebuild()
+  void VerletList::rebuildPairs()
   {
-    timer.reset();
-    real currTime = timer.getElapsedTime();
-
-    //real cutVerlet = cut + getSystem() -> getSkin();
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
 
-    #if 0
     vlPairs.clear();
 
     // add particles to adress zone
@@ -114,7 +109,18 @@ namespace espressopp { namespace vectorization {
       checkPair(*it->first, *it->second);
       LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() << " and " << it->second->id());
     }
-    #endif
+  }
+
+  void VerletList::rebuild()
+  {
+    timer.reset();
+    real currTime = timer.getElapsedTime();
+
+    //real cutVerlet = cut + getSystem() -> getSkin();
+    cutVerlet = cut + getSystem() -> getSkin();
+    cutsq = cutVerlet * cutVerlet;
+
+    vlPairs.clear();
 
     num_pairs = 0;
     neighborList.reset();
@@ -1029,6 +1035,7 @@ namespace espressopp { namespace vectorization {
       .def("getPair", &VerletList::getPair)
       .def("exclude", pyExclude)
       .def("rebuild", &VerletList::rebuild)
+      .def("rebuildPairs", &VerletList::rebuildPairs)
       .def("connect", &VerletList::connect)
       .def("disconnect", &VerletList::disconnect)
       .def("getVerletCutoff", &VerletList::getVerletCutoff)

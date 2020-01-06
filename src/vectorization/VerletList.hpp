@@ -101,6 +101,9 @@ namespace espressopp { namespace vectorization {
 
     void disconnect();
 
+    /** Rebuilds the non-vectorized Verlet list vlPairs for back-compatibility with analysis */
+    void rebuildPairs();
+
     void rebuild();
 
     /** Get the total number of pairs for the Verlet list */
