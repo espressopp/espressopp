@@ -121,13 +121,12 @@ namespace espressopp {
     const CellList& realCells = getSystem()->storage->getRealCells();
     const size_t numRealCells = realCells.size();
 
-    // stores the range of neighbor particles belonging to cell i: c_range[i] to c_range[i+1]
+    // stores the range of neighbor particles belonging to cell i: with end=c_range[i]
     std::vector<int> c_range;
-    c_range.reserve(numRealCells+1);
+    c_range.reserve(numRealCells);
 
     // get the number of particles in all neighbor cells
     size_t c_reserve = 0;
-    c_range.push_back(c_reserve);
     for(size_t icell=0; icell<numRealCells; icell++) {
       size_t row_reserve = 0;
       for(NeighborCellInfo& nc: realCells[icell]->neighborCells) {
@@ -159,7 +158,7 @@ namespace espressopp {
     // fill buffer
     size_t ip = 0;
     for(size_t icell=0; icell<numRealCells; icell++) {
-      size_t end = c_range[icell+1];
+      size_t end = c_range[icell];
       for(NeighborCellInfo& nc: realCells[icell]->neighborCells) {
         if(!nc.useForAllPairs) {
           for(Particle& p: nc.cell->particles) {
@@ -183,7 +182,9 @@ namespace espressopp {
     }
 
     // rebuild neighbor list
+    size_t start=0;
     for(size_t icell=0; icell<numRealCells; icell++) {
+      size_t end=c_range[icell];
       ParticleList& particles = realCells[icell]->particles;
       size_t numParticles = particles.size();
       for(size_t p1=0; p1<numParticles; p1++) {
@@ -212,7 +213,6 @@ namespace espressopp {
         const size_t type1 = part1.type();
 
         // neighbor-loop
-        size_t start=c_range[icell], end=c_range[icell+1];
         for(size_t p2=start; p2<end; p2++) {
           real distsq;
           if(USE_SOA) {
@@ -240,6 +240,7 @@ namespace espressopp {
           }
         }
       }
+      start = end;
     }
   }
 
