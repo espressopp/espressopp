@@ -97,9 +97,7 @@ namespace espressopp {
 
     if(useBuffers) {
       rebuildUsingBuffers(exList.size(), useSOA);
-    }
-    else
-    {
+    } else {
       // add particles to adress zone
       CellList cl = getSystem()->storage->getRealCells();
       LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
@@ -130,13 +128,10 @@ namespace espressopp {
     // get the number of particles in all neighbor cells
     size_t c_reserve = 0;
     c_range.push_back(c_reserve);
-    for(size_t icell=0; icell<numRealCells; icell++)
-    {
+    for(size_t icell=0; icell<numRealCells; icell++) {
       size_t row_reserve = 0;
-      for(NeighborCellInfo& nc: realCells[icell]->neighborCells)
-      {
-        if(!nc.useForAllPairs)
-        {
+      for(NeighborCellInfo& nc: realCells[icell]->neighborCells) {
+        if(!nc.useForAllPairs) {
           row_reserve += nc.cell->particles.size();
         }
       }
@@ -145,8 +140,7 @@ namespace espressopp {
     }
 
     // resize buffer
-    if(c_reserve > c_p.size())
-    {
+    if(c_reserve > c_p.size()) {
       size_t c_resize = 2*c_reserve;
       c_p.resize(c_resize);
       if(USE_SOA){
@@ -164,16 +158,11 @@ namespace espressopp {
 
     // fill buffer
     size_t ip = 0;
-    for(size_t icell=0; icell<numRealCells; icell++)
-    {
-      // size_t ip = c_range[icell];
+    for(size_t icell=0; icell<numRealCells; icell++) {
       size_t end = c_range[icell+1];
-      for(NeighborCellInfo& nc: realCells[icell]->neighborCells)
-      {
-        if(!nc.useForAllPairs)
-        {
-          for(Particle& p: nc.cell->particles)
-          {
+      for(NeighborCellInfo& nc: realCells[icell]->neighborCells) {
+        if(!nc.useForAllPairs) {
+          for(Particle& p: nc.cell->particles) {
             c_p[ip] = &p;
             if(USE_EXCLUSION_LIST)
               c_id[ip] = p.id();
@@ -194,17 +183,14 @@ namespace espressopp {
     }
 
     // rebuild neighbor list
-    for(size_t icell=0; icell<numRealCells; icell++)
-    {
+    for(size_t icell=0; icell<numRealCells; icell++) {
       ParticleList& particles = realCells[icell]->particles;
       size_t numParticles = particles.size();
-      for(size_t p1=0; p1<numParticles; p1++)
-      {
+      for(size_t p1=0; p1<numParticles; p1++) {
         Particle& part1 = particles[p1];
 
         // self-loop
-        for(size_t p2=p1+1; p2<numParticles; p2++)
-        {
+        for(size_t p2=p1+1; p2<numParticles; p2++) {
           Particle& part2 = particles[p2];
           checkPair(part1, part2);
         }
@@ -220,16 +206,14 @@ namespace espressopp {
           p1_pos = part1.position();
         }
         size_t id1;
-        if(USE_EXCLUSION_LIST)
-        {
+        if(USE_EXCLUSION_LIST) {
           id1 = part1.id();
         }
         const size_t type1 = part1.type();
 
         // neighbor-loop
         size_t start=c_range[icell], end=c_range[icell+1];
-        for(size_t p2=start; p2<end; p2++)
-        {
+        for(size_t p2=start; p2<end; p2++) {
           real distsq;
           if(USE_SOA) {
             real dist_x = x1 - c_x[p2];
@@ -244,15 +228,13 @@ namespace espressopp {
           bool addpair = true;
           if (distsq > cutsq) addpair = false;
 
-          if(USE_EXCLUSION_LIST)
-          {
+          if(USE_EXCLUSION_LIST) {
             size_t const& id2 = c_id[p2];
             if (exList.count(std::make_pair(id1, id2)) == 1) addpair = false;
             if (exList.count(std::make_pair(id2, id1)) == 1) addpair = false;
           }
 
-          if(addpair)
-          {
+          if(addpair) {
             max_type = std::max(max_type, std::max(type1, c_type[p2]));
             vlPairs.add(&part1,c_p[p2]);
           }
