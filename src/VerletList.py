@@ -30,7 +30,7 @@ espressopp.VerletList
 		:param system: 
 		:param cutoff: 
 		:param exclusionlist: (default: [])
-		:param useBuffers: Whether particle neighbors are buffered to improve rebuild times. (default: False)
+		:param useBuffers: Whether particle neighbors are buffered to improve rebuild times. (default: True)
 		:param useSOA: Whether the alternative structure of arrays form is used for buffers. (default: False)
 		:type system: 
 		:type cutoff: 

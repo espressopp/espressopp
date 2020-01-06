@@ -54,7 +54,7 @@ namespace espressopp {
 
     */
 
-    VerletList(shared_ptr< System >, real cut, bool rebuildVL, bool useBuffers=false, bool useSOA=false);
+    VerletList(shared_ptr< System >, real cut, bool rebuildVL, bool useBuffers=true, bool useSOA=false);
 
     ~VerletList();
 
