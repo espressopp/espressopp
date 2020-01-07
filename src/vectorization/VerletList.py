@@ -29,6 +29,9 @@ espressopp.vectorization.VerletList
 LIMITATION: This class does not support exclusion lists as they are not supported in the
 vectorized version of VerletList.
 
+NOTE: Only the force calculation is vectorized. Calculating the energy and virial still rely
+on the original Particle pair list so rebuildPairs() needs to be called before any analysis.
+
 .. function:: espressopp.vectorization.VerletList(system, vec, cutoff, exclusionlist, build_order)
 
 		:param system:
@@ -61,6 +64,12 @@ vectorized version of VerletList.
 .. function:: espressopp.vectorization.VerletList.totalSize()
 
 		:rtype:
+
+.. function:: espressopp.vectorization.VerletList.rebuildPairs()
+
+		Rebuilds the non-vectorized Particle pair list which is needed when calculating the energy
+		and virialduring the analysis stages.
+
 """
 from espressopp import pmi
 import _espressopp
