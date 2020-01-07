@@ -8,7 +8,10 @@ import time
 def generate_vl(useBuffers):
   print 'VERLET LIST {}USING BUFFERS'.format('NOT ' if not useBuffers else '')
   nsteps      = 1
-  isteps      = 1000
+  isteps      = 10
+  #
+  # NOTE: For performance comparison increase isteps to 1000
+  #
   rc          = 2.5
   skin        = 0.4
   timestep    = 0.005
