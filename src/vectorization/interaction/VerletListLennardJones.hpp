@@ -192,10 +192,10 @@ namespace espressopp { namespace vectorization {
         auto& particleArray = verletList->getParticleArray();
         auto& neighborList = verletList->getNeighborList();
 
-        const auto __restrict *pa_pos = &(particleArray.position[0]);
-        auto __restrict *pa_force     = &(particleArray.force[0]);
+        const Real3DInt *pa_pos  = &(particleArray.position[0]);
+        Real4D *pa_force         = &(particleArray.force[0]);
 
-        const auto __restrict *pa_type = &(particleArray.type[0]);
+        const ulongint __restrict *pa_type = &(particleArray.type[0]);
         const real __restrict *pa_p_x  = &(particleArray.p_x[0]);
         const real __restrict *pa_p_y  = &(particleArray.p_y[0]);
         const real __restrict *pa_p_z  = &(particleArray.p_z[0]);
