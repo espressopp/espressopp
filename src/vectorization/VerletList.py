@@ -26,21 +26,29 @@ r"""
 espressopp.vectorization.VerletList
 *********************
 
+LIMITATION: This class does not support exclusion lists as they are not supported in the
+vectorized version of VerletList.
 
-.. function:: espressopp.vectorization.VerletList(system, cutoff, exclusionlist)
+.. function:: espressopp.vectorization.VerletList(system, vec, cutoff, exclusionlist, build_order)
 
 		:param system:
+		:param vec: Vectorization object
 		:param cutoff:
 		:param exclusionlist: (default: [])
+		:param build_order: (default: 0) Whether to build the verlet list in the p->nc or nc->p order
 		:type system:
+		:type vec:
 		:type cutoff:
 		:type exclusionlist:
+		:type build_order:
 
 .. function:: espressopp.vectorization.VerletList.exclude(exclusionlist)
 
 		:param exclusionlist:
 		:type exclusionlist:
 		:rtype:
+
+		Throws an error since exclusion lists are not supported.
 
 .. function:: espressopp.vectorization.VerletList.getAllPairs()
 
