@@ -25,7 +25,7 @@ import time
 def generate_md(use_vec=True, vec_mode=""):
   print '{}USING VECTORIZATION'.format('NOT ' if not use_vec else '')
   nsteps      = 1
-  isteps      = 100
+  isteps      = 10
   #
   # NOTE: For performance comparison increase isteps to 1000
   #
