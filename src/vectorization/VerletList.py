@@ -22,15 +22,14 @@
 
 
 r"""
-*********************
+***********************************
 espressopp.vectorization.VerletList
-*********************
+***********************************
 
-LIMITATION: This class does not support exclusion lists as they are not supported in the
-vectorized version of VerletList.
-
-NOTE: Only the force calculation is vectorized. Calculating the energy and virial still rely
-on the original Particle pair list so rebuildPairs() needs to be called before any analysis.
+NOTE:
+    - This vectorized version of Verlet List does not support exclusion lists.
+    - Only the force calculation is vectorized. Calculating the energy and virial still rely
+      on the original Particle pair list so rebuildPairs() needs to be called before any analysis.
 
 .. function:: espressopp.vectorization.VerletList(system, vec, cutoff, exclusionlist, build_order)
 

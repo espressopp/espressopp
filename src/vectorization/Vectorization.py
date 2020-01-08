@@ -21,6 +21,19 @@ from espressopp import pmi
 from espressopp.esutil import cxxinit
 import _espressopp
 
+r"""
+**************************************
+espressopp.vectorization.Vectorization
+**************************************
+
+.. function:: espressopp.vectorization.Vectorization(system, integrator, mode)
+
+    :param system: system object
+    :param integrator: integrator object
+    :param mode: (default='' equiv to 'SOA') 'SOA' for structure of arrays and 'AOS' for array of structures
+
+"""
+
 class VectorizationLocal(_espressopp.Vectorization):
 
     def __init__(self, system, integrator, mode=""):
