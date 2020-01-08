@@ -195,13 +195,13 @@ namespace espressopp { namespace vectorization {
         const Real3DInt *pa_pos  = &(particleArray.position[0]);
         Real4D *pa_force         = &(particleArray.force[0]);
 
-        const ulongint __restrict *pa_type = &(particleArray.type[0]);
-        const real __restrict *pa_p_x  = &(particleArray.p_x[0]);
-        const real __restrict *pa_p_y  = &(particleArray.p_y[0]);
-        const real __restrict *pa_p_z  = &(particleArray.p_z[0]);
-        real __restrict *pa_f_x        = &(particleArray.f_x[0]);
-        real __restrict *pa_f_y        = &(particleArray.f_y[0]);
-        real __restrict *pa_f_z        = &(particleArray.f_z[0]);
+        const __restrict ulongint* pa_type = &(particleArray.type[0]);
+        const __restrict real* pa_p_x = &(particleArray.p_x[0]);
+        const __restrict real* pa_p_y = &(particleArray.p_y[0]);
+        const __restrict real* pa_p_z = &(particleArray.p_z[0]);
+        __restrict real* pa_f_x       = &(particleArray.f_x[0]);
+        __restrict real* pa_f_y       = &(particleArray.f_y[0]);
+        __restrict real* pa_f_z       = &(particleArray.f_z[0]);
 
         {
           const auto* __restrict plist  = &(neighborList.plist[0]);
