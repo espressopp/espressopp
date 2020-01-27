@@ -37,12 +37,10 @@ NOTE:
 		:param vec: Vectorization object
 		:param cutoff:
 		:param exclusionlist: (default: [])
-		:param build_order: (default: 0) Whether to build the verlet list in the p->nc or nc->p order
 		:type system:
 		:type vec:
 		:type cutoff:
 		:type exclusionlist:
-		:type build_order:
 
 .. function:: espressopp.vectorization.VerletList.exclude(exclusionlist)
 
@@ -78,15 +76,15 @@ from espressopp.esutil import cxxinit
 class VerletListLocal(_espressopp.vectorization_VerletList):
 
 
-    def __init__(self, system, vec, cutoff, exclusionlist=[], build_order=0):
+    def __init__(self, system, vec, cutoff, exclusionlist=[]):
 
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, True, build_order)
+                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, True)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, False, build_order)
+                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair

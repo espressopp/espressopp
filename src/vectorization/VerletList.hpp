@@ -81,7 +81,7 @@ namespace espressopp { namespace vectorization {
 
     */
 
-    VerletList(shared_ptr<System>, shared_ptr<Vectorization>, real cut, bool rebuildVL, int build_order);
+    VerletList(shared_ptr<System>, shared_ptr<Vectorization>, real cut, bool rebuildVL);
 
     ~VerletList();
 
@@ -133,14 +133,12 @@ namespace espressopp { namespace vectorization {
 
     int num_pairs = 0;
     void checkPair(Particle &pt1, Particle &pt2);
-    template< bool VEC_MODE_AOS > void rebuild_p_nc();
 
     AlignedVector<int> c_j;
     AlignedVector<real> c_x,c_y,c_z;
 
     template< bool VEC_MODE_AOS, bool PACK_NEIGHBORS > void rebuild_p_nc_pack_stencil();
 
-    void rebuild_nc_p();
     PairList vlPairs;
     NeighborList neighborList;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
@@ -150,7 +148,6 @@ namespace espressopp { namespace vectorization {
     real cut;
     real cutVerlet;
 
-    int build_order;
     int builds;
     boost::signals2::connection connectionResort;
 
