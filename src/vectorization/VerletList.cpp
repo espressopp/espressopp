@@ -346,7 +346,6 @@ namespace espressopp { namespace vectorization {
               for(size_t np = ncell_start; np<ncell_data_end; np++)
               {
                 {
-                  int include_np = 1;
                   real dist_x, dist_y, dist_z;
                   if(VEC_MODE_AOS)
                   {
@@ -363,10 +362,9 @@ namespace espressopp { namespace vectorization {
 
                   const real distSqr  = dist_x*dist_x + dist_y*dist_y + dist_z*dist_z;
 
-                  if(p>=np) include_np = 0;
-
-                  if(distSqr > cutsq) include_np = 0;
-                  if(include_np) npptr[ll++] = np;
+                  if(p < np && distSqr <= cutsq) {
+                    npptr[ll++] = np;
+                  }
                 }
               }
               num_pairs += ll;
@@ -419,7 +417,6 @@ namespace espressopp { namespace vectorization {
               for(size_t np = ncell_start; np<ncell_data_end; np++)
               {
                 {
-                  int include_np = 1;
                   real dist_x, dist_y, dist_z;
                   if(VEC_MODE_AOS)
                   {
@@ -436,8 +433,9 @@ namespace espressopp { namespace vectorization {
 
                   const real distSqr  = dist_x*dist_x + dist_y*dist_y + dist_z*dist_z;
 
-                  if(distSqr > cutsq) include_np = 0;
-                  if(include_np) npptr[ll++] = np;
+                  if(distSqr <= cutsq) {
+                    npptr[ll++] = np;
+                  }
                 }
               }
 
