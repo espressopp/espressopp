@@ -1,4 +1,4 @@
-#  Copyright (C) 2019
+#  Copyright (C) 2019-2020
 #      Max Planck Institute for Polymer Research & JGU Mainz
 #
 #  This file is part of ESPResSo++.

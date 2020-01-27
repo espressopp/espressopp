@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019
+  Copyright (C) 2019-2020
       Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
