@@ -24,6 +24,8 @@ import time
 
 def generate_md(use_vec=True, vec_mode=""):
   print '{}USING VECTORIZATION'.format('NOT ' if not use_vec else '')
+  if use_vec:
+    print 'MODE={}'.format(vec_mode)
   nsteps      = 1
   isteps      = 10
   #
@@ -103,10 +105,17 @@ class TestVectorization(unittest.TestCase):
   def test1(self):
     ''' Ensure that positions after integration are the same for both vec and non-vec versions '''
     print '-'*70
-    pos1 = generate_md(True)
+    pos0 = generate_md(True,'AOS')
+    print '-'*70
+    pos1 = generate_md(True,'SOA')
     print '-'*70
     pos2 = generate_md(False)
     print '-'*70
+
+    self.assertEqual(len(pos0), len(pos2))
+    diff = [(pos0[i]-pos2[i]).sqr() for i in range(len(pos2))]
+    for d in diff:
+      self.assertAlmostEqual(d,0.0,8)
 
     self.assertEqual(len(pos1), len(pos2))
     diff = [(pos1[i]-pos2[i]).sqr() for i in range(len(pos1))]
