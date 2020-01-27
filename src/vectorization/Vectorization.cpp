@@ -82,7 +82,7 @@ namespace espressopp {
     /// reset and update particleArray from current storage
     void Vectorization::resetParticles()
     {
-      particleArray.copy_from(getSystem()->storage->getLocalCells(), mode);
+      particleArray.copyFrom(getSystem()->storage->getLocalCells(), mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ namespace espressopp {
       }
 
       // overwrite particleArray positon data
-      particleArray.update_from_position_only(getSystem()->storage->getLocalCells());
+      particleArray.updateFromPositionOnly(getSystem()->storage->getLocalCells());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ namespace espressopp {
     void Vectorization::updateForces()
     {
       // add particle array forces back to localCells
-      particleArray.add_to_force_only(getSystem()->storage->getLocalCells());
+      particleArray.addToForceOnly(getSystem()->storage->getLocalCells());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

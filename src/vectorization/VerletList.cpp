@@ -164,7 +164,7 @@ namespace espressopp { namespace vectorization {
     {
       const auto& cellNborList            = vec->getNeighborList();
       const auto& particleArray           = vec->getParticleArray();
-      const size_t* __restrict cell_range = &(particleArray.cell_range()[0]);
+      const size_t* __restrict cellRange = &(particleArray.cellRange()[0]);
       const size_t* __restrict sizes      = &(particleArray.sizes()[0]);
 
       const auto* __restrict position  = &(particleArray.position[0]);
@@ -222,8 +222,8 @@ namespace espressopp { namespace vectorization {
 
         size_t  cell_id         = cellNborList.cellId(irow);
         size_t  cell_nnbrs      = cellNborList.numNeighbors(irow);
-        size_t  cell_start      = cell_range[cell_id];
-        size_t  cell_data_end   = cell_range[cell_id+1];
+        size_t  cell_start      = cellRange[cell_id];
+        size_t  cell_data_end   = cellRange[cell_id+1];
         size_t  cell_size       = sizes[cell_id];
         size_t  cell_end        = cell_start + cell_size;
 
@@ -247,8 +247,8 @@ namespace espressopp { namespace vectorization {
           {
             size_t ncell_id = cell_id;
 
-            size_t  ncell_start     = cell_range[ncell_id];
-            size_t  ncell_data_end  = cell_range[ncell_id+1];
+            size_t  ncell_start     = cellRange[ncell_id];
+            size_t  ncell_data_end  = cellRange[ncell_id+1];
             size_t  ncell_end       = ncell_start + sizes[ncell_id];
             int* __restrict npptr =  &(neighborList.nplist[num_pairs]);
 
@@ -294,8 +294,8 @@ namespace espressopp { namespace vectorization {
           {
             size_t ncell_id = cellNborList.at(irow,inbr);
 
-            size_t  ncell_start     = cell_range[ncell_id];
-            size_t  ncell_data_end  = cell_range[ncell_id+1];
+            size_t  ncell_start     = cellRange[ncell_id];
+            size_t  ncell_data_end  = cellRange[ncell_id+1];
             size_t  ncell_end       = ncell_start + sizes[ncell_id];
             int* __restrict npptr =  &(neighborList.nplist[num_pairs]);
 
@@ -346,7 +346,7 @@ namespace espressopp { namespace vectorization {
             // pad remaining part of list with stray neighbor particle
             size_t num_rem = num_pairs % ESPP_VECTOR_WIDTH;
             size_t num_pad = (num_rem > 0) * (ESPP_VECTOR_WIDTH - num_rem);
-            size_t padding = cell_range[last_ncell]+sizes[last_ncell];
+            size_t padding = cellRange[last_ncell]+sizes[last_ncell];
             for(size_t pad = 0; pad < num_pad; pad++)
               neighborList.nplist[num_pairs++] = padding;
             neighborList.plist.push_back(p);
@@ -381,7 +381,7 @@ namespace espressopp { namespace vectorization {
     {
       const auto& cellNborList            = vec->getNeighborList();
       const auto& particleArray           = vec->getParticleArray();
-      const size_t* __restrict cell_range = &(particleArray.cell_range()[0]);
+      const size_t* __restrict cellRange = &(particleArray.cellRange()[0]);
       const size_t* __restrict sizes      = &(particleArray.sizes()[0]);
 
       const auto* __restrict position  = &(particleArray.position[0]);
@@ -447,7 +447,7 @@ namespace espressopp { namespace vectorization {
           for(size_t inbr=0; inbr<cell_nnbrs; inbr++)
           {
             size_t cell_id       = cellNborList.at(irow,inbr);
-            size_t cell_start    = cell_range[cell_id];
+            size_t cell_start    = cellRange[cell_id];
             size_t cell_size     = sizes[cell_id];
             size_t cell_end      = cell_start + cell_size;
             int* __restrict c_j_ctr = c_j_ptr + c_j_max;
@@ -466,7 +466,7 @@ namespace espressopp { namespace vectorization {
           // padding
           {
             int last_nbr = cellNborList.at(irow,cell_nnbrs-1);
-            int padding = cell_range[last_nbr]+sizes[last_nbr];
+            int padding = cellRange[last_nbr]+sizes[last_nbr];
             int pad_end = ((c_j_max+ESPP_VECTOR_WIDTH-1)/ESPP_VECTOR_WIDTH)*ESPP_VECTOR_WIDTH;
             int num_padding  = pad_end - c_j_max;
             int* __restrict c_j_ctr = c_j_ptr + c_j_max;
@@ -533,8 +533,8 @@ namespace espressopp { namespace vectorization {
 
         size_t  cell_id       = cellNborList.cellId(irow);
         size_t  cell_nnbrs    = cellNborList.numNeighbors(irow);
-        size_t  cell_start    = cell_range[cell_id];
-        size_t  cell_data_end = cell_range[cell_id+1];
+        size_t  cell_start    = cellRange[cell_id];
+        size_t  cell_data_end = cellRange[cell_id+1];
         size_t  cell_size     = sizes[cell_id];
         size_t  cell_end      = cell_start + cell_size;
 
@@ -558,8 +558,8 @@ namespace espressopp { namespace vectorization {
           {
             size_t ncell_id = cell_id;
 
-            size_t  ncell_start    = cell_range[ncell_id];
-            size_t  ncell_data_end = cell_range[ncell_id+1];
+            size_t  ncell_start    = cellRange[ncell_id];
+            size_t  ncell_data_end = cellRange[ncell_id+1];
             size_t  ncell_end      = ncell_start + sizes[ncell_id];
             int* __restrict npptr  = &(neighborList.nplist[num_pairs]);
 
@@ -631,8 +631,8 @@ namespace espressopp { namespace vectorization {
           {
             size_t ncell_id = cellNborList.at(irow,inbr);
 
-            size_t  ncell_start     = cell_range[ncell_id];
-            size_t  ncell_data_end  = cell_range[ncell_id+1];
+            size_t  ncell_start     = cellRange[ncell_id];
+            size_t  ncell_data_end  = cellRange[ncell_id+1];
             size_t  ncell_end       = ncell_start + sizes[ncell_id];
             int* __restrict npptr =  &(neighborList.nplist[num_pairs]);
 
@@ -683,7 +683,7 @@ namespace espressopp { namespace vectorization {
             // pad remaining part of list with stray neighbor particle
             size_t num_rem = num_pairs % ESPP_VECTOR_WIDTH;
             size_t num_pad = (num_rem > 0) * (ESPP_VECTOR_WIDTH - num_rem);
-            size_t padding = cell_range[last_ncell]+sizes[last_ncell];
+            size_t padding = cellRange[last_ncell]+sizes[last_ncell];
             for(size_t pad = 0; pad < num_pad; pad++)
               neighborList.nplist[num_pairs++] = padding;
             neighborList.plist.push_back(p);
@@ -718,8 +718,8 @@ namespace espressopp { namespace vectorization {
     {
       auto& cellNborList  = vec->getNeighborList();
       auto& particleArray = vec->getParticleArray();
-      auto const& cell_range  = particleArray.cell_range();
-      auto const& sizes       = particleArray.sizes();
+      auto const& cellRange = particleArray.cellRange();
+      auto const& sizes     = particleArray.sizes();
 
       #if defined(ESPP_AOS)
         const auto* __restrict position  = &(particleArray.position[0]);
@@ -779,8 +779,8 @@ namespace espressopp { namespace vectorization {
 
         size_t  cell_id         = cellNborList.cellId(irow);
         size_t  cell_nnbrs      = cellNborList.numNeighbors(irow);
-        size_t  cell_start      = cell_range[cell_id];
-        size_t  cell_data_end   = cell_range[cell_id+1];
+        size_t  cell_start      = cellRange[cell_id];
+        size_t  cell_data_end   = cellRange[cell_id+1];
         size_t  cell_size       = sizes[cell_id];
         size_t  cell_end        = cell_start + cell_size;
 
@@ -788,8 +788,8 @@ namespace espressopp { namespace vectorization {
         {
           size_t ncell_id = cell_id;
 
-          size_t  ncell_start     = particleArray.cell_range()[ncell_id];
-          size_t  ncell_data_end  = particleArray.cell_range()[ncell_id+1];
+          size_t  ncell_start     = cellRange[ncell_id];
+          size_t  ncell_data_end  = cellRange[ncell_id+1];
           size_t  ncell_end       = ncell_start + particleArray.sizes()[ncell_id];
 
           for(size_t p=cell_start; p < cell_end; p++)
@@ -853,8 +853,8 @@ namespace espressopp { namespace vectorization {
         {
           size_t ncell_id = cellNborList.at(irow,inbr);
 
-          size_t  ncell_start     = particleArray.cell_range()[ncell_id];
-          size_t  ncell_data_end  = particleArray.cell_range()[ncell_id+1];
+          size_t  ncell_start     = cellRange[ncell_id];
+          size_t  ncell_data_end  = cellRange[ncell_id+1];
           size_t  ncell_end       = ncell_start + particleArray.sizes()[ncell_id];
 
           for(size_t p=cell_start; p < cell_end; p++)

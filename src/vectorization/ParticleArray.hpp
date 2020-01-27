@@ -128,14 +128,14 @@ namespace espressopp { namespace vectorization {
   {
   public:
 
-    void copy_from(CellList const& srcCells, Mode mode=ESPP_VEC_MODE_DEFAULT);
+    void copyFrom(CellList const& srcCells, Mode mode=ESPP_VEC_MODE_DEFAULT);
 
-    void update_from_position_only(CellList const& srcCells);
-    void add_to_force_only(CellList & srcCells) const;
+    void updateFromPositionOnly(CellList const& srcCells);
+    void addToForceOnly(CellList & srcCells) const;
 
-    std::vector<size_t> const& cell_range() const { return cellRange_; }
+    std::vector<size_t> const& cellRange() const { return cellRange_; }
     std::vector<size_t> const& sizes() const { return sizes_; }
-    bool check_sizes();
+    bool checkSizes();
     inline bool mode_aos() const { return mode==ESPP_VEC_AOS; }
 
     AlignedVector< Real3DInt > position; /* p_x,p_y,p_z,p_type */
@@ -163,7 +163,7 @@ namespace espressopp { namespace vectorization {
     static const std::size_t chunk_size_ = ESPP_VECTOR_WIDTH;
     inline std::size_t calc_data_size(size_t const& size) { return (1 + ((size - 1) / chunk_size_)) * chunk_size_; }
 
-    void update_from(std::vector<Particle> const& particlelist, size_t start);
+    void updateFrom(std::vector<Particle> const& particlelist, size_t start);
   };
 }}
 

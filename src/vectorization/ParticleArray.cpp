@@ -26,7 +26,7 @@
 namespace espressopp { namespace vectorization
 {
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::copy_from(CellList const& srcCells, Mode mode_)
+  void ParticleArray::copyFrom(CellList const& srcCells, Mode mode_)
   {
     mode = mode_;
 
@@ -80,7 +80,7 @@ namespace espressopp { namespace vectorization
     {
       size_t start = cellRange_[ic];
       ParticleList const& particlelist = srcCells[ic]->particles;
-      update_from(particlelist, start);
+      updateFrom(particlelist, start);
     }
 
     if(mode==ESPP_VEC_AOS)
@@ -113,7 +113,7 @@ namespace espressopp { namespace vectorization
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::update_from(std::vector<Particle> const& particlelist, size_t start)
+  void ParticleArray::updateFrom(std::vector<Particle> const& particlelist, size_t start)
   {
     size_t end = start + particlelist.size();
 
@@ -143,7 +143,7 @@ namespace espressopp { namespace vectorization
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::update_from_position_only(CellList const& srcCells)
+  void ParticleArray::updateFromPositionOnly(CellList const& srcCells)
   {
     if(mode==ESPP_VEC_AOS)
     {
@@ -177,7 +177,7 @@ namespace espressopp { namespace vectorization
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::add_to_force_only(CellList & srcCells) const
+  void ParticleArray::addToForceOnly(CellList & srcCells) const
   {
     if(mode==ESPP_VEC_AOS)
     {
@@ -208,7 +208,7 @@ namespace espressopp { namespace vectorization
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  bool ParticleArray::check_sizes()
+  bool ParticleArray::checkSizes()
   {
     if(size_>data_size_) return false;
 
