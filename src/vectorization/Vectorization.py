@@ -43,7 +43,7 @@ class VectorizationLocal(_espressopp.Vectorization):
         if pmi.workerIsActive():
             if mode=="" or mode==SOA:
                 mode_int = _espressopp.VectorizationMode.SOA
-            elif (mode==AOS):
+            elif mode==AOS:
                 mode_int = _espressopp.VectorizationMode.AOS
             else:
                 raise ValueError("Incorrect mode [{}]".format(mode))
