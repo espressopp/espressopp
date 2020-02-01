@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2018-2019
+      The VOTCA Development Team
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
