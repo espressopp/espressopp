@@ -330,6 +330,7 @@ namespace espressopp {
         srIL[i]->addForces();
         timeForceComp[i] += timeIntegrate.getElapsedTime() - time;
       }
+      aftCalcFLocal();
     }
 
     void VelocityVerlet::updateForces()
