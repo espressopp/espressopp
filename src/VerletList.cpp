@@ -152,7 +152,12 @@ namespace espressopp {
         c_pos.resize(c_resize);
       }
       c_type.resize(c_resize);
-      if(USE_EXCLUSION_LIST){
+    }
+
+    // exclusion list may have been added later so check size of c_id separately
+    if(USE_EXCLUSION_LIST){
+      if(c_reserve > c_id.size()) {
+        size_t c_resize = 2*c_reserve;
         c_id.resize(c_resize);
       }
     }
