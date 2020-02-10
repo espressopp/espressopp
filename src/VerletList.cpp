@@ -232,19 +232,16 @@ namespace espressopp {
             distsq = d.sqr();
           }
 
-          bool addpair = true;
-          if (distsq > cutsq) addpair = false;
+          if (distsq > cutsq) continue;
 
           if(USE_EXCLUSION_LIST) {
             size_t const& id2 = c_id[p2];
-            if (exList.count(std::make_pair(id1, id2)) == 1) addpair = false;
-            if (exList.count(std::make_pair(id2, id1)) == 1) addpair = false;
+            if (exList.count(std::make_pair(id1, id2)) == 1) continue;
+            if (exList.count(std::make_pair(id2, id1)) == 1) continue;
           }
 
-          if(addpair) {
-            max_type = std::max(max_type, std::max(type1, c_type[p2]));
-            vlPairs.add(&part1,c_p[p2]);
-          }
+          max_type = std::max(max_type, std::max(type1, c_type[p2]));
+          vlPairs.add(&part1,c_p[p2]);
         }
       }
       start = end;
