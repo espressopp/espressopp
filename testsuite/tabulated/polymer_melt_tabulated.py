@@ -48,6 +48,7 @@ nvt = True
 timestep = 0.01
 spline  = 2                                # spline interpolation type (1, 2, 3)
 halfCellInt = int(sys.argv[1])
+useBuffers = False                         # too few number of particles/cell to benefit from buffers
 
 conffile = 'polymer_melt.start' # file with inital configuration
 tabfileLJ = "pot-lj.txt"
@@ -73,6 +74,14 @@ print 'dt =', timestep
 print 'Skin =', skin
 print 'nvt =', nvt
 print 'halfCellInt = ', halfCellInt
+
+comm = MPI.COMM_WORLD
+
+nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
+cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin, halfCellInt)
+print "nodeGrid =", nodeGrid
+print "cellGrid =", cellGrid
+print "particles/cell =", 1.0*num_particles/(cellGrid[0]*cellGrid[1]*cellGrid[2])
 
 # writes the tabulated file
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
@@ -124,10 +133,7 @@ for tabulation in [True, False]:
     system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
     system.skin = skin
         
-    comm = MPI.COMM_WORLD
         
-    nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
-    cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin, halfCellInt)
     #nodeGrid = Int3D(1, 1, comm.size)
     #cellGrid = Int3D(
         #calcNumberCells(size[0], nodeGrid[0], rc),
@@ -143,7 +149,7 @@ for tabulation in [True, False]:
         
         
     # Lennard-Jones with Verlet list
-    vl = espressopp.VerletList(system, cutoff = rc + system.skin)
+    vl = espressopp.VerletList(system, cutoff = rc + system.skin, useBuffers=useBuffers)
     if tabulation:
         interLJ = espressopp.interaction.VerletListTabulated(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potTabLJ)
