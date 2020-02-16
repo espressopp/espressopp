@@ -130,7 +130,7 @@ class MultiSystemLocal(object):
             self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
 
 if pmi.isController :
-    class MultiSystem(object, metaclass=pmi.Proxy):
+    class MultiSystem(metaclass=pmi.Proxy):
         """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
         pmiproxydefs = dict(
             cls =  'espressopp.MultiSystemLocal',

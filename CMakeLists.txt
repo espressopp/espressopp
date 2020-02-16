@@ -116,6 +116,11 @@ execute_process(COMMAND ${Python3_EXECUTABLE}
                         OUTPUT_VARIABLE PYTHON_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+execute_process(COMMAND ${Python3_EXECUTABLE}
+                        -c "import sys; print(sys.version[:3].replace('.', ''))"
+                        OUTPUT_VARIABLE PYTHON_VERSION_NO_DOT
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
 message(STATUS "PYTHON_LIBDIR = ${Python3_LIBRARY_DIRS}")
 
@@ -144,13 +149,8 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if (EXTERNAL_BOOST)
   set(NEEDED_Boost_VERSION 1.58.0)
-  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem)
+  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem python38)
   set(Boost_LIBS ${Boost_LIBRARIES})
-  if(${Boost_VERSION} VERSION_LESS 106700)
-      find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python${PYTHON_VERSION})
-  else()
-     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python3)
-  endif()
 
   message(STATUS "BOOST_LIBS = ${Boost_LIBRARIES}")
   
@@ -171,7 +171,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 
 if(EXTERNAL_MPI4PY)
-  find_package(MPI4PY 1.3.1 REQUIRED)
+  find_package(MPI4PY 3.0.0 REQUIRED)
   include_directories(${MPI4PY_INCLUDES})
 else(EXTERNAL_MPI4PY)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.0/src/mpi4py/include)

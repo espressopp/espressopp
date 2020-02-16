@@ -61,7 +61,7 @@ class AngularPotentialLocal(object):
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
 if pmi.isController:
-    class AngularPotential(object, metaclass=pmi.Proxy):
+    class AngularPotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = [ 'cutoff', 'colVarBondList', 'colVarAngleList', 'colVarDihedList', 'colVar' ]

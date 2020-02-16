@@ -121,7 +121,7 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
             return self.cxxclass.getAngle(self, pid1, pid2, pid3)
 
 if pmi.isController:
-    class FixedTripleAngleList(object, metaclass=pmi.Proxy):
+    class FixedTripleAngleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleAngleListLocal',
             localcall = [ "add" ],

@@ -66,7 +66,7 @@ class VersionLocal(_espressopp.Version):
             cxxinit(self, _espressopp.Version)
 
 if pmi.isController:
-    class Version(object, metaclass=pmi.Proxy):
+    class Version(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.VersionLocal',
             pmiproperty = ['major', 'minor', 'gitrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],

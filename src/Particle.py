@@ -309,7 +309,7 @@ class ParticleLocal(object):
         return (tmp is not None)
 
 if pmi.isController:
-    class Particle(object, metaclass=pmi.Proxy):
+    class Particle(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.ParticleLocal',
             pmiproperty = [ "id", "storage" ]

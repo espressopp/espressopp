@@ -75,7 +75,7 @@ class MDIntegratorLocal(object):
             return self.cxxclass.getNumberOfExtensions(self)
 
 if pmi.isController :
-    class MDIntegrator(object, metaclass=pmi.Proxy):
+    class MDIntegrator(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
             pmiproperty = [ 'dt', 'step' ],

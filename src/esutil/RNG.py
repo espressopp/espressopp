@@ -44,7 +44,7 @@ class RNGLocal(esutil_RNG):
 #                pass
 
 if pmi.isController:
-    class RNG(object, metaclass=pmi.Proxy):
+    class RNG(metaclass=pmi.Proxy):
         'Random number generator.'
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.RNGLocal',

@@ -79,7 +79,7 @@ class ParticleGroupLocal(_espressopp.ParticleGroup):
             return self.cxxclass.size(self)
 
 if pmi.isController:
-    class ParticleGroup(object, metaclass=pmi.Proxy):
+    class ParticleGroup(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.ParticleGroupLocal',
             pmicall = [ "add", "show", "has", "size" ]

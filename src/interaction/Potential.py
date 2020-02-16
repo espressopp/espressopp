@@ -87,7 +87,7 @@ class PotentialLocal(object):
     shift = property(_getShift, _setShift)
 
 if pmi.isController:
-    class Potential(object, metaclass=pmi.Proxy):
+    class Potential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = ['cutoff', 'shift', 'colVarBondList', 'colVarAngleList', 'colVarDihedList', 'colVar']

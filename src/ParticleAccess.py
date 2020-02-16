@@ -41,7 +41,7 @@ class ParticleAccessLocal(ParticleAccess):
             self.cxxclass.perform_action(self)
 
 if pmi.isController :
-    class ParticleAccess(object, metaclass=pmi.Proxy):
+    class ParticleAccess(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
             pmicall = [ 'perform_action' ]

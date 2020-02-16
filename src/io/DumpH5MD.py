@@ -506,7 +506,7 @@ if pmi.isController:
                         path = '/particles/{}/{}/value'.format(ag, k)
                         h5[path][t] = h5[path][t][idd]
 
-    class DumpH5MD(object, metaclass=pmi.Proxy):
+    class DumpH5MD(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',

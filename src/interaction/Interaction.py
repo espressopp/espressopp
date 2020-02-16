@@ -103,7 +103,7 @@ class InteractionLocal(object):
             return int(self.cxxclass.bondType(self))
 
 if pmi.isController :
-    class Interaction(object, metaclass=pmi.Proxy):
+    class Interaction(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
             pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]

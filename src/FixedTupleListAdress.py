@@ -79,7 +79,7 @@ class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
 
 
 if pmi.isController:
-    class FixedTupleListAdress(object, metaclass=pmi.Proxy):
+    class FixedTupleListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTupleListAdressLocal',
             pmicall = [ "addTuples" ]

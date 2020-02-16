@@ -62,7 +62,7 @@ class DihedralPotentialLocal(object):
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
 if pmi.isController:
-    class DihedralPotential(object, metaclass=pmi.Proxy):
+    class DihedralPotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy', 'computePhi' ],
             pmiproperty = [ 'cutoff', 'colVarBondList', 'colVarAngleList', 'colVar' ]

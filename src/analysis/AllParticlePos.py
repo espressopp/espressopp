@@ -37,7 +37,7 @@ class AllParticlePosLocal(object):
         return self.cxxclass.gatherAllPositions(self)
 
 if pmi.isController :
-    class AllParticlePos(object, metaclass=pmi.Proxy):
+    class AllParticlePos(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmicall = [ "gatherAllPositions" ]
         )

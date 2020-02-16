@@ -106,7 +106,7 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
                 self.cxxclass.add(self, pid1, pid2)
 
 if pmi.isController:
-    class FixedPairListAdress(object, metaclass=pmi.Proxy):
+    class FixedPairListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListAdressLocal',
             localcall = [ "add" ],

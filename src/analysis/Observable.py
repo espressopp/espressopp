@@ -49,7 +49,7 @@ class ObservableLocal(object):
             return self.cxxclass.compute(self)
 
 if pmi.isController :
-    class Observable(object, metaclass=pmi.Proxy):
+    class Observable(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
             pmicall = [ "compute" ]

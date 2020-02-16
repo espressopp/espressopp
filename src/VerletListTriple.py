@@ -117,7 +117,7 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
 
 
 if pmi.isController:
-    class VerletListTriple(object, metaclass=pmi.Proxy):
+    class VerletListTriple(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.VerletListTripleLocal',
           pmiproperty = [ 'builds' ],

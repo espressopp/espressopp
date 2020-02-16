@@ -89,7 +89,7 @@ class BCLocal(object):
             return self.cxxclass.getRandomPos(self)
 
 if pmi.isController :
-    class BC(object, metaclass=pmi.Proxy):
+    class BC(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmiproperty = [ "boxL", "rng" ],
             localcall = [ "getMinimumImageVector", 

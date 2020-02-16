@@ -42,7 +42,7 @@ class GammaVariateLocal(esutil_GammaVariate):
             cxxinit(self, esutil_GammaVariate, alpha, beta)
 
 if pmi.isController:
-    class GammaVariate(object, metaclass=pmi.Proxy):
+    class GammaVariate(metaclass=pmi.Proxy):
         """A random gamma variate."""
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.GammaVariateLocal',

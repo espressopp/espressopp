@@ -62,7 +62,7 @@ class AutocorrelationLocal(analysis_Autocorrelation):
         return self.cxxclass.compute(self)
 
 if pmi.isController:
-    class Autocorrelation(object, metaclass=pmi.Proxy):
+    class Autocorrelation(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.AutocorrelationLocal',

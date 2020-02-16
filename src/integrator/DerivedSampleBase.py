@@ -8,4 +8,6 @@ class DerivedSampleBaseLocal(SampleBaseLocal):
 
 if pmi.isController:
     class DerivedSampleBase(SampleBase, metaclass=pmi.Proxy):
-        pmiproxydefs = dict(cls='espressopp.integrator.DerivedSampleBaseLocal')
+        pmiproxydefs = {
+            'cls': 'espressopp.integrator.DerivedSampleBaseLocal'
+        }

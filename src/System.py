@@ -216,7 +216,7 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.setTrace(self, switch)
 
 if pmi.isController:
-    class System(object, metaclass=pmi.Proxy):
+    class System(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.SystemLocal',
           pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],

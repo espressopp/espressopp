@@ -33,7 +33,7 @@ class GridLocal(esutil_Grid):
     pass
 
 if pmi.isController:
-    class Grid(object, metaclass=pmi.Proxy):
+    class Grid(metaclass=pmi.Proxy):
         'Grid class'
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.GridLocal',

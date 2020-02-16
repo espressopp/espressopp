@@ -98,7 +98,7 @@ class TDforceLocal(integrator_TDforce):
             return self.cxxclass.computeTDEnergy(self)
 
 if pmi.isController :
-    class TDforce(object, metaclass=pmi.Proxy):
+    class TDforce(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.TDforceLocal',
             pmiproperty = [ 'itype', 'filename'],

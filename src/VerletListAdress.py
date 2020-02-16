@@ -181,7 +181,7 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
             self.cxxclass.rebuild(self)
 
 if pmi.isController:
-    class VerletListAdress(object, metaclass=pmi.Proxy):
+    class VerletListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.VerletListAdressLocal',
             pmiproperty = [ 'builds' ],

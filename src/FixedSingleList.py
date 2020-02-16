@@ -91,7 +91,7 @@ class FixedSingleListLocal(_espressopp.FixedSingleList):
             return singles
 
 if pmi.isController:
-    class FixedSingleList(object, metaclass=pmi.Proxy):
+    class FixedSingleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedSingleListLocal',
             #localcall = [ 'add' ],
