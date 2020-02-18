@@ -1178,12 +1178,19 @@ _CMD = [
     ('DUMP', __workerDump)
 ]
 
-_MAXCMD = len(_CMD)
+_EXEC = 0
+_IMPORT = 1
+_EXECFILE = 2
+_CREATE = 3
+_INVOKE = 4
+_CALL = 5
+_REDUCE = 6
+_DELETE = 7
+_SYNC = 8
+_STOP = 9
+_DUMP = 10
 
-# define the numerical constants to be used
-for i in range(len(_CMD)):
-    exec('_%s=%s' % (_CMD[i][0], i), globals())
-del i
+_MAXCMD = len(_CMD)
 
 # set that stores which oids have been deleted
 DELETED_OIDS = []

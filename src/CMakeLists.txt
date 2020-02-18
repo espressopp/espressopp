@@ -47,8 +47,11 @@ endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+find_package(Threads REQUIRED)
+set(Boost_USE_MULTITHREADED ON)
+
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} libdl.so util.so ${CMAKE_THREAD_LIBS_INIT})
 if(WITH_XTC)
   target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
 endif()
