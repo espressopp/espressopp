@@ -1,9 +1,9 @@
 import espressopp
 import logging
 
-espressopp.pmi.log.setLevel(logging.DEBUG)
+#espressopp.pmi.log.setLevel(logging.DEBUG)
 
-derived = espressopp.integrator.DerivedSampleBase()
+#derived = espressopp.integrator.DerivedSampleBase()
 # print(dir(derived))
 
-derived.exxx()
+#derived.exxx()
