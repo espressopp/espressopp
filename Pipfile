@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 mpi4py = "*"
+six = "*"
+h5py = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.8"

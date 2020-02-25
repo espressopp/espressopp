@@ -145,6 +145,8 @@ The pmi module defines the following useful constants and variables:
 """
 import logging, types, sys, inspect, os
 
+from collections.abc import Iterable
+
 __author__ = 'Olaf Lenz'
 __email__ = 'olaf at lenz dot name'
 __version__ = '1.0'
@@ -619,26 +621,43 @@ def registerAtExit():
 ##################################################
 ## PROXY METACLASS
 ##################################################
+
+from types import BuiltinFunctionType, BuiltinMethodType,  FunctionType, MethodType, LambdaType
+from functools import partial
+
+def is_function(obj):
+    return isinstance(obj, (BuiltinFunctionType, BuiltinMethodType,  FunctionType, MethodType, LambdaType, partial))
+
+
 class Proxy(type):
     """A metaclass to be used to create frontend serial objects."""
 
     class _Initializer(object):
-        def __init__(self, pmiobjectclassdef, super_method=None):
+        def __init__(self, pmiobjectclassdef):
             self.pmiobjectclassdef = pmiobjectclassdef
-            self.super_method = super_method
-
         def __call__(self, method_self, *args, **kwds):
-            # create the pmi object
-            log.info('PMI.Proxy of type %s is creating pmi object of type %s',
-                     method_self.__class__.__name__,
-                     self.pmiobjectclassdef)
-            # if not _isProxy(method_self):
             method_self.pmiobjectclassdef = self.pmiobjectclassdef
             pmiobjectclass = _translateClass(self.pmiobjectclassdef)
             method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
             method_self.pmiobject._pmiproxy = method_self
-            if self.super_method:
-                self.super_method(method_self, *args, **kwds)
+
+    # class _Initializer(object):
+    #     def __init__(self, pmiobjectclassdef, super_method=None):
+    #         self.pmiobjectclassdef = pmiobjectclassdef
+    #         self.super_method = super_method
+    #
+    #     def __call__(self, method_self, *args, **kwds):
+    #         # create the pmi object
+    #         log.info('PMI.Proxy of type %s is creating pmi object of type %s',
+    #                  method_self.__class__.__name__,
+    #                  self.pmiobjectclassdef)
+    #         # if not _isProxy(method_self):
+    #         method_self.pmiobjectclassdef = self.pmiobjectclassdef
+    #         pmiobjectclass = _translateClass(self.pmiobjectclassdef)
+    #         method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
+    #         method_self.pmiobject._pmiproxy = method_self
+    #         if self.super_method:
+    #             self.super_method(method_self, *args, **kwds)
 
     class _LocalCaller(object):
         def __init__(self, methodName):
@@ -678,9 +697,6 @@ class Proxy(type):
             self.propName = propName
 
         def __call__(self, method_self, val):
-            #             property = getattr(method_self.pmiobject.__class__, self.propName)
-            #             setter = getattr(property, 'fset')
-            #             return call(setter, method_self.pmiobject, val)
             setter = '.'.join(
                 (method_self.pmiobjectclassdef,
                  self.propName,
@@ -692,12 +708,8 @@ class Proxy(type):
         setattr(cls, methodName, newMethod)
 
     def __init__(cls, name, bases, ns):
-        # if ns is not None and 'Sample' in ns.get('pmiproxydefs', {}).get('cls', {}):
-        #     import ipdb; ipdb.set_trace()
         if 'pmiproxydefs' in ns:
             defs = ns['pmiproxydefs']
-            from collections.abc import Iterable
-            # Copy pmiproxydefs from bases classes to the derived.
             for base in bases:
                 if not hasattr(base, 'pmiproxydefs'):
                     continue
@@ -710,15 +722,14 @@ class Proxy(type):
                     else:
                         defs[k] = v
 
+
             # now generate the methods of the Proxy object
             if 'cls' in defs:
                 pmiobjectclassdef = defs['cls']
                 log.info('Defining PMI proxy class %s for pmi object class %s.'
                          % (name, pmiobjectclassdef))
-
                 # define cls.pmiinit
-                cls.__addMethod('pmiinit', Proxy._Initializer(pmiobjectclassdef, cls.__init__))
-                # valid_init = isinstance(cls.__init__, (type(type.__call__), types.MethodType, types.FunctionType))
+                cls.__addMethod('pmiinit', Proxy._Initializer(pmiobjectclassdef))
                 valid_init = isinstance(cls.__init__, types.MethodType)
                 if not valid_init:
                     log.debug('  redirecting __init__ to pmiinit')
@@ -953,10 +964,6 @@ def _translateClass(cls):
         return eval(cls)
     elif isinstance(cls, type):
         return cls
-    elif isinstance(cls, type):
-        raise TypeError("""PMI cannot use old-style classes.
-        Please create old style classes via their names.
-        """)
     else:
         raise ValueError("__translateClass expects class as argument, but got %s" % cls)
 
@@ -1060,35 +1067,61 @@ def __backtranslateOIDs(targs, tkwds):
 
 
 # Wrapper that allows to pickle a method
-class __Method(object):
+class __Method(object) :
     def __init__(self, funcname, im_self, im_class=None):
         self.__name__ = funcname
-        self.__self__ = _translateProxy(im_self)
+        self.im_self = _translateProxy(im_self)
         if im_class is None:
-            self.__self__.__class__ = self.__self__.__class__
+            self.im_class = self.im_self.__class__
         else:
-            self.__self__.__class__ = im_class
+            self.im_class = im_class
         self.__determineMethod()
-
     def __getstate__(self):
         return (self.__name__,
-                _translateOID(self.__self__),
-                self.__self__.__class__)
-
+                _translateOID(self.im_self),
+                self.im_class)
     def __setstate__(self, state):
-        self.__name__, self.__self__, self.__self__.__class__ = state
-        self.__self__ = _backtranslateOID(self.__self__)
+        self.__name__, self.im_self, self.im_class = state
+        self.im_self = _backtranslateOID(self.im_self)
         self.__determineMethod()
-
     def __determineMethod(self):
-        for cls in self.__self__.__class__.mro():
+        for cls in self.im_class.mro():
             if hasattr(cls, self.__name__):
                 function = getattr(cls, self.__name__)
-                self.method = function.__get__(self.__self__, cls)
+                self.method = function.__get__(self.im_self, cls)
                 break
-
     def __call__(self, *args, **kwds):
         return self.method(*args, **kwds)
+
+# class __Method(object):
+#     def __init__(self, funcname, im_self, im_class=None):
+#         self.__name__ = funcname
+#         self.__self__ = _translateProxy(im_self)
+#         if im_class is None:
+#             self.__self__.__class__ = self.__self__.__class__
+#         else:
+#             self.__self__.__class__ = im_class
+#         self.__determineMethod()
+#
+#     def __getstate__(self):
+#         return (self.__name__,
+#                 _translateOID(self.__self__),
+#                 self.__self__.__class__)
+#
+#     def __setstate__(self, state):
+#         self.__name__, self.__self__, self.__self__.__class__ = state
+#         self.__self__ = _backtranslateOID(self.__self__)
+#         self.__determineMethod()
+#
+#     def __determineMethod(self):
+#         for cls in self.__self__.__class__.mro():
+#             if hasattr(cls, self.__name__):
+#                 function = getattr(cls, self.__name__)
+#                 self.method = function.__get__(self.__self__, cls)
+#                 break
+#
+#     def __call__(self, *args, **kwds):
+#         return self.method(*args, **kwds)
 
 
 # translate arguments to invoke
@@ -1105,7 +1138,7 @@ def __translateFunctionArgs(*args):
         tfunction = arg0
         function = eval(arg0, globals())
         rargs = args[1:]
-    elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType, type)):
+    elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
         if arg0.__name__ == '<lambda>':
             raise ValueError("pmi cannot handle lambda functions")
         tfunction = arg0
@@ -1123,10 +1156,8 @@ def __translateFunctionArgs(*args):
             tfunction = __Method(arg1, arg0)
             function = tfunction
             rargs = args[2:]
-        else:
-            raise ValueError("bad arguments")
+        else: raise ValueError("bad arguments")
     return function, tfunction, rargs
-
 
 def __backtranslateFunctionArg(arg0):
     if isinstance(arg0, str):
@@ -1134,16 +1165,14 @@ def __backtranslateFunctionArg(arg0):
     else:
         return arg0
 
-
 def __translateReduceOpArgs(*args):
-    tfunction = _MPITranslateReduceOp(*args)
+    tfunction =  _MPITranslateReduceOp(*args)
     if tfunction is not None:
         function = args[0]
         rargs = args[1:]
         return function, tfunction, rargs
     else:
         return __translateFunctionArgs(*args)
-
 
 def __backtranslateReduceOpArg(arg0):
     function = _MPIBacktranslateReduceOp(arg0)
@@ -1152,11 +1181,10 @@ def __backtranslateReduceOpArg(arg0):
     else:
         return __backtranslateFunctionArg(arg0)
 
-
-def __formatCall(function, args, kwds):
-    def formatArgs(args, kwds):
+def __formatCall(function, args, kwds) :
+    def formatArgs(args, kwds) :
         arglist = [repr(arg) for arg in args]
-        for k, v in list(kwds.items()):
+        for k, v in kwds.items():
             arglist.append('%s=%r' % (k, repr(v)))
         return ', '.join(arglist)
 

@@ -190,7 +190,7 @@ import logging
 from espressopp import toReal3DFromVector, ParticleLocal, Particle
 from espressopp.Exceptions import ParticleDoesNotExistHere
 
-class StorageLocal(object):
+class StorageLocal:
 
     logger = logging.getLogger("Storage")
 
@@ -202,6 +202,7 @@ class StorageLocal(object):
                 return False
 
     def addParticle(self, pid, pos):
+        print("addPartcle")
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos))
 
@@ -439,7 +440,8 @@ if pmi.isController:
         pmiproxydefs = dict(
             pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
             pmiproperty = [ "system" ],
-            pmiinvoke = ["getRealParticleIDs", "printRealParticles"]
+            pmiinvoke = ["getRealParticleIDs", "printRealParticles"],
+            cls = 'espressopp.storage.StorageLocal'
             )
 
         def particleExists(self, pid):

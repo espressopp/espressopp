@@ -68,7 +68,7 @@ def _setupLogging():
         logging.Logger.setLevel = my_setLevel
         logging.TRACE = int((logging.NOTSET + logging.DEBUG) / 2.0)
         logging.addLevelName('TRACE', logging.TRACE)
-        _espressopp.setLogger()
+        # _espressopp.setLogger()
 
 
 # execute the function

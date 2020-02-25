@@ -68,7 +68,9 @@ from espressopp import esutil, bc, storage, integrator, interaction, analysis, t
 if pmi.isController:
     # make sure that the workers exit when the script ends
     pmi.registerAtExit()
+    print('pmi.registerAtExit')
     # the script continues after this call
 else:
+    print('pmi.startWorkerLoop')
     pmi.startWorkerLoop()
     # the script will usually not reach this point on the workers
