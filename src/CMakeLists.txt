@@ -48,7 +48,7 @@ endif (WITH_RC_FILES)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 if(WITH_XTC)
   target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
 endif()
