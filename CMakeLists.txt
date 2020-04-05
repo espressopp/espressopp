@@ -12,7 +12,6 @@ enable_testing()
 # these need ot be done early (before further tests).
 #####################################################################
 
-include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 # Check for C++11 standard
@@ -135,9 +134,6 @@ mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
-include(CheckIncludeFiles)
-check_include_files("sys/time.h;sys/resource.h;unistd.h" CMAKE_HEADERS)
-
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 # this conflicts with mpi4py-1.3 (is used to check for MPI version there)
