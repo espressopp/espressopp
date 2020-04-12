@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 #
-#  Copyright (C) 2020(Dr. Horacio Andres Vargas Guzman)
+#  Copyright (C) 2020(Dr. Horacio V Guzman)
 #      Institute Jozef Stefan
 #      Max Planck Institute for Polymer Research
 #

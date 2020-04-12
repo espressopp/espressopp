@@ -1,5 +1,8 @@
 #!/usr/bin/env python2
 #
+#  Copyright (C) 2020(Dr. Horacio V Guzman)
+#      Institute Jozef Stefan
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -54,7 +57,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
         
         print 'NodeGrid = %s'%(nodeGrid,)
-        print 'CellGrid = %s'%cellGrid
+        print 'CellGrid = %s'%(cellGrid,)
 
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         pid = 0
