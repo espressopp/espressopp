@@ -83,7 +83,7 @@ namespace espressopp {
       return boostRNG;
     }
 
-    void RNG::saveState(int step) {
+    void RNG::saveState(long long step) {
       std::ostringstream oss;
       oss << *boostRNG;
       if ( mpiWorld->rank()==0 ) {

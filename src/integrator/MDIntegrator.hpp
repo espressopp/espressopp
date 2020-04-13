@@ -90,6 +90,7 @@ namespace espressopp {
         boost::signals2::signal<void (real&)> inIntP; // inside end of integrate1()
         boost::signals2::signal<void ()> aftIntP; // after  integrate1()
         boost::signals2::signal<void ()> aftInitF; // after initForces()
+        boost::signals2::signal<void ()> aftCalcFLocal; // after calcForces in local cells (before collectGhostForces)
         boost::signals2::signal<void ()> aftCalcF; // after calcForces()
         boost::signals2::signal<void ()> befIntV; // before integrate2()
         boost::signals2::signal<void ()> aftIntV; // after  integrate2()

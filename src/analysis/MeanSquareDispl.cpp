@@ -438,7 +438,7 @@ namespace espressopp {
 
       class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >
       ("analysis_MeanSquareDispl", init< shared_ptr< System > >() )
-      .def(init< shared_ptr< System >, int>() )
+      .def(init< shared_ptr< System >, int, int >() )
       .def("computeG2", &MeanSquareDispl::computeG2)
       .def("computeG3", &MeanSquareDispl::computeG3)
       .add_property("print_progress", &MeanSquareDispl::getPrint_progress, &MeanSquareDispl::setPrint_progress)

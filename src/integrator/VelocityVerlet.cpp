@@ -53,6 +53,7 @@ namespace espressopp {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
       resortFlag = true;
       maxDist    = 0.0;
+      nResorts   = 0;
     }
 
     VelocityVerlet::~VelocityVerlet()
@@ -63,7 +64,7 @@ namespace espressopp {
     void VelocityVerlet::run(int nsteps)
     {
       VT_TRACER("run");
-      int nResorts = 0;
+      nResorts = 0;
       real time;
       timeIntegrate.reset();
       resetTimers();
@@ -233,6 +234,11 @@ namespace espressopp {
       cout << endl;
     }
 
+    int VelocityVerlet::getNumResorts() const
+    {
+      return nResorts;
+    }
+
     real VelocityVerlet::integrate1()
     {
       System& system = getSystemRef();
@@ -324,6 +330,7 @@ namespace espressopp {
         srIL[i]->addForces();
         timeForceComp[i] += timeIntegrate.getElapsedTime() - time;
       }
+      aftCalcFLocal();
     }
 
     void VelocityVerlet::updateForces()
@@ -419,6 +426,7 @@ namespace espressopp {
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
+        .def("getNumResorts", &VelocityVerlet::getNumResorts)
         ;
     }
   }

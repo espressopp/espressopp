@@ -1,3 +1,5 @@
+#  Copyright (C) 2020
+#      Max Planck Institute for Polymer Research & JGU Mainz
 #  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -25,14 +27,18 @@ espressopp.VerletList
 *********************
 
 
-.. function:: espressopp.VerletList(system, cutoff, exclusionlist)
+.. function:: espressopp.VerletList(system, cutoff, exclusionlist, useBuffers, useSOA)
 
 		:param system: 
 		:param cutoff: 
 		:param exclusionlist: (default: [])
+		:param useBuffers: Whether particle neighbors are buffered to improve rebuild times. (default: True)
+		:param useSOA: Whether the alternative structure of arrays form is used for buffers. (default: False)
 		:type system: 
 		:type cutoff: 
 		:type exclusionlist: 
+		:type useBuffers:
+		:type useSOA:
 
 .. function:: espressopp.VerletList.exclude(exclusionlist)
 
@@ -60,15 +66,15 @@ from espressopp.esutil import cxxinit
 class VerletListLocal(_espressopp.VerletList):
 
 
-    def __init__(self, system, cutoff, exclusionlist=[]):
+    def __init__(self, system, cutoff, exclusionlist=[], useBuffers=True, useSOA=False):
 
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espressopp.VerletList, system, cutoff, True)
+                cxxinit(self, _espressopp.VerletList, system, cutoff, True, useBuffers, useSOA)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espressopp.VerletList, system, cutoff, False)
+                cxxinit(self, _espressopp.VerletList, system, cutoff, False, useBuffers, useSOA)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair
@@ -116,6 +122,6 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls = 'espressopp.VerletListLocal',
       pmiproperty = [ 'builds' ],
-      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
-      pmiinvoke = [ 'getAllPairs' ]
+      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers' ],
+      pmiinvoke = [ 'getAllPairs','getTimers' ]
     )

@@ -33,7 +33,7 @@ foreach(DIR ${ALL_DIRS})
                 endif()
                 add_test(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME})
                 set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${TEST_ENV}")
-                target_link_libraries(${TEST_NAME} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} _espressopp ${Boost_LIBRARIES})
+                target_link_libraries(${TEST_NAME} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} _espressopp ${Boost_LIBRARIES})
             endforeach()
 
             file(GLOB TESTS_PY "${DIR}/test*.py")
