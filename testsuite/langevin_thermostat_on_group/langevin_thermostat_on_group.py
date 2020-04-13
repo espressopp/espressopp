@@ -32,7 +32,7 @@ import unittest
 class TestCaseLangevinThermostatOnGroup(unittest.TestCase):
     def setUp(self):
         system = espressopp.System()
-	box=(10,10,10)
+        box=(10,10,10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.rng = espressopp.esutil.RNG(54321)
         system.skin = 0.3

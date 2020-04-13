@@ -36,7 +36,7 @@ class TestMinimizeEnergy(unittest.TestCase):
     def setUp(self):
 
         system = espressopp.System()
-	box=(10,10,10)
+        box=(10,10,10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD

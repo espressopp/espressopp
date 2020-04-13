@@ -1,5 +1,7 @@
-#  Copyright (C) 2012,2013,2017,2018,2020(1H)
-#      Jozef Stefan Institute 
+#  Copyright (C) 2020(1H)
+#      Jozef Stefan Institute
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2012,2013,2017,2018
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2019
 #      Max Planck Computing and Data Facility
@@ -97,10 +99,10 @@ decomp - Domain Decomposition python functions
 
 
 import sys
-#import espressopp
+import espressopp
 
-#from espressopp import Int3D
-#from espressopp.Exceptions import Error
+from espressopp import Int3D
+from espressopp.Exceptions import Error
 
 import math
 import time
@@ -237,7 +239,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
 		            print 'HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!'
 		    else:
 		        print 'HeSpaDDA message: Size Lenghts are different in Y and Z!'
-		    return fdN[0], fdN[1], fdN[2]  #Int3D(fdN[0], fdN[1], fdN[2])
+		    return Int3D(fdN[0], fdN[1], fdN[2])
 	    elif eh_size==0:
 
 		    ijkmax = 3 * n * n + 1
@@ -314,7 +316,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                 print 'HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!'
     else:
             print 'HeSpaDDA message: Size Lenghts are different in Y and Z!'
-    return fdN[0], fdN[1], fdN[2]   #Int3D(fdN[0], fdN[1], fdN[2])
+    return Int3D(fdN[0], fdN[1], fdN[2])
 
 
 def cellGrid(box_size, node_grid, rc, skin, halfCellInt = 1):
@@ -337,7 +339,7 @@ def cellGrid(box_size, node_grid, rc, skin, halfCellInt = 1):
         raise Error("local box size in direction 2 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
                  hint: number of CPUs maybe too high or is prime, perhaps you could also try with Halfcells." % (iz, rc_skin))
 
-    return ix, iy, iz  #Int3D(ix, iy, iz)
+    return Int3D(ix, iy, iz)
 
 
 def nodeGridSimple(n):	# Mainly used for Lattice-Boltzmann and cubic geometries
@@ -354,7 +356,7 @@ def nodeGridSimple(n):	# Mainly used for Lattice-Boltzmann and cubic geometries
                     d3 = i
                     ijkmax = i * i + j * j + k * k
     print d1, d2, d3	
-    return d1, d2, d3  #Int3D(d1, d2, d3)
+    return Int3D(d1, d2, d3)
 
 
 def cherrypickTotalProcs(box_size, rc, skin, MnN, CpN, percTol=0.2, eh_size=0, ratioMS=0, idealGas=0, slabMSDims=[0, 0, 0]):
@@ -500,7 +502,7 @@ def neiListAdress(node_grid, box_size, rc, skin, eh_size, adrCenter, ratioMS, id
             neiListzin = reDistCellsHom(node_grid[2], cursor[2], rc_skin, halfCellInt)
         neiListz = adaptNeiList(neiListzin)
     print "HeSpaDDA message: neiListX:", map(int, neiListx), "\n neiListY", map(int, neiListy), "\n neiListZ", map(int, neiListz)
-    return cellsX, cellsY, cellsZ, map(int, neiListx), map(int, neiListy), map(int, neiListz)  #Int3D(cellsX, cellsY, cellsZ)
+    return Int3D(cellsX, cellsY, cellsZ), map(int, neiListx), map(int, neiListy), map(int, neiListz)
 
 
 def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, printInfo=True):
