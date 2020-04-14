@@ -1,4 +1,7 @@
-#  Copyright (C) 2017,2018(1H)
+#  Copyright (C) 2020(H)
+#      Jozef Stefan Institute 
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2013,2017,2018(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2019
 #      Max Planck Computing and Data Facility
@@ -43,7 +46,12 @@ loadbal - HeSpaDDA load balancing python functions
 *  `halfDecomp(adrCenter1D,rc_skin,eh_size,halfCores1D,cellsX,ratioMS,idealGas)`:
 
     It's a function that decomposes half of the box in one Dimension(1D) and it is assuming symmetry
-    in the initial simulation box. Even with irregularities in the DD it will find the half-Box-DD 
+    in the initial simulation box. Even with irregularities in the DD it will find the correct half-Box-DD.
+
+*  `fullDecomp(adrCenter1D,rc_skin,eh_size,fullCores1D,cellsX,ratioMS,sizeX,idealGas)`:
+
+    It's a function that decomposes the full box in one Dimension(1D) and it is assuming that the load 
+    in terms of No. of particles is not homogeneous but localized in regions/cells of higher load "EH" an lower load "CG".  
 
 *  `addHsymmetry(halfNeilListX,eh_size,rc_skin,node_gridX,cellsX,ratioMS,idealGas)`:
     
@@ -88,7 +96,7 @@ __email__ = 'horacio.v.g at gmail dot com'
 __version__ = '1.0'
 __all__ = [
     'qbicity', 'changeIndex', 'nodeGridSizeCheck',
-    'halfDecomp', 'addHsymmetry', 'adaptNeiList',
+    'halfDecomp', 'fullDecomp', 'addHsymmetry', 'adaptNeiList',
     'reDistCellsHom', 'reDistCells', 'redistDeltaRandomly',
     'findNodesMS'
 ]
@@ -194,8 +202,42 @@ def halfDecomp(adrCenter1D, rc_skin, eh_size, halfCores1D, cellsX, ratioMS, size
             return cellSizes
     return cellSizes
 
-# This function uses the previously decomposed half-box (from halfDecomp) and unfolds it to match the whole Neighbors List. If it does not match the whole neighbor, due to any asymmetry in the number of cores or the number of cells. It will be redistributed region by region by considering the whole simulation box size.
 
+# This function decomposes the whole box in one Dimension(1D) and it is assuming symmetry in the initial simulation box. Even with irregularities in the box dimension and cell-size relation it will find the full-Box-DD 
+
+def fullDecomp(adrCenter1D,rc_skin,eh_size,fullCores1D,cellsX,ratioMS,sizeX,idealGas):
+    pLoadIG=1   # this value is only in case the Ideal Gas will in reality improve any calculation or communication (i.e. Improve notoriously the sims parallelization, which is not the case yet)
+    cellSizes=[]
+    usedCores=0
+    totCellsEH=round(2.*eh_size/rc_skin-0.5)
+    totCellsCG=cellsX-totCellsEH
+    totNodesCG,totNodesEH=findNodesMS(fullCores1D,totCellsEH,totCellsCG,ratioMS,sizeX,eh_size,idealGas)
+    for i in xrange(fullCores1D):
+
+        if idealGas:
+            if i==0:
+                cellSizes.append(round((2.*eh_size)/rc_skin-0.5)+pLoadIG)       #2do: SuperCell stuff
+                usedCores=1     # For Ideal Gas purposes only 1 core covers the low-resolution region
+            else:
+                [cellSizes.append(round((2.*eh_size)/rc_skin/(fullCores1D-usedCores)-0.5)) for i in xrange(usedCores,fullCores1D)] #2do: SuperCell stuff
+                deltaCells=round((2.*eh_size)/rc_skin-0.5)-round((2.*eh_size)/rc_skin/(fullCores1D-usedCores)-0.5)*(fullCores1D-usedCores)  #2do: SuperCell stuff
+                cellSizes[usedCores]=cellSizes[usedCores]+deltaCells-pLoadIG    # Both applies a benefit to the usedCores=1 in the sense that will have one cell less loaded to CG-region. But also a penalty to the usedCores=1 that will have to manage any cells non distributed before
+                return cellSizes
+
+        else: # Applies to all other systems besides the Ideal Gas
+            if totNodesEH>=2.:
+                [cellSizes.append(round((2.*eh_size)/rc_skin/(totNodesEH)-0.5)) for i in xrange(int(totNodesEH))]  #2do: SuperCell stuff
+            else:
+                cellSizes.append(round((2.*eh_size)/rc_skin-0.5))  #2do: SuperCell stuff
+            if totNodesCG>=2.:
+                [cellSizes.append(round((sizeX-2.*eh_size)/rc_skin/totNodesCG-0.5)) for j in xrange(int(totNodesCG))]  #2do: SuperCell stuff
+            else:
+                cellSizes.append(round((sizeX-2.*eh_size)/rc_skin-0.5))  #2do: SuperCell stuff
+            return cellSizes
+    return cellSizes
+
+
+# This function uses the previously decomposed half-box (from halfDecomp) and unfolds it to match the whole Neighbors List. If it does not match the whole neighbor, due to any asymmetry in the number of cores or the number of cells. It will be redistributed region by region by considering the whole simulation box size.
 
 def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, sizeX, idealGas, halfCellInt = 1):
     wholeNeilListX = []

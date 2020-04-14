@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 #
+#  Copyright (C) 2020(H)
+#      Jozef Stefan Institute 
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -28,12 +31,13 @@ from espressopp.tools import timers
 
 
 system = espressopp.System()
-system.bc = espressopp.bc.OrthorhombicBC(system.rng, (10, 10, 10))
+box=(10,10,10)
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin = 0.3
 system.comm = MPI.COMM_WORLD
-#nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
-#cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espressopp.storage.DomainDecomposition(system)
+nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
+system.storage = espressopp.storage.DomainDecomposition(system,nodeGrid,cellGrid)
 
 vl = espressopp.VerletList(system, cutoff=1.4)
 lj1 = espressopp.interaction.VerletListLennardJones(vl)
