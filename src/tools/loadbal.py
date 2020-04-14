@@ -1,5 +1,7 @@
-#  Copyright (C) 2012,2013,2017,2018,2020(1H)
+#  Copyright (C) 2020(H)
 #      Jozef Stefan Institute 
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2013,2017,2018(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2019
 #      Max Planck Computing and Data Facility

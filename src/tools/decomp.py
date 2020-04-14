@@ -1,7 +1,7 @@
-#  Copyright (C) 2020(1H)
+#  Copyright (C) 2020(H)
 #      Jozef Stefan Institute
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2012,2013,2017,2018
+#  Copyright (C) 2012,2013,2017,2018(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2019
 #      Max Planck Computing and Data Facility
@@ -511,10 +511,10 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
 
     fi = (1.0 + math.sqrt(5.0)) / 2.0  # golden ratio
 
-    npart = 100 #espressopp.analysis.NPart(system).compute()
+    npart = espressopp.analysis.NPart(system).compute()
 
     # this is an empirical formula in order to get the appropriate number of steps
-    nsteps = 10 #int(espressopp.MPI.COMM_WORLD.size * 1000000.0 / float(npart))
+    nsteps = int(espressopp.MPI.COMM_WORLD.size * 1000000.0 / float(npart))
 
     if printInfo:
         print 'CellGrid before tuning: ', system.storage.getCellGrid()
@@ -563,9 +563,9 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
 
 
 def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep=0.005):
-    npart = 100 # espressopp.analysis.NPart(system).compute()
+    npart = espressopp.analysis.NPart(system).compute()
     # this is an empirical formula in order to get the appropriate number of steps
-    nsteps = 10 # int(espressopp.MPI.COMM_WORLD.size * 10000000.0 / float(npart))
+    nsteps = int(espressopp.MPI.COMM_WORLD.size * 10000000.0 / float(npart))
 
     print '      Calculations is started. It will print out the dependece of time of \n\
       running of %d steps on the skin size into the file \'timeVSskin.dat\'.\n\
