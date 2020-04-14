@@ -355,7 +355,7 @@ def nodeGridSimple(n):	# Mainly used for Lattice-Boltzmann and cubic geometries
                     d2 = j
                     d3 = i
                     ijkmax = i * i + j * j + k * k
-    print d1, d2, d3	
+    print "nodeGrid reads as follows: ",d1, d2, d3,".... BTW, You are not using HeSpaDDA"
     return Int3D(d1, d2, d3)
 
 
