@@ -1,7 +1,5 @@
 language: cpp
 
-sudo: required
-
 services:
 - docker
 
@@ -29,14 +27,12 @@ script:
   - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
   - deployment/build.sh
 
-matrix:
+jobs:
     exclude:
         - compiler: gcc
           env: DISTRO=ubuntu_rolling EXTERNAL=ON
         - compiler: clang
           env: DISTRO=ubuntu_rolling EXTERNAL=ON
-
-jobs:
     include:
         - stage: canary
           env: DISTRO=ubuntu EXTERNAL=ON
