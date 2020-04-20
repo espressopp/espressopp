@@ -1,3 +1,6 @@
+#  Copyright (C) 2020(H)
+#      Jozef Stefan Institute
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -50,7 +53,7 @@ PDB - read and write pdb format
   :param header: number of header lines to skip at start of file
   :type header: int
 
-  Returns: index,atomname,resname,resid,x,y,z,alpha,beta,segid,element (lists of type int,str,str,int,float,float,float,float,float,str,str)
+  Returns: index,atomname,locator,resname,resid,resseq,x,y,z,alpha,beta,segid,element (lists of type int,str,str,str,str,int,float,float,float,float,float,str,str)
 
 """
 import espressopp
@@ -72,7 +75,7 @@ def pdbwrite(filename, system, molsize=4, append=False, typenames=None):
   mol    = 0
   molcnt = 0
   name='FE' # default name, overwritten when typenames map is given
-  #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+  #following http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
   #crystal header
   st = "%-6s%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n"%('CRYST1',system.bc.boxL[0],system.bc.boxL[1],system.bc.boxL[2],90.00,90.00,90,'P 1',1) #boxes are orthorhombic for now
   file.write(st)
@@ -89,7 +92,7 @@ def pdbwrite(filename, system, molsize=4, append=False, typenames=None):
       if typenames:
 	  name=typenames[type]
       #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
-      #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+      #following http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
       st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f     T%04d%2s%2s\n"%('ATOM  ',(pid+addToPid)%100000,name,'','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,mol%10000,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
       file.write(st)
       pid    += 1
@@ -119,7 +122,7 @@ def fastwritepdb(filename, system, molsize=1000, append=False, folded=True):
   box_x = system.bc.boxL[0]
   box_y = system.bc.boxL[1]
   box_z = system.bc.boxL[2]
-  #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+  #following http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
   #crystal header
   st = "%-6s%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n"%('CRYST1',box_x, box_y, box_z, 90.00, 90.00, 90, 'P 1', 1) #boxes are orthorhombic for now
   file.write(st)
@@ -156,7 +159,7 @@ def pqrwrite(filename, system, molsize=4, append=False):
   addToPid = 0 # if pid begins from 0, then addToPid should be +1
   mol    = 0
   molcnt = 0
-  #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+  #following http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
   #crystal header
   st = "%-6s%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n"%('CRYST1',system.bc.boxL[0],system.bc.boxL[1],system.bc.boxL[2],90.00,90.00,90,'P 1',1) #boxes are orthorhombic for now
   file.write(st)
@@ -172,7 +175,7 @@ def pqrwrite(filename, system, molsize=4, append=False):
       q      = particle.q
       radius = particle.radius
       #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
-      #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+      #following http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
       st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%8.3f%8.3f\n"%('ATOM  ',(pid+addToPid)%100000,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,q,radius)
   
       # ATOM      1  N   ALA     1      46.457  12.189  21.556  0.1414 1.8240
@@ -194,8 +197,9 @@ def pdbread(filename,natoms,header):
   index=[]
   atomname=[]
   resname=[]
-  chainid=[]
+  locator=[]
   resid=[]
+  resseq=[]
   x=[]
   y=[]
   z=[]
@@ -210,9 +214,11 @@ def pdbread(filename,natoms,header):
   for i in range(natoms):
     line = file.readline()
     findex=int(line[7:11])
-    fname=line[12:16]
+    fname=line[13:16]
+    flocator=line[16:17] 
     fresname=line[17:20]
-    fresid=int(line[22:26])
+    fresid=line[21:22]
+    fresseq=int(line[23:26])
     fx=float(line[30:38])
     fy=float(line[38:46])
     fz=float(line[46:54])
@@ -224,7 +230,9 @@ def pdbread(filename,natoms,header):
     index.append(findex)
     atomname.append(fname)
     resname.append(fresname)
+    locator.append(flocator)
     resid.append(fresid)
+    resseq.append(fresseq)	
     x.append(fx)
     y.append(fy)
     z.append(fz)
@@ -233,4 +241,5 @@ def pdbread(filename,natoms,header):
     segid.append(fsegid)
     element.append(felement)
 
-  return index,atomname,resname,resid,x,y,z,alpha,beta,segid,element
+  return index,atomname,locator,resname,resid,resseq,x,y,z,alpha,beta,segid,element
+
