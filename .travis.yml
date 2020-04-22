@@ -1,7 +1,5 @@
 language: cpp
 
-sudo: required
-
 services:
 - docker
 
@@ -29,14 +27,12 @@ script:
   - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
   - deployment/build.sh
 
-matrix:
+jobs:
     exclude:
         - compiler: gcc
           env: DISTRO=ubuntu_rolling EXTERNAL=ON
         - compiler: clang
           env: DISTRO=ubuntu_rolling EXTERNAL=ON
-
-jobs:
     include:
         - stage: canary
           env: DISTRO=ubuntu EXTERNAL=ON
@@ -47,7 +43,7 @@ jobs:
           env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
 
 after_success:
-  - test "${TRAVIS_BUILD_STAGE_NAME}" = "Deploy" || travis_terminate 0
+  - if [[ "${TRAVIS_BUILD_STAGE_NAME}" != [dD]eploy ]]; then travis_terminate 0; fi
   - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v[12].*) ]] && DEPLOY=yes
   - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
