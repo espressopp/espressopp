@@ -1,4 +1,7 @@
 #!/usr/bin/env python2
+#  Copyright (C) 2020(H)
+#      Jozef Stefan Institute
+#      Max Planck Institute for Polymer Research
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -74,14 +77,14 @@ class TestPythonTools(unittest.TestCase):
         typenames = {1: 'AA', 2: 'BB'}
 
         espressopp.tools.pdbwrite(filename, self.system, molsize=0, append=False, typenames=typenames)
-        index,atomname,resname,resid,x,y,z,alpha,beta,segid,element = espressopp.tools.pdbread(filename,natoms=2,header=2)
+        index,atomname,locator,resname,resid,resseq,x,y,z,alpha,beta,segid,element = espressopp.tools.pdbread(filename,natoms=2,header=2)
 
         self.assertEqual(index[0],1)
         self.assertEqual(index[1],2)
         self.assertEqual(atomname[0].strip(),'AA')
         self.assertEqual(atomname[1].strip(),'BB')
-        self.assertEqual(resid[0],0)
-        self.assertEqual(resid[1],0)
+        self.assertEqual(resid[0].strip(),'F')
+        self.assertEqual(resid[1].strip(),'F')
         self.assertEqual(x[0],2.0)
         self.assertEqual(y[0],3.0)
         self.assertEqual(z[0],4.0)

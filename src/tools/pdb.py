@@ -214,7 +214,7 @@ def pdbread(filename,natoms,header):
   for i in range(natoms):
     line = file.readline()
     findex=int(line[7:11])
-    fname=line[13:16]
+    fname=line[12:16]
     flocator=line[16:17] 
     fresname=line[17:20]
     fresid=line[21:22]
