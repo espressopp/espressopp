@@ -202,7 +202,6 @@ class StorageLocal:
                 return False
 
     def addParticle(self, pid, pos):
-        print("addPartcle")
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos))
 

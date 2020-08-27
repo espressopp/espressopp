@@ -222,7 +222,7 @@ dump_conf_gro_adr = espressopp.io.DumpGROAdress(system, ftpl, integrator, filena
 
 # timer, steps
 nsteps = steps / intervals
-start_time = time.clock()
+start_time = time.process_time()
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
@@ -287,7 +287,7 @@ for i in range( len(pressure_array_total) ):
 tempFile.close()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

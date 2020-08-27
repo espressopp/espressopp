@@ -46,47 +46,20 @@ Description
         :param \*args:
         :type \*args:
 """
-
 from _espressopp import RealND
 from _espressopp import RealNDs
-from espressopp import esutil
 
-# This injects additional methods into the RealND class and pulls it
-# into this module
-class __RealND(RealND):
-    # string conversion
-    def __str__(self) :
-      arr = []
-      for i in range(self.dimension):
-        arr.append(self[i])
-      return str(arr)
+__all__ = ['RealND', 'RealNDs', 'toRealNDFromVector', 'toRealND']
 
-    def __repr__(self) :
-      return 'RealND' + str(self)
 
-def toRealNDFromVector(*args):
-    """Try to convert the arguments to a RealND.
+def extend_classes():
+    # This injects additional methods into the RealND class and pulls it
+    # into this module
 
-    This function will only convert to a RealND if x, y and z are
-    specified."""
-    arg0 = args[0]
-    if isinstance(arg0, RealND):
-      return arg0
-    elif hasattr(arg0, '__iter__'):
-      return RealND(*args)
-    else:
-      raise TypeError("Something wrong in toRealNDFromVector")
+    RealND.__str__ = lambda self: str([self[i] for i in range(self.dimension)])
+    RealND.__repr__ = lambda self: 'RealND' + str(self)
 
-def toRealND(*args):
-    """Try to convert the arguments to a RealND, returns the argument,
-    if it is already a RealND."""
-    if len(args) == 1 and isinstance(args[0], RealND):
-        return args[0]
-    else:
-        return RealND(*args)
-
-class __RealNDs(RealNDs):
-    def __str__(self) :
+    def __str_nds(self):
         arr = []
         for i in range(self.dimension):
             arr_i = []
@@ -95,5 +68,31 @@ class __RealNDs(RealNDs):
             arr.append(arr_i)
         return str(arr)
 
-    def __repr__(self) :
-        return 'RealNDs' + str(self)
+    RealNDs.__str__ = __str_nds
+    RealNDs.__repr__ = lambda self: 'RealNDs' + str(self)
+
+
+extend_classes()
+
+
+def toRealNDFromVector(*args):
+    """Try to convert the arguments to a RealND.
+
+    This function will only convert to a RealND if x, y and z are
+    specified."""
+    arg0 = args[0]
+    if isinstance(arg0, RealND):
+        return arg0
+    elif hasattr(arg0, '__iter__'):
+        return RealND(*args)
+    else:
+        raise TypeError("Something wrong in toRealNDFromVector")
+
+
+def toRealND(*args):
+    """Try to convert the arguments to a RealND, returns the argument,
+    if it is already a RealND."""
+    if len(args) == 1 and isinstance(args[0], RealND):
+        return args[0]
+    else:
+        return RealND(*args)

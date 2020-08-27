@@ -111,7 +111,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         # FixedLocalTupleList contain particles
         num_constrain = N*N
         stored = []
-        for i in range(N*N*N/num_constrain):
+        for i in range(int(N*N*N/num_constrain)):
             tuple = []
             for j in range(num_constrain):
                 tuple.append(num_constrain*i + j)
@@ -119,10 +119,10 @@ class TestFixedLocalTupleList(unittest.TestCase) :
             stored.append(tuple)
 
         num_constrain = N*N/2
-        for i in range(N*N*N/num_constrain, 2*N*N*N/num_constrain):
+        for i in range(int(N*N*N/num_constrain), int(2*N*N*N/num_constrain)):
             tuple = []
-            for j in range(num_constrain):
-                tuple.append(num_constrain*i + j)
+            for j in range(int(num_constrain)):
+                tuple.append(int(num_constrain*i + j))
             tuplelist.addTuple(tuple)
             stored.append(tuple)
 
@@ -132,7 +132,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         # check the contained particles id
         g_tuplelist = tuplelist.getTuples()
         s_id = 0
-        for i in range(3*N*N*N/num_constrain/2):
+        for i in range(int(3*N*N*N/num_constrain/2)):
             for j in range(espressopp.MPI.COMM_WORLD.size):
                 if stored[s_id] in g_tuplelist[j]:
                     break

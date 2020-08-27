@@ -87,14 +87,13 @@ def FillFileBuffer(fname, filebuffer):
 
 
 def FindType(proposedtype, typelist):
-    list = [typeid for (typeid, atype) in list(
-        typelist.items()) if atype == proposedtype]
-    if len(list) > 1:
+    type_list = [type_id for (type_id, a_type) in typelist.items() if a_type == proposedtype]
+    if len(type_list) > 1:
         print(("Error: duplicate type definitons", proposedtype.parameters))
         exit()
-    elif len(list) == 0:
+    elif len(type_list) == 0:
         return None
-    return list[0]
+    return type_list[0]
 
 
 class InteractionType:

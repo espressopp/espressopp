@@ -252,7 +252,7 @@ print('')
 # temperature analysis, timer, logfile
 # note that the temperature will differ from target temperature since degrees of freedom are removed in the coarse-grained area, which is not taken into account here
 temperature = espressopp.analysis.Temperature(system)
-start_time = time.clock()
+start_time = time.process_time()
 outfile = open("esp.dat", "w")
 
 # output format
@@ -298,6 +298,6 @@ outfile.close()
 espressopp.tools.writexyz("output.xyz", system)
 
 # time Information
-end_time = time.clock()
+end_time = time.process_time()
 print('Successfully finished simulation.')
 print('Run time = %.1f seconds' % (end_time - start_time))

@@ -224,7 +224,7 @@ Eb = interFENE.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential      ebonded     ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
-start_time = time.clock()
+start_time = time.process_time()
 nsteps = steps / intervals
 for s in range(1, intervals + 1):
   integrator.run(nsteps)
@@ -238,10 +238,10 @@ for s in range(1, intervals + 1):
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
 
-end_time = time.clock()
+end_time = time.process_time()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

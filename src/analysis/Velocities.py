@@ -55,6 +55,8 @@ class VelocitiesLocal(ObservableLocal, analysis_Velocities):
         return self.cxxclass.clear(self)
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+    def __next__(self):
+        return self.cxxclass.all(self).next()
 
 if pmi.isController :
     class Velocities(Observable, metaclass=pmi.Proxy):
@@ -62,6 +64,6 @@ if pmi.isController :
             cls =  'espressopp.analysis.VelocitiesLocal',
             pmicall = [ "gather", "clear" ],
             localcall = ["getNParticles", "getCoordinates",
-                         "__getitem__", "__iter__", "all"],
+                         "__getitem__", "__iter__", "all", "__next__"],
             pmiproperty = ["capacity", "size"]
             )

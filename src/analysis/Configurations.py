@@ -103,6 +103,8 @@ class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
         return self.cxxclass.clear(self)
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+    def __next__(self):
+        return self.cxxclass.all(self).next()
     def back(self):
         return self.cxxclass.back(self)
 
@@ -111,6 +113,6 @@ if pmi.isController :
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ConfigurationsLocal',
             pmicall = [ "gather", "clear", "back" ],
-            localcall = ["__getitem__", "__iter__"],
+            localcall = ["__getitem__", "__iter__", "__next__"],
             pmiproperty = ["capacity", "size"]
             )

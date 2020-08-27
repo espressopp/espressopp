@@ -166,7 +166,7 @@ for spline in range(1,len(splinetypes)+1):
     langevin.gamma = 1.0
     langevin.temperature = 1.0
      
-    start_time = time.clock()
+    start_time = time.process_time()
     integrator.run(nsteps)
     temperature = temp.compute()
     p = press.compute()
@@ -175,7 +175,7 @@ for spline in range(1,len(splinetypes)+1):
     print('Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f\n' % \
             (nsteps, Ek + Ep, Ep, Ek, temperature, p))
         
-    end_time = time.clock()
+    end_time = time.process_time()
     timers.show(integrator.getTimers(), precision=2)
 
 os.system('rm '+tabfile)

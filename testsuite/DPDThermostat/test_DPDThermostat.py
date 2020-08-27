@@ -81,7 +81,9 @@ class TestDPDThermostat(unittest.TestCase):
         noise_pref = np.sqrt( 3.0 * 24.0 * dpd.temperature / integrator.dt )
 
         # coordinates of particles before integration
-        dist = espressopp.Real3D( x[0] - x[1] )
+        d0 = x[0] - x[1]
+        print(d0, type(d0), x)
+        dist = espressopp.Real3D(d0)
         dist_norm = np.sqrt( dist*dist )
         dist_unitv = dist / dist_norm
         veldiff = espressopp.Real3D( v[0] - v[1] )

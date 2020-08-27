@@ -195,7 +195,7 @@ temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 
 # timer
-start_time = time.clock()
+start_time = time.process_time()
 
 # set lambdas and derivates to zero
 for i in range(num_particles + num_particlesCG):
@@ -342,7 +342,7 @@ for i in range( bins+1 ):
 rawFile.close()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

@@ -100,11 +100,11 @@ print('')
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 
 espressopp.tools.analyse.info(system, integrator)
-start_time = time.clock()
+start_time = time.process_time()
 for k in range(nsteps):
   integrator.run(isteps)
   espressopp.tools.analyse.info(system, integrator)
-end_time = time.clock()
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
 

@@ -1026,133 +1026,133 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
 
 
 def setBondedInteractions(system, bonds, bondtypeparams):
-    list = {}
+    bond_interactions = {}
     bc = 0
-    for id, bondlist in list(bonds.items()):
+    for interaction_id, bondlist in bonds.items():
         fpl = espressopp.FixedPairList(system.storage)
         fpl.addBonds(bondlist)
         bc += len(bondlist)
-        bdinteraction = bondtypeparams[id].createEspressoInteraction(
+        bdinteraction = bondtypeparams[interaction_id].createEspressoInteraction(
             system, fpl)
         if bdinteraction:
             system.addInteraction(bdinteraction)
-            list.update({id: bdinteraction})
-    return list
+            bond_interactions.update({interaction_id: bdinteraction})
+    return bond_interactions
 
 
 def setAngleInteractions(system, angles, angletypeparams):
-    list = {}
+    angle_interactions = {}
 
-    for id, anglelist in list(angles.items()):
+    for interaction_idid, anglelist in angles.items():
         fpl = espressopp.FixedTripleList(system.storage)
         fpl.addTriples(anglelist)
-        angleinteraction = angletypeparams[id].createEspressoInteraction(
+        angleinteraction = angletypeparams[interaction_idid].createEspressoInteraction(
             system, fpl)
         if angleinteraction:
             system.addInteraction(angleinteraction)
-            list.update({id: angleinteraction})
-    return list
+            angle_interactions.update({interaction_idid: angleinteraction})
+    return angle_interactions
 
 
 def setDihedralInteractions(system, dihedrals, dihedraltypeparams):
-    list = {}
+    dihedral_interactions = {}
 
-    for idlist, dihedrallist in list(dihedrals.items()):
+    for idlist, dihedrallist in dihedrals.items():
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(dihedrallist)
         for i in range(len(idlist)):
-            id = idlist[i]
-            dihedralinteraction = dihedraltypeparams[id].createEspressoInteraction(
+            interaction_id = idlist[i]
+            dihedralinteraction = dihedraltypeparams[interaction_id].createEspressoInteraction(
                 system, fpl)
             if dihedralinteraction:
                 system.addInteraction(dihedralinteraction)
-                ii = len(list)
+                ii = len(dihedral_interactions)
                 # ii instead of id bcs same id may already have been encountered in another idlist (tuple of id's)
-                list.update({ii: dihedralinteraction})
-    return list
+                dihedral_interactions.update({ii: dihedralinteraction})
+    return dihedral_interactions
 
 
 def setImproperInteractions(system, impropers, impropertypeparams):
-    list = {}
+    improper_interactions = {}
 
     for idlist, improperlist in list(impropers.items()):
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(improperlist)
         for i in range(len(idlist)):
-            id = idlist[i]
-            improperinteraction = impropertypeparams[id].createEspressoInteraction(
+            interaction_id = idlist[i]
+            improperinteraction = impropertypeparams[interaction_id].createEspressoInteraction(
                 system, fpl)
             if improperinteraction:
                 system.addInteraction(improperinteraction)
-                ii = len(list)
+                ii = len(improper_interactions)
                 # ii instead of id bcs same id may already have been encountered in another idlist (tuple of id's)
-                list.update({ii: improperinteraction})
-    return list
+                improper_interactions.update({ii: improperinteraction})
+    return improper_interactions
 
 
 def setBondedInteractionsAdress(system, bonds, bondtypeparams, ftpl):
-    list = {}
+    bond_adress_interactions = {}
     bc = 0
-    for id, bondlist in list(bonds.items()):
+    for interaction_id, bondlist in bonds.items():
         fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
         fpl.addBonds(bondlist)
         bc += len(bondlist)
-        bdinteraction = bondtypeparams[id].createEspressoInteraction(
+        bdinteraction = bondtypeparams[interaction_id].createEspressoInteraction(
             system, fpl)
         if bdinteraction:
             system.addInteraction(bdinteraction)
-            list.update({id: bdinteraction})
-    return list
+            bond_adress_interactions.update({interaction_id: bdinteraction})
+    return bond_adress_interactions
 
 
 def setAngleInteractionsAdress(system, angles, angletypeparams, ftpl):
-    list = {}
+    angle_adress_interactions = {}
 
-    for id, anglelist in list(angles.items()):
+    for interaction_id, anglelist in angles.items():
         fpl = espressopp.FixedTripleListAdress(system.storage, ftpl)
         fpl.addTriples(anglelist)
-        angleinteraction = angletypeparams[id].createEspressoInteraction(
+        angleinteraction = angletypeparams[interaction_id].createEspressoInteraction(
             system, fpl)
         if angleinteraction:
             system.addInteraction(angleinteraction)
-            list.update({id: angleinteraction})
-    return list
+            angle_adress_interactions.update({interaction_id: angleinteraction})
+    return angle_adress_interactions
 
 
 def setDihedralInteractionsAdress(system, dihedrals, dihedraltypeparams, ftpl):
-    list = {}
+    dihedral_interactions = {}
 
-    for idlist, dihedrallist in list(dihedrals.items()):
+    for idlist, dihedrallist in dihedrals.items():
         fpl = espressopp.FixedQuadrupleListAdress(system.storage, ftpl)
         fpl.addQuadruples(dihedrallist)
         for i in range(len(idlist)):
-            id = idlist[i]
-            dihedralinteraction = dihedraltypeparams[id].createEspressoInteraction(
+            interaction_id = idlist[i]
+            dihedralinteraction = dihedraltypeparams[interaction_id].createEspressoInteraction(
                 system, fpl)
             if dihedralinteraction:
                 system.addInteraction(dihedralinteraction)
-                ii = len(list)
+                ii = len(dihedral_interactions)
                 # ii instead of id bcs same id may already have been encountered in another idlist (tuple of id's)
-                list.update({ii: dihedralinteraction})
-    return list
+                dihedral_interactions.update({ii: dihedralinteraction})
+    return dihedral_interactions
 
 
 def setImproperInteractionsAdress(system, impropers, impropertypeparams, ftpl):
-    list = {}
+    improper_interactions = {}
 
-    for idlist, improperlist in list(impropers.items()):
+    for idlist, improperlist in impropers.items():
         fpl = espressopp.FixedQuadrupleListAdress(system.storage, ftpl)
         fpl.addQuadruples(improperlist)
         for i in range(len(idlist)):
-            id = idlist[i]
-            improperinteraction = impropertypeparams[id].createEspressoInteraction(
+            interaction_id = idlist[i]
+            improperinteraction = impropertypeparams[interaction_id].createEspressoInteraction(
                 system, fpl)
             if improperinteraction:
                 system.addInteraction(improperinteraction)
-                ii = len(list)
+                ii = len(improper_interactions)
                 # ii instead of id bcs same id may already have been encountered in another idlist (tuple of id's)
-                list.update({ii: improperinteraction})
-    return list
+                improper_interactions.update({ii: improperinteraction})
+    return improper_interactions
 
 
 def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cutoff, hadress=False, adress=False, ftpl=None):

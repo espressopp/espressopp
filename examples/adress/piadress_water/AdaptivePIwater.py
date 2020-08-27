@@ -353,7 +353,7 @@ print('')
 
 # timer, steps
 nsteps = steps / intervals
-start_time = pytime.clock()
+start_time = pytime.process_time()
 
 # output format for screen and file
 print('Starting the integration loop...')
@@ -485,6 +485,6 @@ rgyr_O_file.close()
 #  9. Done  #
 ###########
 
-end_time = pytime.clock()
+end_time = pytime.process_time()
 print('Successfully finished simulation.')
 print('Run time = %.1f seconds' % (end_time - start_time))

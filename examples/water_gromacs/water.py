@@ -142,7 +142,7 @@ pressureTensor = espressopp.analysis.PressureTensor(system)
 print("i*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
 outfile = open("esp.dat", "w")
-start_time = time.clock()
+start_time = time.process_time()
 
 for i in range(check):
     T = temperature.compute()
@@ -164,7 +164,7 @@ for i in range(check):
     #system.storage.decompose()
     
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 
 sys.stdout.write('Integration steps = %d\n' % integrator.step)

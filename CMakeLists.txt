@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 enable_language(C)
 enable_language(CXX)
 
-#enable_testing()
+enable_testing()
 
 ######################################################################
 # compiler tests
@@ -176,7 +176,7 @@ endif()
 ######################################
 add_subdirectory(src)
 set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-#add_subdirectory(testsuite)
+add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink

@@ -56,7 +56,6 @@ class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
 
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            print('DomainDecompositionLocal')
             cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
 
     def getCellGrid(self):
@@ -73,11 +72,7 @@ if pmi.isController:
             cls = 'espressopp.storage.DomainDecompositionLocal',  
             pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust']
         )
-        def __init__(self, system, 
-                     nodeGrid='auto', 
-                     cellGrid='auto',
-                     nocheck=False):
-            print(f'DomainDecomposition.__init__{system=}')
+        def __init__(self, system,  nodeGrid='auto',  cellGrid='auto', nocheck=False):
             # do sanity checks for the system first
             if nocheck:
                 self.next_id = 0

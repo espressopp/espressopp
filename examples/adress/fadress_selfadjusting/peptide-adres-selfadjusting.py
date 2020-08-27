@@ -468,7 +468,7 @@ print("# starting run...")
 #    pass
 dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename=trjfile,unfolded=True)
 
-start_time = time.clock()
+start_time = time.process_time()
 print('Start time: ', str(datetime.now()))
 print("i*dt,Eb, EAng, Edih, EImp, ELj, Elj14, EQQ, EQQ14, Etotal, T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
@@ -503,5 +503,5 @@ for k in range(nOutput):
     quit()
   dump_conf_gro.dump()
 
-end_time = time.clock()
+end_time = time.process_time()
 

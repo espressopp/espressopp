@@ -133,7 +133,7 @@ print('')
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, steepest)
-start_time = time.clock()
+start_time = time.process_time()
 for k in range(10):
   steepest.run(isteps)
   espressopp.tools.analyse.info(system, steepest)
@@ -147,13 +147,13 @@ system.addInteraction(interFENE)
 for k in range(20):
   steepest.run(isteps)
   espressopp.tools.analyse.info(system, steepest)
-end_time = time.clock()
+end_time = time.process_time()
 
 espressopp.tools.analyse.info(system, integrator)
 for k in range(2):
   integrator.run(isteps)
   espressopp.tools.analyse.info(system, integrator)
-end_time = time.clock()
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
 

@@ -129,7 +129,7 @@ class TestTabDih(makeConf):
         print("Running at temperature T = {:.3f} kJ/mol/k_B".format(langevin.temperature))
 
 
-        start_time = time.clock()
+        start_time = time.process_time()
         print(" ***")
         print("{:8s} {:8s} {:8s}".format("Step","E_tab","E_harm"))
         for k in range(nsnapshots):

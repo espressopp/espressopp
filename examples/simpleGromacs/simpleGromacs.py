@@ -202,7 +202,7 @@ Etotal = Ek + Epnb + Eb + Ea
 sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair        ebond       eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
 
-start_time = time.clock()
+start_time = time.process_time()
 
 for i in range(check):
     integrator.run(steps/check)
@@ -218,7 +218,7 @@ for i in range(check):
     #sys.stdout.write('\n')
 
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
 sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))

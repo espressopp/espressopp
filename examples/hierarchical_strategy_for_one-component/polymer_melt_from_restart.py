@@ -186,7 +186,7 @@ print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 
-start_time = time.clock()
+start_time = time.process_time()
 for k in range(20):
   steepest.run(isteps)
   espressopp.tools.analyse.info(system, steepest)
@@ -203,6 +203,6 @@ for k in range(nsteps/100):
   espressopp.tools.analyse.info(system, integrator)
   espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, True)
   #espressopp.tools.pdb.fastwritepdb(filename, system, monomers_per_chain, True)
-end_time = time.clock()
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)

@@ -51,11 +51,11 @@ espressopp.integrator.MDIntegrator
 from espressopp import pmi
 from _espressopp import integrator_MDIntegrator
 
-class MDIntegratorLocal(object):
+class MDIntegratorLocal:
 
     def run(self, niter):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.run(self, niter)
+            return self.cxxclass.run(self, int(niter))
 
     def addExtension(self, extension):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -76,7 +76,6 @@ class MDIntegratorLocal(object):
 
 if pmi.isController :
     class MDIntegrator(metaclass=pmi.Proxy):
-
         pmiproxydefs = dict(
             pmiproperty = [ 'dt', 'step' ],
             pmicall = [ 'run', 'addExtension', 'getExtension', 'getNumberOfExtensions' ]

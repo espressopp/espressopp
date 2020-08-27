@@ -330,11 +330,11 @@ for k in range(30):
   espressopp.tools.analyse.info(system, steepest)
 
 espressopp.tools.analyse.info(system, integrator)
-start_time = time.clock()
+start_time = time.process_time()
 for k in range(30):
   integrator.run(isteps)
   espressopp.tools.analyse.info(system, integrator)
-end_time = time.clock()
+end_time = time.process_time()
 
 filename = "reinsertion.res"
 espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)

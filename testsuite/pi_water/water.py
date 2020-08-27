@@ -168,7 +168,7 @@ print("i*timestep,Eb, EAng, ETab, Ek, Etotal T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 outfile = open("esp.dat", "w")
 
-start_time = time.clock()
+start_time = time.process_time()
 
 espressopp.tools.psfwrite("system.psf", system)
 
@@ -200,7 +200,7 @@ for i in range(check):
     #espressopp.tools.vmd.imd_positions(system, sock)
 
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 espressopp.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)

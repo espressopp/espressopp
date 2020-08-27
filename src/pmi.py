@@ -705,7 +705,8 @@ class Proxy(type):
                             defs[k] = v
                 pmiobjectclassdef = defs['cls']
                 proxy_init = _create_initializer(pmiobjectclassdef)
-                valid_init = isinstance(cls.__init__, types.MethodType)
+                setattr(cls, 'pmiinit', proxy_init)
+                valid_init = isinstance(cls.__init__, (types.MethodType, types.FunctionType))
                 if not valid_init:
                     cls.__init__ = proxy_init
 

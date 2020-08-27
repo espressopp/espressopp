@@ -312,7 +312,7 @@ t_scale = 1
 
 # Start strucrure relaxation 1
 print("only bond interaction")
-start_time = time.clock()
+start_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 for k in range(16):
   integrator.run(isteps*t_scale)
@@ -371,6 +371,6 @@ while signal == 1.:
 
 espressopp.tools.pdb.pqrwrite("softblobs_n50_msid.res", system, monomers_per_chain, False)
 
-end_time = time.clock()
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)

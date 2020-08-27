@@ -205,7 +205,7 @@ for tabulation in [True, False]:
     sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
     sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-    start_time = time.clock()
+    start_time = time.process_time()
     integrator.run(steps)
 
     T = temperature.compute()
@@ -219,7 +219,7 @@ for tabulation in [True, False]:
     sys.stdout.write(fmt % (steps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
     sys.stdout.write('\n')
 
-    end_time = time.clock()
+    end_time = time.process_time()
     timers.show(integrator.getTimers(), precision=2)
 
 #os.system('rm '+tabfileLJ+' '+tabfileFENE+' '+tabfileCosine)

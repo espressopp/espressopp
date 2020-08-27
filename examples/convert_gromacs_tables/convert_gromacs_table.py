@@ -103,7 +103,7 @@ def calcNumberCells(size, nodes, cutoff):
     return ncells - 1
 
 
-#start_time = time.clock()
+#start_time = time.process_time()
 
 # run simulation for all tabulated potential files
 for potfile in files:
