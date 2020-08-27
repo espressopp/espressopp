@@ -138,17 +138,16 @@ Quaternion(-14.0, Real3D(0.0, 0.0, 0.0))
 
 from _espressopp import Quaternion
 from _espressopp import Real3D
-from espressopp import esutil
-import six
 
-# This injects additional methods into the Quaternion class and pulls it
-# into this module 
-class __Quaternion(six.with_metaclass(esutil.ExtendBaseClass, Quaternion)) :
-    """Basic quaternion as used by ESPResSo++.
-    """
+__all__ = ['Quaternion', 'toQuaternionFromVector', 'toQuaternion']
 
-    __originit = Quaternion.__init__
-    def __init__(self, *args):
+
+def extend_class():
+    # This injects additional methods into the Quaternion class and pulls it
+    # into this module
+    origin_init = Quaternion.__init__
+
+    def init(self, *args):
         if len(args) == 0:
             real_part = 0.0
             unreal_part = Real3D(0.0)
@@ -160,57 +159,54 @@ class __Quaternion(six.with_metaclass(esutil.ExtendBaseClass, Quaternion)) :
             elif isinstance(arg0, Real3D):
                 real_part = 0.0
                 unreal_part = arg0
-            elif isinstance(arg0, (int,float)):
+            elif isinstance(arg0, (int, float)):
                 real_part = arg0
                 unreal_part = Real3D(0.0)
             # test whether the argument is iterable and has 2 elements,
             # first element is float and second element is a Real3D
             elif hasattr(arg0, '__iter__') and len(arg0) == 2 \
-                 and isinstance(arg0[0], (int,float)) \
-                 and isinstance(arg0[1], Real3D):
+                    and isinstance(arg0[0], (int, float)) \
+                    and isinstance(arg0[1], Real3D):
                 real_part = arg0[0]
                 unreal_part = arg0[1]
             # test whether the argument is iterable and has 4 elements
             elif hasattr(arg0, '__iter__') and len(arg0) == 4:
                 real_part = arg0[0]
                 unreal_part = Real3D(arg0[1], arg0[2], arg0[3])
-            else :
+            else:
                 raise TypeError("Cannot initialize Quaternion from %s" % (args))
-        elif len(args) == 2 and isinstance(args[0], (int,float)) \
-             and isinstance(args[1], Real3D):
+        elif len(args) == 2 and isinstance(args[0], (int, float)) \
+                and isinstance(args[1], Real3D):
             real_part, unreal_part = args
-        elif len(args) == 2 and isinstance(args[0], (int,float)) \
-             and hasattr(args[1], '__iter__') \
-             and all(isinstance(elem, (int,float)) for elem in args[1]):
+        elif len(args) == 2 and isinstance(args[0], (int, float)) \
+                and hasattr(args[1], '__iter__') \
+                and all(isinstance(elem, (int, float)) for elem in args[1]):
             real_part = args[0]
             unreal_part = Real3D(args[1])
-        elif len(args) == 4 and all(isinstance(elem, (int,float)) for elem in args):
+        elif len(args) == 4 and all(isinstance(elem, (int, float)) for elem in args):
             real_part = args[0]
             unreal_part = Real3D(args[1], args[2], args[3])
-        else :
+        else:
             raise TypeError("Cannot initialize Quaternion from %s" % (args))
 
-        return self.__originit(real_part, unreal_part)
+        origin_init(self, real_part, unreal_part)
 
-    # create getters and setters
-    @property
-    def real_part(self): return self.getReal()
+    Quaternion.__init__ = init
 
-    @real_part.setter
-    def real_part(self, v): self.setReal(v)
+    Quaternion.real_part = property(
+        lambda self: self.getReal(),
+        (lambda self, value: self.setReal(value))
+    )
+    Quaternion.unreal_part = property(
+        lambda self: self.getImag(),
+        (lambda self, value: self.setImag(value))
+    )
+    Quaternion.__str__ = lambda self: str((self.real_part, self.unreal_part))
+    Quaternion.__repr__ = lambda self: 'Quaternion' + str(self)
 
-    @property
-    def unreal_part(self) : return self.getImag()
 
-    @unreal_part.setter
-    def unreal_part(self, v) : return self.setImag(v)
+extend_class()
 
-    # string conversion
-    def __str__(self) :
-        return str((self.real_part, self.unreal_part))
-
-    def __repr__(self) :
-        return 'Quaternion' + str(self)
 
 def toQuaternionFromVector(*args):
     """Try to convert the arguments to a Quaternion.
@@ -226,6 +222,7 @@ def toQuaternionFromVector(*args):
     elif len(args) == 4:
         return Quaternion(*args)
     raise TypeError("Specify real_part, unreal_part[0], unreal_part[1] and unreal_part[2].")
+
 
 def toQuaternion(*args):
     """Try to convert the arguments to a Quaternion, 

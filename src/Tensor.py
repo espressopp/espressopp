@@ -25,16 +25,16 @@ espressopp.Tensor
 *****************
 """
 from _espressopp import Tensor
-from espressopp import esutil
-import six
 
-# This injects additional methods into the Tensor class and pulls it
-# into this module 
-class __Tensor(six.with_metaclass(esutil.ExtendBaseClass, Tensor)) :
+__all__ = ['Tensor', 'toTensorFromVector', 'toTensor']
 
 
-    __originit = Tensor.__init__
-    def __init__(self, *args):
+def extend_class():
+    # This injects additional methods into the Tensor class and pulls it
+    # into this module
+    origin_init = Tensor.__init__
+
+    def init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -51,40 +51,34 @@ class __Tensor(six.with_metaclass(esutil.ExtendBaseClass, Tensor)) :
                 xx, yy, zz, xy, xz, yz = arg0
             elif isinstance(arg0, float) or isinstance(arg0, int):
                 xx = yy = zz = xy = xz = yz = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Tensor from %s" % (args))
-        elif len(args) == 6 :
+        elif len(args) == 6:
             xx, yy, zz, xy, xz, yz = args
-        else :
+        else:
             raise TypeError("Cannot initialize Tensor from %s" % (args))
 
-        return self.__originit(xx, yy, zz, xy, xz, yz)
+        origin_init(self, xx, yy, zz, xy, xz, yz)
 
-    # create setters and getters
-    @property
-    def xx(self): return self[0]
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    @xx.setter
-    def xx(self, v): self[0] = v
+        def _set(self, v):
+            self[idx] = v
 
-    @property
-    def yy(self) : return self[1]
+        return _get, _set
 
-    @yy.setter
-    def yy(self, v) : self[1] = v
+    Tensor.__init__ = init
+    Tensor.xx = property(*_get_getter_setter(0))
+    Tensor.yy = property(*_get_getter_setter(1))
+    Tensor.zz = property(*_get_getter_setter(2))
+    Tensor.__str__ = lambda self: str((self[0], self[1], self[2], self[3], self[4], self[5]))
+    Tensor.__repr__ = lambda self: 'Tensor' + str(self)
 
-    @property
-    def zz(self) : return self[2]
 
-    @zz.setter
-    def zz(self, v) : self[2] = v
+extend_class()
 
-    # string conversion
-    def __str__(self) :
-        return str((self[0], self[1], self[2], self[3], self[4], self[5]))
-
-    def __repr__(self) :
-        return 'Tensor' + str(self)
 
 def toTensorFromVector(*args):
     """Try to convert the arguments to a Tensor.
@@ -101,6 +95,7 @@ def toTensorFromVector(*args):
         return Tensor(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toTensor(*args):
     """Try to convert the arguments to a Tensor, returns the argument,

@@ -64,15 +64,20 @@ espressopp.Real3D
 		:param \*args: 
 		:type \*args: 
 """
+
+# List of exported methods from the module.
 from _espressopp import Real3D
-from espressopp import esutil
-import six
+
+__all__ = ['Real3D', 'toReal3DFromVector', 'toReal3D']
+
 
 # This injects additional methods into the Real3D class and pulls it
-# into this module 
-class __Real3D(six.with_metaclass(esutil.ExtendBaseClass, Real3D)) :
-    __originit = Real3D.__init__
-    def __init__(self, *args):
+# into this module. Now, this hacky method is required because other places
+# of the code uses _espressopp.Real3D type.
+def extend_class():
+    origin_init = Real3D.__init__
+
+    def new_init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -86,40 +91,34 @@ class __Real3D(six.with_metaclass(esutil.ExtendBaseClass, Real3D)) :
                 x, y, z = arg0
             elif isinstance(arg0, float) or isinstance(arg0, int):
                 x = y = z = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Real3D from %s" % (args))
-        elif len(args) == 3 :
+        elif len(args) == 3:
             x, y, z = args
-        else :
+        else:
             raise TypeError("Cannot initialize Real3D from %s" % (args))
 
-        return self.__originit(x, y, z)
+        origin_init(self, x, y, z)
 
-    # create setters and getters
-    @property
-    def x(self): return self[0]
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    @x.setter
-    def x(self, v): self[0] = v
+        def _set(self, v):
+            self[idx] = v
 
-    @property
-    def y(self) : return self[1]
+        return _get, _set
 
-    @y.setter
-    def y(self, v) : self[1] = v
+    Real3D.__init__ = new_init
+    Real3D.x = property(*_get_getter_setter(0))
+    Real3D.y = property(*_get_getter_setter(1))
+    Real3D.z = property(*_get_getter_setter(2))
+    Real3D.__str__ = lambda self: str((self[0], self[1], self[2]))
+    Real3D.__repr__ = lambda self: 'Real3D' + str(self)
 
-    @property
-    def z(self) : return self[2]
 
-    @z.setter
-    def z(self, v) : self[2] = v
+extend_class()
 
-    # string conversion
-    def __str__(self) :
-        return str((self[0], self[1], self[2]))
-
-    def __repr__(self) :
-        return 'Real3D' + str(self)
 
 def toReal3DFromVector(*args):
     """Try to convert the arguments to a Real3D.
@@ -136,6 +135,7 @@ def toReal3DFromVector(*args):
         return Real3D(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toReal3D(*args):
     """Try to convert the arguments to a Real3D, returns the argument,

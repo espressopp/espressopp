@@ -66,15 +66,17 @@ espressopp.Int3D
 """
 from _espressopp import Int3D
 from espressopp import esutil
-import six
+
+__all__ = ['Int3D', 'toInt3DFromVector', 'toInt3D']
 
 
-# This injects additional methods into the Int3D class and pulls it
-# into this module 
-class __Int3D(Int3D):
-    __originit = Int3D.__init__
+def extend_class():
+    # This injects additional methods into the Int3D class and pulls it
+    # into this module
 
-    def __init__(self, *args):
+    orig_init = Int3D.__init__
+
+    def init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -94,40 +96,22 @@ class __Int3D(Int3D):
             x, y, z = args
         else:
             raise TypeError("Cannot initialize Int3D from %s" % (args))
+        orig_init(self, x, y, z)
 
-        return self.__originit(x, y, z)
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    # create setters and getters
-    @property
-    def x(self):
-        return self[0]
+        def _set(self, v):
+            self[idx] = v
 
-    @x.setter
-    def x(self, v):
-        self[0] = v
+        return _get, _set
 
-    @property
-    def y(self):
-        return self[1]
-
-    @y.setter
-    def y(self, v):
-        self[1] = v
-
-    @property
-    def z(self):
-        return self[2]
-
-    @z.setter
-    def z(self, v):
-        self[2] = v
-
-    # string conversion
-    def __str__(self):
-        return str((self[0], self[1], self[2]))
-
-    def __repr__(self):
-        return 'Int3D' + str(self)
+    Int3D.__init__ = init
+    for i, property_name in enumerate(['x', 'y', 'z']):
+        setattr(Int3D, property_name, property(*_get_getter_setter(i)))
+    Int3D.__str__ = lambda self: str((self[0], self[1], self[2]))
+    Int3D.__repr__ = lambda self: 'Int3D' + str(self)
 
 
 def toInt3DFromVector(*args):
