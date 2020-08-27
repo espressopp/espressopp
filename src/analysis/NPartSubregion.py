@@ -70,8 +70,7 @@ class NPartSubregionLocal(ObservableLocal, analysis_NPartSubregion):
       self.cxxclass.setCenter(self, center[0], center[1], center[2])
 
 if pmi.isController :
-  class NPartSubregion(Observable):
-    __metaclass__ = pmi.Proxy
+  class NPartSubregion(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.analysis.NPartSubregionLocal'
     )

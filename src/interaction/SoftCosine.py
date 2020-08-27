@@ -153,20 +153,17 @@ if pmi.isController:
             cls = 'espressopp.interaction.SoftCosineLocal',
             pmiproperty = ['A']
             )
-    class VerletListSoftCosine(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListSoftCosineLocal',
             pmicall = ['setPotential','getPotential']
             )
-    class CellListSoftCosine(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListSoftCosineLocal',
             pmicall = ['setPotential']
             )
-    class FixedPairListSoftCosine(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListSoftCosineLocal',
             pmicall = ['setPotential']

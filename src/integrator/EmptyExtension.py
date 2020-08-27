@@ -42,8 +42,7 @@ class EmptyExtensionLocal(ExtensionLocal, integrator_EmptyExtension):
           cxxinit(self, integrator_EmptyExtension, system)
 
 if pmi.isController :
-    class EmptyExtension(Extension):
-        __metaclass__ = pmi.Proxy
+    class EmptyExtension(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.EmptyExtensionLocal'
             )

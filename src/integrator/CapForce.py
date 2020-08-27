@@ -64,8 +64,7 @@ class CapForceLocal(ExtensionLocal, integrator_CapForce):
               cxxinit(self, integrator_CapForce, system, capForce, particleGroup)
 
 if pmi.isController :
-    class CapForce(Extension):
-        __metaclass__ = pmi.Proxy
+    class CapForce(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.CapForceLocal',
             pmicall = ['setCapForce', 'setAbsCapForce', 'getCapForce', 'getAbsCapForce'],

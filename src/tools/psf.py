@@ -101,7 +101,7 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
 
   bond = []
   nInteractions = system.getNumberOfInteractions()
-  for i in xrange(nInteractions):
+  for i in range(nInteractions):
       if system.getInteraction(i).bondType() == espressopp.interaction.Pair:
         try:
            

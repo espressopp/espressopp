@@ -43,8 +43,7 @@ class CenterOfMassLocal(ObservableLocal, analysis_CenterOfMass):
           cxxinit(self, analysis_CenterOfMass, system)
 
 if pmi.isController :
-    class CenterOfMass(Observable):
-        __metaclass__ = pmi.Proxy
+    class CenterOfMass(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.analysis.CenterOfMassLocal'
         )

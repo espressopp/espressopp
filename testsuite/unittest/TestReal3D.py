@@ -105,7 +105,7 @@ class Test0Real3D(unittest.TestCase) :
         v2 = Real3D(1.0, 2.0, 3.0)
         self.assertEqual(v, v2)
         self.assertFalse(v != v2)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
 
     def test6Numerics(self) :
         'Test various numeric operations of Real3D.'
@@ -139,7 +139,7 @@ class Test0Real3D(unittest.TestCase) :
         s = pickle.dumps(v)
         # unpickle
         v2 = pickle.loads(s)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
         self.assertEqual(v, v2)
 
 if __name__ == "__main__":

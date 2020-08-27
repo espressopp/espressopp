@@ -152,8 +152,7 @@ if pmi.isController:
       pmiproperty = ['prefactor']  #, 'alpha', 'kmax'
     )
 
-  class CellListCoulombKSpaceP3M(Interaction):
-    __metaclass__ = pmi.Proxy
+  class CellListCoulombKSpaceP3M(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.CellListCoulombKSpaceP3MLocal',
       pmicall = ['getPotential']

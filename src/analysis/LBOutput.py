@@ -44,8 +44,7 @@ class LBOutputLocal(AnalysisBaseLocal, analysis_LBOutput):
             self.cxxclass.writeOutput(self)
             
 if pmi.isController :
-    class LBOutput(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class LBOutput(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
 #            cls =  'espressopp.analysis.LBOutputLocal',
 #            pmicall = ["writeOutput"]

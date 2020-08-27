@@ -118,8 +118,7 @@ if pmi.isController:
             pmiproperty = ['epsilon']
             )
 
-    class VerletListVSpherePair(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListVSpherePair(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListVSpherePairLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']

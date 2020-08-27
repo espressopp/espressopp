@@ -181,22 +181,19 @@ if pmi.isController:
           pmiproperty = ['A', 'lambda1', 'R', 'D']
         )
 
-    class VerletListTersoffPairTerm(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.interaction.VerletListTersoffPairTermLocal',
           pmicall = ['setPotential', 'getPotential', 'getVerletList']
         )
 
-    class CellListTersoffPairTerm(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.interaction.CellListTersoffPairTermLocal',
           pmicall = ['setPotential']
         )
         
-    class FixedPairListTersoffPairTerm(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.interaction.FixedPairListTersoffPairTermLocal',
           pmicall = ['setPotential']

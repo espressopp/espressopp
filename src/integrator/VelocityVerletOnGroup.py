@@ -45,8 +45,7 @@ class VelocityVerletOnGroupLocal(MDIntegratorLocal, integrator_VelocityVerletOnG
           cxxinit(self, integrator_VelocityVerletOnGroup, system, group)
 
 if pmi.isController :
-    class VelocityVerletOnGroup(MDIntegrator):
-        __metaclass__ = pmi.Proxy
+    class VelocityVerletOnGroup(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.VelocityVerletOnGroupLocal',
             pmiproperty = [ 'langevin' ]

@@ -53,10 +53,8 @@ from espressopp import esutil
 
 # This injects additional methods into the RealND class and pulls it
 # into this module
-class __RealND(RealND) :
+class __RealND(RealND, metaclass=esutil.ExtendBaseClass) :
 
-
-    __metaclass__ = esutil.ExtendBaseClass
 
     '''
     __originit = RealND.__init__
@@ -87,7 +85,7 @@ class __RealND(RealND) :
     # string conversion
     def __str__(self) :
       arr = []
-      for i in xrange(self.dimension):
+      for i in range(self.dimension):
         arr.append(self[i])
       return str(arr)
 
@@ -115,14 +113,12 @@ def toRealND(*args):
     else:
         return RealND(*args)
 
-class __RealNDs(RealNDs):
-    __metaclass__ = esutil.ExtendBaseClass
-    # string conversion
+class __RealNDs(RealNDs, metaclass=esutil.ExtendBaseClass):
     def __str__(self) :
 	arr = []
-	for i in xrange(self.dimension):
+	for i in range(self.dimension):
             arr_i = []
-	    for j in xrange(self[i].dimension):
+	    for j in range(self[i].dimension):
 		arr_i.append(str(self[i][j]))
             arr.append(arr_i)
 	return str(arr)

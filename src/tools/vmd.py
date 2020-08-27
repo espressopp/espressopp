@@ -38,12 +38,12 @@ IMD_KILL,       \
 IMD_MDCOMM,     \
 IMD_PAUSE,      \
 IMD_TRATE,      \
-IMD_IOERROR = range(10)
+IMD_IOERROR = list(range(10))
 
 def handshake(initsock):
-  print "before"
+  print("before")
   (sock, sock_port) = initsock.accept()
-  print "after"
+  print("after")
   header = struct.Struct('!II')
   msg    = header.pack(IMD_HANDSHAKE, IMDVERSION)
   sock.send(msg)
@@ -56,13 +56,13 @@ def handshake(initsock):
   if len(res) == 1:
     msg = struct.unpack('!II',sock.recv(8))
     if msg[0] == IMD_GO:
-      print "VMD sent IMD_GO"
+      print("VMD sent IMD_GO")
       return sock
     else:
-      print "unexpected answer from VMD"
+      print("unexpected answer from VMD")
       return 0
   else:
-    print "VMD did not answer."
+    print("VMD did not answer.")
     return 0
 
 def drain_socket(sock):
@@ -104,7 +104,7 @@ def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
     except:
       port += 1
   if port == 65000:
-    print "no free port for vmd socket found."
+    print("no free port for vmd socket found.")
     return initsock
 
   vmdfile = open("vmd.tcl","w")

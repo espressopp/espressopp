@@ -39,7 +39,7 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 	   angles    = []
 	if return_dihedrals == True:
 	   dihedrals    = []
-	for i in xrange(numberOfMonomers-1):
+	for i in range(numberOfMonomers-1):
 	  if mindist and i > 0:
 		while True:
 		  if rng==None:

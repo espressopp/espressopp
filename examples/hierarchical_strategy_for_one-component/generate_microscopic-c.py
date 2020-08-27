@@ -38,8 +38,8 @@ skin        = 0.3
 timestep    = 0.005
 box         = (L, L, L)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 #logging.getLogger("SteepestDescent").setLevel(logging.INFO)
 
@@ -113,19 +113,19 @@ system.addInteraction(interFENE, 'FENE')
 #system.addInteraction(interCosine)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'length of system    = ', L
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('length of system    = ', L)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 

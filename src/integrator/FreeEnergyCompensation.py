@@ -90,8 +90,7 @@ class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensat
               return self.cxxclass.computeCompEnergy(self)
 
 if pmi.isController :
-    class FreeEnergyCompensation(Extension):
-        __metaclass__ = pmi.Proxy
+    class FreeEnergyCompensation(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.FreeEnergyCompensationLocal',
             pmiproperty = [ 'itype', 'filename'],

@@ -125,8 +125,7 @@ class BerendsenBarostatAnisotropicLocal(ExtensionLocal, integrator_BerendsenBaro
       cxxinit(self, integrator_BerendsenBarostatAnisotropic, system)
 
 if pmi.isController:
-  class BerendsenBarostatAnisotropic(Extension):
-    __metaclass__ = pmi.Proxy
+  class BerendsenBarostatAnisotropic(Extension, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.integrator.BerendsenBarostatAnisotropicLocal',
       pmiproperty = [ 'tau', 'pressure' ]

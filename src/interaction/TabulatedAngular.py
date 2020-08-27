@@ -264,22 +264,19 @@ if pmi.isController:
             pmiproperty = ['itype', 'filename']
             )
 
-    class FixedTripleListTabulatedAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTabulatedAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTabulatedAngularLocal',
             pmicall = ['setPotential', 'getFixedTripleList']
             )
 
-    class FixedTripleListTypesTabulatedAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTypesTabulatedAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTypesTabulatedAngularLocal',
             pmicall = ['setPotential','getPotential', 'setFixedTripleList', 'getFixedTripleList']
         )
 
-    class FixedTripleListPIadressTabulatedAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListPIadressTabulatedAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListPIadressTabulatedAngularLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedTripleList', 'getFixedTripleList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']

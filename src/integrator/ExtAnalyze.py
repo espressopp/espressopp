@@ -60,8 +60,7 @@ class ExtAnalyzeLocal(ExtensionLocal, integrator_ExtAnalyze):
            cxxinit(self, integrator_ExtAnalyze, action_obj, interval)
 
 if pmi.isController :
-    class ExtAnalyze(Extension):
-        __metaclass__ = pmi.Proxy
+    class ExtAnalyze(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtAnalyzeLocal',
         )

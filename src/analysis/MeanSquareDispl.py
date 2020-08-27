@@ -68,12 +68,11 @@ class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl)
       return self.cxxclass.computeG3(self)
 
     def strange(self):
-      print 1
+      print(1)
       return 1
 
 if pmi.isController:
-  class MeanSquareDispl(ConfigsParticleDecomp):
-    __metaclass__ = pmi.Proxy
+  class MeanSquareDispl(ConfigsParticleDecomp, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.analysis.MeanSquareDisplLocal',
       pmiproperty = [ 'print_progress' ],

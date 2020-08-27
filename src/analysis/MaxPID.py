@@ -43,8 +43,7 @@ class MaxPIDLocal(ObservableLocal, analysis_MaxPID):
             cxxinit(self, analysis_MaxPID, system)
 
 if pmi.isController :
-    class MaxPID(Observable):
-        __metaclass__ = pmi.Proxy
+    class MaxPID(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.MaxPIDLocal'
             )

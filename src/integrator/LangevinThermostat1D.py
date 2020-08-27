@@ -47,8 +47,7 @@ class LangevinThermostat1DLocal(ExtensionLocal, integrator_LangevinThermostat1D)
     #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
-    class LangevinThermostat1D(Extension):
-        __metaclass__ = pmi.Proxy
+    class LangevinThermostat1D(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostat1DLocal',
             pmiproperty = [ 'gamma', 'temperature', 'adress', 'direction' ]

@@ -63,8 +63,8 @@ timestep    = 0.005
 
 box         = (L, L, L)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
@@ -83,7 +83,7 @@ thermostat.temperature = temperature
 integrator.addExtension(thermostat)
 
 nsteps      = int((thermostat.gamma/29.5788)*num_chains*(2.*monomers_per_chain)**3)
-print "nsteps =", nsteps
+print("nsteps =", nsteps)
 
 # set coarse-grained polymer properties
 bondlen            = 0.97
@@ -111,7 +111,7 @@ for i in range(num_chains):
       res_positions = espressopp.Real3D((float(parameters[6 - i_diff]) + 2.*L)%L,
                                         (float(parameters[7 - i_diff]) + 2.*L)%L,
                                         (float(parameters[8 - i_diff]) + 2.*L)%L)
-      print i*monomers_per_chain + j, " ", res_positions
+      print(i*monomers_per_chain + j, " ", res_positions)
       radius = float(parameters[10 - i_diff])
       part = [res_positions, radius]
       cg_chain.append(part)
@@ -186,7 +186,7 @@ for i in range(num_particles/num_constrain):
   tuple = []
   for j in range(num_constrain):
     tuple.append(num_constrain*i + j + 1)
-    print num_constrain*i + j + 1
+    print(num_constrain*i + j + 1)
   tuplelist.addTuple(tuple)
 
 # VSphere pair with Verlet list
@@ -230,34 +230,34 @@ thermostatOnRadius.temperature = temperature
 # Calculate the mean square internal distance
 def calculate_msid():
   msid = []
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid.append(0.)
 
-  for i in xrange(num_chains):
+  for i in range(num_chains):
     pid = i*monomers_per_chain + 1
     particle = system.storage.getParticle(pid)
     dmy_p = []
     dmy_ele = []
-    for j in xrange(3):
+    for j in range(3):
       dmy_ele.append(particle.pos[j])
     dmy_p.append(dmy_ele)
-    for j in xrange(1, monomers_per_chain):
+    for j in range(1, monomers_per_chain):
       pid += 1
       particle = system.storage.getParticle(pid)
       diff = []
-      for k in xrange(3):
+      for k in range(3):
         x_i = particle.pos[k] - dmy_p[j - 1][k]
         x_i = x_i - round(x_i/L)*L
         diff.append(x_i + dmy_p[j - 1][k])
       dmy_p.append(diff)
-    for j in xrange(monomers_per_chain):
-      for k in xrange(j + 1, monomers_per_chain):
+    for j in range(monomers_per_chain):
+      for k in range(j + 1, monomers_per_chain):
         dist = 0.
-        for l in xrange(3):
+        for l in range(3):
           dist += (dmy_p[k][l] - dmy_p[j][l])**2
         msid[k - j - 1] += dist
 
-  for i in xrange(monomers_per_chain - 1):
+  for i in range(monomers_per_chain - 1):
     msid[i] = msid[i]/(monomers_per_chain - i -1)/num_chains
 
   return msid
@@ -268,19 +268,19 @@ def calculate_signal():
   msid = calculate_msid()
   dev = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
   index = min([monomers_per_chain, 25])
-  for i in xrange(index - 1):
+  for i in range(index - 1):
     dev[i] = (msid[i]/(i + 1) - msid_ideal[i])/msid_ideal[i]
-  print "#current error",
+  print("#current error", end=' ')
   for r in dev:
-    print r,
-  print "end"
+    print(r, end=' ')
+  print("end")
   #print "#current msid", msid[5]/6., msid[6]/7., msid[7]/8., msid[8]/9.
   signal = 0.
-  for i in xrange(5, index - 2):
+  for i in range(5, index - 2):
     if fabs(dev[i]) > 0.005:
       if fabs(dev[i]) > 0.015 or msid[i]/(i + 1) < msid[i - 1]/i:
         signal = 1.
-  for i in xrange(1, 4):
+  for i in range(1, 4):
     if fabs(dev[i]) > 0.005:
       if fabs(dev[i]) > 0.02 or dev[i] < 0.:
         signal = 1.
@@ -290,18 +290,18 @@ def calculate_signal():
 #############################################
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 
@@ -311,7 +311,7 @@ espressopp.tools.pdb.pqrwrite(filename, system, monomers_per_chain, False)
 t_scale = 1
 
 # Start strucrure relaxation 1
-print "only bond interaction"
+print("only bond interaction")
 start_time = time.clock()
 espressopp.tools.analyse.info(system, integrator)
 for k in range(16):
@@ -320,14 +320,14 @@ for k in range(16):
 #integratorOnRadius.disconnect()
 espressopp.tools.pdb.pqrwrite("bond.pdb", system, monomers_per_chain, False)
 
-print "bond+bend interaction"
+print("bond+bend interaction")
 system.addInteraction(interCosine)
 for k in range(16):
   integrator.run(isteps*t_scale)
   espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond_bend.pdb", system, monomers_per_chain, False)
 
-print "bond+bend+nonbond1 interaction"
+print("bond+bend+nonbond1 interaction")
 system.addInteraction(interSP)
 # Start strucrure relaxation 1
 for k in range(16):
@@ -339,14 +339,14 @@ for i in range(num_chains):
   for j in range(i + 1, num_chains):
     interSP.setPotential(type1=i, type2=j, potential=potSP)
 
-print "bond+bend+nonbond2 interaction"
+print("bond+bend+nonbond2 interaction")
 # Start strucrure relaxation 2
 for k in range(16):
   integrator.run(isteps*t_scale)
   espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond_bend_nonbond2.pdb", system, monomers_per_chain, False)
 
-print "Calculation start"
+print("Calculation start")
 espressopp.System.removeInteractionByName(system, 'Constrain_COM')
 integrator.addExtension(integratorOnRadius)
 integrator.addExtension(thermostatOnRadius)

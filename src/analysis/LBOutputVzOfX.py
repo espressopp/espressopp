@@ -54,8 +54,7 @@ class LBOutputVzOfXLocal(LBOutputLocal, analysis_LBOutput_VzOfX):
             cxxinit(self, analysis_LBOutput_VzOfX, system, latticeboltzmann)
 
 if pmi.isController :
-    class LBOutputVzOfX(LBOutput):
-        __metaclass__ = pmi.Proxy
+    class LBOutputVzOfX(LBOutput, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.LBOutputVzOfXLocal',
             pmicall = ["writeOutput"]

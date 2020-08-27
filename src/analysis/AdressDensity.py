@@ -74,8 +74,7 @@ class AdressDensityLocal(ObservableLocal, analysis_AdressDensity):
     return self.cxxclass.compute(self, bins)
 
 if pmi.isController :
-  class AdressDensity(Observable):
-    __metaclass__ = pmi.Proxy
+  class AdressDensity(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ 'addExclusions', 'compute' ],
       cls = 'espressopp.analysis.AdressDensityLocal'

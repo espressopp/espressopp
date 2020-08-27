@@ -89,7 +89,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
     
     for n in range(numInteraction):
 	interaction=system.getInteraction(n)
-	print "expanding interaction", interaction
+	print("expanding interaction", interaction)
 	if interaction.bondType() == espressopp.interaction.Nonbonded:
 	    for i in range(P):	
 		for j in range(numtypes):
@@ -140,7 +140,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 	system.addInteraction(interb)
 	kineticTermInteractions.update({m:interb})
 
-    for idcla, idpi in ringids.iteritems():
+    for idcla, idpi in ringids.items():
 	p=allParticlesById[idcla]
 	mass=p[propDict['mass']]
 	interactionList=kineticTermInteractions[mass].getFixedPairList() #find the appropriate interaction based on the mass

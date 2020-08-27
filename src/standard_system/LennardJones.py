@@ -60,7 +60,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
 
     
   if xyzfilename and xyzrfilename:
-     print "ERROR: only one of xyzfilename (only xyz data) or xyzrfilename (additional particle radius data) can be provided."
+     print("ERROR: only one of xyzfilename (only xyz data) or xyzrfilename (additional particle radius data) can be provided.")
      sys.exit(1)
 
   if xyzrfilename: 
@@ -73,7 +73,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
     num_particles = len(pidf)
   else:
     if box[0]<=0 or box[1]<=0 or box[2]<=0:
-      print "WARNING: no valid box size specified, box size set to (100,100,100) !"    
+      print("WARNING: no valid box size specified, box size set to (100,100,100) !")    
     
   system         = espressopp.System()
   system.rng     = espressopp.esutil.RNG()
@@ -97,7 +97,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
   if xyzrfilename: 
     new_particles = []
     props     = ['id', 'type', 'mass', 'pos', 'v', 'radius']
-    for idx in xrange(num_particles):
+    for idx in range(num_particles):
       part = [ pidf[idx], typef[idx], mass,
                espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
                espressopp.Real3D(xvelf[idx],yvelf[idx],zvelf[idx]),
@@ -112,7 +112,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
   elif xyzfilename: 
     new_particles = []
     props     = ['id', 'type', 'mass', 'pos', 'v']
-    for idx in xrange(num_particles):
+    for idx in range(num_particles):
       part = [ pidf[idx], typef[idx], mass,
                espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
                espressopp.Real3D(xvelf[idx],yvelf[idx],zvelf[idx])]

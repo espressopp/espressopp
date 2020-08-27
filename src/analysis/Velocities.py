@@ -57,8 +57,7 @@ class VelocitiesLocal(ObservableLocal, analysis_Velocities):
         return self.cxxclass.all(self).__iter__()
 
 if pmi.isController :
-    class Velocities(Observable):
-        __metaclass__ = pmi.Proxy
+    class Velocities(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.VelocitiesLocal',
             pmicall = [ "gather", "clear" ],

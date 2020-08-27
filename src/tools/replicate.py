@@ -39,9 +39,9 @@ def replicate (bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
   x_replicated = x[:]
   y_replicated = y[:]
   z_replicated = z[:]
-  for i in xrange(xdim):
-    for j in xrange(ydim):
-      for k in xrange(zdim):
+  for i in range(xdim):
+    for j in range(ydim):
+      for k in range(zdim):
         if(i + j + k != 0):
           for x_, y_, z_ in zip(x, y, z):
             x_replicated.append(x_ + i * Lx)
@@ -53,9 +53,9 @@ def replicate (bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
   num_particles_original = len(x)
   bonds_replicated = bonds[:]
   angles_replicated = angles[:]
-  for i in xrange(xdim):
-    for j in xrange(ydim):
-      for k in xrange(zdim):
+  for i in range(xdim):
+    for j in range(ydim):
+      for k in range(zdim):
         if(i + j + k != 0):
           ct = ct + 1
           for p1, p2 in bonds:

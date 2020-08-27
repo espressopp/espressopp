@@ -70,16 +70,16 @@ def _setupLogging():
 _setupLogging()
 
 def _setupProperty():
-    import __builtin__
+    import builtins
 
     # Make the property setter decorator syntax of python 2.6+ available
     # to earlier versions
     try :
-        __setter = __builtin__.property.setter
+        __setter = builtins.property.setter
     except AttributeError :
-        import __builtin__, sys
+        import builtins, sys
         # save the property builtin
-        _property = __builtin__.property
+        _property = builtins.property
         # now define our property
         # stolen from http://bruynooghe.blogspot.com/2008/04/xsetter-syntax-in-python-25.html 
         class property(_property):
@@ -89,7 +89,7 @@ def _setupProperty():
 
             def setter(self, fset):
                 cls_ns = sys._getframe(1).f_locals
-                for k, v in cls_ns.iteritems():
+                for k, v in cls_ns.items():
                     if v == self:
                         propname = k
                         break
@@ -99,7 +99,7 @@ def _setupProperty():
 
             def deleter(self, fdel):
                 cls_ns = sys._getframe(1).f_locals
-                for k, v in cls_ns.iteritems():
+                for k, v in cls_ns.items():
                     if v == self:
                         propname = k
                         break
@@ -108,6 +108,6 @@ def _setupProperty():
                 return cls_ns[propname]
 
         # Now override the property builtin
-        __builtin__.property = property
+        builtins.property = property
 
 _setupProperty()

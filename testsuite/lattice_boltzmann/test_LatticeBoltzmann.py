@@ -54,7 +54,7 @@ class TestPureLB(unittest.TestCase):
         self.runSteps = runSteps
 
     def test_purelb(self):
-        print "Checking athermal LB fluid"
+        print("Checking athermal LB fluid")
 
         # set initial populations
         global initDen, initVel
@@ -66,7 +66,7 @@ class TestPureLB(unittest.TestCase):
         self.check_averages(initVel)
 
     def test_thermallb(self):
-        print "Checking stochastic LB fluid with sin-wave initialization"
+        print("Checking stochastic LB fluid with sin-wave initialization")
 
         # set initial populations
         global initDen, initVel, initVelSin
@@ -101,7 +101,7 @@ class TestPureLB(unittest.TestCase):
             av_den /= area_yz
             av_j /= area_yz
 
-            print av_den, av_j
+            print(av_den, av_j)
 
             self.assertAlmostEqual(av_den, initDen, places=2)
             self.assertAlmostEqual(av_j[0], _v, places=2)

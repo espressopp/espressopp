@@ -30,9 +30,9 @@ from espressopp.tools import lattice
 import random
 import sys
 
-print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-print "+ Multisystem simulations are still possible but have to be setup manually.     +"
-print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+print("+ Multisystem simulations are still possible but have to be setup manually.     +")
+print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 sys.exit(0) 
          
@@ -50,7 +50,7 @@ ptrng=random
 ptrng.seed(335977)
 
 if espressopp.MPI.COMM_WORLD.size != 4:
-  print "currently this example can only be run with 4 CPUs"
+  print("currently this example can only be run with 4 CPUs")
   sys.exit(0)
 
 # Parallel Tempering (replica exchange) integrator
@@ -97,10 +97,10 @@ for i in range(0, pt.getNumberOfSystems()):
 for p in range(100):
     pt.run(100)
     multiT     = pt._multisystem.runAnalysisTemperature()
-    print "%s" % multiT
+    print("%s" % multiT)
 
 for p in range(10):
     pt.run(200)
     pt.exchange()
     multiT     = pt._multisystem.runAnalysisTemperature()
-    print "%s" % multiT
+    print("%s" % multiT)

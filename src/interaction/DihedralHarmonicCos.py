@@ -90,8 +90,7 @@ if pmi.isController:
       pmiproperty = ['K', 'phi']
     )
 
-  class FixedQuadrupleListDihedralHarmonicCos(Interaction):
-    __metaclass__ = pmi.Proxy
+  class FixedQuadrupleListDihedralHarmonicCos(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.FixedQuadrupleListDihedralHarmonicCosLocal',
       pmicall = ['setPotential', 'getFixedQuadrupleList']

@@ -99,8 +99,7 @@ if pmi.isController:
             pmiproperty = ['k_rg'],
             )
 
-    class FixedLocalTupleListConstrainRG(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedLocalTupleListConstrainRG(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedLocalTupleListConstrainRGLocal',
             pmicall = ['getPotential', 'setRG']

@@ -42,8 +42,7 @@ class NormalVariateLocal(esutil_NormalVariate):
             cxxinit(self, esutil_NormalVariate, mean, sigma)
 
 if pmi.isController:
-    class NormalVariate(object):
-        __metaclass__ = pmi.Proxy
+    class NormalVariate(object, metaclass=pmi.Proxy):
         """A random normal variate."""
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.NormalVariateLocal',

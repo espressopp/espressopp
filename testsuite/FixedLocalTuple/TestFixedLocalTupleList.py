@@ -56,15 +56,15 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,system.skin)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
         
-        print 'NodeGrid = %s'%(nodeGrid,)
-        print 'CellGrid = %s'%(cellGrid,)
+        print('NodeGrid = %s'%(nodeGrid,))
+        print('CellGrid = %s'%(cellGrid,))
 
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         pid = 0
 
-        for i in xrange(N):
-            for j in xrange(N):
-                for k in xrange(N):
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
                     
                     r = 0.5
                     x = (i + r) / N * SIZE
@@ -75,9 +75,9 @@ class TestFixedLocalTupleList(unittest.TestCase) :
 
                     pid = pid + 1
 
-        for i in xrange(N):
-            for j in xrange(N):
-                for k in xrange(N):
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
                     
                     r = 0.25
                     x = (i + r) / N * SIZE

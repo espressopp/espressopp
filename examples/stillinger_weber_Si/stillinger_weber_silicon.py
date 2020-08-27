@@ -81,10 +81,10 @@ for line in lines:
     num_particles = int(line.split()[0])
     count=1
   elif count==1:
-    Lx, Ly, Lz = map(float, line.split()[0:3])
+    Lx, Ly, Lz = list(map(float, line.split()[0:3]))
     count=2
   elif(count==2):
-    id1, type1, x, y, z, vx, vy, vz = map(float, line.split()[0:8])
+    id1, type1, x, y, z, vx, vy, vz = list(map(float, line.split()[0:8]))
     coord.append( Real3D(x,y,z) )
     vel.append( Real3D(vx,vy,vz) )
 
@@ -117,15 +117,15 @@ for pid in range(num_particles):
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
-print ''
-print 'number of particles =', num_particles
-print 'timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep)
-print 'box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
-        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz)
-print 'density = %.4f' % (density)
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep))
+print('box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
+        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz))
+print('density = %.4f' % (density))
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # Stillinger Weber pair potential (similar to other short range pair nonbonded interactions)
 vl = espressopp.VerletList(system, cutoff=rc)
@@ -190,7 +190,7 @@ lT.gamma       = 1.0
 lT.temperature = desiredT
 integrator.addExtension(lT)
 
-print 'Equilibration.'
+print('Equilibration.')
 in_time = time.time()
 espressopp.tools.analyse.info(system, integrator)
 for i in range (10):
@@ -205,7 +205,7 @@ nprints = 5
 ncycles = 2
 nruns = 100
 
-print '\n Measurements!'
+print('\n Measurements!')
 
 rdf_array_total = []
 
@@ -227,7 +227,7 @@ for i in range (nprints):
   espressopp.tools.analyse.info(system, integrator)
 
 fin_time = time.time()
-print '\ngeneral running time: ', (fin_time-in_time)
+print('\ngeneral running time: ', (fin_time-in_time))
 
 # printing radial distribution function
 nameFile = 'rdf.dat'

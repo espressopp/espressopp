@@ -29,10 +29,8 @@ from espressopp import esutil
 
 # This injects additional methods into the Tensor class and pulls it
 # into this module 
-class __Tensor(Tensor) :
+class __Tensor(Tensor, metaclass=esutil.ExtendBaseClass) :
 
-
-    __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Tensor.__init__
     def __init__(self, *args):

@@ -33,14 +33,14 @@ L = pow(N/d, 1.0/3)
 system, integrator = espressopp.standard_system.PolymerMelt(Nchains, Mmonomers,(10,10,10), dt = 0.005, temperature=1.0)
 
 
-print "starting warmup"
+print("starting warmup")
 org_dt = integrator.dt
 pot = system.getInteraction(0).getPotential(0,0)
-print pot
-print "Nint = ", system.getNumberOfInteractions()
+print(pot)
+print("Nint = ", system.getNumberOfInteractions())
 final_sigma = pot.sigma
 final_epsilon = pot.epsilon
-print "sigma=",pot.sigma, "epsilon=",pot.epsilon
+print("sigma=",pot.sigma, "epsilon=",pot.epsilon)
 maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
 N = 1
 number = 50
@@ -70,7 +70,7 @@ for k in range(10):
   espressopp.tools.analyse.info(system, integrator)
 integrator.step = 0
 
-print "warmup finished"
+print("warmup finished")
 
 for k in range(10):
   integrator.run(100)

@@ -126,7 +126,7 @@ def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff
     if masses[pid-1] < massCutoff:
       hydrogenIDs.append(pid)
   # then find hydrogen-containing bonds
-  for bid, bondlist in bondtypes.iteritems():
+  for bid, bondlist in bondtypes.items():
     for pair in bondlist:
       pidHyd = pidHea = 0
       if pair[0] in hydrogenIDs:
@@ -136,14 +136,14 @@ def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff
         pidHyd = pair[1]
         pidHea = pair[0]
       if (pidHyd > 0):
-        if pidHea in constrainedBondsDict.keys():
+        if pidHea in list(constrainedBondsDict.keys()):
           constrainedBondsDict[pidHea].append(pidHyd)
         else:
           constrainedBondsDict[pidHea] = [pidHyd]
         constraintDistances[(pidHea,pidHyd)] = bondtypeparams[bid].parameters['b0']
   
   constrainedBondsList = []
-  for pidHea in constrainedBondsDict.keys():
+  for pidHea in list(constrainedBondsDict.keys()):
     for pidHyd in constrainedBondsDict[pidHea]:
       constrainedBondsList.append([pidHea,pidHyd,constraintDistances[(pidHea,pidHyd)],masses[pidHea-1],masses[pidHyd-1]])
 

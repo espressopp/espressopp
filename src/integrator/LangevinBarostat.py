@@ -180,8 +180,7 @@ class LangevinBarostatLocal(ExtensionLocal, integrator_LangevinBarostat):
       cxxinit(self, integrator_LangevinBarostat, system, rng, temperature)
 
 if pmi.isController :
-  class LangevinBarostat(Extension):
-    __metaclass__ = pmi.Proxy
+  class LangevinBarostat(Extension, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.integrator.LangevinBarostatLocal',
       pmiproperty = [ 'gammaP', 'pressure', 'mass' ],

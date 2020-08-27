@@ -184,15 +184,13 @@ if pmi.isController:
                       'sigma2', 'cutoff1', 'cutoff2']
     )
 
-  class VerletListStillingerWeberTripleTerm(Interaction):
-    __metaclass__ = pmi.Proxy
+  class VerletListStillingerWeberTripleTerm(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.VerletListStillingerWeberTripleTermLocal',
       pmicall = ['setPotential', 'getPotential','getVerletListTriple']
     )
     
-  class FixedTripleListStillingerWeberTripleTerm(Interaction):
-    __metaclass__ = pmi.Proxy
+  class FixedTripleListStillingerWeberTripleTerm(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.FixedTripleListStillingerWeberTripleTermLocal',
       pmicall = ['setPotential','getFixedTripleList']

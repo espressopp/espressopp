@@ -105,8 +105,7 @@ if pmi.isController:
             pmiproperty = ['k_com'],
             )
 
-    class FixedLocalTupleListConstrainCOM(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedLocalTupleListConstrainCOM(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedLocalTupleListConstrainCOMLocal',
             pmicall = ['getPotential', 'setCom']

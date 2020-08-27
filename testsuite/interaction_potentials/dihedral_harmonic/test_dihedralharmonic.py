@@ -104,7 +104,7 @@ class TestDihedralHarmonic(unittest.TestCase):
 
         #add torsions
         interactions = []
-        for i in xrange(3):
+        for i in range(3):
           fql = espressopp.FixedQuadrupleList(self.system.storage)
           fql.addQuadruples([torsiontuples[i]])
           interaction = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(self.system,fql,potential=espressopp.interaction.DihedralHarmonic(K=1.0,phi0=phi0[i]*math.pi/180.0))

@@ -84,8 +84,7 @@ if pmi.isController:
             pmiproperty = ['K', 'theta0']
             )
 
-    class FixedTripleListCosine(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListCosineLocal',
             pmicall = ['setPotential','getFixedTripleList']

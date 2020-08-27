@@ -222,36 +222,31 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma']
             )
 
-    class VerletListLennardJonesAutoBonds(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesAutoBondsLocal',
             pmicall = ['setPotential','getPotential','getVerletList']
             )
 
-    class VerletListAdressLennardJonesAutoBonds(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesAutoBondsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
-    class VerletListHadressLennardJonesAutoBonds(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesAutoBondsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListLennardJonesAutoBonds(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesAutoBondsLocal',
             pmicall = ['setPotential']
             )
         
-    class FixedPairListLennardJonesAutoBonds(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesAutoBondsLocal',
             pmicall = ['setPotential']

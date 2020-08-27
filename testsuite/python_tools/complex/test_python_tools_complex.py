@@ -65,7 +65,7 @@ class TestPythonTools(unittest.TestCase):
 
         restraint_interactions = espressopp.tools.applyBoreschRestraints(self.system,restraintAtoms,restraintK,restraintR0)
         dhdlRstr = 0.0
-        for rt in restraint_interactions.values(): dhdlRstr+=rt.computeEnergy() #energyDeriv = energy for restraints
+        for rt in list(restraint_interactions.values()): dhdlRstr+=rt.computeEnergy() #energyDeriv = energy for restraints
         self.assertAlmostEqual(dhdlRstr,141.92348724,places=5)
 
     def test_self_excl_energy(self):

@@ -75,8 +75,7 @@ class SingleParticlePotentialLocal(object):
             return self.cxxclass.computeForce(self, toReal3DFromVector(position), bc)
 
 if pmi.isController:
-    class SingleParticlePotential(object):
-        __metaclass__ = pmi.Proxy
+    class SingleParticlePotential(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = ['computeForce', 'computeEnergy'],
             )

@@ -153,15 +153,13 @@ if pmi.isController:
             cls='espressopp.interaction.DihedralRBLocal'
             )
 
-    class FixedQuadrupleListDihedralRB(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.interaction.FixedQuadrupleListDihedralRBLocal',
             pmicall=['setPotential', 'getFixedQuadrupleList']
             )
 
-    class FixedQuadrupleListTypesDihedralRB(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTypesDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralRBLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

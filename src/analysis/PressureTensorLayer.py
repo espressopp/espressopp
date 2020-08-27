@@ -90,8 +90,7 @@ class PressureTensorLayerLocal(AnalysisBaseLocal, analysis_PressureTensorLayer):
             cxxinit(self, analysis_PressureTensorLayer, system, h0, dh)
 
 if pmi.isController:
-    class PressureTensorLayer(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class PressureTensorLayer(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.PressureTensorLayerLocal',
             pmiproperty = [ 'h0', 'dh' ]

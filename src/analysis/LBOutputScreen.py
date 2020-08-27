@@ -55,8 +55,7 @@ class LBOutputScreenLocal(LBOutputLocal, analysis_LBOutput_Screen):
             cxxinit(self, analysis_LBOutput_Screen, system, latticeboltzmann)
             
 if pmi.isController :
-    class LBOutputScreen(LBOutput):
-        __metaclass__ = pmi.Proxy
+    class LBOutputScreen(LBOutput, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.LBOutputScreenLocal',
             pmicall = ["writeOutput", "getLBMom", "getMDMom"]

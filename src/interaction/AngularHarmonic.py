@@ -123,8 +123,7 @@ if pmi.isController:
             pmiproperty = ['K', 'theta0']
             )
 
-    class FixedTripleListAngularHarmonic(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListAngularHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListAngularHarmonicLocal',
             pmicall = ['setPotential', 'getFixedTripleList']

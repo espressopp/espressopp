@@ -51,8 +51,8 @@ espressopp.ParticleGroup
 		:rtype: 
 """
 import _espressopp
-import esutil
-import pmi
+from . import esutil
+from . import pmi
 from espressopp.esutil import cxxinit
 
 class ParticleGroupLocal(_espressopp.ParticleGroup):
@@ -79,8 +79,7 @@ class ParticleGroupLocal(_espressopp.ParticleGroup):
             return self.cxxclass.size(self)
 
 if pmi.isController:
-    class ParticleGroup(object):
-        __metaclass__ = pmi.Proxy
+    class ParticleGroup(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.ParticleGroupLocal',
             pmicall = [ "add", "show", "has", "size" ]

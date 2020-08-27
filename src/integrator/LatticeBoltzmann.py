@@ -260,8 +260,7 @@ class LatticeBoltzmannLocal(ExtensionLocal, integrator_LatticeBoltzmann):
                     system, nodeGrid, a, tau, numDims, numVels)
 
 if pmi.isController :
-    class LatticeBoltzmann(Extension):
-        __metaclass__ = pmi.Proxy
+    class LatticeBoltzmann(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
                             cls = 'espressopp.integrator.LatticeBoltzmannLocal',
                             pmiproperty = ['nodeGrid', 'a', 'tau', 'numDims', 'numVels', 'visc_b', 'visc_s', 'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff', 'nSteps', 'profStep', 'getMyNi'],

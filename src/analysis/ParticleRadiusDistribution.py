@@ -43,8 +43,7 @@ class ParticleRadiusDistributionLocal(AnalysisBaseLocal, analysis_ParticleRadius
             cxxinit(self, analysis_ParticleRadiusDistribution, system)
 
 if pmi.isController :
-    class ParticleRadiusDistribution(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class ParticleRadiusDistribution(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ParticleRadiusDistributionLocal'
             )

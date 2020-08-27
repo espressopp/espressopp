@@ -114,8 +114,7 @@ class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
     return self.cxxclass.computePathIntegral(self, rdfN)
 
 if pmi.isController :
-  class RDFatomistic(Observable):
-    __metaclass__ = pmi.Proxy
+  class RDFatomistic(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute", "computePathIntegral" ],
       cls = 'espressopp.analysis.RDFatomisticLocal'

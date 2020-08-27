@@ -78,20 +78,20 @@ em_gamma = 0.0001
 em_ftol = 10.0
 
 # print ESPResSo++ version and compile info
-print espressopp.Version().info()
+print(espressopp.Version().info())
 # print simulation parameters (useful to have them in a log file)
-print "Npart              = ", Npart
-print "rho                = ", rho
-print "L                  = ", L
-print "box                = ", box 
-print "r_cutoff           = ", r_cutoff
-print "skin               = ", skin
-print "temperature        = ", temperature
-print "dt                 = ", dt
-print "epsilon            = ", epsilon
-print "sigma              = ", sigma
-print "equil_nloops       = ", equil_nloops
-print "equil_isteps       = ", equil_isteps
+print("Npart              = ", Npart)
+print("rho                = ", rho)
+print("L                  = ", L)
+print("box                = ", box) 
+print("r_cutoff           = ", r_cutoff)
+print("skin               = ", skin)
+print("temperature        = ", temperature)
+print("dt                 = ", dt)
+print("epsilon            = ", epsilon)
+print("sigma              = ", sigma)
+print("equil_nloops       = ", equil_nloops)
+print("equil_isteps       = ", equil_isteps)
 
 ########################################################################
 # 2. setup of the system, random number geneartor and parallelisation  #
@@ -114,20 +114,20 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, r_cutoff, s
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print "NCPUs              = ", NCPUs
-print "nodeGrid           = ", nodeGrid
-print "cellGrid           = ", cellGrid
+print("NCPUs              = ", NCPUs)
+print("nodeGrid           = ", nodeGrid)
+print("cellGrid           = ", cellGrid)
 
 
 ########################################################################
 # 3. adding the particles                                              #
 ########################################################################
 
-print('adding {} particles to the system ...'.format(Npart))
+print(('adding {} particles to the system ...'.format(Npart)))
 particle_list = [(pid, system.bc.getRandomPos()) for pid in range(Npart)]
 system.storage.addParticles(particle_list, 'id', 'pos')
 system.storage.decompose()
-print('added {} particles'.format(Npart))
+print(('added {} particles'.format(Npart)))
 
 ########################################################################
 # 4. setting up interaction potential for the equilibration            #
@@ -147,8 +147,8 @@ potential   = interaction.setPotential(type1=0, type2=0,
                                        epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
 
 # 5. Run EM
-print('Running energy minimization, ftol={} max_displacement={}, steps={}, gamma={}'.format(
-  em_ftol, 0.001*L, warmup_isteps, em_gamma))
+print(('Running energy minimization, ftol={} max_displacement={}, steps={}, gamma={}'.format(
+  em_ftol, 0.001*L, warmup_isteps, em_gamma)))
 #import logging
 #logging.getLogger('MinimizeEnergy').setLevel(logging.DEBUG)
 minimize_energy = espressopp.integrator.MinimizeEnergy(system, em_gamma, em_ftol, 0.001*L)
@@ -192,7 +192,7 @@ integrator.resetTimers()
 # set integrator time step to zero again
 integrator.step = 0
 
-print "starting equilibration ..."
+print("starting equilibration ...")
 # print inital status information
 espressopp.tools.analyse.info(system, integrator)
 for step in range(equil_nloops):
@@ -200,7 +200,7 @@ for step in range(equil_nloops):
   integrator.run(equil_isteps)
   # print status information
   espressopp.tools.analyse.info(system, integrator)
-print "equilibration finished"
+print("equilibration finished")
 
 ########################################################################
 # 8. writing configuration to file                                     #
@@ -212,12 +212,12 @@ print "equilibration finished"
 # second line     : box_Lx, box_Ly, box_Lz
 # all other lines : ParticleID  ParticleType  x_pos  y_pos  z_pos  x_vel  y_vel  z_vel 
 filename = "lennard_jones_fluid_%0i.xyz" % integrator.step
-print "writing final configuration file ..." 
+print("writing final configuration file ...") 
 espressopp.tools.writexyz(filename, system, velocities = True, unfolded = False)
 
 # also write a PDB file which can be used to visualize configuration with VMD
-print "writing pdb file ..."
+print("writing pdb file ...")
 filename = "lennard_jones_fluid_%0i.pdb" % integrator.step
 espressopp.tools.pdbwrite(filename, system, molsize=Npart)
 
-print "finished."
+print("finished.")

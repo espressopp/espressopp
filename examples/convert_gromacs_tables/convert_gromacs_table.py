@@ -61,10 +61,10 @@ files = [tabfile, fileout]                # run simulation on these files
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
 
-print '\n-- GROMACS Tabulated File Conversion Test -- \n'
-print 'Steps: %3s' % nsteps
-print 'Particles: %3s' % numParticles
-print 'Cutoff: %3s' % cutoff
+print('\n-- GROMACS Tabulated File Conversion Test -- \n')
+print('Steps: %3s' % nsteps)
+print('Particles: %3s' % numParticles)
+print('Cutoff: %3s' % cutoff)
 
 
 # writes the tabulated potential file
@@ -84,13 +84,13 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile.close()
 
 # write the espressopp++ tabulated file for a LJ potential
-print 'Generating potential file ... (%2s)' % tabfile
+print('Generating potential file ... (%2s)' % tabfile)
 potLJ = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=0.0, cutoff=cutoff)
 writeTabFile(potLJ, tabfile, N=1500, low=0.01, high=potLJ.cutoff)
 
 
 # convert gromacs tabulated file to espressopp++ format
-print 'Converting GROMACS file to ESPResSo++ file ... (%2s -> %2s)' % (filein, fileout)
+print('Converting GROMACS file to ESPResSo++ file ... (%2s -> %2s)' % (filein, fileout))
 gromacs.convertTable(filein, fileout, sigma, epsilon, c6, c12)
 
 #exit() # exit if you just want to convert a file
@@ -107,7 +107,7 @@ def calcNumberCells(size, nodes, cutoff):
 
 # run simulation for all tabulated potential files
 for potfile in files:
-    print '\nUsing file: %0s'% potfile
+    print('\nUsing file: %0s'% potfile)
         
     # set up system
     system = espressopp.System()
@@ -173,8 +173,8 @@ for potfile in files:
     Ep = interTab.computeEnergy()
         
         
-    print 'Start %5s: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' \
-        % ("", Ek + Ep, Ep, Ek, temperature, p)
+    print('Start %5s: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' \
+        % ("", Ek + Ep, Ep, Ek, temperature, p))
         
     # langevin thermostat
     langevin = espressopp.integrator.LangevinThermostat(system)
@@ -187,9 +187,9 @@ for potfile in files:
     p = press.compute()
     Ek = 0.5 * temperature * (3 * numParticles)
     Ep = interTab.computeEnergy()
-    print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' % \
-            (nsteps, Ek + Ep, Ep, Ek, temperature, p)
+    print('Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' % \
+            (nsteps, Ek + Ep, Ep, Ek, temperature, p))
        
     os.system('rm '+potfile) # remove file
 
-print '\nDone.'
+print('\nDone.')

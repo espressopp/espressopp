@@ -43,8 +43,7 @@ class IsokineticLocal(ExtensionLocal, integrator_Isokinetic):
             cxxinit(self, integrator_Isokinetic, system)
 
 if pmi.isController :
-    class Isokinetic(Extension):
-        __metaclass__ = pmi.Proxy
+    class Isokinetic(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.integrator.IsokineticLocal',
           pmiproperty = [ 'temperature', 'coupling' ]

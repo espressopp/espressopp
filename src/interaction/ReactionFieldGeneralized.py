@@ -348,43 +348,37 @@ if pmi.isController:
             pmiproperty = ['prefactor']#['qq']
             )
 
-    class VerletListReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListReactionFieldGeneralizedLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class VerletListAdressATReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressATReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressATReactionFieldGeneralizedLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class VerletListAdressReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressReactionFieldGeneralizedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListHadressATReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressATReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressATReactionFieldGeneralizedLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class VerletListHadressReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressReactionFieldGeneralizedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListReactionFieldGeneralized(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListReactionFieldGeneralizedLocal',
             pmicall = ['setPotential']

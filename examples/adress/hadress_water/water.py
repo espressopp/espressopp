@@ -178,7 +178,7 @@ potCG = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rca) # CG
 for n in range(system.getNumberOfInteractions()):
     interaction=system.getInteraction(n)
     if interaction.bondType() == espressopp.interaction.Nonbonded:
-	print "Setting CG interaction", typeCG
+	print("Setting CG interaction", typeCG)
 	interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
 	break
 
@@ -207,16 +207,16 @@ integrator.addExtension(adress)
 espressopp.tools.AdressDecomp(system, integrator)
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 configurations = espressopp.analysis.Configurations(system)
@@ -225,7 +225,7 @@ temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 pressureTensor = espressopp.analysis.PressureTensor(system)
 
-print "i*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal"
+print("i*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
 
 start_time = time.clock()
@@ -241,14 +241,14 @@ for i in range(check):
     P = pressure.compute()
     Eb = 0
     EAng = 0
-    for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-    for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
+    for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
     ELj= ljinteraction.computeEnergy()
     EQQ= qq_interactions.computeEnergy()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+EQQ+ELj
     outfile.write(fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
-    print (fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
+    print((fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal)))
 
     integrator.run(steps/check) # print out every steps/check steps
 

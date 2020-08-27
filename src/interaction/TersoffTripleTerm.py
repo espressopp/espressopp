@@ -172,15 +172,13 @@ if pmi.isController:
                       'c', 'd', 'theta0', 'cutoff1', 'cutoff2']
     )
 
-  class VerletListTersoffTripleTerm(Interaction):
-    __metaclass__ = pmi.Proxy
+  class VerletListTersoffTripleTerm(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.VerletListTersoffTripleTermLocal',
       pmicall = ['setPotential', 'getPotential','getVerletListTriple']
     )
     
-  class FixedTripleListTersoffTripleTerm(Interaction):
-    __metaclass__ = pmi.Proxy
+  class FixedTripleListTersoffTripleTerm(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.interaction.FixedTripleListTersoffTripleTermLocal',
       pmicall = ['setPotential','getFixedTripleList']

@@ -47,8 +47,7 @@ class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquar
           cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength, start_pid)
 
 if pmi.isController:
-  class MeanSquareInternalDist(ConfigsParticleDecomp):
-    __metaclass__ = pmi.Proxy
+  class MeanSquareInternalDist(ConfigsParticleDecomp, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
       pmiproperty = [ 'print_progress' ]

@@ -26,7 +26,7 @@ import mpi4py.MPI as MPI
 
 class TestCollectives(unittest.TestCase):
     def testLocate(self):
-        for owner in xrange(MPI.COMM_WORLD.size - 1):
+        for owner in range(MPI.COMM_WORLD.size - 1):
             if pmi.isController:        
                 res = collectives.locateItem((owner == MPI.COMM_WORLD.rank))
                 self.assertEqual(res, owner)

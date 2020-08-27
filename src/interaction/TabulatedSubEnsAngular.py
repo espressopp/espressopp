@@ -128,15 +128,13 @@ if pmi.isController:
 				       'colVarRef_get']
             )
 
-    class FixedTripleListTabulatedSubEnsAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTabulatedSubEnsAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTabulatedSubEnsAngularLocal',
             pmicall = ['setPotential', 'getFixedTripleList']
             )
 
-    class FixedTripleListTypesTabulatedSubEnsAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTypesTabulatedSubEnsAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTypesTabulatedSubEnsAngularLocal',
             pmicall = ['setPotential','getPotential', 'setFixedTripleList', 'getFixedTripleList']

@@ -128,8 +128,7 @@ class BerendsenBarostatLocal(ExtensionLocal, integrator_BerendsenBarostat):
       cxxinit(self, integrator_BerendsenBarostat, system)
 
 if pmi.isController:
-  class BerendsenBarostat(Extension):
-    __metaclass__ = pmi.Proxy
+  class BerendsenBarostat(Extension, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls =  'espressopp.integrator.BerendsenBarostatLocal',
       pmiproperty = [ 'tau', 'pressure', 'fixed' ]

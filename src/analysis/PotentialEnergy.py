@@ -57,8 +57,7 @@ class PotentialEnergyLocal(ObservableLocal, analysis_PotentialEnergy):
                 cxxinit(self, analysis_PotentialEnergy, system, interaction, compute_method == 'AT')
 
 if pmi.isController:
-    class PotentialEnergy(Observable):
-        __metaclass__ = pmi.Proxy
+    class PotentialEnergy(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.analysis.PotentialEnergyLocal',
             pmiproperty=['value']

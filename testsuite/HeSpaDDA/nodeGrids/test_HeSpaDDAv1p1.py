@@ -58,7 +58,7 @@ slabMS=[1,0,0]
 
 class TestOneScale(unittest.TestCase):
 	def test_OneScaleHDD(self):
-		print "Checking the domain decomposition for a heterogeneous (oneScale) MD simulations"
+		print("Checking the domain decomposition for a heterogeneous (oneScale) MD simulations")
 		# set bassic parameters
 		global box_size,rc,skin
 		for i in range(1,11):

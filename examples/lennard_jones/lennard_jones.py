@@ -104,28 +104,28 @@ equil_nloops       = 100
 equil_isteps       = 100
 
 # print ESPResSo++ version and compile info
-print espressopp.Version().info()
+print(espressopp.Version().info())
 # print simulation parameters (useful to have them in a log file)
-print "Npart              = ", Npart
-print "rho                = ", rho
-print "L                  = ", L
-print "box                = ", box 
-print "r_cutoff           = ", r_cutoff
-print "skin               = ", skin
-print "temperature        = ", temperature
-print "dt                 = ", dt
-print "epsilon            = ", epsilon
-print "sigma              = ", sigma
-print "warmup_cutoff      = ", warmup_cutoff
-print "warmup_nloops      = ", warmup_nloops
-print "warmup_isteps      = ", warmup_isteps
-print "total_warmup_steps = ", total_warmup_steps
-print "epsilon_start      = ", epsilon_start
-print "epsilon_end        = ", epsilon_end
-print "epsilon_delta      = ", epsilon_delta
-print "capradius          = ", capradius
-print "equil_nloops       = ", equil_nloops
-print "equil_isteps       = ", equil_isteps
+print("Npart              = ", Npart)
+print("rho                = ", rho)
+print("L                  = ", L)
+print("box                = ", box) 
+print("r_cutoff           = ", r_cutoff)
+print("skin               = ", skin)
+print("temperature        = ", temperature)
+print("dt                 = ", dt)
+print("epsilon            = ", epsilon)
+print("sigma              = ", sigma)
+print("warmup_cutoff      = ", warmup_cutoff)
+print("warmup_nloops      = ", warmup_nloops)
+print("warmup_isteps      = ", warmup_isteps)
+print("total_warmup_steps = ", total_warmup_steps)
+print("epsilon_start      = ", epsilon_start)
+print("epsilon_end        = ", epsilon_end)
+print("epsilon_delta      = ", epsilon_delta)
+print("capradius          = ", capradius)
+print("equil_nloops       = ", equil_nloops)
+print("equil_isteps       = ", equil_isteps)
 
 ########################################################################
 # 2. setup of the system, random number geneartor and parallelisation  #
@@ -148,9 +148,9 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, warmup_cuto
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print "NCPUs              = ", NCPUs
-print "nodeGrid           = ", nodeGrid
-print "cellGrid           = ", cellGrid
+print("NCPUs              = ", NCPUs)
+print("nodeGrid           = ", nodeGrid)
+print("cellGrid           = ", cellGrid)
 
 ########################################################################
 # 3. setup of the integrator and simulation ensemble                   #
@@ -178,7 +178,7 @@ if (temperature != None):
 # 4. adding the particles                                              #
 ########################################################################
 
-print "adding ", Npart, " particles to the system ..." 
+print("adding ", Npart, " particles to the system ...") 
 for pid in range(Npart):
   # get a 3D random coordinate within the box
   pos = system.bc.getRandomPos()
@@ -212,7 +212,7 @@ interaction.setPotential(type1=0, type2=0, potential=LJpot)
 
 # make the force capping interaction known to the system
 system.addInteraction(interaction)
-print "starting warm-up ..."
+print("starting warm-up ...")
 # print some status information (time, measured temperature, pressure,
 # pressure tensor (xy only), kinetic energy, potential energy, total energy, boxsize)
 espressopp.tools.analyse.info(system, integrator)
@@ -225,7 +225,7 @@ for step in range(warmup_nloops):
   interaction.setPotential(type1=0, type2=0, potential=LJpot)
   # print status info
   espressopp.tools.analyse.info(system, integrator)  
-print "warmup finished"
+print("warmup finished")
 # remove the force capping interaction from the system
 system.removeInteraction(0) 
 # the equilibration uses a different interaction cutoff therefore the current
@@ -263,7 +263,7 @@ integrator.resetTimers()
 # set integrator time step to zero again
 integrator.step = 0
 
-print "starting equilibration ..."
+print("starting equilibration ...")
 # print inital status information
 espressopp.tools.analyse.info(system, integrator)
 for step in range(equil_nloops):
@@ -271,7 +271,7 @@ for step in range(equil_nloops):
   integrator.run(equil_isteps)
   # print status information
   espressopp.tools.analyse.info(system, integrator)
-print "equilibration finished"
+print("equilibration finished")
 
 ########################################################################
 # 9. writing configuration to file                                     #
@@ -283,12 +283,12 @@ print "equilibration finished"
 # second line     : box_Lx, box_Ly, box_Lz
 # all other lines : ParticleID  ParticleType  x_pos  y_pos  z_pos  x_vel  y_vel  z_vel 
 filename = "lennard_jones_fluid_%0i.xyz" % integrator.step
-print "writing final configuration file ..." 
+print("writing final configuration file ...") 
 espressopp.tools.writexyz(filename, system, velocities = True, unfolded = False)
 
 # also write a PDB file which can be used to visualize configuration with VMD
-print "writing pdb file ..."
+print("writing pdb file ...")
 filename = "lennard_jones_fluid_%0i.pdb" % integrator.step
 espressopp.tools.pdbwrite(filename, system, molsize=Npart)
 
-print "finished."
+print("finished.")

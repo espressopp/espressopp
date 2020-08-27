@@ -86,8 +86,7 @@ class VelocityVerletRESPALocal(MDIntegratorLocal, integrator_VelocityVerletRESPA
             return self.cxxclass.getmultistep(self)
 
 if pmi.isController :
-    class VelocityVerletRESPA(MDIntegrator):
-        __metaclass__ = pmi.Proxy
+    class VelocityVerletRESPA(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls =  'espressopp.integrator.VelocityVerletRESPALocal',
           pmiproperty = ['multistep'],

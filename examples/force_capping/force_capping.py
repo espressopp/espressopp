@@ -62,5 +62,5 @@ for i in range(1000):
   if forceCapping and i>100:
     capForce.disconnect()
     forceCapping = False
-    print "switching off force capping"
+    print("switching off force capping")
 

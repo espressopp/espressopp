@@ -98,8 +98,7 @@ if pmi.isController:
             pmiproperty = ['K1', 'K2', 'K3', 'K4']
             )
 
-    class FixedQuadrupleListOPLS(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListOPLS(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListOPLSLocal',
             pmicall = ['setPotential']

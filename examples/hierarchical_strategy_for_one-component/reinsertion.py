@@ -89,8 +89,8 @@ box         = (L, L, L)
 
 random.seed(seed)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 system         = espressopp.System()
 system.rng     = espressopp.esutil.RNG()
@@ -262,45 +262,45 @@ for i in range(num_particles/num_constrain):
   #print "Add tuple", tuple
   tuplelist.addTuple(tuple)
 
-print "Init LJ Pair"
+print("Init LJ Pair")
 potLJ   = espressopp.interaction.LennardJones(epsilon, sigma, cutoff=rc_lj, shift=0)
-print 'Generating potential files ... (%2s)\n' % (tabfileLJ)
+print('Generating potential files ... (%2s)\n' % (tabfileLJ))
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=rc_lj)
 potTabLJ = espressopp.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc_lj)
 interLJ = espressopp.interaction.FixedPairListTabulated(system, bondlist, potTabLJ)
 system.addInteraction(interLJ)
 
-print "Init FENE"
+print("Init FENE")
 # FENE bonds
 potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
-print 'Generating potential files ... (%2s)\n' % (tabfileFENE)
+print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)
 potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)
 interFENE = espressopp.interaction.FixedPairListTabulated(system, bondlist, potTabFENE)
 system.addInteraction(interFENE)
 
-print "Init COM"
+print("Init COM")
 # Constrain COM
 potCOM = espressopp.interaction.ConstrainCOM(k_com)
 interCOM = espressopp.interaction.FixedLocalTupleListConstrainCOM(system, tuplelist, potCOM)
 interCOM.setCom(softblobs_chain)
 system.addInteraction(interCOM, 'Constrain_COM')
 
-print "Init RG"
+print("Init RG")
 # Constrain RG
 potRG = espressopp.interaction.ConstrainRG(k_rg)
 interRG = espressopp.interaction.FixedLocalTupleListConstrainRG(system, tuplelist, potRG)
 interRG.setRG(softblobs_chain)
 system.addInteraction(interRG, 'Constrain_RG')
 
-print "Init SoftCosine"
+print("Init SoftCosine")
 # Soft repulsive interaction
 vl      = espressopp.VerletList(system, cutoff = 0.97)
 potSC   = espressopp.interaction.SoftCosine(A = 3.0, cutoff = 0.97)
 interSC = espressopp.interaction.VerletListSoftCosine(vl)
 interSC.setPotential(type1 = 0, type2 = 0, potential = potSC)
 
-print "Init Bending"
+print("Init Bending")
 # Cosine with FixedTriple list
 potCosine = espressopp.interaction.Cosine(K=0.912/2., theta0=0.)
 interCosine = espressopp.interaction.FixedTripleListCosine(system, anglelist, potCosine)
@@ -309,18 +309,18 @@ interCosine = espressopp.interaction.FixedTripleListCosine(system, anglelist, po
 #espressopp.tools.pdb.pqrwrite(filename, system, monomers_per_chain, False)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 

@@ -77,8 +77,7 @@ class AdressLocal(ExtensionLocal, integrator_Adress):
                 cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI, regionupdates, multistep)
 
 if pmi.isController:
-    class Adress(Extension):
-        __metaclass__ = pmi.Proxy
+    class Adress(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.integrator.AdressLocal' #,
             #pmiproperty = [ 'builds' ],

@@ -83,8 +83,7 @@ if pmi.isController:
             pmiproperty = ['k', 'center']
             )
 
-    class SingleParticleHarmonicTrap(Interaction):
-        __metaclass__ = pmi.Proxy
+    class SingleParticleHarmonicTrap(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.SingleParticleHarmonicTrapLocal',
             pmicall = ['setPotential']

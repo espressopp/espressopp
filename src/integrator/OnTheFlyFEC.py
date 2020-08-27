@@ -102,8 +102,7 @@ class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
               return self.cxxclass.getIterations(self)      
 
 if pmi.isController :
-    class OnTheFlyFEC(Extension):
-        __metaclass__ = pmi.Proxy
+    class OnTheFlyFEC(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.OnTheFlyFECLocal',
             pmiproperty = [ 'gap', 'steps', 'bins'],

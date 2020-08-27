@@ -162,20 +162,17 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'delta']
             )
 
-    class VerletListLennardJonesExpand(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesExpandLocal',
             pmicall = ['setPotential','getPotential']
             )
-    class CellListLennardJonesExpand(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesExpandLocal',
             pmicall = ['setPotential']
             )
-    class FixedPairListLennardJonesExpand(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesExpandLocal',
             pmicall = ['setPotential']

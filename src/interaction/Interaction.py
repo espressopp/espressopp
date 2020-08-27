@@ -68,7 +68,7 @@ from espressopp import pmi
 from _espressopp import interaction_Interaction
 
 
-unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = range(7)
+unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = list(range(7))
 
 class InteractionLocal(object):
 
@@ -103,9 +103,8 @@ class InteractionLocal(object):
             return int(self.cxxclass.bondType(self))
 
 if pmi.isController :
-    class Interaction(object):
+    class Interaction(object, metaclass=pmi.Proxy):
 
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
             )

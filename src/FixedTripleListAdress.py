@@ -83,8 +83,7 @@ class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
                 self.cxxclass.add(self, pid1, pid2, pid3)
 
 if pmi.isController:
-    class FixedTripleListAdress(object):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListAdress(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListAdressLocal',
             localcall = [ "add" ],

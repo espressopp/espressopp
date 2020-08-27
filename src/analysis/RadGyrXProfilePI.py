@@ -67,8 +67,7 @@ class RadGyrXProfilePILocal(ObservableLocal, analysis_RadGyrXProfilePI):
     return self.cxxclass.compute(self, bins, ntrotter, ptype)
 
 if pmi.isController :
-  class RadGyrXProfilePI(Observable):
-    __metaclass__ = pmi.Proxy
+  class RadGyrXProfilePI(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
       cls = 'espressopp.analysis.RadGyrXProfilePILocal'

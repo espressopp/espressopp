@@ -23,7 +23,7 @@ from espressopp.tools import readxyz
 import time
 
 def generate_vl(useBuffers):
-  print 'VERLET LIST {}USING BUFFERS'.format('NOT ' if not useBuffers else '')
+  print('VERLET LIST {}USING BUFFERS'.format('NOT ' if not useBuffers else ''))
   nsteps      = 1
   isteps      = 10
   #
@@ -87,9 +87,9 @@ def sort_pairs(pairs):
 
 class TestVerletListBuffer(unittest.TestCase):
   def test1vl(self):
-    print '-'*70
+    print('-'*70)
     pairs1 = sort_pairs(generate_vl(False))
-    print '-'*70
+    print('-'*70)
     pairs2 = sort_pairs(generate_vl(True))
 
     # ensure the same pairs are generated

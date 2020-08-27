@@ -114,7 +114,6 @@ if pmi.isController:
   class GravityTruncated(Potential):
     pmiproxydefs = dict( cls = 'espressopp.interaction.GravityTruncatedLocal', pmiproperty = [ 'prefactor' ] )
 
-  class VerletListGravityTruncated(Interaction):
-    __metaclass__ = pmi.Proxy
+  class VerletListGravityTruncated(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListGravityTruncatedLocal',
     pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )

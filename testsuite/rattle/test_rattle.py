@@ -111,7 +111,7 @@ class TestRattle(unittest.TestCase):
 
         #check velocities after 5 steps of deterministic simulation
         vsum = 0.0
-        for pid in xrange(1,6):
+        for pid in range(1,6):
           part = self.system.storage.getParticle(pid)
           vsum += sqrlen(part.v)
         self.assertAlmostEqual(vsum,0.3842668659,places=6)

@@ -128,8 +128,7 @@ if pmi.isController:
             pmiproperty = ['K', 'theta0']
             )
 
-    class FixedTripleListAngularCosineSquared(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListAngularCosineSquared(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListAngularCosineSquaredLocal',
             pmicall = ['setPotential','getFixedTripleList']

@@ -155,13 +155,13 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.removeInteraction(self, interaction_id)
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
-                for k, v in self._interaction2id.iteritems()
+                for k, v in self._interaction2id.items()
                 }
             self._interaction_pid = max(self._interaction2id.values()) + 1
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
-            return {k: self.getInteraction(v) for k, v in self._interaction2id.items()}
+            return {k: self.getInteraction(v) for k, v in list(self._interaction2id.items())}
 
     def getNumberOfInteractions(self):
 
@@ -200,7 +200,7 @@ class SystemLocal(_espressopp.System):
                 #print args, " has iterator and length 1"
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
               else:
-                print args, " is invalid"
+                print(args, " is invalid")
             else:
               #print args, " is scalar"
               self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
@@ -208,7 +208,7 @@ class SystemLocal(_espressopp.System):
             #print args, " is 3 numbers"
             self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
-            print args, " is invalid"
+            print(args, " is invalid")
           
     def setTrace(self, switch):
 
@@ -216,8 +216,7 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.setTrace(self, switch)
 
 if pmi.isController:
-  class System(object):
-    __metaclass__ = pmi.Proxy
+  class System(object, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       cls = 'espressopp.SystemLocal',
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],

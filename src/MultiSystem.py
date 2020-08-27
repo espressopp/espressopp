@@ -83,7 +83,7 @@ class MultiSystemLocal(object):
             if pmi._PMIComm.getMPIsubcomm() != MPI.COMM_NULL:
                 self.groupRank = pmi._PMIComm.getMPIsubcomm().rank
             else:
-                print "_MPIsubcomm is MPI.COMM_NULL"
+                print("_MPIsubcomm is MPI.COMM_NULL")
         else:
             self.groupRank = pmi._MPIcomm.rank
 
@@ -130,9 +130,8 @@ class MultiSystemLocal(object):
             self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
 
 if pmi.isController :
-    class MultiSystem(object):
+    class MultiSystem(object, metaclass=pmi.Proxy):
         """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.MultiSystemLocal',
             pmicall = [ 'setIntegrator', 'runIntegrator', 'setAnalysisTemperature', 'beginSystemDefinition',

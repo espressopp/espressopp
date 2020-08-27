@@ -65,23 +65,23 @@ num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
-print '\n-- Tabulated Potentials Test --\n'
-print 'Steps: %3s' % steps
-print 'Particles: %3s' % num_particles
-print 'Cutoff: %3s' % rc
-print 'Density = %.4f' % (density)
-print 'dt =', timestep
-print 'Skin =', skin
-print 'nvt =', nvt
-print 'halfCellInt = ', halfCellInt
+print('\n-- Tabulated Potentials Test --\n')
+print('Steps: %3s' % steps)
+print('Particles: %3s' % num_particles)
+print('Cutoff: %3s' % rc)
+print('Density = %.4f' % (density))
+print('dt =', timestep)
+print('Skin =', skin)
+print('nvt =', nvt)
+print('halfCellInt = ', halfCellInt)
 
 comm = MPI.COMM_WORLD
 
 nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin, halfCellInt)
-print "nodeGrid =", nodeGrid
-print "cellGrid =", cellGrid
-print "particles/cell =", 1.0*num_particles/(cellGrid[0]*cellGrid[1]*cellGrid[2])
+print("nodeGrid =", nodeGrid)
+print("cellGrid =", cellGrid)
+print("particles/cell =", 1.0*num_particles/(cellGrid[0]*cellGrid[1]*cellGrid[2]))
 
 # writes the tabulated file
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
@@ -112,7 +112,7 @@ potLJ  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False
 potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
 
-print 'Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine)
+print('Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine))
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=potLJ.cutoff)
 writeTabFile(potFENE, tabfileFENE, N=257, low=0.0001, high=1.49)
 writeTabFile(potCosine, tabfileCosine, N=257, low=0.0001, high=3.14, body=3)
@@ -125,9 +125,9 @@ potTabCosine = espressopp.interaction.TabulatedAngular(itype=spline, filename = 
 for tabulation in [True, False]:
     if tabulation: w = ''
     else: w = 'out'
-    print 'Running simulation with%0s tabulated potentials' % w
+    print('Running simulation with%0s tabulated potentials' % w)
         
-    print 'Setting up ...'
+    print('Setting up ...')
     system = espressopp.System()
     system.rng = espressopp.esutil.RNG(54321)
     system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
@@ -233,4 +233,4 @@ for tabulation in [True, False]:
     timers.show(integrator.getTimers(), precision=2)
 
 #os.system('rm '+tabfileLJ+' '+tabfileFENE+' '+tabfileCosine)
-print '\nDone.'
+print('\nDone.')

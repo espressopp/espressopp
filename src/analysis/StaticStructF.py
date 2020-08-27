@@ -94,7 +94,7 @@ class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
     else:
       #run computeSingleChain on each CPU
       result = self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
-      print result #this line is in case the outfile causes problems
+      print(result) #this line is in case the outfile causes problems
       #create the outfile only on CPU 0
       if pmi.isController:
         myofile = 'qsq_singleChain' + str(ofile) + '.txt'
@@ -106,8 +106,7 @@ class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
       return result
 
 if pmi.isController:
-  class StaticStructF(Observable):
-    __metaclass__ = pmi.Proxy
+  class StaticStructF(Observable, metaclass=pmi.Proxy):
     pmiproxydefs = dict(
       pmicall = [ "compute", "computeSingleChain" ],
       cls = 'espressopp.analysis.StaticStructFLocal'

@@ -44,8 +44,7 @@ class VelocityVerletOnRadiusLocal(ExtensionLocal, integrator_VelocityVerletOnRad
             cxxinit(self, integrator_VelocityVerletOnRadius, system, dampingmass)
 
 if pmi.isController :
-    class VelocityVerletOnRadius(Extension):
-        __metaclass__ = pmi.Proxy
+    class VelocityVerletOnRadius(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.VelocityVerletOnRadiusLocal',
             pmiproperty = [ 'radialDampingMass' ]

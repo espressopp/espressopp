@@ -310,36 +310,31 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
             )
 
-    class VerletListLennardJonesCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
 
-    class VerletListAdressLennardJonesCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
             
-    class VerletListHadressLennardJonesCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
 
-    class CellListLennardJonesCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
         
-    class FixedPairListLennardJonesCapped(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesCappedLocal',
             pmicall = ['setPotential']

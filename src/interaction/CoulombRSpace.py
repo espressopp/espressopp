@@ -185,7 +185,6 @@ if pmi.isController:
   class CoulombRSpace(Potential):
     pmiproxydefs = dict( cls = 'espressopp.interaction.CoulombRSpaceLocal', pmiproperty = [ 'prefactor', 'alpha'] )
 
-  class VerletListCoulombRSpace(Interaction):
-    __metaclass__ = pmi.Proxy
+  class VerletListCoulombRSpace(Interaction, metaclass=pmi.Proxy):
     pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListCoulombRSpaceLocal',
     pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )
