@@ -151,8 +151,15 @@ endif(NOT Boost_FOUND)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-find_package(MPI4PY 3.0.0 REQUIRED)
-include_directories(${MPI4PY_INCLUDES})
+option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
+
+if(EXTERNAL_MPI4PY)
+  find_package(MPI4PY 3.0.0 REQUIRED)
+  include_directories(${MPI4PY_INCLUDES})
+else(EXTERNAL_MPI4PY)
+  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.3/src/mpi4py/include)
+  set(MPI4PY_LIBRARIES MPI)
+endif(EXTERNAL_MPI4PY)
 
 # Required for acconfig.h
 include_directories(${CMAKE_BINARY_DIR}/src)
@@ -167,6 +174,7 @@ endif()
 # Include the following subdirectory #
 ######################################
 add_subdirectory(src)
+add_subdirectory(contrib)
 set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
 add_subdirectory(testsuite)
 
