@@ -31,7 +31,7 @@ Description
 ...
 
 
-.. function:: espressopp.__RealND(\*args)
+.. function:: espressopp.RealND(\*args)
 
         :param \*args:
         :type \*args:

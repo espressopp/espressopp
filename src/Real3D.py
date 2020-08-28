@@ -25,12 +25,12 @@ espressopp.Real3D
 *****************
 
 
-.. function:: espressopp.__Real3D(\*args)
+.. function:: espressopp.Real3D(\*args)
 
                 :param \*args:
                 :type \*args:
 
-.. function:: espressopp.__Real3D.x(v, [0)
+.. function:: espressopp.Real3D.x(v, [0)
 
                 :param v:
                 :param [0:
@@ -38,7 +38,7 @@ espressopp.Real3D
                 :type [0:
                 :rtype:
 
-.. function:: espressopp.__Real3D.y(v, [1)
+.. function:: espressopp.Real3D.y(v, [1)
 
                 :param v:
                 :param [1:
@@ -46,7 +46,7 @@ espressopp.Real3D
                 :type [1:
                 :rtype:
 
-.. function:: espressopp.__Real3D.z(v, [2)
+.. function:: espressopp.Real3D.z(v, [2)
 
                 :param v:
                 :param [2:

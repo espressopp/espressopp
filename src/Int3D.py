@@ -25,12 +25,12 @@ espressopp.Int3D
 ****************
 
 
-.. function:: espressopp.__Int3D(\*args)
+.. function:: espressopp.Int3D(\*args)
 
                 :param \*args:
                 :type \*args:
 
-.. function:: espressopp.__Int3D.x(v, [0)
+.. function:: espressopp.Int3D.x(v, [0)
 
                 :param v:
                 :param [0:
@@ -38,7 +38,7 @@ espressopp.Int3D
                 :type [0:
                 :rtype:
 
-.. function:: espressopp.__Int3D.y(v, [1)
+.. function:: espressopp.Int3D.y(v, [1)
 
                 :param v:
                 :param [1:
@@ -46,7 +46,7 @@ espressopp.Int3D
                 :type [1:
                 :rtype:
 
-.. function:: espressopp.__Int3D.z(v, [2)
+.. function:: espressopp.Int3D.z(v, [2)
 
                 :param v:
                 :param [2:
@@ -113,6 +113,7 @@ def extend_class():
     Int3D.__str__ = lambda self: str((self[0], self[1], self[2]))
     Int3D.__repr__ = lambda self: 'Int3D' + str(self)
 
+extend_class()
 
 def toInt3DFromVector(*args):
     """Try to convert the arguments to a Int3D.
