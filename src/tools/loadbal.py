@@ -1,5 +1,5 @@
 #  Copyright (C) 2020(H)
-#      Jozef Stefan Institute 
+#      Jozef Stefan Institute
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013,2017,2018(H)
 #      Max Planck Institute for Polymer Research
@@ -28,18 +28,18 @@ loadbal - HeSpaDDA load balancing python functions
 
 
 *  `qbicity(box_size,rc,skin)`:
-    
+
     It's a function to check the system size cubicity, with a tolerance given by the rc+skin
-    `dLnorm` - (Lx,Ly,Lz)/Lmax 
+    `dLnorm` - (Lx,Ly,Lz)/Lmax
 
 *  `changeIndex(dN,ima,imi)`:
 
-    It's a function that sorts the nodeGrid, according to the index of the maximum size of the 
+    It's a function that sorts the nodeGrid, according to the index of the maximum size of the
     box (ima) and its corresponding minimum (imi)
-    
+
 *  `nodeGridSizeCheck(node_gridX,node_gridY,node_gridZ)`:
 
-    It's a function that verifies if it is worthy to take care of special DD for inhomogeneous 	  
+    It's a function that verifies if it is worthy to take care of special DD for inhomogeneous
     systems, otherwise the homogenous DD is triggered and returned as a xyz flags
     nodeGridSizeCheck(node_gridX,node_gridY,node_gridZ)
 
@@ -50,40 +50,40 @@ loadbal - HeSpaDDA load balancing python functions
 
 *  `fullDecomp(adrCenter1D,rc_skin,eh_size,fullCores1D,cellsX,ratioMS,sizeX,idealGas)`:
 
-    It's a function that decomposes the full box in one Dimension(1D) and it is assuming that the load 
-    in terms of No. of particles is not homogeneous but localized in regions/cells of higher load "EH" an lower load "CG".  
+    It's a function that decomposes the full box in one Dimension(1D) and it is assuming that the load
+    in terms of No. of particles is not homogeneous but localized in regions/cells of higher load "EH" an lower load "CG".
 
 *  `addHsymmetry(halfNeilListX,eh_size,rc_skin,node_gridX,cellsX,ratioMS,idealGas)`:
-    
+
     Its a function that uses the previously decomposed half-box (from halfDecomp) and unfolds it to
     match the whole Neighbors List. If it does not match the whole neighbor, due to any asymmetry in
-    the number of cores or the number of cells. It will be redistributed region by region by  
+    the number of cores or the number of cells. It will be redistributed region by region by
     considering the whole simulation box size.
 
 *  `adaptNeiList(neiListxin)`:
-    
+
     It's a function which adapts the number of cells that go into each core into the data structure of
     left and right cell lists for example for 4 cores and 8 cells [3,4,5,8] to [0,3,4,5,8]
 
 *  `reDistCellsHom(node_gridX,sizeX,rc_skin)`:
-    
+
     It's a function which distributes the cells into nodes as if they where homogeneous. It also
     applies to inhomogeneous system whenever there are less than 2 cores per direction: X, Y or Z.
 
 *  `reDistCells(halfNeilListX,cellsX,eh_size,rc_skin,node_gridX,ratioMS,idealGas)`:
-    
+
     It's a function which is matching proportion of cells to the cores on a dual resolution region
     basis
 
 *  `redistDeltaRandomly(wholeNeiListX,deltaCells,totNodesEH=0,biased=0)`:
-    
+
     It's a function which distributes the remaining DELTA cells into nodes semi-randomly. By default
     the biase applies to the CG-region and it assumes ther cannot be more than 3 extra cells to
     redistribute, because this is the total number of regions in the simulation box `|CG|EH|CG|` (by
     default the cg biased is left this could be updated in the dyn load balancing case!
 
 *  `findNodesMS(node_gridX,totCellsEH,totCellsCG,ratioMS,idealGas)`:
-    
+
     It's a function which normalizes the number of cells to go to the EH and CG regions and find the
     ideal corresponding number of Nodes EH and CG
 
@@ -203,7 +203,7 @@ def halfDecomp(adrCenter1D, rc_skin, eh_size, halfCores1D, cellsX, ratioMS, size
     return cellSizes
 
 
-# This function decomposes the whole box in one Dimension(1D) and it is assuming symmetry in the initial simulation box. Even with irregularities in the box dimension and cell-size relation it will find the full-Box-DD 
+# This function decomposes the whole box in one Dimension(1D) and it is assuming symmetry in the initial simulation box. Even with irregularities in the box dimension and cell-size relation it will find the full-Box-DD
 
 def fullDecomp(adrCenter1D,rc_skin,eh_size,fullCores1D,cellsX,ratioMS,sizeX,idealGas):
     pLoadIG=1   # this value is only in case the Ideal Gas will in reality improve any calculation or communication (i.e. Improve notoriously the sims parallelization, which is not the case yet)
@@ -264,7 +264,7 @@ def addHsymmetry(halfNeilListX, eh_size, rc_skin, node_gridX, cellsX, ratioMS, s
             print("HeSpaDDA message: The distributed cores are not matching the available ones (++ reDistCells())")
             # in the original implementation of halfCell the halfCellInt was ommited in the following call
             # I think, however, that it was just forgotten, so I put it here like to all other calls to reDistCells
-            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt) 
+            wholeNeilListX = reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, sizeX, idealGas, halfCellInt)
             # To be determined if additional reDitsCells should be called!
     elif len(halfNeilListX) == node_gridX and aux2 == 0:
         if sum(halfNeilListX) != cellsX:
@@ -334,7 +334,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
     totCellsCG = cellsX - totCellsEH
     totNodesCG, totNodesEH = findNodesMS(node_gridX, totCellsEH, totCellsCG, ratioMS, sizeX, eh_size, idealGas)
     print("HeSpaDDA message: Cores in Both LR and HR, are:", totNodesCG, totNodesEH)
-    if idealGas:	  # This represents the Ideal Gas (IG)!!! (OJO)
+    if idealGas:          # This represents the Ideal Gas (IG)!!! (OJO)
         wholeNeiListX_EH = []
         wholeNeiListX_CG = []
         wholeNeiListX = []
@@ -419,7 +419,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                 au1 = list(range(int(indCG1)))
                 # au1 contains the index of CG cells in the whole neighbor list
                 au1.extend(list(range(indEH1, indEH1 + indCG1)))
-                # internal parameter which in case of dynamic LB, if more weight of DD goes to the center by defaults (EH -region Flag =1) and hence DD focus on any CG-region (default value decomposes cells to CG).	preFactCen=ratioMS per default(OLD)
+                # internal parameter which in case of dynamic LB, if more weight of DD goes to the center by defaults (EH -region Flag =1) and hence DD focus on any CG-region (default value decomposes cells to CG).  preFactCen=ratioMS per default(OLD)
                 centralFlagEH = 1
                 # new stuff TO BE CHECKED
                 if centralFlagEH > 0:  # H's WL as well    #NHEW
@@ -436,7 +436,7 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                             # i was not the cubic root... yet
                             preFactCen = pow(i, 1. / 3.)
                             # if int(totCellsEHtemp)-1==int(totNodesEH):
-                            #	totCellsCG=totCellsCG+1
+                            #   totCellsCG=totCellsCG+1
                             print("HeSpaDDA message indexing: The rescaling preFactor for the Cells distribution is...an optimized value, like this:", preFactCen)
                             break
                             break  # the first value found for preFactCen takes you out of the for
@@ -527,7 +527,7 @@ def redistDeltaRandomly(wholeNeiListX, deltaCells, totNodesEH=0, biased=0):
     else:
         for p in range(0, int(deltaCells)):
             index = len(wholeNeiListX) - 1
-            if biased > 0 and biased < 3: 	            # Left biased!
+            if biased > 0 and biased < 3:                   # Left biased!
                 # Left CG region | * |  |  |
                 aux2 = randint(0, index - totNodesEH - 1)
                 nIndMin = 0

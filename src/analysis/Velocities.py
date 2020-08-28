@@ -27,16 +27,16 @@ espressopp.analysis.Velocities
 
 .. function:: espressopp.analysis.Velocities(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.Velocities.clear()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.Velocities.gather()
 
-		:rtype:
+                :rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

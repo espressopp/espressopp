@@ -33,39 +33,39 @@ NOTE:
 
 .. function:: espressopp.vectorization.VerletList(system, vec, cutoff, exclusionlist, build_order)
 
-		:param system:
-		:param vec: Vectorization object
-		:param cutoff:
-		:param exclusionlist: (default: [])
-		:type system:
-		:type vec:
-		:type cutoff:
-		:type exclusionlist:
+                :param system:
+                :param vec: Vectorization object
+                :param cutoff:
+                :param exclusionlist: (default: [])
+                :type system:
+                :type vec:
+                :type cutoff:
+                :type exclusionlist:
 
 .. function:: espressopp.vectorization.VerletList.exclude(exclusionlist)
 
-		:param exclusionlist:
-		:type exclusionlist:
-		:rtype:
+                :param exclusionlist:
+                :type exclusionlist:
+                :rtype:
 
-		Throws an error since exclusion lists are not supported.
+                Throws an error since exclusion lists are not supported.
 
 .. function:: espressopp.vectorization.VerletList.getAllPairs()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.vectorization.VerletList.localSize()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.vectorization.VerletList.totalSize()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.vectorization.VerletList.rebuildPairs()
 
-		Rebuilds the non-vectorized Particle pair list which is needed when calculating the energy
-		and virialduring the analysis stages.
+                Rebuilds the non-vectorized Particle pair list which is needed when calculating the energy
+                and virialduring the analysis stages.
 
 """
 from espressopp import pmi
@@ -121,16 +121,16 @@ class VerletListLocal(_espressopp.vectorization_VerletList):
             pairs=[]
             npairs=self.localSize()
             for i in range(npairs):
-              pair=self.cxxclass.getPair(self, i+1)
-              pairs.append(pair)
+                pair=self.cxxclass.getPair(self, i+1)
+                pairs.append(pair)
             return pairs
 
 
 if pmi.isController:
-  class VerletList(object, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      cls = 'espressopp.vectorization.VerletListLocal',
-      pmiproperty = [ 'builds' ],
-      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers','rebuildPairs'],
-      pmiinvoke = [ 'getAllPairs','getTimers' ]
-    )
+    class VerletList(object, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          cls = 'espressopp.vectorization.VerletListLocal',
+          pmiproperty = [ 'builds' ],
+          pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers','rebuildPairs'],
+          pmiinvoke = [ 'getAllPairs','getTimers' ]
+        )

@@ -2,19 +2,19 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,15 +27,15 @@ fluxes should be :math:`0`, i.e. :math:`j_{LB} + j_{MD} = 0`.
 
 .. py:class:: espressopp.analysis.LBOutputScreen(system,lb)
 
-	:param shared_ptr system: system object defined earlier in the python-script
-	:param lb_object lb: lattice boltzmann object defined earlier in the python-script
+        :param shared_ptr system: system object defined earlier in the python-script
+        :param lb_object lb: lattice boltzmann object defined earlier in the python-script
 
 Example:
 
->>> # initialise output to the screen 
+>>> # initialise output to the screen
 >>> outputScreen = espressopp.analysis.LBOutputScreen(system,lb)
 >>>
->>> # initialise external analysis object with previously created output object 
+>>> # initialise external analysis object with previously created output object
 >>> # and periodicity of invocation (steps):
 >>> extAnalysis = espressopp.integrator.ExtAnalyze(outputScreen,100)
 >>>

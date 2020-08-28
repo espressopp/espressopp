@@ -175,14 +175,14 @@ integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = dt
 # use a thermostat if the temperature is set
 if (temperature != None):
-  # create e Langevin thermostat
-  thermostat             = espressopp.integrator.LangevinThermostat(system)
-  # set Langevin friction constant
-  thermostat.gamma       = 1.0
-  # set temperature
-  thermostat.temperature = temperature
-  # tell the integrator to use this thermostat
-  integrator.addExtension(thermostat)
+    # create e Langevin thermostat
+    thermostat             = espressopp.integrator.LangevinThermostat(system)
+    # set Langevin friction constant
+    thermostat.gamma       = 1.0
+    # set temperature
+    thermostat.temperature = temperature
+    # tell the integrator to use this thermostat
+    integrator.addExtension(thermostat)
 
 ## steps 2. and 3. could be short-cut by the following expression:
 ## system, integrator = espressopp.standard_system.Default(box, warmup_cutoff, skin, dt, temperature)
@@ -193,13 +193,13 @@ if (temperature != None):
 
 print("adding ", Npart, " particles to the system ...")
 for pid in range(Npart):
-  # get a 3D random coordinate within the box
-  pos = system.bc.getRandomPos()
-  # add a particle with particle id pid and coordinate pos to the system
-  # coordinates are automatically folded according to periodic boundary conditions
-  # the following default values are set for each particle:
-  # (type=0, mass=1.0, velocity=(0,0,0), charge=0.0)
-  system.storage.addParticle(pid, pos)
+    # get a 3D random coordinate within the box
+    pos = system.bc.getRandomPos()
+    # add a particle with particle id pid and coordinate pos to the system
+    # coordinates are automatically folded according to periodic boundary conditions
+    # the following default values are set for each particle:
+    # (type=0, mass=1.0, velocity=(0,0,0), charge=0.0)
+    system.storage.addParticle(pid, pos)
 # distribute the particles to parallel CPUs
 system.storage.decompose()
 
@@ -231,14 +231,14 @@ print("starting warm-up ...")
 espressopp.tools.analyse.info(system, integrator)
 time_warmup_start = time.time()
 for step in range(warmup_nloops):
-  # perform warmup_isteps integraton steps
-  integrator.run(warmup_isteps)
-  # decrease force capping radius in the potential
-  LJpot.epsilon += epsilon_delta
-  # update the type0-type0 interaction to use the new values of LJpot
-  interaction.setPotential(type1=0, type2=0, potential=LJpot)
-  # print status info
-  espressopp.tools.analyse.info(system, integrator)
+    # perform warmup_isteps integraton steps
+    integrator.run(warmup_isteps)
+    # decrease force capping radius in the potential
+    LJpot.epsilon += epsilon_delta
+    # update the type0-type0 interaction to use the new values of LJpot
+    interaction.setPotential(type1=0, type2=0, potential=LJpot)
+    # print status info
+    espressopp.tools.analyse.info(system, integrator)
 time_warmup_end = time.time()
 print("warmup finished")
 # remove the force capping interaction from the system
@@ -252,32 +252,32 @@ verletlist.disconnect()
 ########################################################################
 
 if args.vec:
-  vec = espressopp.vectorization.Vectorization(system, integrator)
-  system.storage.decompose()
+    vec = espressopp.vectorization.Vectorization(system, integrator)
+    system.storage.decompose()
 
-  # create a new verlet list that uses a cutoff radius = r_cutoff
-  # the verlet radius is automatically increased by system.skin (see system setup)
-  verletlist  = espressopp.vectorization.VerletList(system, vec, r_cutoff)
-  # define a Lennard-Jones interaction that uses a verlet list
-  interaction = espressopp.vectorization.interaction.VerletListLennardJones(verletlist)
-  # use a Lennard-Jones potential between 2 particles of type 0
-  # the potential is automatically shifted so that U(r=cutoff) = 0.0
-  # if the potential should not be shifted set shift=0.0
-  potential   = interaction.setPotential(type1=0, type2=0,
-                                        potential=espressopp.vectorization.interaction.LennardJones(
-                                        epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
+    # create a new verlet list that uses a cutoff radius = r_cutoff
+    # the verlet radius is automatically increased by system.skin (see system setup)
+    verletlist  = espressopp.vectorization.VerletList(system, vec, r_cutoff)
+    # define a Lennard-Jones interaction that uses a verlet list
+    interaction = espressopp.vectorization.interaction.VerletListLennardJones(verletlist)
+    # use a Lennard-Jones potential between 2 particles of type 0
+    # the potential is automatically shifted so that U(r=cutoff) = 0.0
+    # if the potential should not be shifted set shift=0.0
+    potential   = interaction.setPotential(type1=0, type2=0,
+                                          potential=espressopp.vectorization.interaction.LennardJones(
+                                          epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
 else:
-  # create a new verlet list that uses a cutoff radius = r_cutoff
-  # the verlet radius is automatically increased by system.skin (see system setup)
-  verletlist  = espressopp.VerletList(system, r_cutoff)
-  # define a Lennard-Jones interaction that uses a verlet list
-  interaction = espressopp.interaction.VerletListLennardJones(verletlist)
-  # use a Lennard-Jones potential between 2 particles of type 0
-  # the potential is automatically shifted so that U(r=cutoff) = 0.0
-  # if the potential should not be shifted set shift=0.0
-  potential   = interaction.setPotential(type1=0, type2=0,
-                                        potential=espressopp.interaction.LennardJones(
-                                        epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
+    # create a new verlet list that uses a cutoff radius = r_cutoff
+    # the verlet radius is automatically increased by system.skin (see system setup)
+    verletlist  = espressopp.VerletList(system, r_cutoff)
+    # define a Lennard-Jones interaction that uses a verlet list
+    interaction = espressopp.interaction.VerletListLennardJones(verletlist)
+    # use a Lennard-Jones potential between 2 particles of type 0
+    # the potential is automatically shifted so that U(r=cutoff) = 0.0
+    # if the potential should not be shifted set shift=0.0
+    potential   = interaction.setPotential(type1=0, type2=0,
+                                          potential=espressopp.interaction.LennardJones(
+                                          epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
 
 ########################################################################
 # 8. running the equilibration loop                                    #
@@ -300,11 +300,11 @@ if args.vec: verletlist.rebuildPairs()
 espressopp.tools.analyse.info(system, integrator)
 time_equil_start = time.time()
 for step in range(equil_nloops):
-  # perform equilibration_isteps integration steps
-  integrator.run(equil_isteps)
-  # print status information
-  if args.vec: verletlist.rebuildPairs()
-  espressopp.tools.analyse.info(system, integrator)
+    # perform equilibration_isteps integration steps
+    integrator.run(equil_isteps)
+    # print status information
+    if args.vec: verletlist.rebuildPairs()
+    espressopp.tools.analyse.info(system, integrator)
 time_equil_end = time.time()
 print("equilibration finished")
 

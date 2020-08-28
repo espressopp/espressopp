@@ -26,20 +26,20 @@ espressopp.analysis.OrderParameter
 
 .. function:: espressopp.analysis.OrderParameter(system, cutoff, angular_momentum, do_cluster_analysis, include_surface_particles, ql_low, ql_high)
 
-		:param system:
-		:param cutoff:
-		:param angular_momentum: (default: 6)
-		:param do_cluster_analysis: (default: False)
-		:param include_surface_particles: (default: False)
-		:param ql_low: (default: -1.0)
-		:param ql_high: (default: 1.0)
-		:type system:
-		:type cutoff:
-		:type angular_momentum: int
-		:type do_cluster_analysis:
-		:type include_surface_particles:
-		:type ql_low:
-		:type ql_high: real
+                :param system:
+                :param cutoff:
+                :param angular_momentum: (default: 6)
+                :param do_cluster_analysis: (default: False)
+                :param include_surface_particles: (default: False)
+                :param ql_low: (default: -1.0)
+                :param ql_high: (default: 1.0)
+                :type system:
+                :type cutoff:
+                :type angular_momentum: int
+                :type do_cluster_analysis:
+                :type include_surface_particles:
+                :type ql_low:
+                :type ql_high: real
 """
 
 from espressopp.esutil import cxxinit

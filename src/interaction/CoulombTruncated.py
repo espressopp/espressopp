@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
 ***************************************
@@ -25,7 +25,7 @@ espressopp.interaction.CoulombTruncated
 
 .. math::
 
-	U = k\frac{q_iq_j}{d_{ij}}
+        U = k\frac{q_iq_j}{d_{ij}}
 
 where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of particle `i`, and :math:`d_{ij}` is interparticle distance
 
@@ -33,44 +33,44 @@ In this interaction potential, a different charge can be associated with each pa
 
 .. function:: espressopppp.interaction.CoulombTruncated(prefactor, cutoff)
 
-		:param prefactor: (default: 1.0) user-supplied prefactor `k`
-		:param cutoff: (default: infinity) user-supplied interaction cutoff
-		:type prefactor: real
-		:type cutoff: real
+                :param prefactor: (default: 1.0) user-supplied prefactor `k`
+                :param cutoff: (default: infinity) user-supplied interaction cutoff
+                :type prefactor: real
+                :type cutoff: real
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated(vl)
 
-		:param espressopp.VerletList vl: verlet list object defined earlier in python script
+                :param espressopp.VerletList vl: verlet list object defined earlier in python script
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
 
-		:param type1: type of first atom in pair
-		:param type2: type of second atom in pair
-		:type type1: integer
-		:type type2: integer
+                :param type1: type of first atom in pair
+                :param type2: type of second atom in pair
+                :type type1: integer
+                :type type2: integer
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
 
-		:param type1: type of first atom in pair
-		:param type2: type of second atom in pair
-		:param potential: potential object defined earlier in python script
-		:type type1: integer
-		:type type2: integer
-		:type potential: CoulombTruncated potential
+                :param type1: type of first atom in pair
+                :param type2: type of second atom in pair
+                :param potential: potential object defined earlier in python script
+                :type type1: integer
+                :type type2: integer
+                :type potential: CoulombTruncated potential
 
 .. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl)
 
-		:param espressopp.System system: system object defined earlier in the python script
-		:param espressopp.FixedPairList vl: fixedpairlist object defined earlier in the python script
+                :param espressopp.System system: system object defined earlier in the python script
+                :param espressopp.FixedPairList vl: fixedpairlist object defined earlier in the python script
 
 .. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated.setPotential(potential)
 
-		:param type1: type of first atom in pair
-		:param type2: type of second atom in pair
-		:param potential: potential object defined earlier in python script
-		:type type1: integer
-		:type type2: integer
-		:type potential: CoulombTruncated potential
+                :param type1: type of first atom in pair
+                :param type2: type of second atom in pair
+                :param potential: potential object defined earlier in python script
+                :type type1: integer
+                :type type2: integer
+                :type potential: CoulombTruncated potential
 
 #Example:
 
@@ -125,7 +125,7 @@ if pmi.isController:
         'The CoulombTruncated potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CoulombTruncatedLocal',
-            pmiproperty = ['prefactor', 'alpha'] 
+            pmiproperty = ['prefactor', 'alpha']
             )
     class VerletListCoulombTruncated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(

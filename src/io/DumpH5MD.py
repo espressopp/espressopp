@@ -187,7 +187,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 new_filename = '{}/{}_{}'.format(dirname, int(py_time.time()), os.path.basename(filename))
                 os.rename(filename, new_filename)
                 print(('File {} exists, moved to {}'.format(filename, new_filename)))
-        try: 
+        try:
             self.file = pyh5md.File(
                 filename, 'w',
                 creator='espressopp',

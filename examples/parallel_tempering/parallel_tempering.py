@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-###########################################################################			
+###########################################################################
 #                                                                         #
 #  ESPResSo++ Python script for a Multisystem simulation                  #
 #                                                                         #
@@ -34,8 +34,8 @@ print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 print("+ Multisystem simulations are still possible but have to be setup manually.     +")
 print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-sys.exit(0) 
-         
+sys.exit(0)
+
 # some global definitions
 skin         = 0.3
 rc           = 2.5
@@ -50,11 +50,11 @@ ptrng=random
 ptrng.seed(335977)
 
 if espressopp.MPI.COMM_WORLD.size != 4:
-  print("currently this example can only be run with 4 CPUs")
-  sys.exit(0)
+    print("currently this example can only be run with 4 CPUs")
+    sys.exit(0)
 
 # Parallel Tempering (replica exchange) integrator
-ptthermostats=[] 
+ptthermostats=[]
 pt = espressopp.ParallelTempering(NumberOfSystems = 4, RNG = ptrng)
 for i in range(0, pt.getNumberOfSystems()):
     pt.startDefiningSystem(i)

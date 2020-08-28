@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -29,7 +29,7 @@ the Quartic potential.
 
 .. math::
 
-	U=\frac{K}{4} \left(d^2 - r_0^2 \right)^2
+        U=\frac{K}{4} \left(d^2 - r_0^2 \right)^2
 
 
 
@@ -38,41 +38,41 @@ the Quartic potential.
 
 .. function:: espressopp.interaction.Quartic(K, r0, cutoff, shift)
 
-		:param K: (default: 1.0)
-		:param r0: (default: 0.0)
-		:param cutoff: (default: infinity)
-		:param shift: (default: 0.0)
-		:type K: real
-		:type r0: real
-		:type cutoff: 
-		:type shift: real
+                :param K: (default: 1.0)
+                :param r0: (default: 0.0)
+                :param cutoff: (default: infinity)
+                :param shift: (default: 0.0)
+                :type K: real
+                :type r0: real
+                :type cutoff:
+                :type shift: real
 
 .. function:: espressopp.interaction.FixedPairListQuartic(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListQuartic.getFixedPairList()
 
-		:rtype: A Python list of lists.
+                :rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListQuartic.setFixedPairList(fixedpairlist)
 
-		:param fixedpairlist: 
-		:type fixedpairlist: 
+                :param fixedpairlist:
+                :type fixedpairlist:
 
 .. function:: espressopp.interaction.FixedPairListQuartic.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -83,7 +83,7 @@ from _espressopp import interaction_Quartic, interaction_FixedPairListQuartic
 
 class QuarticLocal(PotentialLocal, interaction_Quartic):
 
-    def __init__(self, K=1.0, r0=0.0, 
+    def __init__(self, K=1.0, r0=0.0,
                  cutoff=infinity, shift=0.0):
         """Initialize the local Quartic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

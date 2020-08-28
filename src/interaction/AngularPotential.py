@@ -27,15 +27,15 @@ Abstract class for angular potentials that only needed to be inherited from.
 
     .. py:method:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 
     .. py:method:: espressopp.interaction.AngularPotential.computeForce(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 """
 
 from espressopp import pmi

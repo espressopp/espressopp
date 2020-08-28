@@ -19,7 +19,7 @@
 
 ###########################################################################
 # DEMONSTRATION OF THE LJ-COS POTENTIAL CONTROLLING SOLVENT QUALITY       #
-# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)            #  
+# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)            #
 ###########################################################################
 
 import espressopp
@@ -77,14 +77,14 @@ for i in range(num_chains):
     for k in range(mon_per_chain):
         part = [pid + k, ptype, mass, positions[k], vel_zero]
         chain.append(part)
-        if (k < mon_per_chain - 1): 
+        if (k < mon_per_chain - 1):
             exclusionlist.append(bonds[k])
     pid += mon_per_chain
     system.storage.addParticles(chain, *props)
     system.storage.decompose()
     chain = []
     bondlist.addBonds(bonds)
-    
+
 system.storage.decompose()
 
 # initial set-up of the Lennard-Jones cosine
@@ -112,10 +112,10 @@ def main ():
     warmUpFirst()
     warmUpSecond()
 
-    print("Starting simulation") 
+    print("Starting simulation")
     for k in range(100):
         integrator.run(1000)
-    
+
         findTemperature()
         findRee()
 
@@ -201,7 +201,7 @@ def findRee():
         c2 = system.bc.getUnfoldedPosition(p2.pos, p2.imageBox)
         dr = c1 - c2
         d2r = dr.sqr()
-        R2ee += d2r 
+        R2ee += d2r
 
         r_av = Real3D(0.,0.,0.)
         for k in range(mon_per_chain):

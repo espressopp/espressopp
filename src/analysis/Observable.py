@@ -23,7 +23,7 @@ r"""
 
 .. function:: espressopp.analysis.Observable.compute()
 
-		:rtype:
+                :rtype:
 """
 from espressopp import pmi
 from _espressopp import analysis_Observable

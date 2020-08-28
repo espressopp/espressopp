@@ -53,12 +53,12 @@ system, integrator = espressopp.standard_system.Default(box=box, rc=rc, skin=ski
 props = ['id', 'type', 'mass', 'pos']
 new_particles = []
 for i in range(num_particles):
-  part = [i + 1, 0, 1.0, espressopp.Real3D(x[i], y[i], z[i])]
-  new_particles.append(part)
-  if i % 1000 == 0:
-    system.storage.addParticles(new_particles, *props)
-    system.storage.decompose()
-    new_particles = []
+    part = [i + 1, 0, 1.0, espressopp.Real3D(x[i], y[i], z[i])]
+    new_particles.append(part)
+    if i % 1000 == 0:
+        system.storage.addParticles(new_particles, *props)
+        system.storage.decompose()
+        new_particles = []
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
@@ -102,9 +102,8 @@ print('')
 espressopp.tools.analyse.info(system, integrator)
 start_time = time.process_time()
 for k in range(nsteps):
-  integrator.run(isteps)
-  espressopp.tools.analyse.info(system, integrator)
+    integrator.run(isteps)
+    espressopp.tools.analyse.info(system, integrator)
 end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
-

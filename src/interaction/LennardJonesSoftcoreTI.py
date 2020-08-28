@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -92,54 +92,54 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
 
 .. function:: espressopppp.interaction.LennardJonesSoftcoreTI(epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
 
-		:param epsilonA: (default: 1.0) LJ interaction parameter
-		:param sigmaA: (default: 1.0) LJ interaction parameter
-		:param epsilonB: (default: 0.0) LJ interaction parameter
-		:param sigmaB: (default: 1.0) LJ interaction parameter
-		:param alpha: (default: 1.0) softcore parameter
-		:param power: (default: 1.0) softcore parameter
-		:param cutoff: (default: infinity) interaction cutoff
-		:param lambdaTI: (default: 0.0) TI lambda parameter
-		:param annihilate: (default: True) switch between annihilation and decoupling
-		:type epsilonA: real
-		:type sigmaA: real
-		:type epsilonB: real
-		:type sigmaB: real
-		:type alpha: real
-		:type power: real
-		:type cutoff: real
-		:type lambdaTI: real
-		:type annihilate: bool
+                :param epsilonA: (default: 1.0) LJ interaction parameter
+                :param sigmaA: (default: 1.0) LJ interaction parameter
+                :param epsilonB: (default: 0.0) LJ interaction parameter
+                :param sigmaB: (default: 1.0) LJ interaction parameter
+                :param alpha: (default: 1.0) softcore parameter
+                :param power: (default: 1.0) softcore parameter
+                :param cutoff: (default: infinity) interaction cutoff
+                :param lambdaTI: (default: 0.0) TI lambda parameter
+                :param annihilate: (default: True) switch between annihilation and decoupling
+                :type epsilonA: real
+                :type sigmaA: real
+                :type epsilonB: real
+                :type sigmaB: real
+                :type alpha: real
+                :type power: real
+                :type cutoff: real
+                :type lambdaTI: real
+                :type annihilate: bool
 
 .. function:: espressopppp.interaction.LennardJonesSoftcoreTI.addPids(pidlist)
 
-		:param pidlist: list of particle ids of particles whose interaction parameters differ in state A and B
-		:type pidlist: python list
+                :param pidlist: list of particle ids of particles whose interaction parameters differ in state A and B
+                :type pidlist: python list
 
 .. function:: espressopppp.interaction.VerletListAdressLennardJones(vl, fixedtupleList)
 
-		:param vl: Verlet list
-		:param fixedtupleList: list of tuples describing mapping between CG and AT particles 
-		:type vl: VerletListAdress object
-		:type fixedtupleList: FixedTupleListAdress object
+                :param vl: Verlet list
+                :param fixedtupleList: list of tuples describing mapping between CG and AT particles
+                :type vl: VerletListAdress object
+                :type fixedtupleList: FixedTupleListAdress object
 
 .. function:: espressopppp.interaction.VerletListAdressLennardJones.setPotentialAT(type1, type2, potential)
 
-		:param type1: atomtype
-		:param type2: atomtype
-		:param potential: espressopppp potential
-		:type type1: int
-		:type type2: int
-		:type potential: Potential
+                :param type1: atomtype
+                :param type2: atomtype
+                :param potential: espressopppp potential
+                :type type1: int
+                :type type2: int
+                :type potential: Potential
 
 .. function:: espressopppp.interaction.VerletListAdressLennardJones.setPotentialCG(type1, type2, potential)
 
-		:param type1: atomtype
-		:param type2: atomtype
-		:param potential: espressopppp potential
-		:type type1: int
-		:type type2: int
-		:type potential: Potential
+                :param type1: atomtype
+                :param type2: atomtype
+                :param potential: espressopppp potential
+                :type type1: int
+                :type type2: int
+                :type potential: Potential
 
 """
 from espressopp import pmi, infinity
@@ -155,19 +155,19 @@ from _espressopp import interaction_LennardJonesSoftcoreTI, \
 #NOTE: to use LennardJonesSoftcoreTI with VerletList or VerletListHadress, uncomment and check the relevant code in this file and LennardJonesSoftcoreTI.cpp, and implement computeEnergyDeriv in the relevant interaction template
 
 class LennardJonesSoftcoreTILocal(PotentialLocal, interaction_LennardJonesSoftcoreTI):
-    def __init__(self, epsilonA=1.0, sigmaA=1.0, epsilonB=0.0, sigmaB=1.0, alpha=1.0, power=1.0, 
+    def __init__(self, epsilonA=1.0, sigmaA=1.0, epsilonB=0.0, sigmaB=1.0, alpha=1.0, power=1.0,
                  cutoff=infinity, lambdaTI=0.0, annihilate=True):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-           if sigmaB == 0.0:
-             print('Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0')
-             return
-           cxxinit(self, interaction_LennardJonesSoftcoreTI, 
-                   epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
+            if sigmaB == 0.0:
+                print('Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0')
+                return
+            cxxinit(self, interaction_LennardJonesSoftcoreTI,
+                    epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
 
     def addPids(self, pidlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          for pid in pidlist:
-            self.cxxclass.addPid(self, pid)
+            for pid in pidlist:
+                self.cxxclass.addPid(self, pid)
 
 #class VerletListLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListLennardJonesSoftcoreTI):
 #    def __init__(self, vl):
@@ -198,7 +198,7 @@ class VerletListAdressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 #class VerletListHadressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListHadressLennardJonesSoftcoreTI):
 #    def __init__(self, vl, fixedtupleList):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -211,7 +211,7 @@ class VerletListAdressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_
 #    def setPotentialCG(self, type1, type2, potential):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 if pmi.isController:
     class LennardJonesSoftcoreTI(Potential):
         'The Lennard-Jones potential.'
@@ -232,11 +232,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressLennardJonesSoftcoreTILocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
+
     #class VerletListHadressLennardJonesSoftcoreTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
     #        cls =  'espressopp.interaction.VerletListHadressLennardJonesSoftcoreTILocal',
     #        pmicall = ['setPotentialAT', 'setPotentialCG']
     #        )
-            

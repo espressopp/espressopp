@@ -22,7 +22,7 @@
 #  ESPResSo++ Python script for tabulated GROMACS simulation              #
 #                                                                         #
 ########################################################################
-# This example reads in a gromacs water system (tabulated interactions) treated with reaction field and runs a path-integral (PI) simulation using the pathintegral.py script 
+# This example reads in a gromacs water system (tabulated interactions) treated with reaction field and runs a path-integral (PI) simulation using the pathintegral.py script
 # ! WARNINING ! this is still an experimental feature!!
 #
 
@@ -106,7 +106,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(0, 0, 0), types[pid], masses[pid], charges[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 #system.storage.decompose()
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -181,12 +181,12 @@ for i in range(check):
     EAng = 0
     ETab=0
     for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
-    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()    
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
     ETab= tabulatedinteraction.computeEnergy()
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
-    
+
     print((fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T)))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
@@ -199,7 +199,3 @@ timers.show(integrator.getTimers(), precision=2)
 
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-

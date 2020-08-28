@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -26,8 +26,8 @@ espressopp.interaction.LennardJonesExpand
 
 .. math::
 
-	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
-	\left( \frac{\sigma}{r} \right)^{6} \right]
+        V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+        \left( \frac{\sigma}{r} \right)^{6} \right]
 
 
 
@@ -36,66 +36,66 @@ espressopp.interaction.LennardJonesExpand
 
 .. function:: espressopp.interaction.LennardJonesExpand(epsilon, sigma, delta, cutoff, shift)
 
-		:param epsilon: (default: 1.0)
-		:param sigma: (default: 1.0)
-		:param delta: (default: 0.0)
-		:param cutoff: (default: infinity)
-		:param shift: (default: "auto")
-		:type epsilon: real
-		:type sigma: real
-		:type delta: real
-		:type cutoff: 
-		:type shift: 
+                :param epsilon: (default: 1.0)
+                :param sigma: (default: 1.0)
+                :param delta: (default: 0.0)
+                :param cutoff: (default: infinity)
+                :param shift: (default: "auto")
+                :type epsilon: real
+                :type sigma: real
+                :type delta: real
+                :type cutoff:
+                :type shift:
 
 .. function:: espressopp.interaction.VerletListLennardJonesExpand(vl)
 
-		:param vl: 
-		:type vl: 
+                :param vl:
+                :type vl:
 
 .. function:: espressopp.interaction.VerletListLennardJonesExpand.getPotential(type1, type2)
 
-		:param type1: 
-		:param type2: 
-		:type type1: 
-		:type type2: 
-		:rtype: 
+                :param type1:
+                :param type2:
+                :type type1:
+                :type type2:
+                :rtype:
 
 .. function:: espressopp.interaction.VerletListLennardJonesExpand.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.CellListLennardJonesExpand(stor)
 
-		:param stor: 
-		:type stor: 
+                :param stor:
+                :type stor:
 
 .. function:: espressopp.interaction.CellListLennardJonesExpand.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesExpand(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesExpand.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *

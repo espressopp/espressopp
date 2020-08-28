@@ -27,14 +27,14 @@ espressopp.analysis.IntraChainDistSq
 
 .. function:: espressopp.analysis.IntraChainDistSq(system, fpl)
 
-		:param system:
-		:param fpl:
-		:type system:
-		:type fpl:
+                :param system:
+                :param fpl:
+                :type system:
+                :type fpl:
 
 .. function:: espressopp.analysis.IntraChainDistSq.compute()
 
-		:rtype:
+                :rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

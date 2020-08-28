@@ -1,5 +1,5 @@
-#!/usr/bin/env python                                                               
-# -*- coding: iso-8859-1 -*-                                                        
+#!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
 
 from math import sqrt, pi, cos, sin, acos, asin, fabs
 import time
@@ -18,14 +18,14 @@ temperature        = 1.0    # set temperature to None for NVE-simulations
 input_file = open('input.txt')
 
 for i in range(3):
-  line = input_file.readline()
-  parameters = line.split()
-  if parameters[0] == "num_chains:":
-    num_chains = int(parameters[1])
-  if parameters[0] == "monomers_per_chain:":
-    monomers_per_chain = int(parameters[1])
-  if parameters[0] == "system_size:":
-    L = float(parameters[1])
+    line = input_file.readline()
+    parameters = line.split()
+    if parameters[0] == "num_chains:":
+        num_chains = int(parameters[1])
+    if parameters[0] == "monomers_per_chain:":
+        monomers_per_chain = int(parameters[1])
+    if parameters[0] == "system_size:":
+        L = float(parameters[1])
 
 # set coarse-grained polymer properties
 N_blob             = 25  # the number of monomers in a coarse-grained polymer
@@ -111,54 +111,54 @@ res_file = open('reinsertion.res')
 # do this in chunks of 1000 particles to speed it up
 chain = []
 for i in range(num_chains):
-  startpos = system.bc.getRandomPos()
-  positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
-  j = 0
-  pos_i = []
-  while j < monomers_per_chain:
-    line = res_file.readline()
-    parameters = line.split()
-    i_diff = 0
-    if (len(parameters) < 12):
-      i_diff = 1
-    for k in range(3):
-      pos_i.append(0.)
-    if parameters[0] == "ATOM":
-      #pos_j = espressopp.Real3D((float(parameters[6 - i_diff]) + 2.*L)%L,
-      #                          (float(parameters[7 - i_diff]) + 2.*L)%L,
-      #                          (float(parameters[8 - i_diff]) + 2.*L)%L)
-      pos_j = []
-      image = []
-      for k in range(3):
-        x_i = (float(parameters[6 + k - i_diff]) + 2.*L)%L
-        pos_j.append(x_i)
-      #print "Load:", pid + j, pos_j, pos_i
-      if j != 0:
-        diff = []
+    startpos = system.bc.getRandomPos()
+    positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
+    j = 0
+    pos_i = []
+    while j < monomers_per_chain:
+        line = res_file.readline()
+        parameters = line.split()
+        i_diff = 0
+        if (len(parameters) < 12):
+            i_diff = 1
         for k in range(3):
-          x_i = pos_j[k] - pos_i[k]
-          image.append(round(x_i/L))
-          x_i = x_i - round(x_i/L)*L
-          diff.append(x_i)
-        pos_j = []
-        for k in range(3):
-          x_i = pos_i[k] + diff[k]
-          pos_j.append(x_i)
-      pos_i = pos_j
-      res_position = espressopp.Real3D(pos_i[0],
-                                       pos_i[1],
-                                       pos_i[2])
-      #print "Position:", pid + j, res_position, image
-      part = [pid + j, type, mass, res_position, vel_zero]
-      chain.append(part)
-      j += 1
-  pid += monomers_per_chain
-  #type += 1
-  system.storage.addParticles(chain, *props)
-  system.storage.decompose()
-  chain = []
-  bondlist.addBonds(bonds)
-  #anglelist.addTriples(angles)
+            pos_i.append(0.)
+        if parameters[0] == "ATOM":
+            #pos_j = espressopp.Real3D((float(parameters[6 - i_diff]) + 2.*L)%L,
+            #                          (float(parameters[7 - i_diff]) + 2.*L)%L,
+            #                          (float(parameters[8 - i_diff]) + 2.*L)%L)
+            pos_j = []
+            image = []
+            for k in range(3):
+                x_i = (float(parameters[6 + k - i_diff]) + 2.*L)%L
+                pos_j.append(x_i)
+            #print "Load:", pid + j, pos_j, pos_i
+            if j != 0:
+                diff = []
+                for k in range(3):
+                    x_i = pos_j[k] - pos_i[k]
+                    image.append(round(x_i/L))
+                    x_i = x_i - round(x_i/L)*L
+                    diff.append(x_i)
+                pos_j = []
+                for k in range(3):
+                    x_i = pos_i[k] + diff[k]
+                    pos_j.append(x_i)
+            pos_i = pos_j
+            res_position = espressopp.Real3D(pos_i[0],
+                                             pos_i[1],
+                                             pos_i[2])
+            #print "Position:", pid + j, res_position, image
+            part = [pid + j, type, mass, res_position, vel_zero]
+            chain.append(part)
+            j += 1
+    pid += monomers_per_chain
+    #type += 1
+    system.storage.addParticles(chain, *props)
+    system.storage.decompose()
+    chain = []
+    bondlist.addBonds(bonds)
+    #anglelist.addTriples(angles)
 system.storage.addParticles(chain, *props)
 system.storage.decompose()
 
@@ -168,11 +168,11 @@ density = num_particles * 1.0 / (L * L * L)
 #Generating Tuple
 #num_constrain = 25
 #for i in xrange(0, num_particles/num_constrain):
-  #tuple = []
-  #for j in xrange(num_constrain):
-    #tuple.append(num_constrain*i + j + 1)
-  #print "Add tuple", tuple
-  #tuplelist.addTuple(tuple)
+    #tuple = []
+    #for j in xrange(num_constrain):
+        #tuple.append(num_constrain*i + j + 1)
+    #print "Add tuple", tuple
+    #tuplelist.addTuple(tuple)
 
 #Generating Constrain
 #num_fixed = 2
@@ -200,8 +200,8 @@ system.addInteraction(interLJ)
 
 print("Init LJ2")
 for i in range(num_chains):
-  for j in range(monomers_per_chain - 2):
-    bondlistNN.add(i*monomers_per_chain + j + 1, i*monomers_per_chain + j + 3)
+    for j in range(monomers_per_chain - 2):
+        bondlistNN.add(i*monomers_per_chain + j + 1, i*monomers_per_chain + j + 3)
 capradNN = 1.1*sigma
 potLJNN = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradNN, shift=0)
 interLJNN   = espressopp.interaction.FixedPairListLennardJonesCapped(system, bondlistNN, potLJNN)
@@ -212,13 +212,13 @@ print("Init LJ3")
 exclusion_list = []
 
 for i in range(num_chains):
-  #print "Init LJ3:", i
-  for j in range(monomers_per_chain):
-    goal  = min(j + 3, monomers_per_chain)
-    for k in range(j + 1, goal):
-      #print "Init LJ3:", i*monomers_per_chain + j, i*monomers_per_chain + k
-      dmy_pair = [i*monomers_per_chain + j, i*monomers_per_chain + k]
-      exclusion_list.append(dmy_pair)
+    #print "Init LJ3:", i
+    for j in range(monomers_per_chain):
+        goal  = min(j + 3, monomers_per_chain)
+        for k in range(j + 1, goal):
+            #print "Init LJ3:", i*monomers_per_chain + j, i*monomers_per_chain + k
+            dmy_pair = [i*monomers_per_chain + j, i*monomers_per_chain + k]
+            exclusion_list.append(dmy_pair)
 capradO = 2.**(1./6.)*sigma
 potLJO  = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradO, shift=0)
 print("Init LJ4")
@@ -266,69 +266,69 @@ print('')
 
 # Calculate the mean square internal distance
 def calculate_msid():
-  msid = []
-  for i in range(monomers_per_chain - 1):
-    msid.append(0.)
+    msid = []
+    for i in range(monomers_per_chain - 1):
+        msid.append(0.)
 
-  for i in range(num_chains):
-    pid = i*monomers_per_chain + 1
-    particle = system.storage.getParticle(pid)
-    dmy_p = []
-    dmy_ele = []
-    for j in range(3):
-      dmy_ele.append(particle.pos[j])
-    dmy_p.append(dmy_ele)
-    for j in range(1, monomers_per_chain):
-      pid += 1
-      particle = system.storage.getParticle(pid)
-      diff = []
-      for k in range(3):
-        x_i = particle.pos[k] - dmy_p[j - 1][k]
-        x_i = x_i - round(x_i/L)*L
-        diff.append(x_i + dmy_p[j - 1][k])
-      dmy_p.append(diff)
-    for j in range(monomers_per_chain):
-      for k in range(j + 1, monomers_per_chain):
-        dist = 0.
-        for l in range(3):
-          dist += (dmy_p[k][l] - dmy_p[j][l])**2
-        msid[k - j - 1] += dist
+    for i in range(num_chains):
+        pid = i*monomers_per_chain + 1
+        particle = system.storage.getParticle(pid)
+        dmy_p = []
+        dmy_ele = []
+        for j in range(3):
+            dmy_ele.append(particle.pos[j])
+        dmy_p.append(dmy_ele)
+        for j in range(1, monomers_per_chain):
+            pid += 1
+            particle = system.storage.getParticle(pid)
+            diff = []
+            for k in range(3):
+                x_i = particle.pos[k] - dmy_p[j - 1][k]
+                x_i = x_i - round(x_i/L)*L
+                diff.append(x_i + dmy_p[j - 1][k])
+            dmy_p.append(diff)
+        for j in range(monomers_per_chain):
+            for k in range(j + 1, monomers_per_chain):
+                dist = 0.
+                for l in range(3):
+                    dist += (dmy_p[k][l] - dmy_p[j][l])**2
+                msid[k - j - 1] += dist
 
-  for i in range(monomers_per_chain - 1):
-    msid[i] = msid[i]/(monomers_per_chain - i -1)/num_chains
+    for i in range(monomers_per_chain - 1):
+        msid[i] = msid[i]/(monomers_per_chain - i -1)/num_chains
 
-  return msid
+    return msid
 
 # Calculate the signal for feedback loop
 def calculate_signal():
-  calcMSID = espressopp.analysis.MeanSquareInternalDist(system, monomers_per_chain)
-  calcMSID.gather()
-  msid = calcMSID.compute()
-  print("#MSID++ ", end=' ')
-  for r in msid:
-    print(r, end=' ')
-  print("end")
-  calcMSID.clear()
-  current = 0.
-  for i in range(19, 50):
-    current += msid[i]/(i + 1)
-  signal = 51.537 - current # 51.025
-  print("#current signal", current, signal)
-  if fabs(signal) < 0.0001:
-    signal = 0.
-  return signal
+    calcMSID = espressopp.analysis.MeanSquareInternalDist(system, monomers_per_chain)
+    calcMSID.gather()
+    msid = calcMSID.compute()
+    print("#MSID++ ", end=' ')
+    for r in msid:
+        print(r, end=' ')
+    print("end")
+    calcMSID.clear()
+    current = 0.
+    for i in range(19, 50):
+        current += msid[i]/(i + 1)
+    signal = 51.537 - current # 51.025
+    print("#current signal", current, signal)
+    if fabs(signal) < 0.0001:
+        signal = 0.
+    return signal
 
 ###potential setteing
 def set_ex_potential(capradNN, capradO):
-  potLJNN = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradNN, shift=0)
-  interLJNN.setPotential(potLJNN)
-  
-  potLJO  = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradO, shift=0)
-  
-  #for i in xrange(num_chains):
-  #  for j in xrange(i, num_chains):
-  #    interLJO.setPotential(type1=i, type2=j, potential=potLJO)
-  interLJO.setPotential(type1=0, type2=0, potential=potLJO)
+    potLJNN = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradNN, shift=0)
+    interLJNN.setPotential(potLJNN)
+
+    potLJO  = espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff=rc_lj, caprad=capradO, shift=0)
+
+    #for i in xrange(num_chains):
+    #  for j in xrange(i, num_chains):
+    #    interLJO.setPotential(type1=i, type2=j, potential=potLJO)
+    interLJO.setPotential(type1=0, type2=0, potential=potLJO)
 
 set_ex_potential(capradNN, capradO)
 calculate_signal()
@@ -337,47 +337,47 @@ calculate_signal()
 
 espressopp.tools.analyse.info(system, steepest)
 for k in range(1):
-  steepest.run(200)
-  espressopp.tools.analyse.info(system, steepest)
+    steepest.run(200)
+    espressopp.tools.analyse.info(system, steepest)
 
 #filename = "microscopic_nb1_fbloop.pdb"
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, integrator)
 for i in range(100/accelerate + 1):
-  #signal = calculate_signal()
-  #print "#INITIAL_SIGNAL", i, signal
-  isteps = 50000/t_up
-  if i > 70:
-      isteps = 100000/t_up
-  for j in range(10):
-    integrator.run(isteps/10)
-    espressopp.tools.analyse.info(system, integrator)
-  
-  capradO -= 0.003225*accelerate
+    #signal = calculate_signal()
+    #print "#INITIAL_SIGNAL", i, signal
+    isteps = 50000/t_up
+    if i > 70:
+        isteps = 100000/t_up
+    for j in range(10):
+        integrator.run(isteps/10)
+        espressopp.tools.analyse.info(system, integrator)
 
-  signal = calculate_signal()
-  print("#LAST_SIGNAL", i, signal, capradNN)
-  if i > 85:
-    capradNN -= 0.01*sigma*accelerate
-    print("#step is larger than 85", i, capradNN)
-  else:
-    if signal < 0.:
-      capradNN += 0.01*sigma*accelerate
-      print("#signal is negative", i, capradNN)
-    if signal > 0.:
-      capradNN -= 0.01*sigma*accelerate
-      print("#signal is postive", i, capradNN)
-  if capradNN < 0.8*sigma:
-    capradNN = 0.8*sigma
-    #if signal < 0.1:
-    #  break
-  if capradNN > 2.**(1./6.)*sigma:
-    capradNN = 2.**(1./6.)*sigma
-  set_ex_potential(capradNN, capradO)
+    capradO -= 0.003225*accelerate
 
-  #if i%10 == 0:
-  #  espressopp.tools.pdb.pqdwrite(filename, system, monomers_per_chain, True)
+    signal = calculate_signal()
+    print("#LAST_SIGNAL", i, signal, capradNN)
+    if i > 85:
+        capradNN -= 0.01*sigma*accelerate
+        print("#step is larger than 85", i, capradNN)
+    else:
+        if signal < 0.:
+            capradNN += 0.01*sigma*accelerate
+            print("#signal is negative", i, capradNN)
+        if signal > 0.:
+            capradNN -= 0.01*sigma*accelerate
+            print("#signal is postive", i, capradNN)
+    if capradNN < 0.8*sigma:
+        capradNN = 0.8*sigma
+        #if signal < 0.1:
+        #  break
+    if capradNN > 2.**(1./6.)*sigma:
+        capradNN = 2.**(1./6.)*sigma
+    set_ex_potential(capradNN, capradO)
+
+    #if i%10 == 0:
+    #  espressopp.tools.pdb.pqdwrite(filename, system, monomers_per_chain, True)
 
 filename = "microscopic_nb1.res"
 espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)

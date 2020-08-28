@@ -27,14 +27,14 @@ espressopp.analysis.RadialDistrF
 
 .. function:: espressopp.analysis.RadialDistrF(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.RadialDistrF.compute(rdfN)
 
-		:param rdfN:
-		:type rdfN:
-		:rtype:
+                :param rdfN:
+                :type rdfN:
+                :rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -44,17 +44,17 @@ from _espressopp import analysis_RadialDistrF
 
 class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
 
-  def __init__(self, system):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_RadialDistrF, system)
+    def __init__(self, system):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_RadialDistrF, system)
 
-  def compute(self, rdfN):
-    return self.cxxclass.compute(self, rdfN)
+    def compute(self, rdfN):
+        return self.cxxclass.compute(self, rdfN)
 
 if pmi.isController :
-  class RadialDistrF(Observable, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      pmiproperty = [ 'print_progress' ],
-      pmicall = [ "compute" ],
-      cls = 'espressopp.analysis.RadialDistrFLocal'
-    )
+    class RadialDistrF(Observable, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          pmiproperty = [ 'print_progress' ],
+          pmicall = [ "compute" ],
+          cls = 'espressopp.analysis.RadialDistrFLocal'
+        )

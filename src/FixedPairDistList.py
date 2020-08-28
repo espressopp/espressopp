@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -27,45 +27,45 @@ espressopp.FixedPairDistList
 
 .. function:: espressopp.FixedPairDistList(storage)
 
-		:param storage: 
-		:type storage: 
+                :param storage:
+                :type storage:
 
 .. function:: espressopp.FixedPairDistList.add(pid1, pid2)
 
-		:param pid1: 
-		:param pid2: 
-		:type pid1: 
-		:type pid2: 
-		:rtype: 
+                :param pid1:
+                :param pid2:
+                :type pid1:
+                :type pid2:
+                :rtype:
 
 .. function:: espressopp.FixedPairDistList.addPairs(bondlist)
 
-		:param bondlist: 
-		:type bondlist: 
-		:rtype: 
+                :param bondlist:
+                :type bondlist:
+                :rtype:
 
 .. function:: espressopp.FixedPairDistList.getDist(pid1, pid2)
 
-		:param pid1: 
-		:param pid2: 
-		:type pid1: 
-		:type pid2: 
-		:rtype: 
+                :param pid1:
+                :param pid2:
+                :type pid1:
+                :type pid2:
+                :rtype:
 
 .. function:: espressopp.FixedPairDistList.getPairs()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.FixedPairDistList.getPairsDist()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.FixedPairDistList.size()
 
-		:rtype: 
+                :rtype:
 """
 from espressopp import pmi
-import _espressopp 
+import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
@@ -102,19 +102,19 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
     def getPairs(self):
 
         if pmi.workerIsActive():
-          bonds=self.cxxclass.getPairs(self)
-          return bonds 
+            bonds=self.cxxclass.getPairs(self)
+            return bonds
 
     def getPairsDist(self):
 
         if pmi.workerIsActive():
-          bonds=self.cxxclass.getPairsDist(self)
-          return bonds 
-        
+            bonds=self.cxxclass.getPairsDist(self)
+            return bonds
+
     def getDist(self, pid1, pid2):
         if pmi.workerIsActive():
-          return self.cxxclass.getDist(self, pid1, pid2)
-        
+            return self.cxxclass.getDist(self, pid1, pid2)
+
 if pmi.isController:
     class FixedPairDistList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(

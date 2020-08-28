@@ -392,45 +392,45 @@ for s in range(1, intervals + 1):
     if s%10==0:
         rdf_array_OO = rdf_OO.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_OO)):
-                if(i>=len(rdf_array_total_OO)):
-                        rdf_array_total_OO.append(rdf_array_OO[i])
-                else:
-                        rdf_array_total_OO[i] += rdf_array_OO[i]
+            if(i>=len(rdf_array_total_OO)):
+                rdf_array_total_OO.append(rdf_array_OO[i])
+            else:
+                rdf_array_total_OO[i] += rdf_array_OO[i]
         Adds_OO += 1.0
 
         rdf_array_OH = rdf_OH.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_OH)):
-                if(i>=len(rdf_array_total_OH)):
-                        rdf_array_total_OH.append(rdf_array_OH[i])
-                else:
-                        rdf_array_total_OH[i] += rdf_array_OH[i]
+            if(i>=len(rdf_array_total_OH)):
+                rdf_array_total_OH.append(rdf_array_OH[i])
+            else:
+                rdf_array_total_OH[i] += rdf_array_OH[i]
         Adds_OH += 1.0
 
         rdf_array_HH = rdf_HH.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_HH)):
-                if(i>=len(rdf_array_total_HH)):
-                        rdf_array_total_HH.append(rdf_array_HH[i])
-                else:
-                        rdf_array_total_HH[i] += rdf_array_HH[i]
+            if(i>=len(rdf_array_total_HH)):
+                rdf_array_total_HH.append(rdf_array_HH[i])
+            else:
+                rdf_array_total_HH[i] += rdf_array_HH[i]
         Adds_HH += 1.0
 
     gyration_array_H = gyrationprofile.compute(gyrationprofilegrid, nTrotter, 0)
     for i in range(len(gyration_array_H)):
-                if(i>=len(gyration_array_total_H)):
-                        gyration_array_total_H.append(gyration_array_H[i])
-                else:
-                        gyration_array_total_H[i] += gyration_array_H[i]
-                if(gyration_array_H[i] != 0.0):
-                    gyrationAdds_H[i] += 1.0
+        if(i>=len(gyration_array_total_H)):
+            gyration_array_total_H.append(gyration_array_H[i])
+        else:
+            gyration_array_total_H[i] += gyration_array_H[i]
+        if(gyration_array_H[i] != 0.0):
+            gyrationAdds_H[i] += 1.0
 
     gyration_array_O = gyrationprofile.compute(gyrationprofilegrid, nTrotter, 1)
     for i in range(len(gyration_array_O)):
-                if(i>=len(gyration_array_total_O)):
-                        gyration_array_total_O.append(gyration_array_O[i])
-                else:
-                        gyration_array_total_O[i] += gyration_array_O[i]
-                if(gyration_array_O[i] != 0.0):
-                    gyrationAdds_O[i] += 1.0
+        if(i>=len(gyration_array_total_O)):
+            gyration_array_total_O.append(gyration_array_O[i])
+        else:
+            gyration_array_total_O[i] += gyration_array_O[i]
+        if(gyration_array_O[i] != 0.0):
+            gyrationAdds_O[i] += 1.0
 
 # close output file
 outfile.close()
@@ -441,44 +441,44 @@ outfile.close()
 
 # print O-O rdf to file
 for i in range(len(rdf_array_total_OO)):
-  rdf_array_total_OO[i] /= Adds_OO
+    rdf_array_total_OO[i] /= Adds_OO
 rdf_OO_file = open('rdf_profile_OO.dat', 'w')
 for i in range(len(rdf_array_total_OO)):
-  rdf_OO_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OO[i] ))
+    rdf_OO_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OO[i] ))
 rdf_OO_file.close()
 
 # print O-H rdf to file
 for i in range(len(rdf_array_total_OH)):
-  rdf_array_total_OH[i] /= Adds_OH
+    rdf_array_total_OH[i] /= Adds_OH
 rdf_OH_file = open('rdf_profile_OH.dat', 'w')
 for i in range(len(rdf_array_total_OH)):
-  rdf_OH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OH[i] ))
+    rdf_OH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OH[i] ))
 rdf_OH_file.close()
 
 # print H-H rdf to file
 for i in range(len(rdf_array_total_HH)):
-  rdf_array_total_HH[i] /= Adds_HH
+    rdf_array_total_HH[i] /= Adds_HH
 rdf_HH_file = open('rdf_profile_HH.dat', 'w')
 for i in range(len(rdf_array_total_HH)):
-  rdf_HH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_HH[i] ))
+    rdf_HH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_HH[i] ))
 rdf_HH_file.close()
 
 # print hydrogen radius of gyration profile to file
 for i in range(len(gyration_array_total_H)):
-  if(gyrationAdds_H[i] > 0.0):
-    gyration_array_total_H[i] /= gyrationAdds_H[i]
+    if(gyrationAdds_H[i] > 0.0):
+        gyration_array_total_H[i] /= gyrationAdds_H[i]
 rgyr_H_file = open('radgyr_profile_H.dat', 'w')
 for i in range(len(gyration_array_total_H)):
-  rgyr_H_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_H[i] ))
+    rgyr_H_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_H[i] ))
 rgyr_H_file.close()
 
 # print oxygen radius of gyration profile to file
 for i in range(len(gyration_array_total_O)):
-  if(gyrationAdds_O[i] > 0.0):
-    gyration_array_total_O[i] /= gyrationAdds_O[i]
+    if(gyrationAdds_O[i] > 0.0):
+        gyration_array_total_O[i] /= gyrationAdds_O[i]
 rgyr_O_file = open('radgyr_profile_O.dat', 'w')
 for i in range(len(gyration_array_total_O)):
-  rgyr_O_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_O[i] ))
+    rgyr_O_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_O[i] ))
 rgyr_O_file.close()
 
 ###########

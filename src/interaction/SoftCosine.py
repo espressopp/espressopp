@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -33,54 +33,54 @@ This class provides methods to compute forces and energies ofthe SoftCosine pote
 
 .. function:: espressopp.interaction.SoftCosine(A, cutoff, shift)
 
-		:param A: (default: 1.0)
-		:param cutoff: (default: infinity)
-		:param shift: (default: "auto")
-		:type A: real
-		:type cutoff: 
-		:type shift: 
+                :param A: (default: 1.0)
+                :param cutoff: (default: infinity)
+                :param shift: (default: "auto")
+                :type A: real
+                :type cutoff:
+                :type shift:
 
 .. function:: espressopp.interaction.VerletListSoftCosine(stor)
 
-		:param stor: 
-		:type stor: 
+                :param stor:
+                :type stor:
 
 .. function:: espressopp.interaction.VerletListSoftCosine.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.CellListSoftCosine(stor)
 
-		:param stor: 
-		:type stor: 
+                :param stor:
+                :type stor:
 
 .. function:: espressopp.interaction.CellListSoftCosine.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListSoftCosine(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListSoftCosine.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *

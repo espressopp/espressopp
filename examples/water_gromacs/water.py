@@ -33,14 +33,14 @@ from espressopp.tools import gromacs
 from espressopp.tools import decomp
 from espressopp.tools import timers
 
-# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file. 
+# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file.
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-steps = 10000 
+steps = 10000
 check = steps/100
 rc    = 0.9  # Verlet list cutoff
-skin  = 0.03 
+skin  = 0.03
 timestep = 0.0005
 # parameters to convert GROMACS tabulated potential file
 sigma = 1.0
@@ -92,7 +92,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(vx[pid], vy[pid], vz[pid]), types[pid], masses[pid], charges[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 system.storage.decompose()
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -150,7 +150,7 @@ for i in range(check):
     Eb = 0
     EAng = 0
     for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
-    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()    
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
     ELj= ljinteraction.computeEnergy()
     EQQ= qq_interactions.computeEnergy()
     T = temperature.compute()
@@ -158,15 +158,14 @@ for i in range(check):
     Etotal = Ek+Eb+EAng+EQQ+ELj
     outfile.write(fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
     print((fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal)))
-    
+
     #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     integrator.run(steps/check) # print out every steps/check steps
     #system.storage.decompose()
-    
+
 # print timings and neighbor list information
 end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-

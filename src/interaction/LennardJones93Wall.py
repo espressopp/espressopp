@@ -53,34 +53,34 @@ Example:
 
 .. function:: espressopp.interaction.LennardJones93Wall.getParams(type_var)
 
-		:param type_var: 
-		:type type_var: 
-		:rtype: 
+                :param type_var:
+                :type type_var:
+                :rtype:
 
 .. function:: espressopp.interaction.LennardJones93Wall.setParams(type_var, epsilon, sigma, sigmaCutoff, r0)
 
-		:param type_var: 
-		:param epsilon: 
-		:param sigma: 
-		:param sigmaCutoff: 
-		:param r0: 
-		:type type_var: 
-		:type epsilon: 
-		:type sigma: 
-		:type sigmaCutoff: 
-		:type r0: 
+                :param type_var:
+                :param epsilon:
+                :param sigma:
+                :param sigmaCutoff:
+                :param r0:
+                :type type_var:
+                :type epsilon:
+                :type sigma:
+                :type sigmaCutoff:
+                :type r0:
 
 .. function:: espressopp.interaction.SingleParticleLennardJones93Wall(system, potential)
 
-		:param system: 
-		:param potential: 
-		:type system: 
-		:type potential: 
+                :param system:
+                :param potential:
+                :type system:
+                :type potential:
 
 .. function:: espressopp.interaction.SingleParticleLennardJones93Wall.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi
 from espressopp.esutil import *

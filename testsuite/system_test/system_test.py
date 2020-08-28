@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  Copyright (C) 2020(H)
-#      Jozef Stefan Institute 
+#      Jozef Stefan Institute
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research

@@ -35,7 +35,7 @@ from espressopp.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
-steps = 1 
+steps = 1
 check = steps
 rc    = 1.1  # Verlet list cutoff
 skin  = 0.3
@@ -48,8 +48,8 @@ tabBBg = "table_B_B.xvg"
 
 taba1g = "table_a1.xvg"     # angles
 taba2g = "table_a2.xvg"
-taba3g = "table_a3.xvg"  
-taba4g = "table_a4.xvg"   
+taba3g = "table_a3.xvg"
+taba4g = "table_a4.xvg"
 taba5g = "table_a5.xvg"
 
 tabb0g  = "table_b0.xvg"    # bonds
@@ -129,7 +129,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(vx[pid], vy[pid], vz[pid]), types[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 system.storage.decompose()
 
 
@@ -168,7 +168,7 @@ angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypepara
 #    potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename=fe)
 #    intera = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
 #    system.addInteraction(intera)
-    
+
 
 # bonded 4-body interactions
 dihedralinteractions=gromacs.setDihedralInteractions(system, dihedraltypes, dihedraltypeparams)
@@ -252,7 +252,7 @@ for i in range(check):
     Pij = pressureTensor.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Ep = internb.computeEnergy()
-    
+
     Eb, Ea, Ed=0,0,0
     for bd in list(bondedinteractions.values()):Eb+=bd.computeEnergy()
     for ang in list(angleinteractions.values()): Ea+=ang.computeEnergy()
@@ -270,7 +270,3 @@ sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_partic
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-

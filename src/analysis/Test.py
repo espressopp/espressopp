@@ -29,7 +29,7 @@ Test class for any analysis tool.
 
     :param system:
     :type espressopp.system:
-        
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

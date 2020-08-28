@@ -25,17 +25,17 @@ r"""
 espressopp.analysis.CMVelocity
 *********************************
 
-Compute and reset (set to zero) the center-of-mass (CM) velocity of the system. 
+Compute and reset (set to zero) the center-of-mass (CM) velocity of the system.
 
 .. class:: espressopp.analysis.CMVelocity(system)
 
     :param system: system object
     :type system: espressopp.System
-    
-    .. note:: 
-            
-        :class:`CMVelocity <espressopp.analysis.CMVelocity>` can be attached to 
-        the *integrator*. In this case the :meth:`reset` method is called, so 
+
+    .. note::
+
+        :class:`CMVelocity <espressopp.analysis.CMVelocity>` can be attached to
+        the *integrator*. In this case the :meth:`reset` method is called, so
         you will reset the CM-velocity every `n-th` steps.
 
     **Methods**
@@ -43,14 +43,14 @@ Compute and reset (set to zero) the center-of-mass (CM) velocity of the system.
     .. function:: espressopp.analysis.CMVelocity.compute()
 
         Compute the CM-velocity of the system
-        
+
         :rtype: Real3D
 
     .. function:: espressopp.analysis.CMVelocity.reset()
 
         Reset (set to zero) the CM-velocity of the system. Done by computing the
         CM-velocity of the system and subtracting it then from every particle.
-        
+
         :rtype: void
 
     Example of resetting velocity

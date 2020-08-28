@@ -27,8 +27,8 @@ espressopp.analysis.ParticleRadiusDistribution
 
 .. function:: espressopp.analysis.ParticleRadiusDistribution(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

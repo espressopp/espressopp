@@ -26,7 +26,7 @@ espressopp.interaction.Harmonic
 
 .. math::
 
-	U = K (d - r_0)^2
+        U = K (d - r_0)^2
 
 
 .. function:: espressopp.interaction.Harmonic(K, r0, cutoff, shift)

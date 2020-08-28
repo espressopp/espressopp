@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -37,34 +37,34 @@ Reference: Flactuating soft-sphere approach to coars-graining of polymer melts, 
 
 .. function:: espressopp.interaction.VSphereSelf(e1, a1, a2, Nb, cutoff, shift)
 
-		:param e1: (default: 0.0)
-		:param a1: (default: 1.0)
-		:param a2: (default: 0.0)
-		:param Nb: (default: 1)
-		:param cutoff: (default: infinity)
-		:param shift: (default: 0.0)
-		:type e1: real
-		:type a1: real
-		:type a2: real
-		:type Nb: int
-		:type cutoff: 
-		:type shift: real
+                :param e1: (default: 0.0)
+                :param a1: (default: 1.0)
+                :param a2: (default: 0.0)
+                :param Nb: (default: 1)
+                :param cutoff: (default: infinity)
+                :param shift: (default: 0.0)
+                :type e1: real
+                :type a1: real
+                :type a2: real
+                :type Nb: int
+                :type cutoff:
+                :type shift: real
 
 .. function:: espressopp.interaction.SelfVSphere(system, potential)
 
-		:param system: 
-		:param potential: 
-		:type system: 
-		:type potential: 
+                :param system:
+                :param potential:
+                :type system:
+                :type potential:
 
 .. function:: espressopp.interaction.SelfVSphere.getPotential()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.interaction.SelfVSphere.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -75,7 +75,7 @@ from _espressopp import interaction_VSphereSelf, interaction_SelfVSphere
 
 class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
 
-    def __init__(self, e1=0.0, a1=1.0, a2=0.0, Nb=1, 
+    def __init__(self, e1=0.0, a1=1.0, a2=0.0, Nb=1,
                  cutoff=infinity, shift=0.0):
         """Initialize the local VSphere object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

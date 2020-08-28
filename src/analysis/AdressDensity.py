@@ -61,21 +61,21 @@ from _espressopp import analysis_AdressDensity
 
 class AdressDensityLocal(ObservableLocal, analysis_AdressDensity):
 
-  def __init__(self, system, verletlist):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_AdressDensity, system, verletlist)
+    def __init__(self, system, verletlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_AdressDensity, system, verletlist)
 
-  def addExclusions(self, pidlist):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      for pid in pidlist:
-        self.cxxclass.addExclpid(self, pid)
+    def addExclusions(self, pidlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            for pid in pidlist:
+                self.cxxclass.addExclpid(self, pid)
 
-  def compute(self, bins):
-    return self.cxxclass.compute(self, bins)
+    def compute(self, bins):
+        return self.cxxclass.compute(self, bins)
 
 if pmi.isController :
-  class AdressDensity(Observable, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      pmicall = [ 'addExclusions', 'compute' ],
-      cls = 'espressopp.analysis.AdressDensityLocal'
-    )
+    class AdressDensity(Observable, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          pmicall = [ 'addExclusions', 'compute' ],
+          cls = 'espressopp.analysis.AdressDensityLocal'
+        )

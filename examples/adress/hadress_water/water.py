@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python2
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -21,7 +21,7 @@
 #  ESPResSo++ Python script for H-AdResS Water                            #
 #  simulation  based on Gromacs topology                                  #
 ###########################################################################
-	
+
 import math
 import sys
 import time
@@ -178,9 +178,9 @@ potCG = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rca) # CG
 for n in range(system.getNumberOfInteractions()):
     interaction=system.getInteraction(n)
     if interaction.bondType() == espressopp.interaction.Nonbonded:
-	print("Setting CG interaction", typeCG)
-	interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
-	break
+        print("Setting CG interaction", typeCG)
+        interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
+        break
 
 # set up bonded interactions according to the parameters read from the .top file
 bondedinteractions=gromacs.setBondedInteractionsAdress(system, bondtypes, bondtypeparams, ftpl)

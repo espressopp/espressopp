@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 """
@@ -24,17 +24,17 @@
 espressopp.Quaternion
 *********************
 
-This class provides quaternions with the associate methods. 
-Quaternions can be used as an efficient representation for the orientation 
-and rotation of 3D vector objects in 3D euclidean space. A Quaternion as 
-such has a real part and an imaginary part. For implementation purposes, 
-the representation through one real scalar and one real 3D vector is used 
-here. The vector part is defined using the Real3D class of espressopp. 
+This class provides quaternions with the associate methods.
+Quaternions can be used as an efficient representation for the orientation
+and rotation of 3D vector objects in 3D euclidean space. A Quaternion as
+such has a real part and an imaginary part. For implementation purposes,
+the representation through one real scalar and one real 3D vector is used
+here. The vector part is defined using the Real3D class of espressopp.
 
 The format of a quaternion is "(real_part, unreal_part)" with the types
 "real" and "Real3D", respectively.
 
-While there are other possible applications for quaternions (rotation) 
+While there are other possible applications for quaternions (rotation)
 in the simulation code, they will be used at the C++-level in order to per-
 form the integration of the Euler equations of motion regarding the partic-
 les angular motion, i.e. the rigid body dynamics.
@@ -46,7 +46,7 @@ The following methods from C++-level are available at the python-level:
 * getReal()
     return the scalar part of the quaternion
 * setReal(real)
-    sets the scalar part of the quaternion 
+    sets the scalar part of the quaternion
 * getImag()
     returns the vector part of the quaternion
 * getImagItem(i)
@@ -64,7 +64,7 @@ The following methods from C++-level are available at the python-level:
 * transpose()
     transposes the quaternion (changes sign of unreal_part)
 
-The multiplication operator is overloaded in order to perform quaternion 
+The multiplication operator is overloaded in order to perform quaternion
 multiplication, see examples below. Furthermore, it is possible to multi-
 ply a quaternion with a scalar, in order to rescale it.
 
@@ -73,13 +73,13 @@ ply a quaternion with a scalar, in order to rescale it.
 **Initialize:**
 
 >>> espressopp.Quaternion()
-Quaternion(0.0, Real3D(0.0, 0.0, 0.0)) 
+Quaternion(0.0, Real3D(0.0, 0.0, 0.0))
 
 >>> espressopp.Quaternion(0.0, 1.0, 2.0, 3.0)
-Quaternion(1.0, Real3D(1.0, 2.0, 3.0)) 
+Quaternion(1.0, Real3D(1.0, 2.0, 3.0))
 
 >>> vec = espressopp.Real3D(1.0, 2.0, 3.0)
->>> Quaternion(vec) 
+>>> Quaternion(vec)
 Quaternion(0.0, Real3D(1.0, 2.0, 3.0))
 
 >>> espressopp.Quaternion(1.0)
@@ -111,17 +111,17 @@ Quaternion(1.0, Real3D(0.0, 2.0, 3.0))
 
 **Transpose and normalize:**
 
->>> q = Quaternion(0.0, 1.0, 2.0, 3.0) 
+>>> q = Quaternion(0.0, 1.0, 2.0, 3.0)
 >>> q.transpose()
 Quaternion(0.0, Real3D(-1.0, -2.0, -3.0))
->>> q = Quaternion(0.0, 1.0, 2.0, 3.0) 
+>>> q = Quaternion(0.0, 1.0, 2.0, 3.0)
 >>> q.normalize()
 Quaternion(0.0, Real3D(0.2672612419124244, 0.5345224838248488, 0.8017837257372732))
 
 
 **Inner product and absolute value:**
 
->>> q = Quaternion(0.0, 1.0, 2.0, 3.0) 
+>>> q = Quaternion(0.0, 1.0, 2.0, 3.0)
 >>> q.sqr()
 14.0
 >>> q.abs()
@@ -211,7 +211,7 @@ extend_class()
 def toQuaternionFromVector(*args):
     """Try to convert the arguments to a Quaternion.
 
-    This function will only convert to a Quaternion if real_part, 
+    This function will only convert to a Quaternion if real_part,
     unreal_part[0], unreal_part[1] and unreal_part[2] are specified."""
     if len(args) == 1:
         arg0 = args[0]
@@ -225,7 +225,7 @@ def toQuaternionFromVector(*args):
 
 
 def toQuaternion(*args):
-    """Try to convert the arguments to a Quaternion, 
+    """Try to convert the arguments to a Quaternion,
     return the argument if it is already a Quaternion."""
     if len(args) == 1 and isinstance(args[0], Quaternion):
         return args[0]

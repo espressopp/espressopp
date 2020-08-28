@@ -39,23 +39,23 @@ potentials.
 .. function:: espressopp.interaction.TabulatedDihedral(itype, filename)
 
         :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filename: The tabulated potential filename.
-		:type itype: int
-		:type filename: str
+                :param filename: The tabulated potential filename.
+                :type itype: int
+                :type filename: str
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potential)
 
-		:param system: The Espresso++ system object.
-		:param fql: The FixedQuadrupleList.
-		:param potential: The potential.
-		:type system: espressopp.System
-		:type fql: espressopp.FixedQuadrupleList
-		:type potential: espressopp.interaction.Potential
+                :param system: The Espresso++ system object.
+                :param fql: The FixedQuadrupleList.
+                :param potential: The potential.
+                :type system: espressopp.System
+                :type fql: espressopp.FixedQuadrupleList
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral.setPotential(potential)
 
-		:param potential: The potential object.
-		:type potential: espressopp.interaction.Potential
+                :param potential: The potential object.
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTypesTabulatedDihedral(system, fql)
 

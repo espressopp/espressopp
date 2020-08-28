@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python2
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -227,16 +227,16 @@ sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 start_time = time.process_time()
 nsteps = steps / intervals
 for s in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * s
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interFENE.computeEnergy()
-  sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
-  system.storage.decompose()
+    integrator.run(nsteps)
+    step = nsteps * s
+    T = temperature.compute()
+    P = pressure.compute()
+    Pij = pressureTensor.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interFENE.computeEnergy()
+    sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
+    system.storage.decompose()
 
 end_time = time.process_time()
 
@@ -245,4 +245,3 @@ end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-

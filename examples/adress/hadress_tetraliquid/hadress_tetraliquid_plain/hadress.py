@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python2
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -226,39 +226,39 @@ start_time = time.process_time()
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * s
-  T = temperature.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interQuartic.computeEnergy()
-  sys.stdout.write(fmt % (step, T, Ek + Ep + Eb, Ep, Eb, Ek))
+    integrator.run(nsteps)
+    step = nsteps * s
+    T = temperature.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interQuartic.computeEnergy()
+    sys.stdout.write(fmt % (step, T, Ek + Ep + Eb, Ep, Eb, Ek))
 
-  # write trajectory
-  dump_conf_gro.dump()
-  dump_conf_gro_adr.dump()
+    # write trajectory
+    dump_conf_gro.dump()
+    dump_conf_gro_adr.dump()
 
-  # calculate density profile
-  density_array = densityprofile.compute(densityprofilegrid)
-  for i in range(len(density_array)):
-    if(i>=len(density_array_total)):
-      density_array_total.append(density_array[i])
-    else:
-      density_array_total[i] += density_array[i]
-  addsDensity += 1.0
+    # calculate density profile
+    density_array = densityprofile.compute(densityprofilegrid)
+    for i in range(len(density_array)):
+        if(i>=len(density_array_total)):
+            density_array_total.append(density_array[i])
+        else:
+            density_array_total[i] += density_array[i]
+    addsDensity += 1.0
 
-  # calculate pressure profile
-  pressure_array = pressureprofile.compute(pressureprofilegrid)
-  for i in range(len(pressure_array)):
-    if(i>=len(pressure_array_total)):
-      pressure_array_total.append(pressure_array[i])
-    else:
-      pressure_array_total[i] += pressure_array[i]
-  addsPressure += 1.0
+    # calculate pressure profile
+    pressure_array = pressureprofile.compute(pressureprofilegrid)
+    for i in range(len(pressure_array)):
+        if(i>=len(pressure_array_total)):
+            pressure_array_total.append(pressure_array[i])
+        else:
+            pressure_array_total[i] += pressure_array[i]
+    addsPressure += 1.0
 
 # correct the density profile according to number of samples
 for i in range(len(density_array_total)):
-  density_array_total[i] /= addsDensity
+    density_array_total[i] /= addsDensity
 
 # printing density profile
 nameFile = 'density_profile.dat'
@@ -268,12 +268,12 @@ tempFile = open (nameFile, 'w')
 fmt = ' %12.8f %12.8f\n'
 dr = Lx / float(densityprofilegrid)
 for i in range( len(density_array_total) ):
-  tempFile.write(fmt % ( (i+0.5)*dr, density_array_total[i] ))
+    tempFile.write(fmt % ( (i+0.5)*dr, density_array_total[i] ))
 tempFile.close()
 
 # correct the pressure profile according to number of samples
 for i in range(len(pressure_array_total)):
-  pressure_array_total[i] /= addsPressure
+    pressure_array_total[i] /= addsPressure
 
 # printing pressure profile
 nameFile = 'pressure_profile.dat'
@@ -283,7 +283,7 @@ tempFile = open (nameFile, 'w')
 fmt = ' %12.8f %12.8f\n'
 dr = Lx / float(pressureprofilegrid)
 for i in range( len(pressure_array_total) ):
-  tempFile.write(fmt % ( (i+0.5)*dr, pressure_array_total[i] ))
+    tempFile.write(fmt % ( (i+0.5)*dr, pressure_array_total[i] ))
 tempFile.close()
 
 # simulation information

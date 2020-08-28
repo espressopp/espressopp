@@ -69,8 +69,8 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensor(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 
 from espressopp.esutil import cxxinit

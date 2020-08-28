@@ -28,7 +28,7 @@
 #  NaCl crystal. Then the energy and forces are calculated and compared using both
 #  the Ewald summation and the P3M. At the end the Madelung constant of NaCl crystal
 #  is calculated.
-#  
+#
 #  At the moment there is only metallic surrounding media is possible.
 
 #  Parameters:
@@ -49,7 +49,7 @@ from espressopp import Real3D
 
 # initial parameters
 N = 16                 # number of particles on lattice site
-num_particles = N**3   # total number of particles 
+num_particles = N**3   # total number of particles
 rho = 0.03              # number density of particles, number of particles devided by volume
 
 # creating a cubic NaCl crystal
@@ -101,7 +101,7 @@ print('')
 '''
 
 #######################################################################################
-#   system for Ewald 
+#   system for Ewald
 #######################################################################################
 
 systemEwald         = espressopp.System()
@@ -127,19 +127,19 @@ props = ['id', 'pos', 'type', 'q']
 new_particles = []
 countX = countY = countZ = 0
 for i in range(0, num_particles):
-  
-  # charge should be accordingly to NaCl crystall
-  charge = pow(-1, countX + countY + countZ)
-  part = [ i, Real3D(x[i], y[i], z[i]), 0, charge ]
-  new_particles.append(part)
-  
-  countX += 1
-  if countX >= N:
-    countX = 0
-    countY += 1
-    if countY >= N:
-      countY = 0
-      countZ += 1
+
+    # charge should be accordingly to NaCl crystall
+    charge = pow(-1, countX + countY + countZ)
+    part = [ i, Real3D(x[i], y[i], z[i]), 0, charge ]
+    new_particles.append(part)
+
+    countX += 1
+    if countX >= N:
+        countX = 0
+        countY += 1
+        if countY >= N:
+            countY = 0
+            countZ += 1
 
 # adding particles to Ewald system
 systemEwald.storage.addParticles(new_particles, *props)
@@ -214,13 +214,13 @@ print(('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz')))
 print_N = min(num_particles, 20)
 
 for j in range(0, print_N):
-  print(( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
-    abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
-    abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
-    abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) ))
-  
-  print('force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f)
-  
+    print(( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
+      abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
+      abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
+      abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) ))
+
+    print('force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f)
+
 
 # calculating the R space part of electrostatic energy
 energyEwaldR = coulombR_intEwald.computeEnergy()

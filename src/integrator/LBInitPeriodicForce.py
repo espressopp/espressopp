@@ -2,36 +2,36 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
-    
-This class allows to set or add external periodic forces 
-(*lattice units*) to the LB-fluid. At first, one has to create a force object and then 
+
+This class allows to set or add external periodic forces
+(*lattice units*) to the LB-fluid. At first, one has to create a force object and then
 set or add this force to the system.
 
 .. note::
 
-    Please note, that a periodic (sin-like) force acts in *z*-direction as a function 
+    Please note, that a periodic (sin-like) force acts in *z*-direction as a function
     of *x*. The *z*-component of the force provides therefore the amplitude of the
     sin-modulation. The *x*- and *y*-components of the specified force interpreted as
     body forces in corresponding directions.
-    
+
 Example to set external sin-like force.
 
 >>> ampFz = 0.0001
@@ -40,7 +40,7 @@ Example to set external sin-like force.
 >>> lbforceSin = espressopp.integrator.LBInitConstForce(system,lb)
 >>> lbforceSin.setForce( extForceToSet )
 
-Example to add external sin-like force. 
+Example to add external sin-like force.
 
 >>> ampFz = 0.0005
 >>> Fx = Fy = 0.
@@ -66,6 +66,6 @@ if pmi.isController :
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LBInitPeriodicForceLocal',
             pmicall = [
-                       "setForce", 
+                       "setForce",
                        "addForce"]
             )

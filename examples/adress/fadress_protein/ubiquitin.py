@@ -1,21 +1,21 @@
 #!/usr/bin/env python2
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #########################################################################################
 #                                                                                       #
@@ -45,7 +45,7 @@ from datetime import datetime
 
 # This script can also be used to perform an AdResS simulation with a spherical atomistic region centred on a protein, the protein is completely atomistic
 # Change the value of ex_size and hy_size, and uncomment the lines related to CG potential and TDForce. You may also need a stronger thermostat.
-# Uses force-based AdResS and thermodynamic force 
+# Uses force-based AdResS and thermodynamic force
 # Assumes the atomistic region is defined such that the entire protein is always completely inside it
 
 # The particles are stored in memory as follows:
@@ -61,7 +61,7 @@ atProtIndices = [x for x in range(1,1232)] #1 to 1231 inclusive
 nProtAtoms = len(atProtIndices)
 # indices of atoms in water molecules with adaptive resolution
 atWaterIndices = [x for x in range(1232,115484)] #water atoms, 1232 to 115483 inclusive
-nWaterAtoms = len(atWaterIndices) 
+nWaterAtoms = len(atWaterIndices)
 nWaterAtomsPerMol = 3 #number of atoms per cg water bead
 nWaterMols = nWaterAtoms/nWaterAtomsPerMol
 adresRegionCentreAtIndex = 689 #index of atom at centre of AdResS region
@@ -130,12 +130,12 @@ defaults, atTypes, atomtypesDict, atMasses, atCharges, atomtypeparameters, atBon
 reverseAtomtypesDict = dict([(v, k) for k, v in atomtypesDict.items()])
 # delete from atomtypeparams any types not in system, so as not to conflict with any new types created later
 for k in list(atomtypeparameters):
-  if k not in atTypes:
-    print("# Deleting unused type ",k,"/",reverseAtomtypesDict[k]," from atomtypeparameters, atomtypesDict and reverseAtomtypesDict")
-    del atomtypeparameters[k]
-    atomtypekey = reverseAtomtypesDict[k]
-    del reverseAtomtypesDict[k]
-    del atomtypesDict[atomtypekey]
+    if k not in atTypes:
+        print("# Deleting unused type ",k,"/",reverseAtomtypesDict[k]," from atomtypeparameters, atomtypesDict and reverseAtomtypesDict")
+        del atomtypeparameters[k]
+        atomtypekey = reverseAtomtypesDict[k]
+        del reverseAtomtypesDict[k]
+        del atomtypesDict[atomtypekey]
 
 # system box size
 box                = (Lx, Ly, Lz)
@@ -151,12 +151,12 @@ print("# number of atomistic particles in solvent = ",nWaterAtoms)
 print("# number of coarse-grained particles in solvent = ",nWaterMols)
 
 nParticlesTotal=nProtAtoms+nProtCgparticles+nWaterAtoms+nWaterMols
-print("# total number of particles after setup = ",nParticlesTotal) 
+print("# total number of particles after setup = ",nParticlesTotal)
 
 if (nParticlesRead != (nProtAtoms+nWaterAtoms)):
-  print("problem: no. particles in crd file != np. of atomistic particles specified")
-  print("values: ",nParticlesRead,nProtAtoms+nWaterAtoms)
-  quit()
+    print("problem: no. particles in crd file != np. of atomistic particles specified")
+    print("values: ",nParticlesRead,nProtAtoms+nWaterAtoms)
+    quit()
 
 particleX=[]
 particleY=[]
@@ -174,49 +174,49 @@ particleVZ=[]
 
 #atomistic particles (protein and water)
 for i in range(nProtAtoms+nWaterAtoms):
-  particlePID.append(i+1)
-  particleMasses.append(atMasses[i])
-  particleCharges.append(atCharges[i])
-  particleTypes.append(atTypes[i])
-  particleTypestring.append('atomistic__')
-  particleX.append(atX[i])
-  particleY.append(atY[i])
-  particleZ.append(atZ[i])
-  particleVX.append(atVX[i])
-  particleVY.append(atVY[i])
-  particleVZ.append(atVZ[i])
+    particlePID.append(i+1)
+    particleMasses.append(atMasses[i])
+    particleCharges.append(atCharges[i])
+    particleTypes.append(atTypes[i])
+    particleTypestring.append('atomistic__')
+    particleX.append(atX[i])
+    particleY.append(atY[i])
+    particleZ.append(atZ[i])
+    particleVX.append(atVX[i])
+    particleVY.append(atVY[i])
+    particleVZ.append(atVZ[i])
 
 #cg protein particles (same as atomistic)
 for i in range(nProtAtoms):
-  particlePID.append(i+1+nProtAtoms+nWaterAtoms)
-  particleMasses.append(atMasses[i])
-  particleCharges.append(atCharges[i])
-  particleTypes.append(atTypes[i])
-  particleTypestring.append('cg_protein_')
-  particleX.append(atX[i]) 
-  particleY.append(atY[i])
-  particleZ.append(atZ[i])
-  particleVX.append(atVX[i])
-  particleVY.append(atVY[i])
-  particleVZ.append(atVZ[i])
+    particlePID.append(i+1+nProtAtoms+nWaterAtoms)
+    particleMasses.append(atMasses[i])
+    particleCharges.append(atCharges[i])
+    particleTypes.append(atTypes[i])
+    particleTypestring.append('cg_protein_')
+    particleX.append(atX[i])
+    particleY.append(atY[i])
+    particleZ.append(atZ[i])
+    particleVX.append(atVX[i])
+    particleVY.append(atVY[i])
+    particleVZ.append(atVZ[i])
 
 #cg water particles
 typeCG = max(reverseAtomtypesDict.keys())+2
 
 reverseAtomtypesDict[typeCG]='WCG'
 for i in range(nWaterMols):
-  particlePID.append(i+1+nProtAtoms+nProtCgparticles+nWaterAtoms)
-  indexO=atWaterIndices[3*i]-1
-  particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
-  particleCharges.append(0.0)
-  particleTypes.append(typeCG)
-  particleTypestring.append('adres_cg___')
-  particleX.append(atX[indexO]) # put CG particle on O for the moment, later CG particle will be positioned in centre
-  particleY.append(atY[indexO])
-  particleZ.append(atZ[indexO])
-  particleVX.append(atVX[indexO]) # give CG particle velocity of O for the moment
-  particleVY.append(atVY[indexO])
-  particleVZ.append(atVZ[indexO])
+    particlePID.append(i+1+nProtAtoms+nProtCgparticles+nWaterAtoms)
+    indexO=atWaterIndices[3*i]-1
+    particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
+    particleCharges.append(0.0)
+    particleTypes.append(typeCG)
+    particleTypestring.append('adres_cg___')
+    particleX.append(atX[indexO]) # put CG particle on O for the moment, later CG particle will be positioned in centre
+    particleY.append(atY[indexO])
+    particleZ.append(atZ[indexO])
+    particleVX.append(atVX[indexO]) # give CG particle velocity of O for the moment
+    particleVY.append(atVY[indexO])
+    particleVZ.append(atVZ[indexO])
 
 print('# system total charge = ',sum(particleCharges[:nProtAtoms+nWaterAtoms]))
 
@@ -233,7 +233,7 @@ print("RNG Seed:", seed)
 rng = espressopp.esutil.RNG()
 rng.seed(seed)
 system.rng = rng
-# use orthorhombic periodic boundary conditions 
+# use orthorhombic periodic boundary conditions
 system.bc          = espressopp.bc.OrthorhombicBC(system.rng, box)
 # set the skin size used for verlet lists and cell sizes
 system.skin        = skin
@@ -265,38 +265,38 @@ mapAtToCgIndex = {}
 
 #first adres particles
 for i in range(nWaterMols):
-  cgindex = i + nProtAtoms + nProtCgparticles + nWaterAtoms
-  tmptuple = [particlePID[cgindex]]
-  # first CG particle
-  allParticles.append([particlePID[cgindex],
-                      particleTypes[cgindex],
-                      Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
-                      Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
-                      particleMasses[cgindex],particleCharges[cgindex],0])
-  # then AA particles
-  for j in range(nWaterAtomsPerMol):
-    aaindex = i*nWaterAtomsPerMol + j + nProtAtoms
-    tmptuple.append(particlePID[aaindex])
-    allParticles.append([particlePID[aaindex],
-                      particleTypes[aaindex],
-                      Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
-                      Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
-                      particleMasses[aaindex],particleCharges[aaindex],1])
-    mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
-  tuples.append(tmptuple)
+    cgindex = i + nProtAtoms + nProtCgparticles + nWaterAtoms
+    tmptuple = [particlePID[cgindex]]
+    # first CG particle
+    allParticles.append([particlePID[cgindex],
+                        particleTypes[cgindex],
+                        Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
+                        Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
+                        particleMasses[cgindex],particleCharges[cgindex],0])
+    # then AA particles
+    for j in range(nWaterAtomsPerMol):
+        aaindex = i*nWaterAtomsPerMol + j + nProtAtoms
+        tmptuple.append(particlePID[aaindex])
+        allParticles.append([particlePID[aaindex],
+                          particleTypes[aaindex],
+                          Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
+                          Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
+                          particleMasses[aaindex],particleCharges[aaindex],1])
+        mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
+    tuples.append(tmptuple)
 
 # then protein
 for i in range(nProtAtoms):
-  allParticles.append([particlePID[i]+nProtAtoms+nWaterAtoms,particleTypes[i],
-                      Real3D(particleX[i],particleY[i],particleZ[i]),
-                      Real3D(particleVX[i],particleVY[i],particleVZ[i]),
-                      particleMasses[i],particleCharges[i],0])
-  allParticles.append([particlePID[i],particleTypes[i],
-                      Real3D(particleX[i],particleY[i],particleZ[i]),
-                      Real3D(particleVX[i],particleVY[i],particleVZ[i]),
-                      particleMasses[i],particleCharges[i],1])
-  tuples.append([particlePID[i]+nProtAtoms+nWaterAtoms,particlePID[i]])
-  mapAtToCgIndex[particlePID[i]] = particlePID[i]+nProtAtoms+nWaterAtoms
+    allParticles.append([particlePID[i]+nProtAtoms+nWaterAtoms,particleTypes[i],
+                        Real3D(particleX[i],particleY[i],particleZ[i]),
+                        Real3D(particleVX[i],particleVY[i],particleVZ[i]),
+                        particleMasses[i],particleCharges[i],0])
+    allParticles.append([particlePID[i],particleTypes[i],
+                        Real3D(particleX[i],particleY[i],particleZ[i]),
+                        Real3D(particleVX[i],particleVY[i],particleVZ[i]),
+                        particleMasses[i],particleCharges[i],1])
+    tuples.append([particlePID[i]+nProtAtoms+nWaterAtoms,particlePID[i]])
+    mapAtToCgIndex[particlePID[i]] = particlePID[i]+nProtAtoms+nWaterAtoms
 
 print('# adding ',len(allParticles),' particles')
 system.storage.addParticles(allParticles, *properties)
@@ -309,17 +309,17 @@ system.storage.setFixedTuplesAdress(ftpl)
 system.storage.decompose()
 
 if (0): # set to 1 to print file to check if all particles were correctly added
-  file=open('system.out','w')
-  for i in range(1,nParticlesTotal+1):
-    if i <= nProtAtoms + nWaterAtoms:
-      vp = mapAtToCgIndex[i]
-    else:
-      vp = 0
-    part = system.storage.getParticle(i)
-    ptype = part.type
-    st="%7d %d %7.3f %7.3f %7.3f %3d %5s %7.3f %7.3f %8s\n"%(i,vp,part.pos[0],part.pos[1],part.pos[2],ptype,reverseAtomtypesDict[ptype],part.mass,part.q,particleTypestring[i-1])
-    file.write(st)
-  file.close()
+    file=open('system.out','w')
+    for i in range(1,nParticlesTotal+1):
+        if i <= nProtAtoms + nWaterAtoms:
+            vp = mapAtToCgIndex[i]
+        else:
+            vp = 0
+        part = system.storage.getParticle(i)
+        ptype = part.type
+        st="%7d %d %7.3f %7.3f %7.3f %3d %5s %7.3f %7.3f %8s\n"%(i,vp,part.pos[0],part.pos[1],part.pos[2],ptype,reverseAtomtypesDict[ptype],part.mass,part.q,particleTypestring[i-1])
+        file.write(st)
+    file.close()
 
 ########################################################################
 # 3. setup of the integrator and simulation ensemble                   #
@@ -327,24 +327,24 @@ if (0): # set to 1 to print file to check if all particles were correctly added
 
 # use a velocity Verlet integration scheme
 integrator     = espressopp.integrator.VelocityVerlet(system)
-# set the integration step  
+# set the integration step
 integrator.dt  = dt
 # use a thermostat if the temperature is set
 if (temperature != None):
-  # create Langevin thermostat
-  thermostat             = espressopp.integrator.LangevinThermostat(system)
-  # set Langevin friction constant
-  thermostat.gamma       = 5.0 # units ps-1
-  print("# gamma for langevin thermostat = ",thermostat.gamma)
-  # set temperature
-  thermostat.temperature = temperature
-  # switch on for adres
-  thermostat.adress = True
-  print("# thermostat temperature        = ", temperature*temperatureConvFactor)
-  # tell the integrator to use this thermostat
-  integrator.addExtension(thermostat)
+    # create Langevin thermostat
+    thermostat             = espressopp.integrator.LangevinThermostat(system)
+    # set Langevin friction constant
+    thermostat.gamma       = 5.0 # units ps-1
+    print("# gamma for langevin thermostat = ",thermostat.gamma)
+    # set temperature
+    thermostat.temperature = temperature
+    # switch on for adres
+    thermostat.adress = True
+    print("# thermostat temperature        = ", temperature*temperatureConvFactor)
+    # tell the integrator to use this thermostat
+    integrator.addExtension(thermostat)
 else:
-  print("#No thermostat")
+    print("#No thermostat")
 
 ########################################################################
 # 6. define atomistic and adres interactions
@@ -354,8 +354,8 @@ else:
 
 cm = adresRegionCentreAtIndex
 print('# spherical moving atomistic region for adres centred on atom ',cm,' i.e. cg particle ',mapAtToCgIndex[cm])
-verletlist = espressopp.VerletListAdress(system, cutoff=nbCutoff, adrcut=nbCutoff, 
-                                dEx=ex_size, dHy=hy_size, 
+verletlist = espressopp.VerletListAdress(system, cutoff=nbCutoff, adrcut=nbCutoff,
+                                dEx=ex_size, dHy=hy_size,
                                 pids=[mapAtToCgIndex[cm]], sphereAdr=True)
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -378,7 +378,7 @@ qq_adres_interaction=gromacs.setCoulombInteractions(system, verletlist, intCutof
 ## set up LJ 1-4 interactions
 cgOnefourpairslist=[]
 for (a1,a2) in atOnefourpairslist:
-  cgOnefourpairslist.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2]))
+    cgOnefourpairslist.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2]))
 print('# ',len(cgOnefourpairslist),' 1-4 pairs in aa-hybrid region')
 onefourlist = espressopp.FixedPairList(system.storage)
 onefourlist.addBonds(cgOnefourpairslist)
@@ -391,49 +391,49 @@ qq14_interactions=gromacs.setCoulomb14Interactions(system, defaults, onefourlist
 # only for protein, not for water
 cgBondtypes={}
 for btkey in list(atBondtypes.keys()):
-  newBondtypes=[]
-  for (a1,a2) in atBondtypes[btkey]:
-    if (a1 in atProtIndices) and (a2 in atProtIndices):
-      newBondtypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2]))
-  cgBondtypes[btkey]=newBondtypes
+    newBondtypes=[]
+    for (a1,a2) in atBondtypes[btkey]:
+        if (a1 in atProtIndices) and (a2 in atProtIndices):
+            newBondtypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2]))
+    cgBondtypes[btkey]=newBondtypes
 bondedinteractions=gromacs.setBondedInteractions(system, cgBondtypes, bondtypeparams)
 
 # set up angle interactions according to the parameters read from the .top file
 # only for protein, not for water
 cgAngletypes={}
 for atkey in list(atAngletypes.keys()):
-  newAngletypes=[]
-  for (a1,a2,a3) in atAngletypes[atkey]:
-    if (a1 in atProtIndices) and (a2 in atProtIndices) and (a3 in atProtIndices):
-      newAngletypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3]))
-  cgAngletypes[atkey]=newAngletypes
+    newAngletypes=[]
+    for (a1,a2,a3) in atAngletypes[atkey]:
+        if (a1 in atProtIndices) and (a2 in atProtIndices) and (a3 in atProtIndices):
+            newAngletypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3]))
+    cgAngletypes[atkey]=newAngletypes
 angleinteractions=gromacs.setAngleInteractions(system, cgAngletypes, angletypeparams)
 
 # set up dihedral interactions according to the parameters read from the .top file
 cgDihedraltypes={}
 for atkey in list(atDihedraltypes.keys()):
-  newDihedraltypes=[]
-  for (a1,a2,a3,a4) in atDihedraltypes[atkey]:
-    newDihedraltypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3],mapAtToCgIndex[a4]))
-  cgDihedraltypes[atkey]=newDihedraltypes
+    newDihedraltypes=[]
+    for (a1,a2,a3,a4) in atDihedraltypes[atkey]:
+        newDihedraltypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3],mapAtToCgIndex[a4]))
+    cgDihedraltypes[atkey]=newDihedraltypes
 dihedralinteractions=gromacs.setDihedralInteractions(system, cgDihedraltypes, dihedraltypeparams)
 
 # set up improper interactions according to the parameters read from the .top file
 cgImpropertypes={}
 for atkey in list(atImpropertypes.keys()):
-  newImpropertypes=[]
-  for (a1,a2,a3,a4) in atImpropertypes[atkey]:
-    newImpropertypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3],mapAtToCgIndex[a4]))
-  cgImpropertypes[atkey]=newImpropertypes
+    newImpropertypes=[]
+    for (a1,a2,a3,a4) in atImpropertypes[atkey]:
+        newImpropertypes.append((mapAtToCgIndex[a1],mapAtToCgIndex[a2],mapAtToCgIndex[a3],mapAtToCgIndex[a4]))
+    cgImpropertypes[atkey]=newImpropertypes
 improperinteractions=gromacs.setImproperInteractions(system, cgImpropertypes, impropertypeparams)
 
 cgExclusions = [] #previously existing atExclusions list was for atomistic protein, don't use it
 #in espressopppp, exclusions are handled at the CG particle level
 for pair in atExclusions:
-  vp1 = mapAtToCgIndex[pair[0]]
-  vp2 = mapAtToCgIndex[pair[1]]
-  if vp1 == vp2: continue #all at interactions within one cg particle are excluded anyway
-  cgExclusions.append((vp1,vp2))
+    vp1 = mapAtToCgIndex[pair[0]]
+    vp2 = mapAtToCgIndex[pair[1]]
+    if vp1 == vp2: continue #all at interactions within one cg particle are excluded anyway
+    cgExclusions.append((vp1,vp2))
 
 verletlist.exclude(cgExclusions)
 print('# ',len(cgExclusions),' exclusions')
@@ -444,8 +444,8 @@ print('# ',count,' interactions defined')
 # SETTLE water for rigid water
 print('#Warning: settle set-up assumes water was listed first when tuples were constructed')
 molidlist=[]
-for wm in range(nWaterMols): 
-  molidlist.append(tuples[wm][0]) #assuming water is listed first
+for wm in range(nWaterMols):
+    molidlist.append(tuples[wm][0]) #assuming water is listed first
 
 settlewaters = espressopp.integrator.Settle(system, ftpl, mO=15.9994, mH=1.008, distHH=0.1633, distOH=0.1)
 settlewaters.addMolecules(molidlist)
@@ -475,7 +475,7 @@ integrator.addExtension(adress)
 #thdforce.addForce(itype=3,filename=fthd,type=typeCG)
 #integrator.addExtension(thdforce)
 
-# distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass 
+# distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass
 print('# Decomposing...')
 espressopp.tools.AdressDecomp(system, integrator)
 
@@ -500,38 +500,37 @@ fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f
 integrator.run(0)
 
 for k in range(nOutput):
-  i=k*nStepsPerOutput
-  EQQ=0.0
-  EQQ14=0.0
-  ELj=0.0
-  ELj14=0.0
-  Eb = 0.0
-  EAng = 0.0
-  EDih = 0.0
-  EImp = 0.0
-  for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
-  for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
-  for dih in list(dihedralinteractions.values()): EDih+=dih.computeEnergy()
-  for imp in list(improperinteractions.values()): EImp+=imp.computeEnergy()
-  ELj= lj_adres_interaction.computeEnergy()
-  ELj14 = lj14interaction.computeEnergy()
-  EQQ = qq_adres_interaction.computeEnergy()
-  EQQ14 = qq14_interactions.computeEnergy()
-  T = temperature.compute()
-  Etotal = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-  print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor)))
-  sys.stdout.flush()
-  integrator.run(nStepsPerOutput)
-  particle = system.storage.getParticle(1)
-  if math.isnan(particle.pos[0]):
-    quit()
-  if (i > 0) and (i % nStepsPerTrjoutput == 0):
-    dump_conf_gro.dump()
+    i=k*nStepsPerOutput
+    EQQ=0.0
+    EQQ14=0.0
+    ELj=0.0
+    ELj14=0.0
+    Eb = 0.0
+    EAng = 0.0
+    EDih = 0.0
+    EImp = 0.0
+    for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
+    for dih in list(dihedralinteractions.values()): EDih+=dih.computeEnergy()
+    for imp in list(improperinteractions.values()): EImp+=imp.computeEnergy()
+    ELj= lj_adres_interaction.computeEnergy()
+    ELj14 = lj14interaction.computeEnergy()
+    EQQ = qq_adres_interaction.computeEnergy()
+    EQQ14 = qq14_interactions.computeEnergy()
+    T = temperature.compute()
+    Etotal = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
+    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor)))
+    sys.stdout.flush()
+    integrator.run(nStepsPerOutput)
+    particle = system.storage.getParticle(1)
+    if math.isnan(particle.pos[0]):
+        quit()
+    if (i > 0) and (i % nStepsPerTrjoutput == 0):
+        dump_conf_gro.dump()
 
 end_time = time.process_time()
 
 # atomtypesDict {atomparticleTypestring: atomtypenumber}, read from topol.top, not used to set up interactions
 # reverseAtomtypesDict {atomtypenumber: atomparticleTypestring}, from atomtypesDict, not used to set up interactions
-# atomtypeparameters {0: {'particletype': 'A', 'eps': 0.0656888, 'charge': 0.0, 'atnum': 1, 'mass': 1.008, 'sig': 0.247135}, 1: {'particletype... etc., only eps and sig used; any types not in atomistic system deleted after reading from topol.top, doesn't contain types added later such as typeCG 
+# atomtypeparameters {0: {'particletype': 'A', 'eps': 0.0656888, 'charge': 0.0, 'atnum': 1, 'mass': 1.008, 'sig': 0.247135}, 1: {'particletype... etc., only eps and sig used; any types not in atomistic system deleted after reading from topol.top, doesn't contain types added later such as typeCG
 # atTypes - list of type of each atom in original atomistic system
-

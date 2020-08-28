@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python2
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -227,27 +227,27 @@ start_time = time.process_time()
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * s
-  T = temperature.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interQuartic.computeEnergy()
-  Ecorr = fec.computeCompEnergy()
-  sys.stdout.write(fmt % (step, T, Ek + Ep + Eb + Ecorr, Ep, Eb, Ek, Ecorr))
+    integrator.run(nsteps)
+    step = nsteps * s
+    T = temperature.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interQuartic.computeEnergy()
+    Ecorr = fec.computeCompEnergy()
+    sys.stdout.write(fmt % (step, T, Ek + Ep + Eb + Ecorr, Ep, Eb, Ek, Ecorr))
 
-  # calculate pressure profile
-  pressure_array = pressureprofile.compute(pressureprofilegrid)
-  for i in range(len(pressure_array)):
-    if(i>=len(pressure_array_total)):
-      pressure_array_total.append(pressure_array[i])
-    else:
-      pressure_array_total[i] += pressure_array[i]
-  Adds += 1.0
+    # calculate pressure profile
+    pressure_array = pressureprofile.compute(pressureprofilegrid)
+    for i in range(len(pressure_array)):
+        if(i>=len(pressure_array_total)):
+            pressure_array_total.append(pressure_array[i])
+        else:
+            pressure_array_total[i] += pressure_array[i]
+    Adds += 1.0
 
 # correct the pressure profile according to number of samples
 for i in range(len(pressure_array_total)):
-  pressure_array_total[i] /= Adds
+    pressure_array_total[i] /= Adds
 
 # printing pressure profile
 nameFile = 'pressure_profile_Helmholtz.dat'
@@ -257,7 +257,7 @@ tempFile = open (nameFile, 'w')
 fmt = ' %12.8f %12.8f\n'
 dr = Lx / float(pressureprofilegrid)
 for i in range( len(pressure_array_total) ):
-  tempFile.write(fmt % ( (i+0.5)*dr, pressure_array_total[i] ))
+    tempFile.write(fmt % ( (i+0.5)*dr, pressure_array_total[i] ))
 tempFile.close()
 
 # simulation information

@@ -29,11 +29,11 @@ the generalized reaction field.
 
 .. math::
 
-	U = PQ\left(
-	\frac{1}{d}
-	- \frac{\left(1 + \frac{(\varepsilon_1 - 4 \varepsilon_2)(1 + \kappa r_c) - 2 \varepsilon_2  \kappa {r_c}^2}
-	{(\varepsilon_1 + 2 \varepsilon_2)(1 + \kappa r_c) + \varepsilon_2  \kappa {r_c}^2}\right)}{r_c^3 2}
-	\cdot d^2 -  \frac{3 \varepsilon_2}{r_c(2 \varepsilon_2 + 1)}\right)
+        U = PQ\left(
+        \frac{1}{d}
+        - \frac{\left(1 + \frac{(\varepsilon_1 - 4 \varepsilon_2)(1 + \kappa r_c) - 2 \varepsilon_2  \kappa {r_c}^2}
+        {(\varepsilon_1 + 2 \varepsilon_2)(1 + \kappa r_c) + \varepsilon_2  \kappa {r_c}^2}\right)}{r_c^3 2}
+        \cdot d^2 -  \frac{3 \varepsilon_2}{r_c(2 \varepsilon_2 + 1)}\right)
 
 where `P` is a prefactor, `Q` is the product of the charges of the two particles, `d` is their distance from each other, and :math:`r_c` the cutoff-radius.
 

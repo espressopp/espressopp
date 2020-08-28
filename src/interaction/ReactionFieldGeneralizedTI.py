@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -30,7 +30,7 @@ This module is for performing simulations (e.g. as part of Thermodynamic Integra
 
   U(\lambda) = (1-\lambda)U_C^A
 
-where :math:`U_C^A` is the standard Reaction Field interaction. This allows one to perform TI where the charges in TI state A (:math:`\lambda=0`) are the particle charges contained in the particle property ``charge`` and the charges in TI state B (:math:`\lambda=1`) are zero. 
+where :math:`U_C^A` is the standard Reaction Field interaction. This allows one to perform TI where the charges in TI state A (:math:`\lambda=0`) are the particle charges contained in the particle property ``charge`` and the charges in TI state B (:math:`\lambda=1`) are zero.
 
 The user specifies a list of particles, pidlist. For all pairs of particles with particletypes interacting via this potential, the RF interaction between two particles i and j is calculated as follows:
 
@@ -78,50 +78,50 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
 
 .. function:: espressopppp.interaction.ReactionFieldGeneralizedTI(prefactor, kappa, epsilon1, epsilon2, cutoff, lambdaTI, annihilate)
 
-		:param prefactor: (default: 1.0) RF parameter
-		:param kappa: (default: 0.0) RF parameter
-		:param epsilon1: (default: 1.0) RF parameter
-		:param epsilon2: (default: 80.0) RF parameter
-		:param cutoff: (default: infinity) interaction cutoff
-		:param lambdaTI: (default: 0.0) TI lambda parameter
-		:param annihilate: (default: True) switch between annihilation and decoupling
-		:type prefactor: real
-		:type kappa: real
-		:type epsilon1: real
-		:type epsilon2: real
-		:type cutoff: real
-		:type lambdaTI: real
-		:type annihilate: bool
+                :param prefactor: (default: 1.0) RF parameter
+                :param kappa: (default: 0.0) RF parameter
+                :param epsilon1: (default: 1.0) RF parameter
+                :param epsilon2: (default: 80.0) RF parameter
+                :param cutoff: (default: infinity) interaction cutoff
+                :param lambdaTI: (default: 0.0) TI lambda parameter
+                :param annihilate: (default: True) switch between annihilation and decoupling
+                :type prefactor: real
+                :type kappa: real
+                :type epsilon1: real
+                :type epsilon2: real
+                :type cutoff: real
+                :type lambdaTI: real
+                :type annihilate: bool
 
 .. function:: espressopppp.interaction.ReactionFieldGeneralizedTI.addPids(pidlist)
 
-		:param pidlist: list of particle ids of particles whose charge is zero in state B
-		:type pidlist: python list
+                :param pidlist: list of particle ids of particles whose charge is zero in state B
+                :type pidlist: python list
 
 .. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized(vl, fixedtupleList)
 
-		:param vl: Verlet list
-		:param fixedtupleList: list of tuples describing mapping between CG and AT particles 
-		:type vl: VerletListAdress object
-		:type fixedtupleList: FixedTupleListAdress object
+                :param vl: Verlet list
+                :param fixedtupleList: list of tuples describing mapping between CG and AT particles
+                :type vl: VerletListAdress object
+                :type fixedtupleList: FixedTupleListAdress object
 
 .. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
 
-		:param type1: atomtype
-		:param type2: atomtype
-		:param potential: espressopppp potential
-		:type type1: int
-		:type type2: int
-		:type potential: Potential
+                :param type1: atomtype
+                :param type2: atomtype
+                :param potential: espressopppp potential
+                :type type1: int
+                :type type2: int
+                :type potential: Potential
 
 .. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
 
-		:param type1: atomtype
-		:param type2: atomtype
-		:param potential: espressopppp potential
-		:type type1: int
-		:type type2: int
-		:type potential: Potential
+                :param type1: atomtype
+                :param type2: atomtype
+                :param potential: espressopppp potential
+                :type type1: int
+                :type type2: int
+                :type potential: Potential
 
 """
 from espressopp import pmi, infinity
@@ -143,8 +143,8 @@ class ReactionFieldGeneralizedTILocal(PotentialLocal, interaction_ReactionFieldG
 
     def addPids(self, pidlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          for pid in pidlist:
-            self.cxxclass.addPid(self, pid)
+            for pid in pidlist:
+                self.cxxclass.addPid(self, pid)
 
 #class VerletListReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListReactionFieldGeneralizedTI):
 #    def __init__(self, vl):
@@ -158,7 +158,7 @@ class ReactionFieldGeneralizedTILocal(PotentialLocal, interaction_ReactionFieldG
 #    def getPotential(self, type1, type2):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            return self.cxxclass.getPotential(self, type1, type2)
-    
+
 class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralizedTI):
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -171,7 +171,7 @@ class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interact
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 #class VerletListHadressReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListHadressReactionFieldGeneralizedTI):
 #    def __init__(self, vl, fixedtupleList):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -184,7 +184,7 @@ class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interact
 #    def setPotentialCG(self, type1, type2, potential):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 if pmi.isController:
     class ReactionFieldGeneralizedTI(Potential):
         'The ReactionFieldGeneralizedTI potential.'
@@ -193,7 +193,7 @@ if pmi.isController:
             pmiproperty = ['prefactor'],
             pmicall = [ 'addPids' ]
             )
-        
+
     #class VerletListReactionFieldGeneralizedTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
@@ -206,10 +206,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressReactionFieldGeneralizedTILocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
+
     #class VerletListHadressReactionFieldGeneralizedTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
     #        cls =  'espressopp.interaction.VerletListHadressReactionFieldGeneralizedTILocal',
     #        pmicall = ['setPotentialAT', 'setPotentialCG']
-    #        )     
+    #        )

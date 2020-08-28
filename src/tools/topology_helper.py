@@ -4,21 +4,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # Some helper classes usefull when parsing the gromacs topology
@@ -55,17 +55,17 @@ class FileBuffer():
             return ''
         return line
     def seek(self, p):
-	self.pos=p
+        self.pos=p
     def tell(self):
-	return self.pos
-        
+        return self.pos
+
 
 def FillFileBuffer(fname, filebuffer):
     f=open(fname, 'r')
     for line in f:
         if "include" in line and not line[0]==';':
             name=(line.split()[1]).strip('\"')
-            try: 
+            try:
                 FillFileBuffer(name, filebuffer)
             except IOError:
                 #need to use relative path
@@ -75,7 +75,7 @@ def FillFileBuffer(fname, filebuffer):
             l=line.rstrip('\n')
             if l:
                 filebuffer.appendline(l)
-            
+
     f.close
     return
 
@@ -88,7 +88,7 @@ def FindType(proposedtype, typelist):
     elif len(list)==0:
         return None
     return list[0]
-    
+
 
 class InteractionType:
     def __init__(self, parameters):
@@ -115,7 +115,7 @@ class HarmonicBondedInteractionType(InteractionType):
         return interb
     def automaticExclusion(self):
         return True
-    
+
 class MorseBondedInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
@@ -124,7 +124,7 @@ class MorseBondedInteractionType(InteractionType):
         return interb
     def automaticExclusion(self):
         return True
-    
+
 class FENEBondedInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
@@ -134,15 +134,15 @@ class FENEBondedInteractionType(InteractionType):
         return interb
     def automaticExclusion(self):
         return True
-    
+
 class HarmonicAngleInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
         # spring constant kb is half the gromacs spring constant. Also convert deg to rad
         pot = espressopp.interaction.AngularHarmonic(self.parameters['k']/2.0, self.parameters['theta']*2*math.pi/360)
         interb = espressopp.interaction.FixedTripleListAngularHarmonic(system, fpl, pot)
-        return interb     
-    
+        return interb
+
 
 class TabulatedBondInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
@@ -155,7 +155,7 @@ class TabulatedBondInteractionType(InteractionType):
         return interb
     def automaticExclusion(self):
         return self.parameters['excl']
-    
+
 class TabulatedAngleInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         spline = 3
@@ -164,7 +164,7 @@ class TabulatedAngleInteractionType(InteractionType):
         gromacs.convertTable(fg, fe)
         potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename=fe)
         interb = espressopp.interaction.FixedTripleListTabulatedAngular(system, fpl, potTab)
-        return interb  
+        return interb
 
 class TabulatedDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
@@ -174,17 +174,17 @@ class TabulatedDihedralInteractionType(InteractionType):
         gromacs.convertTable(fg, fe)
         potTab = espressopp.interaction.TabulatedDihedral(itype=spline, filename=fe)
         interb = espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fpl, potTab)
-        return interb       
+        return interb
 
 class HarmonicNCosDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
-        # DihedralHarmonicNCos coded such that k = gromacs spring constant. Convert degrees to rad 
+        # DihedralHarmonicNCos coded such that k = gromacs spring constant. Convert degrees to rad
         pot = espressopp.interaction.DihedralHarmonicNCos(self.parameters['K'], self.parameters['phi0']*2*math.pi/360, self.parameters['multiplicity'])
         interb = espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos(system, fpl, pot)
         return interb
     def automaticExclusion(self):
         return True
-    
+
 class RyckaertBellemansDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         print(('RyckaertBellemans: {}'.format(self.parameters)))
@@ -198,7 +198,7 @@ class HarmonicDihedralInteractionType(InteractionType):
         return espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, fpl, pot)
 
 def ParseBondTypeParam(line):
-    tmp = line.split() 
+    tmp = line.split()
     btype= tmp[2]
     # TODO: handle exclusions automatically
     if btype == "8":
@@ -217,10 +217,10 @@ def ParseBondTypeParam(line):
         print("Unsupported bond type", tmp[2], "in line:")
         print(line)
         exit()
-    return p     
+    return p
 
 def ParseAngleTypeParam(line):
-    tmp = line.split() 
+    tmp = line.split()
     type= int(tmp[3])
     if type == 1:
         p=HarmonicAngleInteractionType({"theta":float(tmp[4]), "k":float(tmp[5])})
@@ -230,10 +230,10 @@ def ParseAngleTypeParam(line):
         print("Unsupported angle type", type, "in line:")
         print(line)
         exit()
-    return p    
+    return p
 
 def ParseDihedralTypeParam(line):
-    tmp = line.split() 
+    tmp = line.split()
     type= int(tmp[4])
     if type == 8:
         p=TabulatedDihedralInteractionType({"tablenr":int(tmp[5]), "k":float(tmp[6])})
@@ -242,13 +242,13 @@ def ParseDihedralTypeParam(line):
         p = RyckaertBellemansDihedralInteractionType(
             {'K0': tmp[5], 'K1': tmp[6], 'K2': tmp[7], 'K3': tmp[8], 'K4': tmp[9], 'K5': tmp[10]}
         )
-    elif (type == 1) or (type == 9): 
+    elif (type == 1) or (type == 9):
         p=HarmonicNCosDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5]), "multiplicity":int(tmp[7])})
     else:
         print("Unsupported dihedral type", type, "in line:")
         print(line)
         exit()
-    return p    
+    return p
 
 def ParseImproperTypeParam(line):
     tmp = line.split()
@@ -267,10 +267,10 @@ def ParseImproperTypeParam(line):
 
 class Node():
     def __init__(self, id):
-	self.id=id
-	self.neighbours=[]
+        self.id=id
+        self.neighbours=[]
     def addNeighbour(self, nb):
-	self.neighbours.append(nb)
+        self.neighbours.append(nb)
 
 def FindNodeById(id, nodes):
     list=[n for n in nodes if n.id==id ]
@@ -283,19 +283,19 @@ def FindNodeById(id, nodes):
 
 def FindNNextNeighbours(startnode, numberNeighbours, neighbours, forbiddenNodes):
     if numberNeighbours==0:
-	return neighbours
-	
+        return neighbours
+
     #avoid going back the same path
     forbiddenNodes.append(startnode)
-    
+
     # Loop over next neighbours and add them to the neighbours list
     # Recursively call the function with numberNeighbours-1
     for n in startnode.neighbours:
-	if not n in forbiddenNodes:
-	    if n not in neighbours: neighbours.append(n) # avoid double counting in rings
-	    FindNNextNeighbours(n, numberNeighbours-1, neighbours, forbiddenNodes)
-            
- 
+        if not n in forbiddenNodes:
+            if n not in neighbours: neighbours.append(n) # avoid double counting in rings
+            FindNNextNeighbours(n, numberNeighbours-1, neighbours, forbiddenNodes)
+
+
 def GenerateRegularExclusions(bonds, nrexcl, exclusions):
     nodes=[]
     # make a Node object for each atom involved in bonds
@@ -303,17 +303,17 @@ def GenerateRegularExclusions(bonds, nrexcl, exclusions):
         bids=b[0:2]
         for i in bids:
             if FindNodeById(i, nodes)==None:
-               n=Node(i)
-               nodes.append(n)
+                n=Node(i)
+                nodes.append(n)
 
-    # find the next neighbours for each node and append them   
+    # find the next neighbours for each node and append them
     for b in bonds:
         permutations=[(b[0], b[1]), (b[1], b[0])]
         for p in permutations:
             n=FindNodeById(p[0], nodes)
             nn=FindNodeById(p[1], nodes)
-            n.addNeighbour(nn)   
-    
+            n.addNeighbour(nn)
+
     # for each atom, call the FindNNextNeighbours function, which recursively
     # seraches for nrexcl next neighbours
     for n in nodes:
@@ -326,5 +326,5 @@ def GenerateRegularExclusions(bonds, nrexcl, exclusions):
             if not (n.id, nb.id) in exclusions:
                 if not (nb.id, n.id) in exclusions:
                     exclusions.append((n.id, nb.id))
-   
+
     return exclusions

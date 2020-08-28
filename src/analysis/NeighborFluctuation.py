@@ -27,10 +27,10 @@ espressopp.analysis.NeighborFluctuation
 
 .. function:: espressopp.analysis.NeighborFluctuation(system, radius)
 
-		:param system:
-		:param radius:
-		:type system:
-		:type radius:
+                :param system:
+                :param radius:
+                :type system:
+                :type radius:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

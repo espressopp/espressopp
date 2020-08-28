@@ -1,20 +1,20 @@
 #  Copyright (C) 2018
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import time
@@ -45,7 +45,7 @@ class TestCaseMeanSquareInternalDist(unittest.TestCase):
         msid2=espressopp.analysis.MeanSquareInternalDist(system2, chainlength=10, start_pid=1)
         msid2.gather()
         res2=msid2.compute()
-        
+
         self.assertTrue(res1[0]==1)
         self.assertTrue(res1[1]==4)
         self.assertTrue(res1[2]==9)

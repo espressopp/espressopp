@@ -59,7 +59,7 @@ spline = 2                      # spline interpolation type (1, 2, 3)
 tabAA = "table_A_A.tab"         # output file names
 tabAB = "table_A_B.tab"
 tabBB = "table_B_B.tab"
-tab2b = "table_b1.tab" 
+tab2b = "table_b1.tab"
 tab3b = "table_a1.tab"
 sigma = 1.0
 epsilon = 1.0
@@ -114,18 +114,18 @@ gromacs.convertTable(tab3bg, tab3b, sigma, epsilon, c6, c12)
 # Verlet list
 vl = espressopp.VerletList(system, cutoff = rc + system.skin)
 # note: in the previous version of this example, exclusions were treated
-# incorrectly. Here the nrexcl=3 parameter is taken into account 
+# incorrectly. Here the nrexcl=3 parameter is taken into account
 # which excludes all neighbors up to 3 bonds away
 vl.exclude(exclusions)
 
 internb = espressopp.interaction.VerletListTabulated(vl)
-# A-A with Verlet list      
+# A-A with Verlet list
 potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabAA, cutoff=rcaa)
 internb.setPotential(type1 = 1, type2 = 1, potential = potTab)
-# A-B with Verlet list      
+# A-B with Verlet list
 potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabAB, cutoff=rcab)
 internb.setPotential(type1 = 1, type2 = 0, potential = potTab)
-# B-B with Verlet list      
+# B-B with Verlet list
 potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabBB, cutoff=rcbb)
 internb.setPotential(type1 = 0, type2 = 0, potential = potTab)
 system.addInteraction(internb)

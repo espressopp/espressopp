@@ -103,19 +103,19 @@ from _espressopp import analysis_RDFatomistic
 
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
 
-  def __init__(self, system, type1, type2, span = 1.0, spanbased = True):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_RDFatomistic, system, type1, type2, span, spanbased)
+    def __init__(self, system, type1, type2, span = 1.0, spanbased = True):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_RDFatomistic, system, type1, type2, span, spanbased)
 
-  def compute(self, rdfN):
-    return self.cxxclass.compute(self, rdfN)
+    def compute(self, rdfN):
+        return self.cxxclass.compute(self, rdfN)
 
-  def computePathIntegral(self, rdfN):
-    return self.cxxclass.computePathIntegral(self, rdfN)
+    def computePathIntegral(self, rdfN):
+        return self.cxxclass.computePathIntegral(self, rdfN)
 
 if pmi.isController :
-  class RDFatomistic(Observable, metaclass=pmi.Proxy):
-    pmiproxydefs = dict(
-      pmicall = [ "compute", "computePathIntegral" ],
-      cls = 'espressopp.analysis.RDFatomisticLocal'
-    )
+    class RDFatomistic(Observable, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          pmicall = [ "compute", "computePathIntegral" ],
+          cls = 'espressopp.analysis.RDFatomisticLocal'
+        )

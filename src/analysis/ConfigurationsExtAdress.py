@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -31,7 +31,7 @@ for gathering atomistic particles instead of coarsegrained particles
 
 * `clear()`
   clear trajectory
-  
+
 * `back()`
   get last configuration of trajectory
 
@@ -39,7 +39,7 @@ for gathering atomistic particles instead of coarsegrained particles
   maximum number of configurations in trajectory
   further adding (`gather()`) configurations results
   in erasing oldest configuration before adding new one
-  capacity=0 means: infinite capacity (until memory is full) 
+  capacity=0 means: infinite capacity (until memory is full)
 
 * `size`
   number of stored configurations
@@ -72,22 +72,22 @@ access particle with id <pid> of stored configuration <n>:
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress(system, fixedtuplelist)
 
-		:param system: 
-		:param fixedtuplelist: 
-		:type system: 
-		:type fixedtuplelist: 
+                :param system:
+                :param fixedtuplelist:
+                :type system:
+                :type fixedtuplelist:
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.back()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.clear()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.gather()
 
-		:rtype: 
+                :rtype:
 """
 
 from espressopp.esutil import cxxinit

@@ -27,22 +27,22 @@ espressopp.analysis.Viscosity
 
 .. function:: espressopp.analysis.Viscosity(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.Viscosity.compute(t0, dt, T)
 
-		:param t0:
-		:param dt:
-		:param T:
-		:type t0:
-		:type dt:
-		:type T:
-		:rtype:
+                :param t0:
+                :param dt:
+                :param T:
+                :type t0:
+                :type dt:
+                :type T:
+                :rtype:
 
 .. function:: espressopp.analysis.Viscosity.gather()
 
-		:rtype:
+                :rtype:
 """
 from espressopp import pmi
 from espressopp.esutil import cxxinit

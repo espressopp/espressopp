@@ -145,4 +145,3 @@ if pmi.isController:
             cls = 'espressopp.interaction.FixedPairListTypesSmoothSquareWellLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList', 'getFixedPairList']
         )
-

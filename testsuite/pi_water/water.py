@@ -4,20 +4,20 @@
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 ###########################################################################
@@ -50,7 +50,7 @@ def genTabPotentials(tabfilesnb):
         print("created", t1, t2, fe)
     return potentials
 
-# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file. 
+# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file.
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
@@ -107,7 +107,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(0, 0, 0), types[pid], masses[pid], charges[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 #system.storage.decompose()
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -168,7 +168,7 @@ print("i*timestep,Eb, EAng, ETab, Ek, Etotal T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 outfile = open("esp.dat", "w")
 
-start_time = time.clock()
+start_time = time.process_time()
 
 espressopp.tools.psfwrite("system.psf", system)
 
@@ -184,28 +184,24 @@ for i in range(check):
     EAng = 0
     ETab=0
     #for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-    #for ang in angleinteractions.values(): EAng+=ang.computeEnergy()    
+    #for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
     #ELj= ljinteraction.computeEnergy()
     #EQQ= qq_interactions.computeEnergy()
     ETab= tabulatedinteraction.computeEnergy()
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
-    
+
     sys.stdout.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     #espressopp.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
-    integrator.run(steps/check) # print out every steps/check steps
+    integrator.run(int(steps/check)) # print out every steps/check steps
     #espressopp.tools.vmd.imd_positions(system, sock)
 
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 espressopp.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-

@@ -73,12 +73,12 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 
-		:param system:
-		:param n:
-		:param dh:
-		:type system:
-		:type n:
-		:type dh:
+                :param system:
+                :param n:
+                :param dh:
+                :type system:
+                :type n:
+                :type dh:
 """
 
 from espressopp.esutil import cxxinit

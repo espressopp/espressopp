@@ -1,35 +1,35 @@
 #  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
 ******************************
 espressopp.integrator.Rattle
 ******************************
 
-RATTLE algorithm for satisfying bond constraints and making the corresponding velocity corrections. 
+RATTLE algorithm for satisfying bond constraints and making the corresponding velocity corrections.
 
-Refs: 
+Refs:
 
 Andersen, H. C. Rattle: A velocity version of the Shake algorithm for molecular dynamics calculations, J. Comp. Physics, 52, 24-34 (1983)
 
 Allen & Tildesley, Computer Simulation of Liquids, OUP, 1987
 
-RATTLE is implemented as an integrator extension, and takes as input a list of lists detailing, for each bond to be constrained: the indices of the two particles involved, the constraint distance, and the particle masses. 
+RATTLE is implemented as an integrator extension, and takes as input a list of lists detailing, for each bond to be constrained: the indices of the two particles involved, the constraint distance, and the particle masses.
 
 This implementation is intended for use with hydrogen-heavy atom bonds, which form isolated groups of constrained bonds, e.g NH2 or CH3 groups. The particle which participates in only one constrained bond (i.e. the hydrogen) should be listed first. The particle listed second (the heavy atom) may participate in more than one constrained bond. This implementation will not work if both particles participate in more than one constrained bond.
 
@@ -67,7 +67,7 @@ This list of lists of constrained bonds can be conveniently built using the espr
                 :param int maxit: maximum number of iterations
                 :param real tol: tolerance for deciding if constraint distance and current distance are similar enough
                 :param real rptol: tolerance for deciding if the angle between the bond vector at end of previous timestep and current vector has become too large
-  
+
 .. function:: espressopppp.integrator.Rattle.addConstrainedBonds(bondDetailsLists)
 
                 :param bondDetailsLists: list of lists, each list contains pid of heavy atom, pid of light atom, constraint distance, mass of heavy atom, mass of light atom

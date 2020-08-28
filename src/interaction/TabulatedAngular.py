@@ -30,24 +30,24 @@ espressopp.interaction.TabulatedAngular
 
 .. function:: espressopp.interaction.TabulatedAngular(itype, filename)
 
-		:param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filename: The tabulated potential filename.
-		:type itype: int
-		:type filename: str
+                :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
+                :param filename: The tabulated potential filename.
+                :type itype: int
+                :type filename: str
 
 .. function:: espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potential)
 
-		:param system: The Espresso++ system object.
-		:param ftl: The FixedTripleList.
-		:param potential: The potential.
-		:type system: espressopp.System
-		:type ftl: espressopp.FixedTripleList
-		:type potential: espressopp.interaction.Potential
+                :param system: The Espresso++ system object.
+                :param ftl: The FixedTripleList.
+                :param potential: The potential.
+                :type system: espressopp.System
+                :type ftl: espressopp.FixedTripleList
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedTripleListTabulatedAngular.setPotential(potential)
 
-		:param potential: The potential object.
-		:type potential: espressopp.interaction.Potential
+                :param potential: The potential object.
+                :type potential: espressopp.interaction.Potential
 
 
 .. function:: espressopp.interaction.FixedTripleListTypesTabulatedAngular(system, ftl)
