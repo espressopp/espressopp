@@ -270,43 +270,37 @@ if pmi.isController:
 				       'colVarRef_get']
             )
 
-    class VerletListAdressTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressTabulatedSubEnsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListHadressTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressTabulatedSubEnsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListTabulatedSubEnsLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class CellListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListTabulatedSubEnsLocal',
             pmicall = ['setPotential']
             )
 
-    class FixedPairListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTabulatedSubEnsLocal',
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
 
-    class FixedPairListTypesTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesTabulatedSubEnsLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']

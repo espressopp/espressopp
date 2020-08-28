@@ -132,28 +132,28 @@ class CoulombKSpaceP3MLocal(PotentialLocal, interaction_CoulombKSpaceP3M):
     def __init__(self, system, C_pref, alpha, M, P, rcut, interpolation = 200192):
 
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CoulombKSpaceP3M, system, C_pref, alpha, M, P, rcut, interpolation)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        cxxinit(self, interaction_CoulombKSpaceP3M, system, C_pref, alpha, M, P, rcut, interpolation)
 
 class CellListCoulombKSpaceP3MLocal(InteractionLocal, interaction_CellListCoulombKSpaceP3M):
     def __init__(self, storage, potential):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CellListCoulombKSpaceP3M, storage, potential)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        cxxinit(self, interaction_CellListCoulombKSpaceP3M, storage, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getPotential(self)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+         return self.cxxclass.getPotential(self)
 
 if pmi.isController:
-    class CoulombKSpaceP3M(Potential):
-        pmiproxydefs = dict(
-            cls = 'espressopp.interaction.CoulombKSpaceP3MLocal',
-          pmiproperty = ['prefactor']  #, 'alpha', 'kmax'
-        )
+  class CoulombKSpaceP3M(Potential):
+    pmiproxydefs = dict(
+      cls = 'espressopp.interaction.CoulombKSpaceP3MLocal',
+      pmiproperty = ['prefactor']  #, 'alpha', 'kmax'
+    )
 
-    class CellListCoulombKSpaceP3M(Interaction, metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListCoulombKSpaceP3MLocal',
-          pmicall = ['getPotential']
-        )
+  class CellListCoulombKSpaceP3M(Interaction, metaclass=pmi.Proxy):
+    pmiproxydefs = dict(
+      cls =  'espressopp.interaction.CellListCoulombKSpaceP3MLocal',
+      pmicall = ['getPotential']
+    )

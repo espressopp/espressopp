@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import unittest
@@ -35,7 +35,7 @@ def calcNumberCells(size, nodes, cutoff):
     # compute the number of cells on each node
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
-        ncells = ncells + 1
+       ncells = ncells + 1
     return ncells - 1
 
 # writes the tabulated file

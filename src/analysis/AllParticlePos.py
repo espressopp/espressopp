@@ -34,7 +34,7 @@ from _espressopp import analysis_AllParticlePos
 class AllParticlePosLocal(object):
 
     def gatherAllPositions(self):
-        return self.cxxclass.gatherAllPositions(self)
+      return self.cxxclass.gatherAllPositions(self)
 
 if pmi.isController :
     class AllParticlePos(metaclass=pmi.Proxy):

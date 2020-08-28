@@ -42,7 +42,6 @@ else:
     def pmiimport(module):
         pass
 
-
 # set up logging
 def _setupLogging():
     logConfigFile = "espressopp_log.conf"
@@ -72,4 +71,5 @@ def _setupLogging():
 
 
 # execute the function
+
 _setupLogging()

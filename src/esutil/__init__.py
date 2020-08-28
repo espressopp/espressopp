@@ -55,7 +55,7 @@ if pmi.isController:
 else:
     def pmiimport(module):
         pass
-
+        
 pmiimport('espressopp.esutil')
 
 from espressopp.esutil.RNG import *
@@ -73,22 +73,20 @@ class ExtendBaseClass(type):
 
         theClass = bases[0]
         # loop over all items in the class and replace it
-        for k, v in list(dict.items()):
+        for k,v in dict.iteritems():
             setattr(theClass, k, v)
         return theClass
 
-
-def choose(val, altval):
-    if (val is None):
+def choose(val, altval) :
+    if (val is None) :
         return altval
-    else:
+    else :
         return val
 
-
 def cxxinit(obj, cls, *args, **kwds):
-    #     # check whether the class is a boost.python class
-    #     if not issubclass(cls, type):
-    #         raise TypeError('cxxinit requires a class input argument.')
+#     # check whether the class is a boost.python class
+#     if not issubclass(cls, type):
+#         raise TypeError('cxxinit requires a class input argument.')
     if not hasattr(obj, 'cxxclass'):
         obj.cxxclass = cls
         cls.__init__(obj, *args, **kwds)
@@ -96,3 +94,4 @@ def cxxinit(obj, cls, *args, **kwds):
 # def pmiinit(obj, cls, *args, **kwds):
 #     if not hasattr(obj, 'pmiobject'):
 #         obj.pmiobject = pmi.create(cls, *args, **kwds)
+

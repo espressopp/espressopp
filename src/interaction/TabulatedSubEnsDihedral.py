@@ -142,15 +142,13 @@ if pmi.isController:
 				       'colVarRef_get']
             )
 
-    class FixedQuadrupleListTabulatedSubEnsDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedralLocal',
             pmicall = ['setPotential', 'getFixedQuadrupleList']
             )
 
-    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

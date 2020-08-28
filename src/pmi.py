@@ -1,3 +1,24 @@
+#  Copyright (C) 2012,2013
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2008,2009,2010,2011
+#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+
+
 # PMI - Parallel Method Invocation
 # Copyright (C) 2009,2010 Olaf Lenz
 #
@@ -15,12 +36,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
-************************************
-**PMI** - Parallel Method Invocation
-************************************
+**************
+espressopp.pmi
+**************
 
-PMI allows users to write serial Python scripts that use functions and
-classes that are executed in parallel.
+Parallel Method Invocation (PMI) allows users to write serial Python scripts 
+that use functions and classes that are executed in parallel. 
 
 PMI is intended to be used in data-parallel environments, where
 several threads run in parallel and can communicate via MPI.
@@ -42,8 +63,7 @@ call arbitrary methods of these instances.
 to execute arbitrary code on all workers, `exec_()` can be used, and
 to import python modules to all workers, use 'import_()'.
 
-Main program
-------------
+**Main program**
 
 On the workers, the main program of a PMI script usually consists of a
 single call to the function `startWorkerLoop()`. On the workers, this
@@ -90,8 +110,7 @@ issued on the workers. To stop the worker loop, `stopWorkerLoop()` can
 be issued on the controller, which will end the worker loop without
 exiting the workers.
 
-Controller commands
--------------------
+**Controller commands**
 
 These commands can be called in the controller script. When any of
 these commands is issued on a worker during the worker loop, a
@@ -109,8 +128,7 @@ these commands is issued on a worker during the worker loop, a
 * `stopWorkerLoop()` to interrupt the worker loop an all workers and to
   return control to the single workers
 
-Worker commands
----------------
+**Worker commands**
 
 These commands can be called on a worker.
 
@@ -120,8 +138,7 @@ These commands can be called on a worker.
   receive a single corresponding PMI command. Note that these commands
   will ignore any arguments when called on a worker.
 
-PMI Proxy metaclass
--------------------
+**PMI Proxy metaclass**
 
 The `Proxy` metaclass can be used to easily generate front-end classes
 to distributed PMI classes.
@@ -129,8 +146,7 @@ to distributed PMI classes.
 .
 .
 
-Useful constants and variables
-------------------------------
+**Useful constants and variables**
 
 The pmi module defines the following useful constants and variables:
 

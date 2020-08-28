@@ -87,7 +87,7 @@ class BCLocal(object):
     def getRandomPos(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             return self.cxxclass.getRandomPos(self)
-
+    
 if pmi.isController :
     class BC(metaclass=pmi.Proxy):
         pmiproxydefs = dict(

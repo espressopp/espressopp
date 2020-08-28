@@ -174,15 +174,15 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinBarostat
 
 class LangevinBarostatLocal(ExtensionLocal, integrator_LangevinBarostat):
-    def __init__(self, system, rng, temperature):
+  def __init__(self, system, rng, temperature):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_LangevinBarostat, system, rng, temperature)
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      cxxinit(self, integrator_LangevinBarostat, system, rng, temperature)
 
 if pmi.isController :
-    class LangevinBarostat(Extension, metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LangevinBarostatLocal',
-          pmiproperty = [ 'gammaP', 'pressure', 'mass' ],
-          pmicall = [ "setMassByFrequency" ]
-        )
+  class LangevinBarostat(Extension, metaclass=pmi.Proxy):
+    pmiproxydefs = dict(
+      cls =  'espressopp.integrator.LangevinBarostatLocal',
+      pmiproperty = [ 'gammaP', 'pressure', 'mass' ],
+      pmicall = [ "setMassByFrequency" ]
+    )

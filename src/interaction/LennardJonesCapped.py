@@ -251,7 +251,7 @@ class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_Verl
     def getPotentialCG(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialCG(self, type1, type2)
-
+        
 class VerletListHadressLennardJonesCappedLocal(InteractionLocal, interaction_VerletListHadressLennardJonesCapped):
 
     def __init__(self, vl, fixedtupleList):
@@ -279,7 +279,7 @@ class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLenn
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesCapped, stor)
-
+        
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -293,7 +293,7 @@ class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPa
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesCapped, system, vl, potential)
-
+        
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
@@ -321,7 +321,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressLennardJonesCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
-
+            
     class VerletListHadressLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesCappedLocal',
@@ -333,7 +333,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.CellListLennardJonesCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
-
+        
     class FixedPairListLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesCappedLocal',

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 #
+#  Copyright (C) 2020(H)
+#      Jozef Stefan Institute 
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -33,10 +36,14 @@ class TestMinimizeEnergy(unittest.TestCase):
     def setUp(self):
 
         system = espressopp.System()
-        system.bc = espressopp.bc.OrthorhombicBC(system.rng, (10, 10, 10))
+        box=(10,10,10)
+        system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        system.storage = espressopp.storage.DomainDecomposition(system)
+
+        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
+        system.storage = espressopp.storage.DomainDecomposition(system,nodeGrid,cellGrid)
         self.system = system
 
 

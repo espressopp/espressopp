@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(espressopp)
+project(espressopp LANGUAGES CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-enable_language(C)
-enable_language(CXX)
 
 enable_testing()
 
@@ -15,7 +12,6 @@ enable_testing()
 # these need ot be done early (before further tests).
 #####################################################################
 
-include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 # Check for C++11 standard
@@ -66,8 +62,7 @@ endif(VAMPIRTRACE)
 #Process MPI settings
 ########################################################################
 
-find_package(MPI REQUIRED)
-include_directories(${MPI_INCLUDE_PATH})
+find_package(MPI REQUIRED COMPONENTS CXX)
 
 ########################################################################
 #Process FFTW3 settings
@@ -135,9 +130,6 @@ mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
-include(CheckIncludeFiles)
-check_include_files("sys/time.h;sys/resource.h;unistd.h" CMAKE_HEADERS)
-
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 # Minimum required Boost version is set to 1.58 (only because of travis)

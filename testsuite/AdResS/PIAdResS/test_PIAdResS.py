@@ -45,7 +45,7 @@ class ParametrizedTestCase(unittest.TestCase):
 
 class TestPIAdResS(ParametrizedTestCase):
     def test_PIAdResS(self):
-        print(('param =', self.param))
+        print('param =', self.param)
 
         constkinmass = self.param['constkinmass']
         PILE = self.param['PILE']
@@ -253,88 +253,88 @@ class TestPIAdResS(ParametrizedTestCase):
 
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
+        suite = unittest.TestSuite()
 
-    # Make reference parameter dictionary
-    parameter_dict_ref = {}
-    parameter_dict_ref['constkinmass'] = False
-    parameter_dict_ref['PILE'] = True
-    parameter_dict_ref['realkinmass'] = True
-    parameter_dict_ref['centroidthermostat'] = True
-    parameter_dict_ref['KTI'] = False
-    parameter_dict_ref['speedupInterAtom'] = True
-    parameter_dict_ref['speedupFreezeRings'] = False
-    parameter_dict_ref['spherical_adress'] = False
-    parameter_dict_ref['nb_forcefield_setup'] = 1
-    parameter_dict_ref['energy_before'] = 0.0
-    parameter_dict_ref['energy_after'] = 0.0
+        # Make reference parameter dictionary
+        parameter_dict_ref = {}
+        parameter_dict_ref['constkinmass'] = False
+        parameter_dict_ref['PILE'] = True
+        parameter_dict_ref['realkinmass'] = True
+        parameter_dict_ref['centroidthermostat'] = True
+        parameter_dict_ref['KTI'] = False
+        parameter_dict_ref['speedupInterAtom'] = True
+        parameter_dict_ref['speedupFreezeRings'] = False
+        parameter_dict_ref['spherical_adress'] = False
+        parameter_dict_ref['nb_forcefield_setup'] = 1
+        parameter_dict_ref['energy_before'] = 0.0
+        parameter_dict_ref['energy_after'] = 0.0
 
-    # Make test cases
-    parameter_dict_test1 = dict.copy(parameter_dict_ref)
-    parameter_dict_test1['energy_before'] = 2182.05339049
-    parameter_dict_test1['energy_after'] = 2181.96191713
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test1))
+        # Make test cases
+        parameter_dict_test1 = dict.copy(parameter_dict_ref)
+        parameter_dict_test1['energy_before'] = 2182.05339049
+        parameter_dict_test1['energy_after'] = 2181.96191713
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test1))
 
-    parameter_dict_test2 = dict.copy(parameter_dict_ref)
-    parameter_dict_test2['energy_before'] = 2161.92463502
-    parameter_dict_test2['energy_after'] = 2161.76667819
-    parameter_dict_test2['nb_forcefield_setup'] = 2
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test2))
+        parameter_dict_test2 = dict.copy(parameter_dict_ref)
+        parameter_dict_test2['energy_before'] = 2161.92463502
+        parameter_dict_test2['energy_after'] = 2161.76667819
+        parameter_dict_test2['nb_forcefield_setup'] = 2
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test2))
 
-    parameter_dict_test3 = dict.copy(parameter_dict_ref)
-    parameter_dict_test3['energy_before'] = 2161.92463502
-    parameter_dict_test3['energy_after'] = 2161.76667819
-    parameter_dict_test3['nb_forcefield_setup'] = 3
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test3))
+        parameter_dict_test3 = dict.copy(parameter_dict_ref)
+        parameter_dict_test3['energy_before'] = 2161.92463502
+        parameter_dict_test3['energy_after'] = 2161.76667819
+        parameter_dict_test3['nb_forcefield_setup'] = 3
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test3))
 
-    parameter_dict_test4 = dict.copy(parameter_dict_ref)
-    parameter_dict_test4['energy_before'] = 1713.79167547
-    parameter_dict_test4['energy_after'] = 1713.12411385
-    parameter_dict_test4['constkinmass'] = True
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test4))
+        parameter_dict_test4 = dict.copy(parameter_dict_ref)
+        parameter_dict_test4['energy_before'] = 1713.79167547
+        parameter_dict_test4['energy_after'] = 1713.12411385
+        parameter_dict_test4['constkinmass'] = True
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test4))
 
-    parameter_dict_test5 = dict.copy(parameter_dict_ref)
-    parameter_dict_test5['energy_before'] = 2182.05339049
-    parameter_dict_test5['energy_after'] = 2181.96191713
-    parameter_dict_test5['PILE'] = False
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test5))
+        parameter_dict_test5 = dict.copy(parameter_dict_ref)
+        parameter_dict_test5['energy_before'] = 2182.05339049
+        parameter_dict_test5['energy_after'] = 2181.96191713
+        parameter_dict_test5['PILE'] = False
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test5))
 
-    parameter_dict_test6 = dict.copy(parameter_dict_ref)
-    parameter_dict_test6['energy_before'] = 3277.87198138
-    parameter_dict_test6['energy_after'] = 3277.72611308
-    parameter_dict_test6['realkinmass'] = False
-    parameter_dict_test6['PILE'] = False
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test6))
+        parameter_dict_test6 = dict.copy(parameter_dict_ref)
+        parameter_dict_test6['energy_before'] = 3277.87198138
+        parameter_dict_test6['energy_after'] = 3277.72611308
+        parameter_dict_test6['realkinmass'] = False
+        parameter_dict_test6['PILE'] = False
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test6))
 
-    parameter_dict_test7 = dict.copy(parameter_dict_ref)
-    parameter_dict_test7['energy_before'] = 2182.05339049
-    parameter_dict_test7['energy_after'] = 2181.96191713
-    parameter_dict_test7['centroidthermostat'] = False
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test7))
+        parameter_dict_test7 = dict.copy(parameter_dict_ref)
+        parameter_dict_test7['energy_before'] = 2182.05339049
+        parameter_dict_test7['energy_after'] = 2181.96191713
+        parameter_dict_test7['centroidthermostat'] = False
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test7))
 
-    parameter_dict_test8 = dict.copy(parameter_dict_ref)
-    parameter_dict_test8['energy_before'] = 29760.7680052
-    parameter_dict_test8['energy_after'] = 29760.8107422
-    parameter_dict_test8['KTI'] = True
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test8))
+        parameter_dict_test8 = dict.copy(parameter_dict_ref)
+        parameter_dict_test8['energy_before'] = 29760.7680052
+        parameter_dict_test8['energy_after'] = 29760.8107422
+        parameter_dict_test8['KTI'] = True
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test8))
 
-    parameter_dict_test9 = dict.copy(parameter_dict_ref)
-    parameter_dict_test9['energy_before'] = 1989.29552038
-    parameter_dict_test9['energy_after'] = 1989.19640208
-    parameter_dict_test9['speedupFreezeRings'] = True
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test9))
+        parameter_dict_test9 = dict.copy(parameter_dict_ref)
+        parameter_dict_test9['energy_before'] = 1989.29552038
+        parameter_dict_test9['energy_after'] = 1989.19640208
+        parameter_dict_test9['speedupFreezeRings'] = True
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test9))
 
-    parameter_dict_test10 = dict.copy(parameter_dict_ref)
-    parameter_dict_test10['energy_before'] = 2186.59523062
-    parameter_dict_test10['energy_after'] = 2186.46702152
-    parameter_dict_test10['speedupInterAtom'] = False
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test10))
+        parameter_dict_test10 = dict.copy(parameter_dict_ref)
+        parameter_dict_test10['energy_before'] = 2186.59523062
+        parameter_dict_test10['energy_after'] = 2186.46702152
+        parameter_dict_test10['speedupInterAtom'] = False
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test10))
 
-    parameter_dict_test11 = dict.copy(parameter_dict_ref)
-    parameter_dict_test11['energy_before'] = 3637.02668470
-    parameter_dict_test11['energy_after'] = 3636.26448522
-    parameter_dict_test11['spherical_adress'] = True
-    suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test11))
+        parameter_dict_test11 = dict.copy(parameter_dict_ref)
+        parameter_dict_test11['energy_before'] = 3637.02668470
+        parameter_dict_test11['energy_after'] = 3636.26448522
+        parameter_dict_test11['spherical_adress'] = True
+        suite.addTest(ParametrizedTestCase.parametrize(TestPIAdResS, param=parameter_dict_test11))
 
-    # Run tests
-    unittest.TextTestRunner().run(suite)
+        # Run tests
+        unittest.TextTestRunner().run(suite)

@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2019
+      Max Planck Computing and Data Facility
   
   This file is part of ESPResSo++.
   
@@ -53,8 +55,9 @@ namespace espressopp {
     const int Storage::dataOfUpdateGhosts = 0;
     const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
-    Storage::Storage(shared_ptr< System > system)
+    Storage::Storage(shared_ptr< System > system, int halfCellInt)
       : SystemAccess(system),
+        halfCellInt(halfCellInt),
         inBuffer(*system->comm),
         outBuffer(*system->comm)
     {

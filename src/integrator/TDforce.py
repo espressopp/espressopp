@@ -86,16 +86,16 @@ class TDforceLocal(integrator_TDforce):
             cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
 
     def addForce(self, itype, filename, type):
-        """
-        Each processor takes the broadcasted interpolation type,
-        filename and particle type
-        """
-        if pmi.workerIsActive():
-            self.cxxclass.addForce(self, itype, filename, type)
+            """
+            Each processor takes the broadcasted interpolation type,
+            filename and particle type
+            """
+            if pmi.workerIsActive():
+                self.cxxclass.addForce(self, itype, filename, type)
 
     def computeTDEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.computeTDEnergy(self)
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+              return self.cxxclass.computeTDEnergy(self)
 
 if pmi.isController :
     class TDforce(metaclass=pmi.Proxy):

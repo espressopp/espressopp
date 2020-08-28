@@ -85,13 +85,13 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
     def getBonds(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getBonds(self)
-            return bonds
+          bonds=self.cxxclass.getBonds(self)
+          return bonds
 
     def remove(self):
         if pmi.workerIsActive():
-            self.cxxclass.remove(self)
-            return
+          self.cxxclass.remove(self)
+          return
 
     def addBonds(self, bondlist):
         """
@@ -99,7 +99,7 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
         adds those pairs whose first particle is owned by
         this processor.
         """
-
+        
         if pmi.workerIsActive():
             for bond in bondlist:
                 pid1, pid2 = bond
@@ -111,5 +111,5 @@ if pmi.isController:
             cls = 'espressopp.FixedPairListAdressLocal',
             localcall = [ "add" ],
             pmicall = [ "addBonds","remove" ],
-                        pmiinvoke = ['getBonds']
+			pmiinvoke = ['getBonds']
             )

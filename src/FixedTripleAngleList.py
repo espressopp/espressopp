@@ -106,19 +106,19 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
     def getTriples(self):
 
         if pmi.workerIsActive():
-            triples = self.cxxclass.getTriples(self)
-            return triples
-
+          triples = self.cxxclass.getTriples(self)
+          return triples
+        
     'returns the list of (pid1, pid2, pid3, angle(123))'
     def getTriplesAngles(self):
 
         if pmi.workerIsActive():
-            triples_angles = self.cxxclass.getTriplesAngles(self)
-            return triples_angles
-
+          triples_angles = self.cxxclass.getTriplesAngles(self)
+          return triples_angles
+        
     def getAngle(self, pid1, pid2, pid3):
         if pmi.workerIsActive():
-            return self.cxxclass.getAngle(self, pid1, pid2, pid3)
+          return self.cxxclass.getAngle(self, pid1, pid2, pid3)
 
 if pmi.isController:
     class FixedTripleAngleList(metaclass=pmi.Proxy):
@@ -129,8 +129,8 @@ if pmi.isController:
             pmiinvoke = ["getTriples", "getTriplesAngles", "size"]
         )
 
-        def getAngle(self, pid1, pid2, pid3 ):
-            angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
-            for i in angles:
-                if( i != -1 ):
-                    return i        
+    def getAngle(self, pid1, pid2, pid3 ):
+      angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
+      for i in angles:
+        if( i != -1 ):
+          return i        

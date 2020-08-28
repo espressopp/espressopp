@@ -291,7 +291,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             if 'parameters' not in self.file:
                 self.file.create_group('parameters')
             g_params = self.file['parameters']
-            for k, v in list(paramters.items()):
+            for k, v in paramters.items():
                 g_params.attrs[k] = v
 
     def get_file(self):
@@ -506,7 +506,7 @@ if pmi.isController:
                         path = '/particles/{}/{}/value'.format(ag, k)
                         h5[path][t] = h5[path][t][idd]
 
-    class DumpH5MD(metaclass=pmi.Proxy):
+    class DumpH5MD(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',

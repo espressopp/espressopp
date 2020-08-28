@@ -57,18 +57,18 @@ from espressopp.ParallelTempering import *
 from espressopp.Version import *
 from espressopp.PLogger import *
 
-infinity = float("inf")
-nan = float("nan")
-auto = 'auto'
+
+infinity=float("inf")
+nan=float("nan")
+auto='auto'
 
 # fetch the different subpackages
-from espressopp import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, \
-    io
-#
-if pmi.isController:
+from espressopp import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, io, vectorization
+
+if pmi.isController :
     # make sure that the workers exit when the script ends
     pmi.registerAtExit()
     # the script continues after this call
-else:
+else :
     pmi.startWorkerLoop()
     # the script will usually not reach this point on the workers

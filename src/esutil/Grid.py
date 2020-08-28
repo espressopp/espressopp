@@ -30,7 +30,7 @@ from espressopp import pmi
 from _espressopp import esutil_Grid
 
 class GridLocal(esutil_Grid):
-    pass
+  pass
 
 if pmi.isController:
     class Grid(metaclass=pmi.Proxy):
@@ -41,4 +41,4 @@ if pmi.isController:
             #localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
             #pmicall = [ 'seed' ]
         )
-
+    

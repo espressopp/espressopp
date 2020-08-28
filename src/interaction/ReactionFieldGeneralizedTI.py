@@ -143,8 +143,8 @@ class ReactionFieldGeneralizedTILocal(PotentialLocal, interaction_ReactionFieldG
 
     def addPids(self, pidlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            for pid in pidlist:
-                self.cxxclass.addPid(self, pid)
+          for pid in pidlist:
+            self.cxxclass.addPid(self, pid)
 
 #class VerletListReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListReactionFieldGeneralizedTI):
 #    def __init__(self, vl):
@@ -158,7 +158,7 @@ class ReactionFieldGeneralizedTILocal(PotentialLocal, interaction_ReactionFieldG
 #    def getPotential(self, type1, type2):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            return self.cxxclass.getPotential(self, type1, type2)
-
+    
 class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralizedTI):
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -171,7 +171,7 @@ class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interact
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-
+            
 #class VerletListHadressReactionFieldGeneralizedTILocal(InteractionLocal, interaction_VerletListHadressReactionFieldGeneralizedTI):
 #    def __init__(self, vl, fixedtupleList):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -184,7 +184,7 @@ class VerletListAdressReactionFieldGeneralizedTILocal(InteractionLocal, interact
 #    def setPotentialCG(self, type1, type2, potential):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            self.cxxclass.setPotentialCG(self, type1, type2, potential)
-
+            
 if pmi.isController:
     class ReactionFieldGeneralizedTI(Potential):
         'The ReactionFieldGeneralizedTI potential.'
@@ -193,7 +193,7 @@ if pmi.isController:
             pmiproperty = ['prefactor'],
             pmicall = [ 'addPids' ]
             )
-
+        
     #class VerletListReactionFieldGeneralizedTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
@@ -206,7 +206,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressReactionFieldGeneralizedTILocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-
+            
     #class VerletListHadressReactionFieldGeneralizedTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(

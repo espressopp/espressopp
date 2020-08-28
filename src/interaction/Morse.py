@@ -187,7 +187,7 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
-
+        
 class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
 
     def __init__(self, vl, fixedtupleList):
@@ -201,7 +201,7 @@ class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressM
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
-
+            
 class VerletListHadressMorseLocal(InteractionLocal, interaction_VerletListHadressMorse):
 
     def __init__(self, vl, fixedtupleList):
@@ -221,7 +221,7 @@ class CellListMorseLocal(InteractionLocal, interaction_CellListMorse):
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListMorse, stor)
-
+        
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -231,7 +231,7 @@ class FixedPairListMorseLocal(InteractionLocal, interaction_FixedPairListMorse):
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListMorse, system, vl, potential)
-
+        
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
@@ -255,7 +255,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressMorseLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-
+            
     class VerletListHadressMorse(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressMorseLocal',

@@ -155,13 +155,13 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.removeInteraction(self, interaction_id)
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
-                for k, v in list(self._interaction2id.items())
+                for k, v in self._interaction2id.items()
                 }
             self._interaction_pid = max(self._interaction2id.values()) + 1
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
-            return {k: self.getInteraction(v) for k, v in list(self._interaction2id.items())}
+            return {k: self.getInteraction(v) for k, v in self._interaction2id.items()}
 
     def getNumberOfInteractions(self):
 
@@ -183,44 +183,44 @@ class SystemLocal(_espressopp.System):
     def getInteractionByName(self, name):
         if pmi.workerIsActive():
             return self.getInteraction(self._interaction2id[name])
-
+            
     def scaleVolume(self, *args):
 
         if pmi.workerIsActive():
-            if len(args) == 1:
-                arg0 = args[0]
-                if isinstance(arg0, Real3D):
-                    #print arg0," is a Real3D object"
-                    self.cxxclass.scaleVolume( arg0 )
-                elif hasattr(arg0, '__iter__'):
-                    if len(arg0) == 3:
+          if len(args) == 1:
+            arg0 = args[0]
+            if isinstance(arg0, Real3D):
+              #print arg0," is a Real3D object"
+              self.cxxclass.scaleVolume( arg0 )
+            elif hasattr(arg0, '__iter__'):
+              if len(arg0) == 3:
                 #print args, " has iterator and length 3"
-                        self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
-                    elif len(arg0) == 1:
-                        #print args, " has iterator and length 1"
-                        self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
-                    else:
-                        print((args, " is invalid"))
-                else:
-                    #print args, " is scalar"
-                    self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
-            elif len(args) == 3:          
-                #print args, " is 3 numbers"
-                self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
+                self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
+              elif len(arg0) == 1:
+                #print args, " has iterator and length 1"
+                self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
+              else:
+                print(args, " is invalid")
             else:
-                print((args, " is invalid"))
-
+              #print args, " is scalar"
+              self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
+          elif len(args) == 3:          
+            #print args, " is 3 numbers"
+            self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
+          else:
+            print(args, " is invalid")
+          
     def setTrace(self, switch):
 
         if pmi.workerIsActive():
             self.cxxclass.setTrace(self, switch)
 
 if pmi.isController:
-    class System(metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls = 'espressopp.SystemLocal',
-          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
-          pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
-                'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-                'getAllInteractions', 'getInteractionByName']
-        )
+  class System(metaclass=pmi.Proxy):
+    pmiproxydefs = dict(
+      cls = 'espressopp.SystemLocal',
+      pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
+      pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
+            'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
+            'getAllInteractions', 'getInteractionByName']
+    )

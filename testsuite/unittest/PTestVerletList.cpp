@@ -51,6 +51,8 @@ static int  N = 6;  // particles in each dimension
 
 static real density = 1.0;
 
+static int halfCellInt = 1;
+
 // sets up a storage with particles in a lattice
 
 struct DomainFixture {
@@ -97,7 +99,7 @@ struct DomainFixture {
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(system, nodeGrid, cellGrid);
+    domdec = make_shared< DomainDecomposition >(system, nodeGrid, cellGrid, halfCellInt);
     system->storage = domdec;
     system->rng = make_shared< esutil::RNG >();
   }

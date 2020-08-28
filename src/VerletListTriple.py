@@ -63,35 +63,35 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
     def __init__(self, system, cutoff, exclusionlist=[]):
 
         if pmi.workerIsActive():
-            '''
+          '''
+          cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+          if (exclusionlist != []):
+            print 'Warning! Exclusion list is not yet implemented to the triple verlet \
+                  list. Nothing happend to exclusion list'
+          '''
+
+          if (exclusionlist == []):
+            # rebuild list in constructor
             cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-            if (exclusionlist != []):
-              print 'Warning! Exclusion list is not yet implemented to the triple verlet \
-                    list. Nothing happend to exclusion list'
-            '''
-
-            if (exclusionlist == []):
-                # rebuild list in constructor
-                cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-            else:
-                # do not rebuild list in constructor
-                cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
-                # add exclusions
-                for pid in exclusionlist:
-                    self.cxxclass.exclude(self, pid)
-                # now rebuild list with exclusions
-                self.cxxclass.rebuild(self)
-
+          else:
+            # do not rebuild list in constructor
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
+            # add exclusions
+            for pid in exclusionlist:
+                self.cxxclass.exclude(self, pid)
+            # now rebuild list with exclusions
+            self.cxxclass.rebuild(self)
+            
     def totalSize(self):
 
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
-
+        
     def localSize(self):
 
         if pmi.workerIsActive():
             return self.cxxclass.localSize(self)
-
+        
     def exclude(self, exclusionlist):
         """
         Each processor takes the broadcasted exclusion list
@@ -104,23 +104,23 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
             self.cxxclass.exclude(self, pid)
         # rebuild list with exclusions
         self.cxxclass.rebuild(self)
-
+            
     def getAllTriples(self):
 
         if pmi.workerIsActive():
             triples=[]
             ntriples=self.localSize()
             for i in range(ntriples):
-                triple=self.cxxclass.getTriple(self, i+1)
-                triples.append(triple)
+              triple=self.cxxclass.getTriple(self, i+1)
+              triples.append(triple)
             return triples
 
 
 if pmi.isController:
-    class VerletListTriple(metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls = 'espressopp.VerletListTripleLocal',
-          pmiproperty = [ 'builds' ],
-          pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
-          pmiinvoke = [ 'getAllTriples' ]
-        )
+  class VerletListTriple(metaclass=pmi.Proxy):
+    pmiproxydefs = dict(
+      cls = 'espressopp.VerletListTripleLocal',
+      pmiproperty = [ 'builds' ],
+      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
+      pmiinvoke = [ 'getAllTriples' ]
+    )

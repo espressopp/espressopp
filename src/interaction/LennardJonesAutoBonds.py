@@ -153,7 +153,7 @@ class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBon
         """Initialize the local Lennard Jones auto bonds object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if bondlist == None:
-                raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
+              raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
             cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist, maxcrosslinks)                
 
 class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListLennardJonesAutoBonds):
@@ -167,8 +167,8 @@ class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletL
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getPotential(self, type1, type2)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -183,7 +183,7 @@ class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_V
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
-
+            
 class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListHadressLennardJonesAutoBonds):
 
     def __init__(self, vl, fixedtupleList):
@@ -199,7 +199,7 @@ class CellListLennardJonesAutoBondsLocal(InteractionLocal, interaction_CellListL
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesAutoBonds, stor)
-
+        
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -209,7 +209,7 @@ class FixedPairListLennardJonesAutoBondsLocal(InteractionLocal, interaction_Fixe
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesAutoBonds, system, vl, potential)
-
+        
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
@@ -233,7 +233,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressLennardJonesAutoBondsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-
+            
     class VerletListHadressLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesAutoBondsLocal',
@@ -245,7 +245,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.CellListLennardJonesAutoBondsLocal',
             pmicall = ['setPotential']
             )
-
+        
     class FixedPairListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesAutoBondsLocal',

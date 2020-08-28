@@ -39,6 +39,8 @@ using namespace espressopp::esutil;
 using namespace espressopp::storage;
 using namespace espressopp::iterator;
 
+const int halfCellInt = 1;
+
 struct LoggingFixture {  
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
@@ -73,7 +75,8 @@ struct Fixture {
     system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
     domdec = make_shared< DomainDecomposition >(system,
     						nodeGrid,
-    						cellGrid);
+    						cellGrid,
+                            halfCellInt);
   }
 };
 
@@ -90,7 +93,8 @@ BOOST_AUTO_TEST_CASE(addAndLookup) {
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
   domdec = make_shared< DomainDecomposition >(system,
 					      nodeGrid,
-					      cellGrid);
+					      cellGrid,
+                          halfCellInt);
 
   
   // create a single particle
@@ -114,7 +118,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D cellGrid(1);
     nodeGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
-		      (system, nodeGrid, cellGrid),
+		      (system, nodeGrid, cellGrid, halfCellInt),
 		      NodeGridIllegal);
   }
 
@@ -123,7 +127,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D cellGrid(1);
     cellGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
-		      (system, nodeGrid, cellGrid),
+		      (system, nodeGrid, cellGrid, halfCellInt),
 		      CellGridIllegal);
   }
 
@@ -132,7 +136,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D cellGrid(1);
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  nodeGrid,
-					  cellGrid),
+					  cellGrid,
+                      halfCellInt),
 		      NodeGridMismatch);
   }
 
@@ -141,7 +146,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 
   DomainDecomposition domdec(system,
 			     nodeGrid,
-			     cellGrid);
+			     cellGrid,
+                 halfCellInt);
 
   const CellGrid &cGrid = domdec.getCellGrid();
 
@@ -250,7 +256,8 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
 
   DomainDecomposition domdec2(system,
                               nodeGrid,
-                              cellGrid);
+                              cellGrid,
+                              halfCellInt);
   domdec2.fetchParticles(*domdec);
 
   int total;
@@ -454,7 +461,8 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
   domdec = make_shared< DomainDecomposition >(system,
 					      nodeGrid,
-					      cellGrid);
+					      cellGrid,
+                          halfCellInt);
 
   
   BOOST_TEST_MESSAGE("Setting up system... nodes=" << nodes);

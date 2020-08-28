@@ -51,7 +51,7 @@ find_package(Threads REQUIRED)
 set(Boost_USE_MULTITHREADED ON)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} libdl.so util.so ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 if(WITH_XTC)
   target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
 endif()

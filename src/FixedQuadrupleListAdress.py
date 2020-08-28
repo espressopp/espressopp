@@ -98,8 +98,8 @@ class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
     def getQuadruples(self):
 
         if pmi.workerIsActive():
-            quadruple = self.cxxclass.getQuadruples(self)
-            return quadruple 
+          quadruple = self.cxxclass.getQuadruples(self)
+          return quadruple 
 
 if pmi.isController:
     class FixedQuadrupleListAdress(metaclass=pmi.Proxy):

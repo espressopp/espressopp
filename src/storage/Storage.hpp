@@ -5,6 +5,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2019
+      Max Planck Computing and Data Facility
   
   This file is part of ESPResSo++.
   
@@ -47,7 +49,7 @@ namespace espressopp {
       typedef boost::unordered_map <longint, Particle*> IdParticleMap;
       typedef std::list<Particle> ParticleListAdr;
 
-      Storage(shared_ptr<class System> system);
+      Storage(shared_ptr<class System> system, int halfCellInt);
       virtual ~Storage();
 
       /** Scale Volume, only for Storage. It scales only the particle coord. */
@@ -245,6 +247,10 @@ namespace espressopp {
       // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
       boost::signals2::signal<void ()> onTuplesChanged;
 
+      /** this signal will be called when the cell structure is modified by a call to cellAdjust.
+          The new cells can be accessed using getLocalCells()
+       */
+      boost::signals2::signal<void ()> onCellAdjust;
 
       // for AdResS
       void setFixedTuplesAdress(shared_ptr<FixedTupleListAdress> _fixedtupleList){
@@ -386,6 +392,9 @@ namespace espressopp {
 
       // move a particle from one list to another, updating localParticles
       Particle* moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
+
+      /** 1 for normal, 2 for half-cell, 3 for third-cell, ... */
+      int halfCellInt;
 
       /** here the local particles are actually stored */
       LocalCellList cells;

@@ -173,11 +173,11 @@ class VerletListZeroLocal(InteractionLocal, interaction_VerletListZero):
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
-
+            
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
-
+            
     def setFixedTupleList(self, ftpl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedTupleList(self, ftpl)
@@ -190,15 +190,15 @@ class VerletListAdressZeroLocal(InteractionLocal, interaction_VerletListAdressZe
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
-
+            
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)            
-
+            
     def setFixedTupleList(self, ftpl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedTupleList(self, ftpl)
-
+            
 class VerletListHadressZeroLocal(InteractionLocal, interaction_VerletListHadressZero):
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -207,11 +207,11 @@ class VerletListHadressZeroLocal(InteractionLocal, interaction_VerletListHadress
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
-
+            
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)            
-
+            
     def setFixedTupleList(self, ftpl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedTupleList(self, ftpl)
@@ -220,7 +220,7 @@ class CellListZeroLocal(InteractionLocal, interaction_CellListZero):
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListZero, stor)
-
+        
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -229,7 +229,7 @@ class FixedPairListZeroLocal(InteractionLocal, interaction_FixedPairListZero):
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListZero, system, vl, potential)
-
+        
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
@@ -252,7 +252,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListAdressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-
+            
     class VerletListHadressZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressZeroLocal',
@@ -264,7 +264,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.CellListZeroLocal',
             pmicall = ['setPotential']
             )
-
+        
     class FixedPairListZero(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListZeroLocal',

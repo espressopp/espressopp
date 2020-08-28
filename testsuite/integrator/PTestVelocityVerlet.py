@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#
+#  
 #  This file is part of ESPResSo++.
-#
+#  
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#
+#  
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#
+#  
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
 import unittest
@@ -45,7 +45,7 @@ def calcNumberCells(size, nodes, cutoff):
     ncells = 1
 
     while size / (ncells * nodes) >= cutoff:
-        ncells = ncells + 1
+       ncells = ncells + 1
 
     return ncells - 1
 
@@ -53,99 +53,99 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
     def test0Build(self) :
 
-        system = espressopp.System()
+       system = espressopp.System()
 
-        rng  = espressopp.esutil.RNG()
+       rng  = espressopp.esutil.RNG()
 
-        SIZE = float(N)
-        box  = Real3D(SIZE)
-        bc   = espressopp.bc.OrthorhombicBC(None, box)
+       SIZE = float(N)
+       box  = Real3D(SIZE)
+       bc   = espressopp.bc.OrthorhombicBC(None, box)
 
-        system.bc = bc
-        system.rng = rng
-        system.skin = skin
+       system.bc = bc
+       system.rng = rng 
+       system.skin = skin
 
-        comm = espressopp.MPI.COMM_WORLD
+       comm = espressopp.MPI.COMM_WORLD
 
-        nodeGrid = (1, 1, comm.size)
-        cellGrid = [1, 1, 1]
+       nodeGrid = (1, 1, comm.size)
+       cellGrid = [1, 1, 1]
 
-        for i in range(3):
-            cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
+       for i in range(3):
+          cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-        print(('NodeGrid = %s'%(nodeGrid,)))
-        print(('CellGrid = %s'%cellGrid))
+       print('NodeGrid = %s'%(nodeGrid,))
+       print('CellGrid = %s'%cellGrid)
 
-        dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+       dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
-        system.storage = dd
+       system.storage = dd
 
-        id = 0
+       id = 0
 
-        for i in range(N):
-            for j in range(N):
-                for k in range(N):
+       for i in range(N):
+         for j in range(N):
+           for k in range(N):
+ 
+             m = (i + 2*j + 3*k) % 11
+             r = 0.45 + m * 0.01
+             x = (i + r) / N * SIZE
+             y = (j + r) / N * SIZE
+             z = (k + r) / N * SIZE
+   
+             dd.addParticle(id, Real3D(x, y, z))
 
-                    m = (i + 2*j + 3*k) % 11
-                    r = 0.45 + m * 0.01
-                    x = (i + r) / N * SIZE
-                    y = (j + r) / N * SIZE
-                    z = (k + r) / N * SIZE
+             # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
 
-                    dd.addParticle(id, Real3D(x, y, z))
+             id = id + 1
 
-                    # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
+       dd.decompose()
 
-                    id = id + 1
+       integrator = espressopp.integrator.VelocityVerlet(system)
 
-        dd.decompose()
+       print('integrator.dt = %g, will be set to 0.005'%integrator.dt)
 
-        integrator = espressopp.integrator.VelocityVerlet(system)
+       integrator.dt = 0.005
+  
+       print('integrator.dt = %g, is now '%integrator.dt)
 
-        print(('integrator.dt = %g, will be set to 0.005'%integrator.dt))
+       # now build Verlet List
+       # ATTENTION: you have to add the skin explicitly here
 
-        integrator.dt = 0.005
+       vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
 
-        print(('integrator.dt = %g, is now '%integrator.dt))
+       potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
 
-        # now build Verlet List
-        # ATTENTION: you have to add the skin explicitly here
+       # ATTENTION: auto shift was enabled
 
-        vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
+       print("potLJ, shift = %g"%potLJ.shift)
 
-        potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
+       interLJ = espressopp.interaction.VerletListLennardJones(vl)
 
-        # ATTENTION: auto shift was enabled
+       interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 
-        print(("potLJ, shift = %g"%potLJ.shift))
+       # Todo
 
-        interLJ = espressopp.interaction.VerletListLennardJones(vl)
+       system.addInteraction(interLJ)
 
-        interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
+       temp = espressopp.analysis.Temperature(system)
 
-        # Todo
+       temperature = temp.compute()
+       kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+       potentialEnergy = interLJ.computeEnergy()
+       print('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
+                  potentialEnergy, kineticEnergy, temperature))
 
-        system.addInteraction(interLJ)
+       nsteps = 10
 
-        temp = espressopp.analysis.Temperature(system)
+       # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
 
-        temperature = temp.compute()
-        kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-        potentialEnergy = interLJ.computeEnergy()
-        print(('Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
-                   potentialEnergy, kineticEnergy, temperature)))
-
-        nsteps = 10
-
-        # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
-
-        for i in range(20):
-            integrator.run(nsteps)
-            temperature = temp.compute()
-            kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-            potentialEnergy = interLJ.computeEnergy()
-            print(('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1),
-                 kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)))
+       for i in range(20):
+          integrator.run(nsteps)
+          temperature = temp.compute()
+          kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+          potentialEnergy = interLJ.computeEnergy()
+          print('Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature))
 
 if __name__ == "__main__":
 

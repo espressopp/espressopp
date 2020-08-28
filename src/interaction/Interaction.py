@@ -104,7 +104,6 @@ class InteractionLocal(object):
 
 if pmi.isController :
     class Interaction(metaclass=pmi.Proxy):
-
         pmiproxydefs = dict(
             pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
             )

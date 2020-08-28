@@ -110,19 +110,19 @@ class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
     def getQuadruples(self):
 
         if pmi.workerIsActive():
-            quadruple = self.cxxclass.getQuadruples(self)
-            return quadruple 
-
+          quadruple = self.cxxclass.getQuadruples(self)
+          return quadruple 
+        
     'returns the list of (pid1, pid2, pid3, pid4, angle(123))'
     def getQuadruplesAngles(self):
 
         if pmi.workerIsActive():
-            quadruples_angles = self.cxxclass.getQuadruplesAngles(self)
-            return quadruples_angles
-
+          quadruples_angles = self.cxxclass.getQuadruplesAngles(self)
+          return quadruples_angles
+        
     def getAngle(self, pid1, pid2, pid3, pid4):
         if pmi.workerIsActive():
-            return self.cxxclass.getAngle(self, pid1, pid2, pid3, pid4)
+          return self.cxxclass.getAngle(self, pid1, pid2, pid3, pid4)
 
 if pmi.isController:
     class FixedQuadrupleAngleList(metaclass=pmi.Proxy):

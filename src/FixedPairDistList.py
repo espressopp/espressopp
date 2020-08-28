@@ -102,19 +102,19 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
     def getPairs(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getPairs(self)
-            return bonds 
+          bonds=self.cxxclass.getPairs(self)
+          return bonds 
 
     def getPairsDist(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getPairsDist(self)
-            return bonds 
-
+          bonds=self.cxxclass.getPairsDist(self)
+          return bonds 
+        
     def getDist(self, pid1, pid2):
         if pmi.workerIsActive():
-            return self.cxxclass.getDist(self, pid1, pid2)
-
+          return self.cxxclass.getDist(self, pid1, pid2)
+        
 if pmi.isController:
     class FixedPairDistList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(

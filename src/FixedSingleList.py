@@ -79,7 +79,7 @@ class FixedSingleListLocal(_espressopp.FixedSingleList):
         Each processor takes the broadcasted singlelist and
         adds those particles that are owned by this processor.
         """
-
+        
         if pmi.workerIsActive():
             for pid in singlelist:
                 self.cxxclass.add(self, pid)
@@ -87,9 +87,9 @@ class FixedSingleListLocal(_espressopp.FixedSingleList):
     def getSingles(self):
 
         if pmi.workerIsActive():
-            singles=self.cxxclass.getSingles(self)
-            return singles
-
+          singles=self.cxxclass.getSingles(self)
+          return singles
+      
 if pmi.isController:
     class FixedSingleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
@@ -98,4 +98,4 @@ if pmi.isController:
             pmicall = [ 'add', 'addSingles' ],
             pmiinvoke = ['getSingles', 'size']
         )
-
+        
