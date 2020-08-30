@@ -33,7 +33,7 @@ QUICKINSTALL:
 
 ```
 # cd espressopp
-# cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
+# cmake .
 # make -j2
 # source ESPRC
 ```

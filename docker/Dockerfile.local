@@ -13,7 +13,7 @@ USER root
 RUN mkdir build
 
 WORKDIR build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DWITH_XTC=ON ..
 RUN make -j4 all
 RUN make install
 WORKDIR ../examples

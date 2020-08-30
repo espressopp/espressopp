@@ -132,10 +132,8 @@ mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-# Minimum required Boost version is set to 1.58 (only because of travis)
-# but the version in contrib is 1.61;
-
-set(NEEDED_Boost_VERSION 1.70.0)
+# Minimum required Boost version is set to 1.69.0
+set(NEEDED_Boost_VERSION 1.69.0)
 find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem python38)
 set(Boost_LIBS ${Boost_LIBRARIES})
 

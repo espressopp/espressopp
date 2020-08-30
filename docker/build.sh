@@ -19,6 +19,6 @@ DIST_DOCKERFILE=${DIRNAME}/Dockerfile.${DIST}
 cp -v $DOCKERFILE $DIST_DOCKERFILE
 sed -i "s/buildenv:.*/buildenv:$DIST/g" $DIST_DOCKERFILE
 
-docker build -t espressopp:$DIST -f $DIST_DOCKERFILE .
+docker build --pull=False -t espressopp:$DIST -f $DIST_DOCKERFILE .
 
 rm -v $DIST_DOCKERFILE

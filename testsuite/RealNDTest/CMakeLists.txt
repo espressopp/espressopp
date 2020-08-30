@@ -1,7 +1,5 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/include)
-if (EXTERNAL_BOOST)
-    add_definitions (-DBOOST_TEST_DYN_LINK)
-endif(EXTERNAL_BOOST)
+add_definitions (-DBOOST_TEST_DYN_LINK)
 add_executable(RealNDTest RealNDTest.cpp)
 target_link_libraries(RealNDTest _espressopp ${Boost_LIBRARIES})
 add_test(RealNDTest ${CMAKE_CURRENT_BINARY_DIR}/RealNDTest)

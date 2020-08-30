@@ -20,7 +20,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#define BOOST_TEST_MODULE VerletList
 #define PARALLEL_TEST_MODULE VerletList
+
 #include "ut.hpp"
 
 #include "mpi.hpp"
