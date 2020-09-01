@@ -24,6 +24,7 @@ if(Python3_EXECUTABLE)
     message("-- mpi4py version: " ${MPI4PY_VERSION})
   else()
     set(MPI4PY_VERSION 0.0)
+    message("-- mpi4py version: " ${MPI4PY_VERSION})
   endif()
 
   execute_process(COMMAND
@@ -39,7 +40,7 @@ if(NOT MPI4PY_INCLUDES)
 endif()
 
 message(STATUS "Looking for MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so")
-find_file (MPI4PY_LIBRARIES MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${Python3_SITEDIR}/mpi4py)
+find_file (MPI4PY_LIBRARIES NAMES MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so MPI.cpython-${PYTHON_VERSION_NO_DOT}m-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${Python3_SITEDIR}/mpi4py)
 
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE
