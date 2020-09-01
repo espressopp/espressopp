@@ -14,7 +14,7 @@ env:
     - DISTRO=ubuntu_rolling XTC=OFF
     - DISTRO=ubuntu_mpich XTC=ON
     - DISTRO=fedora XTC=ON
-    #- DISTRO=fedora_mpich XTC=ON
+    - DISTRO=fedora_mpich XTC=ON
     - DISTRO=opensuse XTC=ON
 
 script:
