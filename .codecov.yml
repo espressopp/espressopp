@@ -7,3 +7,4 @@ ignore:
   - testsuite/
   - contrib/
   - /usr/include/
+  - /usr/lib/
