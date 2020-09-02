@@ -26,7 +26,9 @@ jobs:
         - compiler: gcc
           env: DISTRO=ubuntu_rolling
         - compiler: clang
-          env: DISTRO=ubuntu_rolling
+          env: DISTRO=ubuntu_rolling XTC=OFF
+        - compiler: clang
+          env: DISTRO=fedora_mpich XTC=OFF
     include:
         - stage: canary
           env: DISTRO=ubuntu
