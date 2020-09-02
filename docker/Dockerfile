@@ -36,9 +36,9 @@ RUN if [ -z ${COVERAGE} ] && [ -z $BUILD_UG ]; then make test CTEST_OUTPUT_ON_FA
 RUN make install DESTDIR=${PWD}
 RUN cd .. && if [ ${COVERAGE} ]; then \
   if [ ${CC} = clang ]; then \
-    bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov";\
+    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov" > /dev/null; \
   else \
-    bash <(curl -s https://codecov.io/bash) \
+    $HOME/.local/bin/codecov > /dev/null; \
   fi; \
 fi && cd -
 USER root
