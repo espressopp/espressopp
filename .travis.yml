@@ -23,12 +23,10 @@ script:
 
 jobs:
     exclude:
-        - compiler: gcc
-          env: DISTRO=ubuntu_rolling
         - compiler: clang
-          env: DISTRO=ubuntu_rolling
+          env: DISTRO=ubuntu_rolling XTC=OFF
         - compiler: clang
-          env: DISTRO=fedora_mpich
+          env: DISTRO=fedora_mpich XTC=ON
     include:
         - stage: canary
           env: DISTRO=ubuntu
