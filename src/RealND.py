@@ -46,6 +46,8 @@ Description
         :param \*args:
         :type \*args:
 """
+import numbers
+
 from _espressopp import RealND
 from _espressopp import RealNDs
 
@@ -56,8 +58,33 @@ def extend_classes():
     # This injects additional methods into the RealND class and pulls it
     # into this module
 
+    def _eq(self, other):
+        if other is None:
+            return False
+
+        if isinstance(other, numbers.Number):
+            return all([self[i] == other for i in range(self.dimension)])
+
+        if self.dimension != other.dimension:
+            return False
+
+        return all([self[i] == other[i] for i in range(self.dimension)])
+
+    def _lt(self, other):
+        if other is None:
+            return True
+        return id(self) < id(other)
+
+    def _gt(self, other):
+        if other is None:
+            return True
+        return id(self) > id(other)
+
     RealND.__str__ = lambda self: str([self[i] for i in range(self.dimension)])
     RealND.__repr__ = lambda self: 'RealND' + str(self)
+    RealND.__eq__ = _eq
+    RealND.__lt__ = _lt
+    RealND.__gt__ = _gt
 
     def __str_nds(self):
         arr = []
@@ -68,8 +95,31 @@ def extend_classes():
             arr.append(arr_i)
         return str(arr)
 
+    def _eq_nds(self, other):
+        if other is None:
+            return False
+
+        if isinstance(other, numbers.Number):
+            for i in range(self.dimension):
+                for j in range(self[i].dimension):
+                    if self[i][j] != other:
+                        return False
+            return True
+
+        if self.dimension != other.dimension:
+            return False
+
+        for i in range(self.dimension):
+            for j in range(self.dimension):
+                if self[i][j] != other[i][j]:
+                    return False
+        return True
+
     RealNDs.__str__ = __str_nds
     RealNDs.__repr__ = lambda self: 'RealNDs' + str(self)
+    RealNDs.__eq__ = _eq_nds
+    RealNDs.__lt__ = _lt
+    RealNDs.__gt__ = _gt
 
 
 extend_classes()

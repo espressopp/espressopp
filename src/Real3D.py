@@ -66,6 +66,8 @@ espressopp.Real3D
 """
 
 # List of exported methods from the module.
+import numbers
+
 from _espressopp import Real3D
 
 __all__ = ['Real3D', 'toReal3DFromVector', 'toReal3D']
@@ -100,6 +102,20 @@ def extend_class():
 
         origin_init(self, x, y, z)
 
+    def _eq(self, other):
+        if other is None:
+            return False
+        if isinstance(other, numbers.Number):
+            return all([self[i] == other for i in range(3)])
+
+        return all([self[i] == other[i] for i in range(3)])
+
+    def _lt(self, other):
+        if other is None:
+            return True
+
+        return id(self) < id(other)
+
     def _get_getter_setter(idx):
         def _get(self):
             return self[idx]
@@ -115,6 +131,9 @@ def extend_class():
     Real3D.z = property(*_get_getter_setter(2))
     Real3D.__str__ = lambda self: str((self[0], self[1], self[2]))
     Real3D.__repr__ = lambda self: 'Real3D' + str(self)
+    Real3D.__eq__ = _eq
+    Real3D.__lt__ = _lt
+    Real3D.__gt__ = _lt
 
 
 extend_class()

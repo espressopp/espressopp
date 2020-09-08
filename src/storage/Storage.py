@@ -284,24 +284,23 @@ class StorageLocal(object):
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
-            if index_id < 0  : raise "particle property id is mandatory"
-            if index_pos < 0 : raise "particle property pos is mandatory"
+            if index_id < 0  : raise Exception("particle property id is mandatory")
+            if index_pos < 0 : raise Exception("particle property pos is mandatory")
 
             # we should check at the begin whether all the particles do not exist.
             doWeAddParticles = True
             for particle in particleList:
                 pid = particle[index_id]
-                if( self.particleExists(pid) ):
+                if self.particleExists(pid):
                     doWeAddParticles = False
                     print("WARNING: Particle ", pid, " already exists")
 
-            if(not doWeAddParticles):
+            if not doWeAddParticles:
                 print('WARNING: Some particles already exist. The list of particles was not added.')
                 return
 
             for particle in particleList:
-
-                    # verify that each particle has enough entries, avoids index errors
+                # verify that each particle has enough entries, avoids index errors
                 if len(particle) != nindex:
                     raise SyntaxError("particle has %d entries, but %d expected"%(len(particle), nindex))
 
@@ -310,17 +309,15 @@ class StorageLocal(object):
 
                 if index_adrAT >= 0:
                     if particle[index_adrAT] == 0:
-                        #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                         storedParticle = self.cxxclass.addParticle(self, id, pos)
                         last_pos = pos
                     else:
-                        #print "%d:  addAdrATparticle %d, pos %f, %f, %f, last_pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0],pos[1],pos[2],last_pos[0], last_pos[1], last_pos[2])
                         storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
                 else:
                     #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                     storedParticle = self.cxxclass.addParticle(self, id, pos)
 
-                if storedParticle != None:
+                if storedParticle is not None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))
                     self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i lambda_adr=%i lambda_adrd=%i state=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius,index_lambda_adr,index_lambda_adrd,index_state))
 
@@ -376,10 +373,7 @@ class StorageLocal(object):
 
     def modifyParticle(self, pid, property, value):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-
-            if (self.particleExists(pid)):
-                #try:
-                #if not particle.isGhost:
+            if self.particleExists(pid):
                 particle = self.getParticle(pid)
                 self.logger.info("particle pid=%i rank=%i" % (pid, pmi.rank))
                 if   property.lower() == "id"   : raise "particles pid cannot be modified !"
@@ -447,7 +441,7 @@ if pmi.isController:
 
         def addParticle(self, pid, pos, checkexist=True):
             if checkexist:
-                if( self.particleExists(pid) ):
+                if self.particleExists(pid):
                     print("WARNING: Particle ", pid, " already exists. Therefore it was not added.")
                     return None
                 else:

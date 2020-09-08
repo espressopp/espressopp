@@ -492,7 +492,13 @@ def reduce(*args, **kwds):
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_REDUCE, treduceOp, tfunction, *targs, **tkwds)
         log.info("Reducing: %s", __formatCall(cfunction, cargs, ckwds))
-        value = cfunction(*args, **ckwds)
+        if _PMIComm and _PMIComm.isActive():
+            if CONTROLLER in _PMIComm.getMPIcpugroup():
+                value = cfunction(*args, **ckwds)
+            else:
+                value = None
+        else:
+            value = cfunction(*args, **ckwds)
         log.info("Reducing results via %s", creduceOp)
         return _MPIReduce(op=creduceOp, value=value)
     else:

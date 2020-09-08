@@ -172,12 +172,6 @@ class ParticleLocal(object):
     def __getTmp(self):
         return self.storage.lookupRealParticle(self.pid)
 
-          #if tmp is None:
-              # TODO: Exception
-              # raise ParticleDoesNotExistHere('pid='+str(self.pid)+' rank='+str(pmi.rank) )
-          #else:
-          #  return tmp
-
     # Defining __getattr__ will make sure that you can use any
     # property defined in _TmpParticle
     def __getattr__(self, key):
@@ -312,14 +306,18 @@ if pmi.isController:
     class Particle(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.ParticleLocal',
-            pmiproperty = [ "id", "storage" ]
+            pmiproperty = ["id", "storage"]
             )
 
         @property
         def node(self):
-            value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
+            value, node = pmi.invoke(self, 'locateParticle')
             return node
 
         def __getattr__(self, key):
-            value = pmi.reduce(pmi.MAX, self, 'getLocalData', key)
-            return value
+            value = list(filter(lambda v: v is not None, pmi.invoke(self, 'getLocalData', key)))
+            if len(value) == 0:
+                return None
+            if len(value) > 1:
+                raise RuntimeError('The requested particle is on more than one CPU - should not happen')
+            return value[0]

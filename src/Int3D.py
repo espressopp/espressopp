@@ -64,6 +64,8 @@ espressopp.Int3D
                 :param \*args:
                 :type \*args:
 """
+import numbers
+
 from _espressopp import Int3D
 from espressopp import esutil
 
@@ -107,13 +109,37 @@ def extend_class():
 
         return _get, _set
 
+    def _eq(self, other):
+        if other is None:
+            return False
+
+        if isinstance(other, numbers.Number):
+            return all([self[i] == other for i in range(3)])
+
+        return all([self[i] == other[i] for i in range(3)])
+
+    def _lt(self, other):
+        if other is None:
+            return True
+        return id(self) < id(other)
+
+    def _gt(self, other):
+        if other is None:
+            return True
+        return id(self) > id(other)
+
     Int3D.__init__ = init
     for i, property_name in enumerate(['x', 'y', 'z']):
         setattr(Int3D, property_name, property(*_get_getter_setter(i)))
     Int3D.__str__ = lambda self: str((self[0], self[1], self[2]))
     Int3D.__repr__ = lambda self: 'Int3D' + str(self)
+    Int3D.__eq__ = _eq
+    Int3D.__lt__ = _lt
+    Int3D.__gt__ = _gt
+
 
 extend_class()
+
 
 def toInt3DFromVector(*args):
     """Try to convert the arguments to a Int3D.
