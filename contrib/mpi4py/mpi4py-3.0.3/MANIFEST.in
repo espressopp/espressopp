@@ -1,0 +1,20 @@
+include setup*.py *.cfg *.rst
+
+recursive-include demo *.py *.txt *.pyx *.i *.h *.c *.cxx *.f90 *.f08
+recursive-include demo [M,m]akefile  *.sh *.bat python-config
+recursive-include conf *.py *.txt *.cfg *.sh *.bat
+recursive-include src  *.py *.pyx *.px[di] *.h *.c *.i
+recursive-include test *.py
+
+include docs/*.html
+include docs/*.pdf
+include docs/*.info
+include docs/*.[137]
+include docs/*.rst
+include docs/*.bib
+recursive-include docs/usrman *
+recursive-include docs/apiref *
+recursive-include docs/source *
+
+prune conf/ci
+prune conf/conda-recipes

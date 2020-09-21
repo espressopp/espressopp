@@ -1,5 +1,5 @@
 #  Copyright (C) 2017
-#      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
+#      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)
 #
 #  This file is part of ESPResSo++.
 #
@@ -69,22 +69,22 @@ will produce trj.xtc with coordinates in nm
 
 .. function:: espressopp.io.DumpXTC(system, integrator, filename, unfolded, length_factor, append)
 
-		:param system:
-		:param integrator:
-		:param filename: (default: 'out.xtc')
-		:param unfolded: (default: False)
-		:param length_factor: (default: 1.0)
-		:param append: (default: True)
-		:type system:
-		:type integrator:
-		:type filename:
-		:type unfolded:
-		:type length_factor: real
-		:type append:
+                :param system:
+                :param integrator:
+                :param filename: (default: 'out.xtc')
+                :param unfolded: (default: False)
+                :param length_factor: (default: 1.0)
+                :param append: (default: True)
+                :type system:
+                :type integrator:
+                :type filename:
+                :type unfolded:
+                :type length_factor: real
+                :type append:
 
 .. function:: espressopp.io.DumpXTC.dump()
 
-		:rtype:
+                :rtype:
 """
 
 from espressopp.esutil import cxxinit
@@ -95,19 +95,18 @@ from _espressopp import io_DumpXTC
 
 class DumpXTCLocal(ParticleAccessLocal, io_DumpXTC):
 
-  def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
-    cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
+    def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
+        cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
 
-  def dump(self):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.dump(self)
+    def dump(self):
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.dump(self)
 
 
 if pmi.isController :
-  class DumpXTC(ParticleAccess):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-      cls =  'espressopp.io.DumpXTCLocal',
-      pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
-    )
+    class DumpXTC(ParticleAccess, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          cls =  'espressopp.io.DumpXTCLocal',
+          pmicall = [ 'dump' ],
+          pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
+        )

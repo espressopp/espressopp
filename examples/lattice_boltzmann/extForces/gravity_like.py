@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ##################################################################################
-# LATTICE-BOLTZMANN SIMULATION 							 #
-# WITH EXTERNAL GRAVITY-LIKE FORCES 						 #
+# LATTICE-BOLTZMANN SIMULATION                                                   #
+# WITH EXTERNAL GRAVITY-LIKE FORCES                                              #
 # AND FILE-OUTPUT OF THE VELOCITY COMPONENT VZ DEPENDENCE ON THE X COORDINATE    #
 ##################################################################################
 
@@ -58,7 +58,7 @@ lbOutVelFile   = espressopp.analysis.LBOutputVzOfX(system,lb)
 outputToFile   = espressopp.integrator.ExtAnalyze(lbOutVelFile, outStep)
 integrator.addExtension(outputToFile)
 
-# NOW WE WOULD LIKE TO APPLY TO LB LIQUID SOME EXTERNAL FORCES 
+# NOW WE WOULD LIKE TO APPLY TO LB LIQUID SOME EXTERNAL FORCES
 # set external constant (gravity-like) force
 extForceToSet = Real3D(0., 0., 0.0001)
 lbforce = espressopp.integrator.LBInitConstForce(system,lb)

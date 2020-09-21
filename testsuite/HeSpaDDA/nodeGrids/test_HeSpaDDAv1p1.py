@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2020(H)
 #      Institute Jozef Stefan
@@ -57,15 +57,15 @@ idealGas=0   # No load at all in the low-res region
 slabMS=[1,0,0]
 
 class TestOneScale(unittest.TestCase):
-	def test_OneScaleHDD(self):
-		print "Checking the domain decomposition for a heterogeneous (oneScale) MD simulations"
-		# set bassic parameters
-		global box_size,rc,skin
-		for i in range(1,11):
-			pX[i-1], pY[i-1], pZ[i-1] = espressopp.tools.decomp.nodeGrid(pTotal[i-1],box_size,rc,skin)
-		self.assertAlmostEqual(pX[0],hdd1[0],places=2)
-		self.assertAlmostEqual(pY[9],hdd10[1],places=2)
-		self.assertAlmostEqual(pZ[5], hdd6[2], places=2)
+    def test_OneScaleHDD(self):
+        print("Checking the domain decomposition for a heterogeneous (oneScale) MD simulations")
+        # set bassic parameters
+        global box_size,rc,skin
+        for i in range(1,11):
+            pX[i-1], pY[i-1], pZ[i-1] = espressopp.tools.decomp.nodeGrid(pTotal[i-1],box_size,rc,skin)
+        self.assertAlmostEqual(pX[0],hdd1[0],places=2)
+        self.assertAlmostEqual(pY[9],hdd10[1],places=2)
+        self.assertAlmostEqual(pZ[5], hdd6[2], places=2)
 
 if __name__ == '__main__':
-    unittest.main()		
+    unittest.main()

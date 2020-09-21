@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import espressopp
 from espressopp.tools import replicate, readxyz
@@ -10,7 +10,7 @@ import numpy as np
 def bench_lj(xyz_file):
 
     # read from xyz file
-    print "reading from: ", xyz_file
+    print("reading from: ", xyz_file)
     pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz = readxyz(xyz_file)
     Npart              = len(pid)
     box                = (Lx,Ly,Lz)
@@ -55,15 +55,15 @@ def bench_lj(xyz_file):
     # calculate a 3D subgrid to speed up verlet list builds and communication
     cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid,  r_cutoff, skin)
 
-    print "gitrevision        = ", espressopp.Version().gitrevision
-    print "NCPUs              = ", NCPUs
-    print "r_cutoff           = ", r_cutoff
-    print "skin               = ", skin
-    print "box                = ", box
-    print "nodeGrid           = ", nodeGrid
-    print "cellGrid           = ", cellGrid
-    print "Nparticles         = ", Npart
-    print "steps              = ", steps
+    print("gitrevision        = ", espressopp.Version().gitrevision)
+    print("NCPUs              = ", NCPUs)
+    print("r_cutoff           = ", r_cutoff)
+    print("skin               = ", skin)
+    print("box                = ", box)
+    print("nodeGrid           = ", nodeGrid)
+    print("cellGrid           = ", cellGrid)
+    print("Nparticles         = ", Npart)
+    print("steps              = ", steps)
 
     # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
     system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
@@ -150,14 +150,14 @@ def bench_lj(xyz_file):
     timers = list(integrator.getTimers())
     timers_summ += np.mean(np.array(timers),axis=0)
 
-    print ""
+    print("")
     for k in sub_keys:
-        print "{:18} =  {}".format(keys[k],timers_summ[k])
-    print ""
+        print("{:18} =  {}".format(keys[k],timers_summ[k]))
+    print("")
 
     temperature = espressopp.analysis.Temperature(system)
     T = temperature.compute()
-    print "temperature        =  {}".format(T)
+    print("temperature        =  {}".format(T))
 
     T_exp = 0.160074388303
     assert(abs(T-T_exp)<1.0e-8)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 import unittest
@@ -11,7 +11,7 @@ import numpy as np
 import logging
 from espressopp import Real3D, Int3D
 
-print "Comparison Tabulated dihedral vs Harmonic dihedral"
+print("Comparison Tabulated dihedral vs Harmonic dihedral")
 
 # Input values for system
 N = 10                                    # box size
@@ -29,13 +29,13 @@ spline = 2
 tabBond = "table_b0.txt"
 tabDih  = "table_d_h10.txt"
 
-print "Max simulation time: {:d}".format(nsnapshots * nsteps)
+print("Max simulation time: {:d}".format(nsnapshots * nsteps))
 
 def calcNumberCells(size, nodes, cutoff):
     # compute the number of cells on each node
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
-       ncells = ncells + 1
+        ncells = ncells + 1
     return ncells - 1
 
 # writes the tabulated file
@@ -126,17 +126,17 @@ class TestTabDih(makeConf):
         integrator.addExtension(langevin)
         langevin.gamma = 1.0
         langevin.temperature = 2.479 # in kJ/mol
-        print "Running at temperature T = {:.3f} kJ/mol/k_B".format(langevin.temperature)
+        print("Running at temperature T = {:.3f} kJ/mol/k_B".format(langevin.temperature))
 
 
-        start_time = time.clock()
-        print " ***"
-        print "{:8s} {:8s} {:8s}".format("Step","E_tab","E_harm")
+        start_time = time.process_time()
+        print(" ***")
+        print("{:8s} {:8s} {:8s}".format("Step","E_tab","E_harm"))
         for k in range(nsnapshots):
             Ed1, Ed2 = interDihed1.computeEnergy(), interDihed2.computeEnergy()
             if k % 10 == 0:
                 self.assertAlmostEqual(Ed1, Ed2, places=2)
-                print '{:8d} {:8f} {:8f}'.format(((k+10)*nsteps),Ed1, Ed2)
+                print('{:8d} {:8f} {:8f}'.format(((k+10)*nsteps),Ed1, Ed2))
             integrator.run(nsteps)
 
 

@@ -27,36 +27,36 @@ espressopp.analysis.Energy
 
 .. function:: espressopp.analysis.EnergyPot(system, per_atom)
 
-		:param system:
-		:param per_atom: (default: False)
-		:type system:
-		:type per_atom:
+                :param system:
+                :param per_atom: (default: False)
+                :type system:
+                :type per_atom:
 
 .. function:: espressopp.analysis.EnergyPot.compute()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.EnergyKin(system, per_atom)
 
-		:param system:
-		:param per_atom: (default: False)
-		:type system:
-		:type per_atom:
+                :param system:
+                :param per_atom: (default: False)
+                :type system:
+                :type per_atom:
 
 .. function:: espressopp.analysis.EnergyKin.compute()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.EnergyTot(system, per_atom)
 
-		:param system:
-		:param per_atom: (default: False)
-		:type system:
-		:type per_atom:
+                :param system:
+                :param per_atom: (default: False)
+                :type system:
+                :type per_atom:
 
 .. function:: espressopp.analysis.EnergyTot.compute()
 
-		:rtype:
+                :rtype:
 """
 import espressopp
 
@@ -68,13 +68,13 @@ class EnergyPot():
 
     def compute(self):
         EPot = 0.0
-        for k in xrange(self.system.getNumberOfInteractions()):
-          EPot += self.system.getInteraction(k).computeEnergy()
+        for k in range(self.system.getNumberOfInteractions()):
+            EPot += self.system.getInteraction(k).computeEnergy()
         if self.per_atom:
-          NPart  = espressopp.analysis.NPart(self.system).compute()
-          return EPot / NPart
+            NPart  = espressopp.analysis.NPart(self.system).compute()
+            return EPot / NPart
         else:
-          return EPot
+            return EPot
 
 class EnergyKin():
 
@@ -83,13 +83,13 @@ class EnergyKin():
         self.per_atom = per_atom
 
     def compute(self):
-      NPart  = espressopp.analysis.NPart(self.system).compute()
-      T      = espressopp.analysis.Temperature(self.system).compute()
-      EKin   = (3.0/2.0) * NPart * T
-      if self.per_atom:
-          return EKin / NPart
-      else:
-          return EKin
+        NPart  = espressopp.analysis.NPart(self.system).compute()
+        T      = espressopp.analysis.Temperature(self.system).compute()
+        EKin   = (3.0/2.0) * NPart * T
+        if self.per_atom:
+            return EKin / NPart
+        else:
+            return EKin
 
 class EnergyTot():
 
@@ -98,13 +98,13 @@ class EnergyTot():
         self.per_atom = per_atom
 
     def compute(self):
-      NPart  = espressopp.analysis.NPart(self.system).compute()
-      T      = espressopp.analysis.Temperature(self.system).compute()
-      EKin   = (3.0/2.0) * NPart * T
-      EPot   = 0.0
-      for k in xrange(self.system.getNumberOfInteractions()):
-        EPot += self.system.getInteraction(k).computeEnergy()
-      if self.per_atom:
-        return (EPot + EKin) / NPart
-      else:
-        return (EPot + EKin)
+        NPart  = espressopp.analysis.NPart(self.system).compute()
+        T      = espressopp.analysis.Temperature(self.system).compute()
+        EKin   = (3.0/2.0) * NPart * T
+        EPot   = 0.0
+        for k in range(self.system.getNumberOfInteractions()):
+            EPot += self.system.getInteraction(k).computeEnergy()
+        if self.per_atom:
+            return (EPot + EKin) / NPart
+        else:
+            return (EPot + EKin)

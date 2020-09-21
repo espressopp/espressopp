@@ -20,7 +20,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#define BOOST_TEST_MODULE ComputeTemperature
 #define PARALLEL_TEST_MODULE ComputeTemperature
+
 #include "ut.hpp"
 
 #include "types.hpp"

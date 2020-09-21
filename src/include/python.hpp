@@ -86,6 +86,7 @@ namespace espressopp {
       template <class DerivedT>
       inline class_(char const* name, char const* doc, boost::python::init_base<DerivedT> const& i)
 	: base(name, doc, i) {}
+
     };
   }
 }

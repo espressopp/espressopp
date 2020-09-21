@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python2
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -143,9 +143,9 @@ bonds = Tetracryst.makebonds(len(x))
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..."
+print("Added tuples and bonds, decomposing now ...")
 system.storage.decompose()
-print "done decomposing"
+print("done decomposing")
 
 # AdResS Verlet list
 vl = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc,
@@ -191,18 +191,18 @@ integrator.addExtension(fec)
 espressopp.tools.AdressDecomp(system, integrator)
 
 # system information
-print ''
-print 'AdResS Center =', [Lx/2, Ly/2, Lz/2]
-print 'number of AT particles =', num_particles
-print 'number of CG particles =', num_particlesCG
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('AdResS Center =', [Lx/2, Ly/2, Lz/2])
+print('number of AT particles =', num_particles)
+print('number of CG particles =', num_particlesCG)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)
@@ -223,46 +223,45 @@ densityprofile = espressopp.analysis.XDensity(system)
 
 # timer, steps
 nsteps = steps / intervals
-start_time = time.clock()
+start_time = time.process_time()
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * s
-  T = temperature.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interQuartic.computeEnergy()
-  Ecorr = fec.computeCompEnergy()
-  sys.stdout.write(fmt % (step, T, Ek + Ep + Eb + Ecorr, Ep, Eb, Ek, Ecorr))
+    integrator.run(nsteps)
+    step = nsteps * s
+    T = temperature.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interQuartic.computeEnergy()
+    Ecorr = fec.computeCompEnergy()
+    sys.stdout.write(fmt % (step, T, Ek + Ep + Eb + Ecorr, Ep, Eb, Ek, Ecorr))
 
-  # calculate density profile
-  density_array = densityprofile.compute(densityprofilegrid)
-  for i in range(len(density_array)):
-    if(i>=len(density_array_total)):
-      density_array_total.append(density_array[i])
-    else:
-      density_array_total[i] += density_array[i]
-  Adds += 1.0
+    # calculate density profile
+    density_array = densityprofile.compute(densityprofilegrid)
+    for i in range(len(density_array)):
+        if(i>=len(density_array_total)):
+            density_array_total.append(density_array[i])
+        else:
+            density_array_total[i] += density_array[i]
+    Adds += 1.0
 
 # correct the density profile according to number of samples
 for i in range(len(density_array_total)):
-  density_array_total[i] /= Adds
+    density_array_total[i] /= Adds
 
 # printing density profile
 nameFile = 'density_profile_Gibbs.dat'
-print ''
-print "Printing the density profile to %s\n" %nameFile
+print('')
+print("Printing the density profile to %s\n" %nameFile)
 tempFile = open (nameFile, 'w')
 fmt = ' %12.8f %12.8f\n'
 dr = Lx / float(densityprofilegrid)
 for i in range( len(density_array_total) ):
-  tempFile.write(fmt % ( (i+0.5)*dr, density_array_total[i] ))
+    tempFile.write(fmt % ( (i+0.5)*dr, density_array_total[i] ))
 tempFile.close()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-

@@ -10,18 +10,12 @@ stages:
   - deploy
 
 env:
-    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
-    - DISTRO=ubuntu EXTERNAL=OFF
-    - DISTRO=ubuntu_rolling EXTERNAL=ON
-    - DISTRO=ubuntu_rolling EXTERNAL=OFF
-    - DISTRO=ubuntu_mpich EXTERNAL=ON
-    - DISTRO=ubuntu_mpich EXTERNAL=OFF
-    - DISTRO=fedora EXTERNAL=ON
-    - DISTRO=fedora EXTERNAL=OFF
-    - DISTRO=fedora_mpich EXTERNAL=ON
-    - DISTRO=fedora_mpich EXTERNAL=OFF
-    - DISTRO=opensuse EXTERNAL=ON
-    - DISTRO=opensuse EXTERNAL=OFF
+    - DISTRO=ubuntu BUILD_UG=ON XTC=ON
+    - DISTRO=ubuntu_rolling XTC=OFF
+    - DISTRO=ubuntu_mpich XTC=ON
+    - DISTRO=fedora XTC=ON
+    - DISTRO=fedora_mpich XTC=ON
+    - DISTRO=opensuse XTC=ON
 
 script:
   - if [[ ${TRAVIS_BRANCH} = master ]]; then export DOCKER_TAG=latest; else export DOCKER_TAG="${TRAVIS_BRANCH}"; fi
@@ -29,18 +23,18 @@ script:
 
 jobs:
     exclude:
-        - compiler: gcc
-          env: DISTRO=ubuntu_rolling EXTERNAL=ON
         - compiler: clang
-          env: DISTRO=ubuntu_rolling EXTERNAL=ON
+          env: DISTRO=ubuntu_rolling XTC=OFF
+        - compiler: clang
+          env: DISTRO=fedora_mpich XTC=ON
     include:
         - stage: canary
-          env: DISTRO=ubuntu EXTERNAL=ON
+          env: DISTRO=ubuntu
         - stage: coverage
-          env: DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
+          env: DISTRO=ubuntu COVERAGE=ON
         - stage: deploy
           if: type != pull_request
-          env: DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
+          env: DISTRO=ubuntu BUILD_UG=ON XTC=ON
 
 after_success:
   - if [[ "${TRAVIS_BUILD_STAGE_NAME}" != [dD]eploy ]]; then travis_terminate 0; fi

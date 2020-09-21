@@ -192,21 +192,21 @@ namespace espressopp { namespace vectorization {
         auto& particleArray = verletList->getParticleArray();
         auto& neighborList = verletList->getNeighborList();
 
-        const Real3DInt *pa_pos  = &(particleArray.position[0]);
-        Real4D *pa_force         = &(particleArray.force[0]);
+        const Real3DInt *pa_pos  = particleArray.position.data();
+        Real4D *pa_force         = particleArray.force.data();
 
-        const ulongint* __restrict pa_type = &(particleArray.type[0]);
-        const real* __restrict pa_p_x = &(particleArray.p_x[0]);
-        const real* __restrict pa_p_y = &(particleArray.p_y[0]);
-        const real* __restrict pa_p_z = &(particleArray.p_z[0]);
-        real* __restrict pa_f_x       = &(particleArray.f_x[0]);
-        real* __restrict pa_f_y       = &(particleArray.f_y[0]);
-        real* __restrict pa_f_z       = &(particleArray.f_z[0]);
+        const ulongint* __restrict pa_type = particleArray.type.data();
+        const real* __restrict pa_p_x = particleArray.p_x.data();
+        const real* __restrict pa_p_y = particleArray.p_y.data();
+        const real* __restrict pa_p_z = particleArray.p_z.data();
+        real* __restrict pa_f_x       = particleArray.f_x.data();
+        real* __restrict pa_f_y       = particleArray.f_y.data();
+        real* __restrict pa_f_z       = particleArray.f_z.data();
 
         {
-          const auto* __restrict plist  = &(neighborList.plist[0]);
-          const auto* __restrict prange = &(neighborList.prange[0]);
-          const auto* __restrict nplist = &(neighborList.nplist[0]);
+          const auto* __restrict plist  = neighborList.plist.data();
+          const auto* __restrict prange = neighborList.prange.data();
+          const auto* __restrict nplist = neighborList.nplist.data();
           const int ip_max = neighborList.plist.size();
 
           int in_min=0;

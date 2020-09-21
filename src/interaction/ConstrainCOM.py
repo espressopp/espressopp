@@ -1,20 +1,20 @@
 #  Copyright (C) 2017, 2019
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -43,26 +43,26 @@ This class implies 2 conditions on a tuple list defining subchains:
 
 .. function:: espressopp.interaction.ConstrainCOM(k_com)
 
-		:param k_com: (default: 100.)
-		:type k_com: real
+                :param k_com: (default: 100.)
+                :type k_com: real
 
 .. function:: espressopp.interaction.FixedLocalTupleListConstrainCOM(system, tuplelist, potential)
 
-		:param system: 
-		:param tuplelist: 
-		:param potential: 
-		:type system: 
-		:type tuplelist: 
-		:type potential: 
+                :param system:
+                :param tuplelist:
+                :param potential:
+                :type system:
+                :type tuplelist:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedLocalTupleListConstrainCOM.getPotential()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.interaction.FixedLocalTupleListConstrainCOM.setCom(particlelist)
 
-		:param particlelist: 
-		:type particlelist:
+                :param particlelist:
+                :type particlelist:
 
 
 """
@@ -74,14 +74,14 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_ConstrainCOM, interaction_FixedLocalTupleListConstrainCOM
 
 class ConstrainCOMLocal(PotentialLocal, interaction_ConstrainCOM):
-    
+
     def __init__(self, k_com=100.):
         """Initialize the local ConstrainCOM."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_ConstrainCOM, k_com)
-        
+
 class FixedLocalTupleListConstrainCOMLocal(InteractionLocal, interaction_FixedLocalTupleListConstrainCOM):
-    
+
     def __init__(self, system, fixedtuplelist, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedLocalTupleListConstrainCOM, system, fixedtuplelist, potential)
@@ -105,10 +105,8 @@ if pmi.isController:
             pmiproperty = ['k_com'],
             )
 
-    class FixedLocalTupleListConstrainCOM(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedLocalTupleListConstrainCOM(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedLocalTupleListConstrainCOMLocal',
             pmicall = ['getPotential', 'setCom']
             )
-

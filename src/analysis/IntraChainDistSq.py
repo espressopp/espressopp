@@ -27,14 +27,14 @@ espressopp.analysis.IntraChainDistSq
 
 .. function:: espressopp.analysis.IntraChainDistSq(system, fpl)
 
-		:param system:
-		:param fpl:
-		:type system:
-		:type fpl:
+                :param system:
+                :param fpl:
+                :type system:
+                :type fpl:
 
 .. function:: espressopp.analysis.IntraChainDistSq.compute()
 
-		:rtype:
+                :rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -45,14 +45,13 @@ from _espressopp import analysis_IntraChainDistSq
 class IntraChainDistSqLocal(AllParticlePosLocal, analysis_IntraChainDistSq):
 
     def __init__(self, system, fpl):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_IntraChainDistSq, system, fpl)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_IntraChainDistSq, system, fpl)
     def compute(self):
         return self.cxxclass.compute(self)
 
 if pmi.isController :
-    class IntraChainDistSq(AllParticlePos):
-        __metaclass__ = pmi.Proxy
+    class IntraChainDistSq(AllParticlePos, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.IntraChainDistSqLocal',
             pmicall = [ "compute" ]

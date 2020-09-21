@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -27,46 +27,46 @@ espressopp.FixedTripleAngleList
 
 .. function:: espressopp.FixedTripleAngleList(storage)
 
-		:param storage: 
-		:type storage: 
+                :param storage:
+                :type storage:
 
 .. function:: espressopp.FixedTripleAngleList.add(pid1, pid2, pid3)
 
-		:param pid1: 
-		:param pid2: 
-		:param pid3: 
-		:type pid1: 
-		:type pid2: 
-		:type pid3: 
-		:rtype: 
+                :param pid1:
+                :param pid2:
+                :param pid3:
+                :type pid1:
+                :type pid2:
+                :type pid3:
+                :rtype:
 
 .. function:: espressopp.FixedTripleAngleList.addTriples(triplelist)
 
-		:param triplelist: 
-		:type triplelist: 
-		:rtype: 
+                :param triplelist:
+                :type triplelist:
+                :rtype:
 
 .. function:: espressopp.FixedTripleAngleList.getAngle(pid1, pid2, pid3)
 
-		:param pid1: 
-		:param pid2: 
-		:param pid3: 
-		:type pid1: 
-		:type pid2: 
-		:type pid3: 
-		:rtype: 
+                :param pid1:
+                :param pid2:
+                :param pid3:
+                :type pid1:
+                :type pid2:
+                :type pid3:
+                :rtype:
 
 .. function:: espressopp.FixedTripleAngleList.getTriples()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.FixedTripleAngleList.getTriplesAngles()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.FixedTripleAngleList.size()
 
-		:rtype: 
+                :rtype:
 """
 from espressopp import pmi
 import _espressopp
@@ -106,32 +106,31 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
     def getTriples(self):
 
         if pmi.workerIsActive():
-          triples = self.cxxclass.getTriples(self)
-          return triples
-        
+            triples = self.cxxclass.getTriples(self)
+            return triples
+
     'returns the list of (pid1, pid2, pid3, angle(123))'
     def getTriplesAngles(self):
 
         if pmi.workerIsActive():
-          triples_angles = self.cxxclass.getTriplesAngles(self)
-          return triples_angles
-        
+            triples_angles = self.cxxclass.getTriplesAngles(self)
+            return triples_angles
+
     def getAngle(self, pid1, pid2, pid3):
         if pmi.workerIsActive():
-          return self.cxxclass.getAngle(self, pid1, pid2, pid3)
+            return self.cxxclass.getAngle(self, pid1, pid2, pid3)
 
 if pmi.isController:
-  class FixedTripleAngleList(object):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-        cls = 'espressopp.FixedTripleAngleListLocal',
-        localcall = [ "add" ],
-        pmicall = [ "addTriples" ],
-        pmiinvoke = ["getTriples", "getTriplesAngles", "size"]
-    )
+    class FixedTripleAngleList(metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls = 'espressopp.FixedTripleAngleListLocal',
+            localcall = [ "add" ],
+            pmicall = [ "addTriples" ],
+            pmiinvoke = ["getTriples", "getTriplesAngles", "size"]
+        )
 
     def getAngle(self, pid1, pid2, pid3 ):
-      angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
-      for i in angles:
-        if( i != -1 ):
-          return i        
+        angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
+        for i in angles:
+            if( i != -1 ):
+                return i

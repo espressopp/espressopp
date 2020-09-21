@@ -33,23 +33,23 @@ potentials.
 .. function:: espressopp.interaction.TabulatedSubEnsDihedral(itype, filename)
 
         :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filename: The tabulated potential filename.
-		:type itype: int
-		:type filename: str
+                :param filename: The tabulated potential filename.
+                :type itype: int
+                :type filename: str
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedral(system, fql, potential)
 
-		:param system: The Espresso++ system object.
-		:param fql: The FixedQuadrupleList.
-		:param potential: The potential.
-		:type system: espressopp.System
-		:type fql: espressopp.FixedQuadrupleList
-		:type potential: espressopp.interaction.Potential
+                :param system: The Espresso++ system object.
+                :param fql: The FixedQuadrupleList.
+                :param potential: The potential.
+                :type system: espressopp.System
+                :type fql: espressopp.FixedQuadrupleList
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedral.setPotential(potential)
 
-		:param potential: The potential object.
-		:type potential: espressopp.interaction.Potential
+                :param potential: The potential object.
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTypesTabulatedSubEnsDihedral(system, fql)
 
@@ -136,21 +136,19 @@ if pmi.isController:
             cls = 'espressopp.interaction.TabulatedSubEnsDihedralLocal',
             pmicall = ['weight_get', 'weight_set',
                        'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
-				       'colVarSd_get', 'colVarSd_set',
-				       'dimension_get', 'filenames_get', 'filename_get',
-				       'filename_set', 'addInteraction', 'colVarRefs_get',
-				       'colVarRef_get']
+                                       'colVarSd_get', 'colVarSd_set',
+                                       'dimension_get', 'filenames_get', 'filename_get',
+                                       'filename_set', 'addInteraction', 'colVarRefs_get',
+                                       'colVarRef_get']
             )
 
-    class FixedQuadrupleListTabulatedSubEnsDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedralLocal',
             pmicall = ['setPotential', 'getFixedQuadrupleList']
             )
 
-    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

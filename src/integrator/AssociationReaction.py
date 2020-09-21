@@ -17,8 +17,7 @@ class AssociationReactionLocal(ExtensionLocal, integrator_AssociationReaction):
             cxxinit(self, integrator_AssociationReaction, system, vl, fpl, domdec)
 
 if pmi.isController :
-    class AssociationReaction(Extension):
-        __metaclass__ = pmi.Proxy
+    class AssociationReaction(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.AssociationReactionLocal',
             pmiproperty = [ 'rate', 'cutoff', 'typeA', 'typeB', 'deltaA', 'deltaB', 'stateAMin', 'interval' ]

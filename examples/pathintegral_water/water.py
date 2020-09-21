@@ -22,7 +22,7 @@
 #  ESPResSo++ Python script for tabulated GROMACS simulation              #
 #                                                                         #
 ########################################################################
-# This example reads in a gromacs water system (tabulated interactions) treated with reaction field and runs a path-integral (PI) simulation using the pathintegral.py script 
+# This example reads in a gromacs water system (tabulated interactions) treated with reaction field and runs a path-integral (PI) simulation using the pathintegral.py script
 # ! WARNINING ! this is still an experimental feature!!
 #
 
@@ -47,7 +47,7 @@ def genTabPotentials(tabfilesnb):
         pot = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rc)
         t1, t2 = fg[6], fg[8] # type 1, type 2
         potentials.update({t1+"_"+t2: pot})
-        print "created", t1, t2, fe
+        print("created", t1, t2, fe)
     return potentials
 
 
@@ -106,7 +106,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(0, 0, 0), types[pid], masses[pid], charges[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 #system.storage.decompose()
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -147,16 +147,16 @@ system.storage.decompose()
 num_particles  = int(espressopp.analysis.NPart(system).compute())
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 configurations = espressopp.analysis.Configurations(system)
@@ -165,11 +165,11 @@ temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 pressureTensor = espressopp.analysis.PressureTensor(system)
 
-print "i*timestep,Eb, EAng, ETab, Ek, Etotal T"
+print("i*timestep,Eb, EAng, ETab, Ek, Etotal T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 outfile = open("esp.dat", "w")
 
-start_time = time.clock()
+start_time = time.process_time()
 
 espressopp.tools.psfwrite("system.psf", system)
 
@@ -180,26 +180,22 @@ for i in range(check):
     Eb = 0
     EAng = 0
     ETab=0
-    for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-    for ang in angleinteractions.values(): EAng+=ang.computeEnergy()    
+    for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
     ETab= tabulatedinteraction.computeEnergy()
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
-    
-    print (fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
+
+    print((fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T)))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
     integrator.run(steps/check)
 
 
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-

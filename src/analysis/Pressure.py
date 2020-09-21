@@ -26,8 +26,8 @@ espressopp.analysis.Pressure
 
 .. function:: espressopp.analysis.Pressure(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -38,12 +38,11 @@ from _espressopp import analysis_Pressure
 class PressureLocal(ObservableLocal, analysis_Pressure):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_Pressure, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_Pressure, system)
 
 if pmi.isController :
-    class Pressure(Observable):
-        __metaclass__ = pmi.Proxy
+    class Pressure(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.PressureLocal'
             )

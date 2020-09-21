@@ -20,7 +20,7 @@
 ##############################################################################################
 #                                                                                            #
 #  ESPResSo++ Python script for fixing positions of particles within a L-J standard system   #
-#                                                                          		     # 
+#                                                                                            #
 ##############################################################################################
 
 import espressopp
@@ -39,10 +39,10 @@ fixedWall  = espressopp.ParticleGroup(system.storage)
 # add a particle wall
 pid = 1
 for k in range(10):
-  for l in range(10):
-    system.storage.addParticle(pid, espressopp.Real3D(k*1.12, 5, l*1.12))
-    fixedWall.add(pid)
-    pid += 1
+    for l in range(10):
+        system.storage.addParticle(pid, espressopp.Real3D(k*1.12, 5, l*1.12))
+        fixedWall.add(pid)
+        pid += 1
 
 # add also one free particle
 system.storage.addParticle(0, espressopp.Real3D(5.8,9,5.5))
@@ -58,5 +58,5 @@ integrator.addExtension(fixpositions)
 # run the simulation
 sock = espressopp.tools.vmd.connect(system)
 for i in range(10000):
-  integrator.run(100)
-  espressopp.tools.vmd.imd_positions(system, sock)
+    integrator.run(100)
+    espressopp.tools.vmd.imd_positions(system, sock)

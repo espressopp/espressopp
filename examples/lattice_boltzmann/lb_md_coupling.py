@@ -18,7 +18,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###########################################################################
-# DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION			  #	
+# DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION                       #
 ###########################################################################
 
 import espressopp

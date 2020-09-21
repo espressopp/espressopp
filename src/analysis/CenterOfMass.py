@@ -27,8 +27,8 @@ espressopp.analysis.CenterOfMass
 
 .. function:: espressopp.analysis.CenterOfMass(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -39,12 +39,11 @@ from _espressopp import analysis_CenterOfMass
 class CenterOfMassLocal(ObservableLocal, analysis_CenterOfMass):
 
     def __init__(self, system):
-    	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_CenterOfMass, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_CenterOfMass, system)
 
 if pmi.isController :
-    class CenterOfMass(Observable):
-        __metaclass__ = pmi.Proxy
+    class CenterOfMass(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.analysis.CenterOfMassLocal'
         )

@@ -51,8 +51,7 @@ class VectorizationLocal(_espressopp.Vectorization):
             system.storage.decompose()
 
 if pmi.isController:
-    class Vectorization(object):
-        __metaclass__ = pmi.Proxy
+    class Vectorization(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.vectorization.VectorizationLocal'
         )

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -62,7 +62,7 @@ tabBonds = ["table_bi0.txt", "table_bi1.txt"]
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
-       ncells = ncells + 1
+        ncells = ncells + 1
     return ncells - 1
 
 # writes the tabulated file
@@ -181,10 +181,10 @@ class TestSubEnsBond(makeConf):
             cv = self.potBond.colVar
             weights.append([wts[0],wts[1]])
             if k % 10 == 0:
-                print 'Step %6d:' % ((k+10)*nsteps),
-                print "Weights: (%3f, %3f)" % (wts[0], wts[1]),
-                print "avg: %3f" % np.mean([w[0] for w in weights]),
-                print "ColVar: (%3f)" % (cv[0])
+                print('Step %6d:' % ((k+10)*nsteps), end=' ')
+                print("Weights: (%3f, %3f)" % (wts[0], wts[1]), end=' ')
+                print("avg: %3f" % np.mean([w[0] for w in weights]), end=' ')
+                print("ColVar: (%3f)" % (cv[0]))
         self.assertNotEqual(np.mean([w[0] for w in weights]), 0)
         self.assertNotEqual(np.mean([w[1] for w in weights]), 0)
 

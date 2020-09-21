@@ -73,12 +73,12 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 
-		:param system:
-		:param n:
-		:param dh:
-		:type system:
-		:type n:
-		:type dh:
+                :param system:
+                :param n:
+                :param dh:
+                :type system:
+                :type n:
+                :type dh:
 """
 
 from espressopp.esutil import cxxinit
@@ -90,12 +90,11 @@ from _espressopp import analysis_PressureTensorMultiLayer
 class PressureTensorMultiLayerLocal(AnalysisBaseLocal, analysis_PressureTensorMultiLayer):
 
     def __init__(self, system, n, dh):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensorMultiLayer, system, n, dh)
 
 if pmi.isController:
-    class PressureTensorMultiLayer(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class PressureTensorMultiLayer(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.PressureTensorMultiLayerLocal',
             pmiproperty = [ 'n', 'dh' ]

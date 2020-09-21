@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import unittest
@@ -75,7 +75,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(x[0], 1.0)
         self.assertEqual(x[1], 2.0)
         self.assertEqual(x[2], 3.0)
-        
+
     def test3Properties(self) :
         'Test Real3D properties.'
         v = Real3D(1.0, 2.0, 3.0)
@@ -105,7 +105,7 @@ class Test0Real3D(unittest.TestCase) :
         v2 = Real3D(1.0, 2.0, 3.0)
         self.assertEqual(v, v2)
         self.assertFalse(v != v2)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
 
     def test6Numerics(self) :
         'Test various numeric operations of Real3D.'
@@ -139,7 +139,7 @@ class Test0Real3D(unittest.TestCase) :
         s = pickle.dumps(v)
         # unpickle
         v2 = pickle.loads(s)
-        self.assert_(v is not v2)
+        self.assertTrue(v is not v2)
         self.assertEqual(v, v2)
 
 if __name__ == "__main__":

@@ -38,37 +38,37 @@ This is an abstract class, only needed to be inherited from.
 
 .. function:: espressopp.interaction.Interaction.bondType()
 
-		:rtype: int
+                :rtype: int
 
 .. function:: espressopp.interaction.Interaction.computeEnergy()
 
-		:rtype: real
+                :rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeEnergyAA(atomtype)
 
         :param type1: Type of particles with respect to which the atomistic energy is calculated.
         :type type1: int
-		:rtype: real
+                :rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeEnergyDeriv()
 
-		:rtype: real
+                :rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeEnergyCG(atomtype)
 
         :param type1: Type of particles with respect to which the coarse-grained energy is calculated.
         :type type1: int
-		:rtype: real
+                :rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeVirial()
 
-		:rtype: real
+                :rtype: real
 """
 from espressopp import pmi
 from _espressopp import interaction_Interaction
 
 
-unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = range(7)
+unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = list(range(7))
 
 class InteractionLocal(object):
 
@@ -103,9 +103,7 @@ class InteractionLocal(object):
             return int(self.cxxclass.bondType(self))
 
 if pmi.isController :
-    class Interaction(object):
-
-        __metaclass__ = pmi.Proxy
+    class Interaction(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
             )

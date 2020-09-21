@@ -35,7 +35,7 @@ from espressopp.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
-steps = 1 
+steps = 1
 check = steps
 rc    = 1.1  # Verlet list cutoff
 skin  = 0.3
@@ -48,8 +48,8 @@ tabBBg = "table_B_B.xvg"
 
 taba1g = "table_a1.xvg"     # angles
 taba2g = "table_a2.xvg"
-taba3g = "table_a3.xvg"  
-taba4g = "table_a4.xvg"   
+taba3g = "table_a3.xvg"
+taba4g = "table_a4.xvg"
 taba5g = "table_a5.xvg"
 
 tabb0g  = "table_b0.xvg"    # bonds
@@ -129,7 +129,7 @@ for pid in range(num_particles):
     part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
             Real3D(vx[pid], vy[pid], vz[pid]), types[pid]]
     allParticles.append(part)
-system.storage.addParticles(allParticles, *props)    
+system.storage.addParticles(allParticles, *props)
 system.storage.decompose()
 
 
@@ -168,7 +168,7 @@ angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypepara
 #    potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename=fe)
 #    intera = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
 #    system.addInteraction(intera)
-    
+
 
 # bonded 4-body interactions
 dihedralinteractions=gromacs.setDihedralInteractions(system, dihedraltypes, dihedraltypeparams)
@@ -199,16 +199,16 @@ integrator.dt = timestep
 
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 
 #exit()
@@ -232,15 +232,15 @@ Pij = [0,0,0,0,0,0]
 Ek = 0.5 * T * (3 * num_particles)
 Ep = internb.computeEnergy()
 Eb, Ea, Ed=0,0,0
-for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
-for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
-for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
+for bd in list(bondedinteractions.values()):Eb+=bd.computeEnergy()
+for ang in list(angleinteractions.values()): Ea+=ang.computeEnergy()
+for dih in list(dihedralinteractions.values()): Ed+=dih.computeEnergy()
 
 Etotal = Ek + Ep + Eb + Ea + Ed
 sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair         ebond       eangle       edihedral\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
 
-start_time = time.clock()
+start_time = time.process_time()
 
 espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=False)
 
@@ -252,25 +252,21 @@ for i in range(check):
     Pij = pressureTensor.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Ep = internb.computeEnergy()
-    
+
     Eb, Ea, Ed=0,0,0
-    for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
-    for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
-    for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
+    for bd in list(bondedinteractions.values()):Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): Ea+=ang.computeEnergy()
+    for dih in list(dihedralinteractions.values()): Ed+=dih.computeEnergy()
     Etotal = Ek + Ep + Eb + Ea + Ed
     sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
     #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     #sys.stdout.write('\n')
 
 # print timings and neighbor list information
-end_time = time.clock()
+end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
 sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
 sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-

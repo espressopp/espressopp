@@ -6,4 +6,4 @@ ignore:
   - contrib/
   - testsuite/
   - contrib/
-  - /usr/include/
+  - /usr

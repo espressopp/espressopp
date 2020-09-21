@@ -155,14 +155,14 @@ namespace espressopp { namespace vectorization {
     {
       const auto& cellNborList            = vec->getNeighborList();
       const auto& particleArray           = vec->getParticleArray();
-      const size_t* __restrict cellRange = &(particleArray.cellRange()[0]);
-      const size_t* __restrict sizes      = &(particleArray.sizes()[0]);
+      const size_t* __restrict cellRange  = particleArray.cellRange().data();
+      const size_t* __restrict sizes      = particleArray.sizes().data();
 
-      const auto* __restrict position  = &(particleArray.position[0]);
-      const auto* __restrict pa_p_x    = &(particleArray.p_x[0]);
-      const auto* __restrict pa_p_y    = &(particleArray.p_y[0]);
-      const auto* __restrict pa_p_z    = &(particleArray.p_z[0]);
-      const auto* __restrict pa_p_type = &(particleArray.type[0]);
+      const auto* __restrict position  = particleArray.position.data();
+      const auto* __restrict pa_p_x    = particleArray.p_x.data();
+      const auto* __restrict pa_p_y    = particleArray.p_y.data();
+      const auto* __restrict pa_p_z    = particleArray.p_z.data();
+      const auto* __restrict pa_p_type = particleArray.type.data();
 
       // number of cells with neighbors
       const size_t numRealCells = cellNborList.numCells();
@@ -206,10 +206,10 @@ namespace espressopp { namespace vectorization {
         }
       }
 
-      auto* __restrict c_x_ptr = &(c_x[0]);
-      auto* __restrict c_y_ptr = &(c_y[0]);
-      auto* __restrict c_z_ptr = &(c_z[0]);
-      auto* __restrict c_j_ptr = &(c_j[0]);
+      auto* __restrict c_x_ptr = c_x.data();
+      auto* __restrict c_y_ptr = c_y.data();
+      auto* __restrict c_z_ptr = c_z.data();
+      auto* __restrict c_j_ptr = c_j.data();
       int c_j_max = 0;
 
       if(PACK_NEIGHBORS)

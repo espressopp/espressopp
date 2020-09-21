@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -28,23 +28,23 @@ in the documentation of the abstract class **BC**.
 The OrthorhombicBC class is responsible for the orthorhombic boundary condition.
 Currently only periodic boundary conditions are supported.
 
-Example: 
+Example:
 
 >>> boxsize = (Lx, Ly, Lz)
->>> bc = espressopp.bc.OrthorhombicBC(rng, boxsize) 
+>>> bc = espressopp.bc.OrthorhombicBC(rng, boxsize)
 
 
 .. py:method:: espressopp.bc.OrthorhombicBC(rng, boxL)
 
-		:param rng: 
-		:param boxL: (default: 1.0)
-		:type rng: 
-		:type boxL: real
+                :param rng:
+                :param boxL: (default: 1.0)
+                :type rng:
+                :type boxL: real
 
 .. py:method:: espressopp.bc.OrthorhombicBC.setBoxL(boxL)
 
-		:param boxL: 
-		:type boxL: 
+                :param boxL:
+                :type boxL:
 """
 
 from espressopp.esutil import cxxinit
@@ -52,7 +52,7 @@ from espressopp import pmi
 from espressopp import toReal3D
 
 from espressopp.bc.BC import *
-from _espressopp import bc_OrthorhombicBC 
+from _espressopp import bc_OrthorhombicBC
 
 class OrthorhombicBCLocal(BCLocal, bc_OrthorhombicBC):
     def __init__(self, rng, boxL=1.0):

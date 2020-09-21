@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -25,17 +25,16 @@ espressopp.Tensor
 *****************
 """
 from _espressopp import Tensor
-from espressopp import esutil
 
-# This injects additional methods into the Tensor class and pulls it
-# into this module 
-class __Tensor(Tensor) :
+__all__ = ['Tensor', 'toTensorFromVector', 'toTensor']
 
 
-    __metaclass__ = esutil.ExtendBaseClass
+def extend_class():
+    # This injects additional methods into the Tensor class and pulls it
+    # into this module
+    origin_init = Tensor.__init__
 
-    __originit = Tensor.__init__
-    def __init__(self, *args):
+    def init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -52,40 +51,34 @@ class __Tensor(Tensor) :
                 xx, yy, zz, xy, xz, yz = arg0
             elif isinstance(arg0, float) or isinstance(arg0, int):
                 xx = yy = zz = xy = xz = yz = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Tensor from %s" % (args))
-        elif len(args) == 6 :
+        elif len(args) == 6:
             xx, yy, zz, xy, xz, yz = args
-        else :
+        else:
             raise TypeError("Cannot initialize Tensor from %s" % (args))
-        
-        return self.__originit(xx, yy, zz, xy, xz, yz)
 
-    # create setters and getters
-    @property
-    def xx(self): return self[0]
+        origin_init(self, xx, yy, zz, xy, xz, yz)
 
-    @xx.setter
-    def xx(self, v): self[0] = v
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    @property
-    def yy(self) : return self[1]
+        def _set(self, v):
+            self[idx] = v
 
-    @yy.setter
-    def yy(self, v) : self[1] = v
+        return _get, _set
 
-    @property
-    def zz(self) : return self[2]
+    Tensor.__init__ = init
+    Tensor.xx = property(*_get_getter_setter(0))
+    Tensor.yy = property(*_get_getter_setter(1))
+    Tensor.zz = property(*_get_getter_setter(2))
+    Tensor.__str__ = lambda self: str((self[0], self[1], self[2], self[3], self[4], self[5]))
+    Tensor.__repr__ = lambda self: 'Tensor' + str(self)
 
-    @zz.setter
-    def zz(self, v) : self[2] = v
 
-    # string conversion
-    def __str__(self) :
-        return str((self[0], self[1], self[2], self[3], self[4], self[5]))
+extend_class()
 
-    def __repr__(self) :
-        return 'Tensor' + str(self)
 
 def toTensorFromVector(*args):
     """Try to convert the arguments to a Tensor.
@@ -102,6 +95,7 @@ def toTensorFromVector(*args):
         return Tensor(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toTensor(*args):
     """Try to convert the arguments to a Tensor, returns the argument,

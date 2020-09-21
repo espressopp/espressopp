@@ -70,20 +70,20 @@ access particle with id <pid> of stored configuration <n>:
 
 .. function:: espressopp.analysis.ConfigurationsExt(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.ConfigurationsExt.back()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.ConfigurationsExt.clear()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.ConfigurationsExt.gather()
 
-		:rtype:
+                :rtype:
 """
 
 from espressopp.esutil import cxxinit
@@ -95,23 +95,24 @@ from _espressopp import analysis_ConfigurationsExt
 class ConfigurationsExtLocal(ObservableLocal, analysis_ConfigurationsExt):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_ConfigurationsExt, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_ConfigurationsExt, system)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):
         return self.cxxclass.clear(self)
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+    def __next__(self):
+        return self.cxxclass.all(self).next()
     def back(self):
         return self.cxxclass.back(self)
 
 if pmi.isController :
-    class ConfigurationsExt(Observable):
-        __metaclass__ = pmi.Proxy
+    class ConfigurationsExt(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ConfigurationsExtLocal',
             pmicall = [ "gather", "clear", "back" ],
-            localcall = ["__getitem__", "__iter__"],
+            localcall = ["__getitem__", "__iter__", '__next__'],
             pmiproperty = ["capacity", "size", 'unfolded']
             )

@@ -28,7 +28,7 @@
 #  NaCl crystal. Then the energy and forces are calculated and compared using both
 #  the Ewald summation and the P3M. At the end the Madelung constant of NaCl crystal
 #  is calculated.
-#  
+#
 #  At the moment there is only metallic surrounding media is possible.
 
 #  Parameters:
@@ -49,7 +49,7 @@ from espressopp import Real3D
 
 # initial parameters
 N = 16                 # number of particles on lattice site
-num_particles = N**3   # total number of particles 
+num_particles = N**3   # total number of particles
 rho = 0.03              # number density of particles, number of particles devided by volume
 
 # creating a cubic NaCl crystal
@@ -58,8 +58,8 @@ x, y, z, Lx, Ly, Lz = espressopp.tools.lattice.createCubic(num_particles, rho, F
 
 # creating the system box
 box = (Lx, Ly, Lz)
-print 'System box size: ',      box
-print 'Number of particles = ', num_particles
+print('System box size: ',      box)
+print('Number of particles = ', num_particles)
 
 #  Ewald summation parameters
 #alphaEwald     = 1.112583061 #  alpha - Ewald parameter
@@ -67,8 +67,8 @@ alphaEwald     = 0.660557
 rspacecutoff   = 4.9 #  rspacecutoff - the cutoff in real space
 kspacecutoff   = 30 #  kspacecutoff - the cutoff in reciprocal space
 
-print 'Ewald parameters:'
-print 'alfa=%f, rcutoff=%f, kcutoff=%d' % (alphaEwald, rspacecutoff, kspacecutoff)
+print('Ewald parameters:')
+print('alfa=%f, rcutoff=%f, kcutoff=%d' % (alphaEwald, rspacecutoff, kspacecutoff))
 
 #  P3M parameters
 M              = espressopp.Int3D(64, 64, 64)
@@ -76,8 +76,8 @@ P              = 7
 #alphaP3M       = 1.112583061 #  alpha - Ewald parameter
 alphaP3M       = 0.660557
 
-print 'P3M parameters:'
-print 'Mesh=', M,', charge assignment order=%d,  alphaP3M=%lf' % ( P, alphaP3M)
+print('P3M parameters:')
+print('Mesh=', M,', charge assignment order=%d,  alphaP3M=%lf' % ( P, alphaP3M))
 
 # a skin for Verlet list
 skin              = 0.2
@@ -90,18 +90,18 @@ coulomb_prefactor = bjerrumlength * temperature
 nodeGrid          = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rspacecutoff,skin)
 cellGrid          = espressopp.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
 
-print ''
-print 'density = %.4f' % (rho)
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('density = %.4f' % (rho))
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 '''
   Below two systems for Ewald summation and PPPM methods will be created.
 '''
 
 #######################################################################################
-#   system for Ewald 
+#   system for Ewald
 #######################################################################################
 
 systemEwald         = espressopp.System()
@@ -127,19 +127,19 @@ props = ['id', 'pos', 'type', 'q']
 new_particles = []
 countX = countY = countZ = 0
 for i in range(0, num_particles):
-  
-  # charge should be accordingly to NaCl crystall
-  charge = pow(-1, countX + countY + countZ)
-  part = [ i, Real3D(x[i], y[i], z[i]), 0, charge ]
-  new_particles.append(part)
-  
-  countX += 1
-  if countX >= N:
-    countX = 0
-    countY += 1
-    if countY >= N:
-      countY = 0
-      countZ += 1
+
+    # charge should be accordingly to NaCl crystall
+    charge = pow(-1, countX + countY + countZ)
+    part = [ i, Real3D(x[i], y[i], z[i]), 0, charge ]
+    new_particles.append(part)
+
+    countX += 1
+    if countX >= N:
+        countX = 0
+        countY += 1
+        if countY >= N:
+            countY = 0
+            countZ += 1
 
 # adding particles to Ewald system
 systemEwald.storage.addParticles(new_particles, *props)
@@ -206,7 +206,7 @@ integratorPPPM.run(0)
 
 # printing the particle id and force difference (x,y,z) for first 6 particles
 print ('\n    Difference between forces calculated by Ewald summation and PPPM (first 6 particles)')
-print ('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz'))
+print(('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz')))
 
 #sock = espressopp.tools.vmd.connect(systemPPPM)
 #espressopp.tools.vmd.imd_positions(systemPPPM, sock)
@@ -214,13 +214,13 @@ print ('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz'))
 print_N = min(num_particles, 20)
 
 for j in range(0, print_N):
-  print ( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
-    abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
-    abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
-    abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) )
-  
-  print 'force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f
-  
+    print(( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
+      abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
+      abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
+      abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) ))
+
+    print('force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f)
+
 
 # calculating the R space part of electrostatic energy
 energyEwaldR = coulombR_intEwald.computeEnergy()
@@ -238,10 +238,10 @@ enTotPPPM = energyPPPMR + energyPPPMK
 
 
 # printing the total energy and the difference
-print 'Energy (Ewald summation): %5.16f  Energy (PPPM): %5.16f\n' % (enTotEwald, enTotPPPM)
-print 'The difference in energy (Ewald - PPPM): %5.16f\n' % (enTotEwald-enTotPPPM)
+print('Energy (Ewald summation): %5.16f  Energy (PPPM): %5.16f\n' % (enTotEwald, enTotPPPM))
+print('The difference in energy (Ewald - PPPM): %5.16f\n' % (enTotEwald-enTotPPPM))
 
 a = 2 * pow( Lx*Ly*Lz / num_particles , 1./3. )
 madelung_NaCl = -1.747564594633182190636212035544397403481
-print ("Madelung constant is: %14.10f\n" % (enTotEwald/num_particles * a))
-print (" error: %e\n\n" % ( abs( abs( enTotPPPM/num_particles * a) - abs(madelung_NaCl))))
+print(("Madelung constant is: %14.10f\n" % (enTotEwald/num_particles * a)))
+print((" error: %e\n\n" % ( abs( abs( enTotPPPM/num_particles * a) - abs(madelung_NaCl)))))

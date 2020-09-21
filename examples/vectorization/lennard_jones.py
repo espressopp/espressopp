@@ -117,28 +117,28 @@ equil_nloops       = 100
 equil_isteps       = 100
 
 # print ESPResSo++ version and compile info
-print espressopp.Version().info()
+print(espressopp.Version().info())
 # print simulation parameters (useful to have them in a log file)
-print "Npart              = ", Npart
-print "rho                = ", rho
-print "L                  = ", L
-print "box                = ", box
-print "r_cutoff           = ", r_cutoff
-print "skin               = ", skin
-print "temperature        = ", temperature
-print "dt                 = ", dt
-print "epsilon            = ", epsilon
-print "sigma              = ", sigma
-print "warmup_cutoff      = ", warmup_cutoff
-print "warmup_nloops      = ", warmup_nloops
-print "warmup_isteps      = ", warmup_isteps
-print "total_warmup_steps = ", total_warmup_steps
-print "epsilon_start      = ", epsilon_start
-print "epsilon_end        = ", epsilon_end
-print "epsilon_delta      = ", epsilon_delta
-print "capradius          = ", capradius
-print "equil_nloops       = ", equil_nloops
-print "equil_isteps       = ", equil_isteps
+print("Npart              = ", Npart)
+print("rho                = ", rho)
+print("L                  = ", L)
+print("box                = ", box)
+print("r_cutoff           = ", r_cutoff)
+print("skin               = ", skin)
+print("temperature        = ", temperature)
+print("dt                 = ", dt)
+print("epsilon            = ", epsilon)
+print("sigma              = ", sigma)
+print("warmup_cutoff      = ", warmup_cutoff)
+print("warmup_nloops      = ", warmup_nloops)
+print("warmup_isteps      = ", warmup_isteps)
+print("total_warmup_steps = ", total_warmup_steps)
+print("epsilon_start      = ", epsilon_start)
+print("epsilon_end        = ", epsilon_end)
+print("epsilon_delta      = ", epsilon_delta)
+print("capradius          = ", capradius)
+print("equil_nloops       = ", equil_nloops)
+print("equil_isteps       = ", equil_isteps)
 
 ########################################################################
 # 2. setup of the system, random number geneartor and parallelisation  #
@@ -161,9 +161,9 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, warmup_cuto
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print "NCPUs              = ", NCPUs
-print "nodeGrid           = ", nodeGrid
-print "cellGrid           = ", cellGrid
+print("NCPUs              = ", NCPUs)
+print("nodeGrid           = ", nodeGrid)
+print("cellGrid           = ", cellGrid)
 
 ########################################################################
 # 3. setup of the integrator and simulation ensemble                   #
@@ -175,14 +175,14 @@ integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = dt
 # use a thermostat if the temperature is set
 if (temperature != None):
-  # create e Langevin thermostat
-  thermostat             = espressopp.integrator.LangevinThermostat(system)
-  # set Langevin friction constant
-  thermostat.gamma       = 1.0
-  # set temperature
-  thermostat.temperature = temperature
-  # tell the integrator to use this thermostat
-  integrator.addExtension(thermostat)
+    # create e Langevin thermostat
+    thermostat             = espressopp.integrator.LangevinThermostat(system)
+    # set Langevin friction constant
+    thermostat.gamma       = 1.0
+    # set temperature
+    thermostat.temperature = temperature
+    # tell the integrator to use this thermostat
+    integrator.addExtension(thermostat)
 
 ## steps 2. and 3. could be short-cut by the following expression:
 ## system, integrator = espressopp.standard_system.Default(box, warmup_cutoff, skin, dt, temperature)
@@ -191,15 +191,15 @@ if (temperature != None):
 # 4. adding the particles                                              #
 ########################################################################
 
-print "adding ", Npart, " particles to the system ..."
+print("adding ", Npart, " particles to the system ...")
 for pid in range(Npart):
-  # get a 3D random coordinate within the box
-  pos = system.bc.getRandomPos()
-  # add a particle with particle id pid and coordinate pos to the system
-  # coordinates are automatically folded according to periodic boundary conditions
-  # the following default values are set for each particle:
-  # (type=0, mass=1.0, velocity=(0,0,0), charge=0.0)
-  system.storage.addParticle(pid, pos)
+    # get a 3D random coordinate within the box
+    pos = system.bc.getRandomPos()
+    # add a particle with particle id pid and coordinate pos to the system
+    # coordinates are automatically folded according to periodic boundary conditions
+    # the following default values are set for each particle:
+    # (type=0, mass=1.0, velocity=(0,0,0), charge=0.0)
+    system.storage.addParticle(pid, pos)
 # distribute the particles to parallel CPUs
 system.storage.decompose()
 
@@ -225,22 +225,22 @@ interaction.setPotential(type1=0, type2=0, potential=LJpot)
 
 # make the force capping interaction known to the system
 system.addInteraction(interaction)
-print "starting warm-up ..."
+print("starting warm-up ...")
 # print some status information (time, measured temperature, pressure,
 # pressure tensor (xy only), kinetic energy, potential energy, total energy, boxsize)
 espressopp.tools.analyse.info(system, integrator)
 time_warmup_start = time.time()
 for step in range(warmup_nloops):
-  # perform warmup_isteps integraton steps
-  integrator.run(warmup_isteps)
-  # decrease force capping radius in the potential
-  LJpot.epsilon += epsilon_delta
-  # update the type0-type0 interaction to use the new values of LJpot
-  interaction.setPotential(type1=0, type2=0, potential=LJpot)
-  # print status info
-  espressopp.tools.analyse.info(system, integrator)
+    # perform warmup_isteps integraton steps
+    integrator.run(warmup_isteps)
+    # decrease force capping radius in the potential
+    LJpot.epsilon += epsilon_delta
+    # update the type0-type0 interaction to use the new values of LJpot
+    interaction.setPotential(type1=0, type2=0, potential=LJpot)
+    # print status info
+    espressopp.tools.analyse.info(system, integrator)
 time_warmup_end = time.time()
-print "warmup finished"
+print("warmup finished")
 # remove the force capping interaction from the system
 system.removeInteraction(0)
 # the equilibration uses a different interaction cutoff therefore the current
@@ -252,32 +252,32 @@ verletlist.disconnect()
 ########################################################################
 
 if args.vec:
-  vec = espressopp.vectorization.Vectorization(system, integrator)
-  system.storage.decompose()
+    vec = espressopp.vectorization.Vectorization(system, integrator)
+    system.storage.decompose()
 
-  # create a new verlet list that uses a cutoff radius = r_cutoff
-  # the verlet radius is automatically increased by system.skin (see system setup)
-  verletlist  = espressopp.vectorization.VerletList(system, vec, r_cutoff)
-  # define a Lennard-Jones interaction that uses a verlet list
-  interaction = espressopp.vectorization.interaction.VerletListLennardJones(verletlist)
-  # use a Lennard-Jones potential between 2 particles of type 0
-  # the potential is automatically shifted so that U(r=cutoff) = 0.0
-  # if the potential should not be shifted set shift=0.0
-  potential   = interaction.setPotential(type1=0, type2=0,
-                                        potential=espressopp.vectorization.interaction.LennardJones(
-                                        epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
+    # create a new verlet list that uses a cutoff radius = r_cutoff
+    # the verlet radius is automatically increased by system.skin (see system setup)
+    verletlist  = espressopp.vectorization.VerletList(system, vec, r_cutoff)
+    # define a Lennard-Jones interaction that uses a verlet list
+    interaction = espressopp.vectorization.interaction.VerletListLennardJones(verletlist)
+    # use a Lennard-Jones potential between 2 particles of type 0
+    # the potential is automatically shifted so that U(r=cutoff) = 0.0
+    # if the potential should not be shifted set shift=0.0
+    potential   = interaction.setPotential(type1=0, type2=0,
+                                          potential=espressopp.vectorization.interaction.LennardJones(
+                                          epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
 else:
-  # create a new verlet list that uses a cutoff radius = r_cutoff
-  # the verlet radius is automatically increased by system.skin (see system setup)
-  verletlist  = espressopp.VerletList(system, r_cutoff)
-  # define a Lennard-Jones interaction that uses a verlet list
-  interaction = espressopp.interaction.VerletListLennardJones(verletlist)
-  # use a Lennard-Jones potential between 2 particles of type 0
-  # the potential is automatically shifted so that U(r=cutoff) = 0.0
-  # if the potential should not be shifted set shift=0.0
-  potential   = interaction.setPotential(type1=0, type2=0,
-                                        potential=espressopp.interaction.LennardJones(
-                                        epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
+    # create a new verlet list that uses a cutoff radius = r_cutoff
+    # the verlet radius is automatically increased by system.skin (see system setup)
+    verletlist  = espressopp.VerletList(system, r_cutoff)
+    # define a Lennard-Jones interaction that uses a verlet list
+    interaction = espressopp.interaction.VerletListLennardJones(verletlist)
+    # use a Lennard-Jones potential between 2 particles of type 0
+    # the potential is automatically shifted so that U(r=cutoff) = 0.0
+    # if the potential should not be shifted set shift=0.0
+    potential   = interaction.setPotential(type1=0, type2=0,
+                                          potential=espressopp.interaction.LennardJones(
+                                          epsilon=epsilon, sigma=sigma, cutoff=r_cutoff, shift=0.0))
 
 ########################################################################
 # 8. running the equilibration loop                                    #
@@ -294,25 +294,25 @@ integrator.resetTimers()
 # set integrator time step to zero again
 integrator.step = 0
 
-print "starting equilibration ..."
+print("starting equilibration ...")
 # print inital status information
 if args.vec: verletlist.rebuildPairs()
 espressopp.tools.analyse.info(system, integrator)
 time_equil_start = time.time()
 for step in range(equil_nloops):
-  # perform equilibration_isteps integration steps
-  integrator.run(equil_isteps)
-  # print status information
-  if args.vec: verletlist.rebuildPairs()
-  espressopp.tools.analyse.info(system, integrator)
+    # perform equilibration_isteps integration steps
+    integrator.run(equil_isteps)
+    # print status information
+    if args.vec: verletlist.rebuildPairs()
+    espressopp.tools.analyse.info(system, integrator)
 time_equil_end = time.time()
-print "equilibration finished"
+print("equilibration finished")
 
-print "--------------------------------------------------"
-print "vectorization:                  {}".format("ON" if args.vec else "OFF")
-print "time elapsed for warmup:        {} sec".format(time_warmup_end - time_warmup_start)
-print "time elapsed for equilibration: {} sec".format(time_equil_end - time_equil_start)
-print "--------------------------------------------------"
+print("--------------------------------------------------")
+print("vectorization:                  {}".format("ON" if args.vec else "OFF"))
+print("time elapsed for warmup:        {} sec".format(time_warmup_end - time_warmup_start))
+print("time elapsed for equilibration: {} sec".format(time_equil_end - time_equil_start))
+print("--------------------------------------------------")
 
 ########################################################################
 # 9. writing configuration to file                                     #
@@ -324,12 +324,12 @@ print "--------------------------------------------------"
 # second line     : box_Lx, box_Ly, box_Lz
 # all other lines : ParticleID  ParticleType  x_pos  y_pos  z_pos  x_vel  y_vel  z_vel
 filename = "lennard_jones_fluid_%0i.xyz" % integrator.step
-print "writing final configuration file ..."
+print("writing final configuration file ...")
 espressopp.tools.writexyz(filename, system, velocities = True, unfolded = False)
 
 # also write a PDB file which can be used to visualize configuration with VMD
-print "writing pdb file ..."
+print("writing pdb file ...")
 filename = "lennard_jones_fluid_%0i.pdb" % integrator.step
 espressopp.tools.pdbwrite(filename, system, molsize=Npart)
 
-print "finished."
+print("finished.")

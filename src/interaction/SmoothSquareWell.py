@@ -128,24 +128,20 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'Lambda', 'a']
         )
 
-    class VerletListSmoothSquareWell(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListSmoothSquareWell(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.VerletListSmoothSquareWellLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
         )
 
-    class FixedPairListSmoothSquareWell(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListSmoothSquareWell(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListSmoothSquareWellLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList','getFixedPairList']
         )
 
-    class FixedPairListTypesSmoothSquareWell(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesSmoothSquareWell(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FixedPairListTypesSmoothSquareWellLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList', 'getFixedPairList']
         )
-

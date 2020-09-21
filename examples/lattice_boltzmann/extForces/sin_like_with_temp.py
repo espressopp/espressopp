@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###################################################################################
-# STOCHASTIC LATTICE-BOLTZMANN SIMULATION 					  #
-# WITH EXTERNAL GRAVITY- AND SIN-LIKE FORCES 					  #
+# STOCHASTIC LATTICE-BOLTZMANN SIMULATION                                         #
+# WITH EXTERNAL GRAVITY- AND SIN-LIKE FORCES                                      #
 # AND FILE-OUTPUT OF THE VELOCITY COMPONENT VZ DEPENDENCE ON THE X COORDINATE     #
 ###################################################################################
 
@@ -61,7 +61,7 @@ lbOutVelFile   = espressopp.analysis.LBOutputVzOfX(system,lb)
 outputToFile   = espressopp.integrator.ExtAnalyze(lbOutVelFile, outStep)
 integrator.addExtension(outputToFile)
 
-# NOW WE WOULD LIKE TO APPLY TO LB LIQUID SOME EXTERNAL FORCES 
+# NOW WE WOULD LIKE TO APPLY TO LB LIQUID SOME EXTERNAL FORCES
 # set external constant (gravity-like) force
 extForceToSet = Real3D(0., 0., 0.0001)
 lbforce = espressopp.integrator.LBInitConstForce(system,lb)
@@ -71,7 +71,7 @@ lbforce.setForce( extForceToSet )
 steps = 500
 integrator.run( steps )
 
-# NOW WE WOULD LIKE TO ADD SOME SIN-LIKE EXTERNAL FORCE TO THE EXISTING ONE 
+# NOW WE WOULD LIKE TO ADD SOME SIN-LIKE EXTERNAL FORCE TO THE EXISTING ONE
 # SIN MODULATION IS DONE ALONG Z-DIRECTION AS A FUNCTION OF X-COORDINATE
 ampVz = 0.0001              # set amplitude of the sin like force in z direction
 bodyFx = bodyFy = 0.        # body forces in x- and y-dirs to add (0. for now)
