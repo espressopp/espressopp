@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2017
+  Copyright (C) 2017,2020
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -37,16 +37,16 @@ namespace io {
 bool DumpXTCAdress::open(const char *mode) {
   if (mode[0] == 'a' && !boost::filesystem::exists(file_name)) {
     // open file in append mode "w"
-    fio = open_xtc(file_name.c_str(), "w");
+    fio = open_trx(file_name.c_str(), "w");
   } else {
-    fio = open_xtc(file_name.c_str(), mode);
+    fio = open_trx(file_name.c_str(), mode);
   }
 
   return true;
 }
 
 void DumpXTCAdress::close() {
-  close_xtc(fio);
+  close_trx(fio);
 }
 
 void DumpXTCAdress::dump() {
@@ -56,6 +56,8 @@ void DumpXTCAdress::dump() {
   conf.gather();
 
   if (system->comm->rank() == 0) {
+    t_trxframe frame;
+
     analysis::ConfigurationExtPtr conf_real = conf.back();
 
     int num_of_particles = conf_real->getSize();
@@ -67,17 +69,6 @@ void DumpXTCAdress::dump() {
       RealND props;
       props.setDimension(cei.currentProperties().getDimension());
 
-      // TODO(anyone): this works only for orthorombic BC
-      Real3D bl = system->bc->getBoxL();
-
-      for (int i = 0; i < dim; i++) {
-        box[i][0] = 0.;
-        box[i][1] = 0.;
-        box[i][2] = 0.;
-
-        box[i][i] = bl[i];
-      }
-
       for (int i = 0; i < num_of_particles; i++) {
         props = cei.nextProperties();
         coord[i][0] = props[0]*length_factor;  // We only write coordinates to .xtc
@@ -88,7 +79,32 @@ void DumpXTCAdress::dump() {
       int step = integrator->getStep();
       float time = integrator->getTimeStep()*step;
 
-      write_xtc(fio, num_of_particles, step, time, box, coord, xtcprec);
+      frame.natoms = num_of_particles;
+      frame.bTime = true;
+      frame.time = time;
+      frame.bStep = true;
+      frame.step = step;
+      frame.x = coord;
+      frame.bLambda = false;
+      frame.bAtoms = false;
+      frame.bPrec = true;
+      frame.prec = xtcprec;
+      frame.bX = true;
+      frame.bF = false;
+      frame.bBox = true;
+
+      // TODO(anyone): this works only for orthorombic BC
+      Real3D bl = system->bc->getBoxL();
+
+      for (int i = 0; i < dim; i++) {
+        frame.box[i][0] = 0.;
+        frame.box[i][1] = 0.;
+        frame.box[i][2] = 0.;
+
+        frame.box[i][i] = bl[i];
+      }
+
+      write_trxframe(fio, &frame, nullptr);
 
       delete [] coord;
 
