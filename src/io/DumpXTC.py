@@ -57,7 +57,7 @@ writing down trajectory using ExtAnalyze extension
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
 
-Both exapmles will give the same result: 200 configurations in trajectory .xtc file.
+Both examples will give the same result: 200 configurations in trajectory .xtc file.
 
 setting up length scale
 

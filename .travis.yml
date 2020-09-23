@@ -11,7 +11,7 @@ stages:
 
 env:
     - DISTRO=ubuntu BUILD_UG=ON XTC=ON
-    - DISTRO=ubuntu_rolling XTC=OFF
+    - DISTRO=ubuntu_rolling XTC=ON
     - DISTRO=ubuntu_mpich XTC=ON
     - DISTRO=fedora XTC=ON
     - DISTRO=fedora_mpich XTC=ON
