@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -210,7 +210,7 @@ print('\n Measurements!')
 rdf_array_total = []
 
 for i in range (nprints):
-    for j in range(ncycles):
+    for j in range(int(ncycles)):
         integrator.run(nruns)
 
         # calculate radial distribution function

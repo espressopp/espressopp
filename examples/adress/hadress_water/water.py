@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -235,7 +235,7 @@ outfile = open("esp.dat", "w")
 espressopp.tools.psfwrite("system.psf", system, typenames={0:'H', 1:'O', 2:'CG'})
 espressopp.tools.pdbwrite("system.pdb", system, append=False, typenames={0:'H', 1:'O', 2:'CG'})
 
-for i in range(check):
+for i in range(int(check)):
 
     T = temperature.compute()
     P = pressure.compute()
@@ -250,7 +250,7 @@ for i in range(check):
     outfile.write(fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
     print((fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal)))
 
-    integrator.run(steps/check) # print out every steps/check steps
+    integrator.run(steps//check) # print out every steps/check steps
 
 
 # simulation information

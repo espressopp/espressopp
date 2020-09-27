@@ -311,7 +311,7 @@ print('')
 # Start calculation for equilibration
 start_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
-for k in range(nsteps):
+for k in range(int(nsteps)):
     integrator.run(isteps)
     espressopp.tools.analyse.info(system, integrator)
 

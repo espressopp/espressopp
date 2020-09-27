@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -50,7 +50,7 @@ splinetypes = ['Linear','Akima','Cubic']  # implemented spline types
 ## IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE   ##
 ######################################################################
 
-print('\n-- Tabulated Interpolation Test -- \n')
+print('\n-- Tabulated Interpolation Test -- \n', end='')
 print('Steps: %3s' % nsteps)
 print('Particles: %3s' % numParticles)
 print('Cutoff: %3s' % cutoff)
@@ -61,7 +61,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
-    for i in range(N):
+    for i in range(int(N)):
         r = low + i * delta
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
@@ -111,9 +111,9 @@ for spline in range(1,len(splinetypes)+1):
 
     pid = 0
 
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
+    for i in range(int(N)):
+        for j in range(int(N)):
+            for k in range(int(N)):
                 m = (i + 2*j + 3*k) % 11
                 r = 0.45 + m * 0.01
                 x = (i + r) / N * size[0]
@@ -138,7 +138,7 @@ for spline in range(1,len(splinetypes)+1):
 
     # now build Verlet List
     # ATTENTION: you must not add the skin explicitly here
-    logging.getLogger("Interpolation").setLevel(logging.INFO)
+    logging.getLogger("Interpolation").setLevel(logging.DEBUG)
     vl = espressopp.VerletList(system, cutoff = cutoff)
 
     potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabfile, cutoff=cutoff)
@@ -173,7 +173,7 @@ for spline in range(1,len(splinetypes)+1):
     Ek = 0.5 * temperature * (3 * numParticles)
     Ep = interTab.computeEnergy()
     print('Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f\n' % \
-            (nsteps, Ek + Ep, Ep, Ek, temperature, p))
+            (nsteps, Ek + Ep, Ep, Ek, temperature, p), end='')
 
     end_time = time.process_time()
     timers.show(integrator.getTimers(), precision=2)

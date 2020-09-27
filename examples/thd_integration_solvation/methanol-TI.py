@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -193,7 +193,7 @@ cgSoluteParticlesDict = {} #map particlePID of cg particle to original atomistic
 cgSoluteParticlesDict[cgPid] = []
 charge = 0.0 #not needed on CG particles
 mass = 0.0
-for j in range(nSoluteAtoms):
+for j in range(int(nSoluteAtoms)):
     mass += atMasses[j]
     cgSoluteParticlesDict[cgPid].append(j+1)
 particlePID.append(cgPid)
@@ -212,7 +212,7 @@ particleVZ.append(atVZ[index])
 #cg water particles
 typeCG=max(reverseAtomtypesDict.keys())+2
 reverseAtomtypesDict[typeCG]='WCG'
-for i in range(nWaterMols):
+for i in range(int(nWaterMols)):
     particlePID.append(i+1+nSoluteAtoms+nSoluteCgparticles+nWaterAtoms)
     indexO=atWaterIndices[3*i]-1
     particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
@@ -273,7 +273,7 @@ tuples = []
 
 mapAtToCgIndex = {}
 #first adres particles
-for i in range(nWaterMols):
+for i in range(int(nWaterMols)):
     cgindex = i + nSoluteAtoms + nSoluteCgparticles + nWaterAtoms
     tmptuple = [particlePID[cgindex]]
     # first CG particle
@@ -283,7 +283,7 @@ for i in range(nWaterMols):
                         Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
                         particleMasses[cgindex],particleCharges[cgindex],0])
     # then AA particles
-    for j in range(nWaterAtomsPerMol):
+    for j in range(int(nWaterAtomsPerMol)):
         aaindex = i*nWaterAtomsPerMol + j + nSoluteAtoms
         tmptuple.append(particlePID[aaindex])
         allParticles.append([particlePID[aaindex],
@@ -296,7 +296,7 @@ for i in range(nWaterMols):
 
 # then solute
 aaindex = 0
-for i in range(nSoluteCgparticles):
+for i in range(int(nSoluteCgparticles)):
     cgindex = i + nSoluteAtoms + nWaterAtoms
     tmptuple = [particlePID[cgindex]]
     allParticles.append([particlePID[cgindex],particleTypes[cgindex],
@@ -416,7 +416,7 @@ print('# ',count,' interactions defined')
 
 # settle water
 molidlist=[]
-for wm in range(nWaterMols):
+for wm in range(int(nWaterMols)):
     molidlist.append(tuples[wm][0]) #assuming water is listed first
 print('#Warning: settle set-up assumes water was listed first when tuples were constructed')
 
@@ -458,7 +458,7 @@ fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f
 
 integrator.run(0)
 
-for k in range(nOutput):
+for k in range(int(nOutput)):
     i=k*nStepsPerOutput
     EQQ = 0.0
     EQQ14 = 0.0
@@ -481,7 +481,7 @@ for k in range(nOutput):
     dhdlF.write(str(i*dt)+" "+str(dhdlCoul)+" "+str(dhdlVdwl)+"\n")
     T = temperature.compute()
     Epot = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)),"output")
+    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)), end='')
     sys.stdout.flush()
     dhdlF.flush()
     integrator.run(nStepsPerOutput)

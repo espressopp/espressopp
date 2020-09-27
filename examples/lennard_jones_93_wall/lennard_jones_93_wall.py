@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -56,7 +56,7 @@ def get_velocity(system, n):
     """Obtain total velocity of a espressopp system."""
     total_v = espressopp.Real3D(0.)
     total_m = 0.
-    for i in range(n):
+    for i in range(int(n)):
         p = system.storage.getParticle(i)
         total_v += p.v*p.mass
         total_m += p.mass
@@ -65,7 +65,7 @@ def get_velocity(system, n):
 def reset_velocity(system, n):
     """Reset the total velocity of a espressopp system."""
     excess_v = get_velocity(system, n)
-    for i in range(n):
+    for i in range(int(n)):
         v = system.storage.getParticle(i).v
         system.storage.modifyParticle(i, 'v', v-excess_v)
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -53,7 +53,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
-    for i in range(N):
+    for i in range(int(N)):
         r = low + i * delta
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials

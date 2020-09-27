@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -178,7 +178,7 @@ for i in range(nProtAtoms+nWaterAtoms):
     particleVY.append(atVY[i])
     particleVZ.append(atVZ[i])
 #cg protein particles (same as atomistic)
-for i in range(nProtAtoms):
+for i in range(int(nProtAtoms)):
     particlePID.append(i+1+nProtAtoms+nWaterAtoms)
     particleMasses.append(atMasses[i])
     particleCharges.append(atCharges[i])
@@ -193,7 +193,7 @@ for i in range(nProtAtoms):
 #cg water particles
 typeCG = max(reverseAtomtypesDict.keys())+2
 reverseAtomtypesDict[typeCG]='WCG'
-for i in range(nWaterMols):
+for i in range(int(nWaterMols)):
     particlePID.append(i+1+nProtAtoms*2+nWaterAtoms)
     indexO=atWaterIndices[3*i]-1
     particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
@@ -255,7 +255,7 @@ tuples = []
 mapAtToCgIndex = {}
 
 #first adres particles
-for i in range(nWaterMols):
+for i in range(int(nWaterMols)):
     cgindex = i + nProtAtoms*2 + nWaterAtoms
     tmptuple = [particlePID[cgindex]]
     # first CG particle
@@ -265,7 +265,7 @@ for i in range(nWaterMols):
                         Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
                         particleMasses[cgindex],particleCharges[cgindex],0])
     # then AA particles
-    for j in range(nWaterAtomsPerMol):
+    for j in range(int(nWaterAtomsPerMol)):
         aaindex = i*nWaterAtomsPerMol + j + nProtAtoms
         tmptuple.append(particlePID[aaindex])
         allParticles.append([particlePID[aaindex],
@@ -276,7 +276,7 @@ for i in range(nWaterMols):
         mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
     tuples.append(tmptuple)
 # then protein
-for i in range(nProtAtoms):
+for i in range(int(nProtAtoms)):
     allParticles.append([particlePID[i]+nProtAtoms+nWaterAtoms,particleTypes[i], #particlePID[i]+nParticlesTotal works bcs non-adres particles are listed first
                         Real3D(particleX[i],particleY[i],particleZ[i]),
                         Real3D(particleVX[i],particleVY[i],particleVZ[i]),
@@ -421,7 +421,7 @@ print('# ',count,' interactions defined')
 # SETTLE water for rigid water
 print('#Warning: settle set-up assumes water was listed first when tuples were constructed')
 molidlist=[]
-for wm in range(nWaterMols): #assuming water==adres part, and water is listed first
+for wm in range(int(nWaterMols)): #assuming water==adres part, and water is listed first
     molidlist.append(tuples[wm][0])
 
 settlewaters = espressopp.integrator.Settle(system, ftpl, mO=15.9994, mH=1.008, distHH=0.1633, distOH=0.1)
@@ -475,7 +475,7 @@ fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f
 
 integrator.run(0)
 
-for k in range(nOutput):
+for k in range(int(nOutput)):
     i=k*nStepsPerOutput
     EQQ=0.0
     EQQ14=0.0

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -124,7 +124,7 @@ print("cellGrid           = ", cellGrid)
 ########################################################################
 
 print(('adding {} particles to the system ...'.format(Npart)))
-particle_list = [(pid, system.bc.getRandomPos()) for pid in range(Npart)]
+particle_list = [(pid, system.bc.getRandomPos()) for pid in range(int(Npart))]
 system.storage.addParticles(particle_list, 'id', 'pos')
 system.storage.decompose()
 print(('added {} particles'.format(Npart)))

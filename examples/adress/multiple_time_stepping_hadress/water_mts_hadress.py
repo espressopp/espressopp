@@ -267,8 +267,8 @@ outfile.write(fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_correct
 print((fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_correction, E_total)))
 
 # run integration
-for i in range(check):
-    integrator.run(steps/check)
+for i in range(int(check)):
+    integrator.run(steps//check)
     temp = temperature.compute() * 120.27239
     E_bonds = 0
     E_angles = 0
