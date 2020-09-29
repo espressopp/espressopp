@@ -62,7 +62,7 @@ nProtAtoms = len(atProtIndices)
 atWaterIndices = [x for x in range(94,30628)] #water atoms, 94 to 30627 inclusive
 nWaterAtoms = len(atWaterIndices)
 nWaterAtomsPerMol = 3 #number of atoms per cg water bead
-nWaterMols = nWaterAtoms/nWaterAtomsPerMol
+nWaterMols = nWaterAtoms//nWaterAtomsPerMol
 particlePIDsADR = atProtIndices #atomistic indices of atoms at centres of spheres forming AdResS region
 
 # input coordinates
@@ -88,7 +88,7 @@ temperature = float(temperature)/temperatureConvFactor #in units of kJ mol-1
 dt                 = 0.001 #ps
 nSteps             = 1000 #total number of steps
 nStepsPerOutput    = 100 #frequency for printing energies and trajectory
-nOutput      = nSteps/nStepsPerOutput
+nOutput      = nSteps//nStepsPerOutput
 
 # Parameters for size of AdResS dimensions
 ex_size = 1.00
@@ -495,7 +495,7 @@ for k in range(int(nOutput)):
     EQQ14 = qq14_interactions.computeEnergy()
     T = temperature.compute()
     Etotal = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor)))
+    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor)), end='')
     sys.stdout.flush()
     integrator.run(nStepsPerOutput)
     particle = system.storage.getParticle(1)

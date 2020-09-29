@@ -90,7 +90,7 @@ system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, 
 allParticlesAT = []
 allParticles = []
 tuples = []
-for pidAT in range(num_particles):
+for pidAT in range(int(num_particles)):
     allParticlesAT.append([pidAT, # add here these particles just temporarily
                          Real3D(x[pidAT], y[pidAT], z[pidAT]), # position
                          Real3D(vx[pidAT], vy[pidAT], vz[pidAT]), # velocity
@@ -98,7 +98,7 @@ for pidAT in range(num_particles):
                          1, 1.0, 1]) # type, mass, is AT particle
 
 # create CG particles
-for pidCG in range(num_particlesCG):
+for pidCG in range(int(num_particlesCG)):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
     cmp = espressopp.tools.AdressSetCG(4, pidCG, allParticlesAT)
     # Preparation of tuples (tuples define, which atoms belong to which CG molecules)
@@ -227,7 +227,7 @@ start_time = time.process_time()
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
-    integrator.run(nsteps)
+    integrator.run(int(nsteps))
     step = nsteps * s
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)

@@ -153,7 +153,7 @@ interLJ.setPotential(type1=0, type2=0, potential=potTabLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.4999)
 #interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)

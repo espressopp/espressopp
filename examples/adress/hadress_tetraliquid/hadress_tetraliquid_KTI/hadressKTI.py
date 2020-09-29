@@ -59,7 +59,7 @@ pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("equilibra
 tabCG = "table_potential.dat"
 
 # number of CG particles
-num_particlesCG = len(x)/4
+num_particlesCG = len(x)//4
 
 # number of AT particles
 num_particles = len(x)
@@ -207,7 +207,7 @@ system.storage.decompose()
 # equilibration parameters
 EQsteps = 1000
 EQintervals = 100
-EQnsteps = EQsteps/EQintervals
+EQnsteps = EQsteps//EQintervals
 
 print('')
 print('Short equilibration')

@@ -62,7 +62,7 @@ tabCG = "table_potential.dat"
 tabFEC = "table_FEC_Helmholtz.dat"
 
 # number of CG particles
-num_particlesCG = len(x)/4
+num_particlesCG = len(x)//4
 
 # number of AT particles
 num_particles = len(x)
@@ -222,7 +222,7 @@ pressureprofilegrid = 100
 pressureprofile = espressopp.analysis.XPressure(system)
 
 # timer, steps
-nsteps = steps / intervals
+nsteps = steps // intervals
 start_time = time.process_time()
 
 # integration and on the fly analysis

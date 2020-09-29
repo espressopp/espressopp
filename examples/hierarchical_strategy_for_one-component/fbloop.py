@@ -234,7 +234,7 @@ system.addInteraction(interLJO)
 
 print("Init FENE")
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.49999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.49999)
 interFENE_All = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE_All, 'FENE')
 

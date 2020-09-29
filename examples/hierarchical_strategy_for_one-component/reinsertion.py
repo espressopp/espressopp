@@ -272,7 +272,7 @@ system.addInteraction(interLJ)
 
 print("Init FENE")
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.4999)
 print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)
 potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)

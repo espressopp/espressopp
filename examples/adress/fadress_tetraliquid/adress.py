@@ -225,7 +225,7 @@ sys.stdout.write(' step     T          P        Pxy       etotal     epotential 
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
 start_time = time.process_time()
-nsteps = steps / intervals
+nsteps = steps // intervals
 for s in range(1, intervals + 1):
     integrator.run(nsteps)
     step = nsteps * s

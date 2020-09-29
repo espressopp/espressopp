@@ -117,7 +117,7 @@ for pid in range(num_particles):
 num_particlesCG = len(x)/3
 typeCG=0
 # create CG particles
-for pidCG in range(num_particlesCG):
+for pidCG in range(int(num_particlesCG)):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
     #cmp = espressopp.tools.AdressSetCG(3, pidCG, allParticlesAT)
 
