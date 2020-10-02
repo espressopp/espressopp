@@ -198,7 +198,7 @@ for k in range(100):
 
 integrator.dt  = timestep
 
-for k in range(nsteps/100):
+for k in range(nsteps//100):
     integrator.run(isteps*100)
     espressopp.tools.analyse.info(system, integrator)
     espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, True)

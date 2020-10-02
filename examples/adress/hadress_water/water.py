@@ -40,7 +40,7 @@ from espressopp.tools import timers
 
 # simulation parameters (nvt = False is nve)
 steps = 100000
-check = steps/1
+check = steps//1
 timestep = 0.0005
 
 # parameters to convert GROMACS tabulated potential file

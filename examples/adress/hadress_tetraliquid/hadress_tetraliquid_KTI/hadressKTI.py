@@ -250,7 +250,7 @@ steps = 100
 stepsequi = 50
 intervals = 10
 
-nstepsTI = steps/intervals
+nstepsTI = steps//intervals
 lambdastep = 1.0/bins
 
 # specify output filename

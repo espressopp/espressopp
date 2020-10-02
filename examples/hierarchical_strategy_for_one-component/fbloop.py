@@ -344,14 +344,14 @@ for k in range(1):
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, integrator)
-for i in range(100/accelerate + 1):
+for i in range(100//accelerate + 1):
     #signal = calculate_signal()
     #print "#INITIAL_SIGNAL", i, signal
-    isteps = 50000/t_up
+    isteps = 50000//t_up
     if i > 70:
-        isteps = 100000/t_up
+        isteps = 100000//t_up
     for j in range(10):
-        integrator.run(isteps/10)
+        integrator.run(isteps//10)
         espressopp.tools.analyse.info(system, integrator)
 
     capradO -= 0.003225*accelerate
