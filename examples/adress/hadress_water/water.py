@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -40,7 +40,7 @@ from espressopp.tools import timers
 
 # simulation parameters (nvt = False is nve)
 steps = 100000
-check = steps/1
+check = steps//1
 timestep = 0.0005
 
 # parameters to convert GROMACS tabulated potential file
@@ -117,7 +117,7 @@ for pid in range(num_particles):
 num_particlesCG = len(x)/3
 typeCG=0
 # create CG particles
-for pidCG in range(num_particlesCG):
+for pidCG in range(int(num_particlesCG)):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
     #cmp = espressopp.tools.AdressSetCG(3, pidCG, allParticlesAT)
 
@@ -235,7 +235,7 @@ outfile = open("esp.dat", "w")
 espressopp.tools.psfwrite("system.psf", system, typenames={0:'H', 1:'O', 2:'CG'})
 espressopp.tools.pdbwrite("system.pdb", system, append=False, typenames={0:'H', 1:'O', 2:'CG'})
 
-for i in range(check):
+for i in range(int(check)):
 
     T = temperature.compute()
     P = pressure.compute()
@@ -250,7 +250,7 @@ for i in range(check):
     outfile.write(fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
     print((fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal)))
 
-    integrator.run(steps/check) # print out every steps/check steps
+    integrator.run(steps//check) # print out every steps/check steps
 
 
 # simulation information

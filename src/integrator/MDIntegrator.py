@@ -51,9 +51,14 @@ espressopp.integrator.MDIntegrator
 from espressopp import pmi
 from _espressopp import integrator_MDIntegrator
 
+import sys
+
+
 class MDIntegratorLocal(object):
 
     def run(self, niter):
+        if not isinstance(niter, int):
+            raise ValueError('The provided number of steps have to be an integer not {} with value {}'.format(type(niter), niter))
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.run(self, niter)
 

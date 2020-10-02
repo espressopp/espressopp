@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -59,7 +59,7 @@ pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("equilibra
 tabCG = "table_potential.dat"
 
 # number of CG particles
-num_particlesCG = len(x)/4
+num_particlesCG = len(x)//4
 
 # number of AT particles
 num_particles = len(x)
@@ -207,7 +207,7 @@ system.storage.decompose()
 # equilibration parameters
 EQsteps = 1000
 EQintervals = 100
-EQnsteps = EQsteps/EQintervals
+EQnsteps = EQsteps//EQintervals
 
 print('')
 print('Short equilibration')
@@ -250,7 +250,7 @@ steps = 100
 stepsequi = 50
 intervals = 10
 
-nstepsTI = steps/intervals
+nstepsTI = steps//intervals
 lambdastep = 1.0/bins
 
 # specify output filename

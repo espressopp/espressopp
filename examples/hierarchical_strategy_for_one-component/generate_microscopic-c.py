@@ -103,7 +103,7 @@ interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=3000.0, r0=0.0, rMax=1.5, cutoff=8, caprad=1.49999)
+potFENE = espressopp.interaction.FENECapped(K=3000.0, r0=0.0, rMax=1.5, cutoff=8, r_cap=1.49999)
 interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE, 'FENE')
 
@@ -140,7 +140,7 @@ for k in range(10):
 
 # exchange the FENE potential
 espressopp.System.removeInteractionByName(system, 'FENE')
-potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, cutoff=8, caprad=1.499999)
+potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, cutoff=8, r_cap=1.499999)
 interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE)
 

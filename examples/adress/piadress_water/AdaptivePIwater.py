@@ -101,7 +101,7 @@ tabHW_OW = "POTS/tableESP_HW_OW.dat"
 tabOW_OW = "POTS/tableESP_OW_OW.dat"
 
 num_Trotter_beads = len(x) # total number of Trotter beads in the system
-num_atoms = len(x)/nTrotter # total number of atoms in the system
+num_atoms = len(x)//nTrotter # total number of atoms in the system
 size = (Lx, Ly, Lz) # size
 
 #####################
@@ -148,7 +148,7 @@ for pid_atom in range(num_atoms):
 
     # Preparation of tuples (tuples define, which atoms/trotter beads belong to which CG molecules/atoms)
     tmptuple = [pid_atom+num_Trotter_beads+1]
-    for pid_trotter in range(nTrotter):
+    for pid_trotter in range(int(nTrotter)):
         pid = pid_atom*nTrotter+pid_trotter
         tmptuple.append((allParticlesAT[pid])[0])
     firstParticleId=tmptuple[1]
@@ -162,7 +162,7 @@ for pid_atom in range(num_atoms):
                          Real3D(0, 0, 0), # force
                          0, types[pid_atom*nTrotter], masses[pid_atom*nTrotter], 0]) # pib, type, mass, is not AT particle
     # append Trotter beads
-    for pid_trotter in range(nTrotter):
+    for pid_trotter in range(int(nTrotter)):
         pid = pid_atom*nTrotter+pid_trotter
         allParticles.append([(allParticlesAT[pid])[0],
                             (allParticlesAT[pid])[1], # pos
@@ -194,7 +194,7 @@ print('Setting up interactions and force field...')
 # create bond lists between atoms
 bondsOH = []
 bondsHH = []
-for part in range(num_atoms/3):
+for part in range(num_atoms//3):
     bondsOH.append((num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+1))
     bondsOH.append((num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+2))
     bondsHH.append((num_Trotter_beads + 1 + 3*part+1, num_Trotter_beads + 1 + 3*part+2))
@@ -212,7 +212,7 @@ vl = espressopp.VerletListAdress(system, cutoff=interaction_cutoff, adrcut=inter
 
 # create angle list between atoms
 angles = []
-for part in range(num_atoms/3):
+for part in range(num_atoms//3):
     angles.append((num_Trotter_beads + 1 + 3*part+1, num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+2))
 
 # add angles between atoms
@@ -281,8 +281,8 @@ gyration_array_total_H = []
 gyration_array_total_O = []
 gyrationprofile = espressopp.analysis.RadGyrXProfilePI(system)
 gyrationprofilegrid = 40
-gyrationAdds_H = [0 for i in range(gyrationprofilegrid)]
-gyrationAdds_O = [0 for i in range(gyrationprofilegrid)]
+gyrationAdds_H = [0 for i in range(int(gyrationprofilegrid))]
+gyrationAdds_O = [0 for i in range(int(gyrationprofilegrid))]
 
 # OO rdf
 rdf_array_total_OO = []
@@ -352,14 +352,14 @@ print('')
 ##################
 
 # timer, steps
-nsteps = steps / intervals
+nsteps = steps // intervals
 start_time = pytime.process_time()
 
 # output format for screen and file
 print('Starting the integration loop...')
 print('')
 print('step, time (ps), temperature, E_bonds, E_angles, E_ringpolymer, E_nonbonded, E_kin, E_correction, E_total')
-fmt = '%8d %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g\n'
+fmt = '%8d %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g'
 
 # initial configuration analysis
 Eb = interBondedOH.computeEnergy() + interBondedHH.computeEnergy()

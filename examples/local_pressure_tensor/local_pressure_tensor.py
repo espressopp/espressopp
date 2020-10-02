@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -73,7 +73,7 @@ print("setting up system ...")
 # add the particles from the file to the storage of the system
 properties = ['id', 'type', 'pos', 'v']
 particles  = []
-for i in range(NPart):
+for i in range(int(NPart)):
     part = [pid[i], type[i], espressopp.Real3D(xpos[i], ypos[i], zpos[i]), espressopp.Real3D(xvel[i], yvel[i], zvel[i])]
     particles.append(part)
     # add particles in chunks of 1000 particles, this is faster than adding each single particle
@@ -129,7 +129,7 @@ for i in range(n_measurements):
     # layerwise
     pij_aux = pressure_tensor_ml.compute()
 
-    for j in range(n):
+    for j in range(int(n)):
         pressure_tensor_l.h0 = j * h0
         if(j>= len( pij_layers1 ) ):
             pij_layers1.append( espressopp.Tensor( pressure_tensor_l.compute() ) )
@@ -141,7 +141,7 @@ for i in range(n_measurements):
 
 # averaging
 Pijtot /= float(n_measurements)
-for i in range(n):
+for i in range(int(n)):
     pij_layers1[i] /= float(n_measurements)
     pij_layers2[i] /= float(n_measurements)
 
@@ -153,13 +153,13 @@ print((fmt1 % (Pijtot[0], Pijtot[1], Pijtot[2], Pijtot[3], Pijtot[4], Pijtot[5])
 print('\nPressure tensor by PressureTensorLayer (caculated for each layer separatelly).')
 
 print('layer number     z coord of layer        pressure tensor')
-for i in range(n):
+for i in range(int(n)):
     print(('%4d           %7.3f              ' % (i, i * h0)) , pij_layers1[i])
 
 print('\nPressure tensor by PressureTensorMultiLayer (caculated for each layer at once).')
 
 print('layer number     z coord of layer        pressure tensor')
-for i in range(n):
+for i in range(int(n)):
     print(('%4d           %7.3f              ' % (i, i * h0)) , pij_layers2[i])
 
 print('done')

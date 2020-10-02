@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -58,7 +58,7 @@ pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("equilibra
 tabCG = "table_potential.dat"
 
 # number of CG particles
-num_particlesCG = len(x)/4
+num_particlesCG = len(x)//4
 
 # number of AT particles
 num_particles = len(x)
@@ -221,7 +221,7 @@ dump_conf_gro = espressopp.io.DumpGRO(system, integrator, filename='trajCG.gro')
 dump_conf_gro_adr = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename='trajAT.gro')
 
 # timer, steps
-nsteps = steps / intervals
+nsteps = steps // intervals
 start_time = time.process_time()
 
 # integration and on the fly analysis

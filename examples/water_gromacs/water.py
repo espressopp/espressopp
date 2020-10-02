@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -144,7 +144,7 @@ fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
 outfile = open("esp.dat", "w")
 start_time = time.process_time()
 
-for i in range(check):
+for i in range(int(check)):
     T = temperature.compute()
     P = pressure.compute()
     Eb = 0
@@ -157,10 +157,10 @@ for i in range(check):
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+EQQ+ELj
     outfile.write(fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
-    print((fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal)))
+    print((fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal)), end='')
 
     #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)
-    integrator.run(steps/check) # print out every steps/check steps
+    integrator.run(int(steps/check)) # print out every steps/check steps
     #system.storage.decompose()
 
 # print timings and neighbor list information

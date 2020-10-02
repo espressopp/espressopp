@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -48,7 +48,7 @@ def tetramolz(Mz):
 
 def makebonds(N):
     bonds = []
-    for i in range(N):
+    for i in range(int(N)):
         if i%4==0:
             bonds.append((i,i+1))
             bonds.append((i,i+2))

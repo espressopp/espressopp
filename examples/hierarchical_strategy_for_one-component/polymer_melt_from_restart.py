@@ -51,7 +51,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
-    for i in range(N):
+    for i in range(int(N)):
         r = low + i * delta
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
@@ -153,7 +153,7 @@ interLJ.setPotential(type1=0, type2=0, potential=potTabLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.4999)
 #interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)
@@ -198,7 +198,7 @@ for k in range(100):
 
 integrator.dt  = timestep
 
-for k in range(nsteps/100):
+for k in range(nsteps//100):
     integrator.run(isteps*100)
     espressopp.tools.analyse.info(system, integrator)
     espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, True)

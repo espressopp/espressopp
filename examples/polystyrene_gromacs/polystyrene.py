@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2012-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -244,9 +244,8 @@ start_time = time.process_time()
 
 espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=False)
 
-for i in range(check):
-
-    integrator.run(steps/check) # print out every steps/check steps
+for i in range(int(check)):
+    integrator.run(steps//check) # print out every steps/check steps
     T = temperature.compute()
     P = pressure.compute()
     Pij = pressureTensor.compute()

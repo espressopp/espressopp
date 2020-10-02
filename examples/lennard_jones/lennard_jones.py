@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -179,7 +179,7 @@ if (temperature != None):
 ########################################################################
 
 print("adding ", Npart, " particles to the system ...")
-for pid in range(Npart):
+for pid in range(int(Npart)):
     # get a 3D random coordinate within the box
     pos = system.bc.getRandomPos()
     # add a particle with particle id pid and coordinate pos to the system

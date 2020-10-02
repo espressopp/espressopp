@@ -66,7 +66,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
-    for i in range(N):
+    for i in range(int(N)):
         r = low + i * delta
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
@@ -77,7 +77,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
 
     outfile.close()
 
-monomers_per_chain /= N_blob
+monomers_per_chain //= N_blob
 
 nsteps      = 50
 isteps      = 200
@@ -156,8 +156,8 @@ chain = []
 for i in range(num_chains):
     startpos = system.bc.getRandomPos()
     positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
-    for j in range(monomers_per_chain/N_blob - 1):
-        id = i*(monomers_per_chain/N_blob) + j
+    for j in range(monomers_per_chain//N_blob - 1):
+        id = i*(monomers_per_chain//N_blob) + j
         vector = []
         for k in range(3):
             x_i = softblobs_chain[id + 1][0][k] - softblobs_chain[id][0][k]
@@ -175,13 +175,13 @@ for i in range(num_chains):
                 x_i = softblobs_chain[id][0][k] - 0.5*softblobs_chain[id][1]*vector[k]/dist
                 start.append(x_i)
                 goal.append(softblobs_chain[id + 1][0][k])
-            sequential_num += N_blob/2
-        elif j == monomers_per_chain/25 - 2:
+            sequential_num += N_blob//2
+        elif j == monomers_per_chain//25 - 2:
             for k in range(3):
                 start.append(softblobs_chain[id][0][k])
                 x_i = softblobs_chain[id][0][k] + 0.5* softblobs_chain[id][1]*vector[k]/dist
                 goal.append(x_i)
-            sequential_num += N_blob/2 + 1
+            sequential_num += N_blob//2 + 1
         else:
             for k in range(3):
                 start.append(softblobs_chain[id][0][k])
@@ -255,7 +255,7 @@ density = num_particles * 1.0 / (L * L * L)
 
 #Generating Tuple
 num_constrain = 25
-for i in range(num_particles/num_constrain):
+for i in range(num_particles//num_constrain):
     tuple = []
     for j in range(num_constrain):
         tuple.append(num_constrain*i + j + 1)
@@ -272,7 +272,7 @@ system.addInteraction(interLJ)
 
 print("Init FENE")
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.4999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.4999)
 print('Generating potential files ... (%2s)\n' % (tabfileFENE))
 writeTabFile(potFENE, tabfileFENE, N=513, low=0.0001, high=potFENE.cutoff)
 potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)

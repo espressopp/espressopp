@@ -34,14 +34,6 @@ import os
 # load PMI explicitly from espressopp
 from espressopp import pmi
 
-# define pmiimport
-if pmi.isController:
-    def pmiimport(module):
-        pmi.exec_('import ' + module)
-else:
-    def pmiimport(module):
-        pass
-
 # set up logging
 def _setupLogging():
     logConfigFile = "espressopp_log.conf"
@@ -67,9 +59,15 @@ def _setupLogging():
         logging.Logger.setLevel = my_setLevel
         logging.TRACE = int((logging.NOTSET + logging.DEBUG) / 2.0)
         logging.addLevelName('TRACE', logging.TRACE)
-        # _espressopp.setLogger()
+        _espressopp.setLogger()
 
+# define pmiimport and update logging
+if pmi.isController:
+    def pmiimport(module):
+        pmi.exec_('import ' + module)
 
-# execute the function
+    _setupLogging()
+else:
+    def pmiimport(module):
+        pass
 
-_setupLogging()

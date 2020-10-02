@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2012-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -101,7 +101,7 @@ print('')
 
 espressopp.tools.analyse.info(system, integrator)
 start_time = time.process_time()
-for k in range(nsteps):
+for k in range(int(nsteps)):
     integrator.run(isteps)
     espressopp.tools.analyse.info(system, integrator)
 end_time = time.process_time()

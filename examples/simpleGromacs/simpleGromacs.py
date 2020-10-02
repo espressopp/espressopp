@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2012-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -204,8 +204,8 @@ sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
 
 start_time = time.process_time()
 
-for i in range(check):
-    integrator.run(steps/check)
+for i in range(int(check)):
+    integrator.run(steps//check)
     T = temperature.compute()
     P = pressure.compute()
     Pij = pressureTensor.compute()

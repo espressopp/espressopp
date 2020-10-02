@@ -49,7 +49,7 @@ longstep = 0.0025 # long timestep
 multistep = int(longstep/timestep) # short steps per single long step
 steps = int(totaltime/longstep) # total number of long steps
 checkfreq = int(printfreq/longstep) # number of long time steps between printed outputs/checks
-check = steps/checkfreq # number of intervals to run the integrator between checks
+check = int(steps/checkfreq) # number of intervals to run the integrator between checks
 
 interaction_cutoff_cg = 1.0  # cutoff coarse-grained potential
 interaction_cutoff_at = 1.0  # cutoff atomistic potential
@@ -71,7 +71,7 @@ defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bond
 
 # particles, geometry, density
 num_particles_AT = len(x)
-num_particles_CG = len(x)/3
+num_particles_CG = len(x)//3
 density = num_particles_AT / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
@@ -274,8 +274,8 @@ outfile.write(fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total))
 print((fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total)))
 
 # run integration
-for i in range(check):
-    integrator.run(steps/check)
+for i in range(int(check)):
+    integrator.run(steps//check)
     temp = temperature.compute()
     E_bonds = 0
     E_angles = 0

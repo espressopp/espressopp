@@ -53,7 +53,7 @@ k_com = 1.
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
 
-monomers_per_chain /= N_blob
+monomers_per_chain //= N_blob
 
 nsteps      = 20 # 5*2**2
 isteps      = 200
@@ -120,7 +120,7 @@ for i in range(num_chains):
             j +=1
 
 # Init fine-grained polymer configuration
-N_blob = N_blob/2
+N_blob = N_blob//2
 monomers_per_chain *= 2
 
 props    = ['id', 'type', 'mass', 'pos', 'v', 'radius', 'vradius']
@@ -139,15 +139,15 @@ chain = []
 for i in range(num_chains):
     startpos = system.bc.getRandomPos()
     positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
-    for j in range(monomers_per_chain/2):
-        id = i*(monomers_per_chain/2) + j
+    for j in range(monomers_per_chain//2):
+        id = i*(monomers_per_chain//2) + j
         vector = []
         if j == 0:
             for k in range(3):
                 x_i = cg_chain[id + 1][0][k] - cg_chain[id][0][k]
                 x_i = x_i - round(x_i/L)*L
                 vector.append(x_i)
-        elif j == monomers_per_chain/2 - 1:
+        elif j == monomers_per_chain//2 - 1:
             for k in range(3):
                 x_i = cg_chain[id][0][k] - cg_chain[id - 1][0][k]
                 x_i = x_i - round(x_i/L)*L
@@ -184,7 +184,7 @@ density = num_particles * 1.0 / (L * L * L)
 
 #Generating Tuple
 num_constrain = 2
-for i in range(num_particles/num_constrain):
+for i in range(num_particles//num_constrain):
     tuple = []
     for j in range(num_constrain):
         tuple.append(num_constrain*i + j + 1)
@@ -316,14 +316,14 @@ t_scale = 1
 print("only bond interaction")
 start_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
-for k in range(16/a):
+for k in range(16//a):
     integrator.run(isteps*t_scale)
     espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond.pdb", system, monomers_per_chain, False)
 
 print("bond+bend interaction")
 system.addInteraction(interCosine)
-for k in range(16/a):
+for k in range(16//a):
     integrator.run(isteps*t_scale)
     espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond_bend.pdb", system, monomers_per_chain, False)
@@ -331,7 +331,7 @@ espressopp.tools.pdb.pqrwrite("bond_bend.pdb", system, monomers_per_chain, False
 print("bond+bend+nonbond1 interaction")
 system.addInteraction(interSP)
 # Start strucrure relaxation 1
-for k in range(16/a):
+for k in range(16//a):
     integrator.run(isteps*t_scale)
     espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond_bend_nonbond1.pdb", system, monomers_per_chain, False)
@@ -342,7 +342,7 @@ for i in range(num_chains):
 
 print("bond+bend+nonbond2 interaction")
 # Start strucrure relaxation 2
-for k in range(16/a):
+for k in range(16//a):
     integrator.run(isteps*t_scale)
     espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.pdb.pqrwrite("bond_bend_nonbond2.pdb", system, monomers_per_chain, False)

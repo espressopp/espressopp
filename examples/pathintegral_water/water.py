@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -174,7 +174,7 @@ start_time = time.process_time()
 espressopp.tools.psfwrite("system.psf", system)
 
 espressopp.tools.fastwritexyz("traj.xyz", system, append=False, scale=10)
-for i in range(check):
+for i in range(int(check)):
     T = temperature.compute()
     #P = pressure.compute()
     Eb = 0
@@ -187,10 +187,10 @@ for i in range(check):
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
 
-    print((fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T)))
+    print((fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T)), end='')
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
-    integrator.run(steps/check)
+    integrator.run(int(steps//check))
 
 
 # print timings and neighbor list information

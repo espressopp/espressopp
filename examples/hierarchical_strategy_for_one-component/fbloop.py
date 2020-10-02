@@ -234,7 +234,7 @@ system.addInteraction(interLJO)
 
 print("Init FENE")
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, caprad=1.49999)
+potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene, cutoff=rc_fene, r_cap=1.49999)
 interFENE_All = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE_All, 'FENE')
 
@@ -344,14 +344,14 @@ for k in range(1):
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, integrator)
-for i in range(100/accelerate + 1):
+for i in range(100//accelerate + 1):
     #signal = calculate_signal()
     #print "#INITIAL_SIGNAL", i, signal
-    isteps = 50000/t_up
+    isteps = 50000//t_up
     if i > 70:
-        isteps = 100000/t_up
+        isteps = 100000//t_up
     for j in range(10):
-        integrator.run(isteps/10)
+        integrator.run(isteps//10)
         espressopp.tools.analyse.info(system, integrator)
 
     capradO -= 0.003225*accelerate

@@ -97,7 +97,7 @@ mass     = 1.0
 comlist = []
 res_file = open('nb1_start.res')
 for i in range(num_chains):
-    for j in range(monomers_per_chain/N_blob):
+    for j in range(monomers_per_chain//N_blob):
         com   = espressopp.Real3D(0.0, 0.0, 0.0)
         pos_i = espressopp.Real3D(0.0, 0.0, 0.0)
         k = 0
@@ -129,7 +129,7 @@ for i in range(num_chains):
 rglist = []
 res_file = open('nb1_start.res')
 for i in range(num_chains):
-    for j in range(monomers_per_chain/N_blob):
+    for j in range(monomers_per_chain//N_blob):
         rg    = 0.
         pos_i = espressopp.Real3D(0.0, 0.0, 0.0)
         k = 0
@@ -143,7 +143,7 @@ for i in range(num_chains):
                                                   (float(parameters[7 - i_diff]) + 2.*L)%L,
                                                   (float(parameters[8 - i_diff]) + 2.*L)%L)
                 if k == 0:
-                    rg_v = res_positions - comlist[i*monomers_per_chain/N_blob + j]
+                    rg_v = res_positions - comlist[i*monomers_per_chain//N_blob + j]
                     rg += rg_v[0]**2 + rg_v[1]**2 + rg_v[2]**2
                     pos_i = res_positions
                 else :
@@ -151,21 +151,21 @@ for i in range(num_chains):
                     for d in range(3):
                         diff[d] = diff[d] - round(diff[d]/L)*L
                     pos_j = pos_i + diff
-                    rg_v = pos_j - comlist[i*monomers_per_chain/N_blob + j]
+                    rg_v = pos_j - comlist[i*monomers_per_chain//N_blob + j]
                     rg += rg_v[0]**2 + rg_v[1]**2 + rg_v[2]**2
                     pos_i = pos_j
                 k += 1
         rg /= N_blob
         rglist.append(rg**0.5)
-        comlist[i*monomers_per_chain/N_blob + j] = espressopp.Real3D((float(comlist[i*monomers_per_chain/N_blob + j][0]) + 2.*L)%L,
-                                                                     (float(comlist[i*monomers_per_chain/N_blob + j][1]) + 2.*L)%L,
-                                                                     (float(comlist[i*monomers_per_chain/N_blob + j][2]) + 2.*L)%L)
+        comlist[i*monomers_per_chain//N_blob + j] = espressopp.Real3D((float(comlist[i*monomers_per_chain//N_blob + j][0]) + 2.*L)%L,
+                                                                     (float(comlist[i*monomers_per_chain//N_blob + j][1]) + 2.*L)%L,
+                                                                     (float(comlist[i*monomers_per_chain//N_blob + j][2]) + 2.*L)%L)
 
 num_particles = num_chains * monomers_per_chain
 density = num_particles * 1.0 / (L * L * L)
 
 # Init coarse-grained polymers configuration
-monomers_per_chain = monomers_per_chain/N_blob
+monomers_per_chain = monomers_per_chain//N_blob
 
 props    = ['id', 'type', 'mass', 'pos', 'v', 'radius', 'vradius']
 
@@ -311,7 +311,7 @@ print('')
 # Start calculation for equilibration
 start_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
-for k in range(nsteps):
+for k in range(int(nsteps)):
     integrator.run(isteps)
     espressopp.tools.analyse.info(system, integrator)
 
