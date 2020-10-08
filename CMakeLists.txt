@@ -14,8 +14,8 @@ enable_testing()
 
 include(CheckCXXCompilerFlag)
 
-# Check for C++11 standard
-set(CMAKE_CXX_STANDARD 11) # C++11...
+# Check for C++14 standard
+set(CMAKE_CXX_STANDARD 14) # C++14...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 
