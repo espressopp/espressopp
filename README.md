@@ -55,7 +55,7 @@ $ pipenv install
 $ pipenv shell
 ```
 
-then you can co to `examples` and have a look at the Python scripts.
+then you can go to `examples` and have a look at the Python scripts.
 
 ## CMake options
 
