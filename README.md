@@ -1,5 +1,7 @@
-ESPResSo++
-==========
+# ESPResSo++
+
+[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
+[![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
 
 ESPResSo++ is an extensible, flexible, fast and parallel simulation software for
 soft matter research. It is a highly versatile software package for the
@@ -10,38 +12,89 @@ development is independent and they are different software packages. ESPResSo++
 is free, open-source software published under the GNU General Public License
 (GPL).
 
-QUICKSTART:
-===========
+# Quick start:
 
 To get a copy of the developer version (most recent version) of ESPResSo++, you can use git or docker. Using docker will give you a binary release (nothing to compile, but performance may not be optimal). If you use git clone or download a tarball, you will have to compile ESPResSo+ yourself, which might lead to better performance.
 
 Using [docker](https://www.docker.com):
-```
-# docker pull espressopp/espressopp
-# docker run -it espressopp/espressopp /bin/bash
+```sh
+$ docker pull espressopp/espressopp
+$ docker run -it espressopp/espressopp /bin/bash
 ```
 
 Using git:
-```
-# git clone https://github.com/espressopp/espressopp.git
+```sh
+$ git clone https://github.com/espressopp/espressopp.git
 ```
 
 Alternatively, you can download a tarball or zip file of [previous release versions](https://github.com/espressopp/espressopp/releases) of ESPResSo++.
 
-QUICKINSTALL:
-=============
+# Requirements
 
+ - Boost library ( >= 1.69.0),
+ - Python 3 (>= 3.7),
+ - mpi4py (>= 3.0.0),
+ - HDF5 library (>= 1.8) (optional for [H5MD](https://nongnu.org/h5md/) file format)
+ - h5py library (>= 2.6.0) (optional for [H5MD](https://nongnu.org/h5md/) file format)
+ - GROMACS library (required when `WITH_XTC` flag is enabled)
+
+# Quick install:
+
+```sh
+$ cd espressopp
+$ cmake .
+$ make -j2
+$ source ESPRC
 ```
-# cd espressopp
-# cmake .
-# make -j2
-# source ESPRC
+
+After building go to the `examples` directory and have a look at the Python scripts.
+
+Instead of calling `source ESPRC` you can also use [Pipenv](https://github.com/pypa/pipenv), simply after compilation call in the root directory
+```sh
+$ pipenv install
+$ pipenv shell
 ```
 
-After building go to the `examples` directory and have a look at the python scripts.
+then you can go to `examples` and have a look at the Python scripts.
 
-DOCUMENTATION:
-==============
+## CMake options
+
+You can customize the build process by applying following CMake flags
+
+ - `WITH_XTC` - build E++ with support of dumping trajectory to GROMACS xtc files (default: OFF).
+ - `EXTERNAL_MPI4PY` - use externally installed mpi4py library (default: ON).
+ - `CMAKE_INSTALL_PREFIX` - where the E++ should be installed.
+ - `CMAKE_CXX_FLAGS` - put specific compilation flags.
+
+Then, the flags can be used in `cmake`
+
+```sh
+$ cmake . -DWITH_XTC=ON -DEXTERNAL_MPI4PY=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3
+$ make
+```
+
+## How to install E++ in some Linux distributions
+
+### Ubuntu
+
+```sh
+$ apt-get -qq install -y build-essential openmpi-bin libfftw3-dev python3-dev libboost-all-dev git python3-mpi4py cmake wget python3-numpy ipython3 clang llvm ccache python3-pip doxygen sphinx-common python3-matplotlib graphviz texlive-latex-base texlive-latex-extra texlive-latex-recommended ghostscript libgromacs-dev clang-format curl latexmk libhdf5-dev python3-h5py sudo
+
+$ cd espressopp
+$ cmake .
+$ make
+```
+
+### Fedora
+
+```sh
+$ dnf install -y make cmake wget git gcc-c++ doxygen python-devel openmpi-devel environment-modules python-pip clang llvm compiler-rt ccache findutils boost-devel boost-python3-devel python-sphinx fftw-devel python-matplotlib texlive-latex-bin graphviz boost-openmpi-devel ghostscript python3-mpi4py-openmpi texlive-hyphen-base texlive-cm texlive-cmap texlive-ucs texlive-ec gromacs-devel hwloc-devel lmfit-devel ocl-icd-devel hdf5-devel python-h5py atlas hdf5 liblzf python-six python-nose python-numpy
+$ cd espressopp
+$ cmake .
+$ make
+```
+
+# Documentation
 
 Documentation for the developer version of ESPResSo++ is at:
 
@@ -55,14 +108,6 @@ where XXX is the version number, e.g.:
 
 http://espressopp.github.io/v1.9.4.1
 
-ISSUES:
-=======
+# Reporting issues
 
-Report bugs on the [github issues site](https://github.com/espressopp/espressopp/issues)
-
-
-[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
-[![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
-[![codecov.io](https://codecov.io/github/espressopp/espressopp/coverage.svg?branch=master)](https://codecov.io/github/espressopp/espressopp?branch=master)
-[![Analysis Status](https://scan.coverity.com/projects/8143/badge.svg?flat=1)](https://scan.coverity.com/projects/espressopp-espressopp)
-
+Report bugs on the [GitHub issues site](https://github.com/espressopp/espressopp/issues)
