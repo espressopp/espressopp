@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -109,17 +109,17 @@ if(nvt):
   integrator.addExtension(langevin)
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'nvt =', nvt
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid)
-print 'CellGrid = %s' % (cellGrid)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('nvt =', nvt)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid))
+print('CellGrid = %s' % (cellGrid))
+print('')
 
 # analysis
 # configurations = espressopp.analysis.Configurations(system)
@@ -141,9 +141,9 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-start_time = time.clock()
+start_time = time.process_time()
 integrator.run(steps)
-end_time = time.clock()
+end_time = time.process_time()
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()

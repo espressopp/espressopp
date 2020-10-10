@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -40,7 +40,7 @@ def openmpi_workaround():
       import ctypes
       globalFlag = ctypes.RTLD_GLOBAL
     except:
-      print 'ATTENTION: could not find flag RTLD_GLOBAL for dlopen'
+      print('ATTENTION: could not find flag RTLD_GLOBAL for dlopen')
       # take a good value for Linux (but is platform-dependent)
       globalFlag = 256
 
@@ -112,7 +112,7 @@ system.addInteraction(interLJ)
 
 for i in range(2,101):
   r = (i/100.0) * rc
-  print r, potLJ.computeEnergy(r), potLJX.computeEnergy(r),  potLJX.computeForce(Real3D(r, 0, 0))
+  print(r, potLJ.computeEnergy(r), potLJX.computeEnergy(r),  potLJX.computeForce(Real3D(r, 0, 0)))
 
 # setup integrator
 integrator = espressopp.integrator.VelocityVerlet(system)
@@ -124,17 +124,17 @@ if(nvt):
   langevin.temperature = 1.0
   integrator.addExtension(langevin)
 
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'nvt =', nvt
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('nvt =', nvt)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)
@@ -151,9 +151,9 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-start_time = time.clock()
+start_time = time.process_time()
 integrator.run(steps)
-end_time = time.clock()
+end_time = time.process_time()
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
