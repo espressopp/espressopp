@@ -1,1 +1,11 @@
-.
+# v3.0.0
+
+ - implementing the basic half-cell idea
+ - HeSpaDDA updated the distribution of processors independent on the axis sequence X,Y,Z or Z,Y,X; among others
+ - add ability for RNG to restart from a prior state (#283)
+ - do potentialArray range check outside of force loop (#289)
+ - allow id >= 0 for the first particle in chain analysis (e.g. MSID) In older versions of ESPResSo++ (e.g. 1.95) only pid=0 for the first particle was allowed when using chain-analysis functions. Since version 2, only pid=1 was correct. Now the starting pid is a parameter. Default is starting pid=0 (like in older versions).
+ - Speedup Verlet list rebuild by copying neighbors into buffers (#292)
+ - Vectorization (#294)
+ - HeSpaDDA updated/faster the distribution of processors
+ - Migration to Python 3 (#311)
