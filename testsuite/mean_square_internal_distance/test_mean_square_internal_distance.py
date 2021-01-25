@@ -1,20 +1,20 @@
 #  Copyright (C) 2018
 #      Max Planck Institute for Polymer Research
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import time
@@ -25,53 +25,46 @@ import unittest
 
 class TestCaseMeanSquareInternalDist(unittest.TestCase):
     def setUp(self):
-        # set up system
-        system = espressopp.System()
-        rng = espressopp.esutil.RNG()
-        rng.seed(1)
-        system.rng = rng
-        L = 10
-        box = (L, L, L)
-        system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
-        system.skin = 0.3
-        system.comm = MPI.COMM_WORLD
-        self.system = system
-        self.L = L
-        self.box = box
+        pass
 
     def test_MSID(self):
-        # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        # default system: NVE, dt=0.005, boxsize=(10,10,10)
+        system1, integrator1 = espressopp.standard_system.Default((10,10,10))
+        system2, integrator2 = espressopp.standard_system.Default((10,10,10))
 
-        # add some particles (normal, coarse-grained particles only)
-        particle_list = [
-            (1, 1, 0, espressopp.Real3D(7.0, 5.0, 5.0), 1.0, 0, 1.),
-            (2, 1, 0, espressopp.Real3D(8.0, 5.0, 5.0), 1.0, 0, 1.),
-            (3, 1, 0, espressopp.Real3D(9.0, 5.0, 5.0), 1.0, 0, 1.),
-            (4, 1, 0, espressopp.Real3D(10.0, 5.0, 5.0), 1.0, 0, 1.),
-            (5, 1, 0, espressopp.Real3D(11.0, 5.0, 5.0), 1.0, 0, 1.),
-            (6, 1, 0, espressopp.Real3D(1.0, 2.0, 5.0), 1.0, 0, 1.),
-            (7, 1, 0, espressopp.Real3D(2.0, 2.0, 5.0), 1.0, 0, 1.),
-            (8, 1, 0, espressopp.Real3D(3.0, 2.0, 5.0), 1.0, 0, 1.),
-            (9, 1, 0, espressopp.Real3D(4.0, 2.0, 5.0), 1.0, 0, 1.),
-            (10, 1, 0, espressopp.Real3D(5.0, 2.0, 5.0), 1.0, 0, 1.),
-        ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
-        self.system.storage.decompose()
+        # add 10 straight chains, particle ids are numbered from 0 to 99
+        system1.storage.addParticles([[cid*10+k, espressopp.Real3D(k, cid, 0)] for cid in range(10) for k in range(10)],'id','pos')
+        system1.storage.decompose()
+        msid1=espressopp.analysis.MeanSquareInternalDist(system1, chainlength=10, start_pid=0)
+        msid1.gather()
+        res1=msid1.compute()
 
-        # create a MeanSquareInternalDist instance
-        calcMSID = espressopp.analysis.MeanSquareInternalDist(self.system, 5)
-        calcMSID.gather()
-        # compute a mean square internal distance
-        msid = calcMSID.compute()
-        
-        # run checks
-        self.assertTrue(msid[0] == 1)
-        self.assertTrue(msid[1] == 4)
-        self.assertTrue(msid[2] == 9)
-        self.assertTrue(msid[3] == 16)
+        # add 10 straight chains, particle ids are numbered from 1 to 100
+        system2.storage.addParticles([[cid*10+k+1, espressopp.Real3D(k, cid, 0)] for cid in range(10) for k in range(10)],'id','pos')
+        system2.storage.decompose()
+        msid2=espressopp.analysis.MeanSquareInternalDist(system2, chainlength=10, start_pid=1)
+        msid2.gather()
+        res2=msid2.compute()
+
+        self.assertTrue(res1[0]==1)
+        self.assertTrue(res1[1]==4)
+        self.assertTrue(res1[2]==9)
+        self.assertTrue(res1[3]==16)
+        self.assertTrue(res1[4]==25)
+        self.assertTrue(res1[5]==36)
+        self.assertTrue(res1[6]==49)
+        self.assertTrue(res1[7]==64)
+        self.assertTrue(res1[8]==81)
+
+        self.assertTrue(res2[0]==1)
+        self.assertTrue(res2[1]==4)
+        self.assertTrue(res2[2]==9)
+        self.assertTrue(res2[3]==16)
+        self.assertTrue(res2[4]==25)
+        self.assertTrue(res2[5]==36)
+        self.assertTrue(res2[6]==49)
+        self.assertTrue(res2[7]==64)
+        self.assertTrue(res2[8]==81)
 
 if __name__ == '__main__':
     unittest.main()

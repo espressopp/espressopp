@@ -38,15 +38,15 @@ This is an abstract class, only needed to be inherited from.
 
 .. function:: espressopp.interaction.Potential.computeEnergy(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 
 .. function:: espressopp.interaction.Potential.computeForce(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 """
 from espressopp import pmi
 from espressopp import toReal3DFromVector
@@ -87,8 +87,7 @@ class PotentialLocal(object):
     shift = property(_getShift, _setShift)
 
 if pmi.isController:
-    class Potential(object):
-        __metaclass__ = pmi.Proxy
+    class Potential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = ['cutoff', 'shift', 'colVarBondList', 'colVarAngleList', 'colVarDihedList', 'colVar']

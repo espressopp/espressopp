@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -25,57 +25,60 @@ espressopp.Int3D
 ****************
 
 
-.. function:: espressopp.__Int3D(\*args)
+.. function:: espressopp.Int3D(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 
-.. function:: espressopp.__Int3D.x(v, [0)
+.. function:: espressopp.Int3D.x(v, [0)
 
-		:param v: 
-		:param [0: 
-		:type v: 
-		:type [0: 
-		:rtype: 
+                :param v:
+                :param [0:
+                :type v:
+                :type [0:
+                :rtype:
 
-.. function:: espressopp.__Int3D.y(v, [1)
+.. function:: espressopp.Int3D.y(v, [1)
 
-		:param v: 
-		:param [1: 
-		:type v: 
-		:type [1: 
-		:rtype: 
+                :param v:
+                :param [1:
+                :type v:
+                :type [1:
+                :rtype:
 
-.. function:: espressopp.__Int3D.z(v, [2)
+.. function:: espressopp.Int3D.z(v, [2)
 
-		:param v: 
-		:param [2: 
-		:type v: 
-		:type [2: 
-		:rtype: 
+                :param v:
+                :param [2:
+                :type v:
+                :type [2:
+                :rtype:
 
 .. function:: espressopp.toInt3DFromVector(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 
 .. function:: espressopp.toInt3D(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 """
+import numbers
+
 from _espressopp import Int3D
 from espressopp import esutil
 
-# This injects additional methods into the Int3D class and pulls it
-# into this module 
-class __Int3D(Int3D) :
+__all__ = ['Int3D', 'toInt3DFromVector', 'toInt3D']
 
 
-    __metaclass__ = esutil.ExtendBaseClass
+def extend_class():
+    # This injects additional methods into the Int3D class and pulls it
+    # into this module
 
-    __originit = Int3D.__init__
-    def __init__(self, *args):
+    orig_init = Int3D.__init__
+
+    def init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -89,40 +92,54 @@ class __Int3D(Int3D) :
                 x, y, z = arg0
             elif isinstance(arg0, int):
                 x = y = z = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Int3D from %s" % (args))
-        elif len(args) == 3 :
+        elif len(args) == 3:
             x, y, z = args
-        else :
+        else:
             raise TypeError("Cannot initialize Int3D from %s" % (args))
-        
-        return self.__originit(x, y, z)
+        orig_init(self, x, y, z)
 
-    # create setters and getters
-    @property
-    def x(self): return self[0]
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    @x.setter
-    def x(self, v): self[0] = v
+        def _set(self, v):
+            self[idx] = v
 
-    @property
-    def y(self) : return self[1]
+        return _get, _set
 
-    @y.setter
-    def y(self, v) : self[1] = v
+    def _eq(self, other):
+        if other is None:
+            return False
 
-    @property
-    def z(self) : return self[2]
+        if isinstance(other, numbers.Number):
+            return all([self[i] == other for i in range(3)])
 
-    @z.setter
-    def z(self, v) : self[2] = v
+        return all([self[i] == other[i] for i in range(3)])
 
-    # string conversion
-    def __str__(self) :
-        return str((self[0], self[1], self[2]))
+    def _lt(self, other):
+        if other is None:
+            return True
+        return id(self) < id(other)
 
-    def __repr__(self) :
-        return 'Int3D' + str(self)
+    def _gt(self, other):
+        if other is None:
+            return True
+        return id(self) > id(other)
+
+    Int3D.__init__ = init
+    for i, property_name in enumerate(['x', 'y', 'z']):
+        setattr(Int3D, property_name, property(*_get_getter_setter(i)))
+    Int3D.__str__ = lambda self: str((self[0], self[1], self[2]))
+    Int3D.__repr__ = lambda self: 'Int3D' + str(self)
+    Int3D.__eq__ = _eq
+    Int3D.__lt__ = _lt
+    Int3D.__gt__ = _gt
+
+
+extend_class()
+
 
 def toInt3DFromVector(*args):
     """Try to convert the arguments to a Int3D.
@@ -139,6 +156,7 @@ def toInt3DFromVector(*args):
         return Int3D(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toInt3D(*args):
     """Try to convert the arguments to a Int3D, returns the argument,

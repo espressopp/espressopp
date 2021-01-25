@@ -40,30 +40,11 @@ namespace espressopp {
         class MeanSquareInternalDist : public ConfigsParticleDecomp {
         public:
 
-            MeanSquareInternalDist(shared_ptr<System> system, int chainlength) :
-                                ConfigsParticleDecomp(system,chainlength) {
+            MeanSquareInternalDist(shared_ptr<System> system, int chainlength, int start_pid) :
+                                ConfigsParticleDecomp(system,chainlength,start_pid) {
                 // by default 
                 setPrint_progress(true);
                 key = "unfolded";
-
-		int n_nodes = system -> comm -> size();
-              
-		//for monodisperse chains
-		int num_chains = num_of_part / chainlength;
-
-		int local_num_of_part = (num_chains / n_nodes + 1) * chainlength;
-
-		idToCpu.clear();
-		int nodeNum = 0;
-		int count = 0;
-		for(long unsigned int k = 1; k <= num_of_part; k++){
-		    idToCpu[k] = nodeNum;
-		    count ++;
-		    if(count>=local_num_of_part){
-			count = 0;
-			nodeNum++;
-		    }
-		}
             }
 
             ~MeanSquareInternalDist() {

@@ -70,20 +70,20 @@ access particle with id <pid> of stored configuration <n>:
 
 .. function:: espressopp.analysis.Configurations(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.Configurations.back()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.Configurations.clear()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.Configurations.gather()
 
-		:rtype:
+                :rtype:
 """
 
 from espressopp.esutil import cxxinit
@@ -103,15 +103,16 @@ class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
         return self.cxxclass.clear(self)
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+    def __next__(self):
+        return self.cxxclass.all(self).next()
     def back(self):
         return self.cxxclass.back(self)
 
 if pmi.isController :
-    class Configurations(Observable):
-        __metaclass__ = pmi.Proxy
+    class Configurations(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ConfigurationsLocal',
             pmicall = [ "gather", "clear", "back" ],
-            localcall = ["__getitem__", "__iter__"],
+            localcall = ["__getitem__", "__iter__", "__next__"],
             pmiproperty = ["capacity", "size"]
             )

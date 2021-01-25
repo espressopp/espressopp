@@ -27,15 +27,15 @@ Abstract class for angular potentials that only needed to be inherited from.
 
     .. py:method:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 
     .. py:method:: espressopp.interaction.AngularPotential.computeForce(\*args)
 
-		:param \*args:
-		:type \*args:
-		:rtype:
+                :param \*args:
+                :type \*args:
+                :rtype:
 """
 
 from espressopp import pmi
@@ -61,8 +61,7 @@ class AngularPotentialLocal(object):
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
 if pmi.isController:
-    class AngularPotential(object):
-        __metaclass__ = pmi.Proxy
+    class AngularPotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
             pmiproperty = [ 'cutoff', 'colVarBondList', 'colVarAngleList', 'colVarDihedList', 'colVar' ]

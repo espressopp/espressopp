@@ -29,6 +29,8 @@
 #include "python.hpp"
 #include <esutil/Logger.hpp>
 
+#include <iostream>
+
 namespace log4espp {
 
   /**************************************************************************
@@ -90,7 +92,9 @@ namespace log4espp {
 
    PyLogger(std::string, class Logger* parent);
 
-   ~PyLogger() {}
+   ~PyLogger() {
+       std::cout << "~PyLogger" << std::endl;
+   }
 
    /** This routine sets the Python instance of the logger and/or 
        updates the logging level of the C++ class.

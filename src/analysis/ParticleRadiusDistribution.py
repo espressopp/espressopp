@@ -27,8 +27,8 @@ espressopp.analysis.ParticleRadiusDistribution
 
 .. function:: espressopp.analysis.ParticleRadiusDistribution(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -39,12 +39,11 @@ from _espressopp import analysis_ParticleRadiusDistribution
 class ParticleRadiusDistributionLocal(AnalysisBaseLocal, analysis_ParticleRadiusDistribution):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_ParticleRadiusDistribution, system)
 
 if pmi.isController :
-    class ParticleRadiusDistribution(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class ParticleRadiusDistribution(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.ParticleRadiusDistributionLocal'
             )

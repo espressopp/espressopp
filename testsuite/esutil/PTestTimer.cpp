@@ -20,9 +20,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#define BOOST_TEST_MODULE PTestTimer
 #define PARALLEL_TEST_MODULE DomainDecomposition
+
 #include "ut.hpp"
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include "esutil/Timer.hpp"
 

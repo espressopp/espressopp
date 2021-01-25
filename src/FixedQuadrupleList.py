@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -27,26 +27,26 @@ espressopp.FixedQuadrupleList
 
 .. function:: espressopp.FixedQuadrupleList(storage)
 
-		:param storage: 
-		:type storage: 
+                :param storage:
+                :type storage:
 
 .. function:: espressopp.FixedQuadrupleList.add(pid1, pid2, pid3, pid4)
 
-		:param pid1: 
-		:param pid2: 
-		:param pid3: 
-		:param pid4: 
-		:type pid1: 
-		:type pid2: 
-		:type pid3: 
-		:type pid4: 
-		:rtype: 
+                :param pid1:
+                :param pid2:
+                :param pid3:
+                :param pid4:
+                :type pid1:
+                :type pid2:
+                :type pid3:
+                :type pid4:
+                :rtype:
 
 .. function:: espressopp.FixedQuadrupleList.addQuadruples(quadruplelist)
 
-		:param quadruplelist: 
-		:type quadruplelist: 
-		:rtype: 
+                :param quadruplelist:
+                :type quadruplelist:
+                :rtype:
 
 .. function:: espressopp.FixedQuadrupleList.remove()
         remove the FixedPairList and disconnect
@@ -54,11 +54,11 @@ espressopp.FixedQuadrupleList
 
 .. function:: espressopp.FixedQuadrupleList.getQuadruples()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.FixedQuadrupleList.size()
 
-		:rtype: 
+                :rtype:
 """
 from espressopp import pmi
 import _espressopp
@@ -102,12 +102,11 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
     def getQuadruples(self):
 
         if pmi.workerIsActive():
-          quadruple = self.cxxclass.getQuadruples(self)
-          return quadruple 
+            quadruple = self.cxxclass.getQuadruples(self)
+            return quadruple
 
 if pmi.isController:
-    class FixedQuadrupleList(object):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],

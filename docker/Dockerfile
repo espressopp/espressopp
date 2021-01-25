@@ -1,7 +1,7 @@
 from espressopp/buildenv:ubuntu
 
 ARG COVERAGE
-ARG EXTERNAL
+ARG XTC
 ARG CC
 ARG CXX
 ARG BUILD_UG
@@ -29,16 +29,16 @@ RUN mkdir build
 
 WORKDIR build
 RUN ccache -z
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ${COVERAGE:+-DUSE_GCOV=ON} ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DWITH_XTC=${XTC} ${COVERAGE:+-DUSE_GCOV=ON} ..
 RUN make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf}
 RUN ccache -s
 RUN if [ -z ${COVERAGE} ] && [ -z $BUILD_UG ]; then make test CTEST_OUTPUT_ON_FAILURE=1 TEST_H5MD=ON; fi
 RUN make install DESTDIR=${PWD}
 RUN cd .. && if [ ${COVERAGE} ]; then \
   if [ ${CC} = clang ]; then \
-    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
+    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov" > /dev/null; \
   else \
-    $HOME/.local/bin/codecov; \
+    $HOME/.local/bin/codecov > /dev/null; \
   fi; \
 fi && cd -
 USER root

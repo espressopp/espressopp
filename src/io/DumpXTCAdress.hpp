@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2017
+  Copyright (C) 2017,2020
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -28,7 +28,6 @@
 #include <iostream>
 #include "mpi.hpp"
 
-#include "gromacs/fileio/xtcio.h"
 #include "types.hpp"
 #include "System.hpp"
 #include "io/FileBackup.hpp"
@@ -39,6 +38,9 @@
 #include "FixedTupleListAdress.hpp"
 
 #include "esutil/Error.hpp"
+
+#include <gromacs/trajectory/trajectoryframe.h>
+#include <gromacs/fileio/trxio.h>
 
 
 namespace espressopp {
@@ -83,7 +85,7 @@ class DumpXTCAdress : public ParticleAccess {
   static void registerPython();
 
  private:
-  t_fileio *fio;
+  t_trxstatus *fio;
   static const int dim = 3;
   real xtcprec;
 

@@ -24,25 +24,25 @@ espressopp.interaction.TabulatedSubEnsAngular
 
 .. function:: espressopp.interaction.TabulatedSubEnsAngular(dim, itype, filenames)
 
-		:param dim: Number of potentials to be used for this interaction
-		:param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filenames: The tabulated potential filenames.
-		:type itype: int
-		:type filename: str
+                :param dim: Number of potentials to be used for this interaction
+                :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
+                :param filenames: The tabulated potential filenames.
+                :type itype: int
+                :type filename: str
 
 .. function:: espressopp.interaction.FixedTripleListTabulatedSubEnsAngular(system, ftl, potential)
 
-		:param system: The Espresso++ system object.
-		:param ftl: The FixedTripleList.
-		:param potential: The potential.
-		:type system: espressopp.System
-		:type ftl: espressopp.FixedTripleList
-		:type potential: espressopp.interaction.Potential
+                :param system: The Espresso++ system object.
+                :param ftl: The FixedTripleList.
+                :param potential: The potential.
+                :type system: espressopp.System
+                :type ftl: espressopp.FixedTripleList
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedTripleListTabulatedSubEnsAngular.setPotential(potential)
 
-		:param potential: The potential object.
-		:type potential: espressopp.interaction.Potential
+                :param potential: The potential object.
+                :type potential: espressopp.interaction.Potential
 
 
 .. function:: espressopp.interaction.FixedTripleListTypesTabulatedSubEnsAngular(system, ftl)
@@ -122,21 +122,19 @@ if pmi.isController:
             cls = 'espressopp.interaction.TabulatedSubEnsAngularLocal',
             pmicall = ['weight_get', 'weight_set',
                        'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
-				       'colVarSd_get', 'colVarSd_set',
-				       'dimension_get', 'filenames_get', 'filename_get',
-				       'filename_set', 'addInteraction', 'colVarRefs_get',
-				       'colVarRef_get']
+                                       'colVarSd_get', 'colVarSd_set',
+                                       'dimension_get', 'filenames_get', 'filename_get',
+                                       'filename_set', 'addInteraction', 'colVarRefs_get',
+                                       'colVarRef_get']
             )
 
-    class FixedTripleListTabulatedSubEnsAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTabulatedSubEnsAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTabulatedSubEnsAngularLocal',
             pmicall = ['setPotential', 'getFixedTripleList']
             )
 
-    class FixedTripleListTypesTabulatedSubEnsAngular(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListTypesTabulatedSubEnsAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTypesTabulatedSubEnsAngularLocal',
             pmicall = ['setPotential','getPotential', 'setFixedTripleList', 'getFixedTripleList']

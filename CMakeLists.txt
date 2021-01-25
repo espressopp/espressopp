@@ -1,12 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
-project(espressopp)
+project(espressopp LANGUAGES CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-enable_language(C)
-enable_language(CXX)
 
 enable_testing()
 
@@ -15,18 +12,16 @@ enable_testing()
 # these need ot be done early (before further tests).
 #####################################################################
 
-include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
-# Check for C++11 standard
-set(CMAKE_CXX_STANDARD 11) # C++11...
+# Check for C++14 standard
+set(CMAKE_CXX_STANDARD 14) # C++14...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 
 ########################################################################
 # User input options                                                   #
 ########################################################################
-option(EXTERNAL_BOOST "Use external boost" ON)
 option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
@@ -67,8 +62,7 @@ endif(VAMPIRTRACE)
 #Process MPI settings
 ########################################################################
 
-find_package(MPI REQUIRED)
-include_directories(${MPI_INCLUDE_PATH})
+find_package(MPI REQUIRED COMPONENTS CXX)
 
 ########################################################################
 #Process FFTW3 settings
@@ -92,46 +86,43 @@ endif()
 #Process Python settings
 ########################################################################
 
-find_package(PythonInterp 2 REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development)
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_python_inc()"
+execute_process(COMMAND ${Python3_EXECUTABLE}
+                -c "import distutils.sysconfig as cg; print(cg.get_python_inc())"
                 OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_PATH} CACHE PATH "Python Include Directory")
+set(PYTHON_INCLUDE_PATH ${Python3_INCLUDE_DIRS} CACHE PATH "Python Include Directory")
 mark_as_advanced(PYTHON_INCLUDE_PATH)
 
 message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
 include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHON_INSTDIR)
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
+    execute_process(COMMAND ${Python3_EXECUTABLE}
+                -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
                 OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                        -c "import sys; print sys.version[:3]"
+execute_process(COMMAND ${Python3_EXECUTABLE}
+                        -c "import sys; print(sys.version[:3])"
                         OUTPUT_VARIABLE PYTHON_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+execute_process(COMMAND ${Python3_EXECUTABLE}
+                        -c "import sys; print(sys.version[:3].replace('.', ''))"
+                        OUTPUT_VARIABLE PYTHON_VERSION_NO_DOT
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
+message(STATUS "PYTHON_LIBDIR = ${Python3_LIBRARY_DIRS}")
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE}
-                -c "import distutils.sysconfig as cg; print cg.get_config_var('LIBDIR')"
-                OUTPUT_VARIABLE PYTHON_LIBDIR
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
 
-message(STATUS "PYTHON_LIBDIR = ${PYTHON_LIBDIR}")
-
-find_library(PYTHON_LIBRARIES
-             NAMES python${PYTHON_VERSION}
-             PATHS ${PYTHON_LIBDIR}  )
-
-if(NOT PYTHON_LIBRARIES)
+if(NOT Python3_LIBRARIES)
   message(FATAL_ERROR "Python libraries not found!")
-endif(NOT PYTHON_LIBRARIES)
+endif(NOT Python3_LIBRARIES)
 message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
 
 mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
@@ -139,48 +130,32 @@ mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
-include(CheckIncludeFiles)
-check_include_files("sys/time.h;sys/resource.h;unistd.h" CMAKE_HEADERS)
-
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-# this conflicts with mpi4py-1.3 (is used to check for MPI version there)
-# add_definitions( -DHAVE_CONFIG_H )
+# Minimum required Boost version is set to 1.69.0
+set(NEEDED_Boost_VERSION 1.69.0)
+find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT})
+set(Boost_LIBS ${Boost_LIBRARIES})
 
-# Minimum required Boost version is set to 1.58 (only because of travis)
-# but the version in contrib is 1.61;
+message(STATUS "BOOST_LIBS = ${Boost_LIBRARIES}")
 
-if (EXTERNAL_BOOST)
-  set(NEEDED_Boost_VERSION 1.58.0)
-  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem)
-  set(Boost_LIBS ${Boost_LIBRARIES})
-  if(${Boost_VERSION} VERSION_LESS 106700)
-     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python)
-  else()
-     find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS python27)
-  endif()
-  
-  # Append Python library to the list of Boost libraries.
-  list(APPEND Boost_LIBS ${Boost_LIBRARIES})
-  set(Boost_LIBRARIES ${Boost_LIBS})
+# Append Python library to the list of Boost libraries.
+list(APPEND Boost_LIBS ${Boost_LIBRARIES})
+set(Boost_LIBRARIES ${Boost_LIBS})
 
-  if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
-  endif(NOT Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-else(EXTERNAL_BOOST)
-  include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
-  set(Boost_LIBRARIES espressopp_boost)
-endif(EXTERNAL_BOOST)
+if(NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages (mpi, serialization, system, filesystem, python3). To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost.")
+endif(NOT Boost_FOUND)
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 
 if(EXTERNAL_MPI4PY)
-  find_package(MPI4PY 1.3.1 REQUIRED)
+  find_package(MPI4PY 3.0.0 REQUIRED)
   include_directories(${MPI4PY_INCLUDES})
 else(EXTERNAL_MPI4PY)
-  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-2.0.0/src/include)
+  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.3/src/mpi4py/include)
   set(MPI4PY_LIBRARIES MPI)
 endif(EXTERNAL_MPI4PY)
 
@@ -198,11 +173,7 @@ endif()
 ######################################
 add_subdirectory(src)
 add_subdirectory(contrib)
-if (EXTERNAL_MPI4PY)
-  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-else (EXTERNAL_MPI4PY)
-  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
-endif (EXTERNAL_MPI4PY)
+set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
 add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")

@@ -4,21 +4,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -31,7 +31,7 @@ the Mirror Lennard-Jones potential.
 
 .. math::
 
-	V(r) = V_{LJ}(r_m - |r-r_m|)
+        V(r) = V_{LJ}(r_m - |r-r_m|)
 
 where :math:`V_{LJ}` is the 6-12 purely repulsive Lennard-Jones
 potential. This potential is introduced in R.L.C. Akkermans, S. Toxvaerd
@@ -45,37 +45,37 @@ Chemical Physics, 1998, 109, 2929-2940.
 
 .. function:: espressopp.interaction.MirrorLennardJones(epsilon, sigma)
 
-		:param epsilon: (default: 1.0)
-		:param sigma: (default: 0.0)
-		:type epsilon: real
-		:type sigma: real
+                :param epsilon: (default: 1.0)
+                :param sigma: (default: 0.0)
+                :type epsilon: real
+                :type sigma: real
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.getFixedPairList()
 
-		:rtype: A Python list of lists.
+                :rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.getPotential()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.setFixedPairList(fixedpairlist)
 
-		:param fixedpairlist: 
-		:type fixedpairlist: 
+                :param fixedpairlist:
+                :type fixedpairlist:
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -121,8 +121,7 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma']
             )
 
-    class FixedPairListMirrorLennardJones(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListMirrorLennardJones(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListMirrorLennardJonesLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']

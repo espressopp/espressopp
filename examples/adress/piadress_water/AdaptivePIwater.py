@@ -34,13 +34,13 @@ from espressopp.tools import decomp
 # The example system is liquid water, modeled using the force field proposed
 # in J. Chem. Theory Comput. 10, 816 (2014). In the classical region a WCA potential
 # between the oxygens is used.The simulation setup is similar to those used in the JCP paper.
-print 'Performing an ESPResSo++ path integral-based quantum/classical adaptive resolution simulation.\n'
+print('Performing an ESPResSo++ path integral-based quantum/classical adaptive resolution simulation.\n')
 
 ########################################################
 #  1. specification of the system setup and simulation parameters  #
 ########################################################
 
-print 'Specifying simulation parameters...'
+print('Specifying simulation parameters...')
 steps =1000 # integration steps (outer steps of the multiple time stepping integrator)
 intervals = 100 # intervals
 timestep_short = 0.002/40.0 # the shortest timestep (interaction between Trotter beads on the ring polymers)
@@ -74,7 +74,7 @@ speedupFreezeRings = False # speedup in classical region by freezing rings (skip
 #  2. read in coordinates  #
 ######################
 
-print 'Reading in coordinates...'
+print('Reading in coordinates...')
 # read equilibrated configuration file
 pid, types, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("input.xyz")
 
@@ -101,14 +101,14 @@ tabHW_OW = "POTS/tableESP_HW_OW.dat"
 tabOW_OW = "POTS/tableESP_OW_OW.dat"
 
 num_Trotter_beads = len(x) # total number of Trotter beads in the system
-num_atoms = len(x)/nTrotter # total number of atoms in the system
+num_atoms = len(x)//nTrotter # total number of atoms in the system
 size = (Lx, Ly, Lz) # size
 
 #####################
 #  3. set up the system  #
 #####################
 
-print 'Setting up system...'
+print('Setting up system...')
 # System, boundary conditions, skin, communicator, node & cell grids
 system = espressopp.System()
 system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
@@ -129,7 +129,7 @@ system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, 
 #  4. add particles to system  #
 ##########################
 
-print 'Adding particles and tuples...'
+print('Adding particles and tuples...')
 props = ['id', 'pos', 'v', 'f', 'pib', 'type', 'mass', 'adrat']
 allParticlesAT = []
 allParticles = []
@@ -148,7 +148,7 @@ for pid_atom in range(num_atoms):
 
     # Preparation of tuples (tuples define, which atoms/trotter beads belong to which CG molecules/atoms)
     tmptuple = [pid_atom+num_Trotter_beads+1]
-    for pid_trotter in range(nTrotter):
+    for pid_trotter in range(int(nTrotter)):
         pid = pid_atom*nTrotter+pid_trotter
         tmptuple.append((allParticlesAT[pid])[0])
     firstParticleId=tmptuple[1]
@@ -162,7 +162,7 @@ for pid_atom in range(num_atoms):
                          Real3D(0, 0, 0), # force
                          0, types[pid_atom*nTrotter], masses[pid_atom*nTrotter], 0]) # pib, type, mass, is not AT particle
     # append Trotter beads
-    for pid_trotter in range(nTrotter):
+    for pid_trotter in range(int(nTrotter)):
         pid = pid_atom*nTrotter+pid_trotter
         allParticles.append([(allParticlesAT[pid])[0],
                             (allParticlesAT[pid])[1], # pos
@@ -190,11 +190,11 @@ system.storage.decompose()
 #  4. set up structure, interactions, and force field  #
 ###########################################
 
-print 'Setting up interactions and force field...'
+print('Setting up interactions and force field...')
 # create bond lists between atoms
 bondsOH = []
 bondsHH = []
-for part in range(num_atoms/3):
+for part in range(num_atoms//3):
     bondsOH.append((num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+1))
     bondsOH.append((num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+2))
     bondsHH.append((num_Trotter_beads + 1 + 3*part+1, num_Trotter_beads + 1 + 3*part+2))
@@ -212,7 +212,7 @@ vl = espressopp.VerletListAdress(system, cutoff=interaction_cutoff, adrcut=inter
 
 # create angle list between atoms
 angles = []
-for part in range(num_atoms/3):
+for part in range(num_atoms//3):
     angles.append((num_Trotter_beads + 1 + 3*part+1, num_Trotter_beads + 1 + 3*part, num_Trotter_beads + 1 + 3*part+2))
 
 # add angles between atoms
@@ -252,7 +252,7 @@ system.addInteraction(interAngle)
 #  5. set up integration scheme and corrections  #
 #########################################
 
-print 'Setting up integration scheme (path integral-based adaptive resolution multiple time stepping integrator)...'
+print('Setting up integration scheme (path integral-based adaptive resolution multiple time stepping integrator)...')
 # path integral-based adaptive resolution multiple time stepping integrator
 integrator = espressopp.integrator.PIAdressIntegrator(system=system, verletlist=vl, timestep=timestep_short, sSteps=multiplier_short_to_medium, mSteps=multiplier_medium_to_long, nTrotter=nTrotter, realKinMass=realkinmass, constKinMass=constkinmass, temperature=temp, gamma=gamma, centroidThermostat=centroidthermostat, CMDparameter=CMDparameter, PILE=PILE, PILElambda=PILElambda, CLmassmultiplier=clmassmultiplier, speedup=speedupFreezeRings, KTI=KTI)
 
@@ -275,14 +275,14 @@ espressopp.tools.AdressDecomp(system, integrator)
 #  6. set up analysis routines  #
 ##########################
 
-print 'Setting up analysis routines...'
+print('Setting up analysis routines...')
 # radius of gyration profiles
 gyration_array_total_H = []
 gyration_array_total_O = []
 gyrationprofile = espressopp.analysis.RadGyrXProfilePI(system)
 gyrationprofilegrid = 40
-gyrationAdds_H = [0 for i in range(gyrationprofilegrid)]
-gyrationAdds_O = [0 for i in range(gyrationprofilegrid)]
+gyrationAdds_H = [0 for i in range(int(gyrationprofilegrid))]
+gyrationAdds_O = [0 for i in range(int(gyrationprofilegrid))]
 
 # OO rdf
 rdf_array_total_OO = []
@@ -313,53 +313,53 @@ outfile = open("esp.dat", "w")
 #  7. print system information  #
 ###########################
 
-print ''
-print "System setup done, information:"
-print ''
-print 'PI-AdResS Center =', [Lx/2, Ly/2, Lz/2]
-print 'Size of high resolution full path integral region', ex_size
-print 'Size of hybrid region', hy_size
-print 'Trotter number =', integrator.getNtrotter()
-print 'Total number of Trotter beads =', num_Trotter_beads
-print 'Total number of atoms =', num_atoms
-print 'Atomistic density = %.4f' % (num_atoms / (Lx * Ly * Lz))
-print 'Interaction cutoff =', interaction_cutoff
-print 'Potential cutoff =', potential_cutoff
-print 'Skin =', system.skin
-print 'Short timestep =', integrator.getTimeStep()
-print 'Medium timestep =', integrator.getTimeStep() * integrator.getsStep()
-print 'Long timestep =', integrator.getTimeStep() * integrator.getmStep() * integrator.getsStep()
-print 'Outer steps =', steps
-print 'Intervals =', intervals
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print 'Temperature =', integrator.getTemperature()
-print 'Gamma =', integrator.getGamma()
-print 'Classical Mass Multiplier =', integrator.getClmassmultiplier()
-print 'Constant kinetic mass?', integrator.getConstKinMass()
-print 'Using (adaptive or constant) real kinetic masses?', integrator.getRealKinMass()
-print 'Path Integration Langevin Equation thermostating?', integrator.getPILE()
-print 'Path Integration Langevin Equation thermostating lambda =', integrator.getPILElambda()
-print 'Thermostating the centroid?', integrator.getCentroidThermostat()
-print 'CMD adiabadicity parameter =', integrator.getCMDparameter()
-print 'Running Kirkwood Thermodynamic Integration?', integrator.getKTI()
-print 'Using centers of mass in classical region for force calculations?', speedupInterAtom
-print 'Freezing internal ring vibrations in classical region?', integrator.getSpeedup()
-print ''
+print('')
+print("System setup done, information:")
+print('')
+print('PI-AdResS Center =', [Lx/2, Ly/2, Lz/2])
+print('Size of high resolution full path integral region', ex_size)
+print('Size of hybrid region', hy_size)
+print('Trotter number =', integrator.getNtrotter())
+print('Total number of Trotter beads =', num_Trotter_beads)
+print('Total number of atoms =', num_atoms)
+print('Atomistic density = %.4f' % (num_atoms / (Lx * Ly * Lz)))
+print('Interaction cutoff =', interaction_cutoff)
+print('Potential cutoff =', potential_cutoff)
+print('Skin =', system.skin)
+print('Short timestep =', integrator.getTimeStep())
+print('Medium timestep =', integrator.getTimeStep() * integrator.getsStep())
+print('Long timestep =', integrator.getTimeStep() * integrator.getmStep() * integrator.getsStep())
+print('Outer steps =', steps)
+print('Intervals =', intervals)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('Temperature =', integrator.getTemperature())
+print('Gamma =', integrator.getGamma())
+print('Classical Mass Multiplier =', integrator.getClmassmultiplier())
+print('Constant kinetic mass?', integrator.getConstKinMass())
+print('Using (adaptive or constant) real kinetic masses?', integrator.getRealKinMass())
+print('Path Integration Langevin Equation thermostating?', integrator.getPILE())
+print('Path Integration Langevin Equation thermostating lambda =', integrator.getPILElambda())
+print('Thermostating the centroid?', integrator.getCentroidThermostat())
+print('CMD adiabadicity parameter =', integrator.getCMDparameter())
+print('Running Kirkwood Thermodynamic Integration?', integrator.getKTI())
+print('Using centers of mass in classical region for force calculations?', speedupInterAtom)
+print('Freezing internal ring vibrations in classical region?', integrator.getSpeedup())
+print('')
 
 ##################
 #  8. run simulation  #
 ##################
 
 # timer, steps
-nsteps = steps / intervals
-start_time = pytime.clock()
+nsteps = steps // intervals
+start_time = pytime.process_time()
 
 # output format for screen and file
-print 'Starting the integration loop...'
-print ''
-print 'step, time (ps), temperature, E_bonds, E_angles, E_ringpolymer, E_nonbonded, E_kin, E_correction, E_total'
-fmt = '%8d %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g\n'
+print('Starting the integration loop...')
+print('')
+print('step, time (ps), temperature, E_bonds, E_angles, E_ringpolymer, E_nonbonded, E_kin, E_correction, E_total')
+fmt = '%8d %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g'
 
 # initial configuration analysis
 Eb = interBondedOH.computeEnergy() + interBondedHH.computeEnergy()
@@ -387,50 +387,50 @@ for s in range(1, intervals + 1):
     Ecorr = fec.computeCompEnergy() + thdf.computeTDEnergy()
     Etotal = Ek+Eb+EAng+ELj+EPI+Ecorr
     outfile.write(fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal))
-    print (fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal))
+    print((fmt%(step, time, T, Eb, EAng, EPI, ELj, Ek, Ecorr, Etotal)))
 
     if s%10==0:
         rdf_array_OO = rdf_OO.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_OO)):
-                if(i>=len(rdf_array_total_OO)):
-                        rdf_array_total_OO.append(rdf_array_OO[i])
-                else:
-                        rdf_array_total_OO[i] += rdf_array_OO[i]
+            if(i>=len(rdf_array_total_OO)):
+                rdf_array_total_OO.append(rdf_array_OO[i])
+            else:
+                rdf_array_total_OO[i] += rdf_array_OO[i]
         Adds_OO += 1.0
 
         rdf_array_OH = rdf_OH.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_OH)):
-                if(i>=len(rdf_array_total_OH)):
-                        rdf_array_total_OH.append(rdf_array_OH[i])
-                else:
-                        rdf_array_total_OH[i] += rdf_array_OH[i]
+            if(i>=len(rdf_array_total_OH)):
+                rdf_array_total_OH.append(rdf_array_OH[i])
+            else:
+                rdf_array_total_OH[i] += rdf_array_OH[i]
         Adds_OH += 1.0
 
         rdf_array_HH = rdf_HH.computePathIntegral(rdfgrid)
         for i in range(len(rdf_array_HH)):
-                if(i>=len(rdf_array_total_HH)):
-                        rdf_array_total_HH.append(rdf_array_HH[i])
-                else:
-                        rdf_array_total_HH[i] += rdf_array_HH[i]
+            if(i>=len(rdf_array_total_HH)):
+                rdf_array_total_HH.append(rdf_array_HH[i])
+            else:
+                rdf_array_total_HH[i] += rdf_array_HH[i]
         Adds_HH += 1.0
 
     gyration_array_H = gyrationprofile.compute(gyrationprofilegrid, nTrotter, 0)
     for i in range(len(gyration_array_H)):
-                if(i>=len(gyration_array_total_H)):
-                        gyration_array_total_H.append(gyration_array_H[i])
-                else:
-                        gyration_array_total_H[i] += gyration_array_H[i]
-                if(gyration_array_H[i] != 0.0):
-                    gyrationAdds_H[i] += 1.0
+        if(i>=len(gyration_array_total_H)):
+            gyration_array_total_H.append(gyration_array_H[i])
+        else:
+            gyration_array_total_H[i] += gyration_array_H[i]
+        if(gyration_array_H[i] != 0.0):
+            gyrationAdds_H[i] += 1.0
 
     gyration_array_O = gyrationprofile.compute(gyrationprofilegrid, nTrotter, 1)
     for i in range(len(gyration_array_O)):
-                if(i>=len(gyration_array_total_O)):
-                        gyration_array_total_O.append(gyration_array_O[i])
-                else:
-                        gyration_array_total_O[i] += gyration_array_O[i]
-                if(gyration_array_O[i] != 0.0):
-                    gyrationAdds_O[i] += 1.0
+        if(i>=len(gyration_array_total_O)):
+            gyration_array_total_O.append(gyration_array_O[i])
+        else:
+            gyration_array_total_O[i] += gyration_array_O[i]
+        if(gyration_array_O[i] != 0.0):
+            gyrationAdds_O[i] += 1.0
 
 # close output file
 outfile.close()
@@ -441,50 +441,50 @@ outfile.close()
 
 # print O-O rdf to file
 for i in range(len(rdf_array_total_OO)):
-  rdf_array_total_OO[i] /= Adds_OO
+    rdf_array_total_OO[i] /= Adds_OO
 rdf_OO_file = open('rdf_profile_OO.dat', 'w')
 for i in range(len(rdf_array_total_OO)):
-  rdf_OO_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OO[i] ))
+    rdf_OO_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OO[i] ))
 rdf_OO_file.close()
 
 # print O-H rdf to file
 for i in range(len(rdf_array_total_OH)):
-  rdf_array_total_OH[i] /= Adds_OH
+    rdf_array_total_OH[i] /= Adds_OH
 rdf_OH_file = open('rdf_profile_OH.dat', 'w')
 for i in range(len(rdf_array_total_OH)):
-  rdf_OH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OH[i] ))
+    rdf_OH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_OH[i] ))
 rdf_OH_file.close()
 
 # print H-H rdf to file
 for i in range(len(rdf_array_total_HH)):
-  rdf_array_total_HH[i] /= Adds_HH
+    rdf_array_total_HH[i] /= Adds_HH
 rdf_HH_file = open('rdf_profile_HH.dat', 'w')
 for i in range(len(rdf_array_total_HH)):
-  rdf_HH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_HH[i] ))
+    rdf_HH_file.write(fmt_rdf % ( (i+0.5)*dr_rdf, rdf_array_total_HH[i] ))
 rdf_HH_file.close()
 
 # print hydrogen radius of gyration profile to file
 for i in range(len(gyration_array_total_H)):
-  if(gyrationAdds_H[i] > 0.0):
-    gyration_array_total_H[i] /= gyrationAdds_H[i]
+    if(gyrationAdds_H[i] > 0.0):
+        gyration_array_total_H[i] /= gyrationAdds_H[i]
 rgyr_H_file = open('radgyr_profile_H.dat', 'w')
 for i in range(len(gyration_array_total_H)):
-  rgyr_H_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_H[i] ))
+    rgyr_H_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_H[i] ))
 rgyr_H_file.close()
 
 # print oxygen radius of gyration profile to file
 for i in range(len(gyration_array_total_O)):
-  if(gyrationAdds_O[i] > 0.0):
-    gyration_array_total_O[i] /= gyrationAdds_O[i]
+    if(gyrationAdds_O[i] > 0.0):
+        gyration_array_total_O[i] /= gyrationAdds_O[i]
 rgyr_O_file = open('radgyr_profile_O.dat', 'w')
 for i in range(len(gyration_array_total_O)):
-  rgyr_O_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_O[i] ))
+    rgyr_O_file.write(fmt_gyr % ( (i+0.5)*dr_gyr, gyration_array_total_O[i] ))
 rgyr_O_file.close()
 
 ###########
 #  9. Done  #
 ###########
 
-end_time = pytime.clock()
-print 'Successfully finished simulation.'
-print 'Run time = %.1f seconds' % (end_time - start_time)
+end_time = pytime.process_time()
+print('Successfully finished simulation.')
+print('Run time = %.1f seconds' % (end_time - start_time))

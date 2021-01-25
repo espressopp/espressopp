@@ -1,23 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 import sys
@@ -59,7 +59,7 @@ class TestRattle(unittest.TestCase):
             (2, 0, espressopp.Real3D(3.1, 3.1, 3.0), espressopp.Real3D(0.23,  0.22,  0.00),  1.0, 1),
             (3, 0, espressopp.Real3D(3.2, 3.3, 3.0), espressopp.Real3D(0.24, -0.37, -0.10),  3.0, 1),
             (4, 0, espressopp.Real3D(3.1, 3.3, 3.0), espressopp.Real3D(0.14,  0.20, -0.05),  1.0, 1),
-            (5, 0, espressopp.Real3D(3.3, 3.3, 3.0), espressopp.Real3D(0.04,  0.17, -0.20),  1.0, 1) 
+            (5, 0, espressopp.Real3D(3.3, 3.3, 3.0), espressopp.Real3D(0.04,  0.17, -0.20),  1.0, 1)
         ]
 
         tuples = [(6,1,2,3,4,5)]
@@ -67,7 +67,7 @@ class TestRattle(unittest.TestCase):
         constrainedBondsList = [[1, 2, 0.1, 3.0, 1.0], [3, 4, 0.1, 3.0, 1.0], [3, 5, 0.1, 3.0, 1.0]] #pid1,pid2,constraintDist,mass1,mass2
         constraintDist2 = []
         for bond in constrainedBondsList:
-          constraintDist2.append(bond[2]*bond[2])
+            constraintDist2.append(bond[2]*bond[2])
 
         self.system.storage.addParticles(particle_list, 'id', 'type', 'pos', 'v', 'mass','adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
@@ -80,13 +80,13 @@ class TestRattle(unittest.TestCase):
         #one unconstrained bond
         fpl = espressopp.FixedPairListAdress(self.system.storage, ftpl)
         fpl.addBonds([(1,3)])
-        pot = espressopp.interaction.Harmonic(K=5.0, r0=0.2) 
+        pot = espressopp.interaction.Harmonic(K=5.0, r0=0.2)
         interB = espressopp.interaction.FixedPairListHarmonic(self.system, fpl, pot)
         self.system.addInteraction(interB)
         #some angles
         ftl = espressopp.FixedTripleListAdress(self.system.storage, ftpl)
         ftl.addTriples([(2,1,3),(1,3,4),(1,3,5)])
-        pot = espressopp.interaction.AngularHarmonic(K=5.0, theta0=math.pi/2.0) 
+        pot = espressopp.interaction.AngularHarmonic(K=5.0, theta0=math.pi/2.0)
         interA = espressopp.interaction.FixedTripleListAngularHarmonic(self.system, ftl, pot)
         self.system.addInteraction(interA)
 
@@ -104,16 +104,16 @@ class TestRattle(unittest.TestCase):
 
         #check if bond lengths are the same as constraint lengths
         for i,bond in enumerate(constrainedBondsList):
-          pid1 = bond[0]
-          pid2 = bond[1]
-          dist2 = sqrlen(self.system.bc.getMinimumImageVector(self.system.storage.getParticle(pid1).pos,self.system.storage.getParticle(pid2).pos))
-          self.assertAlmostEqual(constraintDist2[i],dist2,places=6)
+            pid1 = bond[0]
+            pid2 = bond[1]
+            dist2 = sqrlen(self.system.bc.getMinimumImageVector(self.system.storage.getParticle(pid1).pos,self.system.storage.getParticle(pid2).pos))
+            self.assertAlmostEqual(constraintDist2[i],dist2,places=6)
 
         #check velocities after 5 steps of deterministic simulation
         vsum = 0.0
-        for pid in xrange(1,6):
-          part = self.system.storage.getParticle(pid)
-          vsum += sqrlen(part.v)
+        for pid in range(1,6):
+            part = self.system.storage.getParticle(pid)
+            vsum += sqrlen(part.v)
         self.assertAlmostEqual(vsum,0.3842668659,places=6)
 
 

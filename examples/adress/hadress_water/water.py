@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -21,7 +21,7 @@
 #  ESPResSo++ Python script for H-AdResS Water                            #
 #  simulation  based on Gromacs topology                                  #
 ###########################################################################
-	
+
 import math
 import sys
 import time
@@ -40,7 +40,7 @@ from espressopp.tools import timers
 
 # simulation parameters (nvt = False is nve)
 steps = 100000
-check = steps/1
+check = steps//1
 timestep = 0.0005
 
 # parameters to convert GROMACS tabulated potential file
@@ -117,7 +117,7 @@ for pid in range(num_particles):
 num_particlesCG = len(x)/3
 typeCG=0
 # create CG particles
-for pidCG in range(num_particlesCG):
+for pidCG in range(int(num_particlesCG)):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
     #cmp = espressopp.tools.AdressSetCG(3, pidCG, allParticlesAT)
 
@@ -178,9 +178,9 @@ potCG = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rca) # CG
 for n in range(system.getNumberOfInteractions()):
     interaction=system.getInteraction(n)
     if interaction.bondType() == espressopp.interaction.Nonbonded:
-	print "Setting CG interaction", typeCG
-	interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
-	break
+        print("Setting CG interaction", typeCG)
+        interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
+        break
 
 # set up bonded interactions according to the parameters read from the .top file
 bondedinteractions=gromacs.setBondedInteractionsAdress(system, bondtypes, bondtypeparams, ftpl)
@@ -207,16 +207,16 @@ integrator.addExtension(adress)
 espressopp.tools.AdressDecomp(system, integrator)
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 configurations = espressopp.analysis.Configurations(system)
@@ -225,36 +225,36 @@ temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 pressureTensor = espressopp.analysis.PressureTensor(system)
 
-print "i*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal"
+print("i*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
 
-start_time = time.clock()
+start_time = time.process_time()
 outfile = open("esp.dat", "w")
 
 # write a snapshot of the system
 espressopp.tools.psfwrite("system.psf", system, typenames={0:'H', 1:'O', 2:'CG'})
 espressopp.tools.pdbwrite("system.pdb", system, append=False, typenames={0:'H', 1:'O', 2:'CG'})
 
-for i in range(check):
+for i in range(int(check)):
 
     T = temperature.compute()
     P = pressure.compute()
     Eb = 0
     EAng = 0
-    for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-    for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
+    for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
     ELj= ljinteraction.computeEnergy()
     EQQ= qq_interactions.computeEnergy()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+EQQ+ELj
     outfile.write(fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
-    print (fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal))
+    print((fmt%(i*steps/check*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal)))
 
-    integrator.run(steps/check) # print out every steps/check steps
+    integrator.run(steps//check) # print out every steps/check steps
 
 
 # simulation information
-end_time = time.clock()
-sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
+end_time = time.process_time()
+sys.stdout.write('Neighbor list builds = %d\n' % verletlist.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

@@ -1,23 +1,26 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
+#  Copyright (C) 2020(H)
+#      Institute Jozef Stefan
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 #
 
@@ -32,67 +35,67 @@ class TestFixedLocalTupleList(unittest.TestCase) :
 
     def setUp(self) :
         system = espressopp.System()
-        
+
         rng  = espressopp.esutil.RNG()
-        
+
         N    = 4
         SIZE = float(N)
         box  = Real3D(SIZE)
         bc   = espressopp.bc.OrthorhombicBC(None, box)
-        
+
         system.bc = bc
-        
+
         # a small skin avoids rounding problems
-        
+
         system.skin = 0.001
-    
-        cutoff = SIZE/2. - system.skin 
-        
+
+        cutoff = SIZE/2. - system.skin
+
         comm = espressopp.MPI.COMM_WORLD
-        
+
         nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,system.skin)
         cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
-        
-        print 'NodeGrid = %s'%(nodeGrid,)
-        print 'CellGrid = %s'%cellGrid
+
+        print('NodeGrid = %s'%(nodeGrid,))
+        print('CellGrid = %s'%(cellGrid,))
 
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         pid = 0
 
-        for i in xrange(N):
-            for j in xrange(N):
-                for k in xrange(N):
-                    
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+
                     r = 0.5
                     x = (i + r) / N * SIZE
                     y = (j + r) / N * SIZE
                     z = (k + r) / N * SIZE
-   
+
                     system.storage.addParticle(pid, Real3D(x, y, z))
 
                     pid = pid + 1
 
-        for i in xrange(N):
-            for j in xrange(N):
-                for k in xrange(N):
-                    
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+
                     r = 0.25
                     x = (i + r) / N * SIZE
                     y = (j + r) / N * SIZE
                     z = (k + r) / N * SIZE
-   
+
                     system.storage.addParticle(pid, Real3D(x, y, z))
 
                     pid = pid + 1
-                    
+
         system.storage.decompose()
-        
-	# now build Fixed Local Tuple List
+
+        # now build Fixed Local Tuple List
         tuplelist = espressopp.FixedLocalTupleList(system.storage)
 
-	self.system = system
-	self.N = N
-	self.tuplelist = tuplelist
+        self.system = system
+        self.N = N
+        self.tuplelist = tuplelist
 
     # This function checks the size of empty FixedLocalTupleList.
     def test_create_fixedtuplelist(self) :
@@ -104,35 +107,35 @@ class TestFixedLocalTupleList(unittest.TestCase) :
     # For getTuples(), this function test
     # whether a tuplelist obtained by getTuples equals added tuplelist
     def test_add_get_fixedtuplelist(self) :
-	system = self.system
-	N = self.N
-	tuplelist = self.tuplelist
+        system = self.system
+        N = self.N
+        tuplelist = self.tuplelist
 
         # FixedLocalTupleList contain particles
         num_constrain = N*N
         stored = []
-        for i in range(N*N*N/num_constrain):
-            tuple = []
+        for i in range(int(N*N*N/num_constrain)):
+            pairs = []
             for j in range(num_constrain):
-                tuple.append(num_constrain*i + j)
-            tuplelist.addTuple(tuple)
-            stored.append(tuple)
+                pairs.append(int(num_constrain*i + j))
+            tuplelist.addTuple(pairs)
+            stored.append(pairs)
 
         num_constrain = N*N/2
-        for i in range(N*N*N/num_constrain, 2*N*N*N/num_constrain):
-            tuple = []
-            for j in range(num_constrain):
-                tuple.append(num_constrain*i + j)
-            tuplelist.addTuple(tuple)
-            stored.append(tuple)
+        for i in range(int(N*N*N/num_constrain), int(2*N*N*N/num_constrain)):
+            pairs = []
+            for j in range(int(num_constrain)):
+                pairs.append(int(num_constrain*i + j))
+            tuplelist.addTuple(pairs)
+            stored.append(pairs)
 
-	# check the size of FixedLocalTupleList
+        # check the size of FixedLocalTupleList
         self.assertEqual(sum(tuplelist.size(), 0), 1.5*N*N*N/num_constrain)
 
         # check the contained particles id
         g_tuplelist = tuplelist.getTuples()
         s_id = 0
-        for i in range(3*N*N*N/num_constrain/2):
+        for i in range(int(3*N*N*N/num_constrain/2)):
             for j in range(espressopp.MPI.COMM_WORLD.size):
                 if stored[s_id] in g_tuplelist[j]:
                     break
@@ -141,4 +144,3 @@ class TestFixedLocalTupleList(unittest.TestCase) :
 
 if __name__ == "__main__":
     unittest.main()
-

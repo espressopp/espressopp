@@ -10,12 +10,12 @@ if (MPI4PY_INCLUDES)
   set (MPI4PY_FIND_QUIETLY TRUE)
 endif (MPI4PY_INCLUDES)
 
-if(PYTHON_EXECUTABLE)
-  execute_process(COMMAND ${PYTHON_EXECUTABLE} 
-                -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0)"
-		OUTPUT_VARIABLE PYTHON_SITEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(Python3_EXECUTABLE)
+  execute_process(COMMAND ${Python3_EXECUTABLE} 
+      -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0))"
+		OUTPUT_VARIABLE Python3_SITEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" 
+  execute_process(COMMAND "${Python3_EXECUTABLE}" 
                 -c "import sys, mpi4py; sys.stdout.write(mpi4py.__version__)"
                     OUTPUT_VARIABLE MPI4PY_VERSION
                     RESULT_VARIABLE _MPI4PY_VERSION_RESULT
@@ -24,21 +24,23 @@ if(PYTHON_EXECUTABLE)
     message("-- mpi4py version: " ${MPI4PY_VERSION})
   else()
     set(MPI4PY_VERSION 0.0)
+    message("-- mpi4py version: " ${MPI4PY_VERSION})
   endif()
 
   execute_process(COMMAND
-      "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print mpi4py.get_include()"
+      "${Python3_EXECUTABLE}" "-c" "import mpi4py; print(mpi4py.get_include())"
       OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-  
-endif(PYTHON_EXECUTABLE)
+  message(STATUS "MPI4PY_INCLUDE = ${MPI4PY_INCLUDE_DIR}")
+endif(Python3_EXECUTABLE)
 
-find_path (MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${PYTHON_SITEDIR}/mpi4py/include )
+find_path(MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${Python3_SITEDIR}/mpi4py/include )
 if(NOT MPI4PY_INCLUDES)
   message("     mpi4py.h not found. Please make sure you have installed the developer version of mpi4py")
 endif()
 
-find_file (MPI4PY_LIBRARIES MPI.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${PYTHON_SITEDIR}/mpi4py)
+message(STATUS "Looking for MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so")
+find_file (MPI4PY_LIBRARIES NAMES MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so MPI.cpython-${PYTHON_VERSION_NO_DOT}m-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${Python3_SITEDIR}/mpi4py)
 
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE

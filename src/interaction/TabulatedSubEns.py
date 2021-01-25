@@ -25,112 +25,112 @@ espressopp.interaction.TabulatedSubEns
 
 .. function:: espressopp.interaction.TabulatedSubEns()
 
-		:param itype:
-		:param filename:
-		:param cutoff: (default: infinity)
-		:type itype:
-		:type filename:
-		:type cutoff:
+                :param itype:
+                :param filename:
+                :param cutoff: (default: infinity)
+                :type itype:
+                :type filename:
+                :type cutoff:
 
 .. function:: espressopp.interaction.VerletListAdressTabulatedSubEns(vl, fixedtupleList)
 
-		:param vl:
-		:param fixedtupleList:
-		:type vl:
-		:type fixedtupleList:
+                :param vl:
+                :param fixedtupleList:
+                :type vl:
+                :type fixedtupleList:
 
 .. function:: espressopp.interaction.VerletListAdressTabulatedSubEns.setPotentialAT(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListAdressTabulatedSubEns.setPotentialCG(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressTabulatedSubEns(vl, fixedtupleList)
 
-		:param vl:
-		:param fixedtupleList:
-		:type vl:
-		:type fixedtupleList:
+                :param vl:
+                :param fixedtupleList:
+                :type vl:
+                :type fixedtupleList:
 
 .. function:: espressopp.interaction.VerletListHadressTabulatedSubEns.setPotentialAT(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressTabulatedSubEns.setPotentialCG(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListTabulatedSubEns(vl)
 
-		:param vl:
-		:type vl:
+                :param vl:
+                :type vl:
 
 .. function:: espressopp.interaction.VerletListTabulatedSubEns.getPotential(type1, type2)
 
-		:param type1:
-		:param type2:
-		:type type1:
-		:type type2:
-		:rtype:
+                :param type1:
+                :param type2:
+                :type type1:
+                :type type2:
+                :rtype:
 
 .. function:: espressopp.interaction.VerletListTabulatedSubEns.setPotential(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.CellListTabulatedSubEns(stor)
 
-		:param stor:
-		:type stor:
+                :param stor:
+                :type stor:
 
 .. function:: espressopp.interaction.CellListTabulatedSubEns.setPotential(type1, type2, potential)
 
-		:param type1:
-		:param type2:
-		:param potential:
-		:type type1:
-		:type type2:
-		:type potential:
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListTabulatedSubEns(system, vl, potential)
 
-		:param system:
-		:param vl:
-		:param potential:
-		:type system:
-		:type vl:
-		:type potential:
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListTabulatedSubEns.setPotential(potential)
 
-		:param potential:
-		:type potential:
+                :param potential:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListTypesTabulatedSubEns(system, ftl)
 
@@ -264,49 +264,43 @@ if pmi.isController:
             cls = 'espressopp.interaction.TabulatedSubEnsLocal',
             pmicall = ['weight_get', 'weight_set',
                        'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
-				       'colVarSd_get', 'colVarSd_set',
-				       'dimension_get', 'filenames_get', 'filename_get',
-				       'filename_set', 'addInteraction', 'colVarRefs_get',
-				       'colVarRef_get']
+                                       'colVarSd_get', 'colVarSd_set',
+                                       'dimension_get', 'filenames_get', 'filename_get',
+                                       'filename_set', 'addInteraction', 'colVarRefs_get',
+                                       'colVarRef_get']
             )
 
-    class VerletListAdressTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressTabulatedSubEnsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListHadressTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressTabulatedSubEnsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListTabulatedSubEnsLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class CellListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListTabulatedSubEnsLocal',
             pmicall = ['setPotential']
             )
 
-    class FixedPairListTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTabulatedSubEnsLocal',
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
 
-    class FixedPairListTypesTabulatedSubEns(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesTabulatedSubEnsLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']

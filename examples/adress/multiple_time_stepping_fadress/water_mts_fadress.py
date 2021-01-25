@@ -34,13 +34,13 @@ from espressopp.tools import decomp
 # All atomistic interactions (both bonded and non-bonded) are integrated on the fast time scale, while coarse-grained
 # interactions are calculated on the slow time scale. The atomistic force field is SPC/Fw with reaction field
 # while the coarse-grained interaction potential is a potential derived from iterative Boltzmann inversion.
-print 'Performing an ESPResSo++ F-AdResS simulation with multiple time stepping.\n'
+print('Performing an ESPResSo++ F-AdResS simulation with multiple time stepping.\n')
 
 ########################################################
 #  1. specification of the system setup and simulation parameters  #
 ########################################################
 
-print 'Specifying simulation parameters...'
+print('Specifying simulation parameters...')
 totaltime = 0.25 # total runtime (in ps)
 printfreq = 0.005 # frequency (in ps) to print outputs
 timestep = 0.0005 # short timestep
@@ -49,7 +49,7 @@ longstep = 0.0025 # long timestep
 multistep = int(longstep/timestep) # short steps per single long step
 steps = int(totaltime/longstep) # total number of long steps
 checkfreq = int(printfreq/longstep) # number of long time steps between printed outputs/checks
-check = steps/checkfreq # number of intervals to run the integrator between checks
+check = int(steps/checkfreq) # number of intervals to run the integrator between checks
 
 interaction_cutoff_cg = 1.0  # cutoff coarse-grained potential
 interaction_cutoff_at = 1.0  # cutoff atomistic potential
@@ -65,13 +65,13 @@ correction_on_slow_timescale = False # apply corrections on slow timescale?
 #  2. read in coordinates  #
 ######################
 
-print 'Reading in coordinates... (not equilibrated!)'
+print('Reading in coordinates... (not equilibrated!)')
 # call the gromacs parser for processing the top file (and included files) and the conf file (note that this configuration is most likely not equilibrated)
 defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, vx, vy, vz, resname, resid, Lx, Ly, Lz = gromacs.read("conf.gro", "topol.top")
 
 # particles, geometry, density
 num_particles_AT = len(x)
-num_particles_CG = len(x)/3
+num_particles_CG = len(x)//3
 density = num_particles_AT / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
@@ -79,7 +79,7 @@ size = (Lx, Ly, Lz)
 #  3. set up the system  #
 #####################
 
-print 'Setting up system...'
+print('Setting up system...')
 # system, boundary conditions, skin, communicator, node & cell grids
 system = espressopp.System()
 system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
@@ -100,7 +100,7 @@ system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, 
 #  4. add particles to system  #
 ##########################
 
-print 'Adding particles and tuples...'
+print('Adding particles and tuples...')
 props = ['id', 'pos', 'v', 'f', 'type', 'mass', 'q', 'adrat']
 allParticlesAT = []
 allParticles = []
@@ -161,7 +161,7 @@ system.storage.decompose()
 #  5. set up structure, interactions, and force field  #
 ###########################################
 
-print 'Setting up interactions and force field...'
+print('Setting up interactions and force field...')
 # create the adaptive resolution verlet list
 verletlist = espressopp.VerletListAdress(system, cutoff=interaction_cutoff_cg, adrcut=interaction_cutoff_verletlist_at,
                                          dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
@@ -195,7 +195,7 @@ verletlist.exclude(exclusions)
 #  6. set up integration scheme and corrections  #
 #########################################
 
-print 'Setting up integration scheme (RESPA velocity verlet integrator)...'
+print('Setting up integration scheme (RESPA velocity verlet integrator)...')
 # set up the RESPA VelocityVerlet Integrator
 integrator = espressopp.integrator.VelocityVerletRESPA(system)
 integrator.dt = timestep
@@ -225,25 +225,25 @@ espressopp.tools.AdressDecomp(system, integrator)
 ###########################
 
 # print simulation parameters
-print ''
-print 'this is Force-based AdResS!'
-print 'number of atomistic particles =', num_particles_AT
-print 'number of coarse-grained particles =', num_particles_CG
-print 'size =', size
-print 'density =', density
-print 'size of high resolution atomistic region =', ex_size
-print 'size of hybrid region =', hy_size
-print 'atomistic interaction cutoff =', interaction_cutoff_at
-print 'coarse-grained interaction cutoff =', interaction_cutoff_cg
-print 'atomistic interaction cutoff in verletlist =', interaction_cutoff_verletlist_at
-print 'skin =', skin
-print 'short timestep =', timestep
-print 'long timestep =', longstep
-print 'total run time =', totaltime
-print 'total steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('this is Force-based AdResS!')
+print('number of atomistic particles =', num_particles_AT)
+print('number of coarse-grained particles =', num_particles_CG)
+print('size =', size)
+print('density =', density)
+print('size of high resolution atomistic region =', ex_size)
+print('size of hybrid region =', hy_size)
+print('atomistic interaction cutoff =', interaction_cutoff_at)
+print('coarse-grained interaction cutoff =', interaction_cutoff_cg)
+print('atomistic interaction cutoff in verletlist =', interaction_cutoff_verletlist_at)
+print('skin =', skin)
+print('short timestep =', timestep)
+print('long timestep =', longstep)
+print('total run time =', totaltime)
+print('total steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 ##################
 #  8. run simulation  #
@@ -252,40 +252,40 @@ print ''
 # temperature analysis, timer, logfile
 # note that the temperature will differ from target temperature since degrees of freedom are removed in the coarse-grained area, which is not taken into account here
 temperature = espressopp.analysis.Temperature(system)
-start_time = time.clock()
+start_time = time.process_time()
 outfile = open("esp.dat", "w")
 
 # output format
-print 'Starting the integration loop...'
-print ''
-print "time, temperature, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total"
+print('Starting the integration loop...')
+print('')
+print("time, temperature, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total")
 fmt = '%5.5f %15.8g %15.10g %15.10g %15.10g %15.10g %15.10g\n'
 
 # initial state
 temp = temperature.compute()
 E_bonds = 0
 E_angles = 0
-for bd in bondedinteractions.values(): E_bonds += bd.computeEnergy()
-for ang in angleinteractions.values(): E_angles += ang.computeEnergy()
+for bd in list(bondedinteractions.values()): E_bonds += bd.computeEnergy()
+for ang in list(angleinteractions.values()): E_angles += ang.computeEnergy()
 E_nonbonded = interNBat.computeEnergy() + interNBcg.computeEnergy()
 E_kinetic = 0.5 * temp * (3 * num_particles_AT)
 E_total = E_kinetic + E_bonds + E_angles + E_nonbonded
 outfile.write(fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total))
-print (fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total))
+print((fmt%(0, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total)))
 
 # run integration
-for i in range(check):
-    integrator.run(steps/check)
+for i in range(int(check)):
+    integrator.run(steps//check)
     temp = temperature.compute()
     E_bonds = 0
     E_angles = 0
-    for bd in bondedinteractions.values(): E_bonds += bd.computeEnergy()
-    for ang in angleinteractions.values(): E_angles += ang.computeEnergy()
+    for bd in list(bondedinteractions.values()): E_bonds += bd.computeEnergy()
+    for ang in list(angleinteractions.values()): E_angles += ang.computeEnergy()
     E_nonbonded = interNBat.computeEnergy() + interNBcg.computeEnergy()
     E_kinetic = 0.5 * temp * (3 * num_particles_AT)
     E_total = E_kinetic + E_bonds + E_angles + E_nonbonded
     outfile.write(fmt%((i+1)*steps*multistep/check*timestep, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total))
-    print (fmt%((i+1)*steps*multistep/check*timestep, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total))
+    print((fmt%((i+1)*steps*multistep/check*timestep, temp, E_bonds, E_angles, E_nonbonded, E_kinetic, E_total)))
 
 ###########
 #  9. Done  #
@@ -298,6 +298,6 @@ outfile.close()
 espressopp.tools.writexyz("output.xyz", system)
 
 # time Information
-end_time = time.clock()
-print 'Successfully finished simulation.'
-print 'Run time = %.1f seconds' % (end_time - start_time)
+end_time = time.process_time()
+print('Successfully finished simulation.')
+print('Run time = %.1f seconds' % (end_time - start_time))

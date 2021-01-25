@@ -27,16 +27,16 @@ espressopp.analysis.Velocities
 
 .. function:: espressopp.analysis.Velocities(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 
 .. function:: espressopp.analysis.Velocities.clear()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.Velocities.gather()
 
-		:rtype:
+                :rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -47,22 +47,23 @@ from _espressopp import analysis_Velocities
 class VelocitiesLocal(ObservableLocal, analysis_Velocities):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_Velocities, system)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_Velocities, system)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):
         return self.cxxclass.clear(self)
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+    def __next__(self):
+        return self.cxxclass.all(self).next()
 
 if pmi.isController :
-    class Velocities(Observable):
-        __metaclass__ = pmi.Proxy
+    class Velocities(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.VelocitiesLocal',
             pmicall = [ "gather", "clear" ],
             localcall = ["getNParticles", "getCoordinates",
-                         "__getitem__", "__iter__", "all"],
+                         "__getitem__", "__iter__", "all", "__next__"],
             pmiproperty = ["capacity", "size"]
             )

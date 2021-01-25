@@ -28,35 +28,35 @@ It provides the following methods:
 
 .. function:: espressopp.analysis.AnalysisBase.compute()
 
-		Computes the instant value of the observable.
+                Computes the instant value of the observable.
 
-		:rtype: a python list or a scalar
+                :rtype: a python list or a scalar
 
 .. function:: espressopp.analysis.AnalysisBase.getAverageValue()
 
-		Returns the average value for the observable and the standard deviation.
+                Returns the average value for the observable and the standard deviation.
 
-		:rtype: a python list
+                :rtype: a python list
 
 .. function:: espressopp.analysis.AnalysisBase.getNumberOfMeasurements()
 
-		counts the number of measurements that have been performed (standalone or in integrator)
-		does _not_ include measurements that have been done using "compute()"
+                counts the number of measurements that have been performed (standalone or in integrator)
+                does _not_ include measurements that have been done using "compute()"
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.AnalysisBase.performMeasurement()
 
-		Computes the observable and updates average and standard deviation
+                Computes the observable and updates average and standard deviation
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.analysis.AnalysisBase.reset()
 
-		Resets average and standard deviation
+                Resets average and standard deviation
 
-		:rtype:
-                    
+                :rtype:
+
 """
 
 from espressopp import pmi
@@ -91,9 +91,8 @@ class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
             return self.cxxclass.getNumberOfMeasurements(self)
 
 if pmi.isController :
-    class AnalysisBase(ParticleAccess):
+    class AnalysisBase(ParticleAccess, metaclass=pmi.Proxy):
 
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "performMeasurement", "reset", "compute", "getAverageValue", "getNumberOfMeasurements" ]
             )

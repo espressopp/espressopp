@@ -46,8 +46,8 @@ namespace espressopp {
                 key = "unfolded";
             }
 
-            MeanSquareDispl(shared_ptr<System> system, int chainlength) :
-                                ConfigsParticleDecomp(system, chainlength) {
+            MeanSquareDispl(shared_ptr<System> system, int chainlength, int start_pid) :
+                                ConfigsParticleDecomp(system, chainlength, start_pid) {
                 // by default 
                 setPrint_progress(true);
                 key = "unfolded";

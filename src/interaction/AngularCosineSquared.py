@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 """
@@ -25,9 +25,9 @@ Calculates the Angular Cosine Squared potential as:
 .. math::
 
     U =  K [cos(\\theta) - cos(\\theta_{0})]^2,
-    
+
 where angle :math:`\\theta` is the planar angle formed by three binded particles
-(triplet or triple). 
+(triplet or triple).
 
 This potential is employed by:
 
@@ -55,15 +55,15 @@ This is done via:
 
     .. py:method:: setPotential(type1, type2, potential)
 
-        :param type1: 
-        :param type2: 
-        :param potential: 
-        :type type1: 
-        :type type2: 
-        :type potential: 
-           
-**Example 1.** Creating a fixed triple list by :py:class:`espressopp.FixedTripleList`.    
-    
+        :param type1:
+        :param type2:
+        :param potential:
+        :type type1:
+        :type type2:
+        :type potential:
+
+**Example 1.** Creating a fixed triple list by :py:class:`espressopp.FixedTripleList`.
+
     >>> # we assume a polymer solution of n_chains of the length chain_len each.
     >>> # At first, create a list_of_triples for the system:
     >>> N = n_chains * chain_len            # number of particles in the system
@@ -128,8 +128,7 @@ if pmi.isController:
             pmiproperty = ['K', 'theta0']
             )
 
-    class FixedTripleListAngularCosineSquared(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedTripleListAngularCosineSquared(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListAngularCosineSquaredLocal',
             pmicall = ['setPotential','getFixedTripleList']

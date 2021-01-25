@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2020
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -29,8 +31,10 @@
 #include "python.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
+#include "esutil/Timer.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
+#include "esutil/Array2D.hpp"
 
 namespace espressopp {
 
@@ -52,7 +56,7 @@ namespace espressopp {
 
     */
 
-    VerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletList(shared_ptr< System >, real cut, bool rebuildVL, bool useBuffers=true, bool useSOA=false);
 
     ~VerletList();
 
@@ -60,6 +64,8 @@ namespace espressopp {
 
     python::tuple getPair(int i);
     
+    std::uint64_t getMaxType() { return max_type; }
+
     real getVerletCutoff(); // returns cutoff + skin
 
     void connect();
@@ -83,21 +89,55 @@ namespace espressopp {
     /** Set the number of times the Verlet list has been rebuilt */
     void setBuilds(int _builds) { builds = _builds; }
 
+    void resetTimers();
+
+    void loadTimers(real* t);
+
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
   protected:
 
+    std::vector<real> c_x,c_y,c_z;
+    std::vector<Real3D> c_pos;
+    std::vector<Particle*> c_p;
+    std::vector<size_t> c_id, c_type;
+
+    inline void rebuildUsingBuffers(bool useExList, bool useSOA)
+    {
+      if(useExList) {
+        if(useSOA)
+          _rebuildUsingBuffers<true,true>();
+        else
+          _rebuildUsingBuffers<true,false>();
+      } else {
+        if(useSOA)
+          _rebuildUsingBuffers<false,true>();
+        else
+          _rebuildUsingBuffers<false,false>();
+      }
+    }
+
+    template< bool USE_EXCLUSION_LIST, bool USE_SOA >
+    void _rebuildUsingBuffers();
+
+    bool useBuffers = false;
+    bool useSOA = false;
+
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
     
+    std::uint64_t max_type;
     real cutsq;
     real cut;
     real cutVerlet;
     
     int builds;
     boost::signals2::connection connectionResort;
+
+    esutil::WallTimer timer;
+    real timeRebuild;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

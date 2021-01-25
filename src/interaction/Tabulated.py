@@ -925,85 +925,73 @@ if pmi.isController:
             pmiproperty = ['itype', 'filename', 'cutoff']
             )
 
-    class VerletListAdressCGTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressCGTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressCGTabulatedLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListAdressTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressTabulatedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListHadressCGTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressCGTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressCGTabulatedLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListHadressTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListHadressTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressTabulatedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class VerletListPIadressTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListPIadressTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListPIadressTabulatedLocal',
             pmicall = ['setPotentialQM','setPotentialCL','setVerletList', 'getVerletList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
             )
 
-    class VerletListPIadressTabulatedLJ(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListPIadressTabulatedLJ(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListPIadressTabulatedLJLocal',
             pmicall = ['setPotentialQM','setPotentialCL','setVerletList', 'getVerletList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
             )
 
-    class VerletListPIadressNoDriftTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListPIadressNoDriftTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListPIadressNoDriftTabulatedLocal',
             pmicall = ['setPotential','setVerletList', 'getVerletList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
             )
 
-    class VerletListTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListTabulatedLocal',
             pmicall = ['setPotential','getPotential']
             )
 
-    class CellListTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListTabulatedLocal',
             pmicall = ['setPotential']
             )
 
-    class FixedPairListTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTabulatedLocal',
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
 
-    class FixedPairListTypesTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListTypesTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesTabulatedLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
             )
 
-    class FixedPairListPIadressTabulated(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedPairListPIadressTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListPIadressTabulatedLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList', 'getFixedPairList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']

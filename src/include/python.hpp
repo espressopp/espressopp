@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2018-2019
+      The VOTCA Development Team
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -23,8 +25,29 @@
 #ifndef _PYTHON_HPP
 #define _PYTHON_HPP
 
-#include "acconfig.hpp"
+//! Macro to detect strictly gcc.
+//! \details __GNUC__ and __GNUG__ were intended to indicate the GNU compilers.
+//! However, they're also defined by Clang/LLVM and Intel compilers to indicate
+//! compatibility. This macro can be used to detect strictly gcc and not clang
+//! or icc.
+#if (defined(__GNUC__) || defined(__GNUG__)) && \
+    !(defined(__clang__) || defined(__INTEL_COMPILER))
+#define STRICT_GNUC
+#define GCC_VERSION \
+  (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+
+#if (defined STRICT_GNUC) && GCC_VERSION > 50000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wplacement-new"
+#endif
 #include <boost/python.hpp>
+#if (defined STRICT_GNUC) && GCC_VERSION > 50000
+#pragma GCC diagnostic pop
+#endif
+
+#include "acconfig.hpp"
 #include "types.hpp"
 
 namespace espressopp {
@@ -63,6 +86,7 @@ namespace espressopp {
       template <class DerivedT>
       inline class_(char const* name, char const* doc, boost::python::init_base<DerivedT> const& i)
 	: base(name, doc, i) {}
+
     };
   }
 }

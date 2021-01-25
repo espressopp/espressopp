@@ -49,8 +49,7 @@ class KineticEnergyLocal(ObservableLocal, analysis_KineticEnergy):
                 cxxinit(self, analysis_KineticEnergy, system, temperature)
 
 if pmi.isController:
-    class KineticEnergy(Observable):
-        __metaclass__ = pmi.Proxy
+    class KineticEnergy(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.analysis.KineticEnergyLocal',
             pmiproperty=['value']

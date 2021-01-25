@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
 **********************
@@ -26,46 +26,46 @@ espressopp.MultiSystem
 .. function:: espressopp.MultiSystem()
 .. function:: espressopp.MultiSystem.beginSystemDefinition()
 
-		:rtype: 
-		
+                :rtype:
+
 .. function:: espressopp.MultiSystem.runAnalysisNPart()
 
-		:rtype: 
-		
+                :rtype:
+
 .. function:: espressopp.MultiSystem.runAnalysisPotential()
 
-		:rtype: 
-		
+                :rtype:
+
 .. function:: espressopp.MultiSystem.runAnalysisTemperature()
 
-		:rtype: 
-		
+                :rtype:
+
 .. function:: espressopp.MultiSystem.runIntegrator(niter)
 
-		:param niter: 
-		:type niter: 
-		:rtype: 
-		
+                :param niter:
+                :type niter:
+                :rtype:
+
 .. function:: espressopp.MultiSystem.setAnalysisNPart(npart)
 
-		:param npart: 
-		:type npart: 
-		
+                :param npart:
+                :type npart:
+
 .. function:: espressopp.MultiSystem.setAnalysisPotential(potential)
 
-		:param potential: 
-		:type potential: 
-		
+                :param potential:
+                :type potential:
+
 .. function:: espressopp.MultiSystem.setAnalysisTemperature(temperature)
 
-		:param temperature: 
-		:type temperature: 
-		
+                :param temperature:
+                :type temperature:
+
 .. function:: espressopp.MultiSystem.setIntegrator(integrator)
 
-		:param integrator: 
-		:type integrator: 
-		
+                :param integrator:
+                :type integrator:
+
 """
 
 from espressopp.esutil import cxxinit
@@ -74,7 +74,7 @@ import mpi4py.MPI as MPI
 
 class MultiSystemLocal(object):
     """Local MultiSystem to simulate and analyze several systems in parallel."""
-    
+
     def __init__(self):
         pass
 
@@ -83,7 +83,7 @@ class MultiSystemLocal(object):
             if pmi._PMIComm.getMPIsubcomm() != MPI.COMM_NULL:
                 self.groupRank = pmi._PMIComm.getMPIsubcomm().rank
             else:
-                print "_MPIsubcomm is MPI.COMM_NULL"
+                print("_MPIsubcomm is MPI.COMM_NULL")
         else:
             self.groupRank = pmi._MPIcomm.rank
 
@@ -110,7 +110,7 @@ class MultiSystemLocal(object):
             return self.analysisTemperature.cxxclass.compute(self.analysisTemperature)
         else :
             self.analysisTemperature.cxxclass.compute(self.analysisTemperature)
-            
+
     def runAnalysisPotential(self):
         if self.groupRank == 0:
             return self.analysisPotential.cxxclass.computeEnergy(self.analysisPotential)
@@ -130,9 +130,8 @@ class MultiSystemLocal(object):
             self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
 
 if pmi.isController :
-    class MultiSystem(object):
+    class MultiSystem(metaclass=pmi.Proxy):
         """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.MultiSystemLocal',
             pmicall = [ 'setIntegrator', 'runIntegrator', 'setAnalysisTemperature', 'beginSystemDefinition',

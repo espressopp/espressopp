@@ -36,6 +36,10 @@ endif (EXTERNAL_MPI4PY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_BINARY_DIR}/ESPRC @ONLY)
 
+#build .env for pipenv
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
+  ${CMAKE_BINARY_DIR}/.env @ONLY)
+
 #after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
@@ -45,10 +49,14 @@ if (WITH_RC_FILES)
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ESPRC DESTINATION bin)
 endif (WITH_RC_FILES)
 
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+find_package(Threads REQUIRED)
+set(Boost_USE_MULTITHREADED ON)
+
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 if(WITH_XTC)
   target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
 endif()

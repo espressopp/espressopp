@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2020
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2017
       Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
   
@@ -40,10 +42,10 @@ namespace espressopp {
     bool DumpXTC::open(const char *mode){
 
       if(mode[0] == 'a' && !boost::filesystem::exists(file_name)){
-        fio = open_xtc(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
+        fio = open_trx(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
       }
       else{
-        fio = open_xtc(file_name.c_str(),mode); 
+        fio = open_trx(file_name.c_str(),mode);
       }
 
       return true;
@@ -51,7 +53,7 @@ namespace espressopp {
 
     void DumpXTC::close(){
 
-      close_xtc(fio);
+      close_trx(fio);
       
       return;
     }
@@ -64,6 +66,8 @@ namespace espressopp {
       conf.gather();
       
       if( system->comm->rank()==0 ){
+        t_trxframe frame;
+
         ConfigurationExtPtr conf_real = conf.back();
         
         int num_of_particles = conf_real->getSize();
@@ -77,17 +81,6 @@ namespace espressopp {
           RealND props;
           props.setDimension( cei.currentProperties().getDimension() );
 
-          //HACK: Only valid for orthorhombic BC. Will there be anything else in ESPP?
-          Real3D bl=system->bc->getBoxL();
-
-          for(int i=0;i<dim;i++){
-            box[i][0] = 0.;
-            box[i][1] = 0.;
-            box[i][2] = 0.;
-
-            box[i][i] = bl[i]; 
-          }
-
           for(int i=0;i<num_of_particles;i++){
             
             props=cei.nextProperties();
@@ -100,7 +93,32 @@ namespace espressopp {
           int step = integrator->getStep();
           float time = integrator->getTimeStep()*step;
 
-          write_xtc(fio, num_of_particles, step, time, box, coord, xtcprec);
+          frame.natoms = num_of_particles;
+          frame.bTime = true;
+          frame.time = time;
+          frame.bStep = true;
+          frame.step = step;
+          frame.x = coord;
+          frame.bLambda = false;
+          frame.bAtoms = false;
+          frame.bPrec = true;
+          frame.prec = xtcprec;
+          frame.bX = true;
+          frame.bF = false;
+          frame.bBox = true;
+
+          //HACK: Only valid for orthorhombic BC. Will there be anything else in ESPP?
+          Real3D bl=system->bc->getBoxL();
+
+          for(int i=0;i<dim;i++){
+            frame.box[i][0] = 0.;
+            frame.box[i][1] = 0.;
+            frame.box[i][2] = 0.;
+
+            frame.box[i][i] = bl[i]; 
+          }
+
+          write_trxframe(fio, &frame, nullptr);
 
           delete [] coord;
           

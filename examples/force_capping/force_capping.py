@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -19,7 +19,7 @@
 
 #################################################################################
 #                                                                               #
-#  ESPResSo++ Python script for a L-J standadrd system featuring force-capping  # 
+#  ESPResSo++ Python script for a L-J standadrd system featuring force-capping  #
 #                                                                               #
 #################################################################################
 
@@ -42,25 +42,24 @@ system, integrator = espressopp.standard_system.LennardJones(num_particles, box=
 integrator.dt = 0.0001
 
 if forceCapping:
-  max_force = 100000.0
-  # define force capping extension
-  capForce = espressopp.integrator.CapForce(system, max_force)
-  # and add it to the integrator
-  integrator.addExtension(capForce)
+    max_force = 100000.0
+    # define force capping extension
+    capForce = espressopp.integrator.CapForce(system, max_force)
+    # and add it to the integrator
+    integrator.addExtension(capForce)
 
 espressopp.tools.analyse.info(system, integrator)
 
 sock = espressopp.tools.vmd.connect(system)
 for i in range(1000):
-  # make 10 Velocity-Verlet integration steps
-  integrator.run(10)
-  # print system information
-  espressopp.tools.analyse.info(system, integrator)
-  # update postions in VMD
-  espressopp.tools.vmd.imd_positions(system, sock)
-  #switch off force capping after some time
-  if forceCapping and i>100:
-    capForce.disconnect()
-    forceCapping = False
-    print "switching off force capping"
-
+    # make 10 Velocity-Verlet integration steps
+    integrator.run(10)
+    # print system information
+    espressopp.tools.analyse.info(system, integrator)
+    # update postions in VMD
+    espressopp.tools.vmd.imd_positions(system, sock)
+    #switch off force capping after some time
+    if forceCapping and i>100:
+        capForce.disconnect()
+        forceCapping = False
+        print("switching off force capping")

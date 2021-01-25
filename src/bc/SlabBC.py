@@ -38,15 +38,15 @@ Example:
 
 .. py:method:: espressopp.bc.SlabBC(rng, boxL)
 
-		:param rng: 
-		:param boxL: (default: 1.0)
-		:type rng: 
-		:type boxL: real
+                :param rng:
+                :param boxL: (default: 1.0)
+                :type rng:
+                :type boxL: real
 
 .. py:method:: espressopp.bc.SlabBC.setBoxL(boxL)
 
-		:param boxL: 
-		:type boxL: 
+                :param boxL:
+                :type boxL:
 """
 
 from espressopp.esutil import cxxinit

@@ -165,6 +165,7 @@ namespace espressopp {
 
       class_<ConfigurationExtIterator>("ConfigurationExtIterator", no_init)
       .def("next", &ConfigurationExtIterator::nextId)
+      .def("__next__", &ConfigurationExtIterator::nextId)
       .def("__iter__", pass_through)
       ;
 

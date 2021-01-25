@@ -1,5 +1,5 @@
-#!/usr/bin/env python                                                               
-# -*- coding: iso-8859-1 -*-                                                        
+#!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
 
 import time
 import espressopp
@@ -18,14 +18,14 @@ temperature        = 1.0     # set temperature to None for NVE-simulations
 
 # set parameters for simulations
 for i in range(3):
-  line = input_file.readline()
-  parameters = line.split()
-  if parameters[0] == "num_chains:":
-    num_chains = int(parameters[1])
-  if parameters[0] == "monomers_per_chain:":
-    monomers_per_chain = int(parameters[1])
-  if parameters[0] == "system_size:":
-    L = float(parameters[1])
+    line = input_file.readline()
+    parameters = line.split()
+    if parameters[0] == "num_chains:":
+        num_chains = int(parameters[1])
+    if parameters[0] == "monomers_per_chain:":
+        monomers_per_chain = int(parameters[1])
+    if parameters[0] == "system_size:":
+        L = float(parameters[1])
 
 ######################################################################
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
@@ -38,8 +38,8 @@ skin        = 0.3
 timestep    = 0.005
 box         = (L, L, L)
 
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 
 #logging.getLogger("SteepestDescent").setLevel(logging.INFO)
 
@@ -77,18 +77,18 @@ mass     = 1.0
 # do this in chunks of 1000 particles to speed it up
 chain = []
 for i in range(num_chains):
-  startpos = system.bc.getRandomPos()
-  positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
-  for k in range(monomers_per_chain):
-    part = [pid + k, type, mass, positions[k], vel_zero]
-    chain.append(part)
-  pid += monomers_per_chain
-  #type += 1
-  system.storage.addParticles(chain, *props)
-  system.storage.decompose()
-  chain = []
-  bondlist.addBonds(bonds)
-  #anglelist.addTriples(angles)
+    startpos = system.bc.getRandomPos()
+    positions, bonds, angles = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen, True)
+    for k in range(monomers_per_chain):
+        part = [pid + k, type, mass, positions[k], vel_zero]
+        chain.append(part)
+    pid += monomers_per_chain
+    #type += 1
+    system.storage.addParticles(chain, *props)
+    system.storage.decompose()
+    chain = []
+    bondlist.addBonds(bonds)
+    #anglelist.addTriples(angles)
 system.storage.addParticles(chain, *props)
 system.storage.decompose()
 
@@ -103,7 +103,7 @@ interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-potFENE = espressopp.interaction.FENECapped(K=3000.0, r0=0.0, rMax=1.5, cutoff=8, caprad=1.49999)
+potFENE = espressopp.interaction.FENECapped(K=3000.0, r0=0.0, rMax=1.5, cutoff=8, r_cap=1.49999)
 interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE, 'FENE')
 
@@ -113,19 +113,19 @@ system.addInteraction(interFENE, 'FENE')
 #system.addInteraction(interCosine)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'length of system    = ', L
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('length of system    = ', L)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 
@@ -133,27 +133,27 @@ print ''
 #espressopp.tools.pdb.pdbwrite(filename, system, monomers_per_chain, False)
 
 espressopp.tools.analyse.info(system, steepest)
-start_time = time.clock()
+start_time = time.process_time()
 for k in range(10):
-  steepest.run(isteps)
-  espressopp.tools.analyse.info(system, steepest)
+    steepest.run(isteps)
+    espressopp.tools.analyse.info(system, steepest)
 
 # exchange the FENE potential
 espressopp.System.removeInteractionByName(system, 'FENE')
-potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, cutoff=8, caprad=1.499999)
+potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, cutoff=8, r_cap=1.499999)
 interFENE = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE)
 
 for k in range(20):
-  steepest.run(isteps)
-  espressopp.tools.analyse.info(system, steepest)
-end_time = time.clock()
+    steepest.run(isteps)
+    espressopp.tools.analyse.info(system, steepest)
+end_time = time.process_time()
 
 espressopp.tools.analyse.info(system, integrator)
 for k in range(2):
-  integrator.run(isteps)
-  espressopp.tools.analyse.info(system, integrator)
-end_time = time.clock()
+    integrator.run(isteps)
+    espressopp.tools.analyse.info(system, integrator)
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
 

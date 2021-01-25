@@ -27,7 +27,7 @@ espressopp.interaction.HarmonicTrap
 
 .. math::
 
-	U = K \frac{1}{2}d^2
+        U = K \frac{1}{2}d^2
 
 
 
@@ -39,15 +39,15 @@ espressopp.interaction.HarmonicTrap
 
 .. function:: espressopp.interaction.SingleParticleHarmonicTrap(system, potential)
 
-		:param system: 
-		:param potential: 
-		:type system: 
-		:type potential: 
+                :param system:
+                :param potential:
+                :type system:
+                :type potential:
 
 .. function:: espressopp.interaction.SingleParticleHarmonicTrap.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -83,8 +83,7 @@ if pmi.isController:
             pmiproperty = ['k', 'center']
             )
 
-    class SingleParticleHarmonicTrap(Interaction):
-        __metaclass__ = pmi.Proxy
+    class SingleParticleHarmonicTrap(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.SingleParticleHarmonicTrapLocal',
             pmicall = ['setPotential']

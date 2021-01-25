@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -38,31 +38,31 @@
 
 # this is an auxiliary function. It reads the results of Deserno from "deserno_ewald.dat"
 def readingDesernoForcesFile():
-  # forces x,y,z
-  fx, fy, fz = [], [], []
-  # energy
-  energy = 0.0
-  
-  # reading the general information
-  file = open("ewald_result.dat")
-  i = 0
-  for line in file:
+    # forces x,y,z
+    fx, fy, fz = [], [], []
     # energy
-    if i==6:
-      tmp = line.split()
-      energy = float(tmp[0])
-    
-    # forces
-    if i>=9:
-      line = line.replace('{','').replace('}','')
-      tmp = line.split()
-      fx.append(float(tmp[0]))
-      fy.append(float(tmp[1]))
-      fz.append(float(tmp[2]))
-      
-    i=i+1
-  
-  return energy, fx, fy, fz
+    energy = 0.0
+
+    # reading the general information
+    file = open("ewald_result.dat")
+    i = 0
+    for line in file:
+        # energy
+        if i==6:
+            tmp = line.split()
+            energy = float(tmp[0])
+
+        # forces
+        if i>=9:
+            line = line.replace('{','').replace('}','')
+            tmp = line.split()
+            fx.append(float(tmp[0]))
+            fy.append(float(tmp[1]))
+            fz.append(float(tmp[2]))
+
+        i=i+1
+
+    return energy, fx, fy, fz
 # end of the function readingDesernoForcesFile
 
 
@@ -76,24 +76,24 @@ from espressopp.tools import espresso_old
 
 # reading the particle coordinates, charges and box size from old espressopp data file
 # file 'ini_struct_deserno.dat' contains the data we need
-print "Reading system data:"
+print("Reading system data:")
 Lx, Ly, Lz, x, y, z, type, q, vx,vy,vz,fx,fy,fz,bondpairs = espresso_old.read('ewald.espressopp')
 
 # creating the system box
 box = (Lx, Ly, Lz)
-print "System box size:", box
+print("System box size:", box)
 # number of particles
 num_particles = len(x)
-print "Number of particles = ", num_particles
-print "The first particle has coordinates", x[0], y[0], z[0]
+print("Number of particles = ", num_particles)
+print("The first particle has coordinates", x[0], y[0], z[0])
 
 '''
 #  Ewald method suppose to calculate electrostatic interaction dividing it into R space and
 #  K space part
-#  
+#
 #  alpha - Ewald parameter
 #  rspacecutoff - the cutoff in real space
-#  kspacecutoff - the cutoff in reciprocal space   
+#  kspacecutoff - the cutoff in reciprocal space
 '''
 alpha          = 1.112583061
 rspacecutoff   = 4.9
@@ -119,8 +119,8 @@ system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGr
 props = ['id', 'pos', 'type', 'q']
 new_particles = []
 for i in range(0, num_particles):
-  part = [ i, Real3D(x[i], y[i], z[i]), type[i], q[i] ]
-  new_particles.append(part)
+    part = [ i, Real3D(x[i], y[i], z[i]), type[i], q[i] ]
+    new_particles.append(part)
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
@@ -170,20 +170,20 @@ energy_Deserno, forceX_Deserno, forceY_Deserno, forceZ_Deserno = readingDesernoF
 
 # printing the particle id, force (x,y,z), and force difference (x,y,z)
 format0 = '\n %45s %105s \n'
-print (format0 % ('forces', 'the difference between Deserno\'s result and forces by Espresso++'))
+print((format0 % ('forces', 'the difference between Deserno\'s result and forces by Espresso++')))
 format1 = '%3s %20s %20s %20s %10s %20s %25s %25s\n'
-print (format1 % ('id', 'fx', 'fy', 'fz', ' ', 'dfx', 'dfy', 'dfz'))
+print((format1 % ('id', 'fx', 'fy', 'fz', ' ', 'dfx', 'dfy', 'dfz')))
 format2 = '%3d %3s %3.17f %3s %3.17f %3s %3.17f %10s %3.17f %3s %3.17f %3s %3.17f'
 for j in range(0, num_particles):
-  print (format2 % (j, ' ', \
-                       system.storage.getParticle(j).f.x, ' ', \
-                       system.storage.getParticle(j).f.y, ' ', \
-                       system.storage.getParticle(j).f.z, \
-                       ' ', \
-                       abs(system.storage.getParticle(j).f.x-forceX_Deserno[j]), ' ', \
-                       abs(system.storage.getParticle(j).f.y-forceY_Deserno[j]), ' ', \
-                       abs(system.storage.getParticle(j).f.z-forceZ_Deserno[j])) )
-  
+    print((format2 % (j, ' ', \
+                         system.storage.getParticle(j).f.x, ' ', \
+                         system.storage.getParticle(j).f.y, ' ', \
+                         system.storage.getParticle(j).f.z, \
+                         ' ', \
+                         abs(system.storage.getParticle(j).f.x-forceX_Deserno[j]), ' ', \
+                         abs(system.storage.getParticle(j).f.y-forceY_Deserno[j]), ' ', \
+                         abs(system.storage.getParticle(j).f.z-forceZ_Deserno[j])) ))
+
 # calculating the R space part of electrostatic energy
 enR = coulombR_int.computeEnergy()
 # calculating the K space part of electrostatic energy
@@ -192,6 +192,6 @@ enK = ewaldK_int.computeEnergy()
 enTot = enR + enK
 
 # printing the total energy and the difference with Deserno results
-print '\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno)
+print('\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno))
 
 sys.exit()

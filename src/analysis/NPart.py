@@ -27,8 +27,8 @@ espressopp.analysis.NPart
 
 .. function:: espressopp.analysis.NPart(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -39,12 +39,11 @@ from _espressopp import analysis_NPart
 class NPartLocal(ObservableLocal, analysis_NPart):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NPart, system)
 
 if pmi.isController :
-    class NPart(Observable):
-        __metaclass__ = pmi.Proxy
+    class NPart(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.NPartLocal'
         )

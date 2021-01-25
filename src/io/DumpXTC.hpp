@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2020
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2017
       Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
  
@@ -37,7 +39,8 @@
 #include <string>
 #include <iostream>
 
-#include "gromacs/fileio/xtcio.h"
+#include <gromacs/trajectory/trajectoryframe.h>
+#include <gromacs/fileio/trxio.h>
 
 namespace espressopp {
   namespace io{
@@ -85,7 +88,7 @@ namespace espressopp {
     
     private:
       
-      t_fileio *fio;
+      t_trxstatus *fio;
       static const int dim=3;
       real xtcprec;
 
