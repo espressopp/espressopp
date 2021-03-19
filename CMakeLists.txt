@@ -134,14 +134,27 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 # Minimum required Boost version is set to 1.69.0
 set(NEEDED_Boost_VERSION 1.69.0)
+set(Boost_NO_BOOST_CMAKE ON)
+
+# Find optional Boost numpy package
+find_package(Boost ${NEEDED_Boost_VERSION} COMPONENTS numpy${PYTHON_VERSION_NO_DOT})
+set(ESPP_BOOST_HAS_NUMPY "${Boost_NUMPY${PYTHON_VERSION_NO_DOT}_FOUND}")
+if(${ESPP_BOOST_HAS_NUMPY})
+  add_definitions(-D ESPP_BOOST_HAS_NUMPY)
+  set(ESPP_BOOST_NUMPY_LIBS ${Boost_LIBRARIES})
+endif()
+message(STATUS "ESPP_BOOST_HAS_NUMPY = ${ESPP_BOOST_HAS_NUMPY}")
+message(STATUS "ESPP_BOOST_NUMPY_LIBS = ${ESPP_BOOST_NUMPY_LIBS}" )
+
+# Find required Boost packages
 find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT})
-set(Boost_LIBS ${Boost_LIBRARIES})
 
-message(STATUS "BOOST_LIBS = ${Boost_LIBRARIES}")
+# Append Numpy library to the list of Boost libraries
+if(ESPP_BOOST_HAS_NUMPY)
+  list(APPEND Boost_LIBRARIES ${ESPP_BOOST_NUMPY_LIBS})
+endif()
 
-# Append Python library to the list of Boost libraries.
-list(APPEND Boost_LIBS ${Boost_LIBRARIES})
-set(Boost_LIBRARIES ${Boost_LIBS})
+message(STATUS "Boost_LIBRARIES = ${Boost_LIBRARIES}")
 
 if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages (mpi, serialization, system, filesystem, python3). To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost.")

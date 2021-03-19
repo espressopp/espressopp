@@ -189,6 +189,7 @@ import mpi4py.MPI as MPI
 import logging
 from espressopp import toReal3DFromVector, ParticleLocal, Particle
 from espressopp.Exceptions import ParticleDoesNotExistHere
+import numpy as np
 
 class StorageLocal(object):
 
@@ -428,12 +429,208 @@ class StorageLocal(object):
                 p = ParticleLocal(pid,self)
                 print("CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2]))
 
+    def addParticlesArray(self, particleList, properties):
+
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+
+            index_id          = -1
+            index_posx        = -1 ### Real3D
+            index_posy        = -1
+            index_posz        = -1
+            index_modeposx    = -1 ### Real3D
+            index_modeposy    = -1
+            index_modeposz    = -1
+            index_vx          = -1 ### Real3D
+            index_vy          = -1
+            index_vz          = -1
+            index_modemomx    = -1 ### Real3D
+            index_modemomy    = -1
+            index_modemomz    = -1
+            index_fx          = -1 ### Real3D
+            index_fy          = -1
+            index_fz          = -1
+            index_fmx         = -1 ### Real3D
+            index_fmy         = -1
+            index_fmz         = -1
+            index_q           = -1
+            index_radius      = -1
+            index_fradius     = -1
+            index_vradius     = -1
+            index_type        = -1
+            index_mass        = -1
+            index_varmass     = -1
+            index_adrAT       = -1 # adress AT particle if 1
+            index_lambda_adr  = -1
+            index_lambda_adrd = -1
+            index_state       = -1
+            index_pib         = -1
+
+            last_pos = toReal3DFromVector([-99,-99,-99])
+
+            if properties == None:
+                # default properties = (id, pos)
+                index_id = 0
+                index_posx = 1
+                index_posy = 2
+                index_posz = 3
+                nindex = 4
+            else:
+                nindex = 0
+                for val in properties:
+                    if val.lower() == "id": index_id = nindex
+                    elif val.lower() == "posx": index_posx = nindex
+                    elif val.lower() == "posy": index_posy = nindex
+                    elif val.lower() == "posz": index_posz = nindex
+                    elif val.lower() == "modeposx": index_modeposx = nindex
+                    elif val.lower() == "modeposy": index_modeposy = nindex
+                    elif val.lower() == "modeposz": index_modeposz = nindex
+                    elif val.lower() == "type": index_type = nindex
+                    elif val.lower() == "mass": index_mass = nindex
+                    elif val.lower() == "varmass": index_varmass = nindex
+                    elif val.lower() == "vx": index_vx = nindex
+                    elif val.lower() == "vy": index_vy = nindex
+                    elif val.lower() == "vz": index_vz = nindex
+                    elif val.lower() == "modemomx": index_modemomx = nindex
+                    elif val.lower() == "modemomy": index_modemomy = nindex
+                    elif val.lower() == "modemomz": index_modemomz = nindex
+                    elif val.lower() == "fx": index_fx = nindex
+                    elif val.lower() == "fy": index_fy = nindex
+                    elif val.lower() == "fz": index_fz = nindex
+                    elif val.lower() == "fmx": index_fmx = nindex
+                    elif val.lower() == "fmy": index_fmy = nindex
+                    elif val.lower() == "fmz": index_fmz = nindex
+                    elif val.lower() == "q": index_q = nindex
+                    elif val.lower() == "radius": index_radius = nindex
+                    elif val.lower() == "fradius": index_fradius = nindex
+                    elif val.lower() == "vradius": index_vradius = nindex
+                    elif val.lower() == "adrat": index_adrAT = nindex
+                    elif val.lower() == "lambda_adr": index_lambda_adr = nindex
+                    elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
+                    elif val.lower() == "state": index_state = nindex
+                    elif val.lower() == "pib": index_pib = nindex
+                    else: raise SyntaxError("unknown particle property: %s"%val)
+                    nindex += 1
+
+            if index_id < 0  : raise "particle property id is mandatory"
+            if index_posx < 0 : raise "particle property pos is mandatory"
+            if index_posy < 0 : raise "particle property pos is mandatory"
+            if index_posz < 0 : raise "particle property pos is mandatory"
+
+            indices = np.array([index_id,
+                index_posx, index_posy, index_posz, index_modeposx, index_modeposy, index_modeposz,
+                index_vx, index_vy, index_vz, index_modemomx, index_modemomy, index_modemomz,
+                index_fx, index_fy, index_fz, index_fmx, index_fmy, index_fmz,
+                index_q, index_radius, index_fradius, index_vradius, index_type, index_mass,
+                index_varmass, index_adrAT, index_lambda_adr, index_lambda_adrd, index_state, index_pib
+                ], dtype=np.int32)
+            self.cxxclass.addParticlesFromArray(self, particleList, indices)
+
+    def addParticlesArrayRepl(self, particleList, properties, size_orig, repl, idstart=0):
+
+        Lx, Ly, Lz = size_orig
+        xdim, ydim, zdim = repl
+
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+
+            index_id          = -1
+            index_posx        = -1 ### Real3D
+            index_posy        = -1
+            index_posz        = -1
+            index_modeposx    = -1 ### Real3D
+            index_modeposy    = -1
+            index_modeposz    = -1
+            index_vx          = -1 ### Real3D
+            index_vy          = -1
+            index_vz          = -1
+            index_modemomx    = -1 ### Real3D
+            index_modemomy    = -1
+            index_modemomz    = -1
+            index_fx          = -1 ### Real3D
+            index_fy          = -1
+            index_fz          = -1
+            index_fmx         = -1 ### Real3D
+            index_fmy         = -1
+            index_fmz         = -1
+            index_q           = -1
+            index_radius      = -1
+            index_fradius     = -1
+            index_vradius     = -1
+            index_type        = -1
+            index_mass        = -1
+            index_varmass     = -1
+            index_adrAT       = -1 # adress AT particle if 1
+            index_lambda_adr  = -1
+            index_lambda_adrd = -1
+            index_state       = -1
+            index_pib         = -1
+
+            last_pos = toReal3DFromVector([-99,-99,-99])
+
+            if properties == None:
+                # default properties = (id, pos)
+                index_id = 0
+                index_posx = 1
+                index_posy = 2
+                index_posz = 3
+                nindex = 4
+            else:
+                nindex = 0
+                for val in properties:
+                    if val.lower() == "id": index_id = nindex
+                    elif val.lower() == "posx": index_posx = nindex
+                    elif val.lower() == "posy": index_posy = nindex
+                    elif val.lower() == "posz": index_posz = nindex
+                    elif val.lower() == "modeposx": index_modeposx = nindex
+                    elif val.lower() == "modeposy": index_modeposy = nindex
+                    elif val.lower() == "modeposz": index_modeposz = nindex
+                    elif val.lower() == "type": index_type = nindex
+                    elif val.lower() == "mass": index_mass = nindex
+                    elif val.lower() == "varmass": index_varmass = nindex
+                    elif val.lower() == "vx": index_vx = nindex
+                    elif val.lower() == "vy": index_vy = nindex
+                    elif val.lower() == "vz": index_vz = nindex
+                    elif val.lower() == "modemomx": index_modemomx = nindex
+                    elif val.lower() == "modemomy": index_modemomy = nindex
+                    elif val.lower() == "modemomz": index_modemomz = nindex
+                    elif val.lower() == "fx": index_fx = nindex
+                    elif val.lower() == "fy": index_fy = nindex
+                    elif val.lower() == "fz": index_fz = nindex
+                    elif val.lower() == "fmx": index_fmx = nindex
+                    elif val.lower() == "fmy": index_fmy = nindex
+                    elif val.lower() == "fmz": index_fmz = nindex
+                    elif val.lower() == "q": index_q = nindex
+                    elif val.lower() == "radius": index_radius = nindex
+                    elif val.lower() == "fradius": index_fradius = nindex
+                    elif val.lower() == "vradius": index_vradius = nindex
+                    elif val.lower() == "adrat": index_adrAT = nindex
+                    elif val.lower() == "lambda_adr": index_lambda_adr = nindex
+                    elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
+                    elif val.lower() == "state": index_state = nindex
+                    elif val.lower() == "pib": index_pib = nindex
+                    else: raise SyntaxError("unknown particle property: %s"%val)
+                    nindex += 1
+
+            if index_id < 0  : raise "particle property id is mandatory"
+            if index_posx < 0 : raise "particle property pos is mandatory"
+            if index_posy < 0 : raise "particle property pos is mandatory"
+            if index_posz < 0 : raise "particle property pos is mandatory"
+
+            indices = np.array([index_id,
+                index_posx, index_posy, index_posz, index_modeposx, index_modeposy, index_modeposz,
+                index_vx, index_vy, index_vz, index_modemomx, index_modemomy, index_modemomz,
+                index_fx, index_fy, index_fz, index_fmx, index_fmy, index_fmz,
+                index_q, index_radius, index_fradius, index_vradius, index_type, index_mass,
+                index_varmass, index_adrAT, index_lambda_adr, index_lambda_adrd, index_state, index_pib
+                ], dtype=np.int32)
+            self.cxxclass.addParticlesFromArrayRepl(self, particleList, indices, Lx, Ly, Lz, xdim, ydim, zdim, idstart)
+
 if pmi.isController:
     class Storage(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray", "addParticlesArrayRepl"],
             pmiproperty = [ "system" ],
-            pmiinvoke = ["getRealParticleIDs", "printRealParticles"]
+            pmiinvoke = ["getRealParticleIDs", "printRealParticles"],
+            localcall = ["hasAddParticlesFromArray"]
             )
 
         def particleExists(self, pid):

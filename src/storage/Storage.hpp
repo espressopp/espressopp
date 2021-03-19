@@ -442,6 +442,21 @@ namespace espressopp {
       // we need to snap shot the particle coordinates
       std::map< size_t, Real3D > savedRealPositions;
       std::map< size_t, Int3D > savedImages;
+
+    public:
+
+      /////////////////////////////////////////////////////////////////////////
+      /// Faster adding of particles by storing data in numpy arrays
+      void addParticlesFromArrayImpl(const real* part, const int* idx,
+        const int npart, const int nidx);
+
+      void addParticlesFromArrayReplImpl(const real* part, const int* idx,
+        const int npart, const int nidx,
+        const real Lx, const real Ly, const real Lz,
+        const int xdim, const int ydim, const int zdim,
+        const int pid_start);
+      /////////////////////////////////////////////////////////////////////////
+
     };
   }
 }
