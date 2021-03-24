@@ -429,7 +429,7 @@ class StorageLocal(object):
                 p = ParticleLocal(pid,self)
                 print("CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2]))
 
-    def addParticlesArray(self, particleList, properties):
+    def addParticlesArray(self, particleList, *properties):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 

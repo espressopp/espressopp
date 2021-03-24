@@ -796,7 +796,7 @@ namespace espressopp {
     }
     #endif
 
-    bool hasAddParticlesFromArray()
+    bool hasAddParticlesFromArray(python::object const&)
     {
       #ifdef ESPP_BOOST_HAS_NUMPY
         return true;
