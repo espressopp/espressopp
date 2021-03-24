@@ -957,7 +957,7 @@ namespace espressopp {
 	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
         .def("addParticlesFromArray", &addParticlesFromArray)
-        .def("hasAddParticlesFromArray", &hasAddParticlesFromArray)
+        .def("hasAddParticlesArray", &hasAddParticlesFromArray)
 	    ;
     }
   }

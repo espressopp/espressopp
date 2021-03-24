@@ -528,10 +528,10 @@ class StorageLocal(object):
 if pmi.isController:
     class Storage(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray", "hasAddParticlesFromArray"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray"],
             pmiproperty = [ "system" ],
             pmiinvoke = ["getRealParticleIDs", "printRealParticles"],
-            localcall = ["hasAddParticlesFromArray"]
+            localcall = ["hasAddParticlesArray"]
             )
 
         def particleExists(self, pid):
