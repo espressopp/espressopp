@@ -784,25 +784,6 @@ namespace espressopp {
       obj->addParticlesFromArrayImpl(part, idx, npart, nidx);
     }
 
-    void addParticlesFromArrayRepl(
-      class Storage* obj,
-      python::numpy::ndarray const& part_arr,
-      python::numpy::ndarray const& idx_arr,
-      const real Lx, const real Ly, const real Lz,
-      const int xdim, const int ydim, const int zdim,
-      const int pid_start
-    )
-    {
-      addParticlesCheck(part_arr, idx_arr);
-
-      const real* part = (real*)(part_arr.get_data());
-      const int* idx = (int*)(idx_arr.get_data());
-      const int npart = part_arr.shape(0);
-      const int nidx = part_arr.shape(1);
-
-      obj->addParticlesFromArrayReplImpl(part, idx, npart, nidx, Lx, Ly, Lz, xdim, ydim, zdim, pid_start);
-    }
-
     #else
 
     void addParticlesFromArray(
@@ -813,19 +794,6 @@ namespace espressopp {
     {
       throw std::runtime_error("WARNING: addParticlesFromArray requires boost.numpy extension");
     }
-
-    void addParticlesFromArrayRepl(
-      class Storage* obj,
-      python::object const& part_arr,
-      python::object const& idx_arr,
-      const real Lx, const real Ly, const real Lz,
-      const int xdim, const int ydim, const int zdim,
-      const int pid_start
-    )
-    {
-      throw std::runtime_error("WARNING: addParticlesFromArrayRepl requires boost.numpy extension");
-    }
-
     #endif
 
     bool hasAddParticlesFromArray()
@@ -960,85 +928,6 @@ namespace espressopp {
           sp->state() = int(part[offset+index_state]);
       }
     }
-
-    void Storage::addParticlesFromArrayReplImpl(
-      const real* part,
-      const int* idx,
-      const int npart,
-      const int nidx,
-      const real Lx, const real Ly, const real Lz,
-      const int xdim, const int ydim, const int zdim,
-      const int pid_start
-    )
-    {
-      int nidx_ = 0;
-      for(int i=0; i<31; i++) nidx_ += ( idx[i] >= 0 );
-      if(nidx_!=nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
-
-      const int index_id   = idx[0];
-      const int index_posx = idx[1];
-      const int index_posy = idx[2];
-      const int index_posz = idx[3];
-
-      if(pid_start<0) throw std::runtime_error("Assertion failed: pid_start>=0");
-      if(xdim<1) throw std::runtime_error("Assertion failed: xdim>=1");
-      if(ydim<1) throw std::runtime_error("Assertion failed: ydim>=1");
-      if(zdim<1) throw std::runtime_error("Assertion failed: zdim>=1");
-
-      typedef std::tuple<size_t,size_t,Real3D> repl_t;
-      std::vector<repl_t> replicated;
-      size_t newId=0;
-      for(size_t i=0; i<xdim; i++){
-        for(size_t j=0; j<ydim; j++){
-          for(size_t k=0; k<zdim; k++){
-            for(int p=0; p<npart; p++) {
-              const int offset = p * nidx;
-              const Real3D newPos(
-                part[offset + index_posx] + i * Lx,
-                part[offset + index_posy] + j * Ly,
-                part[offset + index_posz] + k * Lz);
-              if(checkIsRealParticle(0, newPos)){
-                const size_t oldId = p;
-                replicated.push_back({newId,oldId,newPos});
-              }
-              newId++;
-            }
-          }
-        }
-      }
-
-      std::vector< real > partRepl(replicated.size() * nidx);
-      for(size_t p=0; p<replicated.size(); p++){
-        /// copy all entries
-        const auto& r = replicated[p];
-        const auto newId = std::get<0>(r);
-        const auto oldId = std::get<1>(r);
-        const auto& newPos = std::get<2>(r);
-
-        /// copy all entries for this row
-        const size_t newOffset = p * nidx;
-        const size_t oldOffset = oldId * nidx;
-        for(size_t ii=0; ii<nidx; ii++){
-          partRepl[newOffset+ii] = part[oldOffset+ii];
-        }
-
-        /// replace id
-        partRepl[newOffset+index_id] = newId;
-
-        /// replace position
-        partRepl[newOffset + index_posx] = newPos[0];
-        partRepl[newOffset + index_posy] = newPos[1];
-        partRepl[newOffset + index_posz] = newPos[2];
-      }
-
-      /// call:
-      this->addParticlesFromArrayImpl(
-        partRepl.data(),
-        idx,
-        replicated.size(),
-        nidx
-      );
-    }
     ///////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////
@@ -1068,7 +957,6 @@ namespace espressopp {
 	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
         .def("addParticlesFromArray", &addParticlesFromArray)
-        .def("addParticlesFromArrayRepl", &addParticlesFromArrayRepl)
         .def("hasAddParticlesFromArray", &hasAddParticlesFromArray)
 	    ;
     }
