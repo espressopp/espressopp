@@ -63,7 +63,7 @@ nan=float("nan")
 auto='auto'
 
 # fetch the different subpackages
-from espressopp import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, io, vectorization
+from espressopp import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, io, vectorization, vec
 
 if pmi.isController :
     # make sure that the workers exit when the script ends

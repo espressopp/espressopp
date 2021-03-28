@@ -62,6 +62,7 @@
 #include <io/bindings.hpp>
 
 #include <vectorization/bindings.hpp>
+#include <vec/bindings.hpp>
 
 void espressopp::registerPython() {
   espressopp::Particle::registerPython();
@@ -101,6 +102,7 @@ void espressopp::registerPython() {
   espressopp::io::registerPython();
 
   espressopp::vectorization::registerPython();
+  espressopp::vec::registerPython();
 
   log4espp::PyLogger::registerPython();
 }
