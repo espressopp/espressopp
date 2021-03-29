@@ -47,7 +47,20 @@ class VectorizationLocal(_espressopp.vec_Vectorization):
                 mode_int = _espressopp.VecMode.AOS
             else:
                 raise ValueError("Incorrect mode [{}]".format(mode))
-            cxxinit(self, _espressopp.vec_Vectorization, system, integrator, mode_int)
+            cxxinit(self, _espressopp.vec_Vectorization, system, system.storage, integrator, mode_int)
+
+            # Verify that the correct constructor was called
+            if self.level == 2:
+                assert(
+                    isinstance(system.storage, espressopp.vec.storage.StorageVecLocal) and
+                    isinstance(integrator, espressopp.vec.integrator.MDIntegratorVecLocal))
+            elif self.level == 1:
+                assert(
+                    (not isinstance(system.storage, espressopp.vec.storage.StorageVecLocal)) and
+                    (not isinstance(integrator, espressopp.vec.integrator.MDIntegratorVecLocal)))
+            else:
+                raise RuntimeError("Invalid vectorization level: {}".format(self.level))
+
             system.storage.decompose()
 
 if pmi.isController:

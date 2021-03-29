@@ -50,7 +50,7 @@ namespace espressopp { namespace vec {
     LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
     VelocityVerlet::VelocityVerlet(
-      shared_ptr<vec::SystemVec> system,
+      shared_ptr<System> system,
       shared_ptr<vec::storage::StorageVec> storageVec
       ) : MDIntegratorVec(system, storageVec)
     {
@@ -354,7 +354,7 @@ namespace espressopp { namespace vec {
       class_< vec::integrator::VelocityVerlet,
               bases<espressopp::integrator::MDIntegrator, MDIntegratorVec>,
               boost::noncopyable >
-        ("vec_integrator_VelocityVerlet", init< shared_ptr<SystemVec>, shared_ptr< storage::StorageVec > >())
+        ("vec_integrator_VelocityVerlet", init< shared_ptr<System>, shared_ptr< storage::StorageVec > >())
         // .def("run", &vec::integrator::VelocityVerlet::run)
         // .def("getTimers", &wrapGetTimers)
         // .def("getOtherTimers", &wrapGetOtherTimers)

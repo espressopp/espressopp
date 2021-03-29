@@ -52,14 +52,12 @@ namespace espressopp { namespace vec {
       int _halfCellInt,
       int _vecMode
       )
-      : baseClass(system, _nodeGrid, _cellGrid, _halfCellInt) //,
-        // subCellGrid({_subCellGrid[0],_subCellGrid[1],_subCellGrid[2]}),
-        // commAsync(_commAsync),
-        // inBuf(*system->comm),
-        // outBuf(*system->comm),
-        // excgAligned(_excgAligned),
-        // commUseChannels(_commUseChannels),
-        // decompUseParFor(_decompUseParFor)
+      : baseClass(system, _nodeGrid, _cellGrid, _halfCellInt)
+      // , inBuf(*system->comm)
+      // , outBuf(*system->comm)
+      // , excgAligned(_excgAligned)
+      // , commUseChannels(_commUseChannels)
+      // , decompUseParFor(_decompUseParFor)
     {
       // vecMode = static_cast<Mode>(_vecMode);
       // switch(vecMode){

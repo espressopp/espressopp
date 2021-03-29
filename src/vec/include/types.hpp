@@ -24,7 +24,7 @@
 namespace espressopp {
   namespace vec {
 
-    class SystemVec;
+    class Vectorization;
 
     namespace storage {
       class StorageVec;

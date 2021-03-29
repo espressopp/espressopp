@@ -27,7 +27,6 @@
 #define _VEC_INTEGRATOR_EXTENSION_HPP
 
 #include "vec/include/types.hpp"
-#include "vec/SystemVec.hpp"
 #include "vec/storage/StorageVec.hpp"
 
 #include "log4espp.hpp"
@@ -46,7 +45,7 @@ namespace espressopp { namespace vec {
 
       public:
 
-        Extension(shared_ptr<SystemVec> system, shared_ptr<StorageVec> storage);
+        Extension(shared_ptr<System> system, shared_ptr<StorageVec> storage);
 
         virtual ~Extension();
 
@@ -83,8 +82,6 @@ namespace espressopp { namespace vec {
         // pure virtual functions
         virtual void connect() = 0;
         virtual void disconnect() = 0;
-
-        shared_ptr< SystemVec > systemVec;
 
         shared_ptr< StorageVec> storageVec;
 

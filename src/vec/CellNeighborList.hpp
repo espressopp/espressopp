@@ -25,8 +25,8 @@
 #include "storage/Storage.hpp"
 #include "vec/include/simdconfig.hpp"
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp {
+  namespace vec {
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     /// stores neighbor cells used for all-pair loops (following Newton's 3rd law) as 2d array
@@ -34,7 +34,9 @@ namespace espressopp { namespace vec {
     /// first index corresponds to neighbor cells
     /// zeroth column contains the index in localcells
     /// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
-    class CellNeighborList : private espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge> {
+    class CellNeighborList
+      : private espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge>
+    {
     private:
       typedef espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge> Super;
       size_t startCell = 0;
@@ -49,8 +51,7 @@ namespace espressopp { namespace vec {
       CellNeighborList(
         Cell* const cell0,
         CellList const& localCells,
-        std::vector<size_t> const& realCellIdx,
-        std::map<int, int> const& cellMap
+        std::vector<size_t> const& realCellIdx
       );
 
       inline void clear() { Super::clear(); }
@@ -72,6 +73,6 @@ namespace espressopp { namespace vec {
     };
     /////////////////////////////////////////////////////////////////////////////////////////////
   }
-}}
+}
 
 #endif // VEC_CELLNEIGHBORLIST_HPP

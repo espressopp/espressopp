@@ -21,7 +21,6 @@
 #include "python.hpp"
 #include "bindings.hpp"
 
-#include "vec/SystemVec.hpp"
 #include "vec/Vectorization.hpp"
 
 #include "vec/storage/bindings.hpp"
@@ -32,7 +31,6 @@ namespace espressopp {
 
     void registerPython()
     {
-      vec::SystemVec::registerPython();
       vec::Vectorization::registerPython();
 
       vec::storage::registerPython();

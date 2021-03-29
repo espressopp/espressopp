@@ -25,76 +25,81 @@
 #include "integrator/MDIntegrator.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "ParticleArray.hpp"
-// #include "CellNeighborList.hpp"
-
-#include "vec/integrator/MDIntegratorVec.hpp"
+#include "CellNeighborList.hpp"
 
 #include "types.hpp"
 #include "log4espp.hpp"
 #include "boost/signals2.hpp"
+
+#include "vec/include/types.hpp"
 
 namespace espressopp {
   namespace vec {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// facilitates offloading of particle data to vectorization-friendly form
-    class Vectorization : public SystemAccess
+    class Vectorization
+      : public SystemAccess
+      , public boost::enable_shared_from_this<Vectorization>
     {
+      typedef espressopp::storage::Storage Storage;
+      typedef espressopp::vec::storage::StorageVec StorageVec;
+
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
       typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
+
     public:
       Vectorization(
         shared_ptr<System> system,
+        shared_ptr<Storage> storage,
         shared_ptr<MDIntegrator> mdintegrator,
-        Mode mode = ESPP_VEC_MODE_DEFAULT);
+        Mode vecMode = ESPP_VEC_MODE_DEFAULT);
+
+      Vectorization(
+        shared_ptr<System> system,
+        shared_ptr<StorageVec> storageVec,
+        shared_ptr<MDIntegratorVec> mdintegratorVec,
+        Mode vecMode = ESPP_VEC_MODE_DEFAULT);
+
       ~Vectorization();
 
-      void attachMD(
-        shared_ptr<MDIntegrator> mdintegrator
-      )
-      {
-        std::cout << __FUNCTION__ << std::endl;
-      }
-
-      void attachMDVec(
-        shared_ptr<MDIntegratorVec> mdintegrator
-      )
-      {
-        std::cout << __FUNCTION__ << std::endl;
-      }
-
-      void connect();
+      void connect_level_1();
+      void connect_level_2();
       void disconnect();
 
-      // ParticleArray& getParticleArray() { return particleArray; }
-      // CellNeighborList const& getNeighborList() const { return neighborList; }
+      ParticleArray particles;
+      CellNeighborList neighborList;
+
+      int getVecLevel() {
+        return vecLevel;
+      }
 
       static void registerPython();
 
-      ParticleArray particles;
-
     protected:
-      Mode mode;
-      // void resetParticles();
-      // void befCalcForces();
-      // void updatePositions();
-      // void updateForces();
+      const Mode vecMode;
+      const int vecLevel;
 
-      // CellNeighborList neighborList;
-      // void resetCells();
+      void resetParticles();
+      void befCalcForces();
+      void updatePositions();
+      void updateForces();
+
+      void resetCells();
+
+      shared_ptr<Storage> storage;
+      shared_ptr<StorageVec> storageVec;
 
       shared_ptr<MDIntegrator> mdintegrator;
       shared_ptr<MDIntegratorVec> mdintegratorVec;
 
-      // // signals that connect to integrator
-      // boost::signals2::connection sigBefCalcForces;
-      // boost::signals2::connection sigUpdateForces;
+      // signals that connect to integrator
+      boost::signals2::connection sigBefCalcForces;
+      boost::signals2::connection sigUpdateForces;
 
-      // // signals that connect to system
-      // boost::signals2::connection sigResetParticles;
-      // boost::signals2::connection sigResetCells;
-
-      // shared_ptr<storage::DomainDecomposition> decomp;
+      // signals that connect to system
+      boost::signals2::connection sigResetParticles;
+      boost::signals2::connection sigResetCells;
 
       static LOG4ESPP_DECL_LOGGER(logger);
     };

@@ -22,7 +22,6 @@
 #define VEC_INTEGRATOR_MDINTEGRATORVEC_HPP
 
 #include "vec/include/types.hpp"
-#include "vec/SystemVec.hpp"
 
 #include "esconfig.hpp"
 #include "types.hpp"
@@ -48,10 +47,9 @@ namespace espressopp { namespace vec {
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
 
       MDIntegratorVec(
-        shared_ptr<vec::SystemVec> system,
+        shared_ptr<System> system,
         shared_ptr<vec::storage::StorageVec> storageVec
       ) : storageVec(storageVec)
-        , systemVec(system)
         , MDIntegrator(shared_ptr<System>(system))
       {}
 
@@ -86,8 +84,6 @@ namespace espressopp { namespace vec {
 
     protected:
       ExtensionList exList;
-
-      shared_ptr< SystemVec > systemVec;
 
       shared_ptr< storage::StorageVec > storageVec;
 

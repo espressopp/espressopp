@@ -20,19 +20,15 @@
 
 #include "CellNeighborList.hpp"
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp {
+  namespace vec {
 
     CellNeighborList::CellNeighborList(
       Cell* const cell0,
       CellList const& localCells,
-      std::vector<size_t> const& realCellIdx,
-      std::map<int, int> const& cellMap
+      std::vector<size_t> const& realCellIdx
       )
     {
-      /// NOTE: Include cell neighbor only if it is in the same virtual subdomain
-      /// which can be checked with cellMap
-
       // const size_t numCells = localCells.size();
       const size_t numCells = realCellIdx.size();
 
@@ -54,7 +50,7 @@ namespace espressopp { namespace vec {
         const auto lcell = realCellIdx.at(irow);
         for(NeighborCellInfo& nc: localCells[lcell]->neighborCells){
           if(!nc.useForAllPairs) {
-            const auto vidx = cellMap.at(nc.cell - cell0); /// map global cell idx to virtual cell idx
+            const auto vidx = (nc.cell - cell0); /// map global cell idx to virtual cell idx
             this->at(irow,jnbr++) = vidx;
           }
         }
@@ -77,4 +73,4 @@ namespace espressopp { namespace vec {
       std::cout << ss.str();
     }
   }
-}}
+}

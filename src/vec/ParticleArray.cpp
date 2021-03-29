@@ -106,17 +106,17 @@ namespace espressopp { namespace vec
     }
     cellRange_.push_back(total_data_size);
 
-    if(total_data_size>reserve_size_)
+    // if(total_data_size>reserve_size_)
     {
-      reserve_size_ = 2*total_data_size;
+      reserve_size_ = total_data_size;
       if(mode==ESPP_VEC_AOS)
       {
-        ESPP_PARTICLEARRAY_AOS_APPLY(clear());
+        // ESPP_PARTICLEARRAY_AOS_APPLY(clear());
         ESPP_PARTICLEARRAY_AOS_APPLY(resize(reserve_size_));
       }
       else if(mode==ESPP_VEC_SOA)
       {
-        ESPP_PARTICLEARRAY_SOA_APPLY(clear());
+        // ESPP_PARTICLEARRAY_SOA_APPLY(clear());
         ESPP_PARTICLEARRAY_SOA_APPLY(resize(reserve_size_));
       }
       else

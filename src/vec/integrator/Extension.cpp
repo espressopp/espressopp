@@ -32,8 +32,8 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    Extension::Extension(shared_ptr<SystemVec> system, shared_ptr<StorageVec> storage)
-      : SystemAccess(system), systemVec(system), storageVec(storage)
+    Extension::Extension(shared_ptr<System> system, shared_ptr<StorageVec> storage)
+      : SystemAccess(system), storageVec(storage)
     {
 
         if (!system->storage) {
