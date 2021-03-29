@@ -22,6 +22,7 @@
 #include "bindings.hpp"
 
 #include "vec/Vectorization.hpp"
+#include "vec/VerletList.hpp"
 
 #include "vec/storage/bindings.hpp"
 #include "vec/integrator/bindings.hpp"
@@ -32,6 +33,7 @@ namespace espressopp {
     void registerPython()
     {
       vec::Vectorization::registerPython();
+      vec::VerletList::registerPython();
 
       vec::storage::registerPython();
       vec::integrator::registerPython();
