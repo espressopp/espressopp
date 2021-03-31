@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2021
+  Copyright (C) 2019-2021
       Max Planck Institute for Polymer Research & JGU Mainz
 
   This file is part of ESPResSo++.
@@ -18,28 +18,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
-#include "bindings.hpp"
-
-#include "vec/Vectorization.hpp"
-#include "vec/VerletList.hpp"
-
-#include "vec/storage/bindings.hpp"
-#include "vec/integrator/bindings.hpp"
-#include "vec/interaction/bindings.hpp"
+#ifndef _VEC_INTERACTION_BINDINGS_HPP
+#define _VEC_INTERACTION_BINDINGS_HPP
 
 namespace espressopp {
   namespace vec {
-
-    void registerPython()
-    {
-      vec::Vectorization::registerPython();
-      vec::VerletList::registerPython();
-
-      vec::storage::registerPython();
-      vec::integrator::registerPython();
-      vec::interaction::registerPython();
+    namespace interaction {
+      void registerPython();
     }
-
   }
 }
+
+#endif

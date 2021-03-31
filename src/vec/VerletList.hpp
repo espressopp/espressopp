@@ -86,9 +86,9 @@ namespace espressopp { namespace vec {
 
     // PairList& getPairs() { return vlPairs; }
 
-    // inline auto & getNeighborLists() { return neighborLists; }
+    inline const auto& getNeighborList() { return neighborList; }
 
-    // inline auto & getVectorization() { return *vectorization; }
+    inline auto getVectorization() { return vectorization; }
 
     // python::tuple getPair(int i);
 

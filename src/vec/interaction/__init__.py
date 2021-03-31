@@ -1,4 +1,4 @@
-#  Copyright (C) 2021
+#  Copyright (C) 2019-2021
 #      Max Planck Institute for Polymer Research & JGU Mainz
 #
 #  This file is part of ESPResSo++.
@@ -17,9 +17,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from espressopp.esutil import pmiimport
-pmiimport('espressopp.vec')
+pmiimport('espressopp.vec.interaction')
 
-from espressopp.vec.Vectorization import *
-from espressopp.vec.VerletList import *
-
-from espressopp.vec import storage, integrator, interaction
+from espressopp.vec.interaction.LennardJones import *

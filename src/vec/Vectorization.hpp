@@ -68,8 +68,20 @@ namespace espressopp {
       ParticleArray particles;
       CellNeighborList neighborList;
 
-      int getVecLevel() {
+      inline int getVecLevel() {
         return vecLevel;
+      }
+
+      inline Mode getVecMode() {
+        return vecMode;
+      }
+
+      inline bool modeSOA() {
+        return vecMode == ESPP_VEC_SOA;
+      }
+
+      inline bool modeAOS() {
+        return vecMode == ESPP_VEC_AOS;
       }
 
       static void registerPython();
