@@ -61,26 +61,31 @@ namespace espressopp { namespace vec {
   {
     // LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
 
-    // if (!system->storage) {
-    //    throw std::runtime_error("system has no storage");
-    // }
+    if (!getSystem()->storage) {
+       throw std::runtime_error("system has no storage");
+    }
 
-    // cut = _cut;
-    // cutVerlet = cut + system -> getSkin();
-    // cutsq = cutVerlet * cutVerlet;
-    // builds = 0;
-    // max_type = 0;
+    cut = _cut;
+    cutVerlet = cut + getSystem() -> getSkin();
+    cutsq = cutVerlet * cutVerlet;
+    builds = 0;
+    max_type = 0;
 
-    // resetTimers();
-    // if (rebuildVL) rebuild(); // not called if exclutions are provided
+    resetTimers();
+    if (rebuildVL) rebuild(); // not called if exclutions are provided
 
+    connectionResort = getSystem()->storage->onParticlesChanged.connect(
+        boost::bind(&VerletList::rebuild, this));
+
+    /// TODO: Impelement vecLevel=2
+    // const bool resortOnLoad = (vectorization->getVecLevel()==2);
     // if(resortOnLoad) {
-    //   // make a connection to StorageVec to invoke rebuild on loadCells
-    //   connectionResort = storageVec->onLoadCells.connect(
+    //   // make a connection to vectorization to invoke rebuild on loadCells
+    //   connectionResort = vectorization->onLoadCells.connect(
     //       boost::bind(&VerletList::rebuild, this));
     // } else {
     //   // make a connection to System to invoke rebuild on resort
-    //   connectionResort = system->storage->onParticlesChanged.connect(
+    //   connectionResort = getSystem()->storage->onParticlesChanged.connect(
     //       boost::bind(&VerletList::rebuild, this));
     // }
   }
