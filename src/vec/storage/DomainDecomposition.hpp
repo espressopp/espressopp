@@ -28,6 +28,9 @@
 #include "esutil/Timer.hpp"
 // #include "vec/BufferView.hpp"
 
+#include "types.hpp"
+#include "vec/include/types.hpp"
+
 /// Forward declaration
 namespace espressopp { namespace integrator {
   class MDIntegrator;
@@ -67,7 +70,7 @@ namespace espressopp { namespace vec {
       typedef espressopp::storage::DomainDecomposition baseClass;
 
       DomainDecomposition(
-        shared_ptr< System > system,
+        shared_ptr< Vectorization > vectorization,
         const Int3D& nodeGrid,
         const Int3D& cellGrid,
         int halfCellInt,

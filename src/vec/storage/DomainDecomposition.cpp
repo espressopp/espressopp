@@ -19,6 +19,7 @@
 */
 
 #include "vec/storage/DomainDecomposition.hpp"
+#include "vec/Vectorization.hpp"
 
 #if 0
 #include "vec/include/logging.hpp"
@@ -46,13 +47,14 @@ namespace espressopp { namespace vec {
     // const Real3D DomainDecomposition::SHIFT_ZERO {0.,0.,0.};
 
     DomainDecomposition::DomainDecomposition(
-      shared_ptr< System > system,
+      shared_ptr< Vectorization > vectorization,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
       int _halfCellInt,
       int _vecMode
       )
-      : baseClass(system, _nodeGrid, _cellGrid, _halfCellInt)
+      : baseClass(vectorization->getSystem(), _nodeGrid, _cellGrid, _halfCellInt),
+        StorageVec(vectorization)
       // , inBuf(*system->comm)
       // , outBuf(*system->comm)
       // , excgAligned(_excgAligned)
@@ -2419,7 +2421,7 @@ namespace espressopp { namespace vec {
       using namespace espressopp::python;
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
-        ("vec_storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D&, int, int >())
+        ("vec_storage_DomainDecomposition", init< shared_ptr< Vectorization >, const Int3D&, const Int3D&, int, int >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)
         // .def("connectOffload", &DomainDecomposition::connectOffload)

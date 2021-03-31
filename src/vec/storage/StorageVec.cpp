@@ -26,6 +26,11 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(StorageVec::logger, "StorageVec");
 
+    StorageVec::StorageVec(
+      shared_ptr<Vectorization> vectorization
+      ) : vectorization(vectorization)
+    {}
+
     void StorageVec::registerPython()
     {
       using namespace espressopp::python;

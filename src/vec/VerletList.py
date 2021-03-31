@@ -75,15 +75,15 @@ from espressopp.esutil import cxxinit
 
 class VerletListLocal(vec_VerletList):
 
-    def __init__(self, system, vectorization, cutoff, exclusionlist=[]):
+    def __init__(self, vectorization, cutoff, exclusionlist=[]):
         if pmi.workerIsActive():
 
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, vec_VerletList, system, vectorization, cutoff, True)
+                cxxinit(self, vec_VerletList, vectorization, cutoff, True)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, vec_VerletList, system, vectorization, cutoff, False)
+                cxxinit(self, vec_VerletList, vectorization, cutoff, False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair

@@ -19,6 +19,8 @@
 */
 
 #include "vec/integrator/MDIntegratorVec.hpp"
+#include "vec/Vectorization.hpp"
+
 #include "python.hpp"
 #include "log4espp.hpp"
 #include <iostream>
@@ -27,6 +29,11 @@ namespace espressopp { namespace vec {
   namespace integrator {
 
     LOG4ESPP_LOGGER(MDIntegratorVec::logger, "MDIntegratorVec");
+
+    MDIntegratorVec::MDIntegratorVec(shared_ptr<Vectorization> vectorization)
+      : vectorization(vectorization)
+      , MDIntegrator(vectorization->getSystem())
+    {}
 
     void MDIntegratorVec::addExtension(shared_ptr<integrator::Extension> extension) {
        // add extension to the list

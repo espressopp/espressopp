@@ -57,8 +57,6 @@ namespace espressopp {
 
       Vectorization(
         shared_ptr<System> system,
-        shared_ptr<StorageVec> storageVec,
-        shared_ptr<MDIntegratorVec> mdintegratorVec,
         Mode vecMode = ESPP_VEC_MODE_DEFAULT);
 
       ~Vectorization();
@@ -88,10 +86,7 @@ namespace espressopp {
       void resetCells();
 
       shared_ptr<Storage> storage;
-      shared_ptr<StorageVec> storageVec;
-
       shared_ptr<MDIntegrator> mdintegrator;
-      shared_ptr<MDIntegratorVec> mdintegratorVec;
 
       // signals that connect to integrator
       boost::signals2::connection sigBefCalcForces;

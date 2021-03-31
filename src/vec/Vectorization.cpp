@@ -51,20 +51,16 @@ namespace espressopp {
 
     Vectorization::Vectorization(
       shared_ptr<System> _system,
-      shared_ptr<StorageVec> _storageVec,
-      shared_ptr<MDIntegratorVec> _mdintegratorVec,
       Mode _vecMode
       )
       : SystemAccess(_system)
-      , storageVec(_storageVec)
-      , mdintegratorVec(_mdintegratorVec)
       , vecMode(_vecMode)
       , vecLevel(2)
     {
       std::string mode_str = (vecMode==ESPP_VEC_AOS) ? "AOS" : "SOA";
       LOG4ESPP_INFO(logger,"Using vectorization mode: " << mode_str << " level " << vecLevel);
       connect_level_2();
-      resetCells(); // immediately retrieve cell information
+      // resetCells(); // TODO: retrieve cell information when connecting to Storage
       std::cout << "Vectorization level " << vecLevel << std::endl;
     }
 
@@ -119,6 +115,10 @@ namespace espressopp {
     /// reset and update cell mapping and neighbor lists from current storage
     void Vectorization::resetCells()
     {
+      if(!getSystem()->storage){
+        throw std::runtime_error("System has no storage");
+      }
+
       CellList const& localCells = getSystem()->storage->getLocalCells();
       CellList const& realCells  = getSystem()->storage->getRealCells();
       Cell* const cell0 = localCells[0];
@@ -175,10 +175,11 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<Vectorization, shared_ptr<Vectorization> >
-        ("vec_Vectorization", init< shared_ptr<System>, shared_ptr<Storage>, shared_ptr<MDIntegrator>, Mode >())
+        ("vec_Vectorization",
+             init< shared_ptr<System>, shared_ptr<Storage>, shared_ptr<MDIntegrator>, Mode >())
         .def(init< shared_ptr<System>, shared_ptr<Storage>, shared_ptr<MDIntegrator> >())
-        .def(init< shared_ptr<System>, shared_ptr<StorageVec>, shared_ptr<MDIntegratorVec>, Mode >())
-        .def(init< shared_ptr<System>, shared_ptr<StorageVec>, shared_ptr<MDIntegratorVec>>())
+        .def(init< shared_ptr<System>, Mode >())
+        .def(init< shared_ptr<System>>())
         .add_property("level", &Vectorization::getVecLevel)
         ;
 

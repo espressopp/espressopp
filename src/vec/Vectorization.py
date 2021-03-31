@@ -39,29 +39,31 @@ SOA = 'SOA'
 
 class VectorizationLocal(_espressopp.vec_Vectorization):
 
-    def __init__(self, system, integrator, mode=""):
+    def __init__(self, system, integrator=None, mode=None):
         if pmi.workerIsActive():
-            if mode=="" or mode==SOA:
+            if mode is None or mode==SOA:
                 mode_int = _espressopp.VecMode.SOA
             elif mode==AOS:
                 mode_int = _espressopp.VecMode.AOS
             else:
                 raise ValueError("Incorrect mode [{}]".format(mode))
-            cxxinit(self, _espressopp.vec_Vectorization, system, system.storage, integrator, mode_int)
+
+            # call the appropriate constructor
+            if integrator is not None:
+                cxxinit(self, _espressopp.vec_Vectorization, system, system.storage, integrator, mode_int)
+                system.storage.decompose()
+            else:
+                cxxinit(self, _espressopp.vec_Vectorization, system, mode_int)
 
             # Verify that the correct constructor was called
-            if self.level == 2:
-                assert(
-                    isinstance(system.storage, espressopp.vec.storage.StorageVecLocal) and
-                    isinstance(integrator, espressopp.vec.integrator.MDIntegratorVecLocal))
-            elif self.level == 1:
+            if self.level == 1:
                 assert(
                     (not isinstance(system.storage, espressopp.vec.storage.StorageVecLocal)) and
                     (not isinstance(integrator, espressopp.vec.integrator.MDIntegratorVecLocal)))
+            elif self.level == 2:
+                pass
             else:
                 raise RuntimeError("Invalid vectorization level: {}".format(self.level))
-
-            system.storage.decompose()
 
 if pmi.isController:
     class Vectorization(object, metaclass=pmi.Proxy):

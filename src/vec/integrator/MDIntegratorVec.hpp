@@ -46,20 +46,13 @@ namespace espressopp { namespace vec {
     public:
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
 
-      MDIntegratorVec(
-        shared_ptr<System> system,
-        shared_ptr<vec::storage::StorageVec> storageVec
-      ) : storageVec(storageVec)
-        , MDIntegrator(shared_ptr<System>(system))
-      {}
+      MDIntegratorVec(shared_ptr<Vectorization> vectorization);
 
       void addExtension(shared_ptr<vec::integrator::Extension> extension);
 
       shared_ptr<vec::integrator::Extension> getExtension(int k);
 
       int getNumberOfExtensions();
-
-      inline shared_ptr<storage::StorageVec> getStorageVec() { return storageVec; }
 
       // Boost signals for extensions
       // TODO: These extensions should take futures as arguments as they will be used in
@@ -85,7 +78,7 @@ namespace espressopp { namespace vec {
     protected:
       ExtensionList exList;
 
-      shared_ptr< storage::StorageVec > storageVec;
+      shared_ptr<Vectorization> vectorization;
 
     private:
       static LOG4ESPP_DECL_LOGGER(logger);

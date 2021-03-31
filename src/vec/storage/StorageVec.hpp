@@ -24,13 +24,14 @@
 #include "log4espp.hpp"
 
 #include "vec/ParticleArray.hpp"
+#include "vec/include/types.hpp"
 
 namespace espressopp { namespace vec {
   namespace storage {
 
     class StorageVec {
     public:
-      StorageVec(){}
+      StorageVec(shared_ptr<Vectorization> vectorization);
 
       /// TODO: implement method to attach Vectorization
 
@@ -39,6 +40,9 @@ namespace espressopp { namespace vec {
       virtual void unloadCells(){}
 
       static void registerPython();
+
+    protected:
+      shared_ptr<Vectorization> vectorization;
 
     private:
       static LOG4ESPP_DECL_LOGGER(logger);

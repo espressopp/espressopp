@@ -41,9 +41,9 @@ class VelocityVerletLocal(
     MDIntegratorVecLocal
     ):
 
-    def __init__(self, system):
+    def __init__(self, vec):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, vec_integrator_VelocityVerlet, system, system.storage)
+            cxxinit(self, vec_integrator_VelocityVerlet, vec)
 
     # # NOTE: Manually resolved functions with conflicting names back to MDIntegratorVec
     # def addExtension(self, extension):

@@ -54,11 +54,10 @@ namespace espressopp { namespace vec {
 
   /// cut is a cutoff (without skin)
   VerletList::VerletList(
-    shared_ptr<System> system,
     shared_ptr<Vectorization> vectorization,
     real _cut, bool rebuildVL
     )
-    : SystemAccess(system), vectorization(vectorization)
+    : SystemAccess(vectorization->getSystem()), vectorization(vectorization)
   {
     // LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
 
@@ -684,7 +683,7 @@ namespace espressopp { namespace vec {
 
 
     class_<VerletList, shared_ptr<VerletList> >
-      ("vec_VerletList", init< shared_ptr<System>, shared_ptr<Vectorization>, real, bool>())
+      ("vec_VerletList", init< shared_ptr<Vectorization>, real, bool>())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
