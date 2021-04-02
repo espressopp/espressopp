@@ -50,46 +50,65 @@ namespace espressopp { namespace vec {
       shared_ptr< Vectorization > vectorization,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
-      int _halfCellInt,
-      int _vecMode
+      int _halfCellInt
       )
       : baseClass(vectorization->getSystem(), _nodeGrid, _cellGrid, _halfCellInt),
-        StorageVec(vectorization)
-      // , inBuf(*system->comm)
-      // , outBuf(*system->comm)
-      // , excgAligned(_excgAligned)
-      // , commUseChannels(_commUseChannels)
-      // , decompUseParFor(_decompUseParFor)
+        StorageVec(vectorization), vecMode(vectorization->getVecMode())
     {
-      // vecMode = static_cast<Mode>(_vecMode);
-      // switch(vecMode){
-      //   case ESPP_VEC_SOA:
-      //     vecModeFactor = 3;
-      //     break;
-      //   case ESPP_VEC_AOS:
-      //     vecModeFactor = 4;
-      //     break;
-      //   default:
-      //     VEC_NOT_IMPLEMENTED("Invalid vecMode: "<<_vecMode);
-      // }
-
-      // if(halfCellInt!=1)
-      //   throw std::runtime_error("vec: Not implemented for halfCellInt!=1.");
+      if(halfCellInt!=1)
+        throw std::runtime_error("vec: Not implemented for halfCellInt!=1.");
       // resetTimers();
       // connect();
-      // resetVirtualStorage();
+      // resetStorage();
       // VEC_DEBUG_MSG("DomainDecomposition()");
     }
 
     DomainDecomposition::~DomainDecomposition()
     {
-      // disconnect();
+      disconnect();
     }
 
-#if 0
-
-    void DomainDecomposition::resetVirtualStorage()
+    void DomainDecomposition::connect()
     {
+      if(!sigResetStorage.connected())
+        sigResetStorage = this->onCellAdjust.connect(
+                      boost::signals2::at_back,
+                      boost::bind(&DomainDecomposition::resetStorage, this));
+      LOG4ESPP_INFO(logger, "DomainDecomposition::connect()");
+    }
+
+    void DomainDecomposition::disconnect()
+    {
+      if(sigResetStorage.connected())
+        sigResetStorage.disconnect();
+      LOG4ESPP_INFO(logger, "DomainDecomposition::disconnect()");
+    }
+
+    /// Copy particles to packed form. To be called at the start of integrator.run
+    void DomainDecomposition::loadCells()
+    {
+      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
+      vectorization->particles.copyFrom(localCells, vecMode);
+      prepareGhostBuffers();
+      onLoadCells();
+    }
+
+    /// Copy particles back from packed form. To be called at the end of integrator.run
+    void DomainDecomposition::unloadCells()
+    {
+      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
+      vectorization->particles.updateToPositionVelocity(localCells, true);
+    }
+
+    void DomainDecomposition::resetStorage()
+    {
+
+      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
+
+      /// TODO: Mark real cells
+
+
+    #if 0
       const int rank = getSystem()->comm->rank();
       if(!rank) std::cout << __FUNCTION__ << std::endl;
 
@@ -884,9 +903,11 @@ namespace espressopp { namespace vec {
         }
       }
 
-      VEC_DEBUG_MSG("DomainDecomposition::resetVirtualStorage()");
+      VEC_DEBUG_MSG("DomainDecomposition::resetStorage()");
+    #endif
     }
 
+#if 0
     void DomainDecomposition::initChannels()
     {
       /// Initialize channel-based ghost updates
@@ -950,14 +971,12 @@ namespace espressopp { namespace vec {
       }
     }
 
+#endif
+
     void DomainDecomposition::prepareGhostBuffers()
     {
-      if(commUseChannels){
-        prepareGhostBuffers_channel();
-        return;
-        /// TODO: uncomment^
-      }
-
+      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
+    #if 0
       maxReal = maxGhost = 0;
       for (size_t coord = 0; coord < 3; ++coord) {
         for (size_t lr = 0; lr < 2; ++lr) {
@@ -1033,8 +1052,10 @@ namespace espressopp { namespace vec {
       }
       #endif
 
+    #endif
     }
 
+#if 0
     void DomainDecomposition::updateGhostsBlocking()
     {
       if(commUseChannels)
@@ -1049,22 +1070,6 @@ namespace espressopp { namespace vec {
         ghostCommunication_channel_impl<false, false, 0>();
       else
         ghostCommunication_impl<false, false, 0>();
-    }
-
-    void DomainDecomposition::connect()
-    {
-      if(!sigResetVirtualStorage.connected())
-        sigResetVirtualStorage = this->onCellAdjust.connect(
-                      boost::signals2::at_back,
-                      boost::bind(&DomainDecomposition::resetVirtualStorage, this));
-      VEC_DEBUG_MSG("DomainDecomposition::connect()");
-    }
-
-    void DomainDecomposition::disconnect()
-    {
-      if(sigResetVirtualStorage.connected())
-        sigResetVirtualStorage.disconnect();
-      VEC_DEBUG_MSG("DomainDecomposition::disconnect()");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2242,7 +2247,7 @@ namespace espressopp { namespace vec {
 
     void DomainDecomposition::resetCells()
     {
-      resetVirtualStorage();
+      resetStorage();
       // std::cout << "Called " << __FUNCTION__ << std::endl;
     }
 
@@ -2421,13 +2426,14 @@ namespace espressopp { namespace vec {
       using namespace espressopp::python;
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
-        ("vec_storage_DomainDecomposition", init< shared_ptr< Vectorization >, const Int3D&, const Int3D&, int, int >())
+        ("vec_storage_DomainDecomposition", init< shared_ptr< Vectorization >, const Int3D&,
+            const Int3D&, int >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)
         // .def("connectOffload", &DomainDecomposition::connectOffload)
         // .def("connectedOffload", &DomainDecomposition::connectedOffload)
         // .def("disconnectOffload", &DomainDecomposition::disconnectOffload)
-        // .def("resetVirtualStorage", &DomainDecomposition::resetVirtualStorage)
+        // .def("resetStorage", &DomainDecomposition::resetStorage)
         // .def("resetTimers", &DomainDecomposition::resetTimers)
         // .def("getTimers", &wrapGetTimers)
         // .def("getTimers2", &wrapGetTimers2)

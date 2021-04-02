@@ -64,7 +64,6 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.vec.integrator.VelocityVerletLocal',
-            # pmicall = ['run','resetTimers','getNumResorts'],
-            # pmiinvoke = ['getTimers','getOtherTimers']
-            pmicall = ['run']
+            pmicall = ['run','resetTimers','getNumResorts'],
+            pmiinvoke = ['getTimers']
         )

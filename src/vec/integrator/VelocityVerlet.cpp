@@ -24,16 +24,19 @@
 // #include "vec/utils/algorithms/transform_reduce.hpp"
 // #include "vec/utils/multithreading.hpp"
 
+#include "vec/Vectorization.hpp"
+
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
-// #include "iterator/CellListIterator.hpp"
+#include "iterator/CellListIterator.hpp"
 // #include "interaction/Interaction.hpp"
 // #include "interaction/Potential.hpp"
-// #include "System.hpp"
-// #include "storage/Storage.hpp"
+#include "System.hpp"
+#include "storage/Storage.hpp"
 // #include "mpi.hpp"
 
 #include <iomanip>
+#include <numeric>
 
 #ifdef VTRACE
 #include "vampirtrace/vt_user.h"
@@ -43,71 +46,68 @@
 
 namespace espressopp { namespace vec {
   namespace integrator {
-    // using namespace interaction;
-    // using namespace iterator;
-    // using namespace esutil;
+
+    using namespace interaction;
+    using namespace iterator;
+    using namespace esutil;
+
+    using espressopp::System;
+    using espressopp::storage::Storage;
+    using espressopp::vec::storage::StorageVec;
 
     LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
     VelocityVerlet::VelocityVerlet(shared_ptr<Vectorization> vectorization)
       : MDIntegratorVec(vectorization)
     {
-      // LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
-      // resortFlag = true;
-      // maxDist    = 0.0;
-      // nResorts   = 0;
-      std::cout << "vec::integrator::VelocityVerlet::" << __FUNCTION__ << std::endl;
+      LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
+      resortFlag = true;
+      maxDist    = 0.0;
+      nResorts   = 0;
     }
 
     void VelocityVerlet::run(int nsteps)
     {
-      // VEC_DEBUG_MSG("VelocityVerlet::run");
-      // vec::utils::runAsVecThread([this,nsteps]{this->run_(nsteps);});
-    }
-
-#if 0
-    void VelocityVerlet::run_(int nsteps)
-    {
-      // VEC_DEBUG_MSG_THREAD("VelocityVerlet::hpx_run");
+      if(!(vectorization->storageVec)) {
+        throw std::runtime_error("Vectorization has no storageVec");
+      }
 
       nResorts = 0;
       real time;
       timeIntegrate.reset();
       resetTimers();
+
       System& system = getSystemRef();
-      espressopp::storage::Storage& storage = *system.storage;
-      real skinHalf = 0.5 * system.getSkin();
+      Storage& storage = *system.storage;
+      StorageVec& storageVec = *vectorization->storageVec;
+      const real skinHalf = 0.5 * system.getSkin();
 
       // signal
-      baseClass::runInit();
+      MDIntegratorVec::runInit();
 
       // Before start make sure that particles are on the right processor
       if (resortFlag) {
-        const real time = timeIntegrate.getElapsedTime();
-
         LOG4ESPP_INFO(theLogger, "resort particles");
-        storageVec->decomposeVec();
+        storage.decompose();
         maxDist = 0.0;
         resortFlag = false;
+      }
 
-        timeOtherInitResort += timeIntegrate.getElapsedTime() - time;
-      }
       {
-        const real time = timeIntegrate.getElapsedTime();
-        storageVec->loadCells();
-        timeOtherLoadCells += timeIntegrate.getElapsedTime() - time;
+        storageVec.loadCells();
       }
+
       bool recalcForces = true;  // TODO: more intelligent
       if (recalcForces) {
         LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
         // signal
-        baseClass::recalc1();
+        MDIntegratorVec::recalc1();
 
         updateForces();
 
         // signal
-        baseClass::recalc2();
+        MDIntegratorVec::recalc2();
       }
 
       for (int i = 0; i < nsteps; i++)
@@ -133,12 +133,11 @@ namespace espressopp { namespace vec {
           {
             const real time = timeIntegrate.getElapsedTime();
 
-            storageVec->unloadCells();
+            storageVec.unloadCells();
 
-            // storage.decompose();
-            storageVec->decomposeVec();
+            storage.decompose();
 
-            storageVec->loadCells();
+            storageVec.loadCells();
 
             maxDist  = 0.0;
             resortFlag = false;
@@ -146,24 +145,7 @@ namespace espressopp { namespace vec {
 
             timeResort += timeIntegrate.getElapsedTime() - time;
           }
-
-          #if 0
-          else
-          {
-            /// FIXME: Simplify by updating only the outgoing commCells
-            /// copy position/velocities from array to list
-            /// if resort was done in the previous step, data in array should already be updated
-            auto& virtualStorage = storageVec->virtualStorage;
-            auto f = [&virtualStorage](size_t i){
-              auto& vs = virtualStorage[i];
-              vs.particles.updateToPositionVelocity(vs.localCells, true); /// integrate1 modified only real cells
-            };
-            const size_t nvs = virtualStorage.size();
-            utils::parallelForLoop(0, nvs, f);
-            // for(size_t i=0; i<nvs; i++) f(i);
-          }
-          #endif
-
+        #if 0
           // update forces
           {
             updateForces();
@@ -176,12 +158,12 @@ namespace espressopp { namespace vec {
             step++;
             timeInt2 += timeIntegrate.getElapsedTime() - time;
           }
+        #endif
         }
       }
+
       {
-        const real time = timeIntegrate.getElapsedTime();
-        storageVec->unloadCells();
-        timeOtherUnloadCells += timeIntegrate.getElapsedTime() - time;
+        storageVec.unloadCells();
       }
 
       timeRun = timeIntegrate.getElapsedTime();
@@ -189,8 +171,104 @@ namespace espressopp { namespace vec {
                  timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
     }
 
+    real VelocityVerlet::integrate1()
+    {
+      auto& particles                    = vectorization->particles;
+      const auto& realCells              = particles.realCells();
+      const size_t* __restrict cellRange = particles.cellRange().data();
+      const size_t* __restrict sizes     = particles.sizes().data();
+
+      real maxSqDist = 0.0;
+
+      // first-half integration
+      // apply integration scheme on every cell and obtain the maximum displacement value
+      if(particles.mode_aos())
+      {
+        for(auto const& rcell: realCells)
+        {
+          size_t start = cellRange[rcell];
+          size_t size  = sizes[rcell];
+
+          using espressopp::vec::Real3DInt;
+          using espressopp::vec::Real4D;
+          Real3DInt*    __restrict p    = particles.position.data() + start;
+          Real4D*       __restrict v    = particles.velocity.data() + start;
+          const Real4D* __restrict f    = particles.force.data()    + start;
+          const real*   __restrict mass = particles.mass.data()     + start;
+
+          #pragma vector always
+          #pragma vector aligned
+          #pragma ivdep
+          for(size_t ip=0; ip<size; ip++)
+          {
+            /// TODO: transform division by mass to multiplication by reciprocal or just store
+            /// dtfm as an internal array that gets updated by loadCells()
+            const real dtfm = 0.5 * dt / mass[ip];
+
+            v[ip].x += dtfm * f[ip].x;
+            v[ip].y += dtfm * f[ip].y;
+            v[ip].z += dtfm * f[ip].z;
+
+            const real dp_x = v[ip].x * dt;
+            const real dp_y = v[ip].y * dt;
+            const real dp_z = v[ip].z * dt;
+
+            p[ip].x += dp_x;
+            p[ip].y += dp_y;
+            p[ip].z += dp_z;
+
+            real sqDist = (dp_x*dp_x) + (dp_y*dp_y) + (dp_z*dp_z);
+            maxSqDist = std::max(maxSqDist, sqDist);
+          }
+        }
+      }
+      else
+      {
+        for(auto const& rcell: realCells)
+        {
+          size_t start = cellRange[rcell];
+          size_t size  = sizes[rcell];
+
+          real* __restrict p_x = &(particles.p_x[start]);
+          real* __restrict p_y = &(particles.p_y[start]);
+          real* __restrict p_z = &(particles.p_z[start]);
+          real* __restrict v_x = &(particles.v_x[start]);
+          real* __restrict v_y = &(particles.v_y[start]);
+          real* __restrict v_z = &(particles.v_z[start]);
+          const real* __restrict f_x = &(particles.f_x[start]);
+          const real* __restrict f_y = &(particles.f_y[start]);
+          const real* __restrict f_z = &(particles.f_z[start]);
+          const real* __restrict mass = &(particles.mass[start]);
+
+          real maxSqDist = 0.0;
+
+          #pragma vector always
+          #pragma vector aligned
+          #pragma ivdep
+          for(size_t ip=0; ip<size; ip++)
+          {
+            /// TODO: transform division by mass to multiplication by reciprocal or just store
+            /// dtfm as an internal array that gets updated by loadCells()
+            const real dtfm = 0.5 * dt / mass[ip];
+            v_x[ip] += dtfm * f_x[ip];
+            v_y[ip] += dtfm * f_y[ip];
+            v_z[ip] += dtfm * f_z[ip];
+            const real dp_x = v_x[ip] * dt;
+            const real dp_y = v_y[ip] * dt;
+            const real dp_z = v_z[ip] * dt;
+            p_x[ip] += dp_x;
+            p_y[ip] += dp_y;
+            p_z[ip] += dp_z;
+            real sqDist = (dp_x*dp_x) + (dp_y*dp_y) + (dp_z*dp_z);
+            maxSqDist = std::max(maxSqDist, sqDist);
+          }
+        }
+      }
+    }
+
     void VelocityVerlet::calcForces()
     {
+    #if 0
       initForcesParray();
       {
         // TODO: Might need to place interaction list in VecRuntime
@@ -206,10 +284,13 @@ namespace espressopp { namespace vec {
         }
         // aftCalcFLocal();
       }
+    #endif
     }
 
     void VelocityVerlet::updateForces()
     {
+      std::cout << "VelocityVerlet::" << __FUNCTION__ << std::endl;
+    #if 0
       // Implement force update here
       // Initial implementation: blocking update following original
 
@@ -228,8 +309,9 @@ namespace espressopp { namespace vec {
       timeComm2 += timeIntegrate.getElapsedTime() - time;
 
       time = timeIntegrate.getElapsedTime();
-      baseClass::aftCalcF();
+      MDIntegratorVec::aftCalcF();
       timeOtherAftCalcF += timeIntegrate.getElapsedTime() - time;
+    #endif
     }
 
     void VelocityVerlet::initForcesPlist()
@@ -256,20 +338,6 @@ namespace espressopp { namespace vec {
       timeInt1   = 0.0;
       timeInt2   = 0.0;
       timeResort = 0.0;
-      timeForceIntra = 0.0;
-      for(int i = 0; i < 100; i++)
-        timeForceIntraComp[i] = 0.0;
-      timeOverlap= 0.0;
-
-      //--------------------------------------------------------//
-      timeOtherInitResort = 0.0;
-      timeOtherInitForcesPlist = 0.0;
-      timeOtherLoadCells = 0.0;
-      timeOtherRecalcForces = 0.0;
-      timeOtherInitForcesParray = 0.0;
-      timeOtherUnloadCells = 0.0;
-      timeOtherAftCalcF = 0.0;
-      //--------------------------------------------------------//
     }
 
     using namespace boost::python;
@@ -278,23 +346,20 @@ namespace espressopp { namespace vec {
       real tms[14];
       obj->loadTimers(tms);
       return boost::python::make_tuple(
-          tms[0],
-          tms[1],
-          tms[2],
-          tms[3],
-          tms[4],
-          tms[5],
-          tms[6],
-          tms[7],
-          tms[8],
-          tms[9],
-          tms[10],
-          tms[11],
-          tms[12],
-          tms[13]);
+          tms[0]
+        , tms[1]
+        , tms[2]
+        , tms[3]
+        , tms[4]
+        , tms[5]
+        , tms[6]
+        , tms[7]
+        , tms[8]
+        , tms[9]
+        );
     }
 
-    void VelocityVerlet::loadTimers(real t[14]) {
+    void VelocityVerlet::loadTimers(real t[10]) {
       t[0] = timeRun;
       t[1] = timeForceComp[0];
       t[2] = timeForceComp[1];
@@ -305,40 +370,12 @@ namespace espressopp { namespace vec {
       t[7] = timeInt2;
       t[8] = timeResort;
       t[9] = timeLost;
-      t[10] = timeOverlap;
-      t[11] = timeForceIntraComp[0];
-      t[12] = timeForceIntraComp[1];
-      t[13] = timeForceIntraComp[2];
     }
 
     int VelocityVerlet::getNumResorts() const
     {
       return nResorts;
     }
-
-    void VelocityVerlet::loadOtherTimers(real *t) {
-      t[0] = timeOtherInitResort;
-      t[1] = timeOtherInitForcesPlist;
-      t[2] = timeOtherLoadCells;
-      t[3] = timeOtherRecalcForces;
-      t[4] = timeOtherInitForcesParray;
-      t[5] = timeOtherUnloadCells;
-      t[6] = timeOtherAftCalcF;
-    }
-
-    static object wrapGetOtherTimers(class VelocityVerlet* obj) {
-      real tms[7];
-      obj->loadOtherTimers(tms);
-      return boost::python::make_tuple(
-          tms[0],
-          tms[1],
-          tms[2],
-          tms[3],
-          tms[4],
-          tms[5],
-          tms[6]);
-    }
-#endif
 
     /****************************************************
     ** REGISTRATION WITH PYTHON
@@ -353,11 +390,10 @@ namespace espressopp { namespace vec {
               bases<espressopp::integrator::MDIntegrator, MDIntegratorVec>,
               boost::noncopyable >
         ("vec_integrator_VelocityVerlet", init< shared_ptr<Vectorization> >())
-        // .def("run", &vec::integrator::VelocityVerlet::run)
-        // .def("getTimers", &wrapGetTimers)
-        // .def("getOtherTimers", &wrapGetOtherTimers)
-        // .def("resetTimers", &VelocityVerlet::resetTimers)
-        // .def("getNumResorts", &VelocityVerlet::getNumResorts)
+        .def("run", &vec::integrator::VelocityVerlet::run)
+        .def("getTimers", &wrapGetTimers)
+        .def("resetTimers", &VelocityVerlet::resetTimers)
+        .def("getNumResorts", &VelocityVerlet::getNumResorts)
         ;
     }
   }

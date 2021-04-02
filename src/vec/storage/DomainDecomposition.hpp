@@ -21,15 +21,17 @@
 #ifndef VEC_STORAGE_DOMAINDECOMPOSITION_HPP
 #define VEC_STORAGE_DOMAINDECOMPOSITION_HPP
 
+#include "StorageVec.hpp"
+#include "vec/ParticleArray.hpp"
+#include "vec/include/types.hpp"
+
 #include <iostream>
 #include "log4espp.hpp"
 #include "storage/DomainDecomposition.hpp"
-#include "StorageVec.hpp"
 #include "esutil/Timer.hpp"
 // #include "vec/BufferView.hpp"
 
 #include "types.hpp"
-#include "vec/include/types.hpp"
 
 /// Forward declaration
 namespace espressopp { namespace integrator {
@@ -73,32 +75,36 @@ namespace espressopp { namespace vec {
         shared_ptr< Vectorization > vectorization,
         const Int3D& nodeGrid,
         const Int3D& cellGrid,
-        int halfCellInt,
-        int vecMode
+        int halfCellInt
         );
 
       ~DomainDecomposition();
 
-      static void registerPython();
+      void connect();
 
-#if 0
-      void initChannels();
+      void disconnect();
 
-      /** Copy particles to packed form. To be called at the start of integrator.run */
+      void resetStorage();
+
       void loadCells();
 
-      /** Copy particles back from packed form. To be called at the end of integrator.run */
       void unloadCells();
 
+      static void registerPython();
+
+    protected:
+
+      boost::signals2::connection sigResetStorage;
+
+      const Mode vecMode;
+
       void prepareGhostBuffers();
+
+#if 0
 
       void updateGhostsBlocking();
 
       void collectGhostForcesBlocking();
-
-      void connect();
-
-      void disconnect();
 
       void resetVirtualStorage();
 

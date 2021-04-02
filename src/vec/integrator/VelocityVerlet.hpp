@@ -46,74 +46,56 @@ namespace espressopp { namespace vec {
 
       virtual void run(int nsteps);
 
-      // real getTimeStep() { return baseClass::getTimeStep(); }
+      real getTimeStep() { return MDIntegratorVec::getTimeStep(); }
 
-      // /** Load timings in array to export to Python as a tuple. */
-      // void loadTimers(real t[10]);
+      /// Load timings in array to export to Python as a tuple
+      void loadTimers(real t[10]);
 
-      // void resetTimers();
+      /// Reset timers to zero
+      void resetTimers();
 
-      // /** Returns the number of resorts done during a single call to integrator.run().
-      //     Its value is reset to zero at the beginning of each run. */
-      // int getNumResorts() const;
+      /// Returns the number of resorts done during a single call to integrator.run().
+      /// Its value is reset to zero at the beginning of each run
+      int getNumResorts() const;
 
-      /** Register this class so it can be used from Python. */
+      /// Register this class so it can be used from Python
       static void registerPython();
 
     protected:
 
-      // bool resortFlag;  //!< true implies need for resort of particles
-      // int nResorts;
-      // real maxDist;
-      // real maxCut;
+      bool resortFlag;  //!< true implies need for resort of particles
+      int nResorts;
+      real maxDist;
+      real maxCut;
 
-      // void run_(int nsteps);
-
-      // real integrate1();
-      // std::vector<size_t> vsidx;
+      real integrate1();
 
       // void integrate2();
 
-      // void calcForces();
+      void calcForces();
 
-      // void updateForces();
+      void updateForces();
 
       // void updateForcesBlock();
 
-      // void initForcesPlist();
+      void initForcesPlist();
 
       // void initForcesParray();
 
-      // espressopp::esutil::WallTimer timeIntegrate;  //!< used for timing
+      espressopp::esutil::WallTimer timeIntegrate;  //!< used for timing
 
-      // // variables that keep time information about different phases
-      // real timeRun;
-      // real timeLost;
-      // real timeForce;
-      // real timeForceComp[100];
-      // real timeForceIntra;
-      // real timeForceIntraComp[100];
-      // real timeOverlap;
-      // real timeComm1;
-      // real timeComm2;
-      // real timeInt1;
-      // real timeInt2;
-      // real timeResort;
+      // variables that keep time information about different phases
+      real timeRun;
+      real timeLost;
+      real timeForce;
+      real timeForceComp[100];
+      real timeComm1;
+      real timeComm2;
+      real timeInt1;
+      real timeInt2;
+      real timeResort;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
-
-      // //--------------------------------------------------------//
-      // real timeOtherInitResort;
-      // real timeOtherInitForcesPlist;
-      // real timeOtherLoadCells;
-      // real timeOtherRecalcForces;
-      // real timeOtherInitForcesParray;
-      // real timeOtherUnloadCells;
-      // real timeOtherAftCalcF;
-
-    public:
-      // void loadOtherTimers(real *t);
-      // //--------------------------------------------------------//
     };
 
   }

@@ -181,6 +181,7 @@ namespace espressopp {
         .def(init< shared_ptr<System>, Mode >())
         .def(init< shared_ptr<System>>())
         .add_property("level", &Vectorization::getVecLevel)
+        .def_readwrite("storageVec", &Vectorization::storageVec)
         ;
 
       enum_<Mode>("VecMode")

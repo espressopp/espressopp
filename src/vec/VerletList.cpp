@@ -65,6 +65,10 @@ namespace espressopp { namespace vec {
        throw std::runtime_error("system has no storage");
     }
 
+    if (!vectorization->storageVec) {
+       throw std::runtime_error("vectorization has no storageVec");
+    }
+
     cut = _cut;
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
@@ -77,17 +81,16 @@ namespace espressopp { namespace vec {
     connectionResort = getSystem()->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
 
-    /// TODO: Impelement vecLevel=2
-    // const bool resortOnLoad = (vectorization->getVecLevel()==2);
-    // if(resortOnLoad) {
-    //   // make a connection to vectorization to invoke rebuild on loadCells
-    //   connectionResort = vectorization->onLoadCells.connect(
-    //       boost::bind(&VerletList::rebuild, this));
-    // } else {
-    //   // make a connection to System to invoke rebuild on resort
-    //   connectionResort = getSystem()->storage->onParticlesChanged.connect(
-    //       boost::bind(&VerletList::rebuild, this));
-    // }
+    const bool resortOnLoad = (vectorization->getVecLevel()==2);
+    if(resortOnLoad) {
+      // make a connection to vectorization to invoke rebuild on loadCells
+      connectionResort = vectorization->storageVec->onLoadCells.connect(
+          boost::bind(&VerletList::rebuild, this));
+    } else {
+      // make a connection to System to invoke rebuild on resort
+      connectionResort = getSystem()->storage->onParticlesChanged.connect(
+          boost::bind(&VerletList::rebuild, this));
+    }
   }
 
   real VerletList::getVerletCutoff()

@@ -21,23 +21,26 @@
 #ifndef VEC_STORAGEVEC_HPP
 #define VEC_STORAGEVEC_HPP
 
+#include "vec/include/types.hpp"
+
+#include "python.hpp"
 #include "log4espp.hpp"
 
-#include "vec/ParticleArray.hpp"
-#include "vec/include/types.hpp"
+#include <boost/signals2.hpp>
 
 namespace espressopp { namespace vec {
   namespace storage {
 
-    class StorageVec {
+    class StorageVec
+    {
     public:
       StorageVec(shared_ptr<Vectorization> vectorization);
 
-      /// TODO: implement method to attach Vectorization
+      virtual void loadCells() = 0;
 
-      virtual void loadCells(){}
+      virtual void unloadCells() = 0;
 
-      virtual void unloadCells(){}
+      boost::signals2::signal<void ()> onLoadCells;
 
       static void registerPython();
 

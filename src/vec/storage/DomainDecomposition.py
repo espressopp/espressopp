@@ -30,18 +30,11 @@ class DomainDecompositionLocal(
     espressopp.storage.DomainDecompositionLocal,
     StorageVecLocal
 ):
-    def __init__(self, vec, nodeGrid, cellGrid, halfCellInt, vecMode):
+    def __init__(self, vec, nodeGrid, cellGrid, halfCellInt):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-
-            if vecMode.upper() == 'AOS' or vecMode == '':
-                vecModeInput = VecMode.AOS
-            elif vecMode.upper() == 'SOA':
-                vecModeInput = VecMode.SOA
-            else:
-                raise ValueError("vecMode must be 'SOA' or 'AOS'")
-
-            cxxinit(self, vec_storage_DomainDecomposition, vec, nodeGrid, cellGrid, halfCellInt, vecModeInput)
+            cxxinit(self, vec_storage_DomainDecomposition, vec, nodeGrid, cellGrid, halfCellInt)
+            vec.storageVec = self
 
 if pmi.isController:
     class DomainDecomposition(
@@ -55,6 +48,6 @@ if pmi.isController:
             # pmiinvoke = ['getTimers','getTimers2','getChannelIndices']
         )
 
-        def __init__(self, system, nodeGrid, cellGrid, halfCellInt=1, vecMode=''):
+        def __init__(self, system, nodeGrid, cellGrid, halfCellInt=1):
 
-            self.pmiinit(system, nodeGrid, cellGrid, halfCellInt, vecMode)
+            self.pmiinit(system, nodeGrid, cellGrid, halfCellInt)

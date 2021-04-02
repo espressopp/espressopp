@@ -84,6 +84,8 @@ namespace espressopp {
         return vecMode == ESPP_VEC_AOS;
       }
 
+      shared_ptr<StorageVec> storageVec;
+
       static void registerPython();
 
     protected:
