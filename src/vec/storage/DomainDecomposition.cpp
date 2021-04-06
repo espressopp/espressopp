@@ -58,9 +58,9 @@ namespace espressopp { namespace vec {
       if(halfCellInt!=1)
         throw std::runtime_error("vec: Not implemented for halfCellInt!=1.");
       // resetTimers();
-      // connect();
-      // resetStorage();
-      // VEC_DEBUG_MSG("DomainDecomposition()");
+      connect();
+      resetStorage();
+      LOG4ESPP_INFO(logger, "DomainDecomposition()");
     }
 
     DomainDecomposition::~DomainDecomposition()
@@ -87,8 +87,7 @@ namespace espressopp { namespace vec {
     /// Copy particles to packed form. To be called at the start of integrator.run
     void DomainDecomposition::loadCells()
     {
-      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
-      vectorization->particles.copyFrom(localCells, vecMode);
+      vectorization->resetParticles();
       prepareGhostBuffers();
       onLoadCells();
     }
@@ -96,17 +95,14 @@ namespace espressopp { namespace vec {
     /// Copy particles back from packed form. To be called at the end of integrator.run
     void DomainDecomposition::unloadCells()
     {
-      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
       vectorization->particles.updateToPositionVelocity(localCells, true);
     }
 
     void DomainDecomposition::resetStorage()
     {
+      vectorization->resetCells(this);
 
-      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
-
-      /// TODO: Mark real cells
-
+      /// TODO: Setup ghost communication (fill-in later when ghost comm routines are established)
 
     #if 0
       const int rank = getSystem()->comm->rank();
@@ -975,7 +971,6 @@ namespace espressopp { namespace vec {
 
     void DomainDecomposition::prepareGhostBuffers()
     {
-      std::cout << "DomainDecomposition::" << __FUNCTION__ << std::endl;
     #if 0
       maxReal = maxGhost = 0;
       for (size_t coord = 0; coord < 3; ++coord) {

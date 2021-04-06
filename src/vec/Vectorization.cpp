@@ -32,12 +32,10 @@ namespace espressopp {
     /// constructor
     Vectorization::Vectorization(
       shared_ptr<System> _system,
-      shared_ptr<Storage> _storage,
       shared_ptr<MDIntegrator> _mdintegrator,
       Mode _vecMode
       )
       : SystemAccess(_system)
-      , storage(_storage)
       , mdintegrator(_mdintegrator)
       , vecMode(_vecMode)
       , vecLevel(1)
@@ -118,14 +116,19 @@ namespace espressopp {
       if(!getSystem()->storage){
         throw std::runtime_error("System has no storage");
       }
+      resetCells(getSystem()->storage.get());
+    }
 
-      CellList const& localCells = getSystem()->storage->getLocalCells();
-      CellList const& realCells  = getSystem()->storage->getRealCells();
+    void Vectorization::resetCells(Storage* storage)
+    {
+      CellList const& localCells = storage->getLocalCells();
+      CellList const& realCells  = storage->getRealCells();
       Cell* const cell0 = localCells[0];
       std::vector<size_t> realCellIdx;
       for(Cell* rc: realCells) {
         realCellIdx.push_back(rc-cell0);
       }
+      particles.markRealCells(realCellIdx);
       neighborList = CellNeighborList(cell0, localCells, realCellIdx);
       LOG4ESPP_TRACE(logger,"neighborList, ncells: "<<neighborList.numCells()
         <<" nnbrs: "<<neighborList.maxNumNeighbors());
@@ -156,7 +159,7 @@ namespace espressopp {
         std::fill(f_z.begin(),f_z.end(),0.0);
       }
 
-      // overwrite particles positon data
+      // overwrite particles position data
       particles.updateFromPositionOnly(getSystem()->storage->getLocalCells());
     }
 
@@ -176,8 +179,8 @@ namespace espressopp {
 
       class_<Vectorization, shared_ptr<Vectorization> >
         ("vec_Vectorization",
-             init< shared_ptr<System>, shared_ptr<Storage>, shared_ptr<MDIntegrator>, Mode >())
-        .def(init< shared_ptr<System>, shared_ptr<Storage>, shared_ptr<MDIntegrator> >())
+             init< shared_ptr<System>, shared_ptr<MDIntegrator>, Mode >())
+        .def(init< shared_ptr<System>, shared_ptr<MDIntegrator> >())
         .def(init< shared_ptr<System>, Mode >())
         .def(init< shared_ptr<System>>())
         .add_property("level", &Vectorization::getVecLevel)

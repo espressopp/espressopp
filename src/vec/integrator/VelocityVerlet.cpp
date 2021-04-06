@@ -150,6 +150,7 @@ namespace espressopp { namespace vec {
           {
             updateForces();
           }
+        #endif
 
           {
             const real time = timeIntegrate.getElapsedTime();
@@ -158,7 +159,6 @@ namespace espressopp { namespace vec {
             step++;
             timeInt2 += timeIntegrate.getElapsedTime() - time;
           }
-        #endif
         }
       }
 
@@ -184,7 +184,7 @@ namespace espressopp { namespace vec {
       // apply integration scheme on every cell and obtain the maximum displacement value
       if(particles.mode_aos())
       {
-        for(auto const& rcell: realCells)
+        for(const auto& rcell: realCells)
         {
           size_t start = cellRange[rcell];
           size_t size  = sizes[rcell];
@@ -224,7 +224,7 @@ namespace espressopp { namespace vec {
       }
       else
       {
-        for(auto const& rcell: realCells)
+        for(const auto& rcell: realCells)
         {
           size_t start = cellRange[rcell];
           size_t size  = sizes[rcell];
@@ -261,6 +261,68 @@ namespace espressopp { namespace vec {
             p_z[ip] += dp_z;
             real sqDist = (dp_x*dp_x) + (dp_y*dp_y) + (dp_z*dp_z);
             maxSqDist = std::max(maxSqDist, sqDist);
+          }
+        }
+      }
+    }
+
+    void VelocityVerlet::integrate2()
+    {
+      auto& particles                    = vectorization->particles;
+      const auto& realCells              = particles.realCells();
+      const size_t* __restrict cellRange = particles.cellRange().data();
+      const size_t* __restrict sizes     = particles.sizes().data();
+
+      if(particles.mode_aos())
+      {
+        for(const auto& rcell: realCells)
+        {
+          const size_t start = cellRange[rcell];
+          const size_t size  = sizes[rcell];
+
+          using espressopp::vec::Real4D;
+          Real4D*       __restrict v    = particles.velocity.data() + start;
+          const Real4D* __restrict f    = particles.force.data()    + start;
+          const real*   __restrict mass = particles.mass.data()     + start;
+
+          #pragma vector always
+          #pragma vector aligned
+          #pragma ivdep
+          for(size_t ip=0; ip<size; ip++)
+          {
+            /// TODO: transform division by mass to multiplication by reciprocal or fixed dtfm array
+            const real dtfm = 0.5 * dt / mass[ip];
+            v[ip].x += dtfm * f[ip].x;
+            v[ip].y += dtfm * f[ip].y;
+            v[ip].z += dtfm * f[ip].z;
+          }
+        }
+      }
+      else
+      {
+        for(const auto& rcell: realCells)
+        {
+          const size_t start = cellRange[rcell];
+          const size_t size  = sizes[rcell];
+
+          real* __restrict v_x = &(particles.v_x[start]);
+          real* __restrict v_y = &(particles.v_y[start]);
+          real* __restrict v_z = &(particles.v_z[start]);
+          const real* __restrict f_x = &(particles.f_x[start]);
+          const real* __restrict f_y = &(particles.f_y[start]);
+          const real* __restrict f_z = &(particles.f_z[start]);
+          const real* __restrict mass = &(particles.mass[start]);
+
+          #pragma vector always
+          #pragma vector aligned
+          #pragma ivdep
+          for(size_t ip=0; ip<size; ip++)
+          {
+            /// TODO: transform division by mass to multiplication by reciprocal or fixed dtfm array
+            const real dtfm = 0.5 * dt / mass[ip];
+            v_x[ip] += dtfm * f_x[ip];
+            v_y[ip] += dtfm * f_y[ip];
+            v_z[ip] += dtfm * f_z[ip];
           }
         }
       }

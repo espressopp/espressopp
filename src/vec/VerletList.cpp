@@ -59,14 +59,10 @@ namespace espressopp { namespace vec {
     )
     : SystemAccess(vectorization->getSystem()), vectorization(vectorization)
   {
-    // LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
+    LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
 
     if (!getSystem()->storage) {
-       throw std::runtime_error("system has no storage");
-    }
-
-    if (!vectorization->storageVec) {
-       throw std::runtime_error("vectorization has no storageVec");
+      throw std::runtime_error("system has no storage");
     }
 
     cut = _cut;
@@ -78,14 +74,25 @@ namespace espressopp { namespace vec {
     resetTimers();
     if (rebuildVL) rebuild(); // not called if exclutions are provided
 
-    connectionResort = getSystem()->storage->onParticlesChanged.connect(
-        boost::bind(&VerletList::rebuild, this));
+    connect();
+  }
 
+  real VerletList::getVerletCutoff()
+  {
+    return cutVerlet;
+  }
+
+  void VerletList::connect()
+  {
     const bool resortOnLoad = (vectorization->getVecLevel()==2);
     if(resortOnLoad) {
+      if (!vectorization->storageVec)
+        throw std::runtime_error("vectorization has no storageVec");
       // make a connection to vectorization to invoke rebuild on loadCells
       connectionResort = vectorization->storageVec->onLoadCells.connect(
           boost::bind(&VerletList::rebuild, this));
+
+      std::cout << "VerletList::connect to vectorization->storageVec->onLoadCells" << std::endl;
     } else {
       // make a connection to System to invoke rebuild on resort
       connectionResort = getSystem()->storage->onParticlesChanged.connect(
@@ -93,22 +100,10 @@ namespace espressopp { namespace vec {
     }
   }
 
-  real VerletList::getVerletCutoff()
-  {
-    // return cutVerlet;
-  }
-
-  void VerletList::connect()
-  {
-    // // make a connection to System to invoke rebuild on resort
-    // connectionResort = getSystem()->storage->onParticlesChanged.connect(
-    //     boost::bind(&VerletList::rebuild, this));
-  }
-
   void VerletList::disconnect()
   {
-    // // disconnect from System to avoid rebuild on resort
-    // connectionResort.disconnect();
+    // disconnect from System to avoid rebuild on resort
+    connectionResort.disconnect();
   }
 
   void VerletList::rebuild()
@@ -118,7 +113,6 @@ namespace espressopp { namespace vec {
 
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
-    num_pairs = 0;
 
     {
       neighborList.reset();
@@ -199,9 +193,6 @@ namespace espressopp { namespace vec {
       }
 
       /////////////////////////////////////////////////////////////////////////////////////////////
-
-      neighborList.num_pairs = 0;
-      neighborList.max_type = 0;
 
       const auto* __restrict position  = particleArray.position.data();
       const auto* __restrict pa_p_x    = particleArray.p_x.data();
@@ -603,52 +594,35 @@ namespace espressopp { namespace vec {
 
   int VerletList::totalSize() const
   {
-    // System& system = getSystemRef();
-    // int size = localSize();
-    // int allsize;
+    System& system = getSystemRef();
+    int size = localSize();
+    int allsize;
 
-    // mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
-    // return allsize;
+    mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
+    return allsize;
   }
 
   int VerletList::localSize() const
   {
-    // System& system = getSystemRef();
-    // // return vlPairs.size();
-    // return num_pairs;
-  }
-
-#if 0
-  python::tuple VerletList::getPair(int i) {
-    if (i <= 0 || i > vlPairs.size()) {
-      std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
-      return python::make_tuple();
-    } else {
-      return python::make_tuple(vlPairs[i-1].first->id(), vlPairs[i-1].second->id());
-    }
+    return neighborList.num_pairs;
   }
 
 
   bool VerletList::exclude(longint pid1, longint pid2) {
-
-      throw std::runtime_error("Exclusions in VerletList not implemented.");
-
-      exList.insert(std::make_pair(pid1, pid2));
-
-      return true;
+    throw std::runtime_error("Exclusions in VerletList not implemented.");
+    // exList.insert(std::make_pair(pid1, pid2));
+    return true;
   }
-#endif
-
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   VerletList::~VerletList()
   {
-    // LOG4ESPP_INFO(theLogger, "~VerletList");
+    LOG4ESPP_INFO(theLogger, "~VerletList");
 
-    // if (!connectionResort.connected()) {
-    //   connectionResort.disconnect();
-    // }
+    if (!connectionResort.connected()) {
+      connectionResort.disconnect();
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////

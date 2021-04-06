@@ -64,6 +64,8 @@ namespace espressopp { namespace vec {
       {
         plist.clear();
         prange.clear();
+        num_pairs = 0;
+        max_type = 0;
       }
 
       void clear()
@@ -90,8 +92,6 @@ namespace espressopp { namespace vec {
 
     inline auto getVectorization() { return vectorization; }
 
-    // python::tuple getPair(int i);
-
     std::uint64_t getMaxType() { return max_type; }
 
     real getVerletCutoff(); // returns cutoff + skin
@@ -99,10 +99,6 @@ namespace espressopp { namespace vec {
     void connect();
 
     void disconnect();
-
-    /// Rebuilds the non-vectorized Verlet list vlPairs for back-compatibility with analysis
-    /// FIXME: Implement analysis directly
-    // virtual void rebuildPairs();
 
     virtual void rebuild();
 
@@ -135,22 +131,6 @@ namespace espressopp { namespace vec {
   protected:
     shared_ptr<Vectorization> vectorization;
 
-    int num_pairs = 0;
-    // void checkPair(Particle &pt1, Particle &pt2);
-
-    // AlignedVector<int> c_j;
-    // AlignedVector<real> c_x,c_y,c_z;
-    // AlignedVector<std::pair<int,int>> c_range;
-    // AlignedVector<std::pair<int,int>> cell_nplist_range;
-
-    // template< bool VEC_MODE_AOS, bool PACK_NEIGHBORS >
-    // void rebuild_p_nc_pack_stencil(
-    //   storage::VirtualStorage const& virtualStorage,
-    //   NeighborList & neighborList
-    // );
-
-    // PairList vlPairs;
-    // std::vector<NeighborList> neighborLists;
     NeighborList neighborList;
     // boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
 

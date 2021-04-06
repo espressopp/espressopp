@@ -50,7 +50,7 @@ class VectorizationLocal(_espressopp.vec_Vectorization):
 
             # call the appropriate constructor
             if integrator is not None:
-                cxxinit(self, _espressopp.vec_Vectorization, system, system.storage, integrator, mode_int)
+                cxxinit(self, _espressopp.vec_Vectorization, system, integrator, mode_int)
                 system.storage.decompose()
             else:
                 cxxinit(self, _espressopp.vec_Vectorization, system, mode_int)

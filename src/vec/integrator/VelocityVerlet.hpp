@@ -70,7 +70,7 @@ namespace espressopp { namespace vec {
 
       real integrate1();
 
-      // void integrate2();
+      void integrate2();
 
       void calcForces();
 

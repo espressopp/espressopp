@@ -51,7 +51,6 @@ namespace espressopp {
     public:
       Vectorization(
         shared_ptr<System> system,
-        shared_ptr<Storage> storage,
         shared_ptr<MDIntegrator> mdintegrator,
         Mode vecMode = ESPP_VEC_MODE_DEFAULT);
 
@@ -67,6 +66,7 @@ namespace espressopp {
 
       ParticleArray particles;
       CellNeighborList neighborList;
+      shared_ptr<StorageVec> storageVec;
 
       inline int getVecLevel() {
         return vecLevel;
@@ -84,7 +84,13 @@ namespace espressopp {
         return vecMode == ESPP_VEC_AOS;
       }
 
-      shared_ptr<StorageVec> storageVec;
+      void resetParticles();
+      void befCalcForces();
+      void updatePositions();
+      void updateForces();
+
+      void resetCells();
+      void resetCells(Storage*);
 
       static void registerPython();
 
@@ -92,14 +98,6 @@ namespace espressopp {
       const Mode vecMode;
       const int vecLevel;
 
-      void resetParticles();
-      void befCalcForces();
-      void updatePositions();
-      void updateForces();
-
-      void resetCells();
-
-      shared_ptr<Storage> storage;
       shared_ptr<MDIntegrator> mdintegrator;
 
       // signals that connect to integrator
