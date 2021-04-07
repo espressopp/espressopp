@@ -113,52 +113,49 @@ namespace espressopp { namespace vec {
       for (int i = 0; i < nsteps; i++)
       {
         {
-          {
-            const real time = timeIntegrate.getElapsedTime();
+          const real time = timeIntegrate.getElapsedTime();
 
-            const real maxSqDist = integrate1();
+          const real maxSqDist = integrate1();
 
-            // collective call to allreduce for dmax
-            real maxAllSqDist = 0.0;
-            mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
-            maxDist += std::sqrt(maxAllSqDist);
-            // std::cout << " step: " << i << " maxDist: " << maxDist << std::endl;
+          // collective call to allreduce for dmax
+          real maxAllSqDist = 0.0;
+          mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
+          maxDist += std::sqrt(maxAllSqDist);
+          // std::cout << " step: " << i << " maxDist: " << maxDist << std::endl;
 
-            timeInt1 += timeIntegrate.getElapsedTime() - time;
-          }
+          timeInt1 += timeIntegrate.getElapsedTime() - time;
+        }
 
-          if (maxDist > skinHalf) resortFlag = true;
+        if (maxDist > skinHalf) resortFlag = true;
 
-          if (resortFlag)
-          {
-            const real time = timeIntegrate.getElapsedTime();
+        if (resortFlag)
+        {
+          const real time = timeIntegrate.getElapsedTime();
 
-            storageVec.unloadCells();
+          storageVec.unloadCells();
 
-            storage.decompose();
+          storage.decompose();
 
-            storageVec.loadCells();
+          storageVec.loadCells();
 
-            maxDist  = 0.0;
-            resortFlag = false;
-            nResorts ++;
+          maxDist  = 0.0;
+          resortFlag = false;
+          nResorts ++;
 
-            timeResort += timeIntegrate.getElapsedTime() - time;
-          }
-        #if 0
-          // update forces
-          {
-            updateForces();
-          }
-        #endif
+          timeResort += timeIntegrate.getElapsedTime() - time;
+        }
 
-          {
-            const real time = timeIntegrate.getElapsedTime();
-            // second-half integration
-            integrate2();
-            step++;
-            timeInt2 += timeIntegrate.getElapsedTime() - time;
-          }
+        // update forces
+        {
+          updateForces();
+        }
+
+        {
+          const real time = timeIntegrate.getElapsedTime();
+          // second-half integration
+          integrate2();
+          step++;
+          timeInt2 += timeIntegrate.getElapsedTime() - time;
         }
       }
 
@@ -330,8 +327,8 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::calcForces()
     {
-    #if 0
       initForcesParray();
+    #if 0
       {
         // TODO: Might need to place interaction list in VecRuntime
         System& sys = getSystemRef();
@@ -352,28 +349,26 @@ namespace espressopp { namespace vec {
     void VelocityVerlet::updateForces()
     {
       std::cout << "VelocityVerlet::" << __FUNCTION__ << std::endl;
-    #if 0
       // Implement force update here
       // Initial implementation: blocking update following original
 
       real time;
 
-      time = timeIntegrate.getElapsedTime();
-      storageVec->updateGhostsBlocking();
-      timeComm1 += timeIntegrate.getElapsedTime() - time;
+      // time = timeIntegrate.getElapsedTime();
+      // storageVec->updateGhostsBlocking();
+      // timeComm1 += timeIntegrate.getElapsedTime() - time;
 
       time = timeIntegrate.getElapsedTime();
       calcForces();
       timeForce += timeIntegrate.getElapsedTime() - time;
 
-      time = timeIntegrate.getElapsedTime();
-      storageVec->collectGhostForcesBlocking();
-      timeComm2 += timeIntegrate.getElapsedTime() - time;
+      // time = timeIntegrate.getElapsedTime();
+      // storageVec->collectGhostForcesBlocking();
+      // timeComm2 += timeIntegrate.getElapsedTime() - time;
 
-      time = timeIntegrate.getElapsedTime();
-      MDIntegratorVec::aftCalcF();
-      timeOtherAftCalcF += timeIntegrate.getElapsedTime() - time;
-    #endif
+      // time = timeIntegrate.getElapsedTime();
+      // MDIntegratorVec::aftCalcF();
+      // timeOtherAftCalcF += timeIntegrate.getElapsedTime() - time;
     }
 
     void VelocityVerlet::initForcesPlist()
@@ -389,6 +384,11 @@ namespace espressopp { namespace vec {
         cit->force() = 0.0;
         cit->drift() = 0.0;   // Can in principle be commented, when drift is not used.
       }
+    }
+
+    void VelocityVerlet::initForcesParray()
+    {
+      vectorization->zeroForces();
     }
 
     void VelocityVerlet::resetTimers() {

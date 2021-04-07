@@ -103,13 +103,6 @@ namespace espressopp {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// reset and update particles from current storage
-    void Vectorization::resetParticles()
-    {
-      particles.copyFrom(getSystem()->storage->getLocalCells(), vecMode);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     /// reset and update cell mapping and neighbor lists from current storage
     void Vectorization::resetCells()
     {
@@ -136,30 +129,40 @@ namespace espressopp {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// set force array/s to zero
-    void Vectorization::befCalcForces()
+    void Vectorization::zeroForces()
     {
-      if(vecMode==ESPP_VEC_AOS)
+      auto f_zero = [](real* __restrict f, size_t size)
       {
-        auto& f = particles.force;
-        real* el = &(f[0].x);
-        size_t end = 4*f.size();
-
         #pragma vector always
         #pragma vector aligned
         #pragma ivdep
-        for(size_t i=0; i<end; i++) el[i] = 0.0;
+        for(int i=0; i<size; i++) f[i] = 0.0;
+      };
+
+      if(vecMode==ESPP_VEC_AOS)
+      {
+        f_zero((real* __restrict) particles.force.data(), 4*particles.force.size());
       }
       else
       {
-        auto& f_x = particles.f_x;
-        auto& f_y = particles.f_y;
-        auto& f_z = particles.f_z;
-        std::fill(f_x.begin(),f_x.end(),0.0);
-        std::fill(f_y.begin(),f_y.end(),0.0);
-        std::fill(f_z.begin(),f_z.end(),0.0);
+        f_zero(particles.f_x.data(), particles.f_x.size());
+        f_zero(particles.f_y.data(), particles.f_y.size());
+        f_zero(particles.f_z.data(), particles.f_z.size());
       }
+    }
 
-      // overwrite particles position data
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /// reset and update particles from current storage
+    void Vectorization::resetParticles()
+    {
+      particles.copyFrom(getSystem()->storage->getLocalCells(), vecMode);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /// set force array/s to zero and overwrite particles position data
+    void Vectorization::befCalcForces()
+    {
+      zeroForces();
       particles.updateFromPositionOnly(getSystem()->storage->getLocalCells());
     }
 

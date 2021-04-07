@@ -84,13 +84,15 @@ namespace espressopp {
         return vecMode == ESPP_VEC_AOS;
       }
 
+      void resetCells();
+      void resetCells(Storage*);
+
+      void zeroForces();
+
       void resetParticles();
       void befCalcForces();
       void updatePositions();
       void updateForces();
-
-      void resetCells();
-      void resetCells(Storage*);
 
       static void registerPython();
 

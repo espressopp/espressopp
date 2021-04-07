@@ -80,7 +80,7 @@ namespace espressopp { namespace vec {
 
       void initForcesPlist();
 
-      // void initForcesParray();
+      void initForcesParray();
 
       espressopp::esutil::WallTimer timeIntegrate;  //!< used for timing
 

@@ -41,9 +41,9 @@ class VectorizationLocal(_espressopp.vec_Vectorization):
 
     def __init__(self, system, integrator=None, mode=None):
         if pmi.workerIsActive():
-            if mode is None or mode==SOA:
+            if mode is None or mode==SOA or mode=='SOA':
                 mode_int = _espressopp.VecMode.SOA
-            elif mode==AOS:
+            elif mode==AOS or mode=='AOS':
                 mode_int = _espressopp.VecMode.AOS
             else:
                 raise ValueError("Incorrect mode [{}]".format(mode))
