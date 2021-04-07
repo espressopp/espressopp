@@ -121,7 +121,6 @@ namespace espressopp { namespace vec {
           real maxAllSqDist = 0.0;
           mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
           maxDist += std::sqrt(maxAllSqDist);
-          // std::cout << " step: " << i << " maxDist: " << maxDist << std::endl;
 
           timeInt1 += timeIntegrate.getElapsedTime() - time;
         }
@@ -145,18 +144,18 @@ namespace espressopp { namespace vec {
           timeResort += timeIntegrate.getElapsedTime() - time;
         }
 
-        // update forces
         {
           updateForces();
         }
 
         {
           const real time = timeIntegrate.getElapsedTime();
-          // second-half integration
+
           integrate2();
-          step++;
+
           timeInt2 += timeIntegrate.getElapsedTime() - time;
         }
+        step++;
       }
 
       {
@@ -237,8 +236,6 @@ namespace espressopp { namespace vec {
           const real* __restrict f_z = &(particles.f_z[start]);
           const real* __restrict mass = &(particles.mass[start]);
 
-          real maxSqDist = 0.0;
-
           #pragma vector always
           #pragma vector aligned
           #pragma ivdep
@@ -261,6 +258,8 @@ namespace espressopp { namespace vec {
           }
         }
       }
+
+      return maxSqDist;
     }
 
     void VelocityVerlet::integrate2()
@@ -348,7 +347,6 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::updateForces()
     {
-      std::cout << "VelocityVerlet::" << __FUNCTION__ << std::endl;
       // Implement force update here
       // Initial implementation: blocking update following original
 

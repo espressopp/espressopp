@@ -117,10 +117,7 @@ namespace espressopp {
       CellList const& localCells = storage->getLocalCells();
       CellList const& realCells  = storage->getRealCells();
       Cell* const cell0 = localCells[0];
-      std::vector<size_t> realCellIdx;
-      for(Cell* rc: realCells) {
-        realCellIdx.push_back(rc-cell0);
-      }
+      const auto realCellIdx = CellListToIdx(realCells, cell0);
       particles.markRealCells(realCellIdx);
       neighborList = CellNeighborList(cell0, localCells, realCellIdx);
       LOG4ESPP_TRACE(logger,"neighborList, ncells: "<<neighborList.numCells()

@@ -84,21 +84,76 @@ namespace espressopp { namespace vec {
 
       void disconnect();
 
-      void resetStorage();
+      void resetCells();
 
       void loadCells();
 
       void unloadCells();
 
+      void updateGhostsVec();
+
+      void collectGhostForcesVec();
+
       static void registerPython();
 
     protected:
 
-      boost::signals2::connection sigResetStorage;
+      boost::signals2::connection sigResetCells;
 
       const Mode vecMode;
 
+      /////////////////////////////////////////////////////////////////////////////////////////////
+      //// members involved in ghost communication
+      struct CommCellIdx {
+        std::vector<size_t> reals;
+        std::vector<size_t> ghosts;
+        size_t numReals;  /// buffer size of reals
+        size_t numGhosts; /// buffer size of ghosts
+      };
+
+      std::array< CommCellIdx, 6 > commCellIdx;
+
+      const size_t vecModeFactor;
+
+      AlignedVector< real > buffReal, buffGhost;
+
       void prepareGhostBuffers();
+
+      template < bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA >
+      void ghostCommunication_impl();
+
+      enum PackedData { PACKED_POSITIONS=0, PACKED_FORCES=1 };
+      enum DataMode { DATA_INSERT=0, DATA_ADD=1 };
+      enum AddShift { NO_SHIFT=0, ADD_SHIFT=1 };
+      static const espressopp::Real3D SHIFT_ZERO;
+
+      template< AddShift DO_SHIFT >
+      void copyRealsToGhostsIntra(size_t dir, size_t ir, size_t ig, Real3D const& shift);
+
+      void addGhostForcesToRealsIntra(size_t dir, size_t ir, size_t ig);
+
+      template<
+        PackedData PACKED_DATA,
+        AddShift DO_SHIFT >
+      void packCells(
+        AlignedVector<real> & sendBuf,
+        bool commReal,
+        size_t dir,
+        size_t idxCommNode,
+        Real3D const& shift
+        );
+
+      template<
+        PackedData PACKED_DATA,
+        DataMode DATA_MODE >
+      void unpackCells(
+        AlignedVector<real> const& recvBuf,
+        bool commReal,
+        size_t dir,
+        size_t idxCommNode
+        );
+
+      /////////////////////////////////////////////////////////////////////////////////////////////
 
 #if 0
 
@@ -136,8 +191,6 @@ namespace espressopp { namespace vec {
       std::array< std::vector< size_t >, 6 > nodeCommCellRange;
       ParticleList decompSendBuf, decompRecvBuf;
 
-      template < bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA >
-      void ghostCommunication_impl();
       bool commAsync;
 
       void prepareChannelAttributes();
@@ -152,11 +205,6 @@ namespace espressopp { namespace vec {
       std::array<std::vector<AlignedVectorChar>, 6> sendBufGhost;
       std::array<std::vector<size_t>, 6> sendBufSizeReal;
       std::array<std::vector<size_t>, 6> sendBufSizeGhost;
-
-      enum PackedData { PACKED_POSITIONS=0, PACKED_FORCES=1 };
-      enum DataMode { DATA_INSERT=0, DATA_ADD=1 };
-      enum AddShift { NO_SHIFT=0, ADD_SHIFT=1 };
-      static const espressopp::Real3D SHIFT_ZERO;
 
       template<
         PackedData PACKED_DATA,
@@ -187,33 +235,6 @@ namespace espressopp { namespace vec {
       bool channelsInit=false;
       Channels channels;
 
-      template< AddShift DO_SHIFT >
-      void copyRealsToGhostsIntra(size_t dir, size_t ir, size_t ig, Real3D const& shift);
-
-      void addGhostForcesToRealsIntra(size_t dir, size_t ir, size_t ig);
-
-      template<
-        PackedData PACKED_DATA,
-        AddShift DO_SHIFT >
-      void packCells(
-        AlignedVector<real> & sendBuf,
-        bool commReal,
-        size_t dir,
-        size_t idxCommNode,
-        Real3D const& shift
-        );
-
-      template<
-        PackedData PACKED_DATA,
-        DataMode DATA_MODE >
-      void unpackCells(
-        AlignedVector<real> const& recvBuf,
-        bool commReal,
-        size_t dir,
-        size_t idxCommNode
-        );
-
-      size_t vecModeFactor;
 
     /** Members extending base DomainDecomposition class */
     protected:

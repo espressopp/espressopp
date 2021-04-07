@@ -42,6 +42,8 @@ namespace espressopp { namespace vec {
 
       boost::signals2::signal<void ()> onLoadCells;
 
+      boost::signals2::signal<void ()> onUnloadCells;
+
       static void registerPython();
 
     protected:

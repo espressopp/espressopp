@@ -113,6 +113,20 @@ namespace espressopp {
       static LOG4ESPP_DECL_LOGGER(logger);
     };
 
+    /// converts cell list to list of indices
+    template<typename T = size_t>
+    std::vector<T> CellListToIdx (
+      std::vector<Cell*> const& cellList,
+      Cell* const refCell)
+    {
+      std::vector<T> idx;
+      idx.reserve(cellList.size());
+      for(Cell* const cell: cellList) {
+        idx.push_back(T(cell-refCell));
+      }
+      return std::move(idx);
+    }
+
   }
 }
 
