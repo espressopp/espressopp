@@ -128,9 +128,9 @@ namespace espressopp { namespace vec {
       static const espressopp::Real3D SHIFT_ZERO;
 
       template< AddShift DO_SHIFT >
-      void copyRealsToGhostsIntra(size_t dir, size_t ir, size_t ig, Real3D const& shift);
+      void copyRealsToGhostsIntra(size_t dir, Real3D const& shift);
 
-      void addGhostForcesToRealsIntra(size_t dir, size_t ir, size_t ig);
+      void addGhostForcesToRealsIntra(size_t dir);
 
       template<
         PackedData PACKED_DATA,
@@ -139,7 +139,6 @@ namespace espressopp { namespace vec {
         AlignedVector<real> & sendBuf,
         bool commReal,
         size_t dir,
-        size_t idxCommNode,
         Real3D const& shift
         );
 
@@ -149,8 +148,7 @@ namespace espressopp { namespace vec {
       void unpackCells(
         AlignedVector<real> const& recvBuf,
         bool commReal,
-        size_t dir,
-        size_t idxCommNode
+        size_t dir
         );
 
       /////////////////////////////////////////////////////////////////////////////////////////////

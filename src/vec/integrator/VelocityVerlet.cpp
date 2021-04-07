@@ -347,26 +347,22 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::updateForces()
     {
-      // Implement force update here
-      // Initial implementation: blocking update following original
-
+      auto storageVec = vectorization->storageVec;
       real time;
 
-      // time = timeIntegrate.getElapsedTime();
-      // storageVec->updateGhostsBlocking();
-      // timeComm1 += timeIntegrate.getElapsedTime() - time;
+      time = timeIntegrate.getElapsedTime();
+      storageVec->updateGhostsVec();
+      timeComm1 += timeIntegrate.getElapsedTime() - time;
 
       time = timeIntegrate.getElapsedTime();
       calcForces();
       timeForce += timeIntegrate.getElapsedTime() - time;
 
-      // time = timeIntegrate.getElapsedTime();
-      // storageVec->collectGhostForcesBlocking();
-      // timeComm2 += timeIntegrate.getElapsedTime() - time;
+      time = timeIntegrate.getElapsedTime();
+      storageVec->collectGhostForcesVec();
+      timeComm2 += timeIntegrate.getElapsedTime() - time;
 
-      // time = timeIntegrate.getElapsedTime();
-      // MDIntegratorVec::aftCalcF();
-      // timeOtherAftCalcF += timeIntegrate.getElapsedTime() - time;
+      MDIntegratorVec::aftCalcF();
     }
 
     void VelocityVerlet::initForcesPlist()

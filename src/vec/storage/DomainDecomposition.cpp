@@ -20,13 +20,16 @@
 
 #include "vec/storage/DomainDecomposition.hpp"
 #include "vec/Vectorization.hpp"
+#include "bc/BC.hpp"
+
+const int DD_COMM_TAG = 0xab;
 
 namespace espressopp { namespace vec {
   namespace storage {
 
     LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 
-    // const Real3D DomainDecomposition::SHIFT_ZERO {0.,0.,0.};
+    const Real3D DomainDecomposition::SHIFT_ZERO {0.,0.,0.};
 
     DomainDecomposition::DomainDecomposition(
       shared_ptr< Vectorization > vectorization,
@@ -133,20 +136,88 @@ namespace espressopp { namespace vec {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     void DomainDecomposition::updateGhostsVec()
     {
-
+      ghostCommunication_impl<false, true, 0>();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     void DomainDecomposition::collectGhostForcesVec()
     {
-
+      ghostCommunication_impl<false, false, 0>();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     template < bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA >
     void DomainDecomposition::ghostCommunication_impl()
     {
+      auto const& comm = *(getSystem()->comm);
 
+      for (size_t _coord = 0; _coord < 3; ++_coord)
+      {
+        int coord = REAL_TO_GHOSTS ? _coord : (2 - _coord);
+        const real curCoordBoxL = getSystem()->bc->getBoxL()[coord];
+        const bool doPeriodic   = (nodeGrid.getGridSize(coord) == 1);
+
+        for (size_t lr = 0; lr < 2; ++lr)
+        {
+          size_t const dir    = 2 * coord + lr;
+          size_t const oppDir = 2 * coord + (1-lr);
+
+          Real3D shift(0, 0, 0);
+          if(REAL_TO_GHOSTS) {
+            shift[coord] = nodeGrid.getBoundary(dir) * curCoordBoxL;
+          }
+
+          if(doPeriodic)
+          {
+            if(REAL_TO_GHOSTS){
+              copyRealsToGhostsIntra<ADD_SHIFT>(dir, shift);
+            } else {
+              addGhostForcesToRealsIntra(dir);
+            }
+          }
+          else
+          {
+            if(REAL_TO_GHOSTS) {
+              packCells<PACKED_POSITIONS, ADD_SHIFT>(buffReal,  true,  dir, shift);
+            } else {
+              packCells<PACKED_FORCES,    NO_SHIFT >(buffGhost, false, dir, SHIFT_ZERO);
+            }
+
+            {
+              longint recver, sender, countRecv, countSend;
+              real *buffSend, *buffRecv;
+              if(REAL_TO_GHOSTS) {
+                recver    = nodeGrid.getNodeNeighborIndex(dir);
+                sender    = nodeGrid.getNodeNeighborIndex(oppDir);
+                buffRecv  = buffGhost.data();
+                buffSend  = buffReal.data();
+                countRecv = commCellIdx[dir].numGhosts * vecModeFactor;
+                countSend = commCellIdx[dir].numReals  * vecModeFactor;
+              } else {
+                recver    = nodeGrid.getNodeNeighborIndex(oppDir);
+                sender    = nodeGrid.getNodeNeighborIndex(dir);
+                buffRecv  = buffReal.data();
+                buffSend  = buffGhost.data();
+                countRecv = commCellIdx[dir].numReals  * vecModeFactor;
+                countSend = commCellIdx[dir].numGhosts * vecModeFactor;
+              }
+              if (nodeGrid.getNodePosition(coord) % 2 == 0) {
+                comm.send(recver, DD_COMM_TAG, buffSend, countSend);
+                comm.recv(sender, DD_COMM_TAG, buffRecv, countRecv);
+              } else {
+                comm.recv(sender, DD_COMM_TAG, buffRecv, countRecv);
+                comm.send(recver, DD_COMM_TAG, buffSend, countSend);
+              }
+            }
+
+            if(REAL_TO_GHOSTS){
+              unpackCells<PACKED_POSITIONS, DATA_INSERT>(buffGhost, false, dir);
+            } else {
+              unpackCells<PACKED_FORCES,    DATA_ADD   >(buffReal,  true,  dir);
+            }
+          }
+        }
+      }
     }
 
     template void DomainDecomposition::ghostCommunication_impl<false, true, 0>();
@@ -156,22 +227,176 @@ namespace espressopp { namespace vec {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     template< DomainDecomposition::AddShift DO_SHIFT >
     void DomainDecomposition::copyRealsToGhostsIntra(
-      size_t dir, size_t ir, size_t ig, Real3D const& shift
+      size_t dir, Real3D const& shift
       )
     {
+      const auto& ccr = commCellIdx[dir].reals;
+      const auto& ccg = commCellIdx[dir].ghosts;
+      const size_t numCells = ccr.size();
 
+      auto& particles       = vectorization->particles;
+      const auto& cellRange = particles.cellRange();
+
+      if(vecMode==ESPP_VEC_SOA)
+      {
+        auto f_dim = [&](real* __restrict pos, real shift_v)
+        {
+          for(size_t ic=0; ic<numCells; ic++)
+          {
+            const size_t icr = ccr[ic];
+            const size_t icg = ccg[ic];
+            const size_t numPart = cellRange[icr+1]-cellRange[icr];
+
+            const real* __restrict pos_r = pos + cellRange[icr];
+            real* __restrict       pos_g = pos + cellRange[icg];
+
+            if(DO_SHIFT)
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                pos_g[ip] = pos_r[ip] + shift_v;
+              }
+            }
+            else
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                pos_g[ip] = pos_r[ip];
+              }
+            }
+          }
+        };
+
+        f_dim(particles.p_x.data(), shift[0]);
+        f_dim(particles.p_y.data(), shift[1]);
+        f_dim(particles.p_z.data(), shift[2]);
+      }
+      else
+      {
+        real shift_x, shift_y, shift_z;
+        if(DO_SHIFT)
+        {
+          shift_x = shift[0];
+          shift_y = shift[1];
+          shift_z = shift[2];
+        }
+        Real3DInt* position = particles.position.data();
+        {
+          for(size_t ic=0; ic<numCells; ic++)
+          {
+            const size_t icr = ccr[ic];
+            const size_t icg = ccg[ic];
+            const size_t numPart = cellRange[icr+1]-cellRange[icr];
+
+            const Real3DInt* __restrict position_r  = position + cellRange[icr];
+            Real3DInt* __restrict position_g        = position + cellRange[icg];
+
+            if(DO_SHIFT)
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                position_g[ip].x = position_r[ip].x + shift_x;
+                position_g[ip].y = position_r[ip].y + shift_y;
+                position_g[ip].z = position_r[ip].z + shift_z;
+              }
+            }
+            else
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                position_g[ip].x = position_r[ip].x;
+                position_g[ip].y = position_r[ip].y;
+                position_g[ip].z = position_r[ip].z;
+              }
+            }
+          }
+        }
+      }
     }
 
     template void DomainDecomposition::copyRealsToGhostsIntra< DomainDecomposition::ADD_SHIFT >(
-      size_t dir, size_t ir, size_t ig, Real3D const& shift);
+      size_t dir, Real3D const& shift);
 
     template void DomainDecomposition::copyRealsToGhostsIntra< DomainDecomposition::NO_SHIFT >(
-      size_t dir, size_t ir, size_t ig, Real3D const& shift);
+      size_t dir, Real3D const& shift);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir, size_t ir, size_t ig)
+    void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir)
     {
+      const auto& ccr = commCellIdx[dir].reals;
+      const auto& ccg = commCellIdx[dir].ghosts;
+      const size_t numCells = ccr.size();
 
+      auto& particles       = vectorization->particles;
+      const auto& cellRange = particles.cellRange();
+
+      if(vecMode==ESPP_VEC_SOA)
+      {
+        auto f_dim = [&](real* __restrict f)
+        {
+          for(size_t ic=0; ic<numCells; ic++)
+          {
+            const size_t icr = ccr[ic];
+            const size_t icg = ccg[ic];
+            const size_t numPart = cellRange[icr+1]-cellRange[icr];
+
+            real* __restrict f_r       = f + cellRange[icr];
+            const real* __restrict f_g = f + cellRange[icg];
+
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                f_r[ip] += f_g[ip];
+              }
+            }
+          }
+        };
+        f_dim(particles.f_x.data());
+        f_dim(particles.f_y.data());
+        f_dim(particles.f_z.data());
+      }
+      else
+      {
+        {
+          Real4D* force = particles.force.data();
+          for(size_t ic=0; ic<numCells; ic++)
+          {
+            const size_t icr = ccr[ic];
+            const size_t icg = ccg[ic];
+            const size_t numPart = cellRange[icr+1]-cellRange[icr];
+
+            Real4D* __restrict force_r       = force + cellRange[icr];
+            const Real4D* __restrict force_g = force + cellRange[icg];
+
+            {
+              #pragma vector always
+              #pragma vector aligned
+              #pragma ivdep
+              for(size_t ip=0; ip<numPart; ip++)
+              {
+                force_r[ip].x += force_g[ip].x;
+                force_r[ip].y += force_g[ip].y;
+                force_r[ip].z += force_g[ip].z;
+              }
+            }
+          }
+        }
+      }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +407,6 @@ namespace espressopp { namespace vec {
       AlignedVector<real> & sendBuf,
       bool commReal,
       size_t dir,
-      size_t idxCommNode,
       Real3D const& shift
       )
     {
@@ -196,7 +420,6 @@ namespace espressopp { namespace vec {
       AlignedVector<real> & sendBuf,
       bool commReal,
       size_t dir,
-      size_t idxCommNode,
       Real3D const& shift
     );
 
@@ -207,7 +430,6 @@ namespace espressopp { namespace vec {
       AlignedVector<real> & sendBuf,
       bool commReal,
       size_t dir,
-      size_t idxCommNode,
       Real3D const& shift
     );
 
@@ -218,8 +440,7 @@ namespace espressopp { namespace vec {
     void DomainDecomposition::unpackCells(
       AlignedVector<real> const& recvBuf,
       bool commReal,
-      size_t dir,
-      size_t idxCommNode
+      size_t dir
       )
     {
 
@@ -231,8 +452,7 @@ namespace espressopp { namespace vec {
     (
       AlignedVector<real> const& recvBuf,
       bool commReal,
-      size_t dir,
-      size_t idxCommNode
+      size_t dir
     );
 
     template void DomainDecomposition::unpackCells<
@@ -241,8 +461,7 @@ namespace espressopp { namespace vec {
     (
       AlignedVector<real> const& recvBuf,
       bool commReal,
-      size_t dir,
-      size_t idxCommNode
+      size_t dir
     );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
