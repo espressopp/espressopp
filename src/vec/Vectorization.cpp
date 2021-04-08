@@ -42,9 +42,8 @@ namespace espressopp {
     {
       std::string mode_str = (vecMode==ESPP_VEC_AOS) ? "AOS" : "SOA";
       LOG4ESPP_INFO(logger,"Using vectorization mode: " << mode_str << " level " << vecLevel);
-      connect_level_1();
+      connect();
       resetCells(); // immediately retrieve cell information
-      std::cout << "Vectorization level " << vecLevel << std::endl;
     }
 
     Vectorization::Vectorization(
@@ -57,11 +56,7 @@ namespace espressopp {
     {
       std::string mode_str = (vecMode==ESPP_VEC_AOS) ? "AOS" : "SOA";
       LOG4ESPP_INFO(logger,"Using vectorization mode: " << mode_str << " level " << vecLevel);
-      connect_level_2();
-      // resetCells(); // TODO: retrieve cell information when connecting to Storage
-      std::cout << "Vectorization level " << vecLevel << std::endl;
     }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// destructor
     Vectorization::~Vectorization()
@@ -71,7 +66,7 @@ namespace espressopp {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// connect to boost signals in integrator and storage
-    void Vectorization::connect_level_1()
+    void Vectorization::connect()
     {
       sigResetParticles     = getSystem()->storage->onParticlesChanged.connect(
                                 boost::signals2::at_front, // call first due to reordering
@@ -85,11 +80,6 @@ namespace espressopp {
       sigUpdateForces       = mdintegrator->aftCalcFLocal.connect(
                                 boost::signals2::at_front,
                                 boost::bind(&Vectorization::updateForces,this));
-    }
-
-    void Vectorization::connect_level_2()
-    {
-      // throw std::runtime_error("Vectorization level>=2 not implemented.");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +157,6 @@ namespace espressopp {
     /// add forces back to storage
     void Vectorization::updateForces()
     {
-      // add particle array forces back to localCells
       particles.addToForceOnly(getSystem()->storage->getLocalCells());
     }
 

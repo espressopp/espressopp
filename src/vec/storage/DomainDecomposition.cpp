@@ -461,8 +461,6 @@ namespace espressopp { namespace vec {
       }
       else
       {
-        // throw std::runtime_error("DomainDecomposition::packCells ESPP_VEC_AOS not implemented");
-
         real shift_x, shift_y, shift_z;
         if(DO_SHIFT)
         {
@@ -604,8 +602,6 @@ namespace espressopp { namespace vec {
       }
       else
       {
-        // throw std::runtime_error("DomainDecomposition::unpackCells ESPP_VEC_AOS not implemented");
-
         auto f_unpack = [&](Real4D* __restrict p_ptr)
         {
           const Real4D* __restrict b_ptr = (Real4D*)(recvBuf.data());
@@ -685,7 +681,7 @@ namespace espressopp { namespace vec {
         // .def("connectOffload", &DomainDecomposition::connectOffload)
         // .def("connectedOffload", &DomainDecomposition::connectedOffload)
         // .def("disconnectOffload", &DomainDecomposition::disconnectOffload)
-        // .def("resetCells", &DomainDecomposition::resetCells)
+        .def("resetCells", &DomainDecomposition::resetCells)
         // .def("resetTimers", &DomainDecomposition::resetTimers)
         // .def("getTimers", &wrapGetTimers)
         // .def("getTimers2", &wrapGetTimers2)

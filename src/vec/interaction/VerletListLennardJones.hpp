@@ -26,8 +26,6 @@
 #ifndef _VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
 #define _VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
 
-//#include <typeinfo>
-
 #include "types.hpp"
 #include "interaction/Interaction.hpp"
 #include "Real3D.hpp"
@@ -209,16 +207,16 @@ namespace espressopp { namespace vec {
         Real4D *pa_force         = particleArray.force.data();
 
         const lint* __restrict pa_type = particleArray.type.data();
-        const real* __restrict pa_p_x = particleArray.p_x.data();
-        const real* __restrict pa_p_y = particleArray.p_y.data();
-        const real* __restrict pa_p_z = particleArray.p_z.data();
-        real* __restrict pa_f_x       = particleArray.f_x.data();
-        real* __restrict pa_f_y       = particleArray.f_y.data();
-        real* __restrict pa_f_z       = particleArray.f_z.data();
+        const real* __restrict pa_p_x  = particleArray.p_x.data();
+        const real* __restrict pa_p_y  = particleArray.p_y.data();
+        const real* __restrict pa_p_z  = particleArray.p_z.data();
+        real* __restrict pa_f_x        = particleArray.f_x.data();
+        real* __restrict pa_f_y        = particleArray.f_y.data();
+        real* __restrict pa_f_z        = particleArray.f_z.data();
 
-        const auto* __restrict plist  = neighborList.plist.data();
-        const auto* __restrict prange = neighborList.prange.data();
-        const auto* __restrict nplist = neighborList.nplist.data();
+        const auto* __restrict plist   = neighborList.plist.data();
+        const auto* __restrict prange  = neighborList.prange.data();
+        const auto* __restrict nplist  = neighborList.nplist.data();
         const int ip_max = neighborList.plist.size();
 
         const int pend   = neighborList.plist.size();

@@ -18,22 +18,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #include "vec/include/logging.hpp"
-// #include "vec/include/errors.hpp"
-// #include "vec/utils/algorithms/for_loop.hpp"
-// #include "vec/utils/algorithms/transform_reduce.hpp"
-// #include "vec/utils/multithreading.hpp"
-
 #include "vec/Vectorization.hpp"
 
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
 #include "iterator/CellListIterator.hpp"
-// #include "interaction/Interaction.hpp"
-// #include "interaction/Potential.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
-// #include "mpi.hpp"
 
 #include <iomanip>
 #include <numeric>

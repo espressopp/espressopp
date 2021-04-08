@@ -60,8 +60,7 @@ namespace espressopp {
 
       ~Vectorization();
 
-      void connect_level_1();
-      void connect_level_2();
+      void connect();
       void disconnect();
 
       ParticleArray particles;

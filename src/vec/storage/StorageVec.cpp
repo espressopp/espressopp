@@ -35,8 +35,6 @@ namespace espressopp { namespace vec {
     {
       using namespace espressopp::python;
       class_< StorageVec, boost::noncopyable >("vec_storage_StorageVec", no_init)
-        // .def("connect", &StorageVec::connect)
-        // .def("disconnect", &StorageVec::disconnect)
         ;
     }
 

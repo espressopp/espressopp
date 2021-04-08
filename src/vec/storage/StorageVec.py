@@ -34,7 +34,6 @@ if pmi.isController:
     class StorageVec(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espressopp.vec.storage.StorageVecLocal',
-            pmicall = ['initChannels','connect','disconnect']
+            cls = 'espressopp.vec.storage.StorageVecLocal'
         )
 

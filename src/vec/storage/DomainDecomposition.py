@@ -43,9 +43,7 @@ if pmi.isController:
     ):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espressopp.vec.storage.DomainDecompositionLocal',
-            # pmicall = ['connectOffload','disconnectOffload','resetVirtualStorage','resetTimers'],
-            # pmiinvoke = ['getTimers','getTimers2','getChannelIndices']
+            cls = 'espressopp.vec.storage.DomainDecompositionLocal'
         )
 
         def __init__(self, system, nodeGrid, cellGrid, halfCellInt=1):
