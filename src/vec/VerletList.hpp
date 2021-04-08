@@ -124,10 +124,6 @@ namespace espressopp { namespace vec {
     /// Register this class so it can be used from Python.
     static void registerPython();
 
-    void preallocFactor(double adj_) {
-      std::cout<<"WARNING: espressopp.vec.VerletList.preallocFactor deprecated"<<std::endl;
-    }
-
   protected:
     shared_ptr<Vectorization> vectorization;
 

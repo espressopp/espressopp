@@ -91,8 +91,6 @@ namespace espressopp { namespace vec {
       // make a connection to vectorization to invoke rebuild on loadCells
       connectionResort = vectorization->storageVec->onLoadCells.connect(
           boost::bind(&VerletList::rebuild, this));
-
-      std::cout << "VerletList::connect to vectorization->storageVec->onLoadCells" << std::endl;
     } else {
       // make a connection to System to invoke rebuild on resort
       connectionResort = getSystem()->storage->onParticlesChanged.connect(
@@ -679,7 +677,6 @@ namespace espressopp { namespace vec {
       .def("getVerletCutoff", &VerletList::getVerletCutoff)
       .def("resetTimers", &VerletList::resetTimers)
       .def("getTimers", wrapGetTimers)
-      .def("preallocFactor", &VerletList::preallocFactor)
       ;
   }
 
