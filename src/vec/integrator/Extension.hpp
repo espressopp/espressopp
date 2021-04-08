@@ -27,7 +27,6 @@
 #define _VEC_INTEGRATOR_EXTENSION_HPP
 
 #include "vec/include/types.hpp"
-#include "vec/storage/StorageVec.hpp"
 
 #include "log4espp.hpp"
 #include "types.hpp"
@@ -39,16 +38,13 @@ namespace espressopp { namespace vec {
   namespace integrator {
 
       // abstract base class for extensions
-      class Extension : public SystemAccess {
-
-        typedef espressopp::vec::storage::StorageVec StorageVec;
-
+      class Extension : public SystemAccess
+      {
       public:
 
-        Extension(shared_ptr<System> system, shared_ptr<StorageVec> storage);
+        Extension(shared_ptr<Vectorization> vectorization);
 
         virtual ~Extension();
-
 
         enum ExtensionType {
             all=0,
@@ -62,7 +58,6 @@ namespace espressopp { namespace vec {
             Reaction=8
         };
 
-
         //type of extension
         ExtensionType type;
 
@@ -74,16 +69,15 @@ namespace espressopp { namespace vec {
 
       protected:
 
+        shared_ptr<Vectorization> vectorization;
+
         shared_ptr<MDIntegratorVec> integrator; // this is needed for signal connection
 
         void setIntegrator(shared_ptr<MDIntegratorVec> _integrator);
 
-
         // pure virtual functions
         virtual void connect() = 0;
         virtual void disconnect() = 0;
-
-        shared_ptr< StorageVec> storageVec;
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

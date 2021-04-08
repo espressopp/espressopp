@@ -46,14 +46,14 @@ class VelocityVerletLocal(
             cxxinit(self, vec_integrator_VelocityVerlet, vec)
 
     # # NOTE: Manually resolved functions with conflicting names back to MDIntegratorVec
-    # def addExtension(self, extension):
-    #     return MDIntegratorVecLocal.addExtension(self, extension)
+    def addExtension(self, extension):
+        return MDIntegratorVecLocal.addExtension(self, extension)
 
-    # def getExtension(self, k):
-    #     return MDIntegratorVecLocal.getExtension(self, k)
+    def getExtension(self, k):
+        return MDIntegratorVecLocal.getExtension(self, k)
 
-    # def getNumberOfExtensions(self):
-    #     return MDIntegratorVecLocal.getNumberOfExtensions(self)
+    def getNumberOfExtensions(self):
+        return MDIntegratorVecLocal.getNumberOfExtensions(self)
 
 if pmi.isController :
     class VelocityVerlet(

@@ -42,7 +42,6 @@ from _espressopp import integrator_Extension
 
 class ExtensionLocal(object):
 
-
     #def __init__(self, integrator):
     #    if pmi.workerIsActive():
     #        cxxinit(self, integrator)
@@ -65,10 +64,10 @@ class ExtensionLocal(object):
       return self.cxxclass.disconnect(self)
 
 if pmi.isController :
-    class Extension(object):
-        __metaclass__ = pmi.Proxy
+    class Extension(metaclass=pmi.Proxy):
+        # __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            #cls =  'espressopp.vec.integrator.Extension',
+            # cls =  'espressopp.vec.integrator.Extension',
             pmiproperty = [ 'type'],
             #pmicall = ['addForce']
             pmicall = [ 'connect', 'disconnect' ]

@@ -23,5 +23,5 @@ from espressopp.vec.integrator.MDIntegratorVec import *
 from espressopp.vec.integrator.VelocityVerlet import *
 
 from espressopp.vec.integrator.Extension import *
-# from espressopp.vec.integrator.LangevinThermostat import *
+from espressopp.vec.integrator.LangevinThermostat import *
 

@@ -22,7 +22,7 @@
 #include "VelocityVerlet.hpp"
 
 #include "Extension.hpp"
-// #include "LangevinThermostat.hpp"
+#include "LangevinThermostat.hpp"
 
 #include "python.hpp"
 #include "bindings.hpp"
@@ -34,7 +34,7 @@ namespace espressopp {
         MDIntegratorVec::registerPython();
         VelocityVerlet::registerPython();
         Extension::registerPython();
-        // LangevinThermostat::registerPython();
+        LangevinThermostat::registerPython();
       }
     }
   }

@@ -22,39 +22,36 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "Extension.hpp"
-#include "System.hpp"
+#include "vec/Vectorization.hpp"
 
+#include "python.hpp"
+#include "System.hpp"
+#include "SystemAccess.hpp"
 
 namespace espressopp { namespace vec {
   namespace integrator {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    Extension::Extension(shared_ptr<System> system, shared_ptr<StorageVec> storage)
-      : SystemAccess(system), storageVec(storage)
+    Extension::Extension(shared_ptr<Vectorization> vectorization)
+      : SystemAccess(vectorization->getSystem()), vectorization(vectorization)
     {
+      if (!getSystem()->storage) {
+          throw std::runtime_error("system has no storage");
+      }
 
-        if (!system->storage) {
-           throw std::runtime_error("system has no storage");
-        }
-
-        if (!storage) {
-          throw std::runtime_error("invalid StorageVec");
-        }
-
-        LOG4ESPP_INFO(theLogger, "construct Extension");
+      LOG4ESPP_INFO(theLogger, "construct Extension");
     }
 
-
-    Extension::~Extension() {
+    Extension::~Extension()
+    {
       LOG4ESPP_INFO(theLogger, "~Extension");
     }
 
-
-    void Extension::setIntegrator(shared_ptr<MDIntegratorVec> _integrator) {
-            integrator = _integrator;
+    void Extension::setIntegrator(shared_ptr<MDIntegratorVec> _integrator)
+    {
+      integrator = _integrator;
     }
 
     /****************************************************
