@@ -101,6 +101,8 @@ namespace espressopp { namespace vec {
       if (recalcForces) {
         LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
+        initForcesPlist();
+
         // signal
         MDIntegratorVec::recalc1();
 
