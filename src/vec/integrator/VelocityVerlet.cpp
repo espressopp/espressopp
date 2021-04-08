@@ -327,7 +327,6 @@ namespace espressopp { namespace vec {
     void VelocityVerlet::calcForces()
     {
       initForcesParray();
-    #if 0
       {
         // TODO: Might need to place interaction list in VecRuntime
         System& sys = getSystemRef();
@@ -342,7 +341,6 @@ namespace espressopp { namespace vec {
         }
         // aftCalcFLocal();
       }
-    #endif
     }
 
     void VelocityVerlet::updateForces()

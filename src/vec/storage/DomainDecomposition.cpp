@@ -92,7 +92,7 @@ namespace espressopp { namespace vec {
 
       /// Setup ghost communication for this cell grid
       {
-        /// convert commCells to commCellsIdx
+        /// convert commCells to commCellIdx
         for(int dir=0; dir<6; dir++){
           commCellIdx[dir].reals  = CellListToIdx(commCells[dir].reals,  localCells[0]);
           commCellIdx[dir].ghosts = CellListToIdx(commCells[dir].ghosts, localCells[0]);
@@ -410,7 +410,113 @@ namespace espressopp { namespace vec {
       Real3D const& shift
       )
     {
+      const auto& particles = vectorization->particles;
+      const auto& cr        = particles.cellRange();
+      const auto& cc        = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
+      const auto& numPart   = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
+      if(vecMode==ESPP_VEC_SOA)
+      {
+        auto f_pack_dim = [&](size_t dim, const real* __restrict p_ptr, real shift_v)
+        {
+          real* __restrict b_ptr = sendBuf.data() + numPart * dim;
+
+          size_t b_off = 0;
+          for(const auto& ic: cc)
+          {
+            real* __restrict b_ptr_c       = b_ptr + b_off;
+            const real* __restrict p_ptr_c = p_ptr + cr[ic];
+            const size_t npart             = cr[ic+1]-cr[ic];
+
+            #pragma vector always
+            #pragma vector aligned
+            #pragma ivdep
+            for(size_t ip=0; ip<npart; ip++)
+            {
+              if(DO_SHIFT==ADD_SHIFT)
+              {
+                b_ptr_c[ip] = p_ptr_c[ip] + shift_v;
+              }
+              else
+              {
+                b_ptr_c[ip] = p_ptr_c[ip];
+              }
+            }
+            b_off += npart;
+          }
+        };
+
+        if(PACKED_DATA==PACKED_POSITIONS)
+        {
+          f_pack_dim(0, particles.p_x.data(), shift[0]);
+          f_pack_dim(1, particles.p_y.data(), shift[1]);
+          f_pack_dim(2, particles.p_z.data(), shift[2]);
+        }
+        else
+        {
+          f_pack_dim(0, particles.f_x.data(), shift[0]);
+          f_pack_dim(1, particles.f_y.data(), shift[1]);
+          f_pack_dim(2, particles.f_z.data(), shift[2]);
+        }
+      }
+      else
+      {
+        // throw std::runtime_error("DomainDecomposition::packCells ESPP_VEC_AOS not implemented");
+
+        real shift_x, shift_y, shift_z;
+        if(DO_SHIFT)
+        {
+          shift_x = shift[0];
+          shift_y = shift[1];
+          shift_z = shift[2];
+        }
+
+        auto f_pack = [&](const Real4D* __restrict p_ptr)
+        {
+          Real4D* __restrict b_ptr = (Real4D*)(sendBuf.data());
+
+          size_t b_off = 0;
+          for(const auto& ic: cc)
+          {
+            Real4D* __restrict b_ptr_c       = b_ptr + b_off;
+            const Real4D* __restrict p_ptr_c = p_ptr + cr[ic];
+            const size_t npart               = cr[ic+1]-cr[ic];
+
+            #pragma vector always
+            #pragma vector aligned
+            #pragma ivdep
+            for(size_t ip=0; ip<npart; ip++)
+            {
+              if(DO_SHIFT==ADD_SHIFT)
+              {
+                b_ptr_c[ip].x = p_ptr_c[ip].x + shift_x;
+                b_ptr_c[ip].y = p_ptr_c[ip].y + shift_y;
+                b_ptr_c[ip].z = p_ptr_c[ip].z + shift_z;
+              }
+              else
+              {
+                b_ptr_c[ip].x = p_ptr_c[ip].x;
+                b_ptr_c[ip].y = p_ptr_c[ip].y;
+                b_ptr_c[ip].z = p_ptr_c[ip].z;
+              }
+            }
+            b_off += npart;
+          }
+        };
+
+        if(PACKED_DATA==PACKED_POSITIONS)
+        {
+          f_pack((Real4D*)(particles.position.data()));
+        }
+        else
+        {
+          f_pack((Real4D*)(particles.force.data()));
+        }
+
+        // recasting Real3DInt to Real4D only works if they have the same size
+        static_assert(sizeof(Real3DInt)==sizeof(Real4D),
+          "Mismatch between sizeof(Real3DInt) and sizeof(Real4D)");
+      }
     }
 
     template void DomainDecomposition::packCells<
@@ -443,7 +549,109 @@ namespace espressopp { namespace vec {
       size_t dir
       )
     {
+      auto& particles     = vectorization->particles;
+      const auto& cr      = particles.cellRange();
+      const auto& cc      = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
+      const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
+      if(vecMode==ESPP_VEC_SOA)
+      {
+        auto f_unpack_dim = [&](size_t dim, real* __restrict p_ptr)
+        {
+          const size_t b_start = (numPart * dim);
+          const real* __restrict b_ptr = recvBuf.data() + b_start;
+
+          /// loop over cells
+          size_t b_off = 0;
+          for(const auto& ic: cc)
+          {
+            const real* __restrict b_ptr_c = b_ptr + b_off;
+            real* __restrict p_ptr_c       = p_ptr + cr[ic];
+            const size_t npart             = cr[ic+1]-cr[ic];
+
+            /// loop over particles
+            #pragma vector always
+            #pragma vector aligned
+            #pragma ivdep
+            for(size_t ip=0; ip<npart; ip++)
+            {
+              if(DATA_MODE==DATA_ADD)
+              {
+                p_ptr_c[ip] += b_ptr_c[ip];
+              }
+              else
+              {
+                p_ptr_c[ip] = b_ptr_c[ip];
+              }
+            }
+            b_off += npart;
+          }
+        };
+
+        if(PACKED_DATA==PACKED_POSITIONS)
+        {
+          f_unpack_dim(0, particles.p_x.data());
+          f_unpack_dim(1, particles.p_y.data());
+          f_unpack_dim(2, particles.p_z.data());
+        }
+        else
+        {
+          f_unpack_dim(0, particles.f_x.data());
+          f_unpack_dim(1, particles.f_y.data());
+          f_unpack_dim(2, particles.f_z.data());
+        }
+
+      }
+      else
+      {
+        // throw std::runtime_error("DomainDecomposition::unpackCells ESPP_VEC_AOS not implemented");
+
+        auto f_unpack = [&](Real4D* __restrict p_ptr)
+        {
+          const Real4D* __restrict b_ptr = (Real4D*)(recvBuf.data());
+
+          size_t b_off = 0;
+          for(const auto& ic: cc)
+          {
+            const Real4D* __restrict b_ptr_c = b_ptr + b_off;
+            Real4D* __restrict p_ptr_c       = p_ptr + cr[ic];
+            const size_t npart               = cr[ic+1]-cr[ic];
+
+            #pragma vector always
+            #pragma vector aligned
+            #pragma ivdep
+            for(size_t ip=0; ip<npart; ip++)
+            {
+              if(DATA_MODE==DATA_ADD)
+              {
+                p_ptr_c[ip].x += b_ptr_c[ip].x;
+                p_ptr_c[ip].y += b_ptr_c[ip].y;
+                p_ptr_c[ip].z += b_ptr_c[ip].z;
+              }
+              else
+              {
+                p_ptr_c[ip].x = b_ptr_c[ip].x;
+                p_ptr_c[ip].y = b_ptr_c[ip].y;
+                p_ptr_c[ip].z = b_ptr_c[ip].z;
+              }
+            }
+            b_off += npart;
+          }
+        };
+
+        if(PACKED_DATA==PACKED_POSITIONS)
+        {
+          f_unpack((Real4D*)(particles.position.data()));
+        }
+        else
+        {
+          f_unpack((Real4D*)(particles.force.data()));
+        }
+
+        // recasting Real3DInt to Real4D only works if they have the same size
+        static_assert(sizeof(Real3DInt)==sizeof(Real4D),
+          "Mismatch between sizeof(Real3DInt) and sizeof(Real4D)");
+      }
     }
 
     template void DomainDecomposition::unpackCells<
