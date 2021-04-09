@@ -24,15 +24,18 @@
 namespace espressopp {
   namespace vec {
 
+    class ParticleArray;
     class Vectorization;
+    class VerletList;
+
+    namespace integrator {
+      class Extension;
+      class MDIntegratorVec;
+    }
 
     namespace storage {
       class StorageVec;
-    }
-
-    namespace integrator {
-      class MDIntegratorVec;
-      class Extension;
+      class LocalParticles;
     }
 
   }
