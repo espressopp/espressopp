@@ -55,7 +55,8 @@ namespace espressopp { namespace vec
   {}
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::markRealCells(CellList const& realcellsIn, const Cell* cell0)
+  void ParticleArray::markRealCells(
+    CellList const& realcellsIn, const Cell* cell0, size_t numLocalCells)
   {
     realCells_.clear();
     realCells_.reserve(realcellsIn.size());
@@ -68,12 +69,33 @@ namespace espressopp { namespace vec
       }
       realCells_.push_back(icell);
     }
+    numLocalCells_ = numLocalCells;
+    markGhostCells();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::markRealCells(std::vector<size_t> const& realcellsIn)
+  void ParticleArray::markRealCells(
+    std::vector<size_t> const& realcellsIn, size_t numLocalCells)
   {
-    realCells_ = realcellsIn;
+    realCells_     = realcellsIn;
+    numLocalCells_ = numLocalCells;
+    markGhostCells();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  void ParticleArray::markGhostCells()
+  {
+    std::vector<int> cells(numLocalCells_, 0);
+    for(auto const rc: realCells_)
+      cells[rc]++;
+
+    ghostCells_.clear();
+    ghostCells_.reserve(numLocalCells_ - realCells_.size());
+    for(size_t ic=0; ic<cells.size(); ic++){
+      if(cells[ic]==0){
+        ghostCells_.push_back(ic);
+      }
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +104,9 @@ namespace espressopp { namespace vec
     mode = mode_;
 
     size_t const numCells = srcCells.size();
+    if(numCells!=numLocalCells_)
+      throw std::runtime_error("ParticleArray::copyFrom Incorrect number of cells");
+
     cellRange_.clear();
     cellRange_.reserve(numCells+1);
     sizes_.clear();

@@ -75,8 +75,8 @@ namespace espressopp { namespace vec {
   public:
     ParticleArray();
 
-    void markRealCells(CellList const& realcells, const Cell* cell0);
-    void markRealCells(std::vector<size_t> const& realcells);
+    void markRealCells(CellList const& realcells, const Cell* cell0, size_t numLocalCells);
+    void markRealCells(std::vector<size_t> const& realcells, size_t numLocalCells);
 
     void copyFrom(CellList const& srcCells, Mode mode=ESPP_VEC_MODE_DEFAULT);
 
@@ -95,6 +95,7 @@ namespace espressopp { namespace vec {
     inline std::vector<size_t> const& cellRange() const { return cellRange_; }
     inline std::vector<size_t> const& sizes() const { return sizes_; }
     inline std::vector<size_t> const& realCells() const { return realCells_; }
+    inline std::vector<size_t> const& ghostCells() const { return ghostCells_; }
     bool checkSizes() const;
     void verify(CellList const& srcCells) const;
     inline bool mode_aos() const { return mode==ESPP_VEC_AOS; }
@@ -131,6 +132,10 @@ namespace espressopp { namespace vec {
     std::vector<size_t> sizes_;
     /// indices of real cells
     std::vector<size_t> realCells_;
+    /// indices of ghost cells
+    std::vector<size_t> ghostCells_;
+    /// number of local cells in source storage
+    std::size_t numLocalCells_ = 0;
 
     Mode mode;
 
@@ -141,6 +146,7 @@ namespace espressopp { namespace vec {
     inline std::size_t calc_data_size(size_t const& size) { return (1 + ((size - 1) / chunk_size_)) * chunk_size_; }
 
     void updateFrom(std::vector<Particle> const& particlelist, size_t start);
+    void markGhostCells();
   };
 }}
 
