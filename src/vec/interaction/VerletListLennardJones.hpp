@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019-2020
+  Copyright (C) 2019-2021
       Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
@@ -23,8 +23,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
-#define _VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
+#ifndef VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
+#define VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP
 
 #include "types.hpp"
 #include "interaction/Interaction.hpp"
@@ -624,4 +624,4 @@ namespace espressopp { namespace vec {
     }
   }
 }}
-#endif
+#endif//VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP

@@ -23,8 +23,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _VEC_INTEGRATOR_EXTENSION_HPP
-#define _VEC_INTEGRATOR_EXTENSION_HPP
+#ifndef VEC_INTEGRATOR_EXTENSION_HPP
+#define VEC_INTEGRATOR_EXTENSION_HPP
 
 #include "vec/include/types.hpp"
 
@@ -85,4 +85,4 @@ namespace espressopp { namespace vec {
   }
 }}
 
-#endif
+#endif//VEC_INTEGRATOR_EXTENSION_HPP

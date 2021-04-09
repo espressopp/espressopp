@@ -55,4 +55,4 @@ namespace espressopp {
   }
 }
 
-#endif // VEC_INCLUDE_SIMDCONFIG_HPP
+#endif//VEC_INCLUDE_SIMDCONFIG_HPP

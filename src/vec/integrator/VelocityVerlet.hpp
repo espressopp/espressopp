@@ -101,4 +101,4 @@ namespace espressopp { namespace vec {
   }
 }}
 
-#endif // VEC_INTEGRATOR_VELOCITYVERLET_HPP
+#endif//VEC_INTEGRATOR_VELOCITYVERLET_HPP

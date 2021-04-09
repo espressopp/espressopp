@@ -38,4 +38,4 @@ namespace espressopp {
   }
 }
 
-#endif // VEC_INCLUDE_TYPES_HPP
+#endif//VEC_INCLUDE_TYPES_HPP

@@ -143,4 +143,4 @@ namespace espressopp { namespace vec {
   };
 }}
 
-#endif // VEC_PARTICLEARRAY_HPP
+#endif//VEC_PARTICLEARRAY_HPP

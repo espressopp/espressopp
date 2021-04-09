@@ -23,8 +23,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
-#define _VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
+#ifndef VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
+#define VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
 
 #include "types.hpp"
 #include "logging.hpp"
@@ -110,4 +110,4 @@ namespace espressopp { namespace vec {
   }
 }}
 
-#endif
+#endif//VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP

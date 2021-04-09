@@ -18,8 +18,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _VEC_INTERACTION_BINDINGS_HPP
-#define _VEC_INTERACTION_BINDINGS_HPP
+#ifndef VEC_INTERACTION_BINDINGS_HPP
+#define VEC_INTERACTION_BINDINGS_HPP
 
 namespace espressopp {
   namespace vec {
@@ -29,4 +29,4 @@ namespace espressopp {
   }
 }
 
-#endif
+#endif//VEC_INTERACTION_BINDINGS_HPP

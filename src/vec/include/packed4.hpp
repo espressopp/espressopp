@@ -80,4 +80,4 @@ namespace espressopp { namespace vec {
 
 }}
 
-#endif // VEC_INCLUDE_PACKED4_HPP
+#endif//VEC_INCLUDE_PACKED4_HPP

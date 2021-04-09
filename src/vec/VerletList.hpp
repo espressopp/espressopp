@@ -150,4 +150,4 @@ namespace espressopp { namespace vec {
 
 }}
 
-#endif // VEC_VERLETLIST_HPP
+#endif//VEC_VERLETLIST_HPP

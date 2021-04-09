@@ -29,4 +29,4 @@ namespace espressopp {
   }
 }
 
-#endif // _VEC_INTEGRATOR_BINDINGS_HPP
+#endif//VEC_INTEGRATOR_BINDINGS_HPP

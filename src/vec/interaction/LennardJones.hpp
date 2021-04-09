@@ -23,8 +23,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _VEC_INTERACTION_LENNARDJONES_HPP
-#define _VEC_INTERACTION_LENNARDJONES_HPP
+#ifndef VEC_INTERACTION_LENNARDJONES_HPP
+#define VEC_INTERACTION_LENNARDJONES_HPP
 
 #include "interaction/Potential.hpp"
 
@@ -149,4 +149,4 @@ namespace espressopp { namespace vec {
   }
 }}
 
-#endif
+#endif//VEC_INTERACTION_LENNARDJONES_HPP

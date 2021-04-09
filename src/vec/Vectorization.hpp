@@ -129,4 +129,4 @@ namespace espressopp {
   }
 }
 
-#endif // VEC_VECTORIZATION_HPP
+#endif//VEC_VECTORIZATION_HPP

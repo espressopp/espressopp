@@ -75,4 +75,4 @@ namespace espressopp {
   }
 }
 
-#endif // VEC_CELLNEIGHBORLIST_HPP
+#endif//VEC_CELLNEIGHBORLIST_HPP

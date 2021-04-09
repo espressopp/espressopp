@@ -29,4 +29,4 @@ namespace espressopp {
   }
 }
 
-#endif // VEC_STORAGE_BINDINGS_HPP
+#endif//VEC_STORAGE_BINDINGS_HPP
