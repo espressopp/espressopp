@@ -18,50 +18,35 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VEC_STORAGEVEC_HPP
-#define VEC_STORAGEVEC_HPP
-
-#include "vec/include/types.hpp"
 #include "LocalParticles.hpp"
-
-#include "python.hpp"
-#include "log4espp.hpp"
-
-#include <boost/signals2.hpp>
+#include "vec/ParticleArray.hpp"
 
 namespace espressopp { namespace vec {
   namespace storage {
 
-    class StorageVec
+    void LocalParticles::rebuild(
+      ParticleArray const& pa,
+      std::vector<size_t> const& uniqueCells)
     {
-    public:
-      StorageVec(shared_ptr<Vectorization> vectorization);
+      clear();
 
-      virtual void loadCells() = 0;
+      auto const numCells  = pa.numCells();
+      auto const& cellRange  = pa.cellRange();
+      auto const& cellSizes  = pa.sizes();
+      auto const& pids       = pa.id;
 
-      virtual void unloadCells() = 0;
-
-      virtual void updateGhostsVec() = 0;
-
-      virtual void collectGhostForcesVec() = 0;
-
-      boost::signals2::signal<void ()> onLoadCells;
-
-      boost::signals2::signal<void ()> onUnloadCells;
-
-      static void registerPython();
-
-    protected:
-      shared_ptr<Vectorization> vectorization;
-
-      LocalParticles localParticlesVec;
-      std::vector<size_t> uniqueCells;
-
-    private:
-      static LOG4ESPP_DECL_LOGGER(logger);
-    };
+      for(auto const& ic: uniqueCells)
+      {
+        auto const start = cellRange[ic];
+        auto const size  = cellSizes[ic];
+        auto const end   = start+size;
+        for(auto ip=start; ip<end; ip++)
+        {
+          auto const pid = pids[ip];
+          insert({pid, ip});
+        }
+      }
+    }
 
   }
 }}
-
-#endif//VEC_STORAGEVEC_HPP

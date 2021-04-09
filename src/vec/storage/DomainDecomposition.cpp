@@ -76,6 +76,8 @@ namespace espressopp { namespace vec {
       vectorization->resetParticles();
       prepareGhostBuffers();
       onLoadCells();
+
+      localParticlesVec.rebuild(vectorization->particles, uniqueCells);
     }
 
     /// Copy particles back from packed form. To be called at the end of integrator.run
@@ -98,6 +100,33 @@ namespace espressopp { namespace vec {
           commCellIdx[dir].ghosts = CellListToIdx(commCells[dir].ghosts, localCells[0]);
         }
         /// TODO: Check whether sorting improves performance
+      }
+
+      /// Determine list of unique cells for this subdomain. Unique cells comprise of  real cells
+      /// and ghost cells which are not derived from the same subdomain (intra).
+      {
+        uniqueCells.clear();
+        uniqueCells.reserve(localCells.size());
+        std::vector<size_t> cells(localCells.size(), 0);
+
+        for(int coord = 0; coord < 3; ++coord) {
+          const bool doPeriodic   = (nodeGrid.getGridSize(coord) == 1);
+          for (int lr = 0; lr < 2; ++lr) {
+            int const dir    = 2 * coord + lr;
+            int const oppDir = 2 * coord + (1-lr);
+            if(doPeriodic) {
+              auto const& ghosts = commCellIdx[dir].ghosts;
+              for(auto const& gc: ghosts) {
+                cells[gc]++;
+              }
+            }
+          }
+        }
+
+        for(size_t ic=0; ic<cells.size(); ic++) {
+          if(cells[ic]==0)
+            uniqueCells.push_back(ic);
+        }
       }
     }
 
