@@ -91,6 +91,7 @@ namespace espressopp { namespace vec {
     void addToForceOnly(CellList & srcCells) const;
 
     inline size_t size() const { return size_; }
+    inline size_t numCells() const { return sizes_.size(); }
     inline std::vector<size_t> const& cellRange() const { return cellRange_; }
     inline std::vector<size_t> const& sizes() const { return sizes_; }
     inline std::vector<size_t> const& realCells() const { return realCells_; }
