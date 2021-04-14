@@ -190,8 +190,6 @@ namespace espressopp { namespace vec {
 
   void FixedPairList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
   {
-    std::cout<<vectorization->getSystem()->comm->rank()<<": "<<__CLASS__<<__FUNCTION__<<std::endl;
-
     std::vector< size_t > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
@@ -233,8 +231,6 @@ namespace espressopp { namespace vec {
 
   void FixedPairList::afterRecvParticles(ParticleList &pl, InBuffer& buf)
   {
-    std::cout<<vectorization->getSystem()->comm->rank()<<": "<<__CLASS__<<__FUNCTION__<<std::endl;
-
     std::vector< size_t > received;
     int n;
     size_t pid1, pid2;
