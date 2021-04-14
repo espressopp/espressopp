@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -31,7 +31,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-/** Initial buffer size for incoming and outgoing messages 
+/** Initial buffer size for incoming and outgoing messages
     should fit for smaller messages
 */
 
@@ -55,11 +55,11 @@ namespace espressopp {
       DATA_LOCAL=4
     };
 
-    Buffer(const mpi::communicator &_comm) : comm(_comm) 
-    { 
+    Buffer(const mpi::communicator &_comm) : comm(_comm)
+    {
       // take as default the static buffer to avoid dynamic allocation
 
-      capacity  = BUFFER_SIZE; 
+      capacity  = BUFFER_SIZE;
       usedSize  = 0;
       buf       = staticBuf;
 
@@ -88,7 +88,7 @@ namespace espressopp {
     int  usedSize;   //!< used size of the buffer
     int  pos;        //!< current buffer position
 
-    void allocate(int size) 
+    void allocate(int size)
     {
        // fprintf(stderr, "realloc buffer from %d to capacity %d, used size = %d\n", capacity, size, usedSize);
        capacity = size;
@@ -97,8 +97,8 @@ namespace espressopp {
        dynBuf.reset(newBuf);
        buf = dynBuf.get();
     }
-      
-    void extend(int size) 
+
+    void extend(int size)
     {
        if (size <= capacity) return;
        if (size < 1024) allocate(1024);
@@ -114,8 +114,8 @@ namespace espressopp {
     }
 
     template <class T>
-    void readAll(T& val) { 
-      T* tbuf = (T*) (buf + pos); 
+    void readAll(T& val) {
+      T* tbuf = (T*) (buf + pos);
       pos += sizeof(T);
       //std::cout << comm.rank() << ": read pos: " << pos << ", usedSize: " << usedSize << "\n";
       if (pos > usedSize) {
@@ -123,12 +123,13 @@ namespace espressopp {
         exit(-1);
         return;
       }
-      val = *tbuf; 
+      val = *tbuf;
     }
 
-    void read(int& val) { readAll<int>(val); }
-    
-    void read(real& val) { readAll<real>(val); }
+    template<class T>
+    void read(T& v) {
+      readAll<T>(v);
+    }
 
     void read(Particle& p, int extradata) {
 
@@ -145,33 +146,14 @@ namespace espressopp {
       }
     }
 
-    void read(Particle& p) {
-      readAll<Particle>(p);
-    }
-
-    void read(ParticleForce& f) {
-      readAll<ParticleForce>(f);
-    }
-
-    void read(std::vector<longint> &v) {
-      int nvals;
+    template<class T>
+    void read(std::vector<T> &v) {
+      size_t nvals;
       read(nvals);
       v.clear();
       v.reserve(nvals);
-      for (int i = 0; i < nvals; i++) {
-        int val;
-        read(val);
-        v.push_back(val);
-      }
-    }
-
-    void read(std::vector<real> &v) {
-      int nvals;
-      read(nvals);
-      v.clear();
-      v.reserve(nvals);
-      for (int i = 0; i < nvals; i++) {
-        real val;
+      for (size_t i = 0; i < nvals; i++) {
+        T val;
         read(val);
         v.push_back(val);
       }
@@ -226,27 +208,28 @@ namespace espressopp {
 
   class OutBuffer : public Buffer {
 
-  public: 
+  public:
 
     OutBuffer(const mpi::communicator &comm) : Buffer(comm) {
 
     }
 
     template <class T>
-    void writeAll(T& val) 
-    { 
+    void writeAll(T const& val)
+    {
       int size = sizeof(T);  // needed size to write the data
       extend(pos + size);    // make sure that buffer will be sufficient
-      T* tbuf = (T*) (buf + pos); 
-      *tbuf = val; 
+      T* tbuf = (T*) (buf + pos);
+      *tbuf = val;
       pos += size;           // pos moves forward by size
       usedSize = pos;
       //std::cout << comm.rank() << ": write usedSize: " << usedSize << "\n";
     }
 
-    void write(int& val) { writeAll<int>(val); }
-    
-    void write(real& val) { writeAll<real>(val); }
+    template<class T>
+    void write(T const& v) {
+      writeAll<T>(v);
+    }
 
     void write(Particle& p, int extradata, const Real3D& shift) {
 
@@ -267,28 +250,12 @@ namespace espressopp {
       }
     }
 
-    void write(ParticleForce& f) {
-      writeAll<ParticleForce>(f);
-    }
-
-    void write(Particle& p) {
-      writeAll<Particle>(p);
-    }
-
-    void write(std::vector<longint> &v) {
-      int size = v.size();
+    template<class T>
+    void write(std::vector<T> const& v) {
+      size_t size = v.size();
       write(size);
-      for (longint i = 0; i < size; i++) {
-        int val = v[i];
-        write(val);
-      }
-    }
-
-    void write(std::vector<real> &v) {
-      int size = v.size();
-      write(size);
-      for (longint i = 0; i < size; i++) {
-        real val = v[i];
+      for (size_t i = 0; i < size; i++) {
+        T val = v[i];
         write(val);
       }
     }
