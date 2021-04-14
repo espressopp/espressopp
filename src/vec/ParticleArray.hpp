@@ -100,9 +100,10 @@ namespace espressopp { namespace vec {
     void verify(CellList const& srcCells) const;
     inline bool mode_aos() const { return mode==ESPP_VEC_AOS; }
 
-    AlignedVector< lint > id;
+    AlignedVector< size_t > id;
     AlignedVector< real > mass;
     AlignedVector< real > q;
+    AlignedVector< bool > ghost;
 
     /* AOS */
 

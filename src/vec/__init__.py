@@ -19,6 +19,7 @@
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.vec')
 
+from espressopp.vec.FixedPairList import *
 from espressopp.vec.Vectorization import *
 from espressopp.vec.VerletList import *
 

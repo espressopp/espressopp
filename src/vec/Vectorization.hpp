@@ -21,17 +21,16 @@
 #ifndef VEC_VECTORIZATION_HPP
 #define VEC_VECTORIZATION_HPP
 
+#include "vec/include/types.hpp"
+
 #include "SystemAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
-#include "storage/DomainDecomposition.hpp"
 #include "ParticleArray.hpp"
 #include "CellNeighborList.hpp"
 
 #include "types.hpp"
 #include "log4espp.hpp"
 #include "boost/signals2.hpp"
-
-#include "vec/include/types.hpp"
 
 namespace espressopp {
   namespace vec {

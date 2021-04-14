@@ -35,11 +35,13 @@ namespace espressopp { namespace vec {
       shared_ptr< Vectorization > vectorization,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
-      int _halfCellInt
+      int _halfCellInt,
+      bool rebuildLocalParticles
       )
       : baseClass(vectorization->getSystem(), _nodeGrid, _cellGrid, _halfCellInt),
         StorageVec(vectorization), vecMode(vectorization->getVecMode()),
-        vecModeFactor((vecMode==ESPP_VEC_SOA) ? 3 : 4)
+        vecModeFactor((vecMode==ESPP_VEC_SOA) ? 3 : 4),
+        rebuildLocalParticles(rebuildLocalParticles)
     {
       if(halfCellInt!=1)
         throw std::runtime_error("vec: Not implemented for halfCellInt!=1.");
@@ -74,10 +76,11 @@ namespace espressopp { namespace vec {
     void DomainDecomposition::loadCells()
     {
       vectorization->resetParticles();
+      if(rebuildLocalParticles)
+        localParticlesVec.rebuild(vectorization->particles, uniqueCells);
+
       prepareGhostBuffers();
       onLoadCells();
-
-      localParticlesVec.rebuild(vectorization->particles, uniqueCells);
     }
 
     /// Copy particles back from packed form. To be called at the end of integrator.run
@@ -704,7 +707,7 @@ namespace espressopp { namespace vec {
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
         ("vec_storage_DomainDecomposition", init< shared_ptr< Vectorization >, const Int3D&,
-            const Int3D&, int >())
+            const Int3D&, int, bool >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)
         // .def("connectOffload", &DomainDecomposition::connectOffload)

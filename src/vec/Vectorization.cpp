@@ -19,8 +19,10 @@
 */
 
 #include "Vectorization.hpp"
-#include "storage/Storage.hpp"
 #include "vec/integrator/MDIntegratorVec.hpp"
+#include "vec/storage/StorageVec.hpp"
+
+#include "storage/Storage.hpp"
 
 namespace espressopp {
   namespace vec {

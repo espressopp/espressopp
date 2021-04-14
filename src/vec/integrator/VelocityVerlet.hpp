@@ -22,7 +22,7 @@
 #ifndef VEC_INTEGRATOR_VELOCITYVERLET_HPP
 #define VEC_INTEGRATOR_VELOCITYVERLET_HPP
 
-#include "vec/storage/StorageVec.hpp"
+#include "vec/include/types.hpp"
 #include "vec/integrator/MDIntegratorVec.hpp"
 #include "types.hpp"
 #include "integrator/MDIntegrator.hpp"

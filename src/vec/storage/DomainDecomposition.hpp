@@ -21,9 +21,9 @@
 #ifndef VEC_STORAGE_DOMAINDECOMPOSITION_HPP
 #define VEC_STORAGE_DOMAINDECOMPOSITION_HPP
 
-#include "StorageVec.hpp"
-#include "vec/ParticleArray.hpp"
 #include "vec/include/types.hpp"
+#include "vec/ParticleArray.hpp"
+#include "StorageVec.hpp"
 
 #include <iostream>
 #include "log4espp.hpp"
@@ -46,7 +46,8 @@ namespace espressopp { namespace vec {
         shared_ptr< Vectorization > vectorization,
         const Int3D& nodeGrid,
         const Int3D& cellGrid,
-        int halfCellInt
+        int halfCellInt,
+        bool rebuildLocalParticles
         );
 
       ~DomainDecomposition();
@@ -72,6 +73,8 @@ namespace espressopp { namespace vec {
       boost::signals2::connection sigResetCells;
 
       const Mode vecMode;
+
+      bool rebuildLocalParticles;
 
       /////////////////////////////////////////////////////////////////////////////////////////////
       //// members involved in ghost communication

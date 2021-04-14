@@ -19,9 +19,10 @@
 */
 
 #include "vec/Vectorization.hpp"
+#include "vec/storage/StorageVec.hpp"
+#include "VelocityVerlet.hpp"
 
 #include "python.hpp"
-#include "VelocityVerlet.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"

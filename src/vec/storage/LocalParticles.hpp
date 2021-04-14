@@ -29,7 +29,7 @@
 namespace espressopp { namespace vec {
   namespace storage {
 
-    typedef std::unordered_map<lint, size_t> LocalParticlesBase;
+    typedef std::unordered_map<size_t, size_t> LocalParticlesBase;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Provides a lookup from particle id to (cellIdx, particleIdx)
@@ -44,6 +44,12 @@ namespace espressopp { namespace vec {
 
       /// Default constructor
       LocalParticles(){}
+
+      /// Read-only access
+      inline size_t operator() (size_t const& id) const
+      {
+        return this->at(id);
+      }
 
       /// Rebuild using all particles in uniqueCells, which should prevent any particles to be
       /// inserted multiple times

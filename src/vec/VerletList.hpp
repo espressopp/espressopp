@@ -26,6 +26,9 @@
 #ifndef VEC_VERLETLIST_HPP
 #define VEC_VERLETLIST_HPP
 
+#include "vec/include/types.hpp"
+#include "vec/include/simdconfig.hpp"
+
 #include "log4espp.hpp"
 #include "types.hpp"
 #include "python.hpp"
@@ -34,9 +37,6 @@
 #include "esutil/Timer.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
-
-#include "vec/include/types.hpp"
-#include "vec/include/simdconfig.hpp"
 
 namespace espressopp { namespace vec {
 

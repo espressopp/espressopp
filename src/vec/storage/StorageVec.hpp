@@ -22,12 +22,16 @@
 #define VEC_STORAGEVEC_HPP
 
 #include "vec/include/types.hpp"
+#include "vec/ParticleArray.hpp"
+#include "vec/Vectorization.hpp"
 #include "LocalParticles.hpp"
 
 #include "python.hpp"
 #include "log4espp.hpp"
 
 #include <boost/signals2.hpp>
+
+#define VEC_PARTICLE_NOT_FOUND (std::numeric_limits<size_t>::max())
 
 namespace espressopp { namespace vec {
   namespace storage {
@@ -56,6 +60,27 @@ namespace espressopp { namespace vec {
 
       LocalParticles localParticlesVec;
       std::vector<size_t> uniqueCells;
+
+    public:
+      inline size_t lookupLocalParticleVec(lint id)
+      {
+        const auto it = localParticlesVec.find(id);
+        return (it != localParticlesVec.end()) ?
+          it->second : VEC_PARTICLE_NOT_FOUND;
+      }
+
+      inline size_t lookupRealParticleVec(lint id)
+      {
+        const auto it = localParticlesVec.find(id);
+
+        size_t ret = VEC_PARTICLE_NOT_FOUND;
+        if(it!=localParticlesVec.end()) {
+          if(!(vectorization->particles.ghost[it->second])) {
+            ret = it->second;
+          }
+        }
+        return ret;
+      }
 
     private:
       static LOG4ESPP_DECL_LOGGER(logger);

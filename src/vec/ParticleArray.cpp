@@ -30,6 +30,7 @@
   id          . COMMAND ; \
   mass        . COMMAND ; \
   q           . COMMAND ; \
+  ghost       . COMMAND ; \
   /* */
 
 #define ESPP_PARTICLEARRAY_SOA_APPLY(COMMAND) \
@@ -46,6 +47,7 @@
   id          . COMMAND ; \
   mass        . COMMAND ; \
   q           . COMMAND ; \
+  ghost       . COMMAND ; \
   /* */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,6 +392,7 @@ namespace espressopp { namespace vec
         id       [pi] = p.id();
         mass     [pi] = p.mass();
         q        [pi] = p.q();
+        ghost    [pi] = p.ghost();
 
         position [pi] = Real3DInt(p.position(),p.type());
         velocity [pi] = p.velocity();
@@ -405,6 +408,7 @@ namespace espressopp { namespace vec
         id    [pi] = p.id();
         mass  [pi] = p.mass();
         q     [pi] = p.q();
+        ghost [pi] = p.ghost();
 
         type  [pi] = p.type();
         p_x   [pi] = p.position()[0];
