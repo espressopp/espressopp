@@ -25,8 +25,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _FIXEDPAIRLIST_HPP
-#define _FIXEDPAIRLIST_HPP
+#ifndef VEC_FIXEDPAIRLIST_HPP
+#define VEC_FIXEDPAIRLIST_HPP
 
 #include "Vectorization.hpp"
 
@@ -98,5 +98,4 @@ namespace espressopp {
   }
 }
 
-#endif
-
+#endif//VEC_FIXEDPAIRLIST_HPP
