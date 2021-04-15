@@ -28,8 +28,11 @@
 
 namespace espressopp { namespace vec {
   namespace interaction {
+
     typedef class FixedPairListInteractionTemplate< FENE > FixedPairListFENE;
+
     LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -48,7 +51,6 @@ namespace espressopp { namespace vec {
 
       class_< FixedPairListFENE, bases< Interaction > >
       ("vec_interaction_FixedPairListFENE", init< shared_ptr<Vectorization>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
-      // .def(init< shared_ptr<Vectorization>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
       .def("setPotential", &FixedPairListFENE::setPotential)
       .def("getPotential", &FixedPairListFENE::getPotential)
       .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)

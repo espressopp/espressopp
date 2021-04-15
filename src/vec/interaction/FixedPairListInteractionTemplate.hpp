@@ -77,7 +77,7 @@ namespace espressopp { namespace vec {
       }
 
       void
-      setPotential(shared_ptr < Potential> _potential) {
+      setPotential(shared_ptr < Potential > _potential) {
         if (_potential) {
           potential = _potential;
         } else {
@@ -133,71 +133,56 @@ namespace espressopp { namespace vec {
     FixedPairListInteractionTemplate < _Potential >::addForces_impl< VEC_MODE_SOA >()
     {
       LOG4ESPP_INFO(_Potential::theLogger, "adding forces of FixedPairList");
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
-      auto& particles = vectorization->particles;
+      auto const& bc    = *getSystemRef().bc;
+      auto& particles   = vectorization->particles;
+      auto& fpl         = *fixedpairList;
+      auto& pot         = *potential;
+      real ltMaxBondSqr = fpl.getLongtimeMaxBondSqr();
 
-      const Real3DInt *pa_pos  = particles.position.data();
-      Real4D *pa_force         = particles.force.data();
-
-      const lint* __restrict pa_type = particles.type.data();
-      const real* __restrict pa_p_x  = particles.p_x.data();
-      const real* __restrict pa_p_y  = particles.p_y.data();
-      const real* __restrict pa_p_z  = particles.p_z.data();
-      real* __restrict pa_f_x        = particles.f_x.data();
-      real* __restrict pa_f_y        = particles.f_y.data();
-      real* __restrict pa_f_z        = particles.f_z.data();
-
+      const Real3DInt *pa_pos     = particles.position.data();
+      Real4D *pa_force            = particles.force.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      real* __restrict f_x        = particles.f_x.data();
+      real* __restrict f_y        = particles.f_y.data();
+      real* __restrict f_z        = particles.f_z.data();
       const size_t* __restrict id = particles.id.data();
 
-      for(const auto& pair: *fixedpairList)
+      for(const auto& pair: fpl)
       {
         const auto& p1 = pair.first;
         const auto& p2 = pair.second;
 
-        /// TODO: Re-implement bc.getMinimumImageVectorBox with scalar inputs
-        // Real3D p1_pos, p2_pos;
-        // if(VEC_MODE_SOA){
-        //   p1_pos = {pa_p_x[p1],pa_p_y[p1],pa_p_z[p1]};
-        //   p2_pos = {pa_p_x[p2],pa_p_y[p2],pa_p_z[p2]};
-        // } else {
-        //   p1_pos = {pa_pos[p1].x,pa_pos[p1].y,pa_pos[p1].z};
-        //   p2_pos = {pa_pos[p2].x,pa_pos[p2].y,pa_pos[p2].z};
-        // }
-        // Real3D dist;
-        // bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-
         Real3D dist;
         if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(dist,
-            {pa_p_x[p1],pa_p_y[p1],pa_p_z[p1]},
-            {pa_p_x[p2],pa_p_y[p2],pa_p_z[p2]});
+          bc.getMinimumImageVectorBox(dist, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
         } else {
           bc.getMinimumImageVectorBox(dist, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
         }
         Real3D force;
-        real d = dist.sqr();
+        const real d = dist.sqr();
         if (d > ltMaxBondSqr) {
-          fixedpairList->setLongtimeMaxBondSqr(d);
+          fpl.setLongtimeMaxBondSqr(d);
           ltMaxBondSqr = d;
         }
-        potential->computeColVarWeights(dist, bc);
-        if(potential->_computeForce(force, dist)) {
+        pot.computeColVarWeights(dist, bc);
+        if(pot._computeForce(force, dist)){
           if(VEC_MODE_SOA){
-            pa_f_x[p1] += force[0];
-            pa_f_y[p1] += force[1];
-            pa_f_z[p1] += force[2];
-            pa_f_x[p2] -= force[0];
-            pa_f_y[p2] -= force[1];
-            pa_f_z[p2] -= force[2];
+            f_x[p1] += force.get()[0];
+            f_y[p1] += force.get()[1];
+            f_z[p1] += force.get()[2];
+            f_x[p2] -= force.get()[0];
+            f_y[p2] -= force.get()[1];
+            f_z[p2] -= force.get()[2];
           } else {
             *((Real3D*)(&pa_force[p1])) += force;
             *((Real3D*)(&pa_force[p2])) -= force;
           }
 
           if(VEC_MODE_SOA){
-            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << id[p1] << "(" << pa_p_x[p1] << "," << pa_p_y[p1] << "," << pa_p_z[p1] << ") "
-                                               << "p" << id[p2] << "(" << pa_p_x[p2] << "," << pa_p_y[p2] << "," << pa_p_z[p2] << ") "
+            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << id[p1] << "(" << p_x[p1] << "," << p_y[p1] << "," << p_z[p1] << ") "
+                                               << "p" << id[p2] << "(" << p_x[p2] << "," << p_y[p2] << "," << p_z[p2] << ") "
                                                << "dist=" << sqrt(dist*dist) << " "
                                                << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
           } else {
@@ -207,28 +192,6 @@ namespace espressopp { namespace vec {
                                                << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
           }
         }
-
-      #if 0
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Real3D dist;
-        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-        Real3D force;
-        real d = dist.sqr();
-        if (d > ltMaxBondSqr) {
-            fixedpairList->setLongtimeMaxBondSqr(d);
-            ltMaxBondSqr = d;
-        }
-        potential->computeColVarWeights(dist, bc);
-        if(potential->_computeForce(force, dist)) {
-          p1.force() += force;
-          p2.force() -= force;
-          LOG4ESPP_DEBUG(_Potential::theLogger, "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1] << "," << p1.position()[2] << ") "
-                                             << "p" << p2.id() << "(" << p2.position()[0] << "," << p2.position()[1] << "," << p2.position()[2] << ") "
-                                             << "dist=" << sqrt(dist*dist) << " "
-                                             << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
-        }
-      #endif
       }
     }
 

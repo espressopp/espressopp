@@ -49,7 +49,7 @@ namespace espressopp {
     {
     public:
       typedef boost::unordered_multimap<size_t, size_t> GlobalPairs;
-      shared_ptr <Vectorization> vectorization;
+      shared_ptr<Vectorization> vectorization;
 
     protected:
       boost::signals2::connection sigBeforeSend;
