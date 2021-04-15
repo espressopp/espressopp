@@ -22,6 +22,7 @@
 #include "bindings.hpp"
 
 #include "vec/FixedPairList.hpp"
+#include "vec/FixedTripleList.hpp"
 #include "vec/Vectorization.hpp"
 #include "vec/VerletList.hpp"
 
@@ -35,6 +36,7 @@ namespace espressopp {
     void registerPython()
     {
       vec::FixedPairList::registerPython();
+      vec::FixedTripleList::registerPython();
       vec::Vectorization::registerPython();
       vec::VerletList::registerPython();
 
