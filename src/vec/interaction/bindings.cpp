@@ -22,12 +22,14 @@
 #include "bindings.hpp"
 
 #include "LennardJones.hpp"
+#include "FENE.hpp"
 
 namespace espressopp {
   namespace vec {
     namespace interaction {
       void registerPython() {
         LennardJones::registerPython();
+        FENE::registerPython();
       }
     }
   }
