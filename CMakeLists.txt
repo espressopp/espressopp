@@ -169,6 +169,18 @@ else()
 endif()
 
 ######################################
+# Automatic CCache detection         #
+######################################
+option(USE_CCACHE "automatically search for and use ccache" OFF)
+if (USE_CCACHE)
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    endif()
+endif()
+
+######################################
 # Include the following subdirectory #
 ######################################
 add_subdirectory(src)
