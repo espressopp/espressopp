@@ -151,8 +151,8 @@ namespace espressopp { namespace vec {
 
       for(const auto& pair: fpl)
       {
-        const auto& p1 = pair.first;
-        const auto& p2 = pair.second;
+        const auto p1 = pair.first;
+        const auto p2 = pair.second;
 
         Real3D dist;
         if(VEC_MODE_SOA){

@@ -23,6 +23,7 @@
 
 #include "LennardJones.hpp"
 #include "FENE.hpp"
+#include "Cosine.hpp"
 
 namespace espressopp {
   namespace vec {
@@ -30,6 +31,7 @@ namespace espressopp {
       void registerPython() {
         LennardJones::registerPython();
         FENE::registerPython();
+        Cosine::registerPython();
       }
     }
   }
