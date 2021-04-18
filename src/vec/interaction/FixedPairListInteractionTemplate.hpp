@@ -108,6 +108,9 @@ namespace espressopp { namespace vec {
       template<bool VEC_MODE_SOA>
       void addForces_impl();
 
+      template<bool VEC_MODE_SOA>
+      real computeEnergy_impl();
+
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < vec::FixedPairList > fixedpairList;
@@ -198,17 +201,46 @@ namespace espressopp { namespace vec {
     template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeEnergy() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
+      auto const modeSOA = vectorization->modeSOA();
+      if(modeSOA) {
+        return computeEnergy_impl<1>();
+      } else {
+        return computeEnergy_impl<0>();
+      }
+    }
 
+    template < typename _Potential >
+    template < bool VEC_MODE_SOA >
+    inline real
+    FixedPairListInteractionTemplate < _Potential >::
+    computeEnergy_impl< VEC_MODE_SOA >() {
       LOG4ESPP_INFO(theLogger, "compute energy of the FixedPairList pairs");
 
-      real e = 0.0;
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+      auto const& bc  = *getSystemRef().bc;
       auto& particles = vectorization->particles;
-      for(const auto& pair: *fixedpairList)
+      auto& fpl         = *fixedpairList;
+      auto& pot         = *potential;
+      real ltMaxBondSqr = fpl.getLongtimeMaxBondSqr();
+
+      const Real3DInt *pa_pos     = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+
+      real e = 0.0;
+      for(const auto& pair: fpl)
       {
-        const auto& p1 = pair.first;
-        const auto& p2 = pair.second;
+        const auto p1 = pair.first;
+        const auto p2 = pair.second;
+
+        Real3D r21;
+        if(VEC_MODE_SOA){
+          bc.getMinimumImageVectorBox(r21, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
+        } else {
+          bc.getMinimumImageVectorBox(r21, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
+        }
+        pot.computeColVarWeights(r21, bc);
+        e += pot._computeEnergy(r21);
       #if 0
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
@@ -351,7 +383,7 @@ namespace espressopp { namespace vec {
     template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeVirial() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
 
       LOG4ESPP_INFO(theLogger, "compute the virial for the FixedPair List");
 
@@ -383,7 +415,7 @@ namespace espressopp { namespace vec {
 
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
 
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
@@ -416,7 +448,7 @@ namespace espressopp { namespace vec {
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w, real z){
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
 
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
@@ -455,7 +487,7 @@ namespace espressopp { namespace vec {
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n){
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
 
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 

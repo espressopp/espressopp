@@ -109,6 +109,9 @@ namespace espressopp { namespace vec {
       template<bool VEC_MODE_SOA>
       void addForces_impl();
 
+      template<bool VEC_MODE_SOA>
+      real computeEnergy_impl();
+
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < FixedTripleList > fixedtripleList;
@@ -210,12 +213,48 @@ namespace espressopp { namespace vec {
     template < typename _AngularPotential > inline real
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeEnergy() {
+      auto const modeSOA = vectorization->modeSOA();
+      if(modeSOA) {
+        return computeEnergy_impl<1>();
+      } else {
+        return computeEnergy_impl<0>();
+      }
+    }
+
+    template < typename _AngularPotential >
+    template < bool VEC_MODE_SOA >
+    inline real
+    FixedTripleListInteractionTemplate < _AngularPotential >::
+    computeEnergy_impl< VEC_MODE_SOA >() {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
-      const bc::BC& bc = *getSystemRef().bc;
-      real e = 0.0;
+      auto const& bc              = *getSystemRef().bc;
+      auto& particles             = vectorization->particles;
+      auto& ftl                   = *fixedtripleList;
+      auto& pot                   = *potential;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
 
-      LOG4ESPP_WARN(_AngularPotential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
+      real e = 0.0;
+      for(const auto& triple: ftl)
+      {
+        const auto p1 = std::get<0>(triple);
+        const auto p2 = std::get<1>(triple);
+        const auto p3 = std::get<2>(triple);
+        Real3D dist12, dist32;
+        if(VEC_MODE_SOA){
+          dist12 = bc.getMinimumImageVector({p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
+          dist32 = bc.getMinimumImageVector({p_x[p3],p_y[p3],p_z[p3]}, {p_x[p2],p_y[p2],p_z[p2]});
+        } else {
+          dist12 = bc.getMinimumImageVector(position[p1].to_Real3D(), position[p2].to_Real3D());
+          dist32 = bc.getMinimumImageVector(position[p3].to_Real3D(), position[p2].to_Real3D());
+        }
+        Real3D force12, force32;
+        pot.computeColVarWeights(dist12, dist32, bc);
+        e += pot._computeEnergy(dist12, dist32);
+      }
     #if 0
       for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
       {
@@ -228,10 +267,10 @@ namespace espressopp { namespace vec {
         potential->computeColVarWeights(dist12, dist32, bc);
         e += potential->_computeEnergy(dist12, dist32);
       }
+    #endif
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
-    #endif
     }
 
     template < typename _AngularPotential > inline real

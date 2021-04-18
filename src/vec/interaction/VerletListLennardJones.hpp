@@ -140,6 +140,9 @@ namespace espressopp { namespace vec {
         ParticleArray & particleArray,
         VerletList::NeighborList const& neighborList);
 
+      template <bool VEC_MODE_AOS>
+      real computeEnergy_impl();
+
       int ntypes;
       shared_ptr<VerletList> verletList;
       espressopp::esutil::Array2D<Potential, espressopp::esutil::enlarge> potentialArray;
@@ -219,8 +222,7 @@ namespace espressopp { namespace vec {
         const auto* __restrict nplist  = neighborList.nplist.data();
         const int ip_max = neighborList.plist.size();
 
-        const int pend   = neighborList.plist.size();
-        for(int ip=0; ip<pend; ip++)
+        for(int ip=0; ip<ip_max; ip++)
         {
           int p = plist[ip];
           int p_lookup;
@@ -340,6 +342,19 @@ namespace espressopp { namespace vec {
     inline real
     VerletListLennardJones::
     computeEnergy() {
+      bool VEC_MODE_AOS = verletList->getVectorization()->modeAOS();
+      if(VEC_MODE_AOS){
+        return computeEnergy_impl<1>();
+      }
+      else{
+        return computeEnergy_impl<0>();
+      }
+    }
+
+    template <bool VEC_MODE_AOS>
+    inline real
+    VerletListLennardJones::
+    computeEnergy_impl() {
     #if 0
       LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up potential energies");
 
@@ -357,13 +372,51 @@ namespace espressopp { namespace vec {
         es += e;
         LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
+    #endif
+
+      real e = 0.0;
+      real es = 0.0;
+
+      const auto& particles       = verletList->getVectorization()->particles;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      const lint* __restrict type = particles.type.data();
+
+      const auto& neighborList      = verletList->getNeighborList();
+      const auto* __restrict plist  = neighborList.plist.data();
+      const auto* __restrict prange = neighborList.prange.data();
+      const auto* __restrict nplist = neighborList.nplist.data();
+
+      const int ip_max = neighborList.plist.size();
+      for(int ip=0; ip<ip_max; ip++)
+      {
+        const int p1     = plist[ip];
+        const lint type1 = VEC_MODE_AOS ? position[p1].t : type[p1];
+
+        const int in_min = prange[ip].first;
+        const int in_max = prange[ip].second;
+
+        for(int in=in_min; in<in_max; in++)
+        {
+          const int p2 = nplist[in];
+          const lint type2 = VEC_MODE_AOS ? position[p2].t : type[p2];
+
+          const Potential &potential = getPotential(type1, type2);
+          if(VEC_MODE_AOS){
+            e = potential._computeEnergy(position[p1].to_Real3D() - position[p2].to_Real3D());
+          } else {
+            e = potential._computeEnergy({p_x[p1]-p_x[p2], p_y[p1]-p_y[p2], p_z[p1]-p_z[p2]});
+          }
+          es += e;
+        }
+      }
 
       // reduce over all CPUs
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
       return esum;
-    #endif
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergy() is not yet implemented.");
       return 0.0;
     }
 
