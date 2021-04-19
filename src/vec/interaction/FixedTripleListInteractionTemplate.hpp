@@ -109,9 +109,6 @@ namespace espressopp { namespace vec {
       template<bool VEC_MODE_SOA>
       void addForces_impl();
 
-      template<bool VEC_MODE_SOA>
-      real computeEnergy_impl();
-
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < FixedTripleList > fixedtripleList;
@@ -193,46 +190,28 @@ namespace espressopp { namespace vec {
 
     template < typename _AngularPotential > inline real
     FixedTripleListInteractionTemplate < _AngularPotential >::
-    computeEnergy() {
-      auto const modeSOA = vectorization->modeSOA();
-      if(modeSOA) {
-        return computeEnergy_impl<1>();
-      } else {
-        return computeEnergy_impl<0>();
-      }
-    }
-
-    template < typename _AngularPotential >
-    template < bool VEC_MODE_SOA >
-    inline real
-    FixedTripleListInteractionTemplate < _AngularPotential >::
-    computeEnergy_impl< VEC_MODE_SOA >() {
+    computeEnergy()
+    {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
-      auto const& bc              = *getSystemRef().bc;
-      auto& particles             = vectorization->particles;
-      auto& ftl                   = *fixedtripleList;
-      auto& pot                   = *potential;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       real e = 0.0;
-      for(const auto& triple: ftl)
+      for(const auto& triple: *fixedtripleList)
       {
         const auto p1 = std::get<0>(triple);
         const auto p2 = std::get<1>(triple);
         const auto p3 = std::get<2>(triple);
-        Real3D dist12, dist32;
-        if(VEC_MODE_SOA){
-          dist12 = bc.getMinimumImageVector({p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-          dist32 = bc.getMinimumImageVector({p_x[p3],p_y[p3],p_z[p3]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          dist12 = bc.getMinimumImageVector(position[p1].to_Real3D(), position[p2].to_Real3D());
-          dist32 = bc.getMinimumImageVector(position[p3].to_Real3D(), position[p2].to_Real3D());
-        }
-        Real3D force12, force32;
+
+        const Real3D p1_pos = particles.getPosition(p1);
+        const Real3D p2_pos = particles.getPosition(p2);
+        const Real3D p3_pos = particles.getPosition(p3);
+
+        const Real3D dist12 = bc.getMinimumImageVector(p1_pos, p2_pos);
+        const Real3D dist32 = bc.getMinimumImageVector(p3_pos, p2_pos);
+
         pot.computeColVarWeights(dist12, dist32, bc);
         e += pot._computeEnergy(dist12, dist32);
       }
@@ -290,14 +269,9 @@ namespace espressopp { namespace vec {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
-      auto const& bc              = *getSystemRef().bc;
-      auto& particles             = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       real w = 0.0;
       for(const auto& triple: *fixedtripleList)
@@ -306,16 +280,16 @@ namespace espressopp { namespace vec {
         const auto p2 = std::get<1>(triple);
         const auto p3 = std::get<2>(triple);
 
-        const Real3D p1_pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : position[p1].to_Real3D();
-        const Real3D p2_pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : position[p2].to_Real3D();
-        const Real3D p3_pos = VEC_MODE_SOA ? Real3D(p_x[p3],p_y[p3],p_z[p3]) : position[p3].to_Real3D();
+        const Real3D p1_pos = particles.getPosition(p1);
+        const Real3D p2_pos = particles.getPosition(p2);
+        const Real3D p3_pos = particles.getPosition(p3);
 
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1_pos, p2_pos);
         bc.getMinimumImageVectorBox(dist32, p3_pos, p2_pos);
         Real3D force12, force32;
-        potential->computeColVarWeights(dist12, dist32, bc);
-        potential->_computeForce(force12, force32, dist12, dist32);
+        pot.computeColVarWeights(dist12, dist32, bc);
+        pot._computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
 
@@ -329,14 +303,9 @@ namespace espressopp { namespace vec {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
-      auto const& bc              = *getSystemRef().bc;
-      auto& particles             = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       Tensor wlocal(0.0);
       for(const auto& triple: *fixedtripleList)
@@ -345,16 +314,16 @@ namespace espressopp { namespace vec {
         const auto p2 = std::get<1>(triple);
         const auto p3 = std::get<2>(triple);
 
-        const Real3D p1_pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : position[p1].to_Real3D();
-        const Real3D p2_pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : position[p2].to_Real3D();
-        const Real3D p3_pos = VEC_MODE_SOA ? Real3D(p_x[p3],p_y[p3],p_z[p3]) : position[p3].to_Real3D();
+        const Real3D p1_pos = particles.getPosition(p1);
+        const Real3D p2_pos = particles.getPosition(p2);
+        const Real3D p3_pos = particles.getPosition(p3);
 
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1_pos, p2_pos);
         bc.getMinimumImageVectorBox(r32, p3_pos, p2_pos);
         Real3D force12, force32;
-        potential->computeColVarWeights(r12, r32, bc);
-        potential->_computeForce(force12, force32, r12, r32);
+        pot.computeColVarWeights(r12, r32, bc);
+        pot._computeForce(force12, force32, r12, r32);
         wlocal += Tensor(r12, force12) + Tensor(r32, force32);
       }
 

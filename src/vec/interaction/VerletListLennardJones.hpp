@@ -140,9 +140,6 @@ namespace espressopp { namespace vec {
         ParticleArray & particleArray,
         VerletList::NeighborList const& neighborList);
 
-      template <bool VEC_MODE_AOS>
-      real computeEnergy_impl();
-
       int ntypes;
       shared_ptr<VerletList> verletList;
       espressopp::esutil::Array2D<Potential, espressopp::esutil::enlarge> potentialArray;
@@ -341,31 +338,12 @@ namespace espressopp { namespace vec {
 
     inline real
     VerletListLennardJones::
-    computeEnergy() {
-      bool VEC_MODE_AOS = verletList->getVectorization()->modeAOS();
-      if(VEC_MODE_AOS){
-        return computeEnergy_impl<1>();
-      }
-      else{
-        return computeEnergy_impl<0>();
-      }
-    }
-
-    template <bool VEC_MODE_AOS>
-    inline real
-    VerletListLennardJones::
-    computeEnergy_impl()
+    computeEnergy()
     {
       real e = 0.0;
       real es = 0.0;
 
-      const auto& particles       = verletList->getVectorization()->particles;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
-      const lint* __restrict type = particles.type.data();
-
+      const auto& particles         = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
@@ -375,22 +353,19 @@ namespace espressopp { namespace vec {
       for(int ip=0; ip<ip_max; ip++)
       {
         const int p1     = plist[ip];
-        const lint type1 = VEC_MODE_AOS ? position[p1].t : type[p1];
+        const auto type1 = particles.getType(p1);
+        const auto pos1  = particles.getPosition(p1);
 
         const int in_min = prange[ip].first;
         const int in_max = prange[ip].second;
-
         for(int in=in_min; in<in_max; in++)
         {
-          const int p2 = nplist[in];
-          const lint type2 = VEC_MODE_AOS ? position[p2].t : type[p2];
+          const int p2     = nplist[in];
+          const auto type2 = particles.getType(p2);
+          const auto pos2  = particles.getPosition(p2);
 
           const Potential &potential = getPotential(type1, type2);
-          if(VEC_MODE_AOS){
-            e = potential._computeEnergy(position[p1].to_Real3D() - position[p2].to_Real3D());
-          } else {
-            e = potential._computeEnergy({p_x[p1]-p_x[p2], p_y[p1]-p_y[p2], p_z[p1]-p_z[p2]});
-          }
+          e = potential._computeEnergy(pos1 - pos2);
           es += e;
         }
       }
@@ -449,14 +424,7 @@ namespace espressopp { namespace vec {
     {
       real w = 0.0;
 
-      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
-      const auto& particles       = verletList->getVectorization()->particles;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
-      const lint* __restrict type = particles.type.data();
-
+      const auto& particles         = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
@@ -465,17 +433,17 @@ namespace espressopp { namespace vec {
       const int ip_max = neighborList.plist.size();
       for(int ip=0; ip<ip_max; ip++)
       {
-        const int p1      = plist[ip];
-        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
-        const Real3D pos1 = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+        const int p1     = plist[ip];
+        const auto type1 = particles.getType(p1);
+        const auto pos1  = particles.getPosition(p1);
 
         const int in_min = prange[ip].first;
         const int in_max = prange[ip].second;
         for(int in=in_min; in<in_max; in++)
         {
-          const int p2      = nplist[in];
-          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
-          const Real3D pos2 = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+          const int p2     = nplist[in];
+          const auto type2 = particles.getType(p2);
+          const auto pos2  = particles.getPosition(p2);
 
           const Potential &potential = getPotential(type1, type2);
 
@@ -499,14 +467,7 @@ namespace espressopp { namespace vec {
     {
       Tensor wlocal(0.0);
 
-      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
-      const auto& particles       = verletList->getVectorization()->particles;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
-      const lint* __restrict type = particles.type.data();
-
+      const auto& particles         = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
@@ -515,17 +476,17 @@ namespace espressopp { namespace vec {
       const int ip_max = neighborList.plist.size();
       for(int ip=0; ip<ip_max; ip++)
       {
-        const int p1      = plist[ip];
-        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
-        const Real3D pos1 = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+        const int p1     = plist[ip];
+        const auto type1 = particles.getType(p1);
+        const auto pos1  = particles.getPosition(p1);
 
         const int in_min = prange[ip].first;
         const int in_max = prange[ip].second;
         for(int in=in_min; in<in_max; in++)
         {
-          const int p2      = nplist[in];
-          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
-          const Real3D pos2 = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+          const int p2     = nplist[in];
+          const auto type2 = particles.getType(p2);
+          const auto pos2  = particles.getPosition(p2);
 
           const Potential &potential = getPotential(type1, type2);
 
@@ -567,14 +528,7 @@ namespace espressopp { namespace vec {
 
       Tensor wlocal(0.0);
 
-      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
-      const auto& particles       = verletList->getVectorization()->particles;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
-      const lint* __restrict type = particles.type.data();
-
+      const auto& particles         = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
@@ -583,30 +537,30 @@ namespace espressopp { namespace vec {
       const int ip_max = neighborList.plist.size();
       for(int ip=0; ip<ip_max; ip++)
       {
-        const int p1      = plist[ip];
-        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
-        const Real3D p1pos = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+        const int p1     = plist[ip];
+        const auto type1 = particles.getType(p1);
+        const auto pos1  = particles.getPosition(p1);
 
         const int in_min = prange[ip].first;
         const int in_max = prange[ip].second;
         for(int in=in_min; in<in_max; in++)
         {
-          const int p2      = nplist[in];
-          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
-          const Real3D p2pos = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+          const int p2     = nplist[in];
+          const auto type2 = particles.getType(p2);
+          const auto pos2  = particles.getPosition(p2);
 
           const Potential &potential = getPotential(type1, type2);
 
-          if( (p1pos[2]>z && p2pos[2]<z) ||
-              (p1pos[2]<z && p2pos[2]>z) ||
+          if( (pos1[2]>z && pos2[2]<z) ||
+              (pos1[2]<z && pos2[2]>z) ||
                   (ghost_layer &&
-                      ((p1pos[2]>zghost && p2pos[2]<zghost) ||
-                      (p1pos[2]<zghost && p2pos[2]>zghost))) )
+                      ((pos1[2]>zghost && pos2[2]<zghost) ||
+                      (pos1[2]<zghost && pos2[2]>zghost))) )
           {
             const Potential &potential = getPotential(type1, type2);
 
             Real3D force(0.0, 0.0, 0.0);
-            Real3D r21 = p1pos - p2pos;
+            Real3D r21 = pos1 - pos2;
             if(potential._computeForce(force, r21)) {
               wlocal += Tensor(r21, force) / fabs(r21[2]);
             }
@@ -634,14 +588,7 @@ namespace espressopp { namespace vec {
       Tensor *wlocal = new Tensor[n];
       for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
 
-      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
-      const auto& particles       = verletList->getVectorization()->particles;
-      const Real3DInt *position   = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
-      const lint* __restrict type = particles.type.data();
-
+      const auto& particles         = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
@@ -650,28 +597,28 @@ namespace espressopp { namespace vec {
       const int ip_max = neighborList.plist.size();
       for(int ip=0; ip<ip_max; ip++)
       {
-        const int p1       = plist[ip];
-        const lint type1   = VEC_MODE_AOS ? position[p1].t : type[p1];
-        const Real3D p1pos = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+        const int p1     = plist[ip];
+        const auto type1 = particles.getType(p1);
+        const auto pos1  = particles.getPosition(p1);
 
         const int in_min = prange[ip].first;
         const int in_max = prange[ip].second;
         for(int in=in_min; in<in_max; in++)
         {
-          const int p2       = nplist[in];
-          const lint type2   = VEC_MODE_AOS ? position[p2].t : type[p2];
-          const Real3D p2pos = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+          const int p2     = nplist[in];
+          const auto type2 = particles.getType(p2);
+          const auto pos2  = particles.getPosition(p2);
 
           const Potential &potential = getPotential(type1, type2);
 
           Real3D force(0.0, 0.0, 0.0);
-          Real3D r21 = p1pos - p2pos;
+          Real3D r21 = pos1 - pos2;
           Tensor ww;
           if(potential._computeForce(force, r21)) {
             ww = Tensor(r21, force) / fabs(r21[2]);
 
-            int position1 = (int)( p1pos[2]/z_dist );
-            int position2 = (int)( p2pos[2]/z_dist );
+            int position1 = (int)( pos1[2]/z_dist );
+            int position2 = (int)( pos2[2]/z_dist );
 
             int maxpos = std::max(position1, position2);
             int minpos = std::min(position1, position2);

@@ -99,6 +99,7 @@ namespace espressopp { namespace vec {
     bool checkSizes() const;
     void verify(CellList const& srcCells) const;
     inline bool mode_aos() const { return mode==ESPP_VEC_AOS; }
+    inline bool mode_soa() const { return mode==ESPP_VEC_SOA; }
 
     AlignedVector< size_t > id;
     AlignedVector< real > mass;
@@ -148,6 +149,19 @@ namespace espressopp { namespace vec {
 
     void updateFrom(std::vector<Particle> const& particlelist, size_t start);
     void markGhostCells();
+
+  public:
+
+    inline Real3D getPosition(size_t i) const
+    {
+      return std::move(mode_soa() ? Real3D(p_x[i],p_y[i],p_z[i]) : position[i].to_Real3D());
+    }
+
+    inline lint getType(size_t i) const
+    {
+      return std::move(mode_soa() ? type[i] : position[i].t);
+    }
+
   };
 }}
 

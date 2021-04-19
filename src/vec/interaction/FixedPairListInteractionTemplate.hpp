@@ -108,9 +108,6 @@ namespace espressopp { namespace vec {
       template<bool VEC_MODE_SOA>
       void addForces_impl();
 
-      template<bool VEC_MODE_SOA>
-      real computeEnergy_impl();
-
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < vec::FixedPairList > fixedpairList;
@@ -200,45 +197,25 @@ namespace espressopp { namespace vec {
 
     template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
-    computeEnergy() {
-      auto const modeSOA = vectorization->modeSOA();
-      if(modeSOA) {
-        return computeEnergy_impl<1>();
-      } else {
-        return computeEnergy_impl<0>();
-      }
-    }
-
-    template < typename _Potential >
-    template < bool VEC_MODE_SOA >
-    inline real
-    FixedPairListInteractionTemplate < _Potential >::
-    computeEnergy_impl< VEC_MODE_SOA >() {
+    computeEnergy()
+    {
       LOG4ESPP_INFO(theLogger, "compute energy of the FixedPairList pairs");
 
       auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
       auto& particles = vectorization->particles;
-      auto& fpl         = *fixedpairList;
-      auto& pot         = *potential;
-      real ltMaxBondSqr = fpl.getLongtimeMaxBondSqr();
-
-      const Real3DInt *pa_pos     = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
 
       real e = 0.0;
-      for(const auto& pair: fpl)
+      for(const auto& pair: *fixedpairList)
       {
         const auto p1 = pair.first;
         const auto p2 = pair.second;
 
+        const Real3D p1pos = particles.getPosition(p1);
+        const Real3D p2pos = particles.getPosition(p2);
+
         Real3D r21;
-        if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(r21, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          bc.getMinimumImageVectorBox(r21, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
-        }
+        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         pot.computeColVarWeights(r21, bc);
         e += pot._computeEnergy(r21);
       }
@@ -290,21 +267,15 @@ namespace espressopp { namespace vec {
       std::cout << "Warning! At the moment computeVirialX in FixedPairListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
     }
 
-
     template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeVirial()
     {
       LOG4ESPP_INFO(theLogger, "compute the virial for the FixedPair List");
 
-      const auto& bc              = *getSystemRef().bc;  // boundary conditions
-      const auto& particles       = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *pa_pos     = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       real w = 0.0;
       for(const auto& pair: *fixedpairList)
@@ -312,16 +283,15 @@ namespace espressopp { namespace vec {
         const auto& p1 = pair.first;
         const auto& p2 = pair.second;
 
+        const Real3D p1pos = particles.getPosition(p1);
+        const Real3D p2pos = particles.getPosition(p2);
+
         Real3D r21;
-        if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(r21, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          bc.getMinimumImageVectorBox(r21, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
-        }
+        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
 
         Real3D force;
-        potential->computeColVarWeights(r21, bc);
-        if(potential->_computeForce(force, r21)) {
+        pot.computeColVarWeights(r21, bc);
+        if(pot._computeForce(force, r21)) {
           w += r21 * force;
         }
       }
@@ -336,30 +306,25 @@ namespace espressopp { namespace vec {
     {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-      const auto& bc              = *getSystemRef().bc;
-      const auto& particles       = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *pa_pos     = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       Tensor wlocal(0.0);
       for(const auto& pair: *fixedpairList)
       {
         const auto& p1 = pair.first;
         const auto& p2 = pair.second;
+
+        const Real3D p1pos = particles.getPosition(p1);
+        const Real3D p2pos = particles.getPosition(p2);
+
         Real3D r21;
-        if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(r21, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          bc.getMinimumImageVectorBox(r21, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
-        }
+        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
 
         Real3D force;
-        potential->computeColVarWeights(r21, bc);
-        if(potential->_computeForce(force, r21)) {
+        pot.computeColVarWeights(r21, bc);
+        if(pot._computeForce(force, r21)) {
           wlocal += Tensor(r21, force);
         }
       }
@@ -376,14 +341,9 @@ namespace espressopp { namespace vec {
     {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-      const auto& bc              = *getSystemRef().bc;
-      const auto& particles       = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *pa_pos     = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       Tensor wlocal(0.0);
       for(const auto& pair: *fixedpairList)
@@ -391,16 +351,16 @@ namespace espressopp { namespace vec {
         const auto& p1 = pair.first;
         const auto& p2 = pair.second;
 
-        const Real3D p1pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : pa_pos[p1].to_Real3D();
-        const Real3D p2pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : pa_pos[p2].to_Real3D();
+        const Real3D p1pos = particles.getPosition(p1);
+        const Real3D p2pos = particles.getPosition(p2);
 
         if(  (p1pos[2]>=z && p2pos[2]<=z) ||
              (p1pos[2]<=z && p2pos[2]>=z) ){
           Real3D r21;
           bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
           Real3D force;
-          potential->computeColVarWeights(r21, bc);
-          if(potential->_computeForce(force, r21)) {
+          pot.computeColVarWeights(r21, bc);
+          if(pot._computeForce(force, r21)) {
             wlocal += Tensor(r21, force);
           }
         }
@@ -418,14 +378,9 @@ namespace espressopp { namespace vec {
     {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-      const auto& bc              = *getSystemRef().bc;
-      const auto& particles       = vectorization->particles;
-      const bool VEC_MODE_SOA     = vectorization->modeSOA();
-
-      const Real3DInt *pa_pos     = particles.position.data();
-      const real* __restrict p_x  = particles.p_x.data();
-      const real* __restrict p_y  = particles.p_y.data();
-      const real* __restrict p_z  = particles.p_z.data();
+      auto const& bc  = *getSystemRef().bc;
+      auto& pot       = *potential;
+      auto& particles = vectorization->particles;
 
       Real3D Li = bc.getBoxL();
       Tensor *wlocal = new Tensor[n];
@@ -436,8 +391,8 @@ namespace espressopp { namespace vec {
         const auto& p1 = pair.first;
         const auto& p2 = pair.second;
 
-        const Real3D p1pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : pa_pos[p1].to_Real3D();
-        const Real3D p2pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : pa_pos[p2].to_Real3D();
+        const Real3D p1pos = particles.getPosition(p1);
+        const Real3D p2pos = particles.getPosition(p2);
 
         int position1 = (int)( n * p1pos[2]/Li[2]);
         int position2 = (int)( n * p1pos[2]/Li[2]);
@@ -449,7 +404,7 @@ namespace espressopp { namespace vec {
         bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force;
         Tensor ww;
-        if(potential->_computeForce(force, r21)) {
+        if(pot._computeForce(force, r21)) {
           ww = Tensor(r21, force);
         }
 
