@@ -354,26 +354,8 @@ namespace espressopp { namespace vec {
     template <bool VEC_MODE_AOS>
     inline real
     VerletListLennardJones::
-    computeEnergy_impl() {
-    #if 0
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up potential energies");
-
-      real e = 0.0;
-      real es = 0.0;
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
-        e   = potential._computeEnergy(p1, p2);
-        // e   = potential->_computeEnergy(p1, p2);
-        es += e;
-        LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
-      }
-    #endif
-
+    computeEnergy_impl()
+    {
       real e = 0.0;
       real es = 0.0;
 
@@ -463,25 +445,45 @@ namespace espressopp { namespace vec {
 
     inline real
     VerletListLennardJones::
-    computeVirial() {
-    #if 0
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial");
-
+    computeVirial()
+    {
       real w = 0.0;
-      for (PairList::Iterator it(verletList->getPairs());
-           it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
 
-        Real3D force(0.0, 0.0, 0.0);
-        if(potential._computeForce(force, p1, p2)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          Real3D r21 = p1.position() - p2.position();
-          w = w + r21 * force;
+      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
+      const auto& particles       = verletList->getVectorization()->particles;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      const lint* __restrict type = particles.type.data();
+
+      const auto& neighborList      = verletList->getNeighborList();
+      const auto* __restrict plist  = neighborList.plist.data();
+      const auto* __restrict prange = neighborList.prange.data();
+      const auto* __restrict nplist = neighborList.nplist.data();
+
+      const int ip_max = neighborList.plist.size();
+      for(int ip=0; ip<ip_max; ip++)
+      {
+        const int p1      = plist[ip];
+        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
+        const Real3D pos1 = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+
+        const int in_min = prange[ip].first;
+        const int in_max = prange[ip].second;
+        for(int in=in_min; in<in_max; in++)
+        {
+          const int p2      = nplist[in];
+          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
+          const Real3D pos2 = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+
+          const Potential &potential = getPotential(type1, type2);
+
+          Real3D force(0.0, 0.0, 0.0);
+          const Real3D r21 = pos1 - pos2;
+          if(potential._computeForce(force, r21)) {
+            w = w + r21 * force;
+          }
         }
       }
 
@@ -489,32 +491,49 @@ namespace espressopp { namespace vec {
       real wsum;
       boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return wsum;
-    #endif
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirial() is not yet implemented.");
-      return 0.0;
     }
 
     inline void
     VerletListLennardJones::
-    computeVirialTensor(Tensor& w) {
-    #if 0
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor");
-
+    computeVirialTensor(Tensor& w)
+    {
       Tensor wlocal(0.0);
-      for (PairList::Iterator it(verletList->getPairs());
-           it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
 
-        Real3D force(0.0, 0.0, 0.0);
-        if(potential._computeForce(force, p1, p2)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          Real3D r21 = p1.position() - p2.position();
-          wlocal += Tensor(r21, force);
+      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
+      const auto& particles       = verletList->getVectorization()->particles;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      const lint* __restrict type = particles.type.data();
+
+      const auto& neighborList      = verletList->getNeighborList();
+      const auto* __restrict plist  = neighborList.plist.data();
+      const auto* __restrict prange = neighborList.prange.data();
+      const auto* __restrict nplist = neighborList.nplist.data();
+
+      const int ip_max = neighborList.plist.size();
+      for(int ip=0; ip<ip_max; ip++)
+      {
+        const int p1      = plist[ip];
+        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
+        const Real3D pos1 = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+
+        const int in_min = prange[ip].first;
+        const int in_max = prange[ip].second;
+        for(int in=in_min; in<in_max; in++)
+        {
+          const int p2      = nplist[in];
+          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
+          const Real3D pos2 = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+
+          const Potential &potential = getPotential(type1, type2);
+
+          Real3D force(0.0, 0.0, 0.0);
+          const Real3D r21 = pos1 - pos2;
+          if(potential._computeForce(force, r21)) {
+            wlocal += Tensor(r21, force);
+          }
         }
       }
 
@@ -522,17 +541,13 @@ namespace espressopp { namespace vec {
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
-    #endif
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialTensor() is not yet implemented.");
     }
 
     // local pressure tensor for layer, plane is defined by z coordinate
     inline void
     VerletListLennardJones::
-    computeVirialTensor(Tensor& w, real z) {
-    #if 0
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor over one z-layer");
-
+    computeVirialTensor(Tensor& w, real z)
+    {
       System& system = verletList->getSystemRef();
       Real3D Li = system.bc->getBoxL();
 
@@ -551,46 +566,65 @@ namespace espressopp { namespace vec {
       }
 
       Tensor wlocal(0.0);
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Real3D p1pos = p1.position();
-        Real3D p2pos = p2.position();
 
+      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
+      const auto& particles       = verletList->getVectorization()->particles;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      const lint* __restrict type = particles.type.data();
 
-        if( (p1pos[2]>z && p2pos[2]<z) ||
-            (p1pos[2]<z && p2pos[2]>z) ||
-                (ghost_layer &&
-                    ((p1pos[2]>zghost && p2pos[2]<zghost) ||
-                    (p1pos[2]<zghost && p2pos[2]>zghost))
-                )
-          ){
-          int type1 = p1.type();
-          int type2 = p2.type();
+      const auto& neighborList      = verletList->getNeighborList();
+      const auto* __restrict plist  = neighborList.plist.data();
+      const auto* __restrict prange = neighborList.prange.data();
+      const auto* __restrict nplist = neighborList.nplist.data();
+
+      const int ip_max = neighborList.plist.size();
+      for(int ip=0; ip<ip_max; ip++)
+      {
+        const int p1      = plist[ip];
+        const lint type1  = VEC_MODE_AOS ? position[p1].t : type[p1];
+        const Real3D p1pos = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+
+        const int in_min = prange[ip].first;
+        const int in_max = prange[ip].second;
+        for(int in=in_min; in<in_max; in++)
+        {
+          const int p2      = nplist[in];
+          const lint type2  = VEC_MODE_AOS ? position[p2].t : type[p2];
+          const Real3D p2pos = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+
           const Potential &potential = getPotential(type1, type2);
 
-          Real3D force(0.0, 0.0, 0.0);
-          if(potential._computeForce(force, p1, p2)) {
+          if( (p1pos[2]>z && p2pos[2]<z) ||
+              (p1pos[2]<z && p2pos[2]>z) ||
+                  (ghost_layer &&
+                      ((p1pos[2]>zghost && p2pos[2]<zghost) ||
+                      (p1pos[2]<zghost && p2pos[2]>zghost))) )
+          {
+            const Potential &potential = getPotential(type1, type2);
+
+            Real3D force(0.0, 0.0, 0.0);
             Real3D r21 = p1pos - p2pos;
-            wlocal += Tensor(r21, force) / fabs(r21[2]);
+            if(potential._computeForce(force, r21)) {
+              wlocal += Tensor(r21, force) / fabs(r21[2]);
+            }
           }
         }
       }
-
       // reduce over all CPUs
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
-    #endif
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialTensor() is not yet implemented.");
     }
 
     // it will calculate the pressure in 'n' layers along Z axis
     // the first layer has coordinate 0.0 the last - (Lz - Lz/n)
     inline void
     VerletListLennardJones::
-    computeVirialTensor(Tensor *w, int n) {
-    #if 0
+    computeVirialTensor(Tensor *w, int n)
+    {
       LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor in bins along z-direction");
 
       System& system = verletList->getSystemRef();
@@ -599,51 +633,73 @@ namespace espressopp { namespace vec {
       real z_dist = Li[2] / float(n);  // distance between two layers
       Tensor *wlocal = new Tensor[n];
       for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        Real3D p1pos = p1.position();
-        Real3D p2pos = p2.position();
 
-        const Potential &potential = getPotential(type1, type2);
+      const bool VEC_MODE_AOS     = verletList->getVectorization()->modeAOS();
+      const auto& particles       = verletList->getVectorization()->particles;
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+      const lint* __restrict type = particles.type.data();
 
-        Real3D force(0.0, 0.0, 0.0);
-        Tensor ww;
-        if(potential._computeForce(force, p1, p2)) {
+      const auto& neighborList      = verletList->getNeighborList();
+      const auto* __restrict plist  = neighborList.plist.data();
+      const auto* __restrict prange = neighborList.prange.data();
+      const auto* __restrict nplist = neighborList.nplist.data();
+
+      const int ip_max = neighborList.plist.size();
+      for(int ip=0; ip<ip_max; ip++)
+      {
+        const int p1       = plist[ip];
+        const lint type1   = VEC_MODE_AOS ? position[p1].t : type[p1];
+        const Real3D p1pos = VEC_MODE_AOS ? position[p1].to_Real3D() : Real3D(p_x[p1],p_y[p1],p_z[p1]);
+
+        const int in_min = prange[ip].first;
+        const int in_max = prange[ip].second;
+        for(int in=in_min; in<in_max; in++)
+        {
+          const int p2       = nplist[in];
+          const lint type2   = VEC_MODE_AOS ? position[p2].t : type[p2];
+          const Real3D p2pos = VEC_MODE_AOS ? position[p2].to_Real3D() : Real3D(p_x[p2],p_y[p2],p_z[p2]);
+
+          const Potential &potential = getPotential(type1, type2);
+
+          Real3D force(0.0, 0.0, 0.0);
           Real3D r21 = p1pos - p2pos;
-          ww = Tensor(r21, force) / fabs(r21[2]);
+          Tensor ww;
+          if(potential._computeForce(force, r21)) {
+            ww = Tensor(r21, force) / fabs(r21[2]);
 
-          int position1 = (int)( p1pos[2]/z_dist );
-          int position2 = (int)( p2pos[2]/z_dist );
+            int position1 = (int)( p1pos[2]/z_dist );
+            int position2 = (int)( p2pos[2]/z_dist );
 
-          int maxpos = std::max(position1, position2);
-          int minpos = std::min(position1, position2);
+            int maxpos = std::max(position1, position2);
+            int minpos = std::min(position1, position2);
 
-          // boundaries should be taken into account
-          bool boundaries1 = false;
-          bool boundaries2 = false;
-          if(minpos < 0){
-            minpos += n;
-            boundaries1 =true;
-          }
-          if(maxpos >=n){
-            maxpos -= n;
-            boundaries2 =true;
-          }
-
-          if(boundaries1 || boundaries2){
-            for(int i = 0; i<=maxpos; i++){
-              wlocal[i] += ww;
+            // boundaries should be taken into account
+            bool boundaries1 = false;
+            bool boundaries2 = false;
+            if(minpos < 0){
+              minpos += n;
+              boundaries1 =true;
             }
-            for(int i = minpos+1; i<n; i++){
-              wlocal[i] += ww;
+            if(maxpos >=n){
+              maxpos -= n;
+              boundaries2 =true;
             }
-          }
-          else{
-            for(int i = minpos+1; i<=maxpos; i++){
-              wlocal[i] += ww;
+
+            if(boundaries1 || boundaries2){
+              for(int i = 0; i<=maxpos; i++){
+                wlocal[i] += ww;
+              }
+              for(int i = minpos+1; i<n; i++){
+                wlocal[i] += ww;
+              }
+            }
+            else{
+              for(int i = minpos+1; i<=maxpos; i++){
+                wlocal[i] += ww;
+              }
             }
           }
         }
@@ -659,7 +715,7 @@ namespace espressopp { namespace vec {
 
       delete [] wsum;
       delete [] wlocal;
-    #endif
+
       LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialTensor() is not yet implemented.");
     }
 
@@ -670,11 +726,11 @@ namespace espressopp { namespace vec {
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
             cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-            // cutoff = std::max(cutoff, getPotential(i, j)->getCutoff());
         }
       }
       return cutoff;
     }
   }
 }}
+
 #endif//VEC_INTERACTION_VERLETLISTLENNARDJONES_HPP

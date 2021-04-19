@@ -189,25 +189,6 @@ namespace espressopp { namespace vec {
           *((Real3D*)(&force[p3])) += force32;
         }
       }
-
-    #if 0
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
-      {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D dist12, dist32;
-        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-        Real3D force12, force32;
-        potential->computeColVarWeights(dist12, dist32, bc);
-        potential->_computeForce(force12, force32, dist12, dist32);
-        p1.force() += force12;
-        p2.force() -= force12 + force32;
-        p3.force() += force32;
-      }
-    #endif
     }
 
     template < typename _AngularPotential > inline real
@@ -255,19 +236,7 @@ namespace espressopp { namespace vec {
         pot.computeColVarWeights(dist12, dist32, bc);
         e += pot._computeEnergy(dist12, dist32);
       }
-    #if 0
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
-      {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        potential->computeColVarWeights(dist12, dist32, bc);
-        e += potential->_computeEnergy(dist12, dist32);
-      }
-    #endif
+
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
@@ -312,7 +281,8 @@ namespace espressopp { namespace vec {
     inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeVirialX(std::vector<real> &p_xx_total, int bins) {
-        std::cout << "Warning! At the moment computeVirialX in FixedTripleListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
+        std::cout << "Warning! At the moment computeVirialX in FixedTripleListInteractionTemplate does not work."<< std::endl
+          << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
     }
 
     template < typename _AngularPotential > inline real
@@ -320,30 +290,38 @@ namespace espressopp { namespace vec {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
-      const bc::BC& bc = *getSystemRef().bc;
-      real w = 0.0;
+      auto const& bc              = *getSystemRef().bc;
+      auto& particles             = vectorization->particles;
+      const bool VEC_MODE_SOA     = vectorization->modeSOA();
 
-      LOG4ESPP_WARN(_AngularPotential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
-    #if 0
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+
+      real w = 0.0;
+      for(const auto& triple: *fixedtripleList)
       {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
-        const espressopp::bc::BC& bc = *getSystemRef().bc;
+        const auto p1 = std::get<0>(triple);
+        const auto p2 = std::get<1>(triple);
+        const auto p3 = std::get<2>(triple);
+
+        const Real3D p1_pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : position[p1].to_Real3D();
+        const Real3D p2_pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : position[p2].to_Real3D();
+        const Real3D p3_pos = VEC_MODE_SOA ? Real3D(p_x[p3],p_y[p3],p_z[p3]) : position[p3].to_Real3D();
+
         Real3D dist12, dist32;
-        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist12, p1_pos, p2_pos);
+        bc.getMinimumImageVectorBox(dist32, p3_pos, p2_pos);
         Real3D force12, force32;
         potential->computeColVarWeights(dist12, dist32, bc);
         potential->_computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
+
       real wsum;
       boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return wsum;
-    #endif
     }
 
     template < typename _AngularPotential > inline void
@@ -351,20 +329,29 @@ namespace espressopp { namespace vec {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
+      auto const& bc              = *getSystemRef().bc;
+      auto& particles             = vectorization->particles;
+      const bool VEC_MODE_SOA     = vectorization->modeSOA();
+
+      const Real3DInt *position   = particles.position.data();
+      const real* __restrict p_x  = particles.p_x.data();
+      const real* __restrict p_y  = particles.p_y.data();
+      const real* __restrict p_z  = particles.p_z.data();
+
       Tensor wlocal(0.0);
-      const bc::BC& bc = *getSystemRef().bc;
+      for(const auto& triple: *fixedtripleList)
+      {
+        const auto p1 = std::get<0>(triple);
+        const auto p2 = std::get<1>(triple);
+        const auto p3 = std::get<2>(triple);
 
-      LOG4ESPP_WARN(_AngularPotential::theLogger, "Warning! "<<__FUNCTION__<<"() is not yet implemented.");
-    #if 0
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
+        const Real3D p1_pos = VEC_MODE_SOA ? Real3D(p_x[p1],p_y[p1],p_z[p1]) : position[p1].to_Real3D();
+        const Real3D p2_pos = VEC_MODE_SOA ? Real3D(p_x[p2],p_y[p2],p_z[p2]) : position[p2].to_Real3D();
+        const Real3D p3_pos = VEC_MODE_SOA ? Real3D(p_x[p3],p_y[p3],p_z[p3]) : position[p3].to_Real3D();
 
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        //const Potential &potential = getPotential(0, 0);
         Real3D r12, r32;
-        bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
-        bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(r12, p1_pos, p2_pos);
+        bc.getMinimumImageVectorBox(r32, p3_pos, p2_pos);
         Real3D force12, force32;
         potential->computeColVarWeights(r12, r32, bc);
         potential->_computeForce(force12, force32, r12, r32);
@@ -375,7 +362,6 @@ namespace espressopp { namespace vec {
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal,6, (double*)&wsum, std::plus<double>());
       w += wsum;
-    #endif
     }
 
     template < typename _AngularPotential > inline void
@@ -384,34 +370,6 @@ namespace espressopp { namespace vec {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       std::cout << "Warning! At the moment IK computeVirialTensor for fixed triples does'n work"<<std::endl;
-
-      /*
-      Tensor wlocal(0.0);
-      const bc::BC& bc = *getSystemRef().bc;
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-
-        Real3D p2pos = p2.position();
-
-        if(  (p2pos[0]>xmin && p2pos[0]<xmax &&
-              p2pos[1]>ymin && p2pos[1]<ymax &&
-              p2pos[2]>zmin && p2pos[2]<zmax) ){
-          Real3D r12, r32;
-          bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
-          bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
-          Real3D force12, force32;
-          potential->_computeForce(force12, force32, r12, r32);
-          wlocal += Tensor(r12, force12) + Tensor(r32, force32);
-        }
-      }
-
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal,6, (double*)&wsum, std::plus<double>());
-      w += wsum;
-       */
     }
 
     template < typename _AngularPotential > inline void
@@ -426,14 +384,9 @@ namespace espressopp { namespace vec {
     inline real
     FixedTripleListInteractionTemplate< _AngularPotential >::
     getMaxCutoff() {
-      /*real cutoff = 0.0;
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-        }
-      }*/
       return potential->getCutoff();
     }
   }
 }}
-#endif
+
+#endif//VEC_INTERACTION_FIXEDTRIPLELISTINTERACTIONTEMPLATE_HPP
