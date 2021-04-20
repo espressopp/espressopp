@@ -37,6 +37,9 @@ namespace espressopp {
       Mode mode
       ): SystemAccess(system), mdintegrator(mdintegrator), mode(mode)
     {
+      LOG4ESPP_WARN(logger, "espressopp.vectorization namespace has been deprecated. "
+        "Use espressopp.vec instead.");
+
       std::string mode_str = (mode==ESPP_VEC_AOS) ? "AOS" : "SOA";
       LOG4ESPP_INFO(logger,"Using vectorization mode: " << mode_str);
       connect();
