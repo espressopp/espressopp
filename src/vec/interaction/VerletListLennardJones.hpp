@@ -36,21 +36,20 @@
 #include "storage/Storage.hpp"
 
 #include "LennardJones.hpp"
+#include "VerletListInteractionTemplate.hpp"
 #include "vec/VerletList.hpp"
 #include "vec/Vectorization.hpp"
 
 namespace espressopp { namespace vec {
   namespace interaction {
 
-    using espressopp::vec::VerletList;
-    using espressopp::interaction::Interaction;
-    using espressopp::interaction::Nonbonded;
-
-    class VerletListLennardJones: public Interaction {
-
+    class VerletListLennardJones
+      : public VerletListInteractionTemplate<LennardJones>
+    {
     protected:
       typedef LennardJones _Potential;
       typedef _Potential Potential;
+      typedef VerletListInteractionTemplate<LennardJones> base;
 
       struct LJCoefficients
       {
@@ -61,47 +60,11 @@ namespace espressopp { namespace vec {
 
     public:
       VerletListLennardJones(shared_ptr<VerletList> _verletList)
-        : verletList(_verletList)
+        : base(_verletList)
+        , np_types(0)
+        , p_types(0)
       {
-        potentialArray    = espressopp::esutil::Array2D<Potential, espressopp::esutil::enlarge>(0, 0, Potential());
-        ntypes = 0;
-        np_types = 0;
-        p_types = 0;
-      }
 
-      virtual ~VerletListLennardJones() {};
-
-      void
-      setVerletList(shared_ptr < VerletList > _verletList) {
-        verletList = _verletList;
-      }
-
-      shared_ptr<VerletList> getVerletList() {
-        return verletList;
-      }
-
-      void
-      setPotential(int type1, int type2, const Potential &potential) {
-        // typeX+1 because i<ntypes
-        ntypes = std::max(ntypes, std::max(type1+1, type2+1));
-        potentialArray.at(type1, type2) = potential;
-        LOG4ESPP_INFO(_Potential::theLogger, "added potential for type1=" << type1 << " type2=" << type2);
-        if (type1 != type2) { // add potential in the other direction
-           potentialArray.at(type2, type1) = potential;
-           LOG4ESPP_INFO(_Potential::theLogger, "automatically added the same potential for type1=" << type2 << " type2=" << type1);
-        }
-        rebuildPotential();
-      }
-
-      // this is used in the innermost force-loop
-      Potential &getPotential(int type1, int type2) {
-        if(type1>=potentialArray.size_n() || type2>=potentialArray.size_m()) needRebuildPotential = true;
-        return potentialArray.at(type1, type2);
-      }
-
-      // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-        return  make_shared<Potential>(potentialArray.at(type1, type2));
       }
 
       void rebuildPotential()
@@ -119,19 +82,6 @@ namespace espressopp { namespace vec {
         needRebuildPotential = false;
       }
       virtual void addForces();
-      virtual real computeEnergy();
-      virtual real computeEnergyDeriv();
-      virtual real computeEnergyAA();
-      virtual real computeEnergyCG();
-      virtual real computeEnergyAA(int atomtype);
-      virtual real computeEnergyCG(int atomtype);
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
-      virtual real computeVirial();
-      virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real z);
-      virtual void computeVirialTensor(Tensor *w, int n);
-      virtual real getMaxCutoff();
-      virtual int bondType() { return Nonbonded; }
 
     protected:
 
@@ -139,11 +89,6 @@ namespace espressopp { namespace vec {
       void addForces_impl(
         ParticleArray & particleArray,
         VerletList::NeighborList const& neighborList);
-
-      int ntypes;
-      shared_ptr<VerletList> verletList;
-      espressopp::esutil::Array2D<Potential, espressopp::esutil::enlarge> potentialArray;
-      // not needed espressopp::esutil::Array2D<shared_ptr<Potential>, espressopp::esutil::enlarge> potentialArrayPtr;
 
       size_t np_types, p_types;
       AlignedVector<LJCoefficients> ffs;
@@ -156,7 +101,8 @@ namespace espressopp { namespace vec {
     //////////////////////////////////////////////////
     inline void
     VerletListLennardJones::
-    addForces() {
+    addForces()
+    {
       LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and add forces");
 
       // lookup table for LJ variables
@@ -334,348 +280,6 @@ namespace espressopp { namespace vec {
           }
         }
       }
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergy()
-    {
-      real e = 0.0;
-      real es = 0.0;
-
-      const auto& particles         = verletList->getVectorization()->particles;
-      const auto& neighborList      = verletList->getNeighborList();
-      const auto* __restrict plist  = neighborList.plist.data();
-      const auto* __restrict prange = neighborList.prange.data();
-      const auto* __restrict nplist = neighborList.nplist.data();
-
-      const int ip_max = neighborList.plist.size();
-      for(int ip=0; ip<ip_max; ip++)
-      {
-        const int p1     = plist[ip];
-        const auto type1 = particles.getType(p1);
-        const auto pos1  = particles.getPosition(p1);
-
-        const int in_min = prange[ip].first;
-        const int in_max = prange[ip].second;
-        for(int in=in_min; in<in_max; in++)
-        {
-          const int p2     = nplist[in];
-          const auto type2 = particles.getType(p2);
-          const auto pos2  = particles.getPosition(p2);
-
-          const Potential &potential = getPotential(type1, type2);
-          e = potential._computeEnergy(pos1 - pos2);
-          es += e;
-        }
-      }
-
-      // reduce over all CPUs
-      real esum;
-      boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
-      return esum;
-      return 0.0;
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergyDeriv() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyDeriv() is not yet implemented.");
-      return 0.0;
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergyAA() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA() is not yet implemented.");
-      return 0.0;
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergyAA(int atomtype) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA(int atomtype) is not yet implemented.");
-      return 0.0;
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergyCG() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG() is not yet implemented.");
-      return 0.0;
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeEnergyCG(int atomtype) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG(int atomtype) is not yet implemented.");
-      return 0.0;
-    }
-
-    inline void
-    VerletListLennardJones::
-    computeVirialX(std::vector<real> &p_xx_total, int bins) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialX() is not yet implemented.");
-    }
-
-    inline real
-    VerletListLennardJones::
-    computeVirial()
-    {
-      real w = 0.0;
-
-      const auto& particles         = verletList->getVectorization()->particles;
-      const auto& neighborList      = verletList->getNeighborList();
-      const auto* __restrict plist  = neighborList.plist.data();
-      const auto* __restrict prange = neighborList.prange.data();
-      const auto* __restrict nplist = neighborList.nplist.data();
-
-      const int ip_max = neighborList.plist.size();
-      for(int ip=0; ip<ip_max; ip++)
-      {
-        const int p1     = plist[ip];
-        const auto type1 = particles.getType(p1);
-        const auto pos1  = particles.getPosition(p1);
-
-        const int in_min = prange[ip].first;
-        const int in_max = prange[ip].second;
-        for(int in=in_min; in<in_max; in++)
-        {
-          const int p2     = nplist[in];
-          const auto type2 = particles.getType(p2);
-          const auto pos2  = particles.getPosition(p2);
-
-          const Potential &potential = getPotential(type1, type2);
-
-          Real3D force(0.0, 0.0, 0.0);
-          const Real3D r21 = pos1 - pos2;
-          if(potential._computeForce(force, r21)) {
-            w = w + r21 * force;
-          }
-        }
-      }
-
-      // reduce over all CPUs
-      real wsum;
-      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
-      return wsum;
-    }
-
-    inline void
-    VerletListLennardJones::
-    computeVirialTensor(Tensor& w)
-    {
-      Tensor wlocal(0.0);
-
-      const auto& particles         = verletList->getVectorization()->particles;
-      const auto& neighborList      = verletList->getNeighborList();
-      const auto* __restrict plist  = neighborList.plist.data();
-      const auto* __restrict prange = neighborList.prange.data();
-      const auto* __restrict nplist = neighborList.nplist.data();
-
-      const int ip_max = neighborList.plist.size();
-      for(int ip=0; ip<ip_max; ip++)
-      {
-        const int p1     = plist[ip];
-        const auto type1 = particles.getType(p1);
-        const auto pos1  = particles.getPosition(p1);
-
-        const int in_min = prange[ip].first;
-        const int in_max = prange[ip].second;
-        for(int in=in_min; in<in_max; in++)
-        {
-          const int p2     = nplist[in];
-          const auto type2 = particles.getType(p2);
-          const auto pos2  = particles.getPosition(p2);
-
-          const Potential &potential = getPotential(type1, type2);
-
-          Real3D force(0.0, 0.0, 0.0);
-          const Real3D r21 = pos1 - pos2;
-          if(potential._computeForce(force, r21)) {
-            wlocal += Tensor(r21, force);
-          }
-        }
-      }
-
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
-      w += wsum;
-    }
-
-    // local pressure tensor for layer, plane is defined by z coordinate
-    inline void
-    VerletListLennardJones::
-    computeVirialTensor(Tensor& w, real z)
-    {
-      System& system = verletList->getSystemRef();
-      Real3D Li = system.bc->getBoxL();
-
-      real rc_cutoff = verletList->getVerletCutoff();
-
-      // boundaries should be taken into account
-      bool ghost_layer = false;
-      real zghost = -100.0;
-      if(z<rc_cutoff){
-        zghost = z + Li[2];
-        ghost_layer = true;
-      }
-      else if(z>=Li[2]-rc_cutoff){
-        zghost = z - Li[2];
-        ghost_layer = true;
-      }
-
-      Tensor wlocal(0.0);
-
-      const auto& particles         = verletList->getVectorization()->particles;
-      const auto& neighborList      = verletList->getNeighborList();
-      const auto* __restrict plist  = neighborList.plist.data();
-      const auto* __restrict prange = neighborList.prange.data();
-      const auto* __restrict nplist = neighborList.nplist.data();
-
-      const int ip_max = neighborList.plist.size();
-      for(int ip=0; ip<ip_max; ip++)
-      {
-        const int p1     = plist[ip];
-        const auto type1 = particles.getType(p1);
-        const auto pos1  = particles.getPosition(p1);
-
-        const int in_min = prange[ip].first;
-        const int in_max = prange[ip].second;
-        for(int in=in_min; in<in_max; in++)
-        {
-          const int p2     = nplist[in];
-          const auto type2 = particles.getType(p2);
-          const auto pos2  = particles.getPosition(p2);
-
-          const Potential &potential = getPotential(type1, type2);
-
-          if( (pos1[2]>z && pos2[2]<z) ||
-              (pos1[2]<z && pos2[2]>z) ||
-                  (ghost_layer &&
-                      ((pos1[2]>zghost && pos2[2]<zghost) ||
-                      (pos1[2]<zghost && pos2[2]>zghost))) )
-          {
-            const Potential &potential = getPotential(type1, type2);
-
-            Real3D force(0.0, 0.0, 0.0);
-            Real3D r21 = pos1 - pos2;
-            if(potential._computeForce(force, r21)) {
-              wlocal += Tensor(r21, force) / fabs(r21[2]);
-            }
-          }
-        }
-      }
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
-      w += wsum;
-    }
-
-    // it will calculate the pressure in 'n' layers along Z axis
-    // the first layer has coordinate 0.0 the last - (Lz - Lz/n)
-    inline void
-    VerletListLennardJones::
-    computeVirialTensor(Tensor *w, int n)
-    {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor in bins along z-direction");
-
-      System& system = verletList->getSystemRef();
-      Real3D Li = system.bc->getBoxL();
-
-      real z_dist = Li[2] / float(n);  // distance between two layers
-      Tensor *wlocal = new Tensor[n];
-      for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
-
-      const auto& particles         = verletList->getVectorization()->particles;
-      const auto& neighborList      = verletList->getNeighborList();
-      const auto* __restrict plist  = neighborList.plist.data();
-      const auto* __restrict prange = neighborList.prange.data();
-      const auto* __restrict nplist = neighborList.nplist.data();
-
-      const int ip_max = neighborList.plist.size();
-      for(int ip=0; ip<ip_max; ip++)
-      {
-        const int p1     = plist[ip];
-        const auto type1 = particles.getType(p1);
-        const auto pos1  = particles.getPosition(p1);
-
-        const int in_min = prange[ip].first;
-        const int in_max = prange[ip].second;
-        for(int in=in_min; in<in_max; in++)
-        {
-          const int p2     = nplist[in];
-          const auto type2 = particles.getType(p2);
-          const auto pos2  = particles.getPosition(p2);
-
-          const Potential &potential = getPotential(type1, type2);
-
-          Real3D force(0.0, 0.0, 0.0);
-          Real3D r21 = pos1 - pos2;
-          Tensor ww;
-          if(potential._computeForce(force, r21)) {
-            ww = Tensor(r21, force) / fabs(r21[2]);
-
-            int position1 = (int)( pos1[2]/z_dist );
-            int position2 = (int)( pos2[2]/z_dist );
-
-            int maxpos = std::max(position1, position2);
-            int minpos = std::min(position1, position2);
-
-            // boundaries should be taken into account
-            bool boundaries1 = false;
-            bool boundaries2 = false;
-            if(minpos < 0){
-              minpos += n;
-              boundaries1 =true;
-            }
-            if(maxpos >=n){
-              maxpos -= n;
-              boundaries2 =true;
-            }
-
-            if(boundaries1 || boundaries2){
-              for(int i = 0; i<=maxpos; i++){
-                wlocal[i] += ww;
-              }
-              for(int i = minpos+1; i<n; i++){
-                wlocal[i] += ww;
-              }
-            }
-            else{
-              for(int i = minpos+1; i<=maxpos; i++){
-                wlocal[i] += ww;
-              }
-            }
-          }
-        }
-      }
-
-      // reduce over all CPUs
-      Tensor *wsum = new Tensor[n];
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
-
-      for(int j=0; j<n; j++){
-        w[j] += wsum[j];
-      }
-
-      delete [] wsum;
-      delete [] wlocal;
-
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialTensor() is not yet implemented.");
-    }
-
-    inline real
-    VerletListLennardJones::
-    getMaxCutoff() {
-      real cutoff = 0.0;
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
-            cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-        }
-      }
-      return cutoff;
     }
   }
 }}

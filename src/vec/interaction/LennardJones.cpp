@@ -25,6 +25,7 @@
 #include "python.hpp"
 #include "LennardJones.hpp"
 #include "VerletListLennardJones.hpp"
+#include "VerletListInteractionTemplate.hpp"
 
 namespace espressopp { namespace vec {
   namespace interaction {

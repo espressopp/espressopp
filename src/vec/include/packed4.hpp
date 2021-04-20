@@ -73,6 +73,9 @@ namespace espressopp { namespace vec {
     inline Real3D const& to_Real3D() const {
       return *((Real3D*)(this));
     }
+    inline Real3D& to_Real3D() {
+      return *((Real3D*)(this));
+    }
     inline void operator=(Real3D const& src) {
       x = src[0]; y = src[1]; z = src[2];
     }

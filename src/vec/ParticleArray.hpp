@@ -162,6 +162,34 @@ namespace espressopp { namespace vec {
       return std::move(mode_soa() ? type[i] : position[i].t);
     }
 
+    inline void addForce(size_t i, Real3D const& ff)
+    {
+      if(mode_soa())
+      {
+        f_x[i] += ff[0];
+        f_y[i] += ff[1];
+        f_z[i] += ff[2];
+      }
+      else
+      {
+        force[i].to_Real3D() += ff;
+      }
+    }
+
+    inline void subForce(size_t i, Real3D const& ff)
+    {
+      if(mode_soa())
+      {
+        f_x[i] -= ff[0];
+        f_y[i] -= ff[1];
+        f_z[i] -= ff[2];
+      }
+      else
+      {
+        force[i].to_Real3D() -= ff;
+      }
+    }
+
   };
 }}
 
