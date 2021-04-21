@@ -22,6 +22,7 @@
 #include "bindings.hpp"
 
 #include "LennardJones.hpp"
+#include "LennardJonesCapped.hpp"
 #include "FENE.hpp"
 #include "Cosine.hpp"
 
@@ -30,6 +31,7 @@ namespace espressopp {
     namespace interaction {
       void registerPython() {
         LennardJones::registerPython();
+        LennardJonesCapped::registerPython();
         FENE::registerPython();
         Cosine::registerPython();
       }

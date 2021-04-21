@@ -20,5 +20,6 @@ from espressopp.esutil import pmiimport
 pmiimport('espressopp.vec.interaction')
 
 from espressopp.vec.interaction.LennardJones import *
+from espressopp.vec.interaction.LennardJonesCapped import *
 from espressopp.vec.interaction.FENE import *
 from espressopp.vec.interaction.Cosine import *

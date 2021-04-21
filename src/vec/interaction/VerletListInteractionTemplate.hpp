@@ -35,6 +35,7 @@
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "vec/VerletList.hpp"
+#include "vec/Vectorization.hpp"
 
 namespace espressopp { namespace vec {
   namespace interaction {
