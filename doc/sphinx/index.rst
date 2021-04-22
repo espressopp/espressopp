@@ -15,8 +15,6 @@ Welcome to the user documentation of ESPResSo++
    tutorial.rst
    classdescription.rst
 
-   doxygen 
-
    pdf
 
    credits.rst
