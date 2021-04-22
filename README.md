@@ -1,6 +1,6 @@
 # ESPResSo++
 
-![Build Status](https://github.com/espressopp/espressopp/actions/workflows/ci.yml/badge.svg?branch=master)
+![Build Status](https://github.com/espressopp/espressopp/actions/workflows/validate.yml/badge.svg?branch=master)
 [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
 
 ESPResSo++ is an extensible, flexible, fast and parallel simulation software for
