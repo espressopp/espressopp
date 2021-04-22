@@ -28,7 +28,7 @@
 ###########################################################################
 
 """
-Note: To turn on vectorization for the equilibration, run with `--vec` argument, i.e.
+Note: To turn on vectorization, run with `--vec` argument, i.e.
 
   python lennard_jones.py --vec
 
