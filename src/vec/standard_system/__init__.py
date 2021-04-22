@@ -1,5 +1,9 @@
 #  Copyright (C) 2021
 #      Max Planck Institute for Polymer Research & JGU Mainz
+#  Copyright (C) 2012,2013
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2008,2009,2010,2011
+#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
 #
@@ -16,12 +20,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from espressopp.esutil import pmiimport
-pmiimport('espressopp.vec')
-
-from espressopp.vec.FixedPairList import *
-from espressopp.vec.FixedTripleList import *
-from espressopp.vec.Vectorization import *
-from espressopp.vec.VerletList import *
-
-from espressopp.vec import storage, integrator, interaction, standard_system
+from espressopp.vec.standard_system.Default import *
