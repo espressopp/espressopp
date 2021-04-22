@@ -1,6 +1,6 @@
 # ESPResSo++
 
-[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
+![Build Status](https://github.com/espressopp/espressopp/actions/workflows/ci.yml/badge.svg?branch=master)
 [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
 
 ESPResSo++ is an extensible, flexible, fast and parallel simulation software for
@@ -96,17 +96,7 @@ $ make
 
 # Documentation
 
-Documentation for the developer version of ESPResSo++ is at:
-
 http://espressopp.github.io
-
-Documentation for release versions from v1.9.4.1 onward is at:
-
-http://espressopp.github.io/vXXX
-
-where XXX is the version number, e.g.: 
-
-http://espressopp.github.io/v1.9.4.1
 
 # Reporting issues
 
