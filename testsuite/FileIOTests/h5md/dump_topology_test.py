@@ -29,7 +29,7 @@ def remove_file(file_name):
 
 class TestDumpTopology(ut.TestCase):
     def setUp(self):
-        self.h5md_file = 'output.h5'
+        self.h5md_file = 'topo_output.h5'
         remove_file(self.h5md_file)
         self.system, self.integrator = espressopp.standard_system.Default((10., 10., 10.), dt=0.1)
 
