@@ -30,14 +30,11 @@
 #include "System.hpp"
 #include "SystemAccess.hpp"
 #include "storage/Storage.hpp"
-#include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
 namespace espressopp { namespace vec {
 
   namespace integrator {
-
-    using namespace espressopp::iterator;
 
     LangevinThermostat::LangevinThermostat(shared_ptr<Vectorization> vectorization)
       : Extension(vectorization)
