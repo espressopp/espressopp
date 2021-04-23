@@ -22,6 +22,7 @@
 
 #ifndef _IO_FILEBACKUP_HPP
 #define _IO_FILEBACKUP_HPP
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -43,13 +44,15 @@
             //create backup filename %DATE%_FILE
             boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
             std::stringstream ssnew_file_name;
-            ssnew_file_name 
-              << now.date().year()
-              << now.date().month()
-              << now.date().day()
-              << now.time_of_day().hours()
-              << now.time_of_day().minutes()
-              << "_" << file_name; // this is a bit ugly since there are no leading zeros
+            ssnew_file_name
+                << std::setfill('0')
+                << std::setw(4) << now.date().year()
+                << std::setw(2) << now.date().month()
+                << std::setw(2) << now.date().day()
+                << "_"
+                << std::setw(2) << now.time_of_day().hours()
+                << std::setw(2) << now.time_of_day().minutes()
+                << "_" << file_name; // this is a bit ugly since there are no leading zeros
             std::string new_file_name(ssnew_file_name.str()); 
             std::cout << "Note: file " << file_name << " exists already. Moving " << file_name << " to " << new_file_name << std::endl;
             //make sure the new file does not exist already
