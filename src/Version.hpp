@@ -26,9 +26,9 @@
 #include <string>
 #include "boost/version.hpp"
 
-#define MAJORVERSION 2
+#define MAJORVERSION 3
 #define MINORVERSION 0
-#define PATCHLEVEL   2
+#define PATCHLEVEL   0
 #include "gitversion.hpp"
 
 namespace espressopp {
