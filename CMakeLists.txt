@@ -44,21 +44,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
 endif()
 
 ########################################################################
-#VampirTrace settings
-########################################################################
-
-set(VAMPIRTRACE False)
-
-if(VAMPIRTRACE)
-    set(VAMPIRTRACE_ROOT /people/thnfs/homes/stuehn/software)
-    set(VAMPIRTRACE_LIBRARIES ${VAMPIRTRACE_ROOT}/lib/libvt-mpi.so
-            ${VAMPIRTRACE_ROOT}/lib/libotf.so)
-    # Attention: VampirTrace should be included before MPI
-    include_directories(${VAMPIRTRACE_ROOT}/include)
-    add_definitions( -DVTRACE )
-endif(VAMPIRTRACE)
-
-########################################################################
 #Process MPI settings
 ########################################################################
 
