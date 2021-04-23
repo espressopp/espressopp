@@ -1,27 +1,49 @@
-*~
-Makefile
-*.o
-*.so
-*.pyc
-COPYING
-INSTALL
+*build*
+
+# cmake generated files
 ESPRC
 .env
 espressopp
 src/acconfig.hpp
 src/gitversion.hpp
-build
-CMakeFiles
-cmake_install.cmake
+
+# input/output files
+*.txt
+*.xyz
+*.gro
+*.h5
+*.dat
+
+# binary files
+*.o
+*.so
+*.a
+*.pyc
+
+# IDEs
+*~
+.idea
+.vscode
+
+# Created by https://www.toptal.com/developers/gitignore/api/cmake
+# Edit at https://www.toptal.com/developers/gitignore?templates=cmake
+
+### CMake ###
+CMakeLists.txt.user
 CMakeCache.txt
-CPack*.cmake
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
 install_manifest.txt
-doc/dg/html/
+compile_commands.json
 CTestTestfile.cmake
-contrib/boost/libespressopp_boost.a
-Testing/
-testsuite/pi_water/esp.dat
-testsuite/pi_water/traj.xyz
-testsuite/tabulated/pot-cosine.txt
-testsuite/tabulated/pot-fene.txt
-testsuite/tabulated/pot-lj.txt
+_deps
+CMakeUserPresets.json
+
+### CMake Patch ###
+# External projects
+*-prefix/
+
+# End of https://www.toptal.com/developers/gitignore/api/cmake
