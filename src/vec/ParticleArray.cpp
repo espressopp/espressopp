@@ -23,16 +23,6 @@
 
 #include <iostream>
 
-#define ESPP_PARTICLEARRAY_AOS_APPLY(COMMAND) \
-  position    . COMMAND ; \
-  velocity    . COMMAND ; \
-  force       . COMMAND ; \
-  id          . COMMAND ; \
-  mass        . COMMAND ; \
-  q           . COMMAND ; \
-  ghost       . COMMAND ; \
-  /* */
-
 #define ESPP_PARTICLEARRAY_SOA_APPLY(COMMAND) \
   p_x         . COMMAND ; \
   p_y         . COMMAND ; \
@@ -101,10 +91,8 @@ namespace espressopp { namespace vec
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  void ParticleArray::copyFrom(CellList const& srcCells, Mode mode_)
+  void ParticleArray::copyFrom(CellList const& srcCells)
   {
-    mode = mode_;
-
     size_t const numCells = srcCells.size();
     if(numCells!=numLocalCells_)
       throw std::runtime_error("ParticleArray::copyFrom Incorrect number of cells");
@@ -133,26 +121,8 @@ namespace espressopp { namespace vec
     }
     cellRange_.push_back(total_data_size);
 
-    // if(total_data_size>reserve_size_)
-    {
-      reserve_size_ = total_data_size;
-      if(mode==ESPP_VEC_AOS)
-      {
-        // ESPP_PARTICLEARRAY_AOS_APPLY(clear());
-        ESPP_PARTICLEARRAY_AOS_APPLY(resize(reserve_size_));
-      }
-      else if(mode==ESPP_VEC_SOA)
-      {
-        // ESPP_PARTICLEARRAY_SOA_APPLY(clear());
-        ESPP_PARTICLEARRAY_SOA_APPLY(resize(reserve_size_));
-      }
-      else
-      {
-        throw std::runtime_error("ParticleArray: Given mode not implemented.");
-      }
-      // std::cout << __FUNCTION__ << ": Reallocated " << total_data_size << std::endl;
-      // TODO: implement as LOG4ESPP_WARN
-    }
+    reserve_size_ = total_data_size;
+    ESPP_PARTICLEARRAY_SOA_APPLY(resize(reserve_size_));
 
     size_ = total_size;
     data_size_ = total_data_size;
@@ -166,18 +136,6 @@ namespace espressopp { namespace vec
     };
     for(size_t ic=0; ic<numCells; ic++) updateCell(ic);
 
-    if(mode==ESPP_VEC_AOS)
-    {
-      auto fillCell = [this,&srcCells](size_t ic)
-      {
-        ParticleList const& particlelist = srcCells[ic]->particles;
-        const size_t end = cellRange_[ic] + particlelist.size();
-        const size_t data_end = cellRange_[ic+1];
-        for(size_t ip=end; ip<data_end; ip++) position[ip]={large_pos,large_pos,large_pos,0};
-      };
-      for(size_t ic=0; ic<numCells; ic++) fillCell(ic);
-    }
-    else if(mode==ESPP_VEC_SOA)
     {
       auto fillCell = [this,&srcCells](size_t ic)
       {
@@ -190,10 +148,6 @@ namespace espressopp { namespace vec
         for(size_t ip=end; ip<data_end; ip++) type [ip] = 0;
       };
       for(size_t ic=0; ic<numCells; ic++) fillCell(ic);
-    }
-    else
-    {
-      throw std::runtime_error("ParticleArray: Given mode not implemented.");
     }
 
     {
@@ -220,15 +174,6 @@ namespace espressopp { namespace vec
       ParticleList const& particlelist = srcCells[ic]->particles;
       const size_t start = cellRange_[ic];
       const size_t end = start + particlelist.size();
-      if(mode==ESPP_VEC_AOS)
-      {
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          position[pi] = particlelist[pli].position();
-          velocity[pi] = particlelist[pli].velocity();
-        }
-      }
-      else
       {
         for(size_t pi=start, pli=0; pi<end; pi++,pli++)
         {
@@ -277,54 +222,11 @@ namespace espressopp { namespace vec
       verify(srcCells);
     #endif
 
-    /// TODO: Remove block later
-    #if 0
-    if(mode==ESPP_VEC_AOS)
-    {
-      auto updateCell = [this,&srcCells](size_t ic)
-      {
-        ParticleList & particlelist = srcCells[ic]->particles;
-        const size_t start = cellRange_[ic];
-        const size_t end = start + particlelist.size();
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].position() = position[pi].to_Real3D();
-          particlelist[pli].velocity() = velocity[pi].to_Real3D();
-        }
-      };
-      for(size_t ic=0; ic<numCells; ic++) updateCell(ic);
-    }
-    else
-    {
-      auto updateCell = [this,&srcCells](size_t ic)
-      {
-        ParticleList & particlelist = srcCells[ic]->particles;
-        const size_t start = cellRange_[ic];
-        const size_t end = start + particlelist.size();
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].position() = Real3D(p_x[pi],p_y[pi],p_z[pi]);
-          particlelist[pli].velocity() = Real3D(v_x[pi],v_y[pi],v_z[pi]);
-        }
-      };
-      for(size_t ic=0; ic<numCells; ic++) updateCell(ic);
-    }
-    #endif
-
     auto updateCell = [this,&srcCells](size_t ic)
     {
       ParticleList & particlelist = srcCells[ic]->particles;
       const size_t start = cellRange_[ic];
       const size_t end = start + particlelist.size();
-      if(mode==ESPP_VEC_AOS)
-      {
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].position() = position[pi].to_Real3D();
-          particlelist[pli].velocity() = velocity[pi].to_Real3D();
-        }
-      }
-      else
       {
         for(size_t pi=start, pli=0; pi<end; pi++,pli++)
         {
@@ -382,24 +284,6 @@ namespace espressopp { namespace vec
   void ParticleArray::updateFrom(std::vector<Particle> const& particlelist, size_t start)
   {
     size_t end = start + particlelist.size();
-
-    if(mode==ESPP_VEC_AOS)
-    {
-      for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-      {
-        Particle const& p = particlelist[pli];
-
-        id       [pi] = p.id();
-        mass     [pi] = p.mass();
-        q        [pi] = p.q();
-        ghost    [pi] = p.ghost();
-
-        position [pi] = Real3DInt(p.position(),p.type());
-        velocity [pi] = p.velocity();
-        force    [pi] = p.force();
-      }
-    }
-    else
     {
       for(size_t pi=start, pli=0; pi<end; pi++,pli++)
       {
@@ -429,20 +313,6 @@ namespace espressopp { namespace vec
   /////////////////////////////////////////////////////////////////////////////////////////////////
   void ParticleArray::updateFromPositionOnly(CellList const& srcCells)
   {
-    if(mode==ESPP_VEC_AOS)
-    {
-      for(size_t ic=0; ic<srcCells.size(); ic++)
-      {
-        ParticleList const& particlelist = srcCells[ic]->particles;
-        const size_t start = cellRange_[ic];
-        const size_t end = start + particlelist.size();
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          position[pi] = particlelist[pli].position();
-        }
-      }
-    }
-    else
     {
       for(size_t ic=0; ic<srcCells.size(); ic++)
       {
@@ -463,20 +333,6 @@ namespace espressopp { namespace vec
   /////////////////////////////////////////////////////////////////////////////////////////////////
   void ParticleArray::updateToPositionOnly(CellList & srcCells) const
   {
-    if(mode==ESPP_VEC_AOS)
-    {
-      for(size_t ic=0; ic<srcCells.size(); ic++)
-      {
-        ParticleList & particlelist = srcCells[ic]->particles;
-        const size_t start = cellRange_[ic];
-        const size_t end = start + particlelist.size();
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].position() = position[pi].to_Real3D();
-        }
-      }
-    }
-    else
     {
       for(size_t ic=0; ic<srcCells.size(); ic++)
       {
@@ -499,14 +355,6 @@ namespace espressopp { namespace vec
       ParticleList const& particlelist = srcCells[ic]->particles;
       const size_t start = cellRange_[ic];
       const size_t end = start + particlelist.size();
-      if(mode==ESPP_VEC_AOS)
-      {
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          force[pi] = particlelist[pli].force();
-        }
-      }
-      else
       {
         for(size_t pi=start, pli=0; pi<end; pi++,pli++)
         {
@@ -542,14 +390,6 @@ namespace espressopp { namespace vec
       ParticleList & particlelist = srcCells[ic]->particles;
       const size_t start = cellRange_[ic];
       const size_t end = start + particlelist.size();
-      if(mode==ESPP_VEC_AOS)
-      {
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].force() = force[pi].to_Real3D();
-        }
-      }
-      else
       {
         for(size_t pi=start, pli=0; pi<end; pi++,pli++)
         {
@@ -577,20 +417,6 @@ namespace espressopp { namespace vec
   /////////////////////////////////////////////////////////////////////////////////////////////////
   void ParticleArray::addToForceOnly(CellList & srcCells) const
   {
-    if(mode==ESPP_VEC_AOS)
-    {
-      for(size_t ic=0; ic<srcCells.size(); ic++)
-      {
-        ParticleList & particlelist = srcCells[ic]->particles;
-        const size_t start = cellRange_[ic];
-        const size_t end = start + particlelist.size();
-        for(size_t pi=start, pli=0; pi<end; pi++,pli++)
-        {
-          particlelist[pli].force() += force[pi].to_Real3D();
-        }
-      }
-    }
-    else
     {
       for(size_t ic=0; ic<srcCells.size(); ic++)
       {
@@ -613,26 +439,16 @@ namespace espressopp { namespace vec
     if(id   .size()<data_size_) return false;
     if(mass .size()<data_size_) return false;
     if(q    .size()<data_size_) return false;
-
-    if(mode==ESPP_VEC_AOS)
-    {
-      if(position .size()<data_size_) return false;
-      if(velocity .size()<data_size_) return false;
-      if(force    .size()<data_size_) return false;
-    }
-    else
-    {
-      if(p_x      .size()<data_size_) return false;
-      if(p_y      .size()<data_size_) return false;
-      if(p_z      .size()<data_size_) return false;
-      if(v_x      .size()<data_size_) return false;
-      if(v_y      .size()<data_size_) return false;
-      if(v_z      .size()<data_size_) return false;
-      if(f_x      .size()<data_size_) return false;
-      if(f_y      .size()<data_size_) return false;
-      if(f_z      .size()<data_size_) return false;
-      if(type     .size()<data_size_) return false;
-    }
+    if(p_x  .size()<data_size_) return false;
+    if(p_y  .size()<data_size_) return false;
+    if(p_z  .size()<data_size_) return false;
+    if(v_x  .size()<data_size_) return false;
+    if(v_y  .size()<data_size_) return false;
+    if(v_z  .size()<data_size_) return false;
+    if(f_x  .size()<data_size_) return false;
+    if(f_y  .size()<data_size_) return false;
+    if(f_z  .size()<data_size_) return false;
+    if(type .size()<data_size_) return false;
 
     return true;
   }

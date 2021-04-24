@@ -45,7 +45,7 @@ espressopp.vec.standard_system.Default
 import espressopp
 import mpi4py.MPI as MPI
 
-def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None, halfCellInt=1, vecMode=None):
+def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None, halfCellInt=1):
 
     system         = espressopp.System()
     system.rng     = espressopp.esutil.RNG()
@@ -54,7 +54,7 @@ def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None, halfCellInt=1
     nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rc,skin)
     cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin, halfCellInt)
 
-    vectorization  = espressopp.vec.Vectorization(system, mode=vecMode)
+    vectorization  = espressopp.vec.Vectorization(system)
     system.storage = espressopp.vec.storage.DomainDecomposition(vectorization, nodeGrid, cellGrid, halfCellInt)
 
     print("nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid, "half cell: ", halfCellInt)

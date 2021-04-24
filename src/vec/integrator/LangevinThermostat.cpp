@@ -136,39 +136,6 @@ namespace espressopp { namespace vec {
         const size_t* __restrict cellRange = particles.cellRange().data();
         const size_t* __restrict sizes     = particles.sizes().data();
 
-        if(particles.mode_aos())
-        {
-          for(size_t ircell=0; ircell<realCells.size(); ircell++)
-          {
-            const size_t rcell = particles.realCells()[ircell];
-            const size_t start = cellRange[rcell];
-            const size_t size  = sizes[rcell];
-
-            using espressopp::vec::Real4D;
-            const Real4D* __restrict v = &(particles.velocity[start]);
-            const real* __restrict mass = &(particles.mass[start]);
-
-            Real4D* __restrict f = &(particles.force[start]);
-
-            /// NOTE: Not vectorizable due to rng function call
-            // #pragma vector always
-            // #pragma vector aligned
-            // #pragma ivdep
-            for(size_t ip=0; ip<size; ip++)
-            {
-              const real massf = sqrt(mass[ip]);
-
-              const real ranval_x = (*rng)() - 0.5;
-              const real ranval_y = (*rng)() - 0.5;
-              const real ranval_z = (*rng)() - 0.5;
-
-              f[ip].x += pref1 * v[ip].x * mass[ip] + pref2 * ranval_x * massf;
-              f[ip].y += pref1 * v[ip].y * mass[ip] + pref2 * ranval_y * massf;
-              f[ip].z += pref1 * v[ip].z * mass[ip] + pref2 * ranval_z * massf;
-            }
-          }
-        }
-        else
         {
           for(size_t ircell=0; ircell<realCells.size(); ircell++)
           {

@@ -19,7 +19,7 @@
 import espressopp
 from espressopp import pmi
 from espressopp.esutil import cxxinit
-from _espressopp import vec_storage_DomainDecomposition, VecMode
+from _espressopp import vec_storage_DomainDecomposition
 from espressopp.vec.storage import *
 from espressopp import Int3D
 from espressopp import toReal3D, toReal3DFromVector, ParticleLocal, Particle

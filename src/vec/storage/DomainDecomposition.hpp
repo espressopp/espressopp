@@ -72,8 +72,6 @@ namespace espressopp { namespace vec {
 
       boost::signals2::connection sigResetCells;
 
-      const Mode vecMode;
-
       bool rebuildLocalParticles;
 
       /////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,8 +84,6 @@ namespace espressopp { namespace vec {
       };
 
       std::array< CommCellIdx, 6 > commCellIdx;
-
-      const size_t vecModeFactor;
 
       AlignedVector< real > buffReal, buffGhost;
 

@@ -50,12 +50,10 @@ namespace espressopp {
     public:
       Vectorization(
         shared_ptr<System> system,
-        shared_ptr<MDIntegrator> mdintegrator,
-        Mode vecMode = ESPP_VEC_MODE_DEFAULT);
+        shared_ptr<MDIntegrator> mdintegrator);
 
       Vectorization(
-        shared_ptr<System> system,
-        Mode vecMode = ESPP_VEC_MODE_DEFAULT);
+        shared_ptr<System> system);
 
       ~Vectorization();
 
@@ -68,18 +66,6 @@ namespace espressopp {
 
       inline int getVecLevel() {
         return vecLevel;
-      }
-
-      inline Mode getVecMode() {
-        return vecMode;
-      }
-
-      inline bool modeSOA() {
-        return vecMode == ESPP_VEC_SOA;
-      }
-
-      inline bool modeAOS() {
-        return vecMode == ESPP_VEC_AOS;
       }
 
       void resetCells();
@@ -95,7 +81,6 @@ namespace espressopp {
       static void registerPython();
 
     protected:
-      const Mode vecMode;
       const int vecLevel;
 
       shared_ptr<MDIntegrator> mdintegrator;

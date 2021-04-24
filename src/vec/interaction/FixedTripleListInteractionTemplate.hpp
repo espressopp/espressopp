@@ -106,9 +106,6 @@ namespace espressopp { namespace vec {
       virtual int bondType() { return espressopp::interaction::Angular; }
 
     protected:
-      template<bool VEC_MODE_SOA>
-      void addForces_impl();
-
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < FixedTripleList > fixedtripleList;
@@ -122,28 +119,12 @@ namespace espressopp { namespace vec {
     FixedTripleListInteractionTemplate <_AngularPotential>::
     addForces()
     {
-      auto const modeSOA = vectorization->modeSOA();
-      if(modeSOA) {
-        addForces_impl<1>();
-      } else {
-        addForces_impl<0>();
-      }
-    }
-
-    template < typename _AngularPotential >
-    template < bool VEC_MODE_SOA >
-    inline void
-    FixedTripleListInteractionTemplate <_AngularPotential>::
-    addForces_impl()
-    {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
 
       auto const& bc              = *getSystemRef().bc;
       auto& particles             = vectorization->particles;
       auto& ftl                   = *fixedtripleList;
       auto& pot                   = *potential;
-      const Real3DInt *position   = particles.position.data();
-      Real4D *force               = particles.force.data();
       const real* __restrict p_x  = particles.p_x.data();
       const real* __restrict p_y  = particles.p_y.data();
       const real* __restrict p_z  = particles.p_z.data();
@@ -158,17 +139,12 @@ namespace espressopp { namespace vec {
         const auto p2 = std::get<1>(triple);
         const auto p3 = std::get<2>(triple);
         Real3D dist12, dist32;
-        if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(dist12, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-          bc.getMinimumImageVectorBox(dist32, {p_x[p3],p_y[p3],p_z[p3]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          bc.getMinimumImageVectorBox(dist12, position[p1].to_Real3D(), position[p2].to_Real3D());
-          bc.getMinimumImageVectorBox(dist32, position[p3].to_Real3D(), position[p2].to_Real3D());
-        }
+        bc.getMinimumImageVectorBox(dist12, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
+        bc.getMinimumImageVectorBox(dist32, {p_x[p3],p_y[p3],p_z[p3]}, {p_x[p2],p_y[p2],p_z[p2]});
         Real3D force12, force32;
         pot.computeColVarWeights(dist12, dist32, bc);
         pot._computeForce(force12, force32, dist12, dist32);
-        if(VEC_MODE_SOA){
+        {
           f_x[p1] += force12.get()[0];
           f_y[p1] += force12.get()[1];
           f_z[p1] += force12.get()[2];
@@ -180,10 +156,6 @@ namespace espressopp { namespace vec {
           f_x[p3] += force32.get()[0];
           f_y[p3] += force32.get()[1];
           f_z[p3] += force32.get()[2];
-        } else {
-          *((Real3D*)(&force[p1])) += force12;
-          *((Real3D*)(&force[p2])) -= force12 + force32;
-          *((Real3D*)(&force[p3])) += force32;
         }
       }
     }

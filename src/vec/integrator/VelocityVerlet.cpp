@@ -172,47 +172,6 @@ namespace espressopp { namespace vec {
 
       // first-half integration
       // apply integration scheme on every cell and obtain the maximum displacement value
-      if(particles.mode_aos())
-      {
-        for(const auto& rcell: realCells)
-        {
-          size_t start = cellRange[rcell];
-          size_t size  = sizes[rcell];
-
-          using espressopp::vec::Real3DInt;
-          using espressopp::vec::Real4D;
-          Real3DInt*    __restrict p    = particles.position.data() + start;
-          Real4D*       __restrict v    = particles.velocity.data() + start;
-          const Real4D* __restrict f    = particles.force.data()    + start;
-          const real*   __restrict mass = particles.mass.data()     + start;
-
-          #pragma vector always
-          #pragma vector aligned
-          #pragma ivdep
-          for(size_t ip=0; ip<size; ip++)
-          {
-            /// TODO: transform division by mass to multiplication by reciprocal or just store
-            /// dtfm as an internal array that gets updated by loadCells()
-            const real dtfm = 0.5 * dt / mass[ip];
-
-            v[ip].x += dtfm * f[ip].x;
-            v[ip].y += dtfm * f[ip].y;
-            v[ip].z += dtfm * f[ip].z;
-
-            const real dp_x = v[ip].x * dt;
-            const real dp_y = v[ip].y * dt;
-            const real dp_z = v[ip].z * dt;
-
-            p[ip].x += dp_x;
-            p[ip].y += dp_y;
-            p[ip].z += dp_z;
-
-            real sqDist = (dp_x*dp_x) + (dp_y*dp_y) + (dp_z*dp_z);
-            maxSqDist = std::max(maxSqDist, sqDist);
-          }
-        }
-      }
-      else
       {
         for(const auto& rcell: realCells)
         {
@@ -263,32 +222,6 @@ namespace espressopp { namespace vec {
       const size_t* __restrict cellRange = particles.cellRange().data();
       const size_t* __restrict sizes     = particles.sizes().data();
 
-      if(particles.mode_aos())
-      {
-        for(const auto& rcell: realCells)
-        {
-          const size_t start = cellRange[rcell];
-          const size_t size  = sizes[rcell];
-
-          using espressopp::vec::Real4D;
-          Real4D*       __restrict v    = particles.velocity.data() + start;
-          const Real4D* __restrict f    = particles.force.data()    + start;
-          const real*   __restrict mass = particles.mass.data()     + start;
-
-          #pragma vector always
-          #pragma vector aligned
-          #pragma ivdep
-          for(size_t ip=0; ip<size; ip++)
-          {
-            /// TODO: transform division by mass to multiplication by reciprocal or fixed dtfm array
-            const real dtfm = 0.5 * dt / mass[ip];
-            v[ip].x += dtfm * f[ip].x;
-            v[ip].y += dtfm * f[ip].y;
-            v[ip].z += dtfm * f[ip].z;
-          }
-        }
-      }
-      else
       {
         for(const auto& rcell: realCells)
         {

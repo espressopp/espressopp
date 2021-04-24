@@ -23,20 +23,8 @@
 #define VEC_PARTICLEARRAY_HPP
 
 #include "vec/include/simdconfig.hpp"
-#include "vec/include/packed4.hpp"
 #include "types.hpp"
 #include "Particle.hpp"
-
-#define ESPP_AOS
-#undef  ESPP_AOS // USE SOA
-
-#ifndef ESPP_SOA
-#define ESPP_SOA
-#endif
-
-#ifdef ESPP_AOS
-#undef ESPP_SOA
-#endif
 
 namespace espressopp { namespace vec {
 
@@ -52,23 +40,11 @@ namespace espressopp { namespace vec {
     PARTICLE_FORCE_ONLY=128
   };
 
-  enum Mode {
-    ESPP_VEC_SOA=0,
-    ESPP_VEC_AOS=1
-  };
-
-  #if defined(ESPP_AOS)
-    #define ESPP_VEC_MODE_DEFAULT ESPP_VEC_AOS
-  #else
-    #define ESPP_VEC_MODE_DEFAULT ESPP_VEC_SOA
-  #endif
-
   /*
       Optimizations:
         - store particle data separately as arrays of individual attributes (SOA)
-        - store position and type in packed format (x,y,z,type)
         - use aligned vector everywhere
-        - pad ends of vector w/ fake particles to keep cell length a multiple of the cpu vector width
+        - pad ends of vector w/ pseudo particles to keep cell length a multiple of the cpu vector width
    */
   class ParticleArray
   {
@@ -78,7 +54,7 @@ namespace espressopp { namespace vec {
     void markRealCells(CellList const& realcells, const Cell* cell0, size_t numLocalCells);
     void markRealCells(std::vector<size_t> const& realcells, size_t numLocalCells);
 
-    void copyFrom(CellList const& srcCells, Mode mode=ESPP_VEC_MODE_DEFAULT);
+    void copyFrom(CellList const& srcCells);
 
     void updateFromPositionVelocity(CellList const& srcCells, bool realOnly);
     void updateToPositionVelocity(CellList & srcCells, bool realOnly) const;
@@ -98,19 +74,11 @@ namespace espressopp { namespace vec {
     inline std::vector<size_t> const& ghostCells() const { return ghostCells_; }
     bool checkSizes() const;
     void verify(CellList const& srcCells) const;
-    inline bool mode_aos() const { return mode==ESPP_VEC_AOS; }
-    inline bool mode_soa() const { return mode==ESPP_VEC_SOA; }
 
     AlignedVector< size_t > id;
     AlignedVector< real > mass;
     AlignedVector< real > q;
     AlignedVector< bool > ghost;
-
-    /* AOS */
-
-    AlignedVector< Real3DInt > position; /* p_x,p_y,p_z,p_type */
-    AlignedVector< Real4D    > velocity; /* v_x,v_y,v_z,padding */
-    AlignedVector< Real4D    > force;    /* f_x,f_y,f_z,padding */
 
     /* SOA */
 
@@ -138,9 +106,6 @@ namespace espressopp { namespace vec {
     std::vector<size_t> ghostCells_;
     /// number of local cells in source storage
     std::size_t numLocalCells_ = 0;
-
-    Mode mode;
-
     std::size_t size_ = 0;
     std::size_t data_size_ = 0; // including padding
     std::size_t reserve_size_ = 0; // actual size of vectors (allows for re-use of arrays)
@@ -154,40 +119,26 @@ namespace espressopp { namespace vec {
 
     inline Real3D getPosition(size_t i) const
     {
-      return std::move(mode_soa() ? Real3D(p_x[i],p_y[i],p_z[i]) : position[i].to_Real3D());
+      return Real3D(p_x[i],p_y[i],p_z[i]);
     }
 
     inline lint getType(size_t i) const
     {
-      return std::move(mode_soa() ? type[i] : position[i].t);
+      return type[i];
     }
 
     inline void addForce(size_t i, Real3D const& ff)
     {
-      if(mode_soa())
-      {
-        f_x[i] += ff[0];
-        f_y[i] += ff[1];
-        f_z[i] += ff[2];
-      }
-      else
-      {
-        force[i].to_Real3D() += ff;
-      }
+      f_x[i] += ff[0];
+      f_y[i] += ff[1];
+      f_z[i] += ff[2];
     }
 
     inline void subForce(size_t i, Real3D const& ff)
     {
-      if(mode_soa())
-      {
-        f_x[i] -= ff[0];
-        f_y[i] -= ff[1];
-        f_z[i] -= ff[2];
-      }
-      else
-      {
-        force[i].to_Real3D() -= ff;
-      }
+      f_x[i] -= ff[0];
+      f_y[i] -= ff[1];
+      f_z[i] -= ff[2];
     }
 
   };

@@ -105,9 +105,6 @@ namespace espressopp { namespace vec {
       virtual int bondType() { return espressopp::interaction::Pair; }
 
     protected:
-      template<bool VEC_MODE_SOA>
-      void addForces_impl();
-
       int ntypes;
       shared_ptr < vec::Vectorization > vectorization;
       shared_ptr < vec::FixedPairList > fixedpairList;
@@ -119,19 +116,6 @@ namespace espressopp { namespace vec {
     //////////////////////////////////////////////////
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::addForces() {
-      auto const modeSOA = vectorization->modeSOA();
-      if(modeSOA) {
-        addForces_impl<1>();
-      } else {
-        addForces_impl<0>();
-      }
-    }
-
-    template < typename _Potential>
-    template < bool VEC_MODE_SOA >
-    inline void
-    FixedPairListInteractionTemplate < _Potential >::addForces_impl< VEC_MODE_SOA >()
-    {
       LOG4ESPP_INFO(_Potential::theLogger, "adding forces of FixedPairList");
       auto const& bc    = *getSystemRef().bc;
       auto& particles   = vectorization->particles;
@@ -139,8 +123,6 @@ namespace espressopp { namespace vec {
       auto& pot         = *potential;
       real ltMaxBondSqr = fpl.getLongtimeMaxBondSqr();
 
-      const Real3DInt *pa_pos     = particles.position.data();
-      Real4D *pa_force            = particles.force.data();
       const real* __restrict p_x  = particles.p_x.data();
       const real* __restrict p_y  = particles.p_y.data();
       const real* __restrict p_z  = particles.p_z.data();
@@ -155,11 +137,7 @@ namespace espressopp { namespace vec {
         const auto p2 = pair.second;
 
         Real3D dist;
-        if(VEC_MODE_SOA){
-          bc.getMinimumImageVectorBox(dist, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
-        } else {
-          bc.getMinimumImageVectorBox(dist, pa_pos[p1].to_Real3D(), pa_pos[p2].to_Real3D());
-        }
+        bc.getMinimumImageVectorBox(dist, {p_x[p1],p_y[p1],p_z[p1]}, {p_x[p2],p_y[p2],p_z[p2]});
         Real3D force;
         const real d = dist.sqr();
         if (d > ltMaxBondSqr) {
@@ -168,29 +146,17 @@ namespace espressopp { namespace vec {
         }
         pot.computeColVarWeights(dist, bc);
         if(pot._computeForce(force, dist)){
-          if(VEC_MODE_SOA){
-            f_x[p1] += force.get()[0];
-            f_y[p1] += force.get()[1];
-            f_z[p1] += force.get()[2];
-            f_x[p2] -= force.get()[0];
-            f_y[p2] -= force.get()[1];
-            f_z[p2] -= force.get()[2];
-          } else {
-            *((Real3D*)(&pa_force[p1])) += force;
-            *((Real3D*)(&pa_force[p2])) -= force;
-          }
+          f_x[p1] += force.get()[0];
+          f_y[p1] += force.get()[1];
+          f_z[p1] += force.get()[2];
+          f_x[p2] -= force.get()[0];
+          f_y[p2] -= force.get()[1];
+          f_z[p2] -= force.get()[2];
 
-          if(VEC_MODE_SOA){
-            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << id[p1] << "(" << p_x[p1] << "," << p_y[p1] << "," << p_z[p1] << ") "
-                                               << "p" << id[p2] << "(" << p_x[p2] << "," << p_y[p2] << "," << p_z[p2] << ") "
-                                               << "dist=" << sqrt(dist*dist) << " "
-                                               << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
-          } else {
-            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << id[p1] << "(" << pa_pos[p1].x << "," << pa_pos[p1].y << "," << pa_pos[p1].z << ") "
-                                               << "p" << id[p2] << "(" << pa_pos[p2].x << "," << pa_pos[p2].y << "," << pa_pos[p2].z << ") "
-                                               << "dist=" << sqrt(dist*dist) << " "
-                                               << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
-          }
+          LOG4ESPP_DEBUG(_Potential::theLogger, "p" << id[p1] << "(" << p_x[p1] << "," << p_y[p1] << "," << p_z[p1] << ") "
+                                              << "p" << id[p2] << "(" << p_x[p2] << "," << p_y[p2] << "," << p_z[p2] << ") "
+                                              << "dist=" << sqrt(dist*dist) << " "
+                                              << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
         }
       }
     }

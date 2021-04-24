@@ -41,7 +41,7 @@ namespace espressopp { namespace vec {
 
   using namespace espressopp::iterator;
 
-  template< bool VEC_MODE_AOS, bool PACK_NEIGHBORS >
+  template< bool PACK_NEIGHBORS >
   void rebuild_p_nc_pack_stencil(
     real const cutsq,
     CellNeighborList const& cellNborList,
@@ -115,29 +115,12 @@ namespace espressopp { namespace vec {
 
     {
       neighborList.reset();
-
-      const bool VEC_MODE_AOS = vectorization->particles.mode_aos();
-      const bool PACK_NEIGHBORS = true;
-
       const auto& cellnbrs = vectorization->neighborList;
       const auto& particles = vectorization->particles;
 
       if(particles.size())
       {
-        if(VEC_MODE_AOS)
-        {
-          if(PACK_NEIGHBORS)
-            rebuild_p_nc_pack_stencil<1,1>(cutsq, cellnbrs, particles, neighborList);
-          else
-            rebuild_p_nc_pack_stencil<1,0>(cutsq, cellnbrs, particles, neighborList);
-        }
-        else
-        {
-          if(PACK_NEIGHBORS)
-            rebuild_p_nc_pack_stencil<0,1>(cutsq, cellnbrs, particles, neighborList);
-          else
-            rebuild_p_nc_pack_stencil<0,0>(cutsq, cellnbrs, particles, neighborList);
-        }
+        rebuild_p_nc_pack_stencil<1>(cutsq, cellnbrs, particles, neighborList);
       }
     }
     timeRebuild += timer.getElapsedTime() - currTime;
@@ -146,7 +129,7 @@ namespace espressopp { namespace vec {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
-  template< bool VEC_MODE_AOS, bool PACK_NEIGHBORS >
+  template< bool PACK_NEIGHBORS >
   void rebuild_p_nc_pack_stencil(
     real const cutsq,
     CellNeighborList const& cellNborList,
@@ -193,7 +176,6 @@ namespace espressopp { namespace vec {
 
       /////////////////////////////////////////////////////////////////////////////////////////////
 
-      const auto* __restrict position  = particleArray.position.data();
       const auto* __restrict pa_p_x    = particleArray.p_x.data();
       const auto* __restrict pa_p_y    = particleArray.p_y.data();
       const auto* __restrict pa_p_z    = particleArray.p_z.data();
@@ -262,18 +244,9 @@ namespace espressopp { namespace vec {
           for(int ii=0; ii<c_end; ii++)
           {
             int p = c_j_ptr[ii];
-            if(VEC_MODE_AOS)
-            {
-              c_x_ptr[ii] = position[p].x;
-              c_y_ptr[ii] = position[p].y;
-              c_z_ptr[ii] = position[p].z;
-            }
-            else
-            {
-              c_x_ptr[ii] = pa_p_x[p];
-              c_y_ptr[ii] = pa_p_y[p];
-              c_z_ptr[ii] = pa_p_z[p];
-            }
+            c_x_ptr[ii] = pa_p_x[p];
+            c_y_ptr[ii] = pa_p_y[p];
+            c_z_ptr[ii] = pa_p_z[p];
           }
         }
         else
@@ -306,19 +279,9 @@ namespace espressopp { namespace vec {
         for(size_t p=cell_start; p < cell_end; p++)
         {
           real p_x, p_y, p_z;
-          if(VEC_MODE_AOS)
-          {
-            p_x = position[p].x;
-            p_y = position[p].y;
-            p_z = position[p].z;
-          }
-          else
-          {
-            p_x = pa_p_x[p];
-            p_y = pa_p_y[p];
-            p_z = pa_p_z[p];
-          }
-
+          p_x = pa_p_x[p];
+          p_y = pa_p_y[p];
+          p_z = pa_p_z[p];
           const int prev_c_nplist_size = c_nplist_size;
 
           // self-loop
@@ -340,19 +303,9 @@ namespace espressopp { namespace vec {
               {
                 {
                   real dist_x, dist_y, dist_z;
-                  if(VEC_MODE_AOS)
-                  {
-                    dist_x   = p_x - position[np].x;
-                    dist_y   = p_y - position[np].y;
-                    dist_z   = p_z - position[np].z;
-                  }
-                  else
-                  {
-                    dist_x   = p_x - pa_p_x[np];
-                    dist_y   = p_y - pa_p_y[np];
-                    dist_z   = p_z - pa_p_z[np];
-                  }
-
+                  dist_x   = p_x - pa_p_x[np];
+                  dist_y   = p_y - pa_p_y[np];
+                  dist_z   = p_z - pa_p_z[np];
                   const real distSqr  = dist_x*dist_x + dist_y*dist_y + dist_z*dist_z;
 
                   if(p < np && distSqr <= cutsq) {
@@ -418,19 +371,9 @@ namespace espressopp { namespace vec {
               {
                 {
                   real dist_x, dist_y, dist_z;
-                  if(VEC_MODE_AOS)
-                  {
-                    dist_x = p_x - position[np].x;
-                    dist_y = p_y - position[np].y;
-                    dist_z = p_z - position[np].z;
-                  }
-                  else
-                  {
-                    dist_x = p_x - pa_p_x[np];
-                    dist_y = p_y - pa_p_y[np];
-                    dist_z = p_z - pa_p_z[np];
-                  }
-
+                  dist_x = p_x - pa_p_x[np];
+                  dist_y = p_y - pa_p_y[np];
+                  dist_z = p_z - pa_p_z[np];
                   const real distSqr  = dist_x*dist_x + dist_y*dist_y + dist_z*dist_z;
 
                   if(distSqr <= cutsq) {
@@ -472,12 +415,8 @@ namespace espressopp { namespace vec {
         // num_pairs += c_nplist_size;
 
         std::int64_t max_type_cell = 0;
-        if(VEC_MODE_AOS)
-          for(size_t p=cell_start; p < cell_end; p++)
-            max_type_cell = std::max(max_type_cell, position[p].t);
-        else
-          for(size_t p=cell_start; p < cell_end; p++)
-            max_type_cell = std::max(max_type_cell, pa_p_type[p]);
+        for(size_t p=cell_start; p < cell_end; p++)
+          max_type_cell = std::max(max_type_cell, pa_p_type[p]);
         neighborList.max_type = std::max(neighborList.max_type, max_type_cell);
       }
       neighborList.num_pairs = c_np_start;
@@ -522,7 +461,6 @@ namespace espressopp { namespace vec {
 
       #if 0
       {
-        const auto* __restrict position  = particleArray.position.data();
         const auto* __restrict pa_p_type = particleArray.type.data();
 
         std::int64_t max_type_check = 0;
@@ -532,13 +470,8 @@ namespace espressopp { namespace vec {
           const size_t cell_start    = cellRange[cell_id];
           const size_t cell_size     = sizes[cell_id];
           const size_t cell_end      = cell_start + cell_size;
-
-          if(VEC_MODE_AOS)
-            for(size_t p=cell_start; p < cell_end; p++)
-              max_type_check = std::max(max_type_check, position[p].t);
-          else
-            for(size_t p=cell_start; p < cell_end; p++)
-              max_type_check = std::max(max_type_check, pa_p_type[p]);
+          for(size_t p=cell_start; p < cell_end; p++)
+            max_type_check = std::max(max_type_check, pa_p_type[p]);
         }
         if(max_type_check!=max_type){
           VEC_THROW_EXCEPTION(hpx::assertion_failure,"VerletList::rebuild_p_nc_pack_stencil",

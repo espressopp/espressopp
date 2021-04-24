@@ -39,8 +39,7 @@ namespace espressopp { namespace vec {
       bool rebuildLocalParticles
       )
       : baseClass(vectorization->getSystem(), _nodeGrid, _cellGrid, _halfCellInt),
-        StorageVec(vectorization), vecMode(vectorization->getVecMode()),
-        vecModeFactor((vecMode==ESPP_VEC_SOA) ? 3 : 4),
+        StorageVec(vectorization),
         rebuildLocalParticles(rebuildLocalParticles)
     {
       if(halfCellInt!=1)
@@ -159,8 +158,8 @@ namespace espressopp { namespace vec {
         }
       }
 
-      const size_t preallocReal  = maxReals  * vecModeFactor;
-      const size_t preallocGhost = maxGhosts * vecModeFactor;
+      const size_t preallocReal  = maxReals  * 3;
+      const size_t preallocGhost = maxGhosts * 3;
       buffReal.resize(preallocReal);
       buffGhost.resize(preallocGhost);
     }
@@ -223,15 +222,15 @@ namespace espressopp { namespace vec {
                 sender    = nodeGrid.getNodeNeighborIndex(oppDir);
                 buffRecv  = buffGhost.data();
                 buffSend  = buffReal.data();
-                countRecv = commCellIdx[dir].numGhosts * vecModeFactor;
-                countSend = commCellIdx[dir].numReals  * vecModeFactor;
+                countRecv = commCellIdx[dir].numGhosts * 3;
+                countSend = commCellIdx[dir].numReals  * 3;
               } else {
                 recver    = nodeGrid.getNodeNeighborIndex(oppDir);
                 sender    = nodeGrid.getNodeNeighborIndex(dir);
                 buffRecv  = buffReal.data();
                 buffSend  = buffGhost.data();
-                countRecv = commCellIdx[dir].numReals  * vecModeFactor;
-                countSend = commCellIdx[dir].numGhosts * vecModeFactor;
+                countRecv = commCellIdx[dir].numReals  * 3;
+                countSend = commCellIdx[dir].numGhosts * 3;
               }
               if (nodeGrid.getNodePosition(coord) % 2 == 0) {
                 comm.send(recver, DD_COMM_TAG, buffSend, countSend);
@@ -269,7 +268,6 @@ namespace espressopp { namespace vec {
       auto& particles       = vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
-      if(vecMode==ESPP_VEC_SOA)
       {
         auto f_dim = [&](real* __restrict pos, real shift_v)
         {
@@ -309,53 +307,6 @@ namespace espressopp { namespace vec {
         f_dim(particles.p_y.data(), shift[1]);
         f_dim(particles.p_z.data(), shift[2]);
       }
-      else
-      {
-        real shift_x, shift_y, shift_z;
-        if(DO_SHIFT)
-        {
-          shift_x = shift[0];
-          shift_y = shift[1];
-          shift_z = shift[2];
-        }
-        Real3DInt* position = particles.position.data();
-        {
-          for(size_t ic=0; ic<numCells; ic++)
-          {
-            const size_t icr = ccr[ic];
-            const size_t icg = ccg[ic];
-            const size_t numPart = cellRange[icr+1]-cellRange[icr];
-
-            const Real3DInt* __restrict position_r  = position + cellRange[icr];
-            Real3DInt* __restrict position_g        = position + cellRange[icg];
-
-            if(DO_SHIFT)
-            {
-              #pragma vector always
-              #pragma vector aligned
-              #pragma ivdep
-              for(size_t ip=0; ip<numPart; ip++)
-              {
-                position_g[ip].x = position_r[ip].x + shift_x;
-                position_g[ip].y = position_r[ip].y + shift_y;
-                position_g[ip].z = position_r[ip].z + shift_z;
-              }
-            }
-            else
-            {
-              #pragma vector always
-              #pragma vector aligned
-              #pragma ivdep
-              for(size_t ip=0; ip<numPart; ip++)
-              {
-                position_g[ip].x = position_r[ip].x;
-                position_g[ip].y = position_r[ip].y;
-                position_g[ip].z = position_r[ip].z;
-              }
-            }
-          }
-        }
-      }
     }
 
     template void DomainDecomposition::copyRealsToGhostsIntra< DomainDecomposition::ADD_SHIFT >(
@@ -374,7 +325,6 @@ namespace espressopp { namespace vec {
       auto& particles       = vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
-      if(vecMode==ESPP_VEC_SOA)
       {
         auto f_dim = [&](real* __restrict f)
         {
@@ -402,33 +352,6 @@ namespace espressopp { namespace vec {
         f_dim(particles.f_y.data());
         f_dim(particles.f_z.data());
       }
-      else
-      {
-        {
-          Real4D* force = particles.force.data();
-          for(size_t ic=0; ic<numCells; ic++)
-          {
-            const size_t icr = ccr[ic];
-            const size_t icg = ccg[ic];
-            const size_t numPart = cellRange[icr+1]-cellRange[icr];
-
-            Real4D* __restrict force_r       = force + cellRange[icr];
-            const Real4D* __restrict force_g = force + cellRange[icg];
-
-            {
-              #pragma vector always
-              #pragma vector aligned
-              #pragma ivdep
-              for(size_t ip=0; ip<numPart; ip++)
-              {
-                force_r[ip].x += force_g[ip].x;
-                force_r[ip].y += force_g[ip].y;
-                force_r[ip].z += force_g[ip].z;
-              }
-            }
-          }
-        }
-      }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,7 +370,6 @@ namespace espressopp { namespace vec {
       const auto& cc        = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart   = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
-      if(vecMode==ESPP_VEC_SOA)
       {
         auto f_pack_dim = [&](size_t dim, const real* __restrict p_ptr, real shift_v)
         {
@@ -491,62 +413,6 @@ namespace espressopp { namespace vec {
           f_pack_dim(2, particles.f_z.data(), shift[2]);
         }
       }
-      else
-      {
-        real shift_x, shift_y, shift_z;
-        if(DO_SHIFT)
-        {
-          shift_x = shift[0];
-          shift_y = shift[1];
-          shift_z = shift[2];
-        }
-
-        auto f_pack = [&](const Real4D* __restrict p_ptr)
-        {
-          Real4D* __restrict b_ptr = (Real4D*)(sendBuf.data());
-
-          size_t b_off = 0;
-          for(const auto& ic: cc)
-          {
-            Real4D* __restrict b_ptr_c       = b_ptr + b_off;
-            const Real4D* __restrict p_ptr_c = p_ptr + cr[ic];
-            const size_t npart               = cr[ic+1]-cr[ic];
-
-            #pragma vector always
-            #pragma vector aligned
-            #pragma ivdep
-            for(size_t ip=0; ip<npart; ip++)
-            {
-              if(DO_SHIFT==ADD_SHIFT)
-              {
-                b_ptr_c[ip].x = p_ptr_c[ip].x + shift_x;
-                b_ptr_c[ip].y = p_ptr_c[ip].y + shift_y;
-                b_ptr_c[ip].z = p_ptr_c[ip].z + shift_z;
-              }
-              else
-              {
-                b_ptr_c[ip].x = p_ptr_c[ip].x;
-                b_ptr_c[ip].y = p_ptr_c[ip].y;
-                b_ptr_c[ip].z = p_ptr_c[ip].z;
-              }
-            }
-            b_off += npart;
-          }
-        };
-
-        if(PACKED_DATA==PACKED_POSITIONS)
-        {
-          f_pack((Real4D*)(particles.position.data()));
-        }
-        else
-        {
-          f_pack((Real4D*)(particles.force.data()));
-        }
-
-        // recasting Real3DInt to Real4D only works if they have the same size
-        static_assert(sizeof(Real3DInt)==sizeof(Real4D),
-          "Mismatch between sizeof(Real3DInt) and sizeof(Real4D)");
-      }
     }
 
     template void DomainDecomposition::packCells<
@@ -584,7 +450,6 @@ namespace espressopp { namespace vec {
       const auto& cc      = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
-      if(vecMode==ESPP_VEC_SOA)
       {
         auto f_unpack_dim = [&](size_t dim, real* __restrict p_ptr)
         {
@@ -631,54 +496,6 @@ namespace espressopp { namespace vec {
           f_unpack_dim(2, particles.f_z.data());
         }
 
-      }
-      else
-      {
-        auto f_unpack = [&](Real4D* __restrict p_ptr)
-        {
-          const Real4D* __restrict b_ptr = (Real4D*)(recvBuf.data());
-
-          size_t b_off = 0;
-          for(const auto& ic: cc)
-          {
-            const Real4D* __restrict b_ptr_c = b_ptr + b_off;
-            Real4D* __restrict p_ptr_c       = p_ptr + cr[ic];
-            const size_t npart               = cr[ic+1]-cr[ic];
-
-            #pragma vector always
-            #pragma vector aligned
-            #pragma ivdep
-            for(size_t ip=0; ip<npart; ip++)
-            {
-              if(DATA_MODE==DATA_ADD)
-              {
-                p_ptr_c[ip].x += b_ptr_c[ip].x;
-                p_ptr_c[ip].y += b_ptr_c[ip].y;
-                p_ptr_c[ip].z += b_ptr_c[ip].z;
-              }
-              else
-              {
-                p_ptr_c[ip].x = b_ptr_c[ip].x;
-                p_ptr_c[ip].y = b_ptr_c[ip].y;
-                p_ptr_c[ip].z = b_ptr_c[ip].z;
-              }
-            }
-            b_off += npart;
-          }
-        };
-
-        if(PACKED_DATA==PACKED_POSITIONS)
-        {
-          f_unpack((Real4D*)(particles.position.data()));
-        }
-        else
-        {
-          f_unpack((Real4D*)(particles.force.data()));
-        }
-
-        // recasting Real3DInt to Real4D only works if they have the same size
-        static_assert(sizeof(Real3DInt)==sizeof(Real4D),
-          "Mismatch between sizeof(Real3DInt) and sizeof(Real4D)");
       }
     }
 

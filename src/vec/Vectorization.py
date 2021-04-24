@@ -26,34 +26,23 @@ r"""
 espressopp.vec.Vectorization
 **************************************
 
-.. function:: espressopp.vec.Vectorization(system, integrator, mode)
+.. function:: espressopp.vec.Vectorization(system, integrator)
 
     :param system: system object
     :param integrator: integrator object
-    :param mode: (default='' equiv to 'SOA') 'SOA' for structure of arrays and 'AOS' for array of structures
 
 """
 
-AOS = 'AOS'
-SOA = 'SOA'
-
 class VectorizationLocal(_espressopp.vec_Vectorization):
 
-    def __init__(self, system, integrator=None, mode=None):
+    def __init__(self, system, integrator=None):
         if pmi.workerIsActive():
-            if mode is None or mode==SOA or mode=="":
-                mode_int = _espressopp.VecMode.SOA
-            elif mode==AOS:
-                mode_int = _espressopp.VecMode.AOS
-            else:
-                raise ValueError("Incorrect mode [{}]".format(mode))
-
             # call the appropriate constructor
             if integrator is not None:
-                cxxinit(self, _espressopp.vec_Vectorization, system, integrator, mode_int)
+                cxxinit(self, _espressopp.vec_Vectorization, system, integrator)
                 system.storage.decompose()
             else:
-                cxxinit(self, _espressopp.vec_Vectorization, system, mode_int)
+                cxxinit(self, _espressopp.vec_Vectorization, system)
 
             # Verify that the correct constructor was called
             if self.level == 1:

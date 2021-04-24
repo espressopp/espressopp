@@ -85,7 +85,7 @@ namespace espressopp { namespace vec {
 
     protected:
 
-      template <bool ONETYPE, bool VEC_MODE_AOS>
+      template <bool ONETYPE>
       void addForces_impl(
         ParticleArray & particleArray,
         VerletList::NeighborList const& neighborList);
@@ -111,30 +111,19 @@ namespace espressopp { namespace vec {
       int vlmaxtype = verletList->getMaxType();
       Potential max_pot = getPotential(vlmaxtype,vlmaxtype);
       if(needRebuildPotential) rebuildPotential();
-      bool VEC_MODE_AOS = verletList->getVectorization()->modeAOS();
 
       auto& pa = verletList->getVectorization()->particles;
       const auto& nl = verletList->getNeighborList();
 
       if(np_types==1 && p_types==1){
-        if(VEC_MODE_AOS){
-          addForces_impl<true,true>(pa, nl);
-        }
-        else{
-          addForces_impl<true,false>(pa, nl);
-        }
+        addForces_impl<true>(pa, nl);
       }
       else {
-        if(VEC_MODE_AOS){
-          addForces_impl<false,true>(pa, nl);
-        }
-        else{
-          addForces_impl<false,false>(pa, nl);
-        }
+        addForces_impl<false>(pa, nl);
       }
     }
 
-    template <bool ONETYPE, bool VEC_MODE_AOS>
+    template <bool ONETYPE>
     inline void
     VerletListLennardJones::
     addForces_impl(ParticleArray & particleArray, VerletList::NeighborList const& neighborList)
@@ -148,9 +137,6 @@ namespace espressopp { namespace vec {
           ff2_ = ffs[0].ff2;
           cutoffSqr_ = cutoffSqr[0];
         }
-
-        const Real3DInt *pa_pos  = particleArray.position.data();
-        Real4D *pa_force         = particleArray.force.data();
 
         const lint* __restrict pa_type = particleArray.type.data();
         const real* __restrict pa_p_x  = particleArray.p_x.data();
@@ -169,26 +155,12 @@ namespace espressopp { namespace vec {
         {
           int p = plist[ip];
           int p_lookup;
-          real p_x, p_y, p_z;
-
-          if(VEC_MODE_AOS)
-          {
-            p_x = pa_pos[p].x;
-            p_y = pa_pos[p].y;
-            p_z = pa_pos[p].z;
-            if(!ONETYPE){
-              p_lookup  = pa_pos[p].t*np_types;
-            }
+          if(!ONETYPE){
+            p_lookup  = pa_type[p]*np_types;
           }
-          else
-          {
-            if(!ONETYPE){
-              p_lookup  = pa_type[p]*np_types;
-            }
-            p_x = pa_p_x[p];
-            p_y = pa_p_y[p];
-            p_z = pa_p_z[p];
-          }
+          const real p_x = pa_p_x[p];
+          const real p_y = pa_p_y[p];
+          const real p_z = pa_p_z[p];
 
           real f_x = 0.0;
           real f_y = 0.0;
@@ -206,14 +178,6 @@ namespace espressopp { namespace vec {
             {
               int np_lookup;
               real dist_x, dist_y, dist_z;
-              if(VEC_MODE_AOS)
-              {
-                dist_x   = p_x - pa_pos[np_ii].x;
-                dist_y   = p_y - pa_pos[np_ii].y;
-                dist_z   = p_z - pa_pos[np_ii].z;
-                if(!ONETYPE) np_lookup = pa_pos[np_ii].t+p_lookup;
-              }
-              else
               {
                 dist_x   = p_x - pa_p_x[np_ii];
                 dist_y   = p_y - pa_p_y[np_ii];
@@ -249,14 +213,6 @@ namespace espressopp { namespace vec {
                 f_y += dist_y * ffactor;
                 f_z += dist_z * ffactor;
 
-                if(VEC_MODE_AOS)
-                {
-                  auto& np_force = pa_force[np_ii];
-                  np_force.x -= dist_x * ffactor;
-                  np_force.y -= dist_y * ffactor;
-                  np_force.z -= dist_z * ffactor;
-                }
-                else
                 {
                   pa_f_x[np_ii] -= dist_x * ffactor;
                   pa_f_y[np_ii] -= dist_y * ffactor;
@@ -265,14 +221,7 @@ namespace espressopp { namespace vec {
               }
             }
           }
-          if(VEC_MODE_AOS)
-          {
-            auto& p_force = pa_force[p];
-            p_force.x += f_x;
-            p_force.y += f_y;
-            p_force.z += f_z;
-          }
-          else
+
           {
             pa_f_x[p] += f_x;
             pa_f_y[p] += f_y;
