@@ -54,7 +54,7 @@ namespace espressopp { namespace vec {
       AlignedVector< std::pair<int,int> > prange;
       AlignedVector< int > nplist;
       int num_pairs = 0;
-      std::int64_t max_type = 0;
+      size_t max_type = 0;
 
       AlignedVector<int> c_j;
       AlignedVector<real> c_x,c_y,c_z;
@@ -92,8 +92,6 @@ namespace espressopp { namespace vec {
 
     inline auto getVectorization() { return vectorization; }
 
-    std::uint64_t getMaxType() { return max_type; }
-
     real getVerletCutoff(); // returns cutoff + skin
 
     void connect();
@@ -130,7 +128,6 @@ namespace espressopp { namespace vec {
     NeighborList neighborList;
     // boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
 
-    std::int64_t max_type;
     real cutsq;
     real cut;
     real cutVerlet;

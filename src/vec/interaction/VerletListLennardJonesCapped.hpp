@@ -121,12 +121,12 @@ namespace espressopp { namespace vec {
       // lookup table for LJ variables
       // ideal for low number of types vs number of particle pairs
       // trigger rebuild on setPotential and on size modification from getPotential
-      int vlmaxtype = verletList->getMaxType();
+      auto& pa             = verletList->getVectorization()->particles;
+      const auto& nl       = verletList->getNeighborList();
+      const auto vlmaxtype = nl.max_type;
+
       Potential max_pot = getPotential(vlmaxtype,vlmaxtype);
       if(needRebuildPotential) rebuildPotential();
-
-      auto& pa = verletList->getVectorization()->particles;
-      const auto& nl = verletList->getNeighborList();
 
       if(np_types==1 && p_types==1){
         addForces_impl<true>(pa, nl);
@@ -157,7 +157,7 @@ namespace espressopp { namespace vec {
           cutoffSqr_ = cutoffSqr[0];
         }
 
-        const lint* __restrict pa_type = particleArray.type.data();
+        const size_t* __restrict pa_type = particleArray.type.data();
         const real* __restrict pa_p_x  = particleArray.p_x.data();
         const real* __restrict pa_p_y  = particleArray.p_y.data();
         const real* __restrict pa_p_z  = particleArray.p_z.data();

@@ -62,14 +62,14 @@ namespace espressopp { namespace vec {
       std::vector<size_t> uniqueCells;
 
     public:
-      inline size_t lookupLocalParticleVec(lint id)
+      inline size_t lookupLocalParticleVec(size_t id)
       {
         const auto it = localParticlesVec.find(id);
         return (it != localParticlesVec.end()) ?
           it->second : VEC_PARTICLE_NOT_FOUND;
       }
 
-      inline size_t lookupRealParticleVec(lint id)
+      inline size_t lookupRealParticleVec(size_t id)
       {
         const auto it = localParticlesVec.find(id);
 

@@ -21,21 +21,25 @@
 #ifndef VEC_INCLUDE_SIMDCONFIG_HPP
 #define VEC_INCLUDE_SIMDCONFIG_HPP
 
-// ESPP_VECTOR_WIDTH assumes real = double and lint = std::int64_t
-// NOTE: Force uniform vector alignment for both floating point type and integers
-#define ESPP_VECTOR_ALIGNMENT 64
-#define ESPP_VECTOR_WIDTH      8
+#include <vector>
+#include <cstdint>
+#include <boost/align/aligned_allocator.hpp>
+#include "include/esconfig.hpp"
+
 #if defined(__AVX512F__)
  #if __AVX512F__
   #define ESPP_VECTOR_MASK
  #endif
 #endif
 
-#define ESPP_FIT_TO_VECTOR_WIDTH(SIZE) ((((SIZE)+ESPP_VECTOR_WIDTH-1)/ESPP_VECTOR_WIDTH)*ESPP_VECTOR_WIDTH)
+// NOTE: Padding to 64-byte boundaries
+constexpr size_t ESPP_VECTOR_ALIGNMENT = 64;
+constexpr size_t ESPP_VECTOR_WIDTH     = ESPP_VECTOR_ALIGNMENT / sizeof(espressopp::real);
 
-#include <vector>
-#include <cstdint>
-#include <boost/align/aligned_allocator.hpp>
+constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
+{
+  return ((((SIZE)+ESPP_VECTOR_WIDTH-1)/ESPP_VECTOR_WIDTH)*ESPP_VECTOR_WIDTH);
+}
 
 namespace espressopp {
   namespace vec {
@@ -43,10 +47,6 @@ namespace espressopp {
     // aligned
     template <typename T, std::size_t Alignment=ESPP_VECTOR_ALIGNMENT>
     using AlignedVector = std::vector<T, boost::alignment::aligned_allocator<T,Alignment>>;
-
-    // enforce 64-bit data types
-    typedef std::int64_t lint;
-    typedef double       real;
 
     // represents a very large number for padding positions of "fake" particles = sqrt(max/3)
     // compatible only with real = double

@@ -118,14 +118,14 @@ namespace espressopp { namespace vec {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     addForces() {
-      int vlmaxtype = verletList->getMaxType();
-      Potential max_pot = potentialArray.at(vlmaxtype,vlmaxtype); // force a resize
-
       auto& particles               = verletList->getVectorization()->particles;
       const auto& neighborList      = verletList->getNeighborList();
       const auto* __restrict plist  = neighborList.plist.data();
       const auto* __restrict prange = neighborList.prange.data();
       const auto* __restrict nplist = neighborList.nplist.data();
+
+      const auto vlmaxtype = neighborList.max_type;
+      Potential max_pot = potentialArray.at(vlmaxtype,vlmaxtype); // force a resize
 
       const int ip_max = neighborList.plist.size();
       for(int ip=0; ip<ip_max; ip++)

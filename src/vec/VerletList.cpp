@@ -70,7 +70,6 @@ namespace espressopp { namespace vec {
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
-    max_type = 0;
 
     resetTimers();
     if (rebuildVL) rebuild(); // not called if exclutions are provided
@@ -414,7 +413,7 @@ namespace espressopp { namespace vec {
         // TODO: require reduction for num_pairs or atomic update
         // num_pairs += c_nplist_size;
 
-        std::int64_t max_type_cell = 0;
+        size_t max_type_cell = 0;
         for(size_t p=cell_start; p < cell_end; p++)
           max_type_cell = std::max(max_type_cell, pa_p_type[p]);
         neighborList.max_type = std::max(neighborList.max_type, max_type_cell);
@@ -463,7 +462,7 @@ namespace espressopp { namespace vec {
       {
         const auto* __restrict pa_p_type = particleArray.type.data();
 
-        std::int64_t max_type_check = 0;
+        size_t max_type_check = 0;
         for(size_t irow=0; irow < numRealCells; irow++)
         {
           const size_t cell_id       = cellNborList.cellId(irow);
@@ -517,7 +516,7 @@ namespace espressopp { namespace vec {
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
     if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
 
-    max_type = std::max(max_type, std::int64_t(std::max(pt1.type(), pt2.type())) );
+    max_type = std::max(max_type, (std::max(pt1.type(), pt2.type())) );
     vlPairs.add(pt1, pt2); // add pair to Verlet List
   }
 #endif

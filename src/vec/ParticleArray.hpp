@@ -85,7 +85,7 @@ namespace espressopp { namespace vec {
     AlignedVector< real > p_x;
     AlignedVector< real > p_y;
     AlignedVector< real > p_z;
-    AlignedVector< lint > type;
+    AlignedVector< size_t > type;
 
     AlignedVector< real > v_x;
     AlignedVector< real > v_y;
@@ -122,7 +122,7 @@ namespace espressopp { namespace vec {
       return Real3D(p_x[i],p_y[i],p_z[i]);
     }
 
-    inline lint getType(size_t i) const
+    inline size_t getType(size_t i) const
     {
       return type[i];
     }
