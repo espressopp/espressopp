@@ -56,6 +56,9 @@ namespace espressopp {
 
       mpi::all_reduce(*comm, noExceptions, totalExceptions, std::plus<int>());
 
+      noExceptions = 0;
+      exceptionMessage.clear();
+
       if (totalExceptions > 0) {
 
         std::ostringstream msg;
@@ -71,8 +74,6 @@ namespace espressopp {
 
         throw std::runtime_error(msg.str());
       }
-      exceptionMessage.clear();
-      noExceptions = 0;
     }
 
   }
