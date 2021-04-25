@@ -24,6 +24,11 @@
 #include <iostream>
 
 #define ESPP_PARTICLEARRAY_SOA_APPLY(COMMAND) \
+  id          . COMMAND ; \
+  type        . COMMAND ; \
+  mass        . COMMAND ; \
+  q           . COMMAND ; \
+  ghost       . COMMAND ; \
   p_x         . COMMAND ; \
   p_y         . COMMAND ; \
   p_z         . COMMAND ; \
@@ -33,11 +38,6 @@
   f_x         . COMMAND ; \
   f_y         . COMMAND ; \
   f_z         . COMMAND ; \
-  type        . COMMAND ; \
-  id          . COMMAND ; \
-  mass        . COMMAND ; \
-  q           . COMMAND ; \
-  ghost       . COMMAND ; \
   /* */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,11 +290,11 @@ namespace espressopp { namespace vec
         Particle const& p = particlelist[pli];
 
         id    [pi] = p.id();
+        type  [pi] = p.type();
         mass  [pi] = p.mass();
         q     [pi] = p.q();
         ghost [pi] = p.ghost();
 
-        type  [pi] = p.type();
         p_x   [pi] = p.position()[0];
         p_y   [pi] = p.position()[1];
         p_z   [pi] = p.position()[2];
@@ -437,8 +437,10 @@ namespace espressopp { namespace vec
     if(size_>data_size_) return false;
 
     if(id   .size()<data_size_) return false;
+    if(type .size()<data_size_) return false;
     if(mass .size()<data_size_) return false;
     if(q    .size()<data_size_) return false;
+    if(ghost.size()<data_size_) return false;
     if(p_x  .size()<data_size_) return false;
     if(p_y  .size()<data_size_) return false;
     if(p_z  .size()<data_size_) return false;
@@ -448,7 +450,6 @@ namespace espressopp { namespace vec
     if(f_x  .size()<data_size_) return false;
     if(f_y  .size()<data_size_) return false;
     if(f_z  .size()<data_size_) return false;
-    if(type .size()<data_size_) return false;
 
     return true;
   }

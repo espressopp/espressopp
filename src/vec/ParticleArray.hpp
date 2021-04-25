@@ -76,16 +76,14 @@ namespace espressopp { namespace vec {
     void verify(CellList const& srcCells) const;
 
     AlignedVector< size_t > id;
+    AlignedVector< size_t > type;
     AlignedVector< real > mass;
     AlignedVector< real > q;
     AlignedVector< bool > ghost;
 
-    /* SOA */
-
     AlignedVector< real > p_x;
     AlignedVector< real > p_y;
     AlignedVector< real > p_z;
-    AlignedVector< size_t > type;
 
     AlignedVector< real > v_x;
     AlignedVector< real > v_y;
