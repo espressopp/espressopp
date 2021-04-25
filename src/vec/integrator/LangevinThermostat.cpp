@@ -131,57 +131,19 @@ namespace espressopp { namespace vec {
       if(!exclusions.empty()) throw std::runtime_error(
         "LangevinThermostat::thermalize exclusions not implemented");
 
+      auto& particles = vectorization->particles;
+      for(iterator::ParticleArrayIterator pit(particles, true); pit.isValid(); ++pit)
       {
-        auto& particles = vectorization->particles;
+        const real mass  = pit.mass();
+        const real massf = sqrt(mass);
 
-        const real* __restrict v_x  = particles.v_x.data();
-        const real* __restrict v_y  = particles.v_y.data();
-        const real* __restrict v_z  = particles.v_z.data();
-        const real* __restrict mass = particles.mass.data();
+        const real ranval_x = (*rng)() - 0.5;
+        const real ranval_y = (*rng)() - 0.5;
+        const real ranval_z = (*rng)() - 0.5;
 
-        real* __restrict f_x = particles.f_x.data();
-        real* __restrict f_y = particles.f_y.data();
-        real* __restrict f_z = particles.f_z.data();
-
-        #if 0
-        const auto& realCells              = particles.realCells();
-        const size_t* __restrict cellRange = particles.cellRange().data();
-        const size_t* __restrict sizes     = particles.sizes().data();
-        for(size_t ircell=0; ircell<realCells.size(); ircell++)
-        {
-          const size_t rcell = realCells[ircell];
-          const size_t start = cellRange[rcell];
-          const size_t stop  = start + sizes[rcell];
-
-          for(size_t ip=start; ip<stop; ip++)
-          {
-            const real massf = sqrt(mass[ip]);
-
-            const real ranval_x = (*rng)() - 0.5;
-            const real ranval_y = (*rng)() - 0.5;
-            const real ranval_z = (*rng)() - 0.5;
-
-            f_x[ip] += pref1 * v_x[ip] * mass[ip] + pref2 * ranval_x * massf;
-            f_y[ip] += pref1 * v_y[ip] * mass[ip] + pref2 * ranval_y * massf;
-            f_z[ip] += pref1 * v_z[ip] * mass[ip] + pref2 * ranval_z * massf;
-          }
-        }
-        #else
-        for(iterator::ParticleArrayIterator it(particles, true); it.isValid(); ++it)
-        {
-          const auto ip = it.index();
-          const real massf = sqrt(mass[ip]);
-
-          const real ranval_x = (*rng)() - 0.5;
-          const real ranval_y = (*rng)() - 0.5;
-          const real ranval_z = (*rng)() - 0.5;
-
-          f_x[ip] += pref1 * v_x[ip] * mass[ip] + pref2 * ranval_x * massf;
-          f_y[ip] += pref1 * v_y[ip] * mass[ip] + pref2 * ranval_y * massf;
-          f_z[ip] += pref1 * v_z[ip] * mass[ip] + pref2 * ranval_z * massf;
-        }
-        #endif
-
+        pit.f_x() += pref1 * pit.v_x() * mass + pref2 * ranval_x * massf;
+        pit.f_y() += pref1 * pit.v_y() * mass + pref2 * ranval_y * massf;
+        pit.f_z() += pref1 * pit.v_z() * mass + pref2 * ranval_z * massf;
       }
     }
 

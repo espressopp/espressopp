@@ -26,10 +26,10 @@
 
 namespace espressopp { namespace vec {
   namespace iterator {
+
     /**
-       Iterates all Particles in a list of cells. This is a Python-like,
-       self-contained iterator: isValid() tells whether there are more
-       particles to come.
+       Iterates over all Particles in the ParticleArray.
+       If realCellsOnly==true, only particles in real cells are iterated
     */
     class ParticleArrayIterator
     {
@@ -50,6 +50,33 @@ namespace espressopp { namespace vec {
         else
           return particles.realCells()[cit];
       }
+
+      /** Accessors (read-only for fixed properties) */
+      inline size_t id    () const { return particles.id    [pit]; }
+      inline size_t type  () const { return particles.type  [pit]; }
+      inline real   mass  () const { return particles.mass  [pit]; }
+      inline real   q     () const { return particles.q     [pit]; }
+      inline bool   ghost () const { return particles.ghost [pit]; }
+
+      inline real p_x () const { return particles.p_x [pit]; }
+      inline real p_y () const { return particles.p_y [pit]; }
+      inline real p_z () const { return particles.p_z [pit]; }
+      inline real v_x () const { return particles.v_x [pit]; }
+      inline real v_y () const { return particles.v_y [pit]; }
+      inline real v_z () const { return particles.v_z [pit]; }
+      inline real f_x () const { return particles.f_x [pit]; }
+      inline real f_y () const { return particles.f_y [pit]; }
+      inline real f_z () const { return particles.f_z [pit]; }
+
+      inline real& p_x () { return particles.p_x [pit]; }
+      inline real& p_y () { return particles.p_y [pit]; }
+      inline real& p_z () { return particles.p_z [pit]; }
+      inline real& v_x () { return particles.v_x [pit]; }
+      inline real& v_y () { return particles.v_y [pit]; }
+      inline real& v_z () { return particles.v_z [pit]; }
+      inline real& f_x () { return particles.f_x [pit]; }
+      inline real& f_y () { return particles.f_y [pit]; }
+      inline real& f_z () { return particles.f_z [pit]; }
 
     private:
       void findNonemptyCell();
