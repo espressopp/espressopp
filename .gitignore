@@ -8,7 +8,6 @@ src/acconfig.hpp
 src/gitversion.hpp
 
 # input/output files
-*.txt
 *.xyz
 *.gro
 *.h5
