@@ -24,8 +24,8 @@
 
 #include "python.hpp"
 #include "LennardJones.hpp"
-#include "VerletListLennardJones.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListLennardJones.hpp"
 
 namespace espressopp { namespace vec {
   namespace interaction {
@@ -45,6 +45,13 @@ namespace espressopp { namespace vec {
         .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
         .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
         .def_pickle(LennardJones_pickle())
+      ;
+
+      class_< VerletListLennardJonesBase, bases< Interaction > >
+        ("vec_interaction_VerletListLennardJonesBase", init< shared_ptr<VerletList> >())
+        .def("getVerletList", &VerletListLennardJonesBase::getVerletList)
+        .def("setPotential", &VerletListLennardJonesBase::setPotential)
+        .def("getPotential", &VerletListLennardJonesBase::getPotentialPtr)
       ;
 
       class_< VerletListLennardJones, bases< Interaction > >

@@ -24,6 +24,7 @@ from espressopp.interaction.Interaction import *
 
 from _espressopp import \
     vec_interaction_LennardJones, \
+    vec_interaction_VerletListLennardJonesBase, \
     vec_interaction_VerletListLennardJones
 
 class LennardJonesLocal(PotentialLocal, vec_interaction_LennardJones):
@@ -38,6 +39,24 @@ class LennardJonesLocal(PotentialLocal, vec_interaction_LennardJones):
             else:
                 cxxinit(self, vec_interaction_LennardJones,
                         epsilon, sigma, cutoff, shift)
+
+class VerletListLennardJonesBaseLocal(InteractionLocal, vec_interaction_VerletListLennardJonesBase):
+
+    def __init__(self, vl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, vec_interaction_VerletListLennardJonesBase, vl)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def getVerletListLocal(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getVerletList(self)
 
 class VerletListLennardJonesLocal(InteractionLocal, vec_interaction_VerletListLennardJones):
 
@@ -63,6 +82,13 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.vec.interaction.LennardJonesLocal',
             pmiproperty = ['epsilon', 'sigma']
+            )
+
+    class VerletListLennardJonesBase(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.vec.interaction.VerletListLennardJonesBaseLocal',
+            pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
     class VerletListLennardJones(Interaction):

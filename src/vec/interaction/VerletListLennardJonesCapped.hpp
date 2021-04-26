@@ -43,13 +43,15 @@
 namespace espressopp { namespace vec {
   namespace interaction {
 
+    typedef VerletListInteractionTemplate<LennardJonesCapped> VerletListLennardJonesCappedBase;
+
     class VerletListLennardJonesCapped
-      : public VerletListInteractionTemplate<LennardJonesCapped>
+      : public VerletListLennardJonesCappedBase
     {
     protected:
       typedef LennardJonesCapped _Potential;
       typedef _Potential Potential;
-      typedef VerletListInteractionTemplate<LennardJonesCapped> base;
+      typedef VerletListLennardJonesCappedBase base;
 
       struct LJCoefficients
       {

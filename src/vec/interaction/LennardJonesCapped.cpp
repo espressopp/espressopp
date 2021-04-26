@@ -30,9 +30,6 @@
 namespace espressopp { namespace vec {
   namespace interaction {
 
-    // typedef class VerletListInteractionTemplate <LennardJonesCapped>
-    //     VerletListLennardJonesCapped;
-
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -47,6 +44,12 @@ namespace espressopp { namespace vec {
         .add_property("epsilon", &LennardJonesCapped::getEpsilon, &LennardJonesCapped::setEpsilon)
         .add_property("caprad", &LennardJonesCapped::getCaprad, &LennardJonesCapped::setCaprad)
         .def_pickle(LennardJonesCapped_pickle())
+      ;
+
+      class_< VerletListLennardJonesCappedBase, bases< Interaction > >
+        ("vec_interaction_VerletListLennardJonesCappedBase", init< shared_ptr<VerletList> >())
+        .def("setPotential", &VerletListLennardJonesCappedBase::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListLennardJonesCappedBase::getPotential, return_value_policy< reference_existing_object >())
       ;
 
       class_< VerletListLennardJonesCapped, bases< Interaction > >

@@ -199,7 +199,8 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import vec_interaction_LennardJonesCapped, \
-                      vec_interaction_VerletListLennardJonesCapped
+                        vec_interaction_VerletListLennardJonesCappedBase, \
+                        vec_interaction_VerletListLennardJonesCapped
 
 
 class LennardJonesCappedLocal(PotentialLocal, vec_interaction_LennardJonesCapped):
@@ -214,6 +215,20 @@ class LennardJonesCappedLocal(PotentialLocal, vec_interaction_LennardJonesCapped
             else:
                 cxxinit(self, vec_interaction_LennardJonesCapped,
                         epsilon, sigma, cutoff, caprad, shift)
+
+class VerletListLennardJonesCappedBaseLocal(InteractionLocal, vec_interaction_VerletListLennardJonesCappedBase):
+
+    def __init__(self, vl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, vec_interaction_VerletListLennardJonesCappedBase, vl)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
 
 class VerletListLennardJonesCappedLocal(InteractionLocal, vec_interaction_VerletListLennardJonesCapped):
 
@@ -235,6 +250,12 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.vec.interaction.LennardJonesCappedLocal',
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
+            )
+
+    class VerletListLennardJonesCappedBase(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.vec.interaction.VerletListLennardJonesCappedBaseLocal',
+            pmicall = ['setPotential', 'getPotential']
             )
 
     class VerletListLennardJonesCapped(Interaction, metaclass=pmi.Proxy):
