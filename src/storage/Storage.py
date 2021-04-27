@@ -203,7 +203,7 @@ class StorageLocal(object):
 
     def addParticle(self, pid, pos):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos))
+            self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos), True)
 
     def removeParticle(self, pid):
 
@@ -309,13 +309,13 @@ class StorageLocal(object):
 
                 if index_adrAT >= 0:
                     if particle[index_adrAT] == 0:
-                        storedParticle = self.cxxclass.addParticle(self, id, pos)
+                        storedParticle = self.cxxclass.addParticle(self, id, pos, True)
                         last_pos = pos
                     else:
                         storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
                 else:
                     #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
-                    storedParticle = self.cxxclass.addParticle(self, id, pos)
+                    storedParticle = self.cxxclass.addParticle(self, id, pos, True)
 
                 if storedParticle is not None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))

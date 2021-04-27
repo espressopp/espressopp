@@ -81,7 +81,7 @@ namespace espressopp {
 	  with the given id already exists.  This is left to the parallel
 	  front end.
       */
-      Particle* addParticle(longint id, const Real3D& pos);
+      Particle* addParticle(longint id, const Real3D& pos, bool checkIfRealParticle = true);
 
       // remove particle from the system
       int removeParticle(longint id);
