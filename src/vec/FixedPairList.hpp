@@ -59,7 +59,7 @@ namespace espressopp {
       real longtimeMaxBondSqr;
 
     public:
-      FixedPairList(shared_ptr<Vectorization> vectorization);
+      FixedPairList(shared_ptr< espressopp::storage::Storage > storage);
       ~FixedPairList();
 
       real getLongtimeMaxBondSqr();

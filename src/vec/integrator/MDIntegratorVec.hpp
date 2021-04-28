@@ -46,7 +46,7 @@ namespace espressopp { namespace vec {
     public:
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
 
-      MDIntegratorVec(shared_ptr<Vectorization> vectorization);
+      MDIntegratorVec(shared_ptr<System> system);
 
       void addExtension(shared_ptr<vec::integrator::Extension> extension);
 
@@ -77,8 +77,6 @@ namespace espressopp { namespace vec {
 
     protected:
       ExtensionList exList;
-
-      shared_ptr<Vectorization> vectorization;
 
     private:
       static LOG4ESPP_DECL_LOGGER(logger);

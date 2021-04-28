@@ -45,7 +45,7 @@ namespace espressopp { namespace vec {
       : public Extension
     {
     public:
-      LangevinThermostat(shared_ptr<Vectorization> vectorization);
+      LangevinThermostat(shared_ptr<System> system);
       virtual ~LangevinThermostat();
 
       void setGamma(real gamma);

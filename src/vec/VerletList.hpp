@@ -80,7 +80,7 @@ namespace espressopp { namespace vec {
     /// \param system is the system for which the verlet list is built
     /// \param cut is the cutoff value for the
     VerletList(
-      shared_ptr<Vectorization>,
+      shared_ptr<System>,
       real cut,
       bool rebuildVL);
 

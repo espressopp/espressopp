@@ -49,8 +49,8 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
-    VelocityVerlet::VelocityVerlet(shared_ptr<Vectorization> vectorization)
-      : MDIntegratorVec(vectorization)
+    VelocityVerlet::VelocityVerlet(shared_ptr<System> system)
+      : MDIntegratorVec(system)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
       resortFlag = true;
@@ -60,7 +60,7 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::run(int nsteps)
     {
-      if(!(vectorization->storageVec)) {
+      if(!(getSystem()->vectorization->storageVec)) {
         throw std::runtime_error("Vectorization has no storageVec");
       }
 
@@ -71,7 +71,7 @@ namespace espressopp { namespace vec {
 
       System& system = getSystemRef();
       Storage& storage = *system.storage;
-      StorageVec& storageVec = *vectorization->storageVec;
+      StorageVec& storageVec = *getSystem()->vectorization->storageVec;
       const real skinHalf = 0.5 * system.getSkin();
 
       // signal
@@ -163,7 +163,7 @@ namespace espressopp { namespace vec {
 
     real VelocityVerlet::integrate1()
     {
-      auto& particles                    = vectorization->particles;
+      auto& particles                    = getSystem()->vectorization->particles;
       const auto& realCells              = particles.realCells();
       const size_t* __restrict cellRange = particles.cellRange().data();
       const size_t* __restrict sizes     = particles.sizes().data();
@@ -217,7 +217,7 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::integrate2()
     {
-      auto& particles                    = vectorization->particles;
+      auto& particles                    = getSystem()->vectorization->particles;
       const auto& realCells              = particles.realCells();
       const size_t* __restrict cellRange = particles.cellRange().data();
       const size_t* __restrict sizes     = particles.sizes().data();
@@ -272,7 +272,7 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::updateForces()
     {
-      auto storageVec = vectorization->storageVec;
+      auto storageVec = getSystem()->vectorization->storageVec;
       real time;
 
       time = timeIntegrate.getElapsedTime();
@@ -307,7 +307,7 @@ namespace espressopp { namespace vec {
 
     void VelocityVerlet::initForcesParray()
     {
-      vectorization->zeroForces();
+      getSystem()->vectorization->zeroForces();
     }
 
     void VelocityVerlet::resetTimers() {
@@ -370,7 +370,7 @@ namespace espressopp { namespace vec {
       class_< vec::integrator::VelocityVerlet,
               bases<espressopp::integrator::MDIntegrator, MDIntegratorVec>,
               boost::noncopyable >
-        ("vec_integrator_VelocityVerlet", init< shared_ptr<Vectorization> >())
+        ("vec_integrator_VelocityVerlet", init< shared_ptr<System> >())
         .def("run", &vec::integrator::VelocityVerlet::run)
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)

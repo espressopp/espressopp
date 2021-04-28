@@ -41,7 +41,7 @@ namespace espressopp { namespace vec {
       typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
 
       VelocityVerlet(
-        shared_ptr<Vectorization> vectorization
+        shared_ptr<System> system
         );
 
       virtual void run(int nsteps);

@@ -42,15 +42,19 @@ namespace espressopp { namespace vec {
 
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
 
-  FixedPairList::FixedPairList(shared_ptr<Vectorization> vectorization)
-    : globalPairs(), vectorization(vectorization)
+  FixedPairList::FixedPairList(shared_ptr< espressopp::storage::Storage > storage)
+    : globalPairs()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedPairList");
+
+    if(!storage->getSystem()->vectorization) {
+      throw std::runtime_error("system has no vectorization");
+    }
+    vectorization = storage->getSystem()->vectorization;
 
     if(!(vectorization->storageVec))
       throw std::runtime_error("vectorization->storageVec cannot be null");
     auto& storageVec = vectorization->storageVec;
-    auto& storage    = vectorization->getSystem()->storage;
 
     sigBeforeSend = storage->beforeSendParticles.connect(
       boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
@@ -326,7 +330,7 @@ namespace espressopp { namespace vec {
     //bool (FixedPairList::*pyAdd)(pvec pids) = &FixedPairList::add;
 
     class_<FixedPairList, shared_ptr<FixedPairList> >
-      ("vec_FixedPairList", init <shared_ptr<Vectorization> >())
+      ("vec_FixedPairList", init <shared_ptr<espressopp::storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedPairList::size)
       .def("totalSize", &FixedPairList::totalSize)

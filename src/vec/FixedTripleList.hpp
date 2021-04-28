@@ -51,7 +51,7 @@ namespace espressopp { namespace vec {
     shared_ptr<Vectorization> vectorization;
 
   public:
-    FixedTripleList(shared_ptr<Vectorization>);
+    FixedTripleList(shared_ptr<espressopp::storage::Storage>);
     virtual ~FixedTripleList();
 
     /// Add the given particle triple to the list on this processor if the

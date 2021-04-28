@@ -23,7 +23,6 @@
 */
 
 #include "Extension.hpp"
-#include "vec/Vectorization.hpp"
 
 #include "python.hpp"
 #include "System.hpp"
@@ -34,9 +33,13 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    Extension::Extension(shared_ptr<Vectorization> vectorization)
-      : SystemAccess(vectorization->getSystem()), vectorization(vectorization)
+    Extension::Extension(shared_ptr<System> system)
+      : SystemAccess(system)
     {
+      if(!getSystem()->vectorization) {
+        throw std::runtime_error("system has no vectorization");
+      }
+
       if (!getSystem()->storage) {
           throw std::runtime_error("system has no storage");
       }

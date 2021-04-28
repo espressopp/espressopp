@@ -55,12 +55,16 @@ namespace espressopp { namespace vec {
 
   /// cut is a cutoff (without skin)
   VerletList::VerletList(
-    shared_ptr<Vectorization> vectorization,
+    shared_ptr<System> system,
     real _cut, bool rebuildVL
-    )
-    : SystemAccess(vectorization->getSystem()), vectorization(vectorization)
+    ) : SystemAccess(system)
   {
     LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
+
+    if(!getSystem()->vectorization) {
+      throw std::runtime_error("system has no vectorization");
+    }
+    vectorization = getSystem()->vectorization;
 
     if (!getSystem()->storage) {
       throw std::runtime_error("system has no storage");
@@ -596,7 +600,7 @@ namespace espressopp { namespace vec {
 
 
     class_<VerletList, shared_ptr<VerletList> >
-      ("vec_VerletList", init< shared_ptr<Vectorization>, real, bool>())
+      ("vec_VerletList", init< shared_ptr<System>, real, bool>())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)

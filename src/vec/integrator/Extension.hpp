@@ -42,7 +42,7 @@ namespace espressopp { namespace vec {
       {
       public:
 
-        Extension(shared_ptr<Vectorization> vectorization);
+        Extension(shared_ptr<System> system);
 
         virtual ~Extension();
 
@@ -68,8 +68,6 @@ namespace espressopp { namespace vec {
         void setType(ExtensionType k) {type=k;}
 
       protected:
-
-        shared_ptr<Vectorization> vectorization;
 
         shared_ptr<MDIntegratorVec> integrator; // this is needed for signal connection
 

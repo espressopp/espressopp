@@ -37,8 +37,8 @@ namespace espressopp { namespace vec {
 
   namespace integrator {
 
-    LangevinThermostat::LangevinThermostat(shared_ptr<Vectorization> vectorization)
-      : Extension(vectorization)
+    LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
+      : Extension(system)
     {
       type = Extension::Thermostat;
       gamma  = 0.0;
@@ -131,7 +131,7 @@ namespace espressopp { namespace vec {
       if(!exclusions.empty()) throw std::runtime_error(
         "LangevinThermostat::thermalize exclusions not implemented");
 
-      auto& particles = vectorization->particles;
+      auto& particles = getSystem()->vectorization->particles;
       for(iterator::ParticleArrayIterator pit(particles, true); pit.isValid(); ++pit)
       {
         const real mass  = pit.mass();
@@ -216,7 +216,7 @@ namespace espressopp { namespace vec {
       using namespace espressopp::python;
 
       class_<LangevinThermostat, shared_ptr<LangevinThermostat>, bases<Extension> >
-        ("vec_integrator_LangevinThermostat", init<shared_ptr<Vectorization>>())
+        ("vec_integrator_LangevinThermostat", init<shared_ptr<System>>())
         .def("connect", &LangevinThermostat::connect)
         .def("disconnect", &LangevinThermostat::disconnect)
         .def("addExclpid", &LangevinThermostat::addExclpid)

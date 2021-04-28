@@ -32,14 +32,14 @@ namespace espressopp { namespace vec {
     const Real3D DomainDecomposition::SHIFT_ZERO {0.,0.,0.};
 
     DomainDecomposition::DomainDecomposition(
-      shared_ptr< Vectorization > vectorization,
+      shared_ptr< System > system,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
       int _halfCellInt,
       bool rebuildLocalParticles
       )
-      : baseClass(vectorization->getSystem(), _nodeGrid, _cellGrid, _halfCellInt),
-        StorageVec(vectorization),
+      : baseClass(system, _nodeGrid, _cellGrid, _halfCellInt),
+        StorageVec(system),
         rebuildLocalParticles(rebuildLocalParticles)
     {
       if(halfCellInt!=1)
@@ -74,9 +74,9 @@ namespace espressopp { namespace vec {
     /// Copy particles to packed form. To be called at the start of integrator.run
     void DomainDecomposition::loadCells()
     {
-      vectorization->resetParticles();
+      baseClass::getSystem()->vectorization->resetParticles();
       if(rebuildLocalParticles)
-        localParticlesVec.rebuild(vectorization->particles, uniqueCells);
+        localParticlesVec.rebuild(baseClass::getSystem()->vectorization->particles, uniqueCells);
 
       prepareGhostBuffers();
       onLoadCells();
@@ -85,14 +85,14 @@ namespace espressopp { namespace vec {
     /// Copy particles back from packed form. To be called at the end of integrator.run
     void DomainDecomposition::unloadCells()
     {
-      vectorization->particles.updateToPositionVelocity(localCells, true);
+      baseClass::getSystem()->vectorization->particles.updateToPositionVelocity(localCells, true);
       onUnloadCells();
     }
 
     void DomainDecomposition::resetCells()
     {
       /// reset realCells and cellNeighborList
-      vectorization->resetCells(this);
+      baseClass::getSystem()->vectorization->resetCells(this);
 
       /// Setup ghost communication for this cell grid
       {
@@ -136,7 +136,7 @@ namespace espressopp { namespace vec {
     /// preallocate buffers for ghost communication
     void DomainDecomposition::prepareGhostBuffers()
     {
-      const auto& cr = vectorization->particles.cellRange();
+      const auto& cr = baseClass::getSystem()->vectorization->particles.cellRange();
       size_t maxReals = 0, maxGhosts = 0;
       for (size_t coord = 0; coord < 3; ++coord) {
         for (size_t lr = 0; lr < 2; ++lr) {
@@ -180,12 +180,13 @@ namespace espressopp { namespace vec {
     template < bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA >
     void DomainDecomposition::ghostCommunication_impl()
     {
-      auto const& comm = *(getSystem()->comm);
+      auto const& comm = *(baseClass::getSystem()->comm);
+      auto const boxL  = baseClass::getSystem()->bc->getBoxL();
 
       for (size_t _coord = 0; _coord < 3; ++_coord)
       {
         int coord = REAL_TO_GHOSTS ? _coord : (2 - _coord);
-        const real curCoordBoxL = getSystem()->bc->getBoxL()[coord];
+        const real curCoordBoxL = boxL[coord];
         const bool doPeriodic   = (nodeGrid.getGridSize(coord) == 1);
 
         for (size_t lr = 0; lr < 2; ++lr)
@@ -265,7 +266,7 @@ namespace espressopp { namespace vec {
       const auto& ccg = commCellIdx[dir].ghosts;
       const size_t numCells = ccr.size();
 
-      auto& particles       = vectorization->particles;
+      auto& particles       = baseClass::getSystem()->vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
       {
@@ -322,7 +323,7 @@ namespace espressopp { namespace vec {
       const auto& ccg = commCellIdx[dir].ghosts;
       const size_t numCells = ccr.size();
 
-      auto& particles       = vectorization->particles;
+      auto& particles       = baseClass::getSystem()->vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
       {
@@ -365,7 +366,7 @@ namespace espressopp { namespace vec {
       Real3D const& shift
       )
     {
-      const auto& particles = vectorization->particles;
+      const auto& particles = baseClass::getSystem()->vectorization->particles;
       const auto& cr        = particles.cellRange();
       const auto& cc        = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart   = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
@@ -445,7 +446,7 @@ namespace espressopp { namespace vec {
       size_t dir
       )
     {
-      auto& particles     = vectorization->particles;
+      auto& particles     = baseClass::getSystem()->vectorization->particles;
       const auto& cr      = particles.cellRange();
       const auto& cc      = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
@@ -523,7 +524,7 @@ namespace espressopp { namespace vec {
       using namespace espressopp::python;
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
-        ("vec_storage_DomainDecomposition", init< shared_ptr< Vectorization >, const Int3D&,
+        ("vec_storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&,
             const Int3D&, int, bool >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)

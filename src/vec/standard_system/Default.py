@@ -54,17 +54,17 @@ def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None, halfCellInt=1
     nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rc,skin)
     cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin, halfCellInt)
 
-    vectorization  = espressopp.vec.Vectorization(system)
-    system.storage = espressopp.vec.storage.DomainDecomposition(vectorization, nodeGrid, cellGrid, halfCellInt)
+    system.vectorization = espressopp.vec.Vectorization(system)
+    system.storage       = espressopp.vec.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
 
     print("nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid, "half cell: ", halfCellInt)
 
-    integrator     = espressopp.vec.integrator.VelocityVerlet(vectorization)
+    integrator     = espressopp.vec.integrator.VelocityVerlet(system)
     integrator.dt  = dt
     if (temperature != None):
-        thermostat             = espressopp.vec.integrator.LangevinThermostat(vectorization)
+        thermostat             = espressopp.vec.integrator.LangevinThermostat(system)
         thermostat.gamma       = 1.0
         thermostat.temperature = temperature
         integrator.addExtension(thermostat)
 
-    return system, integrator, vectorization
+    return system, integrator

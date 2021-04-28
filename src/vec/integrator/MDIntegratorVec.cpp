@@ -30,10 +30,13 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(MDIntegratorVec::logger, "MDIntegratorVec");
 
-    MDIntegratorVec::MDIntegratorVec(shared_ptr<Vectorization> vectorization)
-      : vectorization(vectorization)
-      , MDIntegrator(vectorization->getSystem())
-    {}
+    MDIntegratorVec::MDIntegratorVec(shared_ptr<System> system)
+      : MDIntegrator(system)
+    {
+      if(!getSystem()->vectorization) {
+        throw std::runtime_error("system has no vectorization");
+      }
+    }
 
     void MDIntegratorVec::addExtension(shared_ptr<integrator::Extension> extension) {
        // add extension to the list

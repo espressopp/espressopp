@@ -26,10 +26,13 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(StorageVec::logger, "StorageVec");
 
-    StorageVec::StorageVec(
-      shared_ptr<Vectorization> vectorization
-      ) : vectorization(vectorization)
-    {}
+    StorageVec::StorageVec(shared_ptr<System> system)
+      : SystemAccess(system)
+    {
+      if(!getSystem()->vectorization) {
+        throw std::runtime_error("system has no vectorization");
+      }
+    }
 
     void StorageVec::registerPython()
     {

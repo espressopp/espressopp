@@ -40,15 +40,19 @@ namespace espressopp { namespace vec {
 
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
-  FixedTripleList::FixedTripleList(shared_ptr<Vectorization> vectorization)
-    : vectorization(vectorization), globalTriples()
+  FixedTripleList::FixedTripleList(shared_ptr<espressopp::storage::Storage> storage)
+    : globalTriples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
+
+    if(!storage->getSystem()->vectorization) {
+      throw std::runtime_error("system has no vectorization");
+    }
+    vectorization = storage->getSystem()->vectorization;
 
     if(!(vectorization->storageVec))
       throw std::runtime_error("vectorization->storageVec cannot be null");
     auto& storageVec = vectorization->storageVec;
-    auto& storage    = vectorization->getSystem()->storage;
 
     sigBeforeSend = storage->beforeSendParticles.connect
       (boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
@@ -277,7 +281,7 @@ namespace espressopp { namespace vec {
       = &FixedTripleList::add;
 
     class_< FixedTripleList, shared_ptr< FixedTripleList > >
-      ("vec_FixedTripleList", init< shared_ptr< Vectorization > >())
+      ("vec_FixedTripleList", init< shared_ptr<espressopp::storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
       .def("remove",  &FixedTripleList::remove)

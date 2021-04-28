@@ -43,7 +43,7 @@ namespace espressopp { namespace vec {
       typedef espressopp::storage::DomainDecomposition baseClass;
 
       DomainDecomposition(
-        shared_ptr< Vectorization > vectorization,
+        shared_ptr< System > system,
         const Int3D& nodeGrid,
         const Int3D& cellGrid,
         int halfCellInt,

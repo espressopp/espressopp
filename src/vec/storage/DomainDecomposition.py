@@ -30,11 +30,11 @@ class DomainDecompositionLocal(
     espressopp.storage.DomainDecompositionLocal,
     StorageVecLocal
 ):
-    def __init__(self, vec, nodeGrid, cellGrid, halfCellInt, rebuildLocalParticles):
+    def __init__(self, system, nodeGrid, cellGrid, halfCellInt, rebuildLocalParticles):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, vec_storage_DomainDecomposition, vec, nodeGrid, cellGrid, halfCellInt, rebuildLocalParticles)
-            vec.storageVec = self
+            cxxinit(self, vec_storage_DomainDecomposition, system, nodeGrid, cellGrid, halfCellInt, rebuildLocalParticles)
+            system.vectorization.storageVec = self
 
 if pmi.isController:
     class DomainDecomposition(

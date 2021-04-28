@@ -51,11 +51,11 @@ namespace espressopp { namespace vec {
 
     public:
       FixedTripleListInteractionTemplate(
-        shared_ptr < vec::Vectorization > _vectorization,
+        shared_ptr < System > _system,
         shared_ptr < vec::FixedTripleList > _fixedtripleList,
         shared_ptr < Potential > _potential)
-        : vectorization(_vectorization),
-          SystemAccess(_vectorization->getSystem()),
+        : SystemAccess(_system),
+          vectorization(getSystem()->vectorization),
           fixedtripleList(_fixedtripleList),
           potential(_potential)
       {

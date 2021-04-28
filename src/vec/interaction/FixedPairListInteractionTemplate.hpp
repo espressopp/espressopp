@@ -52,14 +52,18 @@ namespace espressopp { namespace vec {
 
     public:
       FixedPairListInteractionTemplate
-      (shared_ptr < vec::Vectorization > vectorization,
+      (shared_ptr < System > system,
        shared_ptr < vec::FixedPairList > _fixedpairList,
        shared_ptr < Potential > _potential)
-        : vectorization(vectorization),
-          SystemAccess(vectorization->getSystem()),
+        : SystemAccess(system),
           fixedpairList(_fixedpairList),
           potential(_potential)
       {
+        if(!getSystem()->vectorization) {
+          throw std::runtime_error("system has no vectorization");
+        }
+        vectorization = getSystem()->vectorization;
+
         if (! potential) {
           LOG4ESPP_ERROR(theLogger, "NULL potential");
         }

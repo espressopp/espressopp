@@ -26,6 +26,7 @@
 #include "vec/Vectorization.hpp"
 #include "LocalParticles.hpp"
 
+#include "SystemAccess.hpp"
 #include "python.hpp"
 #include "log4espp.hpp"
 
@@ -37,9 +38,10 @@ namespace espressopp { namespace vec {
   namespace storage {
 
     class StorageVec
+      : protected SystemAccess
     {
     public:
-      StorageVec(shared_ptr<Vectorization> vectorization);
+      StorageVec(shared_ptr<System> system);
 
       virtual void loadCells() = 0;
 
@@ -56,7 +58,6 @@ namespace espressopp { namespace vec {
       static void registerPython();
 
     protected:
-      shared_ptr<Vectorization> vectorization;
 
       LocalParticles localParticlesVec;
       std::vector<size_t> uniqueCells;
@@ -75,7 +76,7 @@ namespace espressopp { namespace vec {
 
         size_t ret = VEC_PARTICLE_NOT_FOUND;
         if(it!=localParticlesVec.end()) {
-          if(!(vectorization->particles.ghost[it->second])) {
+          if(!(getSystem()->vectorization->particles.ghost[it->second])) {
             ret = it->second;
           }
         }

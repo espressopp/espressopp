@@ -39,7 +39,6 @@ namespace espressopp {
     /// facilitates offloading of particle data to vectorization-friendly form
     class Vectorization
       : public SystemAccess
-      , public boost::enable_shared_from_this<Vectorization>
     {
       typedef espressopp::storage::Storage Storage;
       typedef espressopp::vec::storage::StorageVec StorageVec;
