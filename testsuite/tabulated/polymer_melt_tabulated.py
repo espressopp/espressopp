@@ -51,9 +51,9 @@ halfCellInt = int(sys.argv[1])
 useBuffers = False                         # too few number of particles/cell to benefit from buffers
 
 conffile = 'polymer_melt.start' # file with inital configuration
-tabfileLJ = "pot-lj.txt"
-tabfileFENE = "pot-fene.txt"
-tabfileCosine = "pot-cosine.txt"
+tabfileLJ = "pot-lj_%s.txt" % halfCellInt
+tabfileFENE = "pot-fene_%s.txt" % halfCellInt
+tabfileCosine = "pot-cosine_%s.txt" % halfCellInt
 
 
 ######################################################################
