@@ -42,13 +42,13 @@ jobs:
           curl https://dynamicinstaller.intel.com/api/v2/license > ~/Licenses/intel.lic
       
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }}
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }}
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2
 
-      #    - name: Install
-      #      run: cmake --install build
+      - name: Install
+        run: cmake --install build
 
       - name: Test
         working-directory: build
