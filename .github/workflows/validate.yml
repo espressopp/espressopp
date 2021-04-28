@@ -7,6 +7,20 @@ on:
     - cron:  '0 0 * * SUN'
 
 jobs:
+  cancel-duplicate-workflow-runs:
+    name: "Cancel duplicate workflow runs"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: potiuk/cancel-workflow-runs@master
+        name: "Cancel duplicate workflow runs"
+        with:
+          cancelMode: duplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceRunId: ${{ github.event.workflow_run.id }}
+          notifyPRCancel: true
+          skipEventTypes: '["schedule"]'
+
   build:
     strategy:
       matrix:
