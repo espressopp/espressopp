@@ -36,6 +36,10 @@ namespace espressopp {
     class RNG;
   }
 
+  namespace vec {
+    class Vectorization;
+  }
+
   class System : public enable_shared_from_this< System > {
   
   private:
@@ -51,6 +55,7 @@ namespace espressopp {
     shared_ptr< storage::Storage > storage;
     shared_ptr< bc::BC > bc;
     shared_ptr< esutil::RNG > rng;
+    shared_ptr< vec::Vectorization > vectorization;
 
     interaction::InteractionList shortRangeInteractions;
 
