@@ -85,10 +85,6 @@ namespace espressopp { namespace vec {
         resortFlag = false;
       }
 
-      {
-        storageVec.loadCells();
-      }
-
       bool recalcForces = true;  // TODO: more intelligent
       if (recalcForces) {
         LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
@@ -126,10 +122,7 @@ namespace espressopp { namespace vec {
           const real time = timeIntegrate.getElapsedTime();
 
           storageVec.unloadCells();
-
           storage.decompose();
-
-          storageVec.loadCells();
 
           maxDist  = 0.0;
           resortFlag = false;

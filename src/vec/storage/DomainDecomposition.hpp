@@ -72,6 +72,8 @@ namespace espressopp { namespace vec {
 
       boost::signals2::connection sigResetCells;
 
+      boost::signals2::connection sigLoadCells;
+
       bool rebuildLocalParticles;
 
       /////////////////////////////////////////////////////////////////////////////////////////////

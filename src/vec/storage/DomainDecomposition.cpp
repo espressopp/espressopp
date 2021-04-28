@@ -61,6 +61,12 @@ namespace espressopp { namespace vec {
         sigResetCells = this->onCellAdjust.connect(
                       boost::signals2::at_back,
                       boost::bind(&DomainDecomposition::resetCells, this));
+
+      if(!sigLoadCells.connected())
+        sigLoadCells = this->onParticlesChanged.connect(
+                      boost::signals2::at_front,
+                      boost::bind(&DomainDecomposition::loadCells, this));
+
       LOG4ESPP_INFO(logger, "DomainDecomposition::connect()");
     }
 
@@ -68,6 +74,8 @@ namespace espressopp { namespace vec {
     {
       if(sigResetCells.connected())
         sigResetCells.disconnect();
+      if(sigLoadCells.connected())
+        sigLoadCells.disconnect();
       LOG4ESPP_INFO(logger, "DomainDecomposition::disconnect()");
     }
 
