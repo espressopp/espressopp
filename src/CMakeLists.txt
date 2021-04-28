@@ -84,13 +84,3 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/esp
         FILES_MATCHING PATTERN "*.py"
         PATTERN "CMakeFiles" EXCLUDE)
 
-find_program(CLANG_FORMAT "clang-format")
-if (CLANG_FORMAT)
-    add_custom_target(
-            format
-            COMMAND ${CLANG_FORMAT}
-            -style=file
-            -i
-            ${ESPRESSO_SOURCES}
-    )
-endif()
