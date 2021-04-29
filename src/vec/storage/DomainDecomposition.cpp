@@ -87,14 +87,12 @@ namespace espressopp { namespace vec {
         localParticlesVec.rebuild(baseClass::getSystem()->vectorization->particles, uniqueCells);
 
       prepareGhostBuffers();
-      onLoadCells();
     }
 
     /// Copy particles back from packed form. To be called at the end of integrator.run
     void DomainDecomposition::unloadCells()
     {
       baseClass::getSystem()->vectorization->particles.updateToPositionVelocity(localCells, true);
-      onUnloadCells();
     }
 
     void DomainDecomposition::resetCells()

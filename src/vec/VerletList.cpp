@@ -88,18 +88,9 @@ namespace espressopp { namespace vec {
 
   void VerletList::connect()
   {
-    const bool resortOnLoad = (vectorization->getVecLevel()==2);
-    if(resortOnLoad) {
-      if (!vectorization->storageVec)
-        throw std::runtime_error("vectorization has no storageVec");
-      // make a connection to vectorization to invoke rebuild on loadCells
-      connectionResort = vectorization->storageVec->onLoadCells.connect(
-          boost::bind(&VerletList::rebuild, this));
-    } else {
-      // make a connection to System to invoke rebuild on resort
-      connectionResort = getSystem()->storage->onParticlesChanged.connect(
-          boost::bind(&VerletList::rebuild, this));
-    }
+    // make a connection to vectorization to invoke rebuild on loadCells
+    connectionResort = getSystem()->storage->onParticlesChanged.connect(
+        boost::bind(&VerletList::rebuild, this));
   }
 
   void VerletList::disconnect()

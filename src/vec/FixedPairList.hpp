@@ -53,7 +53,7 @@ namespace espressopp {
 
     protected:
       boost::signals2::connection sigBeforeSend;
-      boost::signals2::connection sigOnLoadCells;
+      boost::signals2::connection sigOnParticlesChanged;
       boost::signals2::connection sigAfterRecv;
       GlobalPairs globalPairs;
       real longtimeMaxBondSqr;
@@ -75,7 +75,7 @@ namespace espressopp {
       bool add(size_t pid1, size_t pid2);
       void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
       void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
-      void onLoadCells();
+      void onParticlesChanged();
       void remove();
       std::vector<size_t> getPairList();
       python::list getBonds();

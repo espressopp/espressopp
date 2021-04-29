@@ -52,14 +52,13 @@ namespace espressopp { namespace vec {
 
     if(!(vectorization->storageVec))
       throw std::runtime_error("vectorization->storageVec cannot be null");
-    auto& storageVec = vectorization->storageVec;
 
     sigBeforeSend = storage->beforeSendParticles.connect
       (boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
     sigAfterRecv = storage->afterRecvParticles.connect
       (boost::bind(&FixedTripleList::afterRecvParticles, this, _1, _2));
-    sigOnLoadCells = storageVec->onLoadCells.connect(
-      boost::bind(&FixedTripleList::onLoadCells, this));
+    sigOnParticlesChanged = storage->onParticlesChanged.connect(
+      boost::bind(&FixedTripleList::onParticlesChanged, this));
   }
 
   FixedTripleList::~FixedTripleList()
@@ -68,7 +67,7 @@ namespace espressopp { namespace vec {
 
     sigBeforeSend.disconnect();
     sigAfterRecv.disconnect();
-    sigOnLoadCells.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
 
   bool FixedTripleList::
@@ -219,7 +218,7 @@ namespace espressopp { namespace vec {
     LOG4ESPP_INFO(theLogger, "received fixed triple list after receive particles");
   }
 
-  void FixedTripleList::onLoadCells()
+  void FixedTripleList::onParticlesChanged()
   {
     auto& system  = vectorization->getSystemRef();
     esutil::Error err(system.comm);
@@ -267,7 +266,7 @@ namespace espressopp { namespace vec {
     globalTriples.clear();
     sigBeforeSend.disconnect();
     sigAfterRecv.disconnect();
-    sigOnLoadCells.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
   /****************************************************
   ** REGISTRATION WITH PYTHON

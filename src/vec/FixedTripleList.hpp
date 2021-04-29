@@ -45,7 +45,7 @@ namespace espressopp { namespace vec {
     : public TripleList
   {
   protected:
-    boost::signals2::connection sigAfterRecv, sigOnLoadCells, sigBeforeSend;
+    boost::signals2::connection sigAfterRecv, sigOnParticlesChanged, sigBeforeSend;
     typedef boost::unordered_multimap <size_t,std::pair <size_t, size_t> > GlobalTriples;
     GlobalTriples globalTriples;
     shared_ptr<Vectorization> vectorization;
@@ -63,7 +63,7 @@ namespace espressopp { namespace vec {
 
     virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
     void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
-    virtual void onLoadCells();
+    virtual void onParticlesChanged();
 
     virtual std::vector<size_t> getTripleList();
     python::list getTriples();

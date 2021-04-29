@@ -60,8 +60,8 @@ namespace espressopp { namespace vec {
       boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
     sigAfterRecv = storage->afterRecvParticles.connect(
       boost::bind(&FixedPairList::afterRecvParticles, this, _1, _2));
-    sigOnLoadCells = storageVec->onLoadCells.connect(
-      boost::bind(&FixedPairList::onLoadCells, this));
+    sigOnParticlesChanged = storage->onParticlesChanged.connect(
+      boost::bind(&FixedPairList::onParticlesChanged, this));
 
     if(vectorization->getVecLevel() != 2) {
       throw std::runtime_error("espressopp::vec::FixedPairList can only be used for vecLevel=2");
@@ -73,7 +73,7 @@ namespace espressopp { namespace vec {
     LOG4ESPP_INFO(theLogger, "~FixedPairList");
     sigBeforeSend.disconnect();
     sigAfterRecv.disconnect();
-    sigOnLoadCells.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
 
   real FixedPairList::getLongtimeMaxBondSqr()
@@ -262,7 +262,7 @@ namespace espressopp { namespace vec {
     LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
   }
 
-  void FixedPairList::onLoadCells()
+  void FixedPairList::onParticlesChanged()
   {
     LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");
 
@@ -279,7 +279,7 @@ namespace espressopp { namespace vec {
         p1 = storageVec->lookupRealParticleVec(it->first);
         if (p1 == VEC_PARTICLE_NOT_FOUND) {
           std::stringstream msg;
-          msg << "onLoadCells error. Fixed Pair List particle p1 " << it->first << " does not exist here. "
+          msg << "onParticlesChanged error. Fixed Pair List particle p1 " << it->first << " does not exist here. "
             << "Checking pair (" << it->first << "," << it->second<< ")";
           err.setException( msg.str() );
         }
@@ -288,7 +288,7 @@ namespace espressopp { namespace vec {
       p2 = storageVec->lookupLocalParticleVec(it->second);
       if (p2 == VEC_PARTICLE_NOT_FOUND) {
           std::stringstream msg;
-          msg << "onLoadCells error. Fixed Pair List particle p2 " << it->second << " does not exist here. "
+          msg << "onParticlesChanged error. Fixed Pair List particle p2 " << it->second << " does not exist here. "
             << "Checking pair (" << it->first << "," << it->second<< ")";
           err.setException(msg.str());
       }
@@ -305,7 +305,7 @@ namespace espressopp { namespace vec {
     globalPairs.clear();
     sigBeforeSend.disconnect();
     sigAfterRecv.disconnect();
-    sigOnLoadCells.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
 
   int FixedPairList::totalSize()
