@@ -57,6 +57,7 @@ namespace espressopp { namespace vec {
 
       LocalParticles localParticlesVec;
       std::vector<size_t> uniqueCells;
+      shared_ptr<Vectorization> vectorization;
 
     public:
       inline size_t lookupLocalParticleVec(size_t id)
@@ -72,7 +73,7 @@ namespace espressopp { namespace vec {
 
         size_t ret = VEC_PARTICLE_NOT_FOUND;
         if(it!=localParticlesVec.end()) {
-          if(!(getSystem()->vectorization->particles.ghost[it->second])) {
+          if(!(vectorization->particles.ghost[it->second])) {
             ret = it->second;
           }
         }

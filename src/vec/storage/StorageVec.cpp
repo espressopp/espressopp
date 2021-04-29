@@ -32,6 +32,7 @@ namespace espressopp { namespace vec {
       if(!getSystem()->vectorization) {
         throw std::runtime_error("system has no vectorization");
       }
+      vectorization = getSystem()->vectorization;
     }
 
     void StorageVec::registerPython()

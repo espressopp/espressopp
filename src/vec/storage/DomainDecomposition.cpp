@@ -82,9 +82,9 @@ namespace espressopp { namespace vec {
     /// Copy particles to packed form. To be called at the start of integrator.run
     void DomainDecomposition::loadCells()
     {
-      baseClass::getSystem()->vectorization->resetParticles();
+      vectorization->resetParticles();
       if(rebuildLocalParticles)
-        localParticlesVec.rebuild(baseClass::getSystem()->vectorization->particles, uniqueCells);
+        localParticlesVec.rebuild(vectorization->particles, uniqueCells);
 
       prepareGhostBuffers();
     }
@@ -92,13 +92,13 @@ namespace espressopp { namespace vec {
     /// Copy particles back from packed form. To be called at the end of integrator.run
     void DomainDecomposition::unloadCells()
     {
-      baseClass::getSystem()->vectorization->particles.updateToPositionVelocity(localCells, true);
+      vectorization->particles.updateToPositionVelocity(localCells, true);
     }
 
     void DomainDecomposition::resetCells()
     {
       /// reset realCells and cellNeighborList
-      baseClass::getSystem()->vectorization->resetCells(this);
+      vectorization->resetCells(this);
 
       /// Setup ghost communication for this cell grid
       {
@@ -142,7 +142,7 @@ namespace espressopp { namespace vec {
     /// preallocate buffers for ghost communication
     void DomainDecomposition::prepareGhostBuffers()
     {
-      const auto& cr = baseClass::getSystem()->vectorization->particles.cellRange();
+      const auto& cr = vectorization->particles.cellRange();
       size_t maxReals = 0, maxGhosts = 0;
       for (size_t coord = 0; coord < 3; ++coord) {
         for (size_t lr = 0; lr < 2; ++lr) {
@@ -272,7 +272,7 @@ namespace espressopp { namespace vec {
       const auto& ccg = commCellIdx[dir].ghosts;
       const size_t numCells = ccr.size();
 
-      auto& particles       = baseClass::getSystem()->vectorization->particles;
+      auto& particles       = vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
       {
@@ -329,7 +329,7 @@ namespace espressopp { namespace vec {
       const auto& ccg = commCellIdx[dir].ghosts;
       const size_t numCells = ccr.size();
 
-      auto& particles       = baseClass::getSystem()->vectorization->particles;
+      auto& particles       = vectorization->particles;
       const auto& cellRange = particles.cellRange();
 
       {
@@ -372,7 +372,7 @@ namespace espressopp { namespace vec {
       Real3D const& shift
       )
     {
-      const auto& particles = baseClass::getSystem()->vectorization->particles;
+      const auto& particles = vectorization->particles;
       const auto& cr        = particles.cellRange();
       const auto& cc        = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart   = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
@@ -452,7 +452,7 @@ namespace espressopp { namespace vec {
       size_t dir
       )
     {
-      auto& particles     = baseClass::getSystem()->vectorization->particles;
+      auto& particles     = vectorization->particles;
       const auto& cr      = particles.cellRange();
       const auto& cc      = commReal ? commCellIdx[dir].reals    : commCellIdx[dir].ghosts;
       const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
