@@ -40,7 +40,7 @@ jobs:
         run: |
           mkdir ~/Licenses
           curl https://dynamicinstaller.intel.com/api/v2/license > ~/Licenses/intel.lic
-      
+
       - name: Configure
         run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }} -DUSE_CCACHE=ON
 
@@ -75,14 +75,14 @@ jobs:
           path: 'html'
 
       - name: update docu repo
-        working-directory: ${{github.workspace}}/html
+        working-directory: html
         run: |
           rm -rf *
           mv ../espressopp-build/doc/sphinx/html/* .
           mv ../espressopp-build/doc/sphinx/pdf/ESPResSo++.pdf .
 
       - name: commit
-        working-directory: ${{github.workspace}}/html
+        working-directory: html
         run: |
           git config --global user.name "Automatic Deployment (GitHub Action)";
           git config --global user.email "espp-devel@listserv.mpip-mainz.mpg.de";
@@ -90,18 +90,22 @@ jobs:
 
       - name: register deploy key
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          PAGES_KEY: ${{ secrets.PAGES_KEY }}
+        if: env.PAGES_KEY != null
         run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.PAGES_KEY }}"
-        if: github.ref == 'refs/heads/master'
+          export HOME=/home/$(whoami)
+          mkdir ~/.ssh && echo "${PAGES_KEY}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          ssh git@github.com || true
 
       - name: deploy documentation
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        working-directory: ${{github.workspace}}/html
-        run: git push git@github.com:espressopp/espressopp.github.io.git master;
-        if: github.ref == 'refs/heads/master'
+        working-directory: html
+        run: |
+          if [[ "${GITHUB_REF}" == 'refs/heads/master' ]]; then
+            git push git@github.com:espressopp/espressopp.github.io.git master;
+          else
+            git push --dry-run git@github.com:espressopp/espressopp.github.io.git master || true;
+          fi
 
   docker:
     runs-on: ubuntu-latest
