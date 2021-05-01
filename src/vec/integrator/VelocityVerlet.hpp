@@ -32,15 +32,15 @@
 namespace espressopp { namespace vec {
   namespace integrator {
 
-    /// Velocity Verlet Integrator
-    class VelocityVerlet
+    /// Velocity Verlet Integrator (Base implementation using ParticleArrayIterator)
+    class VelocityVerletBase
       : public MDIntegratorVec
     {
     public:
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
       typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
 
-      VelocityVerlet(
+      VelocityVerletBase(
         shared_ptr<System> system
         );
 
@@ -68,9 +68,9 @@ namespace espressopp { namespace vec {
       real maxDist;
       real maxCut;
 
-      real integrate1();
+      virtual real integrate1();
 
-      void integrate2();
+      virtual void integrate2();
 
       void calcForces();
 
@@ -95,6 +95,28 @@ namespace espressopp { namespace vec {
       real timeInt2;
       real timeResort;
 
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+    };
+
+    /// Velocity Verlet Integrator (Optimized implementation)
+    class VelocityVerlet
+      : public VelocityVerletBase
+    {
+    public:
+
+      VelocityVerlet(
+        shared_ptr<System> system
+        ) : VelocityVerletBase(system)
+      {}
+
+      virtual real integrate1();
+
+      virtual void integrate2();
+
+      /// Register this class so it can be used from Python
+      static void registerPython();
+
+    protected:
       static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 

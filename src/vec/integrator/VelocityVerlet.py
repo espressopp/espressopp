@@ -32,20 +32,21 @@ espressopp.vec.integrator.VelocityVerlet
 import espressopp
 from espressopp.esutil import cxxinit
 from espressopp import pmi
-from _espressopp import vec_integrator_VelocityVerlet
+from _espressopp import vec_integrator_VelocityVerletBase, \
+                        vec_integrator_VelocityVerlet
 from espressopp.vec.integrator import *
 
-class VelocityVerletLocal(
-    vec_integrator_VelocityVerlet,
+class VelocityVerletBaseLocal(
+    vec_integrator_VelocityVerletBase,
     espressopp.integrator.MDIntegratorLocal,
     MDIntegratorVecLocal
     ):
 
-    def __init__(self, vec):
+    def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, vec_integrator_VelocityVerlet, vec)
+            cxxinit(self, vec_integrator_VelocityVerletBase, system)
 
-    # # NOTE: Manually resolved functions with conflicting names back to MDIntegratorVec
+    # NOTE: Manually resolved functions with conflicting names back to MDIntegratorVec
     def addExtension(self, extension):
         return MDIntegratorVecLocal.addExtension(self, extension)
 
@@ -55,15 +56,33 @@ class VelocityVerletLocal(
     def getNumberOfExtensions(self):
         return MDIntegratorVecLocal.getNumberOfExtensions(self)
 
+class VelocityVerletLocal(
+    VelocityVerletBaseLocal
+    ):
+
+    def __init__(self, vec):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, vec_integrator_VelocityVerlet, system)
+
+
 if pmi.isController :
-    class VelocityVerlet(
+    class VelocityVerletBase(
         espressopp.integrator.MDIntegrator,
         MDIntegratorVec
         ):
 
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.vec.integrator.VelocityVerletLocal',
+            cls =  'espressopp.vec.integrator.VelocityVerletBaseLocal',
             pmicall = ['run','resetTimers','getNumResorts'],
             pmiinvoke = ['getTimers']
+        )
+
+    class VelocityVerlet(
+        VelocityVerletBase
+        ):
+
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.vec.integrator.VelocityVerletLocal'
         )
