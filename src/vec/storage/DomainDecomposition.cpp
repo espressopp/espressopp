@@ -110,7 +110,7 @@ namespace espressopp { namespace vec {
         /// TODO: Check whether sorting improves performance
       }
 
-      /// Determine list of unique cells for this subdomain. Unique cells comprise of  real cells
+      /// Determine list of unique cells for this subdomain. Unique cells comprise of real cells
       /// and ghost cells which are not derived from the same subdomain (intra).
       {
         uniqueCells.clear();

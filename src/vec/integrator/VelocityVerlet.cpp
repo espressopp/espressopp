@@ -402,7 +402,6 @@ namespace espressopp { namespace vec {
           #pragma ivdep
           for(size_t ip=0; ip<size; ip++)
           {
-            /// TODO: transform division by mass to multiplication by reciprocal or fixed dtfm array
             const real dtfm = 0.5 * dt / mass[ip];
             v_x[ip] += dtfm * f_x[ip];
             v_y[ip] += dtfm * f_y[ip];
