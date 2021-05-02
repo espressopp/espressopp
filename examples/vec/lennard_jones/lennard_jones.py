@@ -160,8 +160,8 @@ nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs,box,warmup_cutoff, s
 cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, warmup_cutoff, skin)
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 if args.vec:
-    vec            = espressopp.vec.Vectorization(system)
-    system.storage = espressopp.vec.storage.DomainDecomposition(vec, nodeGrid, cellGrid)
+    system.vectorization = espressopp.vec.Vectorization(system)
+    system.storage = espressopp.vec.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 else:
     system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
@@ -175,7 +175,7 @@ print("cellGrid           = ", cellGrid)
 
 # use a velocity Verlet integration scheme
 if args.vec:
-    integrator = espressopp.vec.integrator.VelocityVerlet(vec)
+    integrator = espressopp.vec.integrator.VelocityVerlet(system)
 else:
     integrator = espressopp.integrator.VelocityVerlet(system)
 
@@ -185,7 +185,7 @@ integrator.dt  = dt
 if (temperature != None):
     # create e Langevin thermostat
     if args.vec:
-        thermostat         = espressopp.vec.integrator.LangevinThermostat(vec)
+        thermostat         = espressopp.vec.integrator.LangevinThermostat(system)
     else:
         thermostat         = espressopp.integrator.LangevinThermostat(system)
     # set Langevin friction constant
@@ -223,7 +223,7 @@ if args.vec:
 if args.vec:
     # create a verlet list that uses a cutoff radius = warmup_cutoff
     # the verlet radius is automatically increased by system.skin (see system setup)
-    verletlist  = espressopp.vec.VerletList(vec, warmup_cutoff)
+    verletlist  = espressopp.vec.VerletList(system, warmup_cutoff)
     # create a force capped Lennard-Jones potential
     # the potential is automatically shifted so that U(r=cutoff) = 0.0
     LJpot       = espressopp.vec.interaction.LennardJonesCapped(epsilon=epsilon_start, sigma=sigma, cutoff=warmup_cutoff, caprad=capradius, shift='auto')
@@ -281,7 +281,7 @@ verletlist.disconnect()
 if args.vec:
     # create a new verlet list that uses a cutoff radius = r_cutoff
     # the verlet radius is automatically increased by system.skin (see system setup)
-    verletlist  = espressopp.vec.VerletList(vec, r_cutoff)
+    verletlist  = espressopp.vec.VerletList(system, r_cutoff)
     # define a Lennard-Jones interaction that uses a verlet list
     interaction = espressopp.vec.interaction.VerletListLennardJones(verletlist)
     # use a Lennard-Jones potential between 2 particles of type 0

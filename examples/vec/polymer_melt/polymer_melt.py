@@ -48,7 +48,7 @@ bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.replicate(bonds, angles, x
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 box = (Lx, Ly, Lz)
-system, integrator, vectorization = espressopp.vec.standard_system.Default(box=box, rc=rc, skin=skin, dt=timestep, temperature=temperature)
+system, integrator = espressopp.vec.standard_system.Default(box=box, rc=rc, skin=skin, dt=timestep, temperature=temperature)
 
 # add particles to the system and then decompose
 # do this in chunks of 1000 particles to speed it up
@@ -66,24 +66,24 @@ system.storage.decompose()
 system.storage.loadCells() # IMPORTANT: load data to vectorized form
 
 # Lennard-Jones with Verlet list
-vl      = espressopp.vec.VerletList(vectorization, cutoff = rc)
+vl      = espressopp.vec.VerletList(system, cutoff = rc)
 potLJ   = espressopp.vec.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
 interLJ = espressopp.vec.interaction.VerletListLennardJones(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-fpl       = espressopp.vec.FixedPairList(vectorization)
+fpl       = espressopp.vec.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potFENE   = espressopp.vec.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espressopp.vec.interaction.FixedPairListFENE(vectorization, fpl, potFENE)
+interFENE = espressopp.vec.interaction.FixedPairListFENE(system, fpl, potFENE)
 system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
-ftl         = espressopp.vec.FixedTripleList(vectorization)
+ftl         = espressopp.vec.FixedTripleList(system.storage)
 ftl.addTriples(angles)
 potCosine   = espressopp.vec.interaction.Cosine(K=1.5, theta0=3.1415926)
-interCosine = espressopp.vec.interaction.FixedTripleListCosine(vectorization, ftl, potCosine)
+interCosine = espressopp.vec.interaction.FixedTripleListCosine(system, ftl, potCosine)
 system.addInteraction(interCosine)
 
 # print simulation parameters
