@@ -1,0 +1,53 @@
+name: WEEKLY
+
+on:
+  schedule:
+    - cron:  '0 0 * * SAT'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+        DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_devel', 'ubuntu_rolling', 'ubuntu_mpich']
+        CXX: ['g++', 'clang++']
+        EXTERNAL_MPI4PY: ['On','Off']
+        include:
+          - BUILD_TYPE: 'Debug'
+            DISTRO: 'fedora_intel'
+            CXX: 'icpc'
+            EXTERNAL_MPI4PY: 'On'
+          - BUILD_TYPE: 'Debug'
+            DISTRO: 'fedora_intel-oneapi'
+            CXX: 'icpx'
+            EXTERNAL_MPI4PY: 'On'
+
+    runs-on: ubuntu-latest
+    container: espressopp/buildenv:${{ matrix.distro }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.DISTRO }}-${{ matrix.CXX }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
+          restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CXX }}-${{ matrix.BUILD_TYPE }}
+
+      - uses: actions/checkout@v2
+
+      - name: Get trail license
+        if: ${{ matrix.CXX == 'icpc' }}
+        run: |
+          mkdir ~/Licenses
+          curl https://dynamicinstaller.intel.com/api/v2/license > ~/Licenses/intel.lic
+      
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }}
+
+      - name: Build
+        run: cmake --build build --verbose --target all -j 2
+
+      #    - name: Install
+      #      run: cmake --install build
+
+      - name: Test
+        working-directory: build
+        run: ctest --rerun-failed --output-on-failure -j 2

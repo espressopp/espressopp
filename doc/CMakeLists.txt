@@ -5,7 +5,7 @@
 find_package( Doxygen QUIET )
 
 if ( DOXYGEN_FOUND )
-    doxygen_add_docs(doxygen src/*)
+    doxygen_add_docs(doxygen ${PROJECT_SOURCE_DIR}/src)
 else ( DOXYGEN_FOUND )
     message ( WARNING "Not building system documentation because Doxygen not found.")
 endif ( DOXYGEN_FOUND )
