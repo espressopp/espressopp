@@ -141,8 +141,8 @@ jobs:
 
       - name: Coverage build
         run: |
-          cmake -B builddir -DUSE_GCOV=on
-          cmake --build builddir -j 2
+          cmake -B builddir -DUSE_GCOV=on -DCMAKE_BUILD_TYPE=Debug
+          cmake --build builddir --verbose -j 2
 
       - name: Run tests
         run: ctest --output-on-failure -j 2
