@@ -108,14 +108,13 @@ namespace espressopp { namespace vec {
 
       // ADD THE GLOBAL TRIPLET
       // see whether the particle already has triples
-      std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange
-        = globalTriples.equal_range(pid2);
+      const auto equalRange = globalTriples.equal_range(pid2);
       if (equalRange.first == globalTriples.end()) {
         // if it hasn't, insert the new triple
         globalTriples.insert(std::make_pair(pid2, std::pair<size_t, size_t>(pid1, pid3)));
       } else {
         // otherwise test whether the triple already exists
-        for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+        for (auto it = equalRange.first; it != equalRange.second; ++it) {
           if (it->second == std::pair<size_t, size_t>(pid1, pid3)) {
             // TODO: Triple already exists, generate error!
             ;
@@ -133,7 +132,7 @@ namespace espressopp { namespace vec {
   {
     python::tuple triple;
     python::list triples;
-    for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
+    for (auto it = globalTriples.cbegin(); it != globalTriples.cend(); it++) {
       triple = python::make_tuple( it->second.first,it->first, it->second.second);
       triples.append(triple);
     }
@@ -143,7 +142,7 @@ namespace espressopp { namespace vec {
   std::vector<size_t> FixedTripleList::getTripleList()
   {
     std::vector<size_t> ret;
-    for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
+    for (auto it = globalTriples.cbegin(); it != globalTriples.cend(); it++) {
       ret.push_back(it->second.first);
       ret.push_back(it->first);
       ret.push_back(it->second.second);
@@ -164,8 +163,7 @@ namespace espressopp { namespace vec {
 
       if (n > 0)
       {
-        std::pair<GlobalTriples::const_iterator, GlobalTriples::const_iterator> equalRange
-          = globalTriples.equal_range(pid);
+        const auto equalRange = globalTriples.equal_range(pid);
 
         // first write the pid of this particle
         // then the number of partners (n)
@@ -173,7 +171,7 @@ namespace espressopp { namespace vec {
         toSend.reserve(toSend.size()+2*n+1);
         toSend.push_back(pid);
         toSend.push_back(n);
-        for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
+        for (auto it = equalRange.first; it != equalRange.second; ++it)
         {
           toSend.push_back(it->second.first);
           toSend.push_back(it->second.second);
@@ -194,7 +192,7 @@ namespace espressopp { namespace vec {
     std::vector< size_t > received;
     size_t n;
     size_t pid1, pid2, pid3;
-    GlobalTriples::iterator it = globalTriples.begin();
+    auto it = globalTriples.begin();
     // receive the triple list
     buf.read(received);
     size_t size = received.size(); size_t i = 0;
@@ -229,7 +227,7 @@ namespace espressopp { namespace vec {
     size_t lastpid2 = VEC_PARTICLE_NOT_FOUND;
     auto const& storageVec = vectorization->storageVec;
     size_t p1, p2, p3;
-    for (GlobalTriples::const_iterator it = globalTriples.begin(); it != globalTriples.end(); ++it)
+    for (auto it = globalTriples.cbegin(); it != globalTriples.cend(); ++it)
     {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid2) {

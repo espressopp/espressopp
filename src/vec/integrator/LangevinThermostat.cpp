@@ -159,14 +159,11 @@ namespace espressopp { namespace vec {
 
       // thermalize AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
-      for (std::vector<Particle>::iterator it = adrATparticles.begin();
-              it != adrATparticles.end(); it++) {
-
+      for (auto it = adrATparticles.begin(); it != adrATparticles.end(); it++) {
         if(exclusions.count((*it).id()) == 0)
         {
           frictionThermo(*it);
         }
-
       }
     #endif
     }

@@ -75,11 +75,11 @@ namespace espressopp { namespace vec {
         p_types = potentialArray.size_m();
         ffs = AlignedVector<LJCoefficients>(np_types*p_types);
         cutoffSqr = AlignedVector<real>(np_types*p_types);
-        AlignedVector<LJCoefficients>::iterator it1 = ffs.begin();
-        AlignedVector<real>::iterator it3 = cutoffSqr.begin();
+        auto it1 = ffs.begin();
+        auto it2 = cutoffSqr.begin();
         for(auto& p: potentialArray){
           *(it1++) = LJCoefficients(p.getff1(),p.getff2());
-          *(it3++) = p.getCutoffSqr();
+          *(it2++) = p.getCutoffSqr();
         }
         needRebuildPotential = false;
       }
