@@ -116,18 +116,15 @@ namespace espressopp { namespace vec {
 
       // ADD THE GLOBAL PAIR
       // see whether the particle already has pairs
-      std::pair<GlobalPairs::const_iterator,
-        GlobalPairs::const_iterator> equalRange
-        = globalPairs.equal_range(pid1);
+      const auto equalRange = globalPairs.equal_range(pid1);
       if (equalRange.first == globalPairs.end()) {
         // if it hasn't, insert the new pair
         globalPairs.insert(std::make_pair(pid1, pid2));
       }
       else {
         // otherwise test whether the pair already exists
-        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+        for (auto it = equalRange.first; it != equalRange.second; ++it) {
           if (it->second == pid2) {
-            // Pair already exists, generate error!
             throw std::runtime_error("Duplicate pair inserted");
             ;
           }
@@ -145,7 +142,7 @@ namespace espressopp { namespace vec {
   {
     python::tuple bond;
     python::list bonds;
-    for (GlobalPairs::const_iterator it=globalPairs.begin(); it != globalPairs.end(); it++) {
+    for (auto it = globalPairs.cbegin(); it != globalPairs.cend(); it++) {
       bond = python::make_tuple(it->first, it->second);
       bonds.append(bond);
     }
@@ -156,7 +153,7 @@ namespace espressopp { namespace vec {
   std::vector<size_t> FixedPairList::getPairList()
   {
     std::vector<size_t> ret;
-    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+    for (auto it = globalPairs.cbegin(); it != globalPairs.cend(); it++) {
       ret.push_back(it->first);
       ret.push_back(it->second);
     }
@@ -165,24 +162,21 @@ namespace espressopp { namespace vec {
 
   python::list FixedPairList::getAllBonds()
   {
-    std::vector<size_t> local_bonds;
+    std::vector<size_t> local_bonds = getPairList();
     std::vector<std::vector<size_t> > global_bonds;
     python::list bonds;
 
-    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+    for (auto it = globalPairs.cbegin(); it != globalPairs.cend(); it++) {
       local_bonds.push_back(it->first);
       local_bonds.push_back(it->second);
     }
     System& system = vectorization->getSystemRef();
     if (system.comm->rank() == 0) {
       mpi::gather(*system.comm, local_bonds, global_bonds, 0);
-      python::tuple bond;
-
-      for (std::vector<std::vector<size_t> >::iterator it = global_bonds.begin();
-           it != global_bonds.end(); ++it) {
-        for (std::vector<size_t>::iterator iit = it->begin(); iit != it->end();) {
-          size_t pid1 = *(iit++);
-          size_t pid2 = *(iit++);
+      for (auto it = global_bonds.begin(); it != global_bonds.end(); ++it) {
+        for (auto iit = it->begin(); iit != it->end(); iit += 2) {
+          size_t pid1 = *(iit);
+          size_t pid2 = *(iit + 1);
           bonds.append(python::make_tuple(pid1, pid2));
         }
       }
@@ -206,9 +200,7 @@ namespace espressopp { namespace vec {
       int n = globalPairs.count(pid);
 
       if (n > 0) {
-        std::pair<GlobalPairs::const_iterator,
-          GlobalPairs::const_iterator> equalRange
-          = globalPairs.equal_range(pid);
+        const auto equalRange = globalPairs.equal_range(pid);
 
         // first write the pid of the first particle
         // then the number of partners
@@ -216,8 +208,7 @@ namespace espressopp { namespace vec {
         toSend.reserve(toSend.size()+n+1);
         toSend.push_back(pid);
         toSend.push_back(n);
-        for (GlobalPairs::const_iterator it = equalRange.first;
-             it != equalRange.second; ++it) {
+        for (auto it = equalRange.first; it != equalRange.second; ++it) {
           toSend.push_back(it->second);
           LOG4ESPP_DEBUG(theLogger, "send global bond: pid "
                        << pid << " and partner " << it->second);
@@ -238,7 +229,7 @@ namespace espressopp { namespace vec {
     std::vector< size_t > received;
     int n;
     size_t pid1, pid2;
-    GlobalPairs::iterator it = globalPairs.begin();
+    auto it = globalPairs.begin();
     // receive the bond list
     buf.read(received);
     int size = received.size(); int i = 0;
@@ -274,7 +265,7 @@ namespace espressopp { namespace vec {
     this->clear();
     size_t lastpid1 = VEC_PARTICLE_NOT_FOUND;
     size_t p1, p2;
-    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
+    for (auto it = globalPairs.cbegin(); it != globalPairs.cend(); ++it) {
       if (it->first != lastpid1) {
         p1 = storageVec->lookupRealParticleVec(it->first);
         if (p1 == VEC_PARTICLE_NOT_FOUND) {
