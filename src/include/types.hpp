@@ -86,12 +86,6 @@ namespace espressopp {
     class InteractionList;
   }
 
-  namespace vectorization {
-    class ParticleArray;
-    class Vectorization;
-    class VerletList;
-  }
-
   class NoDefault: public std::exception {};
 }
 
