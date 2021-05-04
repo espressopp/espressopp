@@ -9,7 +9,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/include)
 
 if(USE_GCOV)
-  set(PY_COV_OPTS "-m" "coverage" "run")
+  set(PY_COV_OPTS "-m" "coverage" "run" "-a")
 endif()
 
 file(GLOB ALL_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/*)
