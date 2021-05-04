@@ -21,14 +21,43 @@
 
 import sys
 
+
+def to_dict(alltimers):
+    """
+    Converts timing data into a dictionary for easy post-processing.
+    """
+
+    t = []
+    nprocs = len(alltimers)
+    for ntimer in range(10):
+        t.append(0.0)
+        for k in range(nprocs):
+            t[ntimer] += alltimers[k][ntimer]
+        t[ntimer] /= nprocs
+
+    stats = {
+        'Run': t[0],
+        'Pair': t[1],
+        'FENE': t[2],
+        'Angle': t[3],
+        'Comm1': t[4],
+        'Comm2': t[5],
+        'Int1': t[6],
+        'Int2': t[7],
+        'Resort': t[8],
+        'Other': t[9]
+    }
+    return stats
+
+
 def show(alltimers, precision=1):
     """
     Python functions to print timings from C++.
     """
 
     fmt1 = '%.' + str(precision) + 'f\n'
-    fmt2 = '%.' + str(precision) + 'f (%.'+ str(precision) + 'f)\n'
-    t=[]
+    fmt2 = '%.' + str(precision) + 'f (%.' + str(precision) + 'f)\n'
+    t = []
     nprocs = len(alltimers)
     for ntimer in range(10):
         t.append(0.0)
@@ -37,13 +66,13 @@ def show(alltimers, precision=1):
         t[ntimer] /= nprocs
 
     sys.stdout.write('Run    time (%) = ' + fmt1 % t[0])
-    sys.stdout.write('Pair   time (%) = ' + fmt2 % (t[1], 100*t[1]/t[0]))
-    sys.stdout.write('FENE   time (%) = ' + fmt2 % (t[2], 100*t[2]/t[0]))
-    sys.stdout.write('Angle  time (%) = ' + fmt2 % (t[3], 100*t[3]/t[0]))
-    sys.stdout.write('Comm1  time (%) = ' + fmt2 % (t[4], 100*t[4]/t[0]))
-    sys.stdout.write('Comm2  time (%) = ' + fmt2 % (t[5], 100*t[5]/t[0]))
-    sys.stdout.write('Int1   time (%) = ' + fmt2 % (t[6], 100*t[6]/t[0]))
-    sys.stdout.write('Int2   time (%) = ' + fmt2 % (t[7], 100*t[7]/t[0]))
-    sys.stdout.write('Resort time (%) = ' + fmt2 % (t[8], 100*t[8]/t[0]))
-    sys.stdout.write('Other  time (%) = ' + fmt2 % (t[9], 100*t[9]/t[0]))
+    sys.stdout.write('Pair   time (%) = ' + fmt2 % (t[1], 100 * t[1] / t[0]))
+    sys.stdout.write('FENE   time (%) = ' + fmt2 % (t[2], 100 * t[2] / t[0]))
+    sys.stdout.write('Angle  time (%) = ' + fmt2 % (t[3], 100 * t[3] / t[0]))
+    sys.stdout.write('Comm1  time (%) = ' + fmt2 % (t[4], 100 * t[4] / t[0]))
+    sys.stdout.write('Comm2  time (%) = ' + fmt2 % (t[5], 100 * t[5] / t[0]))
+    sys.stdout.write('Int1   time (%) = ' + fmt2 % (t[6], 100 * t[6] / t[0]))
+    sys.stdout.write('Int2   time (%) = ' + fmt2 % (t[7], 100 * t[7] / t[0]))
+    sys.stdout.write('Resort time (%) = ' + fmt2 % (t[8], 100 * t[8] / t[0]))
+    sys.stdout.write('Other  time (%) = ' + fmt2 % (t[9], 100 * t[9] / t[0]))
     sys.stdout.write('\n')
