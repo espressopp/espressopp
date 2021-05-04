@@ -136,6 +136,7 @@ def extend_class():
     Int3D.__eq__ = _eq
     Int3D.__lt__ = _lt
     Int3D.__gt__ = _gt
+    Int3D.as_tuple = lambda self: (self[0], self[1], self[2])
 
 
 extend_class()
