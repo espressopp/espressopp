@@ -93,7 +93,6 @@ namespace espressopp { namespace vec {
 
   bool FixedPairList::add(size_t pid1, size_t pid2)
   {
-    bool returnVal = true;
     if (pid1 > pid2)
       std::swap(pid1, pid2);
 
@@ -103,14 +102,15 @@ namespace espressopp { namespace vec {
 
     if(p1==VEC_PARTICLE_NOT_FOUND) {
       // Particle does not exist here, return false
-      returnVal=false;
+      LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << false);
+      return false;
     } else {
       if(p2==VEC_PARTICLE_NOT_FOUND) {
         LOG4ESPP_DEBUG(theLogger, "Particle p2 " << pid2 << " not found");
       }
     }
 
-    if(returnVal){
+    {
       // add the pair locally
       this->push_back({p1,p2});
 
@@ -126,7 +126,6 @@ namespace espressopp { namespace vec {
         for (auto it = equalRange.first; it != equalRange.second; ++it) {
           if (it->second == pid2) {
             throw std::runtime_error("Duplicate pair inserted");
-            ;
           }
         }
         // if not, insert the new pair
@@ -134,8 +133,8 @@ namespace espressopp { namespace vec {
       }
       LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
-    LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << returnVal);
-    return returnVal;
+    LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << true);
+    return true;
   }
 
   python::list FixedPairList::getBonds()
