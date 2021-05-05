@@ -20,11 +20,11 @@
 
 
 import unittest
-import espressopp.unittest
+import espressopp.tools
 from espressopp.interaction.Morse import *
 from espressopp import Real3D, infinity
 
-class Test0Morse(espressopp.unittest.TestCase) :
+class Test0Morse(espressopp.tools.TestCase) :
     def test0Energy(self) :
         morse=Morse(epsilon=1.0, alpha=1.0, rMin=2.0)
         self.assertAlmostEqual(morse.computeEnergy(2.0), -1.0)
