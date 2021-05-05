@@ -133,3 +133,20 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+  coverage:
+    runs-on: ubuntu-latest
+    container: espressopp/buildenv:fedora
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Coverage build
+        run: |
+          cmake -B builddir -DUSE_GCOV=on -DCMAKE_BUILD_TYPE=Debug
+          cmake --build builddir --verbose -j 2
+
+      - name: Run tests
+        run: ctest --output-on-failure -j 2
+        working-directory: builddir
+
+      - name: Upload Report to codecov.io
+        uses: codecov/codecov-action@v1
