@@ -256,9 +256,9 @@ namespace espressopp {
       }
     }
 
-    Particle* Storage::addParticle(longint id, const Real3D& p) {
-      if (!checkIsRealParticle(id, p)) {
-        return static_cast< Particle* >(0);
+    Particle* Storage::addParticle(longint id, const Real3D& p, bool checkIfRealParticle) {
+      if (checkIfRealParticle && !checkIsRealParticle(id, p)) {
+        return nullptr;
       }
 
       Cell *cell;
