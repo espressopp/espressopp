@@ -19,21 +19,22 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from espressopp import *
-from espressopp import unittest
+import espressopp
+import unittest
 import mpi4py.MPI as MPI
 
-class TestParticleLocal(unittest.TestCase) :
+class TestParticleLocal(espressopp.tools.TestCase) :
     def test0get(self):
-        system = System()
-        system.rng = esutil.RNG()
-        system.bc = bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
+        system = espressopp.System()
+        system.rng = espressopp.esutil.RNG()
+        system.bc = espressopp.bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
         system.storage = espressopp.storage.DomainDecomposition(
             system=system,
             nodeGrid=(1,1,1), cellGrid=(2,2,2))
         p = system.storage.addParticle(0, (1.0, 1.0, 1.0))
-        p.v = Real3D(1.0, 1.0, 1.0)
-        self.assertAlmostEqualReal3D(p.v, Real3D(1.0, 1.0, 1.0))
+        p.v = espressopp.Real3D(1.0, 1.0, 1.0)
+
+        self.assertAlmostEqualReal3D(p.v, espressopp.Real3D(1.0, 1.0, 1.0))
 
 if __name__ == "__main__":
     unittest.main()
