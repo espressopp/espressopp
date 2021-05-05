@@ -9,5 +9,7 @@ add_test(polymer_melt_tabulated_fullcell ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${
 set_tests_properties(polymer_melt_tabulated_fullcell PROPERTIES ENVIRONMENT "${TEST_ENV}")
 add_test(polymer_melt_tabulated_halfcell ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${CMAKE_CURRENT_SOURCE_DIR}/polymer_melt_tabulated.py 2)
 set_tests_properties(polymer_melt_tabulated_halfcell PROPERTIES ENVIRONMENT "${TEST_ENV}")
+set_tests_properties(polymer_melt_tabulated_halfcell PROPERTIES DEPENDS polymer_melt_tabulated_fullcell)
 add_test(polymer_melt_tabulated_thirdcell ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${CMAKE_CURRENT_SOURCE_DIR}/polymer_melt_tabulated.py 3)
 set_tests_properties(polymer_melt_tabulated_thirdcell PROPERTIES ENVIRONMENT "${TEST_ENV}")
+set_tests_properties(polymer_melt_tabulated_thirdcell PROPERTIES DEPENDS polymer_melt_tabulated_halfcell)

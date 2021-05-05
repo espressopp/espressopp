@@ -6,3 +6,4 @@ add_test(extForce_lb ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${CMAKE_CURRENT_SOURCE
 set_tests_properties(extForce_lb PROPERTIES ENVIRONMENT "${TEST_ENV}")
 add_test(LBMDcoupling ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${CMAKE_CURRENT_SOURCE_DIR}/test_LBMDcoupling.py)
 set_tests_properties(LBMDcoupling PROPERTIES ENVIRONMENT "${TEST_ENV}")
+set_tests_properties(LBMDcoupling PROPERTIES DEPENDS extForce_lb)
