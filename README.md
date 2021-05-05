@@ -2,6 +2,7 @@
 
 ![Build Status](https://github.com/espressopp/espressopp/actions/workflows/validate.yml/badge.svg?branch=master)
 [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
+[![codecov](https://codecov.io/gh/espressopp/espressopp/branch/master/graph/badge.svg?token=gx8YKTpfcR)](https://codecov.io/gh/espressopp/espressopp)
 
 ESPResSo++ is an extensible, flexible, fast and parallel simulation software for
 soft matter research. It is a highly versatile software package for the
