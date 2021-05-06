@@ -24,7 +24,6 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 ########################################################################
 option(ESPP_LOCAL_ARCHITECTURE "Use instruction set of the local architecture." OFF)
 option(ESPP_VEC_REPORT "Enable reporting of loop vectorization." OFF)
-option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
     message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -60,9 +59,10 @@ find_package(FFTW3 REQUIRED)
 ########################################################################
 #Process GROMACS settings
 ########################################################################
-
+find_package(GROMACS 2021 CONFIG QUIET NAMES gromacs gromacs_d)
+option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" ${GROMACS_FOUND})
 if(WITH_XTC)
-    find_package(GROMACS REQUIRED)
+	find_package(GROMACS 2021 CONFIG REQUIRED NAMES gromacs gromacs_d)
 endif()
 
 
