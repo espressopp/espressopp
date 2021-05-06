@@ -20,7 +20,7 @@ jobs:
             CXX: 'icpc'
             EXTERNAL_MPI4PY: 'On'
           - BUILD_TYPE: 'Debug'
-            DISTRO: 'fedora_intel-oneapi'
+            DISTRO: 'fedora_intel'
             CXX: 'icpx'
             EXTERNAL_MPI4PY: 'On'
 
