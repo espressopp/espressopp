@@ -32,7 +32,7 @@ foreach(DIR ${ALL_DIRS})
                 target_link_libraries(${TEST_NAME} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} _espressopp ${Boost_LIBRARIES})
             endforeach()
 
-            file(GLOB_RECURSE TESTS_PY "${DIR}/*Test*.py")
+            file(GLOB_RECURSE TESTS_PY "${DIR}/test*.py")
             foreach(TEST_FILE ${TESTS_PY})
                 get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
                 add_test(${TEST_NAME} ${Python3_EXECUTABLE} ${PY_COV_OPTS} ${TEST_FILE})
