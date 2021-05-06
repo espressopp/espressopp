@@ -46,8 +46,7 @@ namespace espressopp { namespace vec {
         shared_ptr< System > system,
         const Int3D& nodeGrid,
         const Int3D& cellGrid,
-        int halfCellInt,
-        bool rebuildLocalParticles
+        int halfCellInt
         );
 
       ~DomainDecomposition();
@@ -73,8 +72,6 @@ namespace espressopp { namespace vec {
       boost::signals2::connection sigResetCells;
 
       boost::signals2::connection sigLoadCells;
-
-      bool rebuildLocalParticles;
 
       /////////////////////////////////////////////////////////////////////////////////////////////
       //// members involved in ghost communication

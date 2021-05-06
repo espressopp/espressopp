@@ -55,11 +55,19 @@ namespace espressopp { namespace vec {
 
     protected:
 
+      bool localParticlesEnabled = false;
       LocalParticles localParticlesVec;
       std::vector<size_t> uniqueCells;
       shared_ptr<Vectorization> vectorization;
 
     public:
+      void enableLocalParticles() {
+        if(!localParticlesEnabled){
+          localParticlesEnabled = true;
+          loadCells();
+        }
+      }
+
       inline size_t lookupLocalParticleVec(size_t id)
       {
         const auto it = localParticlesVec.find(id);

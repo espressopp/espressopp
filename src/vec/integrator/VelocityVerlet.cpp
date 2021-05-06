@@ -150,7 +150,10 @@ namespace espressopp { namespace vec {
       }
 
       {
+        // since load is counted in timeResort, unload should also be counted there
+        const real time = timeIntegrate.getElapsedTime();
         storageVec.unloadCells();
+        timeResort += timeIntegrate.getElapsedTime() - time;
       }
 
       timeRun = timeIntegrate.getElapsedTime();

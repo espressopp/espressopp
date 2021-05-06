@@ -35,12 +35,10 @@ namespace espressopp { namespace vec {
       shared_ptr< System > system,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
-      int _halfCellInt,
-      bool rebuildLocalParticles
+      int _halfCellInt
       )
       : baseClass(system, _nodeGrid, _cellGrid, _halfCellInt),
-        StorageVec(system),
-        rebuildLocalParticles(rebuildLocalParticles)
+        StorageVec(system)
     {
       if(halfCellInt!=1)
         throw std::runtime_error("vec: Not implemented for halfCellInt!=1.");
@@ -83,7 +81,7 @@ namespace espressopp { namespace vec {
     void DomainDecomposition::loadCells()
     {
       vectorization->resetParticles();
-      if(rebuildLocalParticles)
+      if(localParticlesEnabled)
         localParticlesVec.rebuild(vectorization->particles, uniqueCells);
 
       prepareGhostBuffers();
@@ -531,7 +529,7 @@ namespace espressopp { namespace vec {
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
         ("vec_storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&,
-            const Int3D&, int, bool >())
+            const Int3D&, int >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)
         // .def("connectOffload", &DomainDecomposition::connectOffload)

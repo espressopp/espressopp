@@ -55,6 +55,7 @@ namespace espressopp { namespace vec {
     if(!(vectorization->storageVec))
       throw std::runtime_error("vectorization->storageVec cannot be null");
     auto& storageVec = vectorization->storageVec;
+    storageVec->enableLocalParticles();
 
     sigBeforeSend = storage->beforeSendParticles.connect(
       boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
