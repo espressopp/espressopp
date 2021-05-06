@@ -58,7 +58,6 @@ namespace espressopp { namespace vec {
 
       AlignedVector<int> c_j;
       AlignedVector<real> c_x,c_y,c_z;
-      int numPrealloc = 0;
 
       void reset()
       {
@@ -117,7 +116,7 @@ namespace espressopp { namespace vec {
 
     void resetTimers();
 
-    void loadTimers(real* t, int* p);
+    void loadTimers(real* t);
 
     /// Register this class so it can be used from Python.
     static void registerPython();
@@ -137,10 +136,6 @@ namespace espressopp { namespace vec {
 
     espressopp::esutil::WallTimer timer;
     real timeRebuild;
-    // real timeExecute;
-    // real timeRealloc;
-    // real timePack;
-    // int  numPrealloc;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

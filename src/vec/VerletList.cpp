@@ -556,27 +556,18 @@ namespace espressopp { namespace vec {
   void VerletList::resetTimers()
   {
     timeRebuild = 0.0;
-    // timeExecute = 0.0;
-    // timeRealloc = 0.0;
-    // timePack = 0.0;
-    // numPrealloc = 0;
   }
 
-  void VerletList::loadTimers(real* t, int* p)
+  void VerletList::loadTimers(real* t)
   {
-    t[0] = timeRebuild;
-    t[1] = 0; // timeExecute;
-    t[2] = 0; // timeRealloc;
-    t[3] = 0; // timePack;
-    p[0] = 0; // numPrealloc;
+    t[0] = timeRebuild;;
   }
 
   static boost::python::object wrapGetTimers(class VerletList* obj)
   {
-    real tms[4];
-    int pre[1];
-    obj->loadTimers(tms, pre);
-    return boost::python::make_tuple(tms[0],tms[1],tms[2],tms[3],pre[0]);
+    real tms[1];
+    obj->loadTimers(tms);
+    return boost::python::make_tuple(tms[0]);
   }
 
   /****************************************************
