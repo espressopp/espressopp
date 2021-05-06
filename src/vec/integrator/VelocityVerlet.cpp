@@ -83,10 +83,12 @@ namespace espressopp { namespace vec {
 
       // Before start make sure that particles are on the right processor
       if (resortFlag) {
+        time = timeIntegrate.getElapsedTime();
         LOG4ESPP_INFO(theLogger, "resort particles");
         storage.decompose();
         maxDist = 0.0;
         resortFlag = false;
+        timeResort += timeIntegrate.getElapsedTime();
       }
 
       bool recalcForces = true;  // TODO: more intelligent
