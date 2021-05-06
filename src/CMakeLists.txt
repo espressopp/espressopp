@@ -80,12 +80,11 @@ message(STATUS "_espressopp compiler flags are: ${ESPP_CFLAGS}")
 target_include_directories(_espressopp PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_include_directories(_espressopp PUBLIC ${CMAKE_SOURCE_DIR}/src/include)
 target_include_directories(_espressopp PUBLIC ${CMAKE_BINARY_DIR}/src)
-target_include_directories(_espressopp PRIVATE ${FFTW3_INCLUDES})
 
 target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::system Boost::filesystem Boost::python${PYTHON_VERSION_NO_DOT})
 target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
-target_link_libraries(_espressopp PRIVATE ${FFTW3_LIBRARIES})
+target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 
 if(WITH_XTC)
     target_include_directories(_espressopp PRIVATE ${GROMACS_INCLUDE_DIRS})
