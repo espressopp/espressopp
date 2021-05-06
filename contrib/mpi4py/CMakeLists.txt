@@ -7,11 +7,11 @@ set(DL_SOURCES ${MPI4PY_DIR}/src/dynload.c)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/${MPI4PY_DIR}/src)
 
 add_library(MPI ${MPI4PY_SOURCES})
-target_link_libraries(MPI ${Python3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} MPI::MPI_CXX)
+target_link_libraries(MPI Python3::Python MPI::MPI_CXX)
 set_target_properties(MPI PROPERTIES PREFIX "" SUFFIX ".so")
 
 add_library(dl ${DL_SOURCES})
-target_link_libraries(dl ${Python3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} MPI::MPI_CXX)
+target_link_libraries(dl Python3::Python MPI::MPI_CXX)
 set_target_properties(dl PROPERTIES PREFIX "" SUFFIX ".so")
 
 install(TARGETS MPI LIBRARY DESTINATION ${PYTHON_INSTDIR}/mpi4py ARCHIVE DESTINATION ${PYTHON_INSTDIR}/mpi4py)

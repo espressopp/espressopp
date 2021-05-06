@@ -56,7 +56,6 @@ find_package(MPI REQUIRED COMPONENTS CXX)
 ########################################################################
 
 find_package(FFTW3 REQUIRED)
-include_directories(${FFTW3_INCLUDES})
 
 ########################################################################
 #Process GROMACS settings
@@ -64,8 +63,6 @@ include_directories(${FFTW3_INCLUDES})
 
 if(WITH_XTC)
     find_package(GROMACS REQUIRED)
-    include_directories(${GROMACS_INCLUDE_DIRS})
-    add_definitions( -DHAS_GROMACS ${GROMACS_DEFINITIONS})
 endif()
 
 
@@ -84,7 +81,6 @@ set(PYTHON_INCLUDE_PATH ${Python3_INCLUDE_DIRS} CACHE PATH "Python Include Direc
 mark_as_advanced(PYTHON_INCLUDE_PATH)
 
 message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
-include_directories(${PYTHON_INCLUDE_PATH})
 
 if(NOT PYTHON_INSTDIR)
     execute_process(COMMAND ${Python3_EXECUTABLE}
@@ -119,22 +115,7 @@ mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-# Minimum required Boost version is set to 1.69.0
-set(NEEDED_Boost_VERSION 1.69.0)
-find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT})
-set(Boost_LIBS ${Boost_LIBRARIES})
-
-message(STATUS "BOOST_LIBS = ${Boost_LIBRARIES}")
-
-# Append Python library to the list of Boost libraries.
-list(APPEND Boost_LIBS ${Boost_LIBRARIES})
-set(Boost_LIBRARIES ${Boost_LIBS})
-
-if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages (mpi, serialization, system, filesystem, python3). To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost.")
-endif(NOT Boost_FOUND)
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/src)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT})
 
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 
@@ -145,9 +126,6 @@ else(EXTERNAL_MPI4PY)
     include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.3/src/mpi4py/include)
     set(MPI4PY_LIBRARIES MPI)
 endif(EXTERNAL_MPI4PY)
-
-# Required for acconfig.h
-include_directories(${CMAKE_BINARY_DIR}/src)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set ( RT_LIBRARIES )
