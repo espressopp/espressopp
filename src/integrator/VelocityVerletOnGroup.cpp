@@ -87,13 +87,13 @@ namespace espressopp {
       // Before start make sure that particles are on the right processor
 
       if (resortFlag) {
-        // time = timeIntegrate.getElapsedTime();
+        time = timeIntegrate.getElapsedTime();
 	LOG4ESPP_INFO(theLogger, "resort particles");
 	storage.decompose();
 	LOG4ESPP_INFO(theLogger, "particles resort");
 	maxDist = 0.0;
 	resortFlag = false;
-        // timeResort += timeIntegrate.getElapsedTime();
+        timeResort += timeIntegrate.getElapsedTime();
       }
 
       bool recalcForces = true;  // TODO: more intelligent
