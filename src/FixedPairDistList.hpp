@@ -40,12 +40,12 @@ namespace espressopp {
 	  protected:
 	    typedef std::multimap<longint, std::pair<longint, real> > PairsDist;
 		boost::signals2::connection con1, con2, con3;
-		shared_ptr <storage::Storage> storage;
+		std::shared_ptr <storage::Storage> storage;
 		PairsDist pairsDist;
 		using PairList::add;
 
 	  public:
-		FixedPairDistList(shared_ptr< storage::Storage > _storage);
+		FixedPairDistList(std::shared_ptr< storage::Storage > _storage);
 		virtual ~FixedPairDistList();
 
 		/** Add the given particle pair to the list on this processor if the

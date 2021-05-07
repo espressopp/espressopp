@@ -32,8 +32,8 @@ namespace espressopp {
     class LBInit {
     public:
       /* Constructor for the class */
-      LBInit(shared_ptr< System > _system,
-                         shared_ptr< LatticeBoltzmann > _latticeboltzmann) {
+      LBInit(std::shared_ptr< System > _system,
+                         std::shared_ptr< LatticeBoltzmann > _latticeboltzmann) {
                             latticeboltzmann = _latticeboltzmann;
       }
       /* Destructor for the class */
@@ -49,7 +49,7 @@ namespace espressopp {
       static void registerPython();
 
     protected:
-      shared_ptr<LatticeBoltzmann> latticeboltzmann;
+      std::shared_ptr<LatticeBoltzmann> latticeboltzmann;
       real rho0;
       Real3D u0;
     };

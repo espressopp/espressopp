@@ -41,13 +41,13 @@ namespace espressopp {
 
       public:
 
-        CapForce(shared_ptr< System > _system, const Real3D& _CapForce);
+        CapForce(std::shared_ptr< System > _system, const Real3D& _CapForce);
 
-        CapForce(shared_ptr< System > _system, real _AbsCapForce);
+        CapForce(std::shared_ptr< System > _system, real _AbsCapForce);
 
-        CapForce(shared_ptr< System > _system, const Real3D& _CapForce, shared_ptr< ParticleGroup > _particleGroup);
+        CapForce(std::shared_ptr< System > _system, const Real3D& _CapForce, std::shared_ptr< ParticleGroup > _particleGroup);
 
-        CapForce(shared_ptr< System > _system, real _AbsCapForce, shared_ptr< ParticleGroup > _particleGroup);
+        CapForce(std::shared_ptr< System > _system, real _AbsCapForce, std::shared_ptr< ParticleGroup > _particleGroup);
 
         void setCapForce(Real3D& _CapForce);
 
@@ -59,9 +59,9 @@ namespace espressopp {
         void setAdress(bool _adress);
         bool getAdress();
         
-        void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
+        void setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup);
 
-        shared_ptr< ParticleGroup > getParticleGroup();
+        std::shared_ptr< ParticleGroup > getParticleGroup();
 
         void applyForceCappingToGroup();
         void applyForceCappingToAll();
@@ -73,7 +73,7 @@ namespace espressopp {
 
       private:
         boost::signals2::connection _aftCalcF;
-        shared_ptr< ParticleGroup > particleGroup;
+        std::shared_ptr< ParticleGroup > particleGroup;
         bool allParticles;
         bool absCapping;
         bool adress;

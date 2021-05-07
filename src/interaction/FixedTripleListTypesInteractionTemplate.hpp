@@ -49,8 +49,8 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
 
  public:
   FixedTripleListTypesInteractionTemplate
-      (shared_ptr<System> system,
-       shared_ptr<FixedTripleList> _fixedtripleList)
+      (std::shared_ptr<System> system,
+       std::shared_ptr<FixedTripleList> _fixedtripleList)
       : SystemAccess(system), fixedtripleList(_fixedtripleList) {
     potentialArray = esutil::Array3D<Potential, esutil::enlarge>(0, 0, 0, Potential());
     ntypes = 0;
@@ -58,11 +58,11 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
 
   virtual ~FixedTripleListTypesInteractionTemplate() { }
 
-  void setFixedTripleList(shared_ptr<FixedTripleList> _fixedtripleList) {
+  void setFixedTripleList(std::shared_ptr<FixedTripleList> _fixedtripleList) {
     fixedtripleList = _fixedtripleList;
   }
 
-  shared_ptr<FixedTripleList> getFixedTripleList() {
+  std::shared_ptr<FixedTripleList> getFixedTripleList() {
     return fixedtripleList;
   }
 
@@ -80,8 +80,8 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
     return potentialArray.at(type1, type2, type3);
   }
 
-  shared_ptr<Potential> getPotentialPtr(int type1, int type2, int type3) {
-    return make_shared<Potential>(potentialArray.at(type1, type2, type3));
+  std::shared_ptr<Potential> getPotentialPtr(int type1, int type2, int type3) {
+    return std::make_shared<Potential>(potentialArray.at(type1, type2, type3));
   }
 
   virtual void addForces();
@@ -101,7 +101,7 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
 
  protected:
   int ntypes;
-  shared_ptr<FixedTripleList> fixedtripleList;
+  std::shared_ptr<FixedTripleList> fixedtripleList;
   esutil::Array3D<Potential, esutil::enlarge> potentialArray;
 };
 

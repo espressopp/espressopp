@@ -39,7 +39,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(Rattle::theLogger, "Rattle");
 
-    Rattle::Rattle(shared_ptr<System> _system, 
+    Rattle::Rattle(std::shared_ptr<System> _system,
         real _maxit, real _tol, real _rptol)
     : Extension(_system),
         maxit(_maxit), tol(_tol), rptol(_rptol) {
@@ -306,8 +306,8 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<Rattle, shared_ptr<Rattle>, bases<Extension> >
-        ("integrator_Rattle", init<shared_ptr<System>, real, real, real>())
+      class_<Rattle, std::shared_ptr<Rattle>, bases<Extension> >
+        ("integrator_Rattle", init<std::shared_ptr<System>, real, real, real>())
          .def("addBond", &Rattle::addBond)
         ;
     }

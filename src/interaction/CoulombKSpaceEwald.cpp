@@ -30,7 +30,7 @@ namespace espressopp {
 
     typedef class CellListAllParticlesInteractionTemplate <CoulombKSpaceEwald> CellListCoulombKSpaceEwald;
 
-    CoulombKSpaceEwald::CoulombKSpaceEwald(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax){
+    CoulombKSpaceEwald::CoulombKSpaceEwald(std::shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax){
       system = _system;
       prefactor = _prefactor;
       alpha = _alpha;
@@ -67,14 +67,14 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_< CoulombKSpaceEwald, bases< Potential > >
-    	("interaction_CoulombKSpaceEwald", init< shared_ptr< System >, real, real, int >())
+    	("interaction_CoulombKSpaceEwald", init< std::shared_ptr< System >, real, real, int >())
     	.add_property("prefactor", &CoulombKSpaceEwald::getPrefactor, &CoulombKSpaceEwald::setPrefactor)
     	.add_property("alpha", &CoulombKSpaceEwald::getAlpha, &CoulombKSpaceEwald::setAlpha)
     	.add_property("kmax", &CoulombKSpaceEwald::getKMax, &CoulombKSpaceEwald::setKMax)
       ;
 
       class_< CellListCoulombKSpaceEwald, bases< Interaction > >
-        ("interaction_CellListCoulombKSpaceEwald",	init< shared_ptr< storage::Storage >, shared_ptr< CoulombKSpaceEwald > >())
+        ("interaction_CellListCoulombKSpaceEwald",	init< std::shared_ptr< storage::Storage >, std::shared_ptr< CoulombKSpaceEwald > >())
         .def("getPotential", &CellListCoulombKSpaceEwald::getPotential)
 	  ;
 

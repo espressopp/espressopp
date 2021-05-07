@@ -36,7 +36,7 @@ namespace espressopp {
 
     class VelocityVerletOnRadius : public Extension {
       public:
-        VelocityVerletOnRadius(shared_ptr< System > _system, real _radialDampingMass);
+        VelocityVerletOnRadius(std::shared_ptr< System > _system, real _radialDampingMass);
         virtual ~VelocityVerletOnRadius() {};
 
         void setRadialDampingMass(real _radialDampingMass) {

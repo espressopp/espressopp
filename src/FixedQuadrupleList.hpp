@@ -39,14 +39,14 @@ namespace espressopp {
   class FixedQuadrupleList : public QuadrupleList {
   protected:
     boost::signals2::connection sigBeforeSend, sigAfterRecv, sigOnParticlesChanged;
-    shared_ptr< storage::Storage > storage;
+    std::shared_ptr< storage::Storage > storage;
     typedef boost::unordered_multimap< longint,
             Triple < longint, longint, longint > > GlobalQuadruples;
     GlobalQuadruples globalQuadruples;
     using QuadrupleList::add;
 
   public:
-    FixedQuadrupleList(shared_ptr< storage::Storage > _storage);
+    FixedQuadrupleList(std::shared_ptr< storage::Storage > _storage);
     ~FixedQuadrupleList();
 
     /** Add the given particle quadruple to the list on this processor if the

@@ -39,7 +39,7 @@ namespace espressopp {
 
       public:
 
-        VelocityVerlet(shared_ptr<class espressopp::System> system);
+        VelocityVerlet(std::shared_ptr<class espressopp::System> system);
 
         virtual ~VelocityVerlet();
 

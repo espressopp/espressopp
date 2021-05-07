@@ -34,7 +34,7 @@ namespace espressopp {
 	using namespace espressopp::iterator;
 	
 	
-	LangevinThermostatOnRadius::LangevinThermostatOnRadius(shared_ptr<System> system, real _dampingmass)
+	LangevinThermostatOnRadius::LangevinThermostatOnRadius(std::shared_ptr<System> system, real _dampingmass)
 	    :Extension(system) {
 	    
 	    type = Extension::Thermostat;
@@ -181,8 +181,8 @@ namespace espressopp {
 	    using namespace espressopp::python;
 	    
 	    
-	    class_<LangevinThermostatOnRadius, shared_ptr<LangevinThermostatOnRadius>, bases<Extension> >
-		("integrator_LangevinThermostatOnRadius", init<shared_ptr<System>, real >())
+	    class_<LangevinThermostatOnRadius, std::shared_ptr<LangevinThermostatOnRadius>, bases<Extension> >
+		("integrator_LangevinThermostatOnRadius", init<std::shared_ptr<System>, real >())
 		.def("connect", &LangevinThermostatOnRadius::connect)
 		.def("disconnect", &LangevinThermostatOnRadius::disconnect)
 		.def("addExclpid", &LangevinThermostatOnRadius::addExclpid)

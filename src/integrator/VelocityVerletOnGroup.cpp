@@ -40,8 +40,8 @@ namespace espressopp {
     using namespace iterator;
     using namespace esutil;
 
-    VelocityVerletOnGroup::VelocityVerletOnGroup(shared_ptr< System > system,
-            shared_ptr<class espressopp::ParticleGroup> group_) : MDIntegrator(system), group(group_)
+    VelocityVerletOnGroup::VelocityVerletOnGroup(std::shared_ptr< System > system,
+            std::shared_ptr<class espressopp::ParticleGroup> group_) : MDIntegrator(system), group(group_)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerletOnGroup");
 
@@ -58,7 +58,7 @@ namespace espressopp {
 
     /*****************************************************************************/
 
-    void VelocityVerletOnGroup::setLangevin(shared_ptr< LangevinThermostat > _langevin)
+    void VelocityVerletOnGroup::setLangevin(std::shared_ptr< LangevinThermostat > _langevin)
     {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;
@@ -398,7 +398,7 @@ namespace espressopp {
       // Note: use noncopyable and no_init for abstract classes
 
       class_<VelocityVerletOnGroup, bases<MDIntegrator>, boost::noncopyable >
-        ("integrator_VelocityVerletOnGroup", init< shared_ptr<System>,  shared_ptr<ParticleGroup> >())
+        ("integrator_VelocityVerletOnGroup", init< std::shared_ptr<System>,  std::shared_ptr<ParticleGroup> >())
 
         .add_property("langevin", &VelocityVerletOnGroup::getLangevin, &VelocityVerletOnGroup::setLangevin)
         ;

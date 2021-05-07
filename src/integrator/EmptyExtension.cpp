@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(EmptyExtension::theLogger, "EmptyExtension");
 
-    EmptyExtension::EmptyExtension(shared_ptr<System> system)
+    EmptyExtension::EmptyExtension(std::shared_ptr<System> system)
     : Extension(system)
     {
     }
@@ -61,9 +61,9 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<EmptyExtension, shared_ptr<EmptyExtension>, bases<Extension> >
+      class_<EmptyExtension, std::shared_ptr<EmptyExtension>, bases<Extension> >
 
-        ("integrator_EmptyExtension", init< shared_ptr< System > >())
+        ("integrator_EmptyExtension", init< std::shared_ptr< System > >())
         .def("connect", &EmptyExtension::connect)
         .def("disconnect", &EmptyExtension::disconnect)
         ;

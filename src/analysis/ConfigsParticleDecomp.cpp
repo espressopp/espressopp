@@ -58,7 +58,7 @@ namespace espressopp {
         stringstream msg;
         msg << "Error. Velocities::get <out-of-range>" << endl;
         err.setException( msg.str() );
-        return shared_ptr<Configuration>();
+        return std::shared_ptr<Configuration>();
       }
     }
 
@@ -89,7 +89,7 @@ namespace espressopp {
         }
       }
 
-      ConfigurationPtr config = make_shared<Configuration> ();
+      ConfigurationPtr config = std::make_shared<Configuration> ();
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
@@ -139,7 +139,7 @@ namespace espressopp {
 
       int localN = system.storage->getNRealParticles();
 
-      ConfigurationPtr config = make_shared<Configuration> ();
+      ConfigurationPtr config = std::make_shared<Configuration> ();
       map< size_t, Real3D > conf;
 
       if (myrank==0) {
@@ -193,7 +193,7 @@ namespace espressopp {
 
       class_<ConfigsParticleDecomp, boost::noncopyable >(
         "analysis_ConfigsParticleDecomp", no_init
-        //init< shared_ptr< System > >()
+        //init< std::shared_ptr< System > >()
       )
       .def_readonly("size", &ConfigsParticleDecomp::getListSize)
       

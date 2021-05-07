@@ -51,9 +51,9 @@ namespace espressopp {
 
     public:
       FixedTripleAngleListInteractionTemplate
-      (shared_ptr < System > _system,
-       shared_ptr < FixedTripleAngleList > _fixedtripleList,
-       shared_ptr < Potential > _potential)
+      (std::shared_ptr < System > _system,
+       std::shared_ptr < FixedTripleAngleList > _fixedtripleList,
+       std::shared_ptr < Potential > _potential)
         : SystemAccess(_system), fixedtripleList(_fixedtripleList), potential(_potential)
       {
         if(! potential){
@@ -64,17 +64,17 @@ namespace espressopp {
       virtual ~FixedTripleAngleListInteractionTemplate() {};
 
       void
-      setFixedTripleAngleList(shared_ptr < FixedTripleAngleList > _fixedtripleList) {
+      setFixedTripleAngleList(std::shared_ptr < FixedTripleAngleList > _fixedtripleList) {
         fixedtripleList = _fixedtripleList;
       }
 
-      shared_ptr < FixedTripleAngleList >
+      std::shared_ptr < FixedTripleAngleList >
       getFixedTripleList() {
         return fixedtripleList;
       }
 
       void
-      setPotential(shared_ptr < Potential> _potential) {
+      setPotential(std::shared_ptr < Potential> _potential) {
         if (_potential) {
           potential = _potential;
         }
@@ -83,7 +83,7 @@ namespace espressopp {
         }
       }
 
-      shared_ptr < Potential >
+      std::shared_ptr < Potential >
       getPotential() {
         return potential;
       }
@@ -105,8 +105,8 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr<FixedTripleAngleList> fixedtripleList;
-      shared_ptr < Potential > potential;
+      std::shared_ptr<FixedTripleAngleList> fixedtripleList;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

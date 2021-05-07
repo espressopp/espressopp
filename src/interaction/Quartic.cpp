@@ -44,8 +44,8 @@ namespace espressopp {
         FixedPairListQuartic;
       class_< FixedPairListQuartic, bases< Interaction > >
         ("interaction_FixedPairListQuartic",
-           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Quartic> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Quartic> >())
+           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<Quartic> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<Quartic> >())
         .def("setPotential", &FixedPairListQuartic::setPotential)
         .def("getPotential", &FixedPairListQuartic::getPotential)
         .def("setFixedPairList", &FixedPairListQuartic::setFixedPairList)

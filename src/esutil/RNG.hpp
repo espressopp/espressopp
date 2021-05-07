@@ -71,7 +71,7 @@ namespace espressopp {
       /** returns a random 3D vector that is uniformly distributed on a sphere. */
       Real3D uniformOnSphere();
 
-      shared_ptr< RNGType > getBoostRNG();
+      std::shared_ptr< RNGType > getBoostRNG();
 
       void saveState(long long);
 
@@ -94,7 +94,7 @@ namespace espressopp {
       variate_generator< RNGType&, uniform_on_sphere< real, Real3D > >
       UniformOnSphereVariate;
 
-      shared_ptr< RNGType > boostRNG;
+      std::shared_ptr< RNGType > boostRNG;
 
       NormalVariate normalVariate;
 

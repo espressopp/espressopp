@@ -48,7 +48,7 @@ namespace espressopp { namespace vectorization {
       ;
 
       class_< VerletListLennardJones, bases< Interaction > >
-        ("vectorization_interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
+        ("vectorization_interaction_VerletListLennardJones", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
         .def("getPotential", &VerletListLennardJones::getPotentialPtr)

@@ -45,7 +45,7 @@ namespace espressopp {
 	    
 	    class_< FixedLocalTupleListConstrainCOM, bases< Interaction > >
 		("interaction_FixedLocalTupleListConstrainCOM",
-		 init< shared_ptr<System>, shared_ptr<FixedLocalTupleList>, shared_ptr<ConstrainCOM> >())
+		 init< std::shared_ptr<System>, std::shared_ptr<FixedLocalTupleList>, std::shared_ptr<ConstrainCOM> >())
 		.def("getPotential", &FixedLocalTupleListConstrainCOM::getPotential)
 		.def("setCom", &FixedLocalTupleListConstrainCOM::setCom)
 		;

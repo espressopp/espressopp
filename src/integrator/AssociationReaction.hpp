@@ -69,7 +69,7 @@ namespace espressopp {
 
       public:
 
-      AssociationReaction(shared_ptr<System> system, shared_ptr<VerletList> _verletList, shared_ptr<FixedPairList> _fixedPairList, shared_ptr<DomainDecomposition> _domdec);
+      AssociationReaction(std::shared_ptr<System> system, std::shared_ptr<VerletList> _verletList, std::shared_ptr<FixedPairList> _fixedPairList, std::shared_ptr<DomainDecomposition> _domdec);
       ~AssociationReaction();
 
       void setRate(real rate);
@@ -121,14 +121,14 @@ namespace espressopp {
       int stateAMin; //!< minimum state of reactant A
       int interval; //!< number of steps between reaction loops
       real dt; //!< timestep from the integrator
-      shared_ptr<espressopp::interaction::Potential> potential;
+      std::shared_ptr<espressopp::interaction::Potential> potential;
 
       real current_cutoff;
       real current_cutoff_sqr;
-      shared_ptr<VerletList> verletList;
-      shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
-      shared_ptr<FixedPairList> fpl;
-      shared_ptr<DomainDecomposition> domdec;
+      std::shared_ptr<VerletList> verletList;
+      std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+      std::shared_ptr<FixedPairList> fpl;
+      std::shared_ptr<DomainDecomposition> domdec;
 
       /** container for (A,B) potential partners */
       boost::unordered_multimap<longint, longint> Alist;

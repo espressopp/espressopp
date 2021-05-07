@@ -48,7 +48,7 @@ namespace espressopp {
 
     public:
       // Constructor, allow for unlimited snapshots.
-      Viscosity(shared_ptr<System> system): Autocorrelation (system){
+      Viscosity(std::shared_ptr<System> system): Autocorrelation (system){
       }
       ~Viscosity(){
       }

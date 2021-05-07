@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(CapForce::theLogger, "CapForce");
 
-    CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce)
+    CapForce::CapForce(std::shared_ptr<System> system, const Real3D& _capForce)
     : Extension(system), capForce(_capForce)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
@@ -45,7 +45,7 @@ namespace espressopp {
       adress = false;
     }
 
-    CapForce::CapForce(shared_ptr<System> system, real _absCapForce)
+    CapForce::CapForce(std::shared_ptr<System> system, real _absCapForce)
     : Extension(system), absCapForce(_absCapForce)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
@@ -54,7 +54,7 @@ namespace espressopp {
       adress = false;
     }
 
-    CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce, shared_ptr< ParticleGroup > _particleGroup)
+    CapForce::CapForce(std::shared_ptr<System> system, const Real3D& _capForce, std::shared_ptr< ParticleGroup > _particleGroup)
     : Extension(system), capForce(_capForce), particleGroup(_particleGroup)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
@@ -63,7 +63,7 @@ namespace espressopp {
       adress = false;
     }
 
-    CapForce::CapForce(shared_ptr<System> system, real _absCapForce, shared_ptr< ParticleGroup > _particleGroup)
+    CapForce::CapForce(std::shared_ptr<System> system, real _absCapForce, std::shared_ptr< ParticleGroup > _particleGroup)
     : Extension(system), absCapForce(_absCapForce), particleGroup(_particleGroup)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
@@ -109,7 +109,7 @@ namespace espressopp {
         return adress;
     }
 
-    void CapForce::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
+    void CapForce::setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup) {
         particleGroup = _particleGroup;
         if (allParticles) {
      	  disconnect();
@@ -118,7 +118,7 @@ namespace espressopp {
         }
     }
 
-     shared_ptr< ParticleGroup > CapForce::getParticleGroup() {
+     std::shared_ptr< ParticleGroup > CapForce::getParticleGroup() {
     	//if (!allParticles) {
      	  return particleGroup;
     	//}
@@ -210,12 +210,12 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<CapForce, shared_ptr<CapForce>, bases<Extension> >
+      class_<CapForce, std::shared_ptr<CapForce>, bases<Extension> >
 
-        ("integrator_CapForce", init< shared_ptr< System >, const Real3D& >())
-        .def(init< shared_ptr< System >, real >())
-        .def(init< shared_ptr< System >, const Real3D&, shared_ptr< ParticleGroup > >())
-        .def(init< shared_ptr< System >, real, shared_ptr< ParticleGroup > >())
+        ("integrator_CapForce", init< std::shared_ptr< System >, const Real3D& >())
+        .def(init< std::shared_ptr< System >, real >())
+        .def(init< std::shared_ptr< System >, const Real3D&, std::shared_ptr< ParticleGroup > >())
+        .def(init< std::shared_ptr< System >, real, std::shared_ptr< ParticleGroup > >())
         .add_property("particleGroup", &CapForce::getParticleGroup, &CapForce::setParticleGroup)
         .add_property("adress", &CapForce::getAdress, &CapForce::setAdress)
         .def("getCapForce", &CapForce::getCapForce, return_value_policy< reference_existing_object >())

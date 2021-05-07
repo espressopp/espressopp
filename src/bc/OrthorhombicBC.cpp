@@ -31,7 +31,7 @@ namespace espressopp {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
-    OrthorhombicBC(shared_ptr< esutil::RNG > _rng,
+    OrthorhombicBC(std::shared_ptr< esutil::RNG > _rng,
 		   const Real3D& _boxL) 
       : BC(_rng)
     { setBoxL(_boxL); }
@@ -173,7 +173,7 @@ namespace espressopp {
     registerPython() {
       using namespace espressopp::python;
       class_<OrthorhombicBC, bases< BC >, boost::noncopyable >
-	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3D& >())
+	("bc_OrthorhombicBC", init< std::shared_ptr< esutil::RNG >, Real3D& >())
 	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)
       ;
     }

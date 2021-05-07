@@ -65,7 +65,7 @@ namespace espressopp {
        * Constructor, allow for unlimited snapshots. It defines how many particles
        * correspond to different cpu.
        */
-      ConfigsParticleDecomp(shared_ptr<System> system): SystemAccess (system){
+      ConfigsParticleDecomp(std::shared_ptr<System> system): SystemAccess (system){
         // by default key = "position", it will store the particle positions
         // (option: "velocity" or "unfolded")
         esutil::Error err(system->comm);
@@ -147,7 +147,7 @@ namespace espressopp {
         * !! works for particles numbered like 0+start_pid, 1+start_pid, 2+start_pid,... !!
         * !! with each chain consisting of particles with subsequent ids     !!
        */
-      ConfigsParticleDecomp(shared_ptr<System> system, int _chainlength, int _start_pid): SystemAccess (system){
+      ConfigsParticleDecomp(std::shared_ptr<System> system, int _chainlength, int _start_pid): SystemAccess (system){
         // by default key = "position", it will store the particle positions
         // (option: "velocity" or "unfolded")
         esutil::Error err(system->comm);

@@ -48,12 +48,12 @@ namespace espressopp {
       protected:
 		boost::signals2::connection con1, con2, con3;
 		typedef multimap <longint,pair<pair<longint, longint>, real> > TriplesAngles;
-		shared_ptr <storage::Storage> storage;
+		std::shared_ptr <storage::Storage> storage;
 		TriplesAngles triplesAngles;
 		using TripleList::add;
 
 	  public:
-		FixedTripleAngleList( shared_ptr<storage::Storage> _storage );
+		FixedTripleAngleList( std::shared_ptr<storage::Storage> _storage );
 		virtual ~FixedTripleAngleList();
 		/** Add the given particle triple to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

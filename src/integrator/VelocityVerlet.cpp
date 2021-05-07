@@ -48,7 +48,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
-    VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
+    VelocityVerlet::VelocityVerlet(std::shared_ptr< System > system) : MDIntegrator(system)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
       resortFlag = true;
@@ -423,7 +423,7 @@ namespace espressopp {
 
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
-        ("integrator_VelocityVerlet", init< shared_ptr<System> >())
+        ("integrator_VelocityVerlet", init< std::shared_ptr<System> >())
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
         .def("getNumResorts", &VelocityVerlet::getNumResorts)

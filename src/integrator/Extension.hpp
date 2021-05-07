@@ -40,7 +40,7 @@ namespace espressopp {
 
       public:
 
-        Extension(shared_ptr<System> system);
+        Extension(std::shared_ptr<System> system);
 
         virtual ~Extension();
 
@@ -69,9 +69,9 @@ namespace espressopp {
 
       protected:
 
-        shared_ptr<MDIntegrator> integrator; // this is needed for signal connection
+        std::shared_ptr<MDIntegrator> integrator; // this is needed for signal connection
 
-        void setIntegrator(shared_ptr<MDIntegrator> _integrator);
+        void setIntegrator(std::shared_ptr<MDIntegrator> _integrator);
 
 
         // pure virtual functions

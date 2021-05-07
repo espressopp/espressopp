@@ -27,7 +27,7 @@ fluxes should be :math:`0`, i.e. :math:`j_{LB} + j_{MD} = 0`.
 
 .. py:class:: espressopp.analysis.LBOutputScreen(system,lb)
 
-        :param shared_ptr system: system object defined earlier in the python-script
+        :param std::shared_ptr system: system object defined earlier in the python-script
         :param lb_object lb: lattice boltzmann object defined earlier in the python-script
 
 Example:

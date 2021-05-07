@@ -49,8 +49,8 @@ namespace espressopp {
 
     // TODO The ensemble is very sensitive to parameters. The manual how to choose the
     // parameters for simple system should be written.
-    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system,
-                                       shared_ptr<esutil::RNG> _rng,
+    LangevinBarostat::LangevinBarostat(std::shared_ptr<System> _system,
+                                       std::shared_ptr<esutil::RNG> _rng,
                                        real _temperature) : Extension(_system), 
                                                             rng(_rng), 
                                                             desiredTemperature(_temperature){
@@ -288,9 +288,9 @@ namespace espressopp {
     void LangevinBarostat::registerPython() {
       using namespace espressopp::python;
 
-      class_<LangevinBarostat, shared_ptr<LangevinBarostat>, bases<Extension> >
+      class_<LangevinBarostat, std::shared_ptr<LangevinBarostat>, bases<Extension> >
 
-        ("integrator_LangevinBarostat", init< shared_ptr<System>, shared_ptr<esutil::RNG>, real >() )
+        ("integrator_LangevinBarostat", init< std::shared_ptr<System>, std::shared_ptr<esutil::RNG>, real >() )
 
         .add_property("gammaP", &LangevinBarostat::getGammaP, &LangevinBarostat::setGammaP)
         .add_property("pressure", &LangevinBarostat::getPressure, &LangevinBarostat::setPressure)

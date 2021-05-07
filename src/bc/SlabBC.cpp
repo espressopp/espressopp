@@ -33,7 +33,7 @@ namespace espressopp {
   namespace bc {
     /* Constructor */
     SlabBC::
-    SlabBC(shared_ptr< esutil::RNG > _rng, const Real3D& _boxL) : BC(_rng) {
+    SlabBC(std::shared_ptr< esutil::RNG > _rng, const Real3D& _boxL) : BC(_rng) {
       setBoxL(_boxL);
       slabDir=0;
     }
@@ -173,7 +173,7 @@ namespace espressopp {
     registerPython() {
       using namespace espressopp::python;
       class_<SlabBC, bases< BC >, boost::noncopyable >
-	("bc_SlabBC", init< shared_ptr< esutil::RNG >, Real3D& >())
+	("bc_SlabBC", init< std::shared_ptr< esutil::RNG >, Real3D& >())
 	.add_property("boxL", &SlabBC::getBoxL, &SlabBC::setBoxL)
       ;
     }

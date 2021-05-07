@@ -32,7 +32,7 @@ namespace espressopp {
   namespace esutil {
 
     /********************************************************************/
-    Error::Error(shared_ptr< mpi::communicator > _comm)
+    Error::Error(std::shared_ptr< mpi::communicator > _comm)
     {
       comm = _comm;
       noExceptions = 0;

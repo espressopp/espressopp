@@ -41,7 +41,7 @@ Examples:
                 :param span: radius of the subregion to be considered
                 :param geometry: geometry of the subregion. Can only be in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']
                 :param center: center of the subregion
-                :type system: shared_ptr<System>
+                :type system: std::shared_ptr<System>
                 :type parttype: int
                 :type span: real
                 :type geometry: str in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']

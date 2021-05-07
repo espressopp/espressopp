@@ -36,7 +36,7 @@ namespace espressopp {
     using namespace espressopp::iterator;
 
 
-    LangevinThermostatHybrid::LangevinThermostatHybrid(shared_ptr<System> system,shared_ptr<FixedTupleListAdress> _fixedtupleList)
+    LangevinThermostatHybrid::LangevinThermostatHybrid(std::shared_ptr<System> system,std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
     :Extension(system),fixedtupleList(_fixedtupleList) {
 
       type = Extension::Thermostat;
@@ -249,8 +249,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
 
-      class_<LangevinThermostatHybrid, shared_ptr<LangevinThermostatHybrid>, bases<Extension> >
-        ("integrator_LangevinThermostatHybrid", init<shared_ptr<System>,shared_ptr<FixedTupleListAdress> >())
+      class_<LangevinThermostatHybrid, std::shared_ptr<LangevinThermostatHybrid>, bases<Extension> >
+        ("integrator_LangevinThermostatHybrid", init<std::shared_ptr<System>,std::shared_ptr<FixedTupleListAdress> >())
         .def("connect", &LangevinThermostatHybrid::connect)
         .def("disconnect", &LangevinThermostatHybrid::disconnect)
         .add_property("gamma", &LangevinThermostatHybrid::getGamma, &LangevinThermostatHybrid::setGamma)

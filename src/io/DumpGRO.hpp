@@ -47,8 +47,8 @@ namespace espressopp {
 
     public:
 
-      DumpGRO(shared_ptr<System> system, 
-              shared_ptr<integrator::MDIntegrator> _integrator,
+      DumpGRO(std::shared_ptr<System> system,
+              std::shared_ptr<integrator::MDIntegrator> _integrator,
               std::string _file_name,
               bool _unfolded,
               real _length_factor,
@@ -137,7 +137,7 @@ namespace espressopp {
     private:
       
       // integrator we need to know an integration step
-      shared_ptr<integrator::MDIntegrator> integrator;
+      std::shared_ptr<integrator::MDIntegrator> integrator;
       
       std::string file_name;
 

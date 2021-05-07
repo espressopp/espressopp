@@ -37,7 +37,7 @@ Example:
         Constructs the VelocityVerletRESPA object.
 
         :param system: system object
-        :type system: shared_ptr<System>
+        :type system: std::shared_ptr<System>
 
 .. function:: espressopp.integrator.VelocityVerletRESPA.setmultistep(multistep)
 

@@ -40,7 +40,7 @@ namespace espressopp {
 
     public:
 
-      CMVelocity(shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
+      CMVelocity(std::shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
 
       ~CMVelocity() {}
 

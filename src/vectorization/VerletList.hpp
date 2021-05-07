@@ -81,7 +81,7 @@ namespace espressopp { namespace vectorization {
 
     */
 
-    VerletList(shared_ptr<System>, shared_ptr<Vectorization>, real cut, bool rebuildVL);
+    VerletList(std::shared_ptr<System>, std::shared_ptr<Vectorization>, real cut, bool rebuildVL);
 
     ~VerletList();
 
@@ -129,7 +129,7 @@ namespace espressopp { namespace vectorization {
     static void registerPython();
 
   protected:
-    shared_ptr<Vectorization> vec;
+    std::shared_ptr<Vectorization> vec;
 
     int num_pairs = 0;
     void checkPair(Particle &pt1, Particle &pt2);

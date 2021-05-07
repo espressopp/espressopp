@@ -46,7 +46,7 @@ namespace espressopp {
         ;
 
       class_< SingleParticleHarmonicTrap, bases< Interaction > >
-        ("interaction_SingleParticleHarmonicTrap", init< shared_ptr<System>, shared_ptr<HarmonicTrap> >())
+        ("interaction_SingleParticleHarmonicTrap", init< std::shared_ptr<System>, std::shared_ptr<HarmonicTrap> >())
         .def("setPotential", &SingleParticleHarmonicTrap::setPotential)
         .def("getPotential", &SingleParticleHarmonicTrap::getPotential)
       ;

@@ -31,7 +31,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FixedListComm::theLogger, "FixedListComm");
 
-    FixedListComm::FixedListComm(shared_ptr <storage::Storage> _storage)
+    FixedListComm::FixedListComm(std::shared_ptr <storage::Storage> _storage)
         : storage(_storage), globalLists(){
 
         //std::cout << "fixedlist" << std::endl;

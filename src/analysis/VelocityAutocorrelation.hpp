@@ -36,7 +36,7 @@ namespace espressopp {
 
     public:
       
-      VelocityAutocorrelation(shared_ptr<System> system): ConfigsParticleDecomp (system){
+      VelocityAutocorrelation(std::shared_ptr<System> system): ConfigsParticleDecomp (system){
         // by default calculation progress is printed
         setPrint_progress(true);
         

@@ -46,8 +46,8 @@ namespace espressopp {
 
       public:
 
-        DPDThermostat(shared_ptr<System> system,
-						shared_ptr<VerletList> _verletList);
+        DPDThermostat(std::shared_ptr<System> system,
+						std::shared_ptr<VerletList> _verletList);
         ~DPDThermostat();
 
         void setGamma(real gamma);
@@ -98,8 +98,8 @@ namespace espressopp {
 
 		real current_cutoff;
 		real current_cutoff_sqr;
-        shared_ptr<VerletList> verletList;
-        shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+        std::shared_ptr<VerletList> verletList;
+        std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
     };
   }

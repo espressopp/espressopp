@@ -37,7 +37,7 @@ namespace espressopp {
     using namespace iterator;
     using namespace esutil;
 
-    PIAdressIntegrator::PIAdressIntegrator(shared_ptr< System > system, shared_ptr<VerletListAdress> _verletList)
+    PIAdressIntegrator::PIAdressIntegrator(std::shared_ptr< System > system, std::shared_ptr<VerletListAdress> _verletList)
       : MDIntegrator(system), verletList(_verletList)
     {
       // Initialize variables
@@ -185,7 +185,7 @@ namespace espressopp {
     void PIAdressIntegrator::initializeSetup() {
       System& system = getSystemRef();
       CellList localCells = system.storage->getLocalCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -279,7 +279,7 @@ namespace espressopp {
 
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -319,7 +319,7 @@ namespace espressopp {
 
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
         Particle &vp = *cit;
@@ -476,7 +476,7 @@ namespace espressopp {
     void PIAdressIntegrator::integrateModePos() {
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells(); //!!!!
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
 
@@ -695,7 +695,7 @@ namespace espressopp {
 
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
@@ -769,7 +769,7 @@ namespace espressopp {
       real maxSqDist = 0.0;
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -823,7 +823,7 @@ namespace espressopp {
     void PIAdressIntegrator::transPos2() { // Update the mode positions from real positions
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -868,7 +868,7 @@ namespace espressopp {
 
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -940,7 +940,7 @@ namespace espressopp {
     void PIAdressIntegrator::transMom2() { // Update the mode momenta from real velocities
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -1005,7 +1005,7 @@ namespace espressopp {
     void PIAdressIntegrator::transForces() { // Update the mode forces from real forces
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -1072,7 +1072,7 @@ namespace espressopp {
     void PIAdressIntegrator::calcForcesF() { // Calculate fast forces, this is, the intra-ring forces between the path integral beads (purely in mode space)
       System& system = getSystemRef();
       CellList localCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -1279,7 +1279,7 @@ namespace espressopp {
     void PIAdressIntegrator::distributeForces() { // distribute forces from atomistic particles (path integral beads) to CG particles (physical atoms)
       System& system = getSystemRef();
       CellList localCells = system.storage->getLocalCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         FixedTupleListAdress::iterator it3;
@@ -1355,7 +1355,7 @@ namespace espressopp {
       real esum = 0.0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         FixedTupleListAdress::iterator it3;
@@ -1412,7 +1412,7 @@ namespace espressopp {
       real esum = 0.0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         FixedTupleListAdress::iterator it3;
@@ -1451,7 +1451,7 @@ namespace espressopp {
       real esum = 0.0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         FixedTupleListAdress::iterator it3;
@@ -1498,7 +1498,7 @@ namespace espressopp {
       real esum = 0.0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         if(vp.type() == parttype) {
@@ -1543,7 +1543,7 @@ namespace espressopp {
       real esum = 0.0;
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
         if(vp.type() == parttype) {
@@ -1582,7 +1582,7 @@ namespace espressopp {
     void PIAdressIntegrator::setWeights() {
       System& system = getSystemRef();
       CellList localCells = system.storage->getLocalCells();
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
@@ -1740,7 +1740,7 @@ namespace espressopp {
     }
 
 
-    void PIAdressIntegrator::setVerletList(shared_ptr<VerletListAdress> _verletList) {
+    void PIAdressIntegrator::setVerletList(std::shared_ptr<VerletListAdress> _verletList) {
       if (!_verletList) {
         throw std::invalid_argument("No Verletlist given in PIAdressIntegrator::setVerletList.");
       }
@@ -1774,7 +1774,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<PIAdressIntegrator, bases<MDIntegrator>, boost::noncopyable >
-      ("integrator_PIAdressIntegrator", init< shared_ptr<System>, shared_ptr<VerletListAdress> >())
+      ("integrator_PIAdressIntegrator", init< std::shared_ptr<System>, std::shared_ptr<VerletListAdress> >())
       .def("setTimeStep", &PIAdressIntegrator::setTimeStep)
       .def("getTimeStep", &PIAdressIntegrator::getTimeStep)
       .def("setmStep", &PIAdressIntegrator::setmStep)

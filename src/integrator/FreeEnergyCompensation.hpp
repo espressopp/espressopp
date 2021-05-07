@@ -47,7 +47,7 @@ namespace espressopp {
         bool sphereAdr;
         int ntrotter;
         bool slow;
-        FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr = false, int _ntrotter = 1, bool _slow = false);
+        FreeEnergyCompensation(std::shared_ptr<System> system, bool _sphereAdr = false, int _ntrotter = 1, bool _slow = false);
         virtual ~FreeEnergyCompensation();
 
         /** Setter for the filename, will read in the table. */
@@ -71,7 +71,7 @@ namespace espressopp {
 
         Real3D center;
         std::string filename;
-        typedef shared_ptr <interaction::Interpolation> Table;
+        typedef std::shared_ptr <interaction::Interpolation> Table;
         std::unordered_map<int, Table> forces; // map type to force
 
         static LOG4ESPP_DECL_LOGGER(theLogger);

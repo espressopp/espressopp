@@ -28,7 +28,6 @@
 #include "mpi.hpp"
 #include "Particle.hpp"
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
 /** Initial buffer size for incoming and outgoing messages 

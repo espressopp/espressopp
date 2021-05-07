@@ -50,7 +50,7 @@ void DumpXTCAdress::close() {
 }
 
 void DumpXTCAdress::dump() {
-  shared_ptr<System> system = getSystem();
+  std::shared_ptr<System> system = getSystem();
   analysis::ConfigurationsExtAdress conf(system, ftpl);
   conf.setUnfolded(unfolded);
   conf.gather();
@@ -120,9 +120,9 @@ void DumpXTCAdress::registerPython() {
   using namespace espressopp::python;  // NOLINT
 
   class_<DumpXTCAdress, bases<ParticleAccess>, boost::noncopyable>
-  ("io_DumpXTCAdress", init<shared_ptr<System>,
-                       shared_ptr<FixedTupleListAdress>,
-                       shared_ptr<integrator::MDIntegrator>,
+  ("io_DumpXTCAdress", init<std::shared_ptr<System>,
+                       std::shared_ptr<FixedTupleListAdress>,
+                       std::shared_ptr<integrator::MDIntegrator>,
                        std::string,
                        bool,
                        real,

@@ -39,7 +39,7 @@ namespace espressopp {
   class FixedTripleList : public TripleList {
       protected:
 		boost::signals2::connection sigAfterRecv, sigOnParticleChanged, sigBeforeSend;
-		shared_ptr<storage::Storage> storage;
+		std::shared_ptr<storage::Storage> storage;
 		typedef boost::unordered_multimap <longint,std::pair <longint, longint> > GlobalTriples;
 		GlobalTriples globalTriples;
 		using TripleList::add;
@@ -47,7 +47,7 @@ namespace espressopp {
       //FixedListComm<FixedTripleList, 3> _comm;
 
 	  public:
-		FixedTripleList(shared_ptr<storage::Storage> _storage);
+		FixedTripleList(std::shared_ptr<storage::Storage> _storage);
 		virtual ~FixedTripleList();
 		//bool add(pvec pids) { _comm.add(pids); }
 		/** Add the given particle triple to the list on this processor if the

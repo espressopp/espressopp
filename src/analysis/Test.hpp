@@ -34,7 +34,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      Test(shared_ptr< System > system) : AnalysisBaseTemplate< int >(system) {};
+      Test(std::shared_ptr< System > system) : AnalysisBaseTemplate< int >(system) {};
       virtual ~Test() {};
 
       int computeRaw() {

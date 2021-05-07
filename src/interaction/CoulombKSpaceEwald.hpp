@@ -74,7 +74,7 @@ namespace espressopp {
       real alpha; // Ewald parameter
       int kmax; // cutoff in k space
       
-      shared_ptr< System > system; // we need the system object to be able to access the box
+      std::shared_ptr< System > system; // we need the system object to be able to access the box
                                    // dimensions, communicator, number of particles, signals
       
       real Lx, Ly, Lz; // local variable for system size
@@ -113,7 +113,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      CoulombKSpaceEwald(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax);
+      CoulombKSpaceEwald(std::shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax);
       
       ~CoulombKSpaceEwald();
       

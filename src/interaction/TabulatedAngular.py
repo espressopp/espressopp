@@ -100,7 +100,7 @@ espressopp.interaction.TabulatedAngular
         Gets the potential.
 
         :return: the potential
-        :rtype: shared_ptr < Potential >
+        :rtype: std::shared_ptr < Potential >
 
 .. function:: espressopp.interaction.FixedTripleListPIadressTabulatedAngular.setFixedTripleList(ftl)
 
@@ -114,7 +114,7 @@ espressopp.interaction.TabulatedAngular
         Gets the FixedTripleList.
 
         :return: the FixedTripleList
-        :rtype: shared_ptr < FixedTripleList >
+        :rtype: std::shared_ptr < FixedTripleList >
 
 .. function:: espressopp.interaction.FixedTripleListPIadressTabulatedAngular.setFixedTupleList(fixedtupleList)
 
@@ -128,7 +128,7 @@ espressopp.interaction.TabulatedAngular
         Gets the FixedTupleList.
 
         :return: the FixedTupleList
-        :rtype: shared_ptr < FixedTupleListAdress >
+        :rtype: std::shared_ptr < FixedTupleListAdress >
 
 .. function:: espressopp.interaction.FixedTripleListPIadressTabulatedAngular.setNTrotter(ntrotter)
 

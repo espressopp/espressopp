@@ -43,9 +43,9 @@ namespace espressopp {
       FixedQuadrupleListDihedralHarmonicCos;
       class_ <FixedQuadrupleListDihedralHarmonicCos, bases <Interaction> >
         ("interaction_FixedQuadrupleListDihedralHarmonicCos",
-                  init< shared_ptr<System>,
-                        shared_ptr<FixedQuadrupleList>,
-                        shared_ptr<DihedralHarmonicCos> >())
+                  init< std::shared_ptr<System>,
+                        std::shared_ptr<FixedQuadrupleList>,
+                        std::shared_ptr<DihedralHarmonicCos> >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonicCos::setPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonicCos::getFixedQuadrupleList)
         ;

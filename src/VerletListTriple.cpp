@@ -37,7 +37,7 @@ namespace espressopp {
 /*-------------------------------------------------------------*/
 
   // cut is a cutoff (without skin)
-  VerletListTriple::VerletListTriple(shared_ptr<System> system, real _cut, bool rebuildVL):SystemAccess(system){
+  VerletListTriple::VerletListTriple(std::shared_ptr<System> system, real _cut, bool rebuildVL):SystemAccess(system){
     LOG4ESPP_INFO(theLogger, "construct VerletListTriple, cut = " << _cut);
   
     if (!system->storage) {
@@ -176,8 +176,8 @@ namespace espressopp {
 
     bool (VerletListTriple::*pyExclude)(longint pid) = &VerletListTriple::exclude;
 
-    class_<VerletListTriple, shared_ptr<VerletListTriple> >
-      ("VerletListTriple", init< shared_ptr<System>, real, bool >())
+    class_<VerletListTriple, std::shared_ptr<VerletListTriple> >
+      ("VerletListTriple", init< std::shared_ptr<System>, real, bool >())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletListTriple::getBuilds, &VerletListTriple::setBuilds)
       .def("totalSize", &VerletListTriple::totalSize)

@@ -37,7 +37,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(Settle::theLogger, "Settle");
 
-    Settle::Settle(shared_ptr<System> _system, shared_ptr<FixedTupleListAdress> _fixedTupleList,
+    Settle::Settle(std::shared_ptr<System> _system, std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
       real _mO, real _mH, real _distHH, real _distOH)
     : Extension(_system), fixedTupleList(_fixedTupleList),
       mO(_mO), mH(_mH), distHH(_distHH), distOH(_distOH){
@@ -385,8 +385,8 @@ namespace espressopp {
 
       void (Settle::*pyAdd)(longint pid) = &Settle::add;
 
-      class_<Settle, shared_ptr<Settle>, bases<Extension> >
-        ("integrator_Settle", init<shared_ptr<System>, shared_ptr<FixedTupleListAdress>, real, real, real, real>())
+      class_<Settle, std::shared_ptr<Settle>, bases<Extension> >
+        ("integrator_Settle", init<std::shared_ptr<System>, std::shared_ptr<FixedTupleListAdress>, real, real, real, real>())
         .def("add", pyAdd)
         ;
     }

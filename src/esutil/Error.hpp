@@ -81,7 +81,7 @@ namespace espressopp {
           this constrcutor.
       */
 
-      Error(boost::shared_ptr< boost::mpi::communicator > comm);
+      Error(std::shared_ptr< boost::mpi::communicator > comm);
 
       /** Destructor; will also test for pending exceptions. */
 
@@ -119,7 +119,7 @@ namespace espressopp {
 
     private:    
 
-      boost::shared_ptr< boost::mpi::communicator > comm;
+      std::shared_ptr< boost::mpi::communicator > comm;
 
       std::string exceptionMessage;
 

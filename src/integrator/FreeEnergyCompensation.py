@@ -42,7 +42,7 @@ Example:
         :param sphereAdr: (default: False) Spherical AdResS region (True) vs. slab geometry with resolution change in x-direction (False)
         :param ntrotter: (default: 1) Trotter number when used in Path Integral AdResS. Default leads to normal non-PI-AdResS behaviour.
         :param slow: (default: False) When used with RESPA Velocity Verlet, this flag decides whether the Free Energy Compensation is applied together with the slow, less frequently updated forces (slow=True) or with the fast, more frequently updated (slow=False) forces.
-        :type system: shared_ptr<System>
+        :type system: std::shared_ptr<System>
         :type center: list of reals
         :type sphereAdr: bool
         :type ntrotter: int

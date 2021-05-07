@@ -24,8 +24,8 @@
 #define _MPI_HPP
 
 #include <boost/mpi.hpp>
-#include <boost/smart_ptr.hpp>
+#include <memory>
 
-extern boost::shared_ptr< boost::mpi::communicator > mpiWorld;
+extern std::shared_ptr< boost::mpi::communicator > mpiWorld;
 
 #endif

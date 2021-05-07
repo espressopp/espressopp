@@ -43,7 +43,7 @@ namespace espressopp {
     class BerendsenBarostat: public Extension {
 
       public:
-        BerendsenBarostat(shared_ptr< System > system);
+        BerendsenBarostat(std::shared_ptr< System > system);
         
         void setFixed(Int3D);
         Int3D getFixed();

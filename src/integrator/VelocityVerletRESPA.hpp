@@ -34,7 +34,7 @@ namespace espressopp {
 
       public:
 
-        VelocityVerletRESPA(shared_ptr<class espressopp::System> system);
+        VelocityVerletRESPA(std::shared_ptr<class espressopp::System> system);
 
         virtual ~VelocityVerletRESPA();
 

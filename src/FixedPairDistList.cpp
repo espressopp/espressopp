@@ -33,7 +33,7 @@ namespace espressopp {
   LOG4ESPP_LOGGER(FixedPairDistList::theLogger, "FixedPairDistList");
 
 
-  FixedPairDistList::FixedPairDistList(shared_ptr< storage::Storage > _storage) 
+  FixedPairDistList::FixedPairDistList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), pairsDist()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedPairDistList");
@@ -268,8 +268,8 @@ namespace espressopp {
       = &FixedPairDistList::add;
     //bool (FixedPairDistList::*pyAdd)(pvec pids) = &FixedPairDistList::add;
 
-    class_<FixedPairDistList, shared_ptr<FixedPairDistList> >
-      ("FixedPairDistList", init <shared_ptr<storage::Storage> >())
+    class_<FixedPairDistList, std::shared_ptr<FixedPairDistList> >
+      ("FixedPairDistList", init <std::shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedPairDistList::size)
       .def("getPairs",  &FixedPairDistList::getPairs)

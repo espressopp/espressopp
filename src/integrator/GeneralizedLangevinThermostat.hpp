@@ -47,7 +47,7 @@ namespace espressopp {
 
       public:
 
-        GeneralizedLangevinThermostat(shared_ptr<System> system);
+        GeneralizedLangevinThermostat(std::shared_ptr<System> system);
         virtual ~GeneralizedLangevinThermostat();
 
                 /** Setter for the filename, will read in the table. */
@@ -96,7 +96,7 @@ namespace espressopp {
         void disconnect();
 
         std::string filename;
-        typedef shared_ptr <interaction::Interpolation> Table;
+        typedef std::shared_ptr <interaction::Interpolation> Table;
         std::map<int, Table> coeffs; // map type to force
 
         //static LOG4ESPP_DECL_LOGGER(theLogger);
@@ -108,7 +108,7 @@ namespace espressopp {
 
         //real pref2buffer; //!< temporary to save value between heatUp/coolDown
 
-        //shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+        //std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
     };
   }

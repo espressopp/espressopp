@@ -45,7 +45,7 @@ namespace espressopp {
   const int DD_COMM_TAG = 0xab;
 
   DomainDecompositionNonBlocking::
-  DomainDecompositionNonBlocking(shared_ptr< System > _system,
+  DomainDecompositionNonBlocking(std::shared_ptr< System > _system,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
     : DomainDecomposition(_system, _nodeGrid, _cellGrid, 1 /*in DD nonblocking we do not allow halfcell at the moment*/),
@@ -411,7 +411,7 @@ namespace espressopp {
   void DomainDecompositionNonBlocking::registerPython() {
     using namespace espressopp::python;
     class_< DomainDecompositionNonBlocking, bases< DomainDecomposition >, boost::noncopyable >
-    ("storage_DomainDecompositionNonBlocking", init< shared_ptr< System >, const Int3D&, const Int3D& >())
+    ("storage_DomainDecompositionNonBlocking", init< std::shared_ptr< System >, const Int3D&, const Int3D& >())
     ;
   }
 

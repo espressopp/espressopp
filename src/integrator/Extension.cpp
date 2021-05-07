@@ -30,7 +30,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    Extension::Extension(shared_ptr<System> system)
+    Extension::Extension(std::shared_ptr<System> system)
       :SystemAccess(system){
 
         if (!system->storage) {
@@ -46,7 +46,7 @@ namespace espressopp {
     }
 
 
-    void Extension::setIntegrator(shared_ptr<MDIntegrator> _integrator) {
+    void Extension::setIntegrator(std::shared_ptr<MDIntegrator> _integrator) {
             integrator = _integrator;
     }
 

@@ -39,8 +39,8 @@ namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTripleListAdress::theLogger, "FixedTripleListAdress");
 
-FixedTripleListAdress::FixedTripleListAdress(shared_ptr< storage::Storage > _storage,
-    shared_ptr<FixedTupleListAdress> _fixedtupleList)
+FixedTripleListAdress::FixedTripleListAdress(std::shared_ptr< storage::Storage > _storage,
+    std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
     : FixedTripleList(_storage), fixedtupleList(_fixedtupleList) {
   LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
 
@@ -249,10 +249,10 @@ FixedTripleListAdress::~FixedTripleListAdress() {
     bool (FixedTripleListAdress::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleListAdress::add;
 
-    class_<FixedTripleListAdress, shared_ptr<FixedTripleListAdress> >
+    class_<FixedTripleListAdress, std::shared_ptr<FixedTripleListAdress> >
       ("FixedTripleListAdress",
-              init <shared_ptr<storage::Storage>,
-                     shared_ptr<FixedTupleListAdress> >())
+              init <std::shared_ptr<storage::Storage>,
+                     std::shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
       .def("remove",  &FixedTripleList::remove)
       ;

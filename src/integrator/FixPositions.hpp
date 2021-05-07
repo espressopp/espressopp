@@ -41,11 +41,11 @@ namespace espressopp {
 
       public:
 
-        FixPositions(shared_ptr< System > _system, shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask);
+        FixPositions(std::shared_ptr< System > _system, std::shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask);
 
-        void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
+        void setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup);
 
-        shared_ptr< ParticleGroup > getParticleGroup();
+        std::shared_ptr< ParticleGroup > getParticleGroup();
 
         void setFixMask(Int3D& _fixMask);
 
@@ -61,7 +61,7 @@ namespace espressopp {
 
       private:
         boost::signals2::connection _befIntP, _aftIntP;
-        shared_ptr< ParticleGroup > particleGroup;
+        std::shared_ptr< ParticleGroup > particleGroup;
         Int3D fixMask;
         std::list< std::pair<Particle *, Real3D> > savePos;
         void connect();

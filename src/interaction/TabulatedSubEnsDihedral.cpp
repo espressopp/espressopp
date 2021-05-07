@@ -40,17 +40,17 @@ namespace espressopp {
               filenames[i] = boost::python::extract<std::string>(_filenames[i]);
               colVarRef[i].setDimension(8);
               if (itype == 1) { // create a new InterpolationLinear
-                  tables[i] = make_shared <InterpolationLinear> ();
+                  tables[i] = std::make_shared <InterpolationLinear> ();
                   tables[i]->read(world, filenames[i].c_str());
               }
 
               else if (itype == 2) { // create a new InterpolationAkima
-                  tables[i] = make_shared <InterpolationAkima> ();
+                  tables[i] = std::make_shared <InterpolationAkima> ();
                   tables[i]->read(world, filenames[i].c_str());
               }
 
               else if (itype == 3) { // create a new InterpolationCubic
-                  tables[i] = make_shared <InterpolationCubic> ();
+                  tables[i] = std::make_shared <InterpolationCubic> ();
                   tables[i]->read(world, filenames[i].c_str());
               }
             }
@@ -71,15 +71,15 @@ namespace espressopp {
             weightSum.push_back(0.);
             targetProb.push_back(0.);
             if (itype == 1) { // create a new InterpolationLinear
-                  tables.push_back(make_shared <InterpolationLinear> ());
+                  tables.push_back(std::make_shared <InterpolationLinear> ());
                   tables[i]->read(world, filenames[i].c_str());
               }
               else if (itype == 2) { // create a new InterpolationAkima
-                  tables.push_back(make_shared <InterpolationAkima> ());
+                  tables.push_back(std::make_shared <InterpolationAkima> ());
                   tables[i]->read(world, filenames[i].c_str());
               }
               else if (itype == 3) { // create a new InterpolationCubic
-                  tables.push_back(make_shared <InterpolationCubic> ());
+                  tables.push_back(std::make_shared <InterpolationCubic> ());
                   tables[i]->read(world, filenames[i].c_str());
               }
         }
@@ -262,15 +262,15 @@ namespace espressopp {
 
             class_ <FixedQuadrupleListTabulatedSubEnsDihedral, bases <Interaction> >
                 ("interaction_FixedQuadrupleListTabulatedSubEnsDihedral",
-                        init <shared_ptr<System>,
-                              shared_ptr<FixedQuadrupleList>,
-                              shared_ptr<TabulatedSubEnsDihedral> >())
+                        init <std::shared_ptr<System>,
+                              std::shared_ptr<FixedQuadrupleList>,
+                              std::shared_ptr<TabulatedSubEnsDihedral> >())
                 .def("setPotential", &FixedQuadrupleListTabulatedSubEnsDihedral::setPotential)
                 .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedSubEnsDihedral::getFixedQuadrupleList);
 
             class_< FixedQuadrupleListTypesTabulatedSubEnsDihedral, bases< Interaction > >
                 ("interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral",
-                 init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+                 init< std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
                 .def("setPotential", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::setPotential)
                 .def("getPotential", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::getPotentialPtr)
                 .def("setFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedSubEnsDihedral::setFixedQuadrupleList)

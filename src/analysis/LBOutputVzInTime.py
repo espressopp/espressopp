@@ -26,7 +26,7 @@ an index :math:`(0.25*N_i, 0, 0)`.
 
 .. py:class:: espressopp.analysis.LBOutputVzInTime(system,lb)
 
-        :param shared_ptr system: system object defined earlier in the python-script
+        :param std::shared_ptr system: system object defined earlier in the python-script
         :param lb_object lb: lattice boltzmann object defined earlier in the python-script
 
 Example:

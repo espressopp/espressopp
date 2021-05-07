@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FixPositions::theLogger, "FixPositions");
 
-    FixPositions::FixPositions(shared_ptr<System> system, shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask)
+    FixPositions::FixPositions(std::shared_ptr<System> system, std::shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask)
           : Extension(system), particleGroup(_particleGroup), fixMask(_fixMask)
     {
       LOG4ESPP_INFO(theLogger, "Isokinetic constructed");
@@ -53,11 +53,11 @@ namespace espressopp {
       _aftIntP  = integrator->aftIntP.connect( boost::bind(&FixPositions::restorePositions, this));
     }
 
-    void FixPositions::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
+    void FixPositions::setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup) {
      	particleGroup = _particleGroup;
      }
 
-     shared_ptr< ParticleGroup > FixPositions::getParticleGroup() {
+     std::shared_ptr< ParticleGroup > FixPositions::getParticleGroup() {
      	return particleGroup;
      }
 
@@ -101,9 +101,9 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<FixPositions, shared_ptr<FixPositions>, bases<Extension> >
+      class_<FixPositions, std::shared_ptr<FixPositions>, bases<Extension> >
 
-        ("integrator_FixPositions", init< shared_ptr< System >, shared_ptr< ParticleGroup >, const Int3D& >())
+        ("integrator_FixPositions", init< std::shared_ptr< System >, std::shared_ptr< ParticleGroup >, const Int3D& >())
         .add_property("particleGroup", &FixPositions::getParticleGroup, &FixPositions::setParticleGroup)
         .def("getFixMask", &FixPositions::getFixMask, return_value_policy< reference_existing_object >() )
         .def("setFixMask", &FixPositions::setFixMask )

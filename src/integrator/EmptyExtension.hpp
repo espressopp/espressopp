@@ -41,7 +41,7 @@ namespace espressopp {
 
       public:
 
-        EmptyExtension(shared_ptr< System > _system);
+        EmptyExtension(std::shared_ptr< System > _system);
 
         void emptyFunction();
 

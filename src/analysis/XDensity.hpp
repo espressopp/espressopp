@@ -34,7 +34,7 @@ namespace espressopp {
     // Class to compute the density profile along slabs in the x-direction of the system.
     class XDensity : public Observable {
     public:
-      XDensity(shared_ptr< System > system) : Observable(system) {}
+      XDensity(std::shared_ptr< System > system) : Observable(system) {}
       ~XDensity() {}
       virtual real compute() const;
       virtual python::list computeArray(int) const;

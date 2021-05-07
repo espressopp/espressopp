@@ -47,7 +47,7 @@ namespace espressopp {
 
     class AllParticlePos : public SystemAccess {
     public:
-      AllParticlePos(shared_ptr<System> system) : SystemAccess (system) {};
+      AllParticlePos(std::shared_ptr<System> system) : SystemAccess (system) {};
       ~AllParticlePos() {};
       /** gather and broadcast all particle positions to all cpus */
       void gatherAllPositions();

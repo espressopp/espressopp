@@ -48,7 +48,7 @@ namespace espressopp {
       LOG4ESPP_LOGGER(LatticeBoltzmann::theLogger, "LatticeBoltzmann");
 
       /* LB Constructor; expects 1 Int3D, 2 reals and 2 integers */
-      LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _nodeGrid,
+      LatticeBoltzmann::LatticeBoltzmann(std::shared_ptr<System> _system, Int3D _nodeGrid,
                                          real _a, real _tau, int _numDims, int _numVels)
       : Extension(_system)
       , nodeGrid(_nodeGrid)
@@ -2105,9 +2105,9 @@ namespace espressopp {
       void LatticeBoltzmann::registerPython() {
 
          using namespace espressopp::python;
-         class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
+         class_<LatticeBoltzmann, std::shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
-         ("integrator_LatticeBoltzmann", init<	shared_ptr< System >, Int3D, real, real, int, int >())
+         ("integrator_LatticeBoltzmann", init<	std::shared_ptr< System >, Int3D, real, real, int, int >())
          .add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid, &LatticeBoltzmann::setNodeGrid)
          .add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
          .add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)

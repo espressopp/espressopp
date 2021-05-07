@@ -60,14 +60,14 @@ namespace espressopp {
       ;
 
       class_< VerletListLennardJonesEnergyCapped, bases< Interaction > >
-        ("interaction_VerletListLennardJonesEnergyCapped", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListLennardJonesEnergyCapped", init< std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListLennardJonesEnergyCapped::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListLennardJonesEnergyCapped::getPotential, return_value_policy< reference_existing_object >())
       ;
 
       class_< VerletListAdressLennardJonesEnergyCapped, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesEnergyCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+         init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListAdressLennardJonesEnergyCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListAdressLennardJonesEnergyCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListAdressLennardJonesEnergyCapped::getPotentialAT,
@@ -78,7 +78,7 @@ namespace espressopp {
 
       class_< VerletListHadressLennardJonesEnergyCapped, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesEnergyCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+         init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListHadressLennardJonesEnergyCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListHadressLennardJonesEnergyCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListHadressLennardJonesEnergyCapped::getPotentialAT,
@@ -88,15 +88,15 @@ namespace espressopp {
       ;
       
       class_< CellListLennardJonesEnergyCapped, bases< Interaction > >
-        ("interaction_CellListLennardJonesEnergyCapped", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListLennardJonesEnergyCapped", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListLennardJonesEnergyCapped::setPotential)
         .def("getPotential", &CellListLennardJonesEnergyCapped::getPotential, return_value_policy< reference_existing_object >());
 	  ;
 
       class_< FixedPairListLennardJonesEnergyCapped, bases< Interaction > >
         ("interaction_FixedPairListLennardJonesEnergyCapped",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesEnergyCapped> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesEnergyCapped> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJonesEnergyCapped> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<LennardJonesEnergyCapped> >())
           .def("setPotential", &FixedPairListLennardJonesEnergyCapped::setPotential);
       ;
     }

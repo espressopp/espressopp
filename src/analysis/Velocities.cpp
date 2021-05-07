@@ -90,7 +90,7 @@ namespace espressopp {
         return configurations[nconfigs - 1 - stackpos];
       } else {
         LOG4ESPP_ERROR(logger, "Velocities::get <out-of-range>");
-        return shared_ptr<Configuration>();
+        return std::shared_ptr<Configuration>();
       }
     }
 
@@ -162,7 +162,7 @@ namespace espressopp {
 
       if (system.comm->rank() == 0) {
 
-         ConfigurationPtr config = make_shared<Configuration> (); //totalN
+         ConfigurationPtr config = std::make_shared<Configuration> (); //totalN
 
          // root process collects data from all processors and sets it
 
@@ -260,7 +260,7 @@ namespace espressopp {
       //;
 
       class_<Velocities>
-        ("analysis_Velocities", init< shared_ptr< System > >())
+        ("analysis_Velocities", init< std::shared_ptr< System > >())
       .add_property("size", &Velocities::getSize)
       .add_property("capacity", &Velocities::getCapacity, 
                                 &Velocities::setCapacity)

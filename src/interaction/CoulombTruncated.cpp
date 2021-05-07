@@ -50,15 +50,15 @@ namespace espressopp {
       ;
 
       class_< VerletListCoulombTruncated, bases< Interaction > >
-        ("interaction_VerletListCoulombTruncated", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListCoulombTruncated", init< std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
         ;
 
       class_< FixedPairListTypesCoulombTruncated, bases< Interaction > >
         ("interaction_FixedPairListTypesCoulombTruncated",
-          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListTypesCoulombTruncated::setPotential)
         ;
     }

@@ -30,7 +30,7 @@ namespace espressopp {
   namespace storage {
     class DomainDecompositionNonBlocking: public DomainDecomposition {
     public:
-      DomainDecompositionNonBlocking(shared_ptr< System > system,
+      DomainDecompositionNonBlocking(std::shared_ptr< System > system,
               const Int3D& _nodeGrid,
 			  const Int3D& _cellGrid);
       virtual ~DomainDecompositionNonBlocking() {}

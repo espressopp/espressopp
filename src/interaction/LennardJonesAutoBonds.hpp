@@ -44,7 +44,7 @@ namespace espressopp {
       real sigma;
       real ff1, ff2;
       real ef1, ef2;
-      shared_ptr < FixedPairList > bondlist;
+      std::shared_ptr < FixedPairList > bondlist;
       int max_crosslinks;
 
     public:
@@ -58,7 +58,7 @@ namespace espressopp {
       }
 
       LennardJonesAutoBonds(real _epsilon, real _sigma,
-		   real _cutoff, real _shift, shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
+		   real _cutoff, real _shift, std::shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
 	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl), max_crosslinks(_max_crosslinks) {
         setShift(_shift);
         setCutoff(_cutoff);
@@ -66,7 +66,7 @@ namespace espressopp {
       }
 
       LennardJonesAutoBonds(real _epsilon, real _sigma,
-		   real _cutoff, shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
+		   real _cutoff, std::shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
 	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl), max_crosslinks(_max_crosslinks) {
         autoShift = false;
         setCutoff(_cutoff);

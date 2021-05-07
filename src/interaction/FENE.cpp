@@ -43,8 +43,8 @@ namespace espressopp {
 	  ;
 
       class_< FixedPairListFENE, bases< Interaction > >
-      ("interaction_FixedPairListFENE", init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
-      .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
+      ("interaction_FixedPairListFENE", init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<FENE> >())
+      .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<FENE> >())
       .def("setPotential", &FixedPairListFENE::setPotential)
       .def("getPotential", &FixedPairListFENE::getPotential)
       .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)

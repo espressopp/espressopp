@@ -39,10 +39,10 @@ namespace espressopp {
       typedef variate_generator< RNGType&, DistType > Super;
       
       /// store the shared pointer to the RNG
-      shared_ptr< RNG > rng;
+      std::shared_ptr< RNG > rng;
       
     public:
-      UniformOnSphere(shared_ptr< RNG > _rng);
+      UniformOnSphere(std::shared_ptr< RNG > _rng);
       using Super::operator();
       static void registerPython();
     };

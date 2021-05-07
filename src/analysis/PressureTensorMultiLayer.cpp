@@ -29,7 +29,7 @@ namespace espressopp {
     void PressureTensorMultiLayer::registerPython() {
       using namespace espressopp::python;
       class_<PressureTensorMultiLayer, bases< AnalysisBase > >
-        ("analysis_PressureTensorMultiLayer", init< shared_ptr< System >, int, real >())
+        ("analysis_PressureTensorMultiLayer", init< std::shared_ptr< System >, int, real >())
         .add_property("n",
               &PressureTensorMultiLayer::getN,
               &PressureTensorMultiLayer::setN)

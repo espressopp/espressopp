@@ -41,17 +41,17 @@ namespace espressopp {
 
       public:
 
-        ExtForce(shared_ptr< System > _system, const Real3D& _extForce);
+        ExtForce(std::shared_ptr< System > _system, const Real3D& _extForce);
 
-        ExtForce(shared_ptr< System > _system, const Real3D& _extForce, shared_ptr< ParticleGroup > _particleGroup);
+        ExtForce(std::shared_ptr< System > _system, const Real3D& _extForce, std::shared_ptr< ParticleGroup > _particleGroup);
 
         void setExtForce(Real3D& _extForce);
 
         Real3D& getExtForce();
 
-        void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
+        void setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup);
 
-        shared_ptr< ParticleGroup > getParticleGroup();
+        std::shared_ptr< ParticleGroup > getParticleGroup();
 
         void applyForceToGroup();
         void applyForceToAll();
@@ -63,7 +63,7 @@ namespace espressopp {
 
       private:
         boost::signals2::connection _aftInitF;
-        shared_ptr< ParticleGroup > particleGroup;
+        std::shared_ptr< ParticleGroup > particleGroup;
         bool allParticles;
         Real3D extForce;
         void connect();

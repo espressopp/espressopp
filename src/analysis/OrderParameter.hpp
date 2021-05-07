@@ -226,7 +226,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      OrderParameter(shared_ptr< System > system,
+      OrderParameter(std::shared_ptr< System > system,
                      real _cutoff,
                      int _angular_momentum,
                      bool _do_cl_an,
@@ -281,8 +281,8 @@ namespace espressopp {
         opp_map.clear();
         pairs.clear();
 
-        shared_ptr< storage::Storage > stor = getSystem()->storage;
-        shared_ptr< mpi::communicator > cmm = getSystem()->comm;
+        std::shared_ptr< storage::Storage > stor = getSystem()->storage;
+        std::shared_ptr< mpi::communicator > cmm = getSystem()->comm;
         int this_node = cmm -> rank();
 
         // ------------------------------------------------------------------------------
@@ -490,7 +490,7 @@ namespace espressopp {
         if(incl_surface){
           // -----------------------------------------------------------------------
           // send ghost info
-          shared_ptr< mpi::communicator > cmm = getSystem()->comm;
+          std::shared_ptr< mpi::communicator > cmm = getSystem()->comm;
           vector <OrderParticleProps> sendGhostInfo;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
             Particle& p = *cit;

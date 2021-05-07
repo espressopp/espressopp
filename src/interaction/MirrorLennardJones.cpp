@@ -47,8 +47,8 @@ namespace espressopp {
 
       class_< FixedPairListMirrorLennardJones, bases< Interaction > >
       ("interaction_FixedPairListMirrorLennardJones",
-        init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<MirrorLennardJones> >())
-       .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<MirrorLennardJones> >())
+        init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<MirrorLennardJones> >())
+       .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<MirrorLennardJones> >())
        .def("setPotential", &FixedPairListMirrorLennardJones::setPotential)
        .def("getPotential", &FixedPairListMirrorLennardJones::getPotential)
        .def("setFixedPairList", &FixedPairListMirrorLennardJones::setFixedPairList)

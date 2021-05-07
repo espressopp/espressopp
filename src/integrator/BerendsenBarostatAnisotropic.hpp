@@ -43,7 +43,7 @@ namespace espressopp {
     class BerendsenBarostatAnisotropic: public Extension {
 
       public:
-        BerendsenBarostatAnisotropic(shared_ptr< System > system);
+        BerendsenBarostatAnisotropic(std::shared_ptr< System > system);
         
         void setTau(real);
         real getTau();

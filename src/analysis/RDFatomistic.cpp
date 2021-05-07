@@ -64,7 +64,7 @@ namespace espressopp {
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, data > conf;
         if (rank_i == myrank) {
-          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
           for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
@@ -221,7 +221,7 @@ namespace espressopp {
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, dataPathIntegral > conf;
         if (rank_i == myrank) {
-          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
           for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
@@ -359,7 +359,7 @@ namespace espressopp {
     void RDFatomistic::registerPython() {
       using namespace espressopp::python;
       class_<RDFatomistic, bases< Observable > >
-      ("analysis_RDFatomistic", init< shared_ptr< System >, int, int, real, bool >())
+      ("analysis_RDFatomistic", init< std::shared_ptr< System >, int, int, real, bool >())
       .def("compute", &RDFatomistic::computeArray)
       .def("computePathIntegral", &RDFatomistic::computeArrayPathIntegral)
       ;

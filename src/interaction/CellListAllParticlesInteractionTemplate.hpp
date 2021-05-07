@@ -38,10 +38,10 @@ namespace espressopp {
       typedef _Potential Potential;
     public:
       CellListAllParticlesInteractionTemplate
-      (shared_ptr < storage::Storage > _storage, shared_ptr < Potential > _potential)
+      (std::shared_ptr < storage::Storage > _storage, std::shared_ptr < Potential > _potential)
         : storage(_storage), potential(_potential) {}
 
-      shared_ptr< Potential > getPotential() {
+      std::shared_ptr< Potential > getPotential() {
         return potential;
       }
 
@@ -62,8 +62,8 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr< storage::Storage > storage;
-      shared_ptr< Potential > potential;
+      std::shared_ptr< storage::Storage > storage;
+      std::shared_ptr< Potential > potential;
     };
 
     //////////////////////////////////////////////////

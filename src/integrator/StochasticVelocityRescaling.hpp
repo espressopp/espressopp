@@ -39,7 +39,7 @@ namespace integrator {
 
 class GammaDistribution {
 public:
-	GammaDistribution(shared_ptr<esutil::RNG> _rng) :
+	GammaDistribution(std::shared_ptr<esutil::RNG> _rng) :
 			rng(_rng) {
 	}
 	virtual ~GammaDistribution() {
@@ -48,13 +48,13 @@ public:
 	virtual real drawNumber(const unsigned int alpha) = 0;
 
 protected:
-	shared_ptr<esutil::RNG> rng;
+	std::shared_ptr<esutil::RNG> rng;
 };
 
 /** Gamma distribution, from Boost */
 class GammaDistributionBoost: public GammaDistribution {
 public:
-	GammaDistributionBoost(shared_ptr<esutil::RNG> _rng) :
+	GammaDistributionBoost(std::shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
 	real drawNumber(const unsigned int ia);
@@ -63,7 +63,7 @@ public:
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
 class GammaDistributionNR2nd: public GammaDistribution {
 public:
-	GammaDistributionNR2nd(shared_ptr<esutil::RNG> _rng) :
+	GammaDistributionNR2nd(std::shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
 	real drawNumber(const unsigned int ia);
@@ -72,7 +72,7 @@ public:
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
 class GammaDistributionNR3rd: public GammaDistribution {
 public:
-	GammaDistributionNR3rd(shared_ptr<esutil::RNG> _rng) :
+	GammaDistributionNR3rd(std::shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
 	real drawNumber(const unsigned int ia);
@@ -82,7 +82,7 @@ class StochasticVelocityRescaling: public Extension {
 
 public:
 
-	StochasticVelocityRescaling(shared_ptr<System> system);
+	StochasticVelocityRescaling(std::shared_ptr<System> system);
 
 	void setTemperature(real temperature);
 
@@ -105,7 +105,7 @@ public:
 	 *  taut: coupling time/strength
 	 *  */
 	real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
-			real taut, shared_ptr<esutil::RNG> rng);
+			real taut, std::shared_ptr<esutil::RNG> rng);
 
 	/** Register this class so it can be used from Python. */
 	static void registerPython();
@@ -122,7 +122,7 @@ private:
 
   void initialize();
 
-	shared_ptr<esutil::RNG> rng; //!< random number generator
+	std::shared_ptr<esutil::RNG> rng; //!< random number generator
 
 	GammaDistribution *gammaDist;
 

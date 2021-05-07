@@ -51,17 +51,17 @@ namespace espressopp {
         filename = _filename;
 
         if (itype == 1) { // create a new InterpolationLinear
-            table = make_shared <InterpolationLinear> ();
+            table = std::make_shared <InterpolationLinear> ();
             table->read(world, _filename);
         }
 
         else if (itype == 2) { // create a new InterpolationAkima
-            table = make_shared <InterpolationAkima> ();
+            table = std::make_shared <InterpolationAkima> ();
             table->read(world, _filename);
         }
 
         else if (itype == 3) { // create a new InterpolationCubic
-            table = make_shared <InterpolationCubic> ();
+            table = std::make_shared <InterpolationCubic> ();
             table->read(world, _filename);
         }
     }
@@ -92,15 +92,15 @@ namespace espressopp {
         ;
 
       class_ <VerletListTabulated, bases <Interaction> >
-        ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())
+        ("interaction_VerletListTabulated", init <std::shared_ptr<VerletList> >())
             .def("setPotential", &VerletListTabulated::setPotential)
             .def("getPotential", &VerletListTabulated::getPotentialPtr)
         ;
 
       class_< VerletListAdressCGTabulated, bases< Interaction > >
         ("interaction_VerletListAdressCGTabulated",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListAdressCGTabulated::getVerletList)
         .def("setPotential", &VerletListAdressCGTabulated::setPotential)
         .def("getPotential", &VerletListAdressCGTabulated::getPotentialPtr)
@@ -108,8 +108,8 @@ namespace espressopp {
 
       class_ <VerletListAdressTabulated, bases <Interaction> >
         ("interaction_VerletListAdressTabulated",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress> >()
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListAdressTabulated::setPotentialAT)
             .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG);
@@ -117,8 +117,8 @@ namespace espressopp {
 
       class_< VerletListHadressCGTabulated, bases< Interaction > >
         ("interaction_VerletListHadressCGTabulated",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListHadressCGTabulated::getVerletList)
         .def("setPotential", &VerletListHadressCGTabulated::setPotential)
         .def("getPotential", &VerletListHadressCGTabulated::getPotentialPtr)
@@ -126,8 +126,8 @@ namespace espressopp {
 
       class_ <VerletListHadressTabulated, bases <Interaction> >
         ("interaction_VerletListHadressTabulated",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress> >()
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListHadressTabulated::setPotentialAT)
             .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG);
@@ -135,8 +135,8 @@ namespace espressopp {
 
       class_ <VerletListPIadressTabulated, bases <Interaction> >
         ("interaction_VerletListPIadressTabulated",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress>,
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress>,
                  int,
                  bool>()
                 )
@@ -154,8 +154,8 @@ namespace espressopp {
 
       class_ <VerletListPIadressTabulatedLJ, bases <Interaction> >
         ("interaction_VerletListPIadressTabulatedLJ",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress>,
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress>,
                  int,
                  bool>()
                 )
@@ -173,8 +173,8 @@ namespace espressopp {
 
       class_ <VerletListPIadressNoDriftTabulated, bases <Interaction> >
         ("interaction_VerletListPIadressNoDriftTabulated",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress>,
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress>,
                  int,
                  bool>()
                 )
@@ -190,25 +190,25 @@ namespace espressopp {
         ;
 
       class_ <CellListTabulated, bases <Interaction> >
-        ("interaction_CellListTabulated", init <shared_ptr <storage::Storage> >())
+        ("interaction_CellListTabulated", init <std::shared_ptr <storage::Storage> >())
             .def("setPotential", &CellListTabulated::setPotential);
         ;
 
       class_ <FixedPairListTabulated, bases <Interaction> >
         ("interaction_FixedPairListTabulated",
-          init <shared_ptr<System>,
-                shared_ptr<FixedPairList>,
-                shared_ptr<Tabulated> >()
+          init <std::shared_ptr<System>,
+                std::shared_ptr<FixedPairList>,
+                std::shared_ptr<Tabulated> >()
         )
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Tabulated> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<Tabulated> >())
         .def("setPotential", &FixedPairListTabulated::setPotential)
         .def("setFixedPairList", &FixedPairListTabulated::setFixedPairList)
         .def("getFixedPairList", &FixedPairListTabulated::getFixedPairList);
 
       class_< FixedPairListTypesTabulated, bases< Interaction > >
           ("interaction_FixedPairListTypesTabulated",
-           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
           .def("setPotential", &FixedPairListTypesTabulated::setPotential)
           .def("getPotential", &FixedPairListTypesTabulated::getPotentialPtr)
           .def("setFixedPairList", &FixedPairListTypesTabulated::setFixedPairList)
@@ -216,14 +216,14 @@ namespace espressopp {
 
       class_ <FixedPairListPIadressTabulated, bases <Interaction> >
         ("interaction_FixedPairListPIadressTabulated",
-          init <shared_ptr<System>,
-                shared_ptr<FixedPairList>,
-                shared_ptr<FixedTupleListAdress>,
-                shared_ptr<Tabulated>,
+          init <std::shared_ptr<System>,
+                std::shared_ptr<FixedPairList>,
+                std::shared_ptr<FixedTupleListAdress>,
+                std::shared_ptr<Tabulated>,
                 int,
                 bool>()
         )
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FixedTupleListAdress>, shared_ptr<Tabulated>, int, bool>())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<FixedTupleListAdress>, std::shared_ptr<Tabulated>, int, bool>())
         .def("setPotential", &FixedPairListPIadressTabulated::setPotential)
         .def("getPotential", &FixedPairListPIadressTabulated::getPotential)
         .def("setFixedPairList", &FixedPairListPIadressTabulated::setFixedPairList)

@@ -41,17 +41,17 @@ namespace espressopp {
             filename = _filename;
 
             if (itype == 1) { // create a new InterpolationLinear
-                table = make_shared <InterpolationLinear> ();
+                table = std::make_shared <InterpolationLinear> ();
                 table->read(world, _filename);
             }
 
             else if (itype == 2) { // create a new InterpolationAkima
-                table = make_shared <InterpolationAkima> ();
+                table = std::make_shared <InterpolationAkima> ();
                 table->read(world, _filename);
             }
 
             else if (itype == 3) { // create a new InterpolationCubic
-                table = make_shared <InterpolationCubic> ();
+                table = std::make_shared <InterpolationCubic> ();
                 table->read(world, _filename);
             }
         }
@@ -76,15 +76,15 @@ namespace espressopp {
 
             class_ <FixedTripleListTabulatedAngular, bases <Interaction> >
                 ("interaction_FixedTripleListTabulatedAngular",
-                init <shared_ptr<System>,
-                      shared_ptr <FixedTripleList>,
-                      shared_ptr <TabulatedAngular> >())
+                init <std::shared_ptr<System>,
+                      std::shared_ptr <FixedTripleList>,
+                      std::shared_ptr <TabulatedAngular> >())
                 .def("setPotential", &FixedTripleListTabulatedAngular::setPotential)
                 .def("getFixedTripleList", &FixedTripleListTabulatedAngular::getFixedTripleList);
 
             class_< FixedTripleListTypesTabulatedAngular, bases< Interaction > >
                 ("interaction_FixedTripleListTypesTabulatedAngular",
-                 init< shared_ptr<System>, shared_ptr<FixedTripleList> >())
+                 init< std::shared_ptr<System>, std::shared_ptr<FixedTripleList> >())
                 .def("setPotential", &FixedTripleListTypesTabulatedAngular::setPotential)
                 .def("getPotential", &FixedTripleListTypesTabulatedAngular::getPotentialPtr)
                 .def("setFixedTripleList", &FixedTripleListTypesTabulatedAngular::setFixedTripleList)
@@ -92,10 +92,10 @@ namespace espressopp {
 
             class_ <FixedTripleListPIadressTabulatedAngular, bases <Interaction> >
                 ("interaction_FixedTripleListPIadressTabulatedAngular",
-                init <shared_ptr<System>,
-                      shared_ptr <FixedTripleList>,
-                      shared_ptr<FixedTupleListAdress>,
-                      shared_ptr <TabulatedAngular>,
+                init <std::shared_ptr<System>,
+                      std::shared_ptr <FixedTripleList>,
+                      std::shared_ptr<FixedTupleListAdress>,
+                      std::shared_ptr <TabulatedAngular>,
                       int,
                       bool>())
                 .def("setPotential", &FixedTripleListPIadressTabulatedAngular::setPotential)

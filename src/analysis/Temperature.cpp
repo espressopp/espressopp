@@ -32,7 +32,7 @@ namespace espressopp {
     void Temperature::registerPython() {
       using namespace espressopp::python;
       class_<Temperature, bases< Observable > >
-        ("analysis_Temperature", init< shared_ptr< System > >())
+        ("analysis_Temperature", init< std::shared_ptr< System > >())
         .def("add_type", &Temperature::addType)
         .def("remove_type", &Temperature::removeType)
       ;

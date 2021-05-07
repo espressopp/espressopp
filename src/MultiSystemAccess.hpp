@@ -41,12 +41,12 @@ namespace espressopp {
 
     /** Constructor */
 
-	MultiSystemAccess(shared_ptr<System> system1, shared_ptr<System> system2);
+	MultiSystemAccess(std::shared_ptr<System> system1, std::shared_ptr<System> system2);
 
     /** Get shared pointers to the systems */
 
-    shared_ptr<System> getSystem1() const;
-    shared_ptr<System> getSystem2() const;
+    std::shared_ptr<System> getSystem1() const;
+    std::shared_ptr<System> getSystem2() const;
 
     /** Get system references */
 
@@ -66,7 +66,7 @@ namespace espressopp {
   *  Implementation                                                         *
   **************************************************************************/
 
-  inline MultiSystemAccess::MultiSystemAccess(shared_ptr<System> system1, shared_ptr<System> system2) {
+  inline MultiSystemAccess::MultiSystemAccess(std::shared_ptr<System> system1, std::shared_ptr<System> system2) {
 	if (!system1) {
 	  throw std::runtime_error("NULL system1");
 	}
@@ -86,7 +86,7 @@ namespace espressopp {
     mySystem = system->getShared();
   }
 
-  inline shared_ptr<System> MultiSystemAccess::getSystem1() const {
+  inline std::shared_ptr<System> MultiSystemAccess::getSystem1() const {
 
     if (mySystem1.expired()) {
        throw std::runtime_error("expired system1");
@@ -95,7 +95,7 @@ namespace espressopp {
     return mySystem1.lock();
   }
 
-  inline shared_ptr<System> MultiSystemAccess::getSystem2() const {
+  inline std::shared_ptr<System> MultiSystemAccess::getSystem2() const {
  
     if (mySystem2.expired()) {
        throw std::runtime_error("expired system2");

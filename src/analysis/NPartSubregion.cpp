@@ -73,7 +73,7 @@ namespace espressopp {
       using namespace espressopp::python;
       void (NPartSubregion::*pySetCenter)(real x, real y, real z) = &NPartSubregion::setCenter;
       class_<NPartSubregion, bases< Observable > >
-      ("analysis_NPartSubregion", init< shared_ptr< System >, int, real, int >())
+      ("analysis_NPartSubregion", init< std::shared_ptr< System >, int, real, int >())
       .def("setCenter", pySetCenter)
       ;
     }

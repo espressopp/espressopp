@@ -36,14 +36,14 @@
 namespace espressopp {
 
   /*
-  FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
+  FixedTripleList::FixedTripleList(std::shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
   */
 
 
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
-  FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
+  FixedTripleList::FixedTripleList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalTriples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
@@ -311,8 +311,8 @@ namespace espressopp {
     //bool (FixedTripleList::*pyAdd)(pvec pids)
     //      = &FixedTripleList::add;
 
-    class_< FixedTripleList, shared_ptr< FixedTripleList > >
-      ("FixedTripleList", init< shared_ptr< storage::Storage > >())
+    class_< FixedTripleList, std::shared_ptr< FixedTripleList > >
+      ("FixedTripleList", init< std::shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
       .def("remove",  &FixedTripleList::remove)

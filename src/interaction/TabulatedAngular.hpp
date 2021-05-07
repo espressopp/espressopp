@@ -36,7 +36,7 @@ namespace espressopp {
          
             private:
                 std::string filename;
-                shared_ptr <Interpolation> table;
+                std::shared_ptr <Interpolation> table;
                 int interpolationType;
          
             public:

@@ -24,8 +24,8 @@
 
 namespace espressopp {
    namespace analysis {
-      LBOutputVzOfX::LBOutputVzOfX(shared_ptr<System> system,
-                                   shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
+      LBOutputVzOfX::LBOutputVzOfX(std::shared_ptr<System> system,
+                                   std::shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
       : LBOutput(system, latticeboltzmann) {}
 
       void LBOutputVzOfX::writeOutput()
@@ -62,8 +62,8 @@ namespace espressopp {
          using namespace espressopp::python;
 
          class_<LBOutputVzOfX, bases< LBOutput > >
-         ("analysis_LBOutput_VzOfX", init< shared_ptr< System >,
-          shared_ptr< integrator::LatticeBoltzmann > >())
+         ("analysis_LBOutput_VzOfX", init< std::shared_ptr< System >,
+          std::shared_ptr< integrator::LatticeBoltzmann > >())
 
          .def("writeOutput", &LBOutputVzOfX::writeOutput)
          ;
