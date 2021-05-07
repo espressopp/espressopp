@@ -23,7 +23,7 @@
 #define BOOST_TEST_MODULE SmoothSquareWell
 #include "ut.hpp"
 #include "interaction/SmoothSquareWell.hpp"
-#incldue "Real3D.hpp"
+#include "Real3D.hpp"
 
 using namespace espressopp;
 using namespace interaction;

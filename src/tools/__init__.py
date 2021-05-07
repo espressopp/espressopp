@@ -45,6 +45,7 @@ from espressopp.tools.timers import *
 from espressopp.tools.topology import *
 from espressopp.tools.topology_helper import *
 from espressopp.tools.units import *
+from espressopp.tools.test import *
 from espressopp.tools.velocities import *
 from espressopp.tools.vmd import *
 from espressopp.tools.warmup import *

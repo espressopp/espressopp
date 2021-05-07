@@ -22,7 +22,6 @@
 import unittest
 import espressopp
 import espressopp.esutil
-import espressopp.unittest
 import espressopp.storage
 import espressopp.integrator
 import espressopp.interaction
@@ -49,7 +48,7 @@ def calcNumberCells(size, nodes, cutoff):
 
     return ncells - 1
 
-class TestVerletList(espressopp.unittest.TestCase) :
+class TestVerletList(unittest.TestCase) :
 
     def test0Build(self) :
 
@@ -67,7 +66,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
         comm = espressopp.MPI.COMM_WORLD
 
-        nodeGrid = (1, 1, comm.size)
+        nodeGrid = [1, 1, comm.size]
         cellGrid = [1, 1, 1]
 
         for i in range(3):
@@ -76,7 +75,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
         print('NodeGrid = %s'%(nodeGrid,))
         print('CellGrid = %s'%cellGrid)
 
-        dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+        dd = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
         system.storage = dd
 
