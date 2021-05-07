@@ -1,26 +1,10 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
-file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-        esutil/GenLogger.cpp
-        iterator/unittest/*.cpp
-        interaction/unittest/*.cpp
-        unittest/*.cpp
-        analysis/unittest/*.cpp
-        esutil/unittest/*.cpp
-        storage/unittest/*.cpp
-        bc/unittest/*.cpp
-        integrator/unittest/*.cpp
-        )
+file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
+file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
-list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
-
-if(NOT WITH_XTC)
-    file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
-    list(REMOVE_ITEM ESPRESSO_SOURCES ${DUMP_XTC_SOURCE})
-endif()
+list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
 
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
-
-list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
@@ -48,9 +32,6 @@ option(WITH_RC_FILES "Install Espresso rc file, no need when installing under /u
 if (WITH_RC_FILES)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ESPRC DESTINATION bin)
 endif (WITH_RC_FILES)
-
-find_package(Threads REQUIRED)
-set(Boost_USE_MULTITHREADED ON)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
 
@@ -88,6 +69,7 @@ target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 if(WITH_XTC)
     target_add_definitions(_espressopp PRIVATE -DHAS_GROMACS)
     target_link_libraries(_espressopp PRIVATE Gromacs::libgromacs)
+    target_sources(_espressopp PRIVATE ${DUMP_XTC_SOURCE})
 endif()
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)

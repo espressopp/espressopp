@@ -1,7 +1,7 @@
 # - Find FFTW3
 # Find the native FFTW3 includes and library
 #
-# FFTW3_INCLUDES - where to find fftw3.h
+# FFTW3_INCLUDE_DIRS - where to find fftw3.h
 # FFTW3_LIBRARIES - List of libraries when using FFTW3.
 # FFTW3_FOUND - True if FFTW3 found.
 
@@ -21,8 +21,6 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 
 find_package_handle_standard_args(FFTW3 DEFAULT_MSG FFTW3_LIBRARY FFTW3_INCLUDE_DIR )
-
-find_path (FFTW3_INCLUDES fftw3.h)
 
 # Copy the results to the output variables and target.
 if(FFTW3_FOUND)

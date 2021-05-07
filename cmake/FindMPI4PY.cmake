@@ -1,7 +1,7 @@
 # - Find MPI4PY
 # Find the native MPI4PY includes and library
 #
-# MPI4PY_INCLUDES - where to find mpi4py.h
+# MPI4PY_INCLUDE_DIR - where to find mpi4py.h
 # MPI4PY_LIBRARIES - List of libraries when using MPI4PY.
 # MPI4PY_FOUND - True if MPI4PY found.
 
@@ -34,17 +34,30 @@ if(Python3_EXECUTABLE)
   message(STATUS "MPI4PY_INCLUDE = ${MPI4PY_INCLUDE_DIR}")
 endif(Python3_EXECUTABLE)
 
-find_path(MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${Python3_SITEDIR}/mpi4py/include )
+find_path(MPI4PY_INCLUDE_DIR mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${Python3_SITEDIR}/mpi4py/include )
 if(NOT MPI4PY_INCLUDES)
   message("     mpi4py.h not found. Please make sure you have installed the developer version of mpi4py")
 endif()
 
 message(STATUS "Looking for MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so")
-find_file (MPI4PY_LIBRARIES NAMES MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so MPI.cpython-${PYTHON_VERSION_NO_DOT}m-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${Python3_SITEDIR}/mpi4py)
+find_file (MPI4PY_LIBRARY NAMES MPI.cpython-${PYTHON_VERSION_NO_DOT}-x86_64-linux-gnu.so MPI.cpython-${PYTHON_VERSION_NO_DOT}m-x86_64-linux-gnu.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${Python3_SITEDIR}/mpi4py)
 
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MPI4PY REQUIRED_VARS MPI4PY_LIBRARIES MPI4PY_INCLUDES VERSION_VAR MPI4PY_VERSION)
+find_package_handle_standard_args(MPI4PY REQUIRED_VARS MPI4PY_LIBRARY MPI4PY_INCLUDE_DIR VERSION_VAR MPI4PY_VERSION)
+
+# Copy the results to the output variables and target.
+if(MPI4PY_FOUND)
+  set(MPI4PY_LIBRARIES ${MPI4PY_LIBRARY} )
+  set(MPI4PY_INCLUDE_DIRS ${MPI4PY_INCLUDE_DIR} )
+
+  if(NOT TARGET MPI4PY::mpi4py)
+    add_library(MPI4PY::mpi4py UNKNOWN IMPORTED)
+    set_target_properties(MPI4PY::mpi4py PROPERTIES
+      IMPORTED_LOCATION "${MPI4PY_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${MPI4PY_INCLUDE_DIRS}")
+  endif()
+endif()
 
 mark_as_advanced (MPI4PY_LIBRARIES MPI4PY_INCLUDES)

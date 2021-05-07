@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(espressopp LANGUAGES CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 enable_testing()
 
@@ -72,16 +72,6 @@ endif()
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
-execute_process(COMMAND ${Python3_EXECUTABLE}
-        -c "import distutils.sysconfig as cg; print(cg.get_python_inc())"
-        OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-set(PYTHON_INCLUDE_PATH ${Python3_INCLUDE_DIRS} CACHE PATH "Python Include Directory")
-mark_as_advanced(PYTHON_INCLUDE_PATH)
-
-message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
-
 if(NOT PYTHON_INSTDIR)
     execute_process(COMMAND ${Python3_EXECUTABLE}
             -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
@@ -89,45 +79,27 @@ if(NOT PYTHON_INSTDIR)
 endif()
 
 execute_process(COMMAND ${Python3_EXECUTABLE}
-        -c "import sys; print(sys.version[:3])"
-        OUTPUT_VARIABLE PYTHON_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-execute_process(COMMAND ${Python3_EXECUTABLE}
         -c "import sys; print(sys.version[:3].replace('.', ''))"
         OUTPUT_VARIABLE PYTHON_VERSION_NO_DOT
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
-message(STATUS "PYTHON_LIBDIR = ${Python3_LIBRARY_DIRS}")
-
-set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
-
-if(NOT Python3_LIBRARIES)
-    message(FATAL_ERROR "Python libraries not found!")
-endif(NOT Python3_LIBRARIES)
-message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
-
-mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT})
+find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
-
 if(EXTERNAL_MPI4PY)
     find_package(MPI4PY 3.0.0 REQUIRED)
-    include_directories(${MPI4PY_INCLUDES})
+    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
 else(EXTERNAL_MPI4PY)
-    include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-3.0.3/src/mpi4py/include)
-    set(MPI4PY_LIBRARIES MPI)
+    add_subdirectory(contrib/mpi4py)
+    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
 endif(EXTERNAL_MPI4PY)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (APPLE)
     set ( RT_LIBRARIES )
 else()
     set ( RT_LIBRARIES rt )
@@ -149,12 +121,6 @@ endif()
 # Include the following subdirectory #
 ######################################
 add_subdirectory(src)
-add_subdirectory(contrib)
-if (EXTERNAL_MPI4PY)
-    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-else()
-    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
-endif()
 add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
