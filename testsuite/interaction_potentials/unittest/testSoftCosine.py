@@ -21,10 +21,10 @@
 
 import unittest
 from espressopp import Real3D, infinity
-import espressopp.unittest
+import espressopp.tools
 from espressopp.interaction.SoftCosine import *
 
-class TestSoftCosine(espressopp.unittest.TestCase):
+class TestSoftCosine(espressopp.tools.TestCase):
     def testDefaults(self):
         sc=SoftCosine()
         self.assertEqual(sc.A, 1.0)
@@ -41,7 +41,7 @@ class TestSoftCosine(espressopp.unittest.TestCase):
         # force in the minimum
         self.assertAlmostEqual(
             (sc.computeForce(0.1, 0.2, 0.3) -
-             Real3D(0.0, 0.0, 0.0)).sqr(), 0.87097538776667)
+             Real3D(0.0, 0.0, 0.0)).sqr(), 0.7585981260953123)
 
     def testProperties(self):
         sc=SoftCosine()

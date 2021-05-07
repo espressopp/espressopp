@@ -20,7 +20,7 @@
 
 
 import espressopp
-from espressopp import unittest
+import unittest
 import mpi4py.MPI as MPI
 import math
 
