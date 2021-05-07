@@ -20,7 +20,7 @@ jobs:
             CXX: 'icpc'
             EXTERNAL_MPI4PY: 'On'
           - BUILD_TYPE: 'Debug'
-            DISTRO: 'fedora_intel-oneapi'
+            DISTRO: 'fedora_intel'
             CXX: 'icpx'
             EXTERNAL_MPI4PY: 'On'
 
@@ -34,12 +34,6 @@ jobs:
           restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CXX }}-${{ matrix.BUILD_TYPE }}
 
       - uses: actions/checkout@v2
-
-      - name: Get trail license
-        if: ${{ matrix.CXX == 'icpc' }}
-        run: |
-          mkdir ~/Licenses
-          curl https://dynamicinstaller.intel.com/api/v2/license > ~/Licenses/intel.lic
 
       - name: Configure
         run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }} -DUSE_CCACHE=ON
@@ -133,3 +127,20 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+  coverage:
+    runs-on: ubuntu-latest
+    container: espressopp/buildenv:fedora
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Coverage build
+        run: |
+          cmake -B builddir -DUSE_GCOV=on -DCMAKE_BUILD_TYPE=Debug
+          cmake --build builddir --verbose -j 2
+
+      - name: Run tests
+        run: ctest --output-on-failure -j 2
+        working-directory: builddir
+
+      - name: Upload Report to codecov.io
+        uses: codecov/codecov-action@v1

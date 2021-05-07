@@ -97,7 +97,7 @@ from espressopp.ParticleAccess import *
 from _espressopp import io_DumpTopology
 
 import collections
-from . import pyh5md
+import pyh5md
 import numpy as np
 
 
