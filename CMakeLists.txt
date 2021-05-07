@@ -22,6 +22,8 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 ########################################################################
 # User input options                                                   #
 ########################################################################
+option(ESPP_LOCAL_ARCHITECTURE "Use instruction set of the local architecture." OFF)
+option(ESPP_VEC_REPORT "Enable reporting of loop vectorization." OFF)
 option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
@@ -31,8 +33,8 @@ endif()
 option(USE_GCOV "Enable gcov support" OFF)
 if(USE_GCOV)
     message(STATUS "Enabling gcov support")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -O0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -O0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()

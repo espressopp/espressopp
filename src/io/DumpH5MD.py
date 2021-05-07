@@ -109,7 +109,7 @@ from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import h5py
 import numpy as np
-from . import pyh5md
+import pyh5md
 import os
 
 import time as py_time
