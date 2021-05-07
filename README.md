@@ -30,14 +30,15 @@ $ git clone https://github.com/espressopp/espressopp.git
 
 Alternatively, you can download a tarball or zip file of [previous release versions](https://github.com/espressopp/espressopp/releases) of ESPResSo++.
 
-# Requirements
+# Dependencies
+## C++ Dependencies
+ - Boost ( >= 1.69.0)
+ - MPI
+ - FFTW3
+ - GROMACS (required when `WITH_XTC` flag is enabled)
 
- - Boost library ( >= 1.69.0),
- - Python 3 (>= 3.7),
- - mpi4py (>= 3.0.0),
- - HDF5 library (>= 1.8) (optional for [H5MD](https://nongnu.org/h5md/) file format)
- - h5py library (>= 2.6.0) (optional for [H5MD](https://nongnu.org/h5md/) file format)
- - GROMACS library (required when `WITH_XTC` flag is enabled)
+## Python Dependencies
+ESPResSo++ requires Python 3.7 or newer. All required Python packages are listed in `requirements.txt`. You can install them via: `pip3 install -r requirements.txt`
 
 # Quick install:
 
