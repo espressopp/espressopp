@@ -1,13 +1,3 @@
-set(Boost_LIBS ${Boost_LIBRARIES})
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-
-list(APPEND Boost_LIBS ${Boost_LIBRARIES})
-set(Boost_LIBRARIES ${Boost_LIBS})
-
-include_directories(${Boost_INCLUDE_DIRS})
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/include)
-
 if(USE_GCOV)
   set(PY_COV_OPTS "-m" "coverage" "run" "-a")
 endif()
@@ -29,7 +19,7 @@ foreach(DIR ${ALL_DIRS})
                 add_executable(${TEST_NAME} ${DIR}/${TEST_FILENAME})
                 add_test(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME})
                 set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${TEST_ENV}")
-                target_link_libraries(${TEST_NAME} ${PYTHON_LIBRARIES} MPI::MPI_CXX ${FFTW3_LIBRARIES} _espressopp ${Boost_LIBRARIES})
+                target_link_libraries(${TEST_NAME} _espressopp Boost::unit_test_framework)
             endforeach()
 
             file(GLOB TESTS_PY "${DIR}/test*.py")
