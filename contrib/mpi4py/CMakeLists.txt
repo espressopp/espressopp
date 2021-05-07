@@ -22,7 +22,7 @@ if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 add_library(MPI4PY_include INTERFACE)
-target_include_directories(MPI4PY_include PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/${MPI4PY_DIR}/src)
+target_include_directories(MPI4PY_include INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/${MPI4PY_DIR}/src)
 
 add_library(MPI4PY::mpi4py ALIAS MPI)
 add_library(MPI4PY::include ALIAS MPI4PY_include)
