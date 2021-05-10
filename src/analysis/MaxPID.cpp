@@ -54,7 +54,7 @@ namespace espressopp {
     void MaxPID::registerPython() {
       using namespace espressopp::python;
       class_<MaxPID, bases< Observable > >
-        ("analysis_MaxPID", init< shared_ptr< System > >())
+        ("analysis_MaxPID", init< std::shared_ptr< System > >())
       ;
     }
   }

@@ -48,7 +48,7 @@ namespace espressopp {
         ;
 
       class_ <VerletListSmoothSquareWell, bases <Interaction> >
-        ("interaction_VerletListSmoothSquareWell", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListSmoothSquareWell", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListSmoothSquareWell::getVerletList)
         .def("setPotential", &VerletListSmoothSquareWell::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListSmoothSquareWell::getPotential, return_value_policy< reference_existing_object >())
@@ -56,8 +56,8 @@ namespace espressopp {
 
       class_ <FixedPairListSmoothSquareWell, bases <Interaction> >
         ("interaction_FixedPairListSmoothSquareWell",
-         init< shared_ptr<System>, shared_ptr<FixedPairList>,  shared_ptr<SmoothSquareWell> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<SmoothSquareWell> >())
+         init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>,  std::shared_ptr<SmoothSquareWell> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<SmoothSquareWell> >())
         .def("setPotential", &FixedPairListSmoothSquareWell::setPotential)
         .def("getPotential", &FixedPairListSmoothSquareWell::getPotential)
         .def("setFixedPairList", &FixedPairListSmoothSquareWell::setFixedPairList)
@@ -66,8 +66,8 @@ namespace espressopp {
 
       class_ <FixedPairListTypesSmoothSquareWell, bases <Interaction> >
         ("interaction_FixedPairListTypesSmoothSquareWell",
-         init< shared_ptr<System>, shared_ptr<FixedPairList> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+         init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListTypesSmoothSquareWell::setPotential)
         .def("getPotential", &FixedPairListTypesSmoothSquareWell::getPotentialPtr)
         .def("setFixedPairList", &FixedPairListTypesSmoothSquareWell::setFixedPairList)

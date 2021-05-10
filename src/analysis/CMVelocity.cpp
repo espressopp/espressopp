@@ -96,7 +96,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<CMVelocity, bases<AnalysisBase> >
-        ("analysis_CMVelocity", init<shared_ptr<System> >())
+        ("analysis_CMVelocity", init<std::shared_ptr<System> >())
       .add_property("v", &CMVelocity::getV)
       ;
     }

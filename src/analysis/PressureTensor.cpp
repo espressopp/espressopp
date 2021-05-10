@@ -29,7 +29,7 @@ namespace espressopp {
     void PressureTensor::registerPython() {
       using namespace espressopp::python;
       class_<PressureTensor, bases< AnalysisBase > >
-        ("analysis_PressureTensor", init< shared_ptr< System > >())
+        ("analysis_PressureTensor", init< std::shared_ptr< System > >())
       ;
     }
   }

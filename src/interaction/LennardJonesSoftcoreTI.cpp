@@ -58,7 +58,7 @@ namespace espressopp {
       ;
 
       //class_< VerletListLennardJonesSoftcoreTI, bases< Interaction > > 
-      //  ("interaction_VerletListLennardJonesSoftcoreTI", init< shared_ptr<VerletList> >())
+      //  ("interaction_VerletListLennardJonesSoftcoreTI", init< std::shared_ptr<VerletList> >())
       //  .def("getVerletList", &VerletListLennardJonesSoftcoreTI::getVerletList)
       //  .def("setPotential", &VerletListLennardJonesSoftcoreTI::setPotential)
       //  .def("getPotential", &VerletListLennardJonesSoftcoreTI::getPotentialPtr)
@@ -66,16 +66,16 @@ namespace espressopp {
 
       class_< VerletListAdressLennardJonesSoftcoreTI, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesSoftcoreTI",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressLennardJonesSoftcoreTI::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJonesSoftcoreTI::setPotentialCG);
       ;
       
       //class_< VerletListHadressLennardJonesSoftcoreTI, bases< Interaction > >
       //  ("interaction_VerletListHadressLennardJonesSoftcoreTI",
-      //     init< shared_ptr<VerletListAdress>,
-      //            shared_ptr<FixedTupleListAdress> >())
+      //     init< std::shared_ptr<VerletListAdress>,
+      //            std::shared_ptr<FixedTupleListAdress> >())
       //  .def("setPotentialAT", &VerletListHadressLennardJonesSoftcoreTI::setPotentialAT)
       //  .def("setPotentialCG", &VerletListHadressLennardJonesSoftcoreTI::setPotentialCG);
       //;

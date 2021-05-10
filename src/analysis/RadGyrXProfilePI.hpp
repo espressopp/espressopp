@@ -32,7 +32,7 @@ namespace espressopp {
     // Class to compute the radius of gyration profile in adaptive path integral-based simulations along slabs in the x-direction of the system.
     class RadGyrXProfilePI : public Observable {
       public:
-        RadGyrXProfilePI(shared_ptr< System > system) : Observable(system) {}
+        RadGyrXProfilePI(std::shared_ptr< System > system) : Observable(system) {}
         ~RadGyrXProfilePI() {}
         virtual real compute() const;
         virtual python::list computeArray(int, int, int) const;

@@ -29,8 +29,8 @@ namespace espressopp {
   namespace analysis {
     class LBOutputVzOfX : public LBOutput {
       public:
-        LBOutputVzOfX(shared_ptr<System> _system,
-                          shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
+        LBOutputVzOfX(std::shared_ptr<System> _system,
+                          std::shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
         void writeOutput();
 

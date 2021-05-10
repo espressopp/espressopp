@@ -51,8 +51,8 @@ Example:
         :param CLmassmultiplier: (default: 100.0) multiplier by which the higher modes' spring masses (if constKinMass = False also the kinetic masses) are increased in the classical region
         :param speedup: (default: True) If True, the higher modes' are not integrated in the classical region and also the intraatomistic forces between the Trotter beads are not calculated in the classical region
         :param KTI: (default: False) If True, the particles' resolution parameters and adaptive masses are not updated but can be set by hand everywhere. This is necessary when running Kirkwood Thermodynamic Integration (KTI)
-        :type system: shared_ptr<System>
-        :type verletlist: shared_ptr<VerletListAdress>
+        :type system: std::shared_ptr<System>
+        :type verletlist: std::shared_ptr<VerletListAdress>
         :type timestep: real
         :type sSteps: int
         :type mSteps: int
@@ -81,7 +81,7 @@ Example:
         Gets the VerletList.
 
         :return: the Adress VerletList
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.integrator.PIAdressIntegrator.setTimeStep(timestep)
 

@@ -59,34 +59,34 @@ namespace espressopp {
     	;
 
       class_< VerletListMorse, bases< Interaction > > 
-        ("interaction_VerletListMorse", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListMorse", init< std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListMorse::setPotential)
         .def("getPotential", &VerletListMorse::getPotentialPtr)
       ;
 
       class_< VerletListAdressMorse, bases< Interaction > >
         ("interaction_VerletListAdressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressMorse::setPotentialCG);
         ;
         
       class_< VerletListHadressMorse, bases< Interaction > >
         ("interaction_VerletListHadressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
         ;
         
       class_< CellListMorse, bases< Interaction > > 
-        ("interaction_CellListMorse", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListMorse", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListMorse::setPotential);
 	;
 
       class_< FixedPairListMorse, bases< Interaction > >
         ("interaction_FixedPairListMorse",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Morse> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Morse> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<Morse> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<Morse> >())
         .def("setPotential", &FixedPairListMorse::setPotential);
         ;
     }

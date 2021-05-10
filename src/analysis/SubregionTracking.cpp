@@ -75,7 +75,7 @@ namespace espressopp {
       using namespace espressopp::python;
       void (SubregionTracking::*pySetCenter)(real x, real y, real z) = &SubregionTracking::setCenter;
       class_<SubregionTracking, bases< Observable > >
-      ("analysis_SubregionTracking", init< shared_ptr< System >, real, int >())
+      ("analysis_SubregionTracking", init< std::shared_ptr< System >, real, int >())
       .def("setCenter", pySetCenter)
       .def("addPID", &SubregionTracking::addPID)
       ;

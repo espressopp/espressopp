@@ -57,7 +57,7 @@ namespace espressopp {
       ;
 
       class_< VerletListStillingerWeberPairTerm, bases< Interaction > > 
-        ("interaction_VerletListStillingerWeberPairTerm", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListStillingerWeberPairTerm", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListStillingerWeberPairTerm::getVerletList)
         .def("setPotential", &VerletListStillingerWeberPairTerm::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListStillingerWeberPairTerm::getPotential, return_value_policy< reference_existing_object >())
@@ -65,29 +65,29 @@ namespace espressopp {
 
       class_< VerletListAdressStillingerWeberPairTerm, bases< Interaction > >
         ("interaction_VerletListAdressStillingerWeberPairTerm",
-            init< shared_ptr<VerletListAdress>,
-            shared_ptr<FixedTupleListAdress> >())
+            init< std::shared_ptr<VerletListAdress>,
+            std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressStillingerWeberPairTerm::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressStillingerWeberPairTerm::setPotentialCG);
       ;
 
       class_< VerletListHadressStillingerWeberPairTerm, bases< Interaction > >
         ("interaction_VerletListHadressStillingerWeberPairTerm",
-            init< shared_ptr<VerletListAdress>,
-            shared_ptr<FixedTupleListAdress> >())
+            init< std::shared_ptr<VerletListAdress>,
+            std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressStillingerWeberPairTerm::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressStillingerWeberPairTerm::setPotentialCG);
       ;
       
       class_< CellListStillingerWeberPairTerm, bases< Interaction > > 
-        ("interaction_CellListStillingerWeberPairTerm", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListStillingerWeberPairTerm", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListStillingerWeberPairTerm::setPotential);
 	  ;
 
       class_< FixedPairListStillingerWeberPairTerm, bases< Interaction > >
         ("interaction_FixedPairListStillingerWeberPairTerm",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<StillingerWeberPairTerm> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<StillingerWeberPairTerm> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<StillingerWeberPairTerm> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<StillingerWeberPairTerm> >())
           .def("setPotential", &FixedPairListStillingerWeberPairTerm::setPotential);
       ;
     }

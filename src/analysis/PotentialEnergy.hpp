@@ -31,13 +31,13 @@ namespace analysis {
 
 class PotentialEnergy : public Observable {
  public:
-  PotentialEnergy(shared_ptr<System> system, shared_ptr<interaction::Interaction> interaction,
+  PotentialEnergy(std::shared_ptr<System> system, std::shared_ptr<interaction::Interaction> interaction,
                   bool compute_at):
       Observable(system), interaction_(interaction), compute_at_(compute_at) {
     result_type = real_scalar;
     compute_global_ = false;
   }
-  PotentialEnergy(shared_ptr<System> system, shared_ptr<interaction::Interaction> interaction)
+  PotentialEnergy(std::shared_ptr<System> system, std::shared_ptr<interaction::Interaction> interaction)
       : Observable(system), interaction_(interaction) {
     result_type = real_scalar;
     compute_global_ = true;
@@ -47,7 +47,7 @@ class PotentialEnergy : public Observable {
 
   static void registerPython();
  private:
-  shared_ptr<interaction::Interaction> interaction_;
+  std::shared_ptr<interaction::Interaction> interaction_;
   bool compute_at_;  // set to true then computeEnergyAA, otherwise computeEnergyCG
   bool compute_global_;
 };

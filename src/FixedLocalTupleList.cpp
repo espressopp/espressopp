@@ -33,7 +33,7 @@ namespace espressopp {
     
     LOG4ESPP_LOGGER(FixedLocalTupleList::theLogger, "FixedLocalTupleList");
     
-    FixedLocalTupleList::FixedLocalTupleList(shared_ptr< storage::Storage > _storage)
+    FixedLocalTupleList::FixedLocalTupleList(std::shared_ptr< storage::Storage > _storage)
 	: storage(_storage), globalTuples()
     {
 	LOG4ESPP_INFO(theLogger, "construct FixedLocalTupleList");
@@ -232,8 +232,8 @@ namespace espressopp {
 	
 	using namespace espressopp::python;
 	
-	class_< FixedLocalTupleList, shared_ptr< FixedLocalTupleList > >
-	    ("FixedLocalTupleList", init< shared_ptr< storage::Storage > >())
+	class_< FixedLocalTupleList, std::shared_ptr< FixedLocalTupleList > >
+	    ("FixedLocalTupleList", init< std::shared_ptr< storage::Storage > >())
 	    .def("addTuple", &FixedLocalTupleList::addTuple)
 	    .def("getTuples", &FixedLocalTupleList::getTuples)
 	    .def("size", &FixedLocalTupleList::size)

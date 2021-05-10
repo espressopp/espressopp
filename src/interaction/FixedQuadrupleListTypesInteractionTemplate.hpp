@@ -49,21 +49,21 @@ class FixedQuadrupleListTypesInteractionTemplate: public Interaction, SystemAcce
 
  public:
   FixedQuadrupleListTypesInteractionTemplate
-      (shared_ptr<System> _system,
-       shared_ptr<FixedQuadrupleList> _fixedquadrupleList)
+      (std::shared_ptr<System> _system,
+       std::shared_ptr<FixedQuadrupleList> _fixedquadrupleList)
       : SystemAccess(_system), fixedquadrupleList(_fixedquadrupleList) {
     potentialArray = esutil::Array4D<Potential, esutil::enlarge>(0, 0, 0, 0, Potential());
     ntypes = 0;
   }
 
   void
-  setFixedQuadrupleList(shared_ptr<FixedQuadrupleList> _fixedquadrupleList) {
+  setFixedQuadrupleList(std::shared_ptr<FixedQuadrupleList> _fixedquadrupleList) {
     fixedquadrupleList = _fixedquadrupleList;
   }
 
   virtual ~FixedQuadrupleListTypesInteractionTemplate() { }
 
-  shared_ptr<FixedQuadrupleList> getFixedQuadrupleList() {
+  std::shared_ptr<FixedQuadrupleList> getFixedQuadrupleList() {
     return fixedquadrupleList;
   }
 
@@ -81,8 +81,8 @@ class FixedQuadrupleListTypesInteractionTemplate: public Interaction, SystemAcce
     return potentialArray.at(type1, type2, type3, type4);
   }
 
-  shared_ptr<Potential> getPotentialPtr(int type1, int type2, int type3, int type4) {
-    return make_shared<Potential>(potentialArray.at(type1, type2, type3, type4));
+  std::shared_ptr<Potential> getPotentialPtr(int type1, int type2, int type3, int type4) {
+    return std::make_shared<Potential>(potentialArray.at(type1, type2, type3, type4));
   }
 
   virtual void addForces();
@@ -102,7 +102,7 @@ class FixedQuadrupleListTypesInteractionTemplate: public Interaction, SystemAcce
 
  protected:
   int ntypes;
-  shared_ptr<FixedQuadrupleList> fixedquadrupleList;
+  std::shared_ptr<FixedQuadrupleList> fixedquadrupleList;
   esutil::Array4D<Potential, esutil::enlarge> potentialArray;
 };
 

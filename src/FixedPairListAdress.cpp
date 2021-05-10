@@ -34,8 +34,8 @@ namespace espressopp {
 
 
   FixedPairListAdress::
-  FixedPairListAdress(shared_ptr< storage::Storage > _storage,
-          shared_ptr<FixedTupleListAdress> _fixedtupleList)
+  FixedPairListAdress(std::shared_ptr< storage::Storage > _storage,
+          std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
           : FixedPairList(_storage), fixedtupleList(_fixedtupleList) {
     LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
     
@@ -245,10 +245,10 @@ namespace espressopp {
     bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairListAdress::add;
 
-    class_<FixedPairListAdress, shared_ptr<FixedPairListAdress> >
+    class_<FixedPairListAdress, std::shared_ptr<FixedPairListAdress> >
       ("FixedPairListAdress",
-              init <shared_ptr<storage::Storage>,
-                     shared_ptr<FixedTupleListAdress> >())
+              init <std::shared_ptr<storage::Storage>,
+                     std::shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
       .def("remove",  &FixedPairListAdress::remove)
       .def("getBonds",  &FixedPairListAdress::getBonds)

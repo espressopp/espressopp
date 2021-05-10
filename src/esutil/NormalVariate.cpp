@@ -28,7 +28,7 @@ using namespace boost;
 
 namespace espressopp {
   namespace esutil {
-    NormalVariate::NormalVariate(shared_ptr< RNG > _rng,
+    NormalVariate::NormalVariate(std::shared_ptr< RNG > _rng,
 				 const real mean, 
 				 const real sigma) 
       : Super(*(_rng->getBoostRNG()), DistType(mean, sigma)), rng(_rng)
@@ -45,7 +45,7 @@ namespace espressopp {
       	= &NormalVariate::operator();
 
       class_< NormalVariate >("esutil_NormalVariate",
-			      init< shared_ptr< RNG > >())
+			      init< std::shared_ptr< RNG > >())
       	.def("__call__", pyCall)
       	;
     }

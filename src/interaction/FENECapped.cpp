@@ -47,8 +47,8 @@ namespace espressopp {
 
       class_< FixedPairListFENECapped, bases< Interaction > >
       ("interaction_FixedPairListFENECapped",
-        init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENECapped> >())
-       .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENECapped> >())
+        init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<FENECapped> >())
+       .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<FENECapped> >())
        .def("setPotential", &FixedPairListFENECapped::setPotential)
        .def("getPotential", &FixedPairListFENECapped::getPotential)
        .def("setFixedPairList", &FixedPairListFENECapped::setFixedPairList)

@@ -39,8 +39,8 @@
 namespace espressopp {
 class FixedQuadrupleListAdress : public FixedQuadrupleList {
  public:
-  FixedQuadrupleListAdress(shared_ptr< storage::Storage > _storage,
-                           shared_ptr<FixedTupleListAdress> _fixedtupleList);
+  FixedQuadrupleListAdress(std::shared_ptr< storage::Storage > _storage,
+                           std::shared_ptr<FixedTupleListAdress> _fixedtupleList);
   ~FixedQuadrupleListAdress();
 
   /** Add the given particle quadruple to the list on this processor if the
@@ -62,7 +62,7 @@ class FixedQuadrupleListAdress : public FixedQuadrupleList {
   boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
  private:
-  shared_ptr<FixedTupleListAdress> fixedtupleList;
+  std::shared_ptr<FixedTupleListAdress> fixedtupleList;
   using QuadrupleList::add;
   static LOG4ESPP_DECL_LOGGER(theLogger);
 };

@@ -44,7 +44,7 @@ namespace espressopp {
       ~SlabBC() {}
 
       /** Constructor */
-      SlabBC(shared_ptr< esutil::RNG > _rng,
+      SlabBC(std::shared_ptr< esutil::RNG > _rng,
 		     const Real3D& _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */

@@ -39,14 +39,14 @@ namespace espressopp {
     class FixedTupleListAdress: public TupleList  {
         protected:
             boost::signals2::connection sigOnTupleChanged, sigAfterRecv, sigBeforeSend;
-            shared_ptr<storage::Storage> storage;
+            std::shared_ptr<storage::Storage> storage;
             typedef std::vector<longint> tuple;
             typedef boost::unordered_map<longint, tuple> GlobalTuples;
             GlobalTuples globalTuples;
             using TupleList::add;
 
         public:
-            FixedTupleListAdress(shared_ptr<storage::Storage> _storage);
+            FixedTupleListAdress(std::shared_ptr<storage::Storage> _storage);
             ~FixedTupleListAdress();
 
             void add(longint pid) { tmppids.push_back(pid); } // add particle id (called from python)

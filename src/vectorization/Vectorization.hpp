@@ -39,7 +39,7 @@ namespace espressopp {
     class Vectorization : public SystemAccess
     {
     public:
-      Vectorization(shared_ptr<System> system, shared_ptr<integrator::MDIntegrator> mdintegrator,
+      Vectorization(std::shared_ptr<System> system, std::shared_ptr<integrator::MDIntegrator> mdintegrator,
         Mode mode = ESPP_VEC_MODE_DEFAULT);
       ~Vectorization();
 
@@ -62,7 +62,7 @@ namespace espressopp {
       CellNeighborList neighborList;
       void resetCells();
 
-      shared_ptr<integrator::MDIntegrator> mdintegrator;
+      std::shared_ptr<integrator::MDIntegrator> mdintegrator;
 
       // signals that connect to integrator
       boost::signals2::connection sigBefCalcForces;
@@ -72,7 +72,7 @@ namespace espressopp {
       boost::signals2::connection sigResetParticles;
       boost::signals2::connection sigResetCells;
 
-      shared_ptr<storage::DomainDecomposition> decomp;
+      std::shared_ptr<storage::DomainDecomposition> decomp;
 
       static LOG4ESPP_DECL_LOGGER(logger);
     };

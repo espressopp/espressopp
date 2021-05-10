@@ -50,8 +50,8 @@ Example - how to turn on thermodynamic force for multiple moving spherical regio
         :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
         :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications (not used for static or single moving region)
         :param slow: (default: False) When used with RESPA Velocity Verlet, this flag decides whether the TD force is applied together with the slow, less frequently updated forces (slow=True) or with the fast, more frequently updated (slow=False) forces.
-        :type system: shared_ptr<System>
-        :type verletlist: shared_ptr<VerletListAdress>
+        :type system: std::shared_ptr<System>
+        :type verletlist: std::shared_ptr<VerletListAdress>
         :type startdist: real
         :type enddist: real
         :type edgeweightmultiplier: int

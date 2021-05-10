@@ -46,7 +46,7 @@ namespace espressopp {
 
       public:
         VerletListPIadressInteractionTemplate
-        (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, int _ntrotter, bool _speedup)
+        (std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList, int _ntrotter, bool _speedup)
           : verletList(_verletList), fixedtupleList(_fixedtupleList), ntrotter(_ntrotter), speedup(_speedup) {
 
           potentialArrayQM = esutil::Array2D<PotentialQM, esutil::enlarge>(0, 0, PotentialQM());
@@ -55,20 +55,20 @@ namespace espressopp {
         }
 
         void
-        setVerletList(shared_ptr < VerletListAdress > _verletList) {
+        setVerletList(std::shared_ptr < VerletListAdress > _verletList) {
           verletList = _verletList;
         }
 
-        shared_ptr<VerletListAdress> getVerletList() {
+        std::shared_ptr<VerletListAdress> getVerletList() {
           return verletList;
         }
 
         void
-        setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
+        setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
         }
 
-        shared_ptr < FixedTupleListAdress > getFixedTupleList() {
+        std::shared_ptr < FixedTupleListAdress > getFixedTupleList() {
           return fixedtupleList;
         }
 
@@ -139,8 +139,8 @@ namespace espressopp {
 
       protected:
         int ntypes;
-        shared_ptr<VerletListAdress> verletList;
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
+        std::shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         esutil::Array2D<PotentialQM, esutil::enlarge> potentialArrayQM;
         esutil::Array2D<PotentialCL, esutil::enlarge> potentialArrayCL;
 

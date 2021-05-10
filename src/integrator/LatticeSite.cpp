@@ -292,7 +292,7 @@ namespace espressopp {
 
 /*******************************************************************************************/
 
-        LatticePar::LatticePar (shared_ptr<System> system, int _numVelsLoc, real _a, real _tau) {
+        LatticePar::LatticePar (std::shared_ptr<System> system, int _numVelsLoc, real _a, real _tau) {
             setNumVelsLoc(_numVelsLoc);
             setALoc(_a);
             setTauLoc(_tau);
@@ -354,7 +354,7 @@ namespace espressopp {
 
 /*******************************************************************************************/
 
-        shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
+        std::shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
         int LatticePar::numVelsLoc = 0;								// initializer
         real LatticePar::aLoc = 0.;										// initializer
         real LatticePar::tauLoc = 0.;									// initializer

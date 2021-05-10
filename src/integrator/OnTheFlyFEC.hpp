@@ -45,7 +45,7 @@ namespace espressopp {
     class OnTheFlyFEC : public Extension {
 
       public:
-        OnTheFlyFEC(shared_ptr<System> system);
+        OnTheFlyFEC(std::shared_ptr<System> system);
         virtual ~OnTheFlyFEC();
 
         void setBins(int bins);

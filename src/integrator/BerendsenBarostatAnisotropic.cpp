@@ -35,7 +35,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(BerendsenBarostatAnisotropic::theLogger, "BerendsenBarostatAnisotropic");
 
-    BerendsenBarostatAnisotropic::BerendsenBarostatAnisotropic(shared_ptr<System> system): Extension(system){
+    BerendsenBarostatAnisotropic::BerendsenBarostatAnisotropic(std::shared_ptr<System> system): Extension(system){
       tau  = 1.0;
       P0 = Real3D(1.0);
       
@@ -121,9 +121,9 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<BerendsenBarostatAnisotropic, shared_ptr<BerendsenBarostatAnisotropic>, bases<Extension> >
+      class_<BerendsenBarostatAnisotropic, std::shared_ptr<BerendsenBarostatAnisotropic>, bases<Extension> >
 
-        ("integrator_BerendsenBarostatAnisotropic", init< shared_ptr<System> >())
+        ("integrator_BerendsenBarostatAnisotropic", init< std::shared_ptr<System> >())
 
         .add_property("tau",
               &BerendsenBarostatAnisotropic::getTau,

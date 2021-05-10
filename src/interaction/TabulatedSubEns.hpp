@@ -45,7 +45,7 @@ namespace espressopp {
         private:
             int numInteractions;
             std::vector<std::string> filenames;
-            std::vector<shared_ptr <Interpolation>> tables;
+            std::vector<std::shared_ptr <Interpolation>> tables;
             int interpolationType;
             // Reference values of the collective variable centers
             RealNDs colVarRef;

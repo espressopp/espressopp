@@ -52,19 +52,19 @@ namespace espressopp {
     	;
 
       class_< VerletListLennardJonesExpand, bases< Interaction > > 
-        ("interaction_VerletListLennardJonesExpand", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListLennardJonesExpand", init< std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListLennardJonesExpand::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListLennardJonesExpand::getPotential, return_value_policy< reference_existing_object >())
         ;
 
       class_< CellListLennardJonesExpand, bases< Interaction > >
-        ("interaction_CellListLennardJonesExpand", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListLennardJonesExpand", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListLennardJonesExpand::setPotential);
 	;
 
       class_< FixedPairListLennardJonesExpand, bases< Interaction > >
         ("interaction_FixedPairListLennardJonesExpand",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesExpand> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJonesExpand> >())
         .def("setPotential", &FixedPairListLennardJonesExpand::setPotential);
         ;
     }

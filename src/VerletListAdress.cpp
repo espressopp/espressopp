@@ -39,7 +39,7 @@ namespace espressopp {
 
   /*-------------------------------------------------------------*/
 
-    VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, real adrCut,
+    VerletListAdress::VerletListAdress(std::shared_ptr<System> system, real cut, real adrCut,
                                        bool rebuildVL, real _dEx, real _dHy)
     :SystemAccess(system) {
       LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
@@ -244,8 +244,8 @@ namespace espressopp {
       void (VerletListAdress::*pySetAdrRegionType)(bool _sphereAdr)
             = &VerletListAdress::setAdrRegionType;
 
-      class_<VerletListAdress, shared_ptr<VerletList> >
-        ("VerletListAdress", init< shared_ptr<System>, real, real, bool, real, real>())
+      class_<VerletListAdress, std::shared_ptr<VerletList> >
+        ("VerletListAdress", init< std::shared_ptr<System>, real, real, bool, real, real>())
         .add_property("system", &SystemAccess::getSystem)
         .add_property("builds", &VerletListAdress::getBuilds, &VerletListAdress::setBuilds)
         .def("totalSize", &VerletListAdress::totalSize)

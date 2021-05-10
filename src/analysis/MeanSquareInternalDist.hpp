@@ -40,7 +40,7 @@ namespace espressopp {
         class MeanSquareInternalDist : public ConfigsParticleDecomp {
         public:
 
-            MeanSquareInternalDist(shared_ptr<System> system, int chainlength, int start_pid) :
+            MeanSquareInternalDist(std::shared_ptr<System> system, int chainlength, int start_pid) :
                                 ConfigsParticleDecomp(system,chainlength,start_pid) {
                 // by default 
                 setPrint_progress(true);

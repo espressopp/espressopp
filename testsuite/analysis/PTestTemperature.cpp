@@ -62,8 +62,8 @@ static int halfCellInt = 1;
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr<DomainDecomposition> domdec;
-  shared_ptr<System> system;
+  std::shared_ptr<DomainDecomposition> domdec;
+  std::shared_ptr<System> system;
 
   Fixture() {
 
@@ -96,11 +96,11 @@ struct Fixture {
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
                                  cellGrid[1] << " x " << cellGrid[2]);
 
-    system = make_shared< System >();
-    system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
+    system = std::make_shared< System >();
+    system->rng = std::make_shared< RNG >();
+    system->bc = std::make_shared< OrthorhombicBC >(system->rng, boxLRef);
     system->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(system,
+    domdec = std::make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
                                                 cellGrid,
                                                 halfCellInt);
@@ -141,8 +141,8 @@ struct Fixture {
 
 struct DomainFixture {
 
-  shared_ptr<DomainDecomposition> domdec;
-  shared_ptr<System> system;
+  std::shared_ptr<DomainDecomposition> domdec;
+  std::shared_ptr<System> system;
 
   real SIZE;
 
@@ -179,11 +179,11 @@ struct DomainFixture {
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
                                  cellGrid[1] << " x " << cellGrid[2]);
 
-    system = make_shared< System >();
-    system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
+    system = std::make_shared< System >();
+    system->rng = std::make_shared< RNG >();
+    system->bc = std::make_shared< OrthorhombicBC >(system->rng, boxL);
     system->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(system,
+    domdec = std::make_shared< DomainDecomposition >(system,
                                                 nodeGrid,
                                                 cellGrid,
                                                 halfCellInt);

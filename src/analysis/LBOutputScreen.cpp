@@ -26,8 +26,8 @@
 namespace espressopp {
    namespace analysis {
       //  LOG4ESPP_LOGGER(LBOutputScreen::theLogger, "LBOutputScreen");
-      LBOutputScreen::LBOutputScreen(shared_ptr<System> system,
-                                     shared_ptr< integrator::LatticeBoltzmann >latticeboltzmann)
+      LBOutputScreen::LBOutputScreen(std::shared_ptr<System> system,
+                                     std::shared_ptr< integrator::LatticeBoltzmann >latticeboltzmann)
       : LBOutput(system, latticeboltzmann) {}
 
       void LBOutputScreen::writeOutput() {
@@ -175,8 +175,8 @@ namespace espressopp {
          using namespace espressopp::python;
 
          class_<LBOutputScreen, bases< LBOutput > >
-         ("analysis_LBOutput_Screen", init< shared_ptr< System >,
-          shared_ptr< integrator::LatticeBoltzmann > >())
+         ("analysis_LBOutput_Screen", init< std::shared_ptr< System >,
+          std::shared_ptr< integrator::LatticeBoltzmann > >())
 
          .def("writeOutput", &LBOutputScreen::writeOutput)
          .def("getLBMom", &LBOutputScreen::getLBMom)

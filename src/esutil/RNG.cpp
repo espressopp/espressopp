@@ -36,7 +36,7 @@ using namespace boost;
 namespace espressopp {
   namespace esutil {
 
-    RNG::RNG(long _seed): boostRNG(make_shared< RNGType >(_seed + mpiWorld->rank())),
+    RNG::RNG(long _seed): boostRNG(std::make_shared< RNGType >(_seed + mpiWorld->rank())),
             normalVariate(*boostRNG, normal_distribution< real >(0.0, 1.0)),
             uniformOnSphereVariate(*boostRNG, uniform_on_sphere< real, Real3D >(3)),
             seed_(_seed)
@@ -79,7 +79,7 @@ namespace espressopp {
       return uniformOnSphereVariate();
     }
 
-    shared_ptr< RNGType > RNG::getBoostRNG() {
+    std::shared_ptr< RNGType > RNG::getBoostRNG() {
       return boostRNG;
     }
 

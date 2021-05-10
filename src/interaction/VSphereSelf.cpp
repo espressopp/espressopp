@@ -46,7 +46,7 @@ namespace espressopp {
       ;
 
       class_< SelfVSphere, bases< Interaction > >("interaction_SelfVSphere",
-      init< shared_ptr<System>, shared_ptr<VSphereSelf> >())
+      init< std::shared_ptr<System>, std::shared_ptr<VSphereSelf> >())
       .def("setPotential", &SelfVSphere::setPotential)
       .def("getPotential", &SelfVSphere::getPotential)
       ;

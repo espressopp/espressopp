@@ -46,8 +46,8 @@ espressopp.interaction.Tabulated
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressTabulated.setPotentialAT(type1, type2, potential)
 
@@ -58,7 +58,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressTabulated.setPotentialCG(type1, type2, potential)
 
@@ -69,7 +69,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressCGTabulated(vl, fixedtupleList)
 
@@ -77,8 +77,8 @@ espressopp.interaction.Tabulated
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressCGTabulated.setPotential(type1, type2, potential)
 
@@ -89,7 +89,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressCGTabulated.getPotential(type1, type2)
 
@@ -99,13 +99,13 @@ espressopp.interaction.Tabulated
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Tabulated>
+        :rtype: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressCGTabulated.getVerletList()
 
         Gets the verletlist used in VerletListAdressCGTabulated interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressTabulated(vl, fixedtupleList)
 
@@ -113,8 +113,8 @@ espressopp.interaction.Tabulated
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressTabulated.setPotentialAT(type1, type2, potential)
 
@@ -125,7 +125,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressTabulated.setPotentialCG(type1, type2, potential)
 
@@ -136,7 +136,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressCGTabulated(vl, fixedtupleList)
 
@@ -144,8 +144,8 @@ espressopp.interaction.Tabulated
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressCGTabulated.setPotential(type1, type2, potential)
 
@@ -156,7 +156,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressCGTabulated.getPotential(type1, type2)
 
@@ -166,20 +166,20 @@ espressopp.interaction.Tabulated
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Tabulated>
+        :rtype: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressCGTabulated.getVerletList()
 
         Gets the verletlist used in VerletListHadressCGTabulated interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListTabulated(vl)
 
         Defines a verletlist-based interaction using a tabulated potential.
 
         :param vl: Verletlist object
-        :type vl: shared_ptr<VerletList>
+        :type vl: std::shared_ptr<VerletList>
 
 .. function:: espressopp.interaction.VerletListTabulated.getPotential(type1, type2)
 
@@ -189,7 +189,7 @@ espressopp.interaction.Tabulated
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Tabulated>
+        :rtype: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListTabulated.setPotential(type1, type2, potential)
 
@@ -200,14 +200,14 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.CellListTabulated(stor)
 
         Defines a CellList-based interaction using a tabulated potential.
 
         :param stor: storage object
-        :type stor: shared_ptr <storage::Storage>
+        :type stor: std::shared_ptr <storage::Storage>
 
 .. function:: espressopp.interaction.CellListTabulated.setPotential(type1, type2, potential)
 
@@ -218,7 +218,7 @@ espressopp.interaction.Tabulated
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.FixedPairListTabulated(system, vl, potential)
 
@@ -227,16 +227,16 @@ espressopp.interaction.Tabulated
         :param system: system object
         :param vl: FixedPairList list object
         :param potential: tabulated potential object
-        :type system: shared_ptr<System>
-        :type vl: shared_ptr<FixedPairList>
-        :type potential: shared_ptr<Tabulated>
+        :type system: std::shared_ptr<System>
+        :type vl: std::shared_ptr<FixedPairList>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.FixedPairListTabulated.setPotential(potential)
 
         Sets the tabulated interaction potential in FixedPairListTabulated for interacting particles.
 
         :param potential: tabulated potential object
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.FixedPairListTypesTabulated(system, fpl)
 
@@ -286,7 +286,7 @@ espressopp.interaction.Tabulated
         Gets the potential.
 
         :return: the potential
-        :rtype: shared_ptr < Potential >
+        :rtype: std::shared_ptr < Potential >
 
 .. function:: espressopp.interaction.FixedPairListPIadressTabulated.setFixedPairList(fpl)
 
@@ -300,7 +300,7 @@ espressopp.interaction.Tabulated
         Gets the FixedPairList.
 
         :return: the FixedPairList
-        :rtype: shared_ptr < FixedPairList >
+        :rtype: std::shared_ptr < FixedPairList >
 
 .. function:: espressopp.interaction.FixedPairListPIadressTabulated.setFixedTupleList(fixedtupleList)
 
@@ -314,7 +314,7 @@ espressopp.interaction.Tabulated
         Gets the FixedTupleList.
 
         :return: the FixedTupleList
-        :rtype: shared_ptr < FixedTupleListAdress >
+        :rtype: std::shared_ptr < FixedTupleListAdress >
 
 .. function:: espressopp.interaction.FixedPairListPIadressTabulated.setNTrotter(ntrotter)
 
@@ -383,7 +383,7 @@ espressopp.interaction.Tabulated
         Gets the VerletList.
 
         :return: the Adress VerletList
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListPIadressTabulated.setFixedTupleList(fixedtupleList)
 
@@ -397,7 +397,7 @@ espressopp.interaction.Tabulated
         Gets the FixedTupleList.
 
         :return: the FixedTupleList
-        :rtype: shared_ptr < FixedTupleListAdress >
+        :rtype: std::shared_ptr < FixedTupleListAdress >
 
 .. function:: espressopp.interaction.VerletListPIadressTabulated.setNTrotter(ntrotter)
 
@@ -466,7 +466,7 @@ espressopp.interaction.Tabulated
         Gets the VerletList.
 
         :return: the Adress VerletList
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListPIadressTabulatedLJ.setFixedTupleList(fixedtupleList)
 
@@ -480,7 +480,7 @@ espressopp.interaction.Tabulated
         Gets the FixedTupleList.
 
         :return: the FixedTupleList
-        :rtype: shared_ptr < FixedTupleListAdress >
+        :rtype: std::shared_ptr < FixedTupleListAdress >
 
 .. function:: espressopp.interaction.VerletListPIadressTabulatedLJ.setNTrotter(ntrotter)
 
@@ -542,7 +542,7 @@ espressopp.interaction.Tabulated
         Gets the VerletList.
 
         :return: the Adress VerletList
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListPIadressNoDriftTabulated.setFixedTupleList(fixedtupleList)
 
@@ -556,7 +556,7 @@ espressopp.interaction.Tabulated
         Gets the FixedTupleList.
 
         :return: the FixedTupleList
-        :rtype: shared_ptr < FixedTupleListAdress >
+        :rtype: std::shared_ptr < FixedTupleListAdress >
 
 .. function:: espressopp.interaction.VerletListPIadressNoDriftTabulated.setNTrotter(ntrotter)
 

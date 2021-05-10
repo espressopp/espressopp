@@ -169,7 +169,7 @@ namespace espressopp {
 
       class_<Autocorrelation>(
         "analysis_Autocorrelation",
-        init< shared_ptr< System > >()
+        init< std::shared_ptr< System > >()
       )
       .def_readonly("size", &Autocorrelation::getListSize)
       

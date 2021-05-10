@@ -42,7 +42,7 @@ This is done via:
 
 .. py:class:: espressopp.interaction.FixedTripleListAngularCosineSquared (system, fixed_triple_list, potential)
 
-    :param shared_ptr system: system object
+    :param std::shared_ptr system: system object
     :param list fixed_triple_list: a fixed list of all triples in the system
     :param potential: triple potential (in this case, :py:class:`espressopp.interaction.AngularCosineSquared`).
     :rtype: interaction

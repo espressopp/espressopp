@@ -34,14 +34,14 @@ namespace espressopp {
     class FixedLocalTupleList : public TupleList {
     protected:
 	boost::signals2::connection con1, con2, con3;
-	shared_ptr<storage::Storage> storage;
+	std::shared_ptr<storage::Storage> storage;
 	typedef std::vector<longint> tuple;
 	typedef std::multimap <longint,tuple > GlobalTuples;
 	GlobalTuples globalTuples;
 	using TupleList::add;
 	
     public:
-	FixedLocalTupleList(shared_ptr<storage::Storage> _storage);
+	FixedLocalTupleList(std::shared_ptr<storage::Storage> _storage);
 	virtual ~FixedLocalTupleList();
 	virtual bool addTuple(boost::python::list& tuple);
 	virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);

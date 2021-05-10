@@ -40,7 +40,7 @@ namespace integrator {
 /** Langevin thermostat on ParticleGroup */
 class LangevinThermostatOnGroup: public Extension {
  public:
-  LangevinThermostatOnGroup(shared_ptr<System>, shared_ptr<ParticleGroup> pg);
+  LangevinThermostatOnGroup(std::shared_ptr<System>, std::shared_ptr<ParticleGroup> pg);
   virtual ~LangevinThermostatOnGroup();
 
   void setGamma(real gamma);
@@ -85,9 +85,9 @@ class LangevinThermostatOnGroup: public Extension {
 
   real pref2buffer;  //!< temporary to save value between heatUp/coolDown
 
-  shared_ptr<esutil::RNG> rng;  //!< random number generator used for friction term
+  std::shared_ptr<esutil::RNG> rng;  //!< random number generator used for friction term
 
-  shared_ptr<ParticleGroup> particle_group;
+  std::shared_ptr<ParticleGroup> particle_group;
 };
 }  // end namespace integrator
 }  // end namespace espressopp

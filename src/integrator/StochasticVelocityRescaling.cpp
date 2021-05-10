@@ -41,7 +41,7 @@ LOG4ESPP_LOGGER(StochasticVelocityRescaling::theLogger,
 		"StochasticVelocityRescaling");
 
 StochasticVelocityRescaling::StochasticVelocityRescaling(
-		shared_ptr<System> system) :
+		std::shared_ptr<System> system) :
 		Extension(system) {
 	temperature = 0.0;
 	coupling = 1; //tau_t coupling
@@ -173,7 +173,7 @@ real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
 }
 
 real StochasticVelocityRescaling::stochasticVR_pullEkin(real Ekin,
-		real Ekin_ref, int dof, real taut, shared_ptr<esutil::RNG> rng) {
+		real Ekin_ref, int dof, real taut, std::shared_ptr<esutil::RNG> rng) {
 	real factor, rr;
 
 	/*
@@ -258,9 +258,9 @@ void StochasticVelocityRescaling::registerPython() {
 
 	using namespace espressopp::python;
 
-	class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling>, bases<Extension> >
+	class_<StochasticVelocityRescaling, std::shared_ptr<StochasticVelocityRescaling>, bases<Extension> >
 
-	("integrator_StochasticVelocityRescaling", init<shared_ptr<System> >())
+	("integrator_StochasticVelocityRescaling", init<std::shared_ptr<System> >())
 
 	.add_property("temperature", &StochasticVelocityRescaling::getTemperature,
 			&StochasticVelocityRescaling::setTemperature).add_property(

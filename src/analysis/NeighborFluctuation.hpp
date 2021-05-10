@@ -39,7 +39,7 @@ namespace espressopp {
     /** Class to get the number of particles in the system. */
     class NeighborFluctuation : public Observable {
     public:
-      NeighborFluctuation(shared_ptr< System > system, real _radius) : Observable(system), radius(_radius){
+      NeighborFluctuation(std::shared_ptr< System > system, real _radius) : Observable(system), radius(_radius){
         esutil::Error err(system->comm);
         
         Real3D Li = system->bc->getBoxL();

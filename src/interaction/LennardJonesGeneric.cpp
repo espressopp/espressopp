@@ -66,7 +66,7 @@ namespace espressopp {
       ;
 
       class_< VerletListLennardJonesGeneric, bases< Interaction > > 
-        ("interaction_VerletListLennardJonesGeneric", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListLennardJonesGeneric", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJonesGeneric::getVerletList)
         .def("setPotential", &VerletListLennardJonesGeneric::setPotential)
         .def("getPotential", &VerletListLennardJonesGeneric::getPotentialPtr)
@@ -74,45 +74,45 @@ namespace espressopp {
 
       class_< VerletListAdressLennardJonesGeneric, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesGeneric",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressLennardJonesGeneric::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJonesGeneric::setPotentialCG);
       ;
       
       class_< VerletListAdressLennardJonesGeneric2, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesGeneric2",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressLennardJonesGeneric2::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJonesGeneric2::setPotentialCG);
       ;
 
       class_< VerletListHadressLennardJonesGeneric, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesGeneric",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLennardJonesGeneric::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJonesGeneric::setPotentialCG);
       ;
       
       class_< VerletListHadressLennardJonesGeneric2, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesGeneric2",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLennardJonesGeneric2::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJonesGeneric2::setPotentialCG);
       ;
       
       class_< CellListLennardJonesGeneric, bases< Interaction > > 
-        ("interaction_CellListLennardJonesGeneric", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListLennardJonesGeneric", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListLennardJonesGeneric::setPotential);
 	  ;
 
       class_< FixedPairListLennardJonesGeneric, bases< Interaction > >
         ("interaction_FixedPairListLennardJonesGeneric",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesGeneric> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesGeneric> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJonesGeneric> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<LennardJonesGeneric> >())
           .def("setPotential", &FixedPairListLennardJonesGeneric::setPotential)
           .def("getPotential", &FixedPairListLennardJonesGeneric::getPotential)
           .def("setFixedPairList", &FixedPairListLennardJonesGeneric::setFixedPairList)

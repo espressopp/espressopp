@@ -41,7 +41,7 @@ namespace espressopp {
 /*-------------------------------------------------------------*/
 
   // cut is a cutoff (without skin)
-  VerletList::VerletList(shared_ptr<System> system, real _cut, bool rebuildVL, bool useBuffers, bool useSOA)
+  VerletList::VerletList(std::shared_ptr<System> system, real _cut, bool rebuildVL, bool useBuffers, bool useSOA)
     : SystemAccess(system), useBuffers(useBuffers), useSOA(useSOA)
   {
     LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
@@ -348,8 +348,8 @@ namespace espressopp {
           = &VerletList::exclude;
 
 
-    class_<VerletList, shared_ptr<VerletList> >
-      ("VerletList", init< shared_ptr<System>, real, bool, bool, bool >())
+    class_<VerletList, std::shared_ptr<VerletList> >
+      ("VerletList", init< std::shared_ptr<System>, real, bool, bool, bool >())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)

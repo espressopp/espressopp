@@ -46,7 +46,7 @@ namespace espressopp {
 
       public:
         VerletListAdressATATCGInteractionTemplate
-        (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+        (std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
           : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
           potentialArrayAT1 = esutil::Array2D<PotentialAT1, esutil::enlarge>(0, 0, PotentialAT1());
@@ -65,16 +65,16 @@ namespace espressopp {
         }
 
         void
-        setVerletList(shared_ptr < VerletListAdress > _verletList) {
+        setVerletList(std::shared_ptr < VerletListAdress > _verletList) {
           verletList = _verletList;
         }
 
-        shared_ptr<VerletListAdress> getVerletList() {
+        std::shared_ptr<VerletListAdress> getVerletList() {
           return verletList;
         }
 
         void
-        setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
+        setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
         }
 
@@ -142,8 +142,8 @@ namespace espressopp {
 
       protected:
         int ntypes;
-        shared_ptr<VerletListAdress> verletList;
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
+        std::shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         esutil::Array2D<PotentialAT1, esutil::enlarge> potentialArrayAT1;
         esutil::Array2D<PotentialAT2, esutil::enlarge> potentialArrayAT2;
         esutil::Array2D<PotentialCG, esutil::enlarge> potentialArrayCG;

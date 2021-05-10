@@ -55,7 +55,7 @@ namespace espressopp {
 			;
 			
 			class_< VerletListLJcos, bases< Interaction > >
-			("interaction_VerletListLJcos", init< shared_ptr<VerletList> >())
+			("interaction_VerletListLJcos", init< std::shared_ptr<VerletList> >())
 			.def("getVerletList", &VerletListLJcos::getVerletList)
 			.def("setPotential", &VerletListLJcos::setPotential, return_value_policy< reference_existing_object >())
 			.def("getPotential", &VerletListLJcos::getPotential, return_value_policy< reference_existing_object >())
@@ -63,27 +63,27 @@ namespace espressopp {
 			
 			class_< VerletListAdressLJcos, bases< Interaction > >
 			("interaction_VerletListAdressLJcos",
-			 init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+			 init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
 			.def("setPotentialAT", &VerletListAdressLJcos::setPotentialAT)
 			.def("setPotentialCG", &VerletListAdressLJcos::setPotentialCG);
 			;
 			
 			class_< VerletListHadressLJcos, bases< Interaction > >
 			("interaction_VerletListHadressLJcos",
-			 init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+			 init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
 			.def("setPotentialAT", &VerletListHadressLJcos::setPotentialAT)
 			.def("setPotentialCG", &VerletListHadressLJcos::setPotentialCG);
 			;
 			
 			class_< CellListLJcos, bases< Interaction > >
-			("interaction_CellListLJcos", init< shared_ptr< storage::Storage > >())
+			("interaction_CellListLJcos", init< std::shared_ptr< storage::Storage > >())
 			.def("setPotential", &CellListLJcos::setPotential);
 	  ;
 			
 			class_< FixedPairListLJcos, bases< Interaction > >
 			("interaction_FixedPairListLJcos",
-			 init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LJcos> >())
-			.def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LJcos> >())
+			 init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LJcos> >())
+			.def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<LJcos> >())
 			.def("setPotential", &FixedPairListLJcos::setPotential)
 			.def("setFixedPairList", &FixedPairListLJcos::setFixedPairList)
 			.def("getFixedPairList", &FixedPairListLJcos::getFixedPairList)

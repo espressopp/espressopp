@@ -63,8 +63,8 @@ namespace espressopp {
 
       class_< FixedPairListHarmonic, bases< Interaction > >
         ("interaction_FixedPairListHarmonic",
-           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Harmonic> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Harmonic> >())
+           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<Harmonic> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<Harmonic> >())
         .def("setPotential", &FixedPairListHarmonic::setPotential)
         .def("getPotential", &FixedPairListHarmonic::getPotential)
         .def("setFixedPairList", &FixedPairListHarmonic::setFixedPairList)
@@ -72,8 +72,8 @@ namespace espressopp {
       ;
       class_< FixedPairListTypesHarmonic, bases< Interaction > >
         ("interaction_FixedPairListTypesHarmonic",
-           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListTypesHarmonic::setPotential)
         .def("getPotential", &FixedPairListTypesHarmonic::getPotentialPtr)
         .def("setFixedPairList", &FixedPairListTypesHarmonic::setFixedPairList)
@@ -82,15 +82,15 @@ namespace espressopp {
 
       class_< VerletListHarmonic, bases< Interaction > >
         ("interaction_VerletListHarmonic",
-           init< shared_ptr<VerletList> >())
+           init< std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListHarmonic::setPotential)
         .def("getPotential", &VerletListHarmonic::getPotentialPtr)
       ;
 
             class_< VerletListAdressATHarmonic, bases< Interaction > >
         ("interaction_VerletListAdressATHarmonic",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListAdressATHarmonic::getVerletList)
         .def("setPotential", &VerletListAdressATHarmonic::setPotential)
         .def("getPotential", &VerletListAdressATHarmonic::getPotentialPtr)
@@ -98,8 +98,8 @@ namespace espressopp {
 
       class_< VerletListAdressCGHarmonic, bases< Interaction > >
         ("interaction_VerletListAdressCGHarmonic",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListAdressCGHarmonic::getVerletList)
         .def("setPotential", &VerletListAdressCGHarmonic::setPotential)
         .def("getPotential", &VerletListAdressCGHarmonic::getPotentialPtr)
@@ -107,8 +107,8 @@ namespace espressopp {
 
             class_< VerletListHadressATHarmonic, bases< Interaction > >
         ("interaction_VerletListHadressATHarmonic",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListHadressATHarmonic::getVerletList)
         .def("setPotential", &VerletListHadressATHarmonic::setPotential)
         .def("getPotential", &VerletListHadressATHarmonic::getPotentialPtr)
@@ -116,8 +116,8 @@ namespace espressopp {
 
       class_< VerletListHadressCGHarmonic, bases< Interaction > >
         ("interaction_VerletListHadressCGHarmonic",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+           init< std::shared_ptr<VerletListAdress>,
+                  std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListHadressCGHarmonic::getVerletList)
         .def("setPotential", &VerletListHadressCGHarmonic::setPotential)
         .def("getPotential", &VerletListHadressCGHarmonic::getPotentialPtr)

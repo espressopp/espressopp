@@ -47,12 +47,12 @@ namespace espressopp {
     class TDforce : public Extension {
 
       public:
-        shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<VerletListAdress> verletList;
         real startdist;
         real enddist;
         int edgeweightmultiplier;
         bool slow;
-        TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1, bool _slow = false);
+        TDforce(std::shared_ptr<System> system, std::shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1, bool _slow = false);
 
         ~TDforce();
 
@@ -76,7 +76,7 @@ namespace espressopp {
         Real3D center; // center of adress zone, from verletlistadress (assumes only one point as center)
         bool sphereAdr; // true: adress region is spherical centered on point x,y,z or particle pid; false: adress region is slab centered on point x or particle pid, from verletlistadres
         std::string filename;
-        typedef shared_ptr <interaction::Interpolation> Table;
+        typedef std::shared_ptr <interaction::Interpolation> Table;
         std::unordered_map<int, Table> forces; // map type to force
 
         static LOG4ESPP_DECL_LOGGER(theLogger);

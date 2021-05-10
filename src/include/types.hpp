@@ -23,22 +23,20 @@
 #ifndef _TYPES_HPP
 #define _TYPES_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpi.hpp>
 #include <exception>
 #include <limits>
+#include <memory>
 #include "esconfig.hpp"
 
 namespace espressopp {
-  using boost::shared_ptr;
-  using boost::weak_ptr;
-  using boost::make_shared;
-  using boost::enable_shared_from_this;
-  using boost::const_pointer_cast;
-  using boost::static_pointer_cast;
-  using boost::dynamic_pointer_cast;
+  using std::shared_ptr;
+  using std::weak_ptr;
+  using std::make_shared;
+  using std::enable_shared_from_this;
+  using std::const_pointer_cast;
+  using std::static_pointer_cast;
+  using std::dynamic_pointer_cast;
   namespace mpi {
     using namespace boost::mpi;
   }

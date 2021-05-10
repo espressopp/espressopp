@@ -57,7 +57,7 @@ namespace espressopp {
           straightforward.
           */
       public:
-         LatticeBoltzmann (shared_ptr< System > _system,
+         LatticeBoltzmann (std::shared_ptr< System > _system,
                            Int3D _nodeGrid, real _a, real _tau, int _numDims, int _numVels);
          ~LatticeBoltzmann ();
 
@@ -269,7 +269,7 @@ namespace espressopp {
          int stepNum;                           // step number
          real copyTimestep;                  // copy of the integrator timestep
          bool restart;
-         shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
+         std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
 
          // EXTERNAL FORCES
          bool extForce;                         // flag for an external force

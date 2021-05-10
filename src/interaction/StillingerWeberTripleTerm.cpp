@@ -67,8 +67,8 @@ namespace espressopp {
       
       class_< VerletListStillingerWeberTripleTerm, bases< Interaction > >(
         "interaction_VerletListStillingerWeberTripleTerm",
-        init< shared_ptr<System>, 
-              shared_ptr<VerletListTriple> >()
+        init< std::shared_ptr<System>,
+              std::shared_ptr<VerletListTriple> >()
       )
       .def("getVerletListTriple", &VerletListStillingerWeberTripleTerm::getVerletListTriple)
       .def("setPotential", &VerletListStillingerWeberTripleTerm::setPotential,
@@ -79,7 +79,7 @@ namespace espressopp {
 
       class_< FixedListStillingerWeberTripleTerm, bases< Interaction > >(
           "interaction_FixedTripleListStillingerWeberTripleTerm",
-          init<shared_ptr<System>, shared_ptr<FixedTripleList>, shared_ptr<StillingerWeberTripleTerm> >()
+          init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<StillingerWeberTripleTerm> >()
       )
       .def("setPotential", &FixedListStillingerWeberTripleTerm::setPotential)
       .def("getFixedTripleList", &FixedListStillingerWeberTripleTerm::getFixedTripleList)

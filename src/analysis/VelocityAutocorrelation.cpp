@@ -105,7 +105,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >
-      ("analysis_VelocityAutocorrelation",init< shared_ptr< System > >() )
+      ("analysis_VelocityAutocorrelation",init< std::shared_ptr< System > >() )
         .add_property("print_progress", &VelocityAutocorrelation::getPrint_progress, &VelocityAutocorrelation::setPrint_progress)
       ;
     }

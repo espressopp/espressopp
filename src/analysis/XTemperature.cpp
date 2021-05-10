@@ -66,7 +66,7 @@ namespace espressopp {
       }
       
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
           
@@ -219,7 +219,7 @@ namespace espressopp {
     void XTemperature::registerPython() {
       using namespace espressopp::python;
       class_<XTemperature, bases< Observable > >
-        ("analysis_XTemperature", init< shared_ptr< System > >())
+        ("analysis_XTemperature", init< std::shared_ptr< System > >())
         .def("compute", &XTemperature::computeArray)
       ;
     }

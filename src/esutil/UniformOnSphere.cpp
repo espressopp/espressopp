@@ -28,7 +28,7 @@ using namespace boost;
 
 namespace espressopp {
   namespace esutil {
-    UniformOnSphere::UniformOnSphere(shared_ptr< RNG > _rng)
+    UniformOnSphere::UniformOnSphere(std::shared_ptr< RNG > _rng)
       : Super(*(_rng->getBoostRNG()), DistType(3)), rng(_rng)
     {}
 
@@ -43,7 +43,7 @@ namespace espressopp {
       	= &UniformOnSphere::operator();
 
       class_< UniformOnSphere >("esutil_UniformOnSphere",
-      				init< shared_ptr< RNG > >())
+      				init< std::shared_ptr< RNG > >())
       	.def("__call__", pyCall)
       	;
     }

@@ -43,9 +43,9 @@ namespace espressopp {
       FixedTripleListAngularCosineSquared;
       class_< FixedTripleListAngularCosineSquared, bases< Interaction > >
         ("interaction_FixedTripleListAngularCosineSquared",
-                init<shared_ptr<System>,
-                    shared_ptr<FixedTripleList>,
-                    shared_ptr<AngularCosineSquared> >())
+                init<std::shared_ptr<System>,
+                    std::shared_ptr<FixedTripleList>,
+                    std::shared_ptr<AngularCosineSquared> >())
         .def("setPotential", &FixedTripleListAngularCosineSquared::setPotential)
         .def("getFixedTripleList", &FixedTripleListAngularCosineSquared::getFixedTripleList)
       ;

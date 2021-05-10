@@ -31,24 +31,24 @@ namespace analysis {
 
 class KineticEnergy : public Observable {
  public:
-  KineticEnergy(shared_ptr<System> system, shared_ptr<Temperature> temperature):
+  KineticEnergy(std::shared_ptr<System> system, std::shared_ptr<Temperature> temperature):
       Observable(system), temperature_(temperature) {
     result_type = real_scalar;
     observable_type = KINETIC_ENERGY;
     precomputed_ = true;
   }
-  KineticEnergy(shared_ptr<System> system): Observable(system) {
+  KineticEnergy(std::shared_ptr<System> system): Observable(system) {
     result_type = real_scalar;
     observable_type = KINETIC_ENERGY;
     precomputed_ = false;
-    temperature_ = make_shared<Temperature>(system);
+    temperature_ = std::make_shared<Temperature>(system);
   }
   ~KineticEnergy() {}
   real compute_real() const;
 
   static void registerPython();
  private:
-  shared_ptr<Temperature> temperature_;
+  std::shared_ptr<Temperature> temperature_;
   bool precomputed_;
 };
 }  // end namespace analysis

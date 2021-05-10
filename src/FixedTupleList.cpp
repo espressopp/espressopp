@@ -38,7 +38,7 @@ namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTupleList::theLogger, "FixedTupleList");
 
-  FixedTupleList::FixedTupleList(shared_ptr< storage::Storage > _storage)
+  FixedTupleList::FixedTupleList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalTuples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTupleList");
@@ -237,8 +237,8 @@ namespace espressopp {
     //bool (FixedTupleList::*pyAdd)(pvec pids)
     //      = &FixedTupleList::add;
 
-    class_< FixedTupleList, shared_ptr< FixedTupleList > >
-      ("FixedTupleList", init< shared_ptr< storage::Storage > >())
+    class_< FixedTupleList, std::shared_ptr< FixedTupleList > >
+      ("FixedTupleList", init< std::shared_ptr< storage::Storage > >())
       .def("addTuple", &FixedTupleList::addTuple)
      .def("getTuples", &FixedTupleList::getTuples)
       .def("size", &FixedTupleList::size)

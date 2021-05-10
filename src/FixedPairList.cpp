@@ -39,7 +39,7 @@ using namespace std;
 namespace espressopp {
 
   /*
-  FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
+  FixedPairList::FixedPairList(std::shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
 
   FixedPairList::~FixedPairList() {
@@ -51,7 +51,7 @@ namespace espressopp {
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
 
 
-  FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
+  FixedPairList::FixedPairList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalPairs()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedPairList");
@@ -325,8 +325,8 @@ namespace espressopp {
       = &FixedPairList::add;
     //bool (FixedPairList::*pyAdd)(pvec pids) = &FixedPairList::add;
 
-    class_<FixedPairList, shared_ptr<FixedPairList> >
-      ("FixedPairList", init <shared_ptr<storage::Storage> >())
+    class_<FixedPairList, std::shared_ptr<FixedPairList> >
+      ("FixedPairList", init <std::shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedPairList::size)
       .def("totalSize", &FixedPairList::totalSize)

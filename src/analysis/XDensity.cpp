@@ -53,12 +53,12 @@ namespace espressopp {
       //for(int i=0;i<splitN;i++) histogram.push_back(0.0);
       real dr = Li / (real)splitN;
       int num_part = 0;
-      //ConfigurationPtr config = make_shared<Configuration> ();
+      //ConfigurationPtr config = std::make_shared<Configuration> ();
       /*for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
             if(system.storage->getFixedTuples()){
-                shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+                std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
                 CellList realCells = system.storage->getRealCells();
                                 
                 for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // Iterate over all (CG) particles.              
@@ -119,7 +119,7 @@ namespace espressopp {
       real pos = 0.0;
       int bin = 0;
       if(system.storage->getFixedTuples()){
-            shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+            std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
             CellList realCells = system.storage->getRealCells();
 
             for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // Iterate over all (CG) particles.              
@@ -267,7 +267,7 @@ namespace espressopp {
     void XDensity::registerPython() {
       using namespace espressopp::python;
       class_<XDensity, bases< Observable > >
-        ("analysis_XDensity", init< shared_ptr< System > >())
+        ("analysis_XDensity", init< std::shared_ptr< System > >())
         .def("compute", &XDensity::computeArray)
       ;
     }

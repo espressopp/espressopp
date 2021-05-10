@@ -68,7 +68,7 @@ namespace espressopp {
     
     class CoulombKSpaceP3M : public PotentialTemplate< CoulombKSpaceP3M > {
     private:
-      shared_ptr< System > system; // we need the system object to be able to access the box
+      std::shared_ptr< System > system; // we need the system object to be able to access the box
                                    // dimensions, communicator, number of particles, signals
       
       Real3D d_mesh; // distance between two meshpoints
@@ -123,7 +123,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      CoulombKSpaceP3M(shared_ptr< System > _system,
+      CoulombKSpaceP3M(std::shared_ptr< System > _system,
                        real _coulomb_prefactor,
                        real _alpha,
                        Int3D _M,

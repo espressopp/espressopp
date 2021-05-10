@@ -33,7 +33,7 @@ namespace espressopp {
     /** Class to compute the center-of-mass of the system. */
     class CenterOfMass : public Observable {
     public:
-      CenterOfMass(shared_ptr< System > system) : Observable(system) {}
+      CenterOfMass(std::shared_ptr< System > system) : Observable(system) {}
       ~CenterOfMass() {}
       virtual real compute() const;
       virtual Real3D computeVector() const;

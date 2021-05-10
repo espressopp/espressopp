@@ -34,7 +34,7 @@ namespace espressopp {
     class Rattle : public Extension {
 
       public:
-        Rattle(shared_ptr<System> _system, real _maxit, real _tol, real _rptol);
+        Rattle(std::shared_ptr<System> _system, real _maxit, real _tol, real _rptol);
         ~Rattle();        
 
         void addBond(int pid1, int pid2, real constraintDist, real mass1, real mass2);

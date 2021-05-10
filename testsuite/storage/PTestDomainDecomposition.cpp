@@ -53,8 +53,8 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr< DomainDecomposition > domdec;
-  shared_ptr< System > system;
+  std::shared_ptr< DomainDecomposition > domdec;
+  std::shared_ptr< System > system;
 
   Fixture() {
     Real3D boxL(1.0, 2.0, 3.0);
@@ -72,10 +72,10 @@ struct Fixture {
       }
     }
     Int3D cellGrid(1, 2, 3);
-    system = make_shared< System >();
-    system->rng = make_shared< esutil::RNG >();
-    system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
-    domdec = make_shared< DomainDecomposition >(system,
+    system = std::make_shared< System >();
+    system->rng = std::make_shared< esutil::RNG >();
+    system->bc = std::make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+    domdec = std::make_shared< DomainDecomposition >(system,
     						nodeGrid,
     						cellGrid,
                             halfCellInt);
@@ -83,17 +83,17 @@ struct Fixture {
 };
 
 BOOST_AUTO_TEST_CASE(addAndLookup) {
-  shared_ptr< DomainDecomposition > domdec;
-  shared_ptr< System > system;
+  std::shared_ptr< DomainDecomposition > domdec;
+  std::shared_ptr< System > system;
 
   Real3D boxL(1.0);
   Int3D nodeGrid(mpiWorld->size(), 1, 1);
   Int3D cellGrid(1);
 
-  system = make_shared< System >();
-  system->rng = make_shared< esutil::RNG >();
-  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
-  domdec = make_shared< DomainDecomposition >(system,
+  system = std::make_shared< System >();
+  system->rng = std::make_shared< esutil::RNG >();
+  system->bc = std::make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+  domdec = std::make_shared< DomainDecomposition >(system,
 					      nodeGrid,
 					      cellGrid,
                           halfCellInt);
@@ -110,10 +110,10 @@ BOOST_AUTO_TEST_CASE(addAndLookup) {
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
   Real3D boxL(1.0, 2.0, 3.0);
-  shared_ptr< System > system;
-  system = make_shared< System >();
-  system->rng = make_shared< esutil::RNG >();
-  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+  std::shared_ptr< System > system;
+  system = std::make_shared< System >();
+  system->rng = std::make_shared< esutil::RNG >();
+  system->bc = std::make_shared< bc::OrthorhombicBC >(system->rng, boxL);
 
  for(int i = 0; i < 3; ++i) {
     Int3D nodeGrid(1);
@@ -448,8 +448,8 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
 {
   // check whether a particle is migrated from one node to the other
   // and whether it takes all data with it
-  shared_ptr< DomainDecomposition > domdec;
-  shared_ptr< System > system;
+  std::shared_ptr< DomainDecomposition > domdec;
+  std::shared_ptr< System > system;
 
   int nodes = mpiWorld->size();
   int lastnode = nodes-1;
@@ -457,11 +457,11 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   Int3D nodeGrid(nodes, 1, 1);
   Int3D cellGrid(1);
 
-  system = make_shared< System >();
+  system = std::make_shared< System >();
   system->setSkin(0.0);
-  system->rng = make_shared< esutil::RNG >();
-  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
-  domdec = make_shared< DomainDecomposition >(system,
+  system->rng = std::make_shared< esutil::RNG >();
+  system->bc = std::make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+  domdec = std::make_shared< DomainDecomposition >(system,
 					      nodeGrid,
 					      cellGrid,
                           halfCellInt);

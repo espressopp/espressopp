@@ -34,7 +34,7 @@ namespace espressopp {
     // Class to compute the pressure profile along slabs in the x-direction of the system.
     class XTemperature : public Observable {
     public:
-      XTemperature(shared_ptr< System > system) : Observable(system) {}
+      XTemperature(std::shared_ptr< System > system) : Observable(system) {}
       ~XTemperature() {}
       virtual real compute() const;
       virtual python::list computeArray(int) const;

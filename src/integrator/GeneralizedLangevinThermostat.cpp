@@ -38,7 +38,7 @@ namespace espressopp {
     using namespace espressopp::iterator;
 
 
-    GeneralizedLangevinThermostat::GeneralizedLangevinThermostat(shared_ptr<System> system)
+    GeneralizedLangevinThermostat::GeneralizedLangevinThermostat(std::shared_ptr<System> system)
     :Extension(system) {
 
       type = Extension::Thermostat;
@@ -74,17 +74,17 @@ namespace espressopp {
         Table table;
 
         if (itype == 1) { // create a new InterpolationLinear
-            table = make_shared <interaction::InterpolationLinear> ();
+            table = std::make_shared <interaction::InterpolationLinear> ();
             table->read(world, _filename);
         }
 
         else if (itype == 2) { // create a new InterpolationAkima
-            table = make_shared <interaction::InterpolationAkima> ();
+            table = std::make_shared <interaction::InterpolationAkima> ();
             table->read(world, _filename);
         }
 
         else if (itype == 3) { // create a new InterpolationCubic
-            table = make_shared <interaction::InterpolationCubic> ();
+            table = std::make_shared <interaction::InterpolationCubic> ();
             table->read(world, _filename);
         }
 
@@ -146,7 +146,7 @@ namespace espressopp {
 
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
-          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           FixedTupleListAdress::iterator it2;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {                                      
 
@@ -183,8 +183,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
 
-      class_<GeneralizedLangevinThermostat, shared_ptr<GeneralizedLangevinThermostat>, bases<Extension> >
-        ("integrator_GeneralizedLangevinThermostat", init<shared_ptr<System> >())
+      class_<GeneralizedLangevinThermostat, std::shared_ptr<GeneralizedLangevinThermostat>, bases<Extension> >
+        ("integrator_GeneralizedLangevinThermostat", init<std::shared_ptr<System> >())
         .add_property("filename", &GeneralizedLangevinThermostat::getFilename)
         .def("connect", &GeneralizedLangevinThermostat::connect)
         .def("disconnect", &GeneralizedLangevinThermostat::disconnect)

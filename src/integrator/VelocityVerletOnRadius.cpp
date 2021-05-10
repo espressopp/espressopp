@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(VelocityVerletOnRadius::theLogger, "VelocityVerletOnRadius");
 
-    VelocityVerletOnRadius::VelocityVerletOnRadius(shared_ptr<System> system, real _radialDampingMass)
+    VelocityVerletOnRadius::VelocityVerletOnRadius(std::shared_ptr<System> system, real _radialDampingMass)
       : Extension(system), radialDampingMass(_radialDampingMass)
     {
       LOG4ESPP_INFO(theLogger, "VelocityVerletOnRadius constructed");
@@ -107,8 +107,8 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<VelocityVerletOnRadius, shared_ptr<VelocityVerletOnRadius>, bases<Extension> >
-        ("integrator_VelocityVerletOnRadius", init< shared_ptr< System >, real >())
+      class_<VelocityVerletOnRadius, std::shared_ptr<VelocityVerletOnRadius>, bases<Extension> >
+        ("integrator_VelocityVerletOnRadius", init< std::shared_ptr< System >, real >())
         .def("connect", &VelocityVerletOnRadius::connect)
         .def("disconnect", &VelocityVerletOnRadius::disconnect)
         .add_property("radialDampingMass" ,&VelocityVerletOnRadius::getRadialDampingMass, &VelocityVerletOnRadius::setRadialDampingMass )

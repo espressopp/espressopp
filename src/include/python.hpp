@@ -60,9 +60,9 @@ namespace espressopp {
       , class X2 = ::boost::python::detail::not_specified
       >
     class class_
-      : public boost::python::class_< W, shared_ptr< W >, X1, X2 > 
+      : public boost::python::class_< W, std::shared_ptr< W >, X1, X2 >
     {
-      typedef typename boost::python::class_< W, shared_ptr< W >, X1, X2 > base;
+      typedef typename boost::python::class_< W, std::shared_ptr< W >, X1, X2 > base;
       
     public:
       // Construct with the class name, with or without docstring, and default __init__() function

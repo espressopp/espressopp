@@ -29,7 +29,7 @@ namespace espressopp {
     void ParticleRadiusDistribution::registerPython() {
       using namespace espressopp::python;
       class_<ParticleRadiusDistribution, bases< AnalysisBase > >
-        ("analysis_ParticleRadiusDistribution", init< shared_ptr< System > >())
+        ("analysis_ParticleRadiusDistribution", init< std::shared_ptr< System > >())
       ;
     }
   }

@@ -46,11 +46,11 @@ namespace espressopp {
     System();
     System(python::object _pyobj);
 
-    shared_ptr< mpi::communicator > comm;
+    std::shared_ptr< mpi::communicator > comm;
 
-    shared_ptr< storage::Storage > storage;
-    shared_ptr< bc::BC > bc;
-    shared_ptr< esutil::RNG > rng;
+    std::shared_ptr< storage::Storage > storage;
+    std::shared_ptr< bc::BC > bc;
+    std::shared_ptr< esutil::RNG > rng;
 
     interaction::InteractionList shortRangeInteractions;
 
@@ -58,7 +58,7 @@ namespace espressopp {
 
     bool CommunicatorIsInitialized;
 
-    shared_ptr< System > getShared() { 
+    std::shared_ptr< System > getShared() {
       return shared_from_this();
     }
     
@@ -69,9 +69,9 @@ namespace espressopp {
     void scaleVolume(Real3D s, bool particleCoordinates);
     void scaleVolume3D(Real3D s);
     void setTrace(bool flag);
-    void addInteraction(shared_ptr< interaction::Interaction > ia);
+    void addInteraction(std::shared_ptr< interaction::Interaction > ia);
     void removeInteraction(int i);
-    shared_ptr< interaction::Interaction > getInteraction(int i);
+    std::shared_ptr< interaction::Interaction > getInteraction(int i);
     int getNumberOfInteractions();
     static void registerPython();
 

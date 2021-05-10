@@ -60,7 +60,7 @@ namespace espressopp {
                                          // should use for Li_half[XXX] the shortest side length   
       
       int num_part = 0;
-      ConfigurationPtr config = make_shared<Configuration> ();
+      ConfigurationPtr config = std::make_shared<Configuration> ();
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
@@ -155,7 +155,7 @@ namespace espressopp {
     void RadialDistrF::registerPython() {
       using namespace espressopp::python;
       class_<RadialDistrF, bases< Observable > >
-        ("analysis_RadialDistrF", init< shared_ptr< System > >())
+        ("analysis_RadialDistrF", init< std::shared_ptr< System > >())
         .add_property("print_progress", &RadialDistrF::getPrint_progress, &RadialDistrF::setPrint_progress)
         .def("compute", &RadialDistrF::computeArray)
       ;

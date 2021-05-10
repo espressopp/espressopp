@@ -49,7 +49,7 @@ namespace espressopp {
       typedef boost::unordered_map <longint, Particle*> IdParticleMap;
       typedef std::list<Particle> ParticleListAdr;
 
-      Storage(shared_ptr<class System> system, int halfCellInt);
+      Storage(std::shared_ptr<class System> system, int halfCellInt);
       virtual ~Storage();
 
       /** Scale Volume, only for Storage. It scales only the particle coord. */
@@ -253,10 +253,10 @@ namespace espressopp {
       boost::signals2::signal<void ()> onCellAdjust;
 
       // for AdResS
-      void setFixedTuplesAdress(shared_ptr<FixedTupleListAdress> _fixedtupleList){
+      void setFixedTuplesAdress(std::shared_ptr<FixedTupleListAdress> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
-      shared_ptr<FixedTupleListAdress> getFixedTuples() { return fixedtupleList; }
+      std::shared_ptr<FixedTupleListAdress> getFixedTuples() { return fixedtupleList; }
       ParticleList&    getAdrATParticles()  { return AdrATParticles; }
       //ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
       std::list<ParticleList>& getAdrATParticlesG() { return AdrATParticlesG; }
@@ -413,7 +413,7 @@ namespace espressopp {
 
 
       // used for AdResS
-      shared_ptr<FixedTupleListAdress> fixedtupleList;
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList;
       void clearAdrATParticlesG() {
           //std::cout << "size of AdrATParticlesG: " << AdrATParticlesG.size() << ", clearing... \n";
           AdrATParticlesG.clear();

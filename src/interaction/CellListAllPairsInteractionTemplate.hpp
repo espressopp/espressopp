@@ -40,7 +40,7 @@ namespace espressopp {
       typedef _Potential Potential;
     public:
       CellListAllPairsInteractionTemplate
-      (shared_ptr < storage::Storage > _storage)
+      (std::shared_ptr < storage::Storage > _storage)
       : storage(_storage){
         potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes=0;
@@ -82,7 +82,7 @@ namespace espressopp {
     protected:
       int ntypes;
       esutil::Array2D< Potential, esutil::enlarge > potentialArray;
-      shared_ptr< storage::Storage > storage;
+      std::shared_ptr< storage::Storage > storage;
     };
 
     //////////////////////////////////////////////////

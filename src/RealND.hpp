@@ -112,13 +112,13 @@ namespace espressopp {
   };
 
   class RealNDs {
-    std::vector<shared_ptr <RealND>> data;
+    std::vector<std::shared_ptr <RealND>> data;
   private:
     int dimension;
   public:
     void setDimension(int _dim) {
       for (int i = dimension; i<_dim; ++i) {
-        data.push_back(boost::make_shared<RealND>());
+        data.push_back(std::make_shared<RealND>());
       }
       dimension = _dim;
     }

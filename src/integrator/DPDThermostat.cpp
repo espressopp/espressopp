@@ -39,8 +39,8 @@ namespace espressopp {
     using namespace espressopp::iterator;
 
     DPDThermostat::DPDThermostat(
-    		shared_ptr<System> system,
-    		shared_ptr<VerletList> _verletList)
+    		std::shared_ptr<System> system,
+    		std::shared_ptr<VerletList> _verletList)
     :Extension(system), verletList(_verletList) {
 
       type = Extension::Thermostat;
@@ -257,8 +257,8 @@ namespace espressopp {
 
     void DPDThermostat::registerPython() {
       using namespace espressopp::python;
-      class_<DPDThermostat, shared_ptr<DPDThermostat>, bases<Extension> >
-        ("integrator_DPDThermostat", init<shared_ptr<System>, shared_ptr<VerletList> >())
+      class_<DPDThermostat, std::shared_ptr<DPDThermostat>, bases<Extension> >
+        ("integrator_DPDThermostat", init<std::shared_ptr<System>, std::shared_ptr<VerletList> >())
         .def("connect", &DPDThermostat::connect)
         .def("disconnect", &DPDThermostat::disconnect)
         .add_property("gamma", &DPDThermostat::getGamma, &DPDThermostat::setGamma)

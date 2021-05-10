@@ -48,7 +48,7 @@ namespace espressopp {
 
     public:
       // Constructor, allow for unlimited snapshots.
-      Autocorrelation(shared_ptr<System> system): SystemAccess (system){
+      Autocorrelation(std::shared_ptr<System> system): SystemAccess (system){
       }
       ~Autocorrelation(){
         valueList.clear();

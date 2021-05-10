@@ -36,7 +36,7 @@ namespace espressopp {
     using namespace espressopp::iterator;
 
 
-    LangevinThermostat1D::LangevinThermostat1D(shared_ptr<System> system)
+    LangevinThermostat1D::LangevinThermostat1D(std::shared_ptr<System> system)
     :Extension(system) {
 
       type = Extension::Thermostat;
@@ -229,8 +229,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
 
-      class_<LangevinThermostat1D, shared_ptr<LangevinThermostat1D>, bases<Extension> >
-        ("integrator_LangevinThermostat1D", init<shared_ptr<System> >())
+      class_<LangevinThermostat1D, std::shared_ptr<LangevinThermostat1D>, bases<Extension> >
+        ("integrator_LangevinThermostat1D", init<std::shared_ptr<System> >())
         .def("connect", &LangevinThermostat1D::connect)
         .def("disconnect", &LangevinThermostat1D::disconnect)
         .add_property("adress", &LangevinThermostat1D::getAdress, &LangevinThermostat1D::setAdress)
