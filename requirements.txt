@@ -1,3 +1,4 @@
 h5py
 mpi4py
 pyh5md
+numpy
