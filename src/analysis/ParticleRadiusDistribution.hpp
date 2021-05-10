@@ -41,7 +41,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      ParticleRadiusDistribution(shared_ptr< System > system) : AnalysisBaseTemplate< result >(system) {
+      ParticleRadiusDistribution(std::shared_ptr< System > system) : AnalysisBaseTemplate< result >(system) {
     	  // default binwidth for particle radius histogram
     	  binwidth=0.1;
     	  radave=0.0;

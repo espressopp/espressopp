@@ -45,17 +45,17 @@ namespace espressopp {
           filenames[i] = boost::python::extract<std::string>(_filenames[i]);
           colVarRef[i].setDimension(6);
           if (itype == 1) { // create a new InterpolationLinear
-              tables[i] = make_shared <InterpolationLinear> ();
+              tables[i] = std::make_shared <InterpolationLinear> ();
               tables[i]->read(world, filenames[i].c_str());
           }
 
           else if (itype == 2) { // create a new InterpolationAkima
-              tables[i] = make_shared <InterpolationAkima> ();
+              tables[i] = std::make_shared <InterpolationAkima> ();
               tables[i]->read(world, filenames[i].c_str());
           }
 
           else if (itype == 3) { // create a new InterpolationCubic
-              tables[i] = make_shared <InterpolationCubic> ();
+              tables[i] = std::make_shared <InterpolationCubic> ();
               tables[i]->read(world, filenames[i].c_str());
           }
       }
@@ -75,15 +75,15 @@ namespace espressopp {
         weightSum.push_back(0.);
         targetProb.push_back(0.);
         if (itype == 1) { // create a new InterpolationLinear
-              tables.push_back(make_shared <InterpolationLinear> ());
+              tables.push_back(std::make_shared <InterpolationLinear> ());
               tables[i]->read(world, filenames[i].c_str());
           }
           else if (itype == 2) { // create a new InterpolationAkima
-              tables.push_back(make_shared <InterpolationAkima> ());
+              tables.push_back(std::make_shared <InterpolationAkima> ());
               tables[i]->read(world, filenames[i].c_str());
           }
           else if (itype == 3) { // create a new InterpolationCubic
-              tables.push_back(make_shared <InterpolationCubic> ());
+              tables.push_back(std::make_shared <InterpolationCubic> ());
               tables[i]->read(world, filenames[i].c_str());
           }
     }
@@ -262,15 +262,15 @@ namespace espressopp {
         ;
 
       class_ <VerletListTabulatedSubEns, bases <Interaction> >
-        ("interaction_VerletListTabulatedSubEns", init <shared_ptr<VerletList> >())
+        ("interaction_VerletListTabulatedSubEns", init <std::shared_ptr<VerletList> >())
             .def("setPotential", &VerletListTabulatedSubEns::setPotential)
             .def("getPotential", &VerletListTabulatedSubEns::getPotentialPtr)
         ;
 
       class_ <VerletListAdressTabulatedSubEns, bases <Interaction> >
         ("interaction_VerletListAdressTabulatedSubEns",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress> >()
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListAdressTabulatedSubEns::setPotentialAT)
             .def("setPotentialCG", &VerletListAdressTabulatedSubEns::setPotentialCG);
@@ -278,33 +278,33 @@ namespace espressopp {
 
       class_ <VerletListHadressTabulatedSubEns, bases <Interaction> >
         ("interaction_VerletListHadressTabulatedSubEns",
-           init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress> >()
+           init <std::shared_ptr<VerletListAdress>,
+                 std::shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListHadressTabulatedSubEns::setPotentialAT)
             .def("setPotentialCG", &VerletListHadressTabulatedSubEns::setPotentialCG);
         ;
 
       class_ <CellListTabulatedSubEns, bases <Interaction> >
-        ("interaction_CellListTabulatedSubEns", init <shared_ptr <storage::Storage> >())
+        ("interaction_CellListTabulatedSubEns", init <std::shared_ptr <storage::Storage> >())
             .def("setPotential", &CellListTabulatedSubEns::setPotential);
         ;
 
       class_ <FixedPairListTabulatedSubEns, bases <Interaction> >
         ("interaction_FixedPairListTabulatedSubEns",
-          init <shared_ptr<System>,
-                shared_ptr<FixedPairList>,
-                shared_ptr<TabulatedSubEns> >()
+          init <std::shared_ptr<System>,
+                std::shared_ptr<FixedPairList>,
+                std::shared_ptr<TabulatedSubEns> >()
         )
-        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<TabulatedSubEns> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<TabulatedSubEns> >())
         .def("setPotential", &FixedPairListTabulatedSubEns::setPotential)
         .def("setFixedPairList", &FixedPairListTabulatedSubEns::setFixedPairList)
         .def("getFixedPairList", &FixedPairListTabulatedSubEns::getFixedPairList);
 
       class_< FixedPairListTypesTabulatedSubEns, bases< Interaction > >
           ("interaction_FixedPairListTypesTabulatedSubEns",
-           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
           .def("setPotential", &FixedPairListTypesTabulatedSubEns::setPotential)
           .def("getPotential", &FixedPairListTypesTabulatedSubEns::getPotentialPtr)
           .def("setFixedPairList", &FixedPairListTypesTabulatedSubEns::setFixedPairList)

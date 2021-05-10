@@ -57,7 +57,7 @@ namespace espressopp {
       for(int i=0; i<n; i++) vvlocal[i] = 0.0;
       
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
-      shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+      std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
           
@@ -196,7 +196,7 @@ namespace espressopp {
     void XPressure::registerPython() {
       using namespace espressopp::python;
       class_<XPressure, bases< Observable > >
-        ("analysis_XPressure", init< shared_ptr< System > >())
+        ("analysis_XPressure", init< std::shared_ptr< System > >())
         .def("compute", &XPressure::computeArray)
       ;
     }

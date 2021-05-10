@@ -75,7 +75,7 @@ void SystemMonitor::info() {
   }
 }
 
-void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs,
+void SystemMonitor::addObservable(std::string name, std::shared_ptr<Observable> obs,
     bool is_visible) {
   observables_.push_back(std::make_pair(name, obs));
   header_->push_back(name);
@@ -89,9 +89,9 @@ void SystemMonitor::registerPython() {
   using namespace espressopp::python;  // NOLINT
   class_<SystemMonitor, bases< ParticleAccess > >
       ("analysis_SystemMonitor", init<
-          shared_ptr<System>,
-          shared_ptr<integrator::MDIntegrator>,
-          shared_ptr<SystemMonitorOutputCSV>
+          std::shared_ptr<System>,
+          std::shared_ptr<integrator::MDIntegrator>,
+          std::shared_ptr<SystemMonitorOutputCSV>
           >())
       .def("add_observable", &SystemMonitor::addObservable)
       .def("info", &SystemMonitor::info)

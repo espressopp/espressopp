@@ -47,9 +47,9 @@ namespace espressopp {
         FixedQuadrupleListOPLS;
       class_ <FixedQuadrupleListOPLS, bases <Interaction> >
         ("interaction_FixedQuadrupleListOPLS",
-                init< shared_ptr<System>,
-                      shared_ptr<FixedQuadrupleList>,
-                      shared_ptr<OPLS> >())
+                init< std::shared_ptr<System>,
+                      std::shared_ptr<FixedQuadrupleList>,
+                      std::shared_ptr<OPLS> >())
         .def("setPotential", &FixedQuadrupleListOPLS::setPotential);
       ;
     }

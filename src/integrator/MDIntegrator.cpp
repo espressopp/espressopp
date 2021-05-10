@@ -34,7 +34,7 @@ namespace espressopp {
     // Constructor              
     //////////////////////////////////////////////////
 
-    MDIntegrator::MDIntegrator(shared_ptr<System> system) :
+    MDIntegrator::MDIntegrator(std::shared_ptr<System> system) :
     SystemAccess(system)
     {
       LOG4ESPP_INFO(theLogger, "construct Integrator");
@@ -65,7 +65,7 @@ namespace espressopp {
     }
 
 
-    void MDIntegrator::addExtension(shared_ptr<integrator::Extension> extension) {
+    void MDIntegrator::addExtension(std::shared_ptr<integrator::Extension> extension) {
        //extension->setIntegrator(this); // this is done in python
        //std::cout << "type is: " << extension->type << "\n";
 
@@ -89,7 +89,7 @@ namespace espressopp {
     	return exList.size();
     }
 
-    shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) {
+    std::shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) {
     	return exList[k];
     }
 

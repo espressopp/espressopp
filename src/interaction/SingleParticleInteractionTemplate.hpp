@@ -55,8 +55,8 @@ namespace espressopp {
 
     public:
       SingleParticleInteractionTemplate
-      (shared_ptr < System > system,
-       shared_ptr < _Potential > _potential)
+      (std::shared_ptr < System > system,
+       std::shared_ptr < _Potential > _potential)
         : SystemAccess(system),
           potential(_potential)
       {
@@ -68,7 +68,7 @@ namespace espressopp {
       virtual ~SingleParticleInteractionTemplate() {};
 
       void
-      setPotential(shared_ptr < _Potential> _potential) {
+      setPotential(std::shared_ptr < _Potential> _potential) {
         if (_potential) {
           potential = _potential;
         } else {
@@ -76,7 +76,7 @@ namespace espressopp {
         }
       }
 
-      shared_ptr < _Potential > getPotential() {
+      std::shared_ptr < _Potential > getPotential() {
         return potential;
       }
 
@@ -97,7 +97,7 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr < Potential > potential;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

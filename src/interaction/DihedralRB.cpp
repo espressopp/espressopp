@@ -35,9 +35,9 @@ void DihedralRB::registerPython() {
   typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
   class_ <FixedQuadrupleListDihedralRB, bases <Interaction> >
       ("interaction_FixedQuadrupleListDihedralRB",
-          init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralRB> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
-                shared_ptr<DihedralRB> >())
+          init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>, std::shared_ptr<DihedralRB> >())
+      .def(init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleListAdress>,
+                std::shared_ptr<DihedralRB> >())
       .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
       .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
 
@@ -45,7 +45,7 @@ void DihedralRB::registerPython() {
     FixedQuadrupleListTypesDihedralRB;
   class_< FixedQuadrupleListTypesDihedralRB, bases< Interaction > >
     ("interaction_FixedQuadrupleListTypesDihedralRB",
-       init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+       init< std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
       .def("setPotential", &FixedQuadrupleListTypesDihedralRB::setPotential)
       .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
       .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)

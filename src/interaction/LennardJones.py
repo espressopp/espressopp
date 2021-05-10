@@ -46,7 +46,7 @@ espressopp.interaction.LennardJones
         Defines a verletlist-based interaction using a Lennard-Jones potential.
 
         :param vl: Verletlist object
-        :type vl: shared_ptr<VerletList>
+        :type vl: std::shared_ptr<VerletList>
 
 .. function:: espressopp.interaction.VerletListLennardJones.getPotential(type1, type2)
 
@@ -56,13 +56,13 @@ espressopp.interaction.LennardJones
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListLennardJones.getVerletList()
 
         Gets the verletlist used in VerletListLennardJones interaction.
 
-        :rtype: shared_ptr<VerletList>
+        :rtype: std::shared_ptr<VerletList>
 
 .. function:: espressopp.interaction.VerletListLennardJones.setPotential(type1, type2, potential)
 
@@ -73,7 +73,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones(vl, fixedtupleList)
 
@@ -81,8 +81,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones.setPotentialAT(type1, type2, potential)
 
@@ -93,7 +93,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones.setPotentialCG(type1, type2, potential)
 
@@ -104,7 +104,7 @@ espressopp.interaction.LennardJones
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones2(vl, fixedtupleList)
 
@@ -112,8 +112,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones2.setPotentialAT(type1, type2, potential)
 
@@ -124,7 +124,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJones2.setPotentialCG(type1, type2, potential)
 
@@ -135,7 +135,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesHarmonic(vl, fixedtupleList)
 
@@ -143,8 +143,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesHarmonic.setPotentialAT(type1, type2, potential)
 
@@ -155,7 +155,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesHarmonic.setPotentialCG(type1, type2, potential)
 
@@ -166,7 +166,7 @@ espressopp.interaction.LennardJones
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones(vl, fixedtupleList)
 
@@ -174,8 +174,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones.setPotentialAT(type1, type2, potential)
 
@@ -186,7 +186,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones.setPotentialCG(type1, type2, potential)
 
@@ -197,7 +197,7 @@ espressopp.interaction.LennardJones
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones2(vl, fixedtupleList)
 
@@ -205,8 +205,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones2.setPotentialAT(type1, type2, potential)
 
@@ -217,7 +217,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJones2.setPotentialCG(type1, type2, potential)
 
@@ -228,7 +228,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesHarmonic(vl, fixedtupleList)
 
@@ -236,8 +236,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesHarmonic.setPotentialAT(type1, type2, potential)
 
@@ -248,7 +248,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesHarmonic.setPotentialCG(type1, type2, potential)
 
@@ -259,14 +259,14 @@ espressopp.interaction.LennardJones
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.CellListLennardJones(stor)
 
         Defines a CellList-based interaction using a LennardJones potential.
 
         :param stor: storage object
-        :type stor: shared_ptr <storage::Storage>
+        :type stor: std::shared_ptr <storage::Storage>
 
 .. function:: espressopp.interaction.CellListLennardJones.setPotential(type1, type2, potential)
 
@@ -277,7 +277,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.FixedPairListLennardJones(system, vl, potential)
 
@@ -286,35 +286,35 @@ espressopp.interaction.LennardJones
         :param system: system object
         :param vl: FixedPairList object
         :param potential: LennardJones potential object
-        :type system: shared_ptr<System>
-        :type vl: shared_ptr<FixedPairList>
-        :type potential: shared_ptr<LennardJones>
+        :type system: std::shared_ptr<System>
+        :type vl: std::shared_ptr<FixedPairList>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.getFixedPairList()
 
         Gets the FixedPairList.
 
-        :rtype: shared_ptr<FixedPairList>
+        :rtype: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.getPotential()
 
         Gets the LennardJones interaction potential.
 
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.setFixedPairList(fixedpairlist)
 
         Sets the FixedPairList.
 
         :param fixedpairlist: FixedPairList object
-        :type fixedpairlist: shared_ptr<FixedPairList>
+        :type fixedpairlist: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.setPotential(potential)
 
         Sets the LennardJones interaction potential.
 
         :param potential: tabulated potential object
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLennardJones(vl, fixedtupleList)
 
@@ -322,8 +322,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATLennardJones.setPotential(type1, type2, potential)
 
@@ -334,7 +334,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLennardJones.getPotential(type1, type2)
 
@@ -344,13 +344,13 @@ espressopp.interaction.LennardJones
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLennardJones.getVerletList()
 
         Gets the verletlist used in VerletListAdressATLennardJones interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATLennardJones(vl, fixedtupleList)
 
@@ -358,8 +358,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATLennardJones.setPotential(type1, type2, potential)
 
@@ -370,7 +370,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressATLennardJones.getPotential(type1, type2)
 
@@ -380,13 +380,13 @@ espressopp.interaction.LennardJones
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressATLennardJones.getVerletList()
 
         Gets the verletlist used in VerletListHadressATLennardJones interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressCGLennardJones(vl, fixedtupleList)
 
@@ -394,8 +394,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressCGLennardJones.setPotential(type1, type2, potential)
 
@@ -406,7 +406,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressCGLennardJones.getPotential(type1, type2)
 
@@ -416,13 +416,13 @@ espressopp.interaction.LennardJones
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressCGLennardJones.getVerletList()
 
         Gets the verletlist used in VerletListAdressCGLennardJones interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressCGLennardJones(vl, fixedtupleList)
 
@@ -430,8 +430,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressCGLennardJones.setPotential(type1, type2, potential)
 
@@ -442,7 +442,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressCGLennardJones.getPotential(type1, type2)
 
@@ -452,13 +452,13 @@ espressopp.interaction.LennardJones
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<LennardJones>
+        :rtype: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressCGLennardJones.getVerletList()
 
         Gets the verletlist used in VerletListHadressCGLennardJones interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATLenJonesReacFieldGen(vl, fixedtupleList)
 
@@ -466,8 +466,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATLenJonesReacFieldGen.setPotential1(type1, type2, potential)
 
@@ -478,7 +478,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLenJonesReacFieldGen.setPotential2(type1, type2, potential)
 
@@ -489,7 +489,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressATLenJonesReacFieldGen(vl, fixedtupleList)
 
@@ -497,8 +497,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATLenJonesReacFieldGen.setPotential1(type1, type2, potential)
 
@@ -509,7 +509,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressATLenJonesReacFieldGen.setPotential2(type1, type2, potential)
 
@@ -520,7 +520,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenTab(vl, fixedtupleList)
 
@@ -528,8 +528,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenTab.setPotentialAT1(type1, type2, potential)
 
@@ -540,7 +540,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenTab.setPotentialAT2(type1, type2, potential)
 
@@ -551,7 +551,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenTab.setPotentialCG(type1, type2, potential)
 
@@ -562,7 +562,7 @@ espressopp.interaction.LennardJones
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenTab(vl, fixedtupleList)
 
@@ -570,8 +570,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenTab.setPotentialAT1(type1, type2, potential)
 
@@ -582,7 +582,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenTab.setPotentialAT2(type1, type2, potential)
 
@@ -593,7 +593,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenTab.setPotentialCG(type1, type2, potential)
 
@@ -604,7 +604,7 @@ espressopp.interaction.LennardJones
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenHarmonic(vl, fixedtupleList)
 
@@ -612,8 +612,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenHarmonic.setPotentialAT1(type1, type2, potential)
 
@@ -624,7 +624,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenHarmonic.setPotentialAT2(type1, type2, potential)
 
@@ -635,7 +635,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressATLJReacFieldGenHarmonic.setPotentialCG(type1, type2, potential)
 
@@ -646,7 +646,7 @@ espressopp.interaction.LennardJones
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic(vl, fixedtupleList)
 
@@ -654,8 +654,8 @@ espressopp.interaction.LennardJones
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic.setPotentialAT1(type1, type2, potential)
 
@@ -666,7 +666,7 @@ espressopp.interaction.LennardJones
         :param potential: LennardJones potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<LennardJones>
+        :type potential: std::shared_ptr<LennardJones>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic.setPotentialAT2(type1, type2, potential)
 
@@ -677,7 +677,7 @@ espressopp.interaction.LennardJones
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic.setPotentialCG(type1, type2, potential)
 
@@ -688,7 +688,7 @@ espressopp.interaction.LennardJones
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 """
 from espressopp import pmi, infinity

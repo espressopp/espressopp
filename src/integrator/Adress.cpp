@@ -41,7 +41,7 @@ namespace espressopp {
 
     using namespace espressopp::iterator;
 
-    Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates, int _multistep)
+    Adress::Adress(std::shared_ptr<System> _system, std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates, int _multistep)
         : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI), regionupdates(_regionupdates), multistep(_multistep){
         LOG4ESPP_INFO(theLogger, "construct Adress");
         type = Extension::Adress;
@@ -638,8 +638,8 @@ namespace espressopp {
     void Adress::registerPython() {
       using namespace espressopp::python;
 
-      class_<Adress, shared_ptr<Adress>, bases<Extension> >
-        ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool, int, int >())
+      class_<Adress, std::shared_ptr<Adress>, bases<Extension> >
+        ("integrator_Adress", init<std::shared_ptr<System>, std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress>, bool, int, int >())
         .def("connect", &Adress::connect)
         .def("disconnect", &Adress::disconnect)
         ;

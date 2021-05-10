@@ -66,7 +66,7 @@ namespace espressopp {
     void OrderParameter::registerPython() {
       using namespace espressopp::python;
       class_<OrderParameter, bases< AnalysisBase > >
-        ("analysis_OrderParameter", init< shared_ptr<System>, real, int, bool, bool, real, real>())
+        ("analysis_OrderParameter", init< std::shared_ptr<System>, real, int, bool, bool, real, real>())
         .add_property("l", 
               &OrderParameter::getAngularMomentum,
               &OrderParameter::setAngularMomentum)

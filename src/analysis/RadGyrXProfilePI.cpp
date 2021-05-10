@@ -55,7 +55,7 @@ namespace espressopp {
       real pos = 0.0;
       int bin = 0;
       if(system.storage->getFixedTuples()) {
-        shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
         CellList realCells = system.storage->getRealCells();
 
         for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -150,7 +150,7 @@ namespace espressopp {
     void RadGyrXProfilePI::registerPython() {
       using namespace espressopp::python;
       class_<RadGyrXProfilePI, bases< Observable > >
-      ("analysis_RadGyrXProfilePI", init< shared_ptr< System > >())
+      ("analysis_RadGyrXProfilePI", init< std::shared_ptr< System > >())
       .def("compute", &RadGyrXProfilePI::computeArray)
       ;
     }

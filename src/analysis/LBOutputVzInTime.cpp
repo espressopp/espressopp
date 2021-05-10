@@ -25,8 +25,8 @@
 namespace espressopp {
    namespace analysis {
       //    LOG4ESPP_LOGGER(LBOutputVzInTime::theLogger, "LBOutputVzInTime");
-      LBOutputVzInTime::LBOutputVzInTime(shared_ptr<System> system,
-                                         shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
+      LBOutputVzInTime::LBOutputVzInTime(std::shared_ptr<System> system,
+                                         std::shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
       : LBOutput(system, latticeboltzmann) {}
 
       void LBOutputVzInTime::writeOutput()
@@ -66,8 +66,8 @@ namespace espressopp {
          using namespace espressopp::python;
 
          class_<LBOutputVzInTime, bases< LBOutput > >
-         ("analysis_LBOutput_VzInTime", init< shared_ptr< System >,
-          shared_ptr< integrator::LatticeBoltzmann > >())
+         ("analysis_LBOutput_VzInTime", init< std::shared_ptr< System >,
+          std::shared_ptr< integrator::LatticeBoltzmann > >())
 
          .def("writeOutput", &LBOutputVzInTime::writeOutput)
          ;

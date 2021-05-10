@@ -41,7 +41,7 @@ Examples:
                 :param geometry: geometry of the subregion. Can only be in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']
                 :param center: center of the subregion
                 :param pidlist: list of particle ids of coarse-grained particles that are counted in the specified subregion
-                :type system: shared_ptr<System>
+                :type system: std::shared_ptr<System>
                 :type span: real
                 :type geometry: str in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']
                 :type center: list of 3 reals (x,y,z coordinates of center)

@@ -43,7 +43,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      PressureTensor(shared_ptr< System > system) : AnalysisBaseTemplate< Tensor >(system) {}
+      PressureTensor(std::shared_ptr< System > system) : AnalysisBaseTemplate< Tensor >(system) {}
       virtual ~PressureTensor() {}
 
       Tensor computeRaw() {

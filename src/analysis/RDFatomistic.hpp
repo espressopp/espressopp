@@ -34,7 +34,7 @@ namespace espressopp {
     /** Class to compute the radial distribution function of the system. */
     class RDFatomistic : public Observable {
       public:
-        RDFatomistic(shared_ptr< System > system, int type1, int type2, real _span = 1.0, bool _spanbased = true) : Observable(system), target1(type1), target2(type2), span(_span), spanbased(_spanbased) {}
+        RDFatomistic(std::shared_ptr< System > system, int type1, int type2, real _span = 1.0, bool _spanbased = true) : Observable(system), target1(type1), target2(type2), span(_span), spanbased(_spanbased) {}
         ~RDFatomistic() {}
         virtual real compute() const;
         virtual python::list computeArray(int) const;

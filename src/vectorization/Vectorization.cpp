@@ -32,8 +32,8 @@ namespace espressopp {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// constructor
     Vectorization::Vectorization(
-      shared_ptr<System> system,
-      shared_ptr<MDIntegrator> mdintegrator,
+      std::shared_ptr<System> system,
+      std::shared_ptr<MDIntegrator> mdintegrator,
       Mode mode
       ): SystemAccess(system), mdintegrator(mdintegrator), mode(mode)
     {
@@ -136,9 +136,9 @@ namespace espressopp {
     {
       using namespace espressopp::python;
 
-      class_<Vectorization, shared_ptr<Vectorization> >
-        ("Vectorization", init< shared_ptr<System>, shared_ptr<MDIntegrator>, Mode >())
-        .def(init< shared_ptr<System>, shared_ptr<MDIntegrator> >())
+      class_<Vectorization, std::shared_ptr<Vectorization> >
+        ("Vectorization", init< std::shared_ptr<System>, std::shared_ptr<MDIntegrator>, Mode >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<MDIntegrator> >())
         ;
 
       enum_<Mode>("VectorizationMode")

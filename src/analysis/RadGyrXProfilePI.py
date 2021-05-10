@@ -37,7 +37,7 @@ Examples:
                 Constructs the RadGyrXProfilePI object.
 
                 :param system: system object
-                :type system: shared_ptr<System>
+                :type system: std::shared_ptr<System>
 
 .. function:: espressopp.analysis.RadGyrXProfilePI.compute(bins, ntrotter, ptype):
 

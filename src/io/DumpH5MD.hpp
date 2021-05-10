@@ -40,7 +40,7 @@ void free_pb(Py_buffer *pb);
 /** Store particle data in Python buffers */
 class DumpH5MD : public SystemAccess {
  public:
-  DumpH5MD(shared_ptr<System> system, bool is_adress);
+  DumpH5MD(std::shared_ptr<System> system, bool is_adress);
   ~DumpH5MD();
 
   int get_NLocal() { return NLocal; }

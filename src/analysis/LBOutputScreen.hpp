@@ -30,8 +30,8 @@ namespace espressopp {
    namespace analysis {
       class LBOutputScreen : public LBOutput {
       public:
-         LBOutputScreen(shared_ptr<System> _system,
-                        shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
+         LBOutputScreen(std::shared_ptr<System> _system,
+                        std::shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
          void writeOutput();
          void findLBMom(int _mode);

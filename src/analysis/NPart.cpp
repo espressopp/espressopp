@@ -42,7 +42,7 @@ namespace espressopp {
     void NPart::registerPython() {
       using namespace espressopp::python;
       class_<NPart, bases< Observable > >
-        ("analysis_NPart", init< shared_ptr< System > >())
+        ("analysis_NPart", init< std::shared_ptr< System > >())
       ;
     }
   }

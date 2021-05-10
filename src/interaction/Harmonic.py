@@ -49,49 +49,49 @@ espressopp.interaction.Harmonic
         :param system: system object
         :param vl: FixedPairList object
         :param potential: Harmonic potential object
-        :type system: shared_ptr<System>
-        :type vl: shared_ptr<FixedPairList>
-        :type potential: shared_ptr<Harmonic>
+        :type system: std::shared_ptr<System>
+        :type vl: std::shared_ptr<FixedPairList>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.getFixedPairList()
 
         Gets the FixedPairList.
 
-        :rtype: shared_ptr<FixedPairList>
+        :rtype: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.setFixedPairList(fixedpairlist)
 
         Sets the FixedPairList.
 
         :param fixedpairlist: FixedPairList object
-        :type fixedpairlist: shared_ptr<FixedPairList>
+        :type fixedpairlist: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.setPotential(potential)
 
         Sets the Harmonic interaction potential.
 
         :param potential: Harmonic potential object
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.FixedPairListTypesHarmonic(system, vl)
 
         :param system: system object
         :param vl: FixedPairList object
-        :type system: shared_ptr<System>
-        :type vl: shared_ptr<FixedPairList>
+        :type system: std::shared_ptr<System>
+        :type vl: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListTypesHarmonic.getFixedPairList()
 
         Gets the FixedPairList.
 
-        :rtype: shared_ptr<FixedPairList>
+        :rtype: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListTypesHarmonic.setFixedPairList(fixedpairlist)
 
         Sets the FixedPairList.
 
         :param fixedpairlist: FixedPairList object
-        :type fixedpairlist: shared_ptr<FixedPairList>
+        :type fixedpairlist: std::shared_ptr<FixedPairList>
 
 .. function:: espressopp.interaction.FixedPairListTypesHarmonic.setPotential(type1, type2, potential)
 
@@ -102,7 +102,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.FixedPairListTypesHarmonic.getPotential(type1,type2)
 
@@ -112,14 +112,14 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHarmonic(vl)
 
         Defines a verletlist-based interaction using a Harmonic potential.
 
         :param vl: Verletlist object
-        :type vl: shared_ptr<VerletList>
+        :type vl: std::shared_ptr<VerletList>
 
 .. function:: espressopp.interaction.VerletListHarmonic.getPotential(type1, type2)
 
@@ -129,7 +129,7 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHarmonic.setPotential(type1, type2, potential)
 
@@ -140,7 +140,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListAdressATHarmonic(vl, fixedtupleList)
 
@@ -148,8 +148,8 @@ espressopp.interaction.Harmonic
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATHarmonic.setPotential(type1, type2, potential)
 
@@ -160,7 +160,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListAdressATHarmonic.getPotential(type1, type2)
 
@@ -170,13 +170,13 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListAdressATHarmonic.getVerletList()
 
         Gets the verletlist used in VerletListAdressATHarmonic interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressCGHarmonic(vl, fixedtupleList)
 
@@ -184,8 +184,8 @@ espressopp.interaction.Harmonic
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressCGHarmonic.setPotential(type1, type2, potential)
 
@@ -196,7 +196,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListAdressCGHarmonic.getPotential(type1, type2)
 
@@ -206,13 +206,13 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListAdressCGHarmonic.getVerletList()
 
         Gets the verletlist used in VerletListAdressCGHarmonic interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATHarmonic(vl, fixedtupleList)
 
@@ -220,8 +220,8 @@ espressopp.interaction.Harmonic
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATHarmonic.setPotential(type1, type2, potential)
 
@@ -232,7 +232,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressATHarmonic.getPotential(type1, type2)
 
@@ -242,13 +242,13 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressATHarmonic.getVerletList()
 
         Gets the verletlist used in VerletListHadressATHarmonic interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressCGHarmonic(vl, fixedtupleList)
 
@@ -256,8 +256,8 @@ espressopp.interaction.Harmonic
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressCGHarmonic.setPotential(type1, type2, potential)
 
@@ -268,7 +268,7 @@ espressopp.interaction.Harmonic
         :param potential: Harmonic potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Harmonic>
+        :type potential: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressCGHarmonic.getPotential(type1, type2)
 
@@ -278,13 +278,13 @@ espressopp.interaction.Harmonic
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<Harmonic>
+        :rtype: std::shared_ptr<Harmonic>
 
 .. function:: espressopp.interaction.VerletListHadressCGHarmonic.getVerletList()
 
         Gets the verletlist used in VerletListHadressCGHarmonic interaction.
 
-        :rtype: shared_ptr<VerletListAdress>
+        :rtype: std::shared_ptr<VerletListAdress>
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *

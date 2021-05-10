@@ -38,8 +38,8 @@ void KineticEnergy::registerPython() {
   using namespace espressopp::python;  //NOLINT
   class_<KineticEnergy, bases<Observable> >
     ("analysis_KineticEnergy",
-        init< shared_ptr<System>, shared_ptr<Temperature> >())
-    .def(init<shared_ptr<System> >())
+        init< std::shared_ptr<System>, std::shared_ptr<Temperature> >())
+    .def(init<std::shared_ptr<System> >())
     .add_property("value", &KineticEnergy::compute_real);
 }
 }  // end namespace analysis

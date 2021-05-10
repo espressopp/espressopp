@@ -67,7 +67,7 @@ namespace espressopp {
     };
 
     struct InteractionList
-      : public std::vector< shared_ptr< Interaction > > {
+      : public std::vector< std::shared_ptr< Interaction > > {
       typedef esutil::ESPPIterator< std::vector< Interaction > > Iterator;
     };
 

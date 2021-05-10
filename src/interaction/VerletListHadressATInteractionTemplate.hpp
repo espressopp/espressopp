@@ -46,7 +46,7 @@ namespace espressopp {
 
       public:
         VerletListHadressATInteractionTemplate
-        (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+        (std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
           : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
           potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
@@ -63,16 +63,16 @@ namespace espressopp {
         }
 
         void
-        setVerletList(shared_ptr < VerletListAdress > _verletList) {
+        setVerletList(std::shared_ptr < VerletListAdress > _verletList) {
           verletList = _verletList;
         }
 
-        shared_ptr<VerletListAdress> getVerletList() {
+        std::shared_ptr<VerletListAdress> getVerletList() {
           return verletList;
         }
 
         void
-        setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
+        setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
         }
 
@@ -91,8 +91,8 @@ namespace espressopp {
           return potentialArray.at(type1, type2);
         }
 
-        shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-          return  make_shared<Potential>(potentialArray.at(type1, type2));
+        std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
+          return  std::make_shared<Potential>(potentialArray.at(type1, type2));
         }
 
         virtual void addForces();
@@ -114,8 +114,8 @@ namespace espressopp {
 
       protected:
         int ntypes;
-        shared_ptr<VerletListAdress> verletList;
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
+        std::shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         esutil::Array2D<Potential, esutil::enlarge> potentialArray;
 
         // AdResS stuff

@@ -36,14 +36,14 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtForce::theLogger, "ExtForce");
 
-    ExtForce::ExtForce(shared_ptr<System> system, const Real3D& _extForce)
+    ExtForce::ExtForce(std::shared_ptr<System> system, const Real3D& _extForce)
     : Extension(system), extForce(_extForce)
     {
       LOG4ESPP_INFO(theLogger, "External Force for all particles constructed");
       allParticles = true;
     }
 
-    ExtForce::ExtForce(shared_ptr<System> system, const Real3D& _extForce, shared_ptr< ParticleGroup > _particleGroup)
+    ExtForce::ExtForce(std::shared_ptr<System> system, const Real3D& _extForce, std::shared_ptr< ParticleGroup > _particleGroup)
     : Extension(system), extForce(_extForce), particleGroup(_particleGroup)
     {
       LOG4ESPP_INFO(theLogger, "External Force for particle group constructed");
@@ -71,7 +71,7 @@ namespace espressopp {
     	return extForce;
     }
 
-    void ExtForce::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
+    void ExtForce::setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup) {
         particleGroup = _particleGroup;
         if (allParticles) {
      	  disconnect();
@@ -80,7 +80,7 @@ namespace espressopp {
         }
     }
 
-     shared_ptr< ParticleGroup > ExtForce::getParticleGroup() {
+     std::shared_ptr< ParticleGroup > ExtForce::getParticleGroup() {
     	//if (!allParticles) {
      	  return particleGroup;
     	//}
@@ -110,10 +110,10 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<ExtForce, shared_ptr<ExtForce>, bases<Extension> >
+      class_<ExtForce, std::shared_ptr<ExtForce>, bases<Extension> >
 
-        ("integrator_ExtForce", init< shared_ptr< System >, const Real3D& >())
-        .def(init< shared_ptr< System >, const Real3D&, shared_ptr< ParticleGroup > >())
+        ("integrator_ExtForce", init< std::shared_ptr< System >, const Real3D& >())
+        .def(init< std::shared_ptr< System >, const Real3D&, std::shared_ptr< ParticleGroup > >())
         .add_property("particleGroup", &ExtForce::getParticleGroup, &ExtForce::setParticleGroup)
         .def("getExtForce", &ExtForce::getExtForce, return_value_policy< reference_existing_object >())
         .def("setExtForce", &ExtForce::setExtForce )

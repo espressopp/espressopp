@@ -59,7 +59,7 @@ namespace espressopp {
     //};
     
     // Following is some extreme typecasting which we need to convert the
-    // pmi python object pmi._MPIcomm into a shared_ptr< boost::mpi::communicator >
+    // pmi python object pmi._MPIcomm into a std::shared_ptr< boost::mpi::communicator >
     // I have not yet figured out how to do it in a more elegant way
     PyObject *pyobj = _pyobj.ptr();
     // in mpi4py.1.2.1 this has to be:
@@ -67,7 +67,7 @@ namespace espressopp {
     // in version >= mpi4py.1.2.2 this has to be:
     PyMPICommObject* pyMPIComm = (PyMPICommObject*) pyobj;
     MPI_Comm * comm_p = &pyMPIComm->ob_mpi;
-    shared_ptr< mpi::communicator > newcomm = make_shared< mpi::communicator >(*comm_p, mpi::comm_attach);
+    std::shared_ptr< mpi::communicator > newcomm = std::make_shared< mpi::communicator >(*comm_p, mpi::comm_attach);
 
     comm = newcomm;
     maxCutoff = 0.0;
@@ -92,7 +92,7 @@ namespace espressopp {
     return skin;
   }
 
-  void System::addInteraction(shared_ptr< interaction::Interaction > ia){
+  void System::addInteraction(std::shared_ptr< interaction::Interaction > ia){
     shortRangeInteractions.push_back(ia);
     
     // check if the cutoff of this interaction is bigger then maxCutoff
@@ -129,7 +129,7 @@ namespace espressopp {
     }
   }
 
-  shared_ptr< interaction::Interaction > System::getInteraction(int i)
+  std::shared_ptr< interaction::Interaction > System::getInteraction(int i)
   {
     return shortRangeInteractions[i];
   }

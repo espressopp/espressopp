@@ -46,7 +46,7 @@ namespace espressopp {
         ;
 
       class_< SingleParticleLennardJones93Wall, bases< Interaction > >
-        ("interaction_SingleParticleLennardJones93Wall", init< shared_ptr<System>, shared_ptr<LennardJones93Wall> >())
+        ("interaction_SingleParticleLennardJones93Wall", init< std::shared_ptr<System>, std::shared_ptr<LennardJones93Wall> >())
         .def("setPotential", &SingleParticleLennardJones93Wall::setPotential)
         .def("getPotential", &SingleParticleLennardJones93Wall::getPotential)
        ;

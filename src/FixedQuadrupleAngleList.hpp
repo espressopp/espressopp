@@ -40,12 +40,12 @@ namespace espressopp {
     boost::signals2::connection con1, con2, con3;
     typedef std::multimap< longint,
             std::pair<Triple < longint, longint, longint >, real> > QuadruplesAngles;
-    shared_ptr <storage::Storage> storage;
+    std::shared_ptr <storage::Storage> storage;
     QuadruplesAngles quadruplesAngles;
     using QuadrupleList::add;
 
   public:
-    FixedQuadrupleAngleList(shared_ptr <storage::Storage> _storage);
+    FixedQuadrupleAngleList(std::shared_ptr <storage::Storage> _storage);
     ~FixedQuadrupleAngleList();
 
     /** Add the given particle quadruple to the list on this processor if the

@@ -52,7 +52,7 @@ namespace espressopp {
 
     */
 
-    VerletListAdress(shared_ptr< System >, real cut, real adrcut, bool rebuildVL, real _dEx, real _dHy);
+    VerletListAdress(std::shared_ptr< System >, real cut, real adrcut, bool rebuildVL, real _dEx, real _dHy);
 
     ~VerletListAdress();
 

@@ -73,7 +73,7 @@ Examples:
                 :param type2: type of atom 2
                 :param spanbased: (default: True) If True, calculates RDFs in a cuboid region of radius span from the center (limited in x, periodic in y,z). If False, calculates RDFs with both particles being in the high resolution region (using lambda resolution values and ignoring span parameter).
                 :param span: (default: 1.0) +/- distance from centre of box in x-direction of the cuboid region used for RDF calculation if spanbased == True. If spanbased == False, this parameter is not used.
-                :type system: shared_ptr<System>
+                :type system: std::shared_ptr<System>
                 :type type1: int
                 :type type2: int
                 :type spanbased: bool

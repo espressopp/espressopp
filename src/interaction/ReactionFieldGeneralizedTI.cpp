@@ -55,21 +55,21 @@ namespace espressopp {
             ;
 
             //class_<VerletListReactionFieldGeneralizedTI, bases<Interaction> >
-            //    ("interaction_VerletListReactionFieldGeneralizedTI", init< shared_ptr<VerletList> >())
+            //    ("interaction_VerletListReactionFieldGeneralizedTI", init< std::shared_ptr<VerletList> >())
             //    .def("setPotential", &VerletListReactionFieldGeneralizedTI::setPotential)
             //    .def("getPotential", &VerletListReactionFieldGeneralizedTI::getPotentialPtr)
             //;
 
             class_<VerletListAdressReactionFieldGeneralizedTI, bases<Interaction> >
                 ("interaction_VerletListAdressReactionFieldGeneralizedTI",
-                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                        init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
                 .def("setPotentialAT", &VerletListAdressReactionFieldGeneralizedTI::setPotentialAT)
                 .def("setPotentialCG", &VerletListAdressReactionFieldGeneralizedTI::setPotentialCG);
             ;
 
             //class_<VerletListHadressReactionFieldGeneralizedTI, bases<Interaction> >
             //    ("interaction_VerletListHadressReactionFieldGeneralizedTI",
-            //            init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+            //            init< std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
             //    .def("setPotentialAT", &VerletListHadressReactionFieldGeneralizedTI::setPotentialAT)
             //    .def("setPotentialCG", &VerletListHadressReactionFieldGeneralizedTI::setPotentialCG);
             //;

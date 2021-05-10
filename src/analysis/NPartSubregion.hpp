@@ -31,7 +31,7 @@ namespace espressopp {
     /** Class to get the number of particles in the system. */
     class NPartSubregion : public Observable {
       public:
-        NPartSubregion(shared_ptr< System > system, int parttype, real span, int geometry) : Observable(system), parttype(parttype), span(span), geometry(geometry) {
+        NPartSubregion(std::shared_ptr< System > system, int parttype, real span, int geometry) : Observable(system), parttype(parttype), span(span), geometry(geometry) {
           result_type=int_scalar;
         }
         virtual ~NPartSubregion() {}

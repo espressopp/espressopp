@@ -41,7 +41,7 @@ namespace espressopp {
     class Settle : public Extension {
 
         public:
-            Settle(shared_ptr<System> _system, shared_ptr<FixedTupleListAdress> _fixedTupleList,
+            Settle(std::shared_ptr<System> _system, std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
             		real mO, real mH, real distHH, real distOH);
             ~Settle();
 
@@ -70,7 +70,7 @@ namespace espressopp {
     	    typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
     	    OldPos oldPos;
 
-	    shared_ptr<FixedTupleListAdress> fixedTupleList;
+	    std::shared_ptr<FixedTupleListAdress> fixedTupleList;
 	    void connect();
 	    void disconnect();
             static LOG4ESPP_DECL_LOGGER(theLogger);

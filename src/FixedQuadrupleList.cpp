@@ -37,14 +37,14 @@
 namespace espressopp {
 
   /*
-  FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage)
+  FixedQuadrupleList::FixedQuadrupleList(std::shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
   */
 
 
   LOG4ESPP_LOGGER(FixedQuadrupleList::theLogger, "FixedQuadrupleList");
 
-  FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage) 
+  FixedQuadrupleList::FixedQuadrupleList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalQuadruples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleList");
@@ -306,8 +306,8 @@ namespace espressopp {
     //bool (FixedQuadrupleList::*pyAdd)(pvec pids)
     //          = &FixedQuadrupleList::add;
 
-    class_< FixedQuadrupleList, shared_ptr< FixedQuadrupleList > >
-      ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())
+    class_< FixedQuadrupleList, std::shared_ptr< FixedQuadrupleList > >
+      ("FixedQuadrupleList", init< std::shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedQuadrupleList::size)
       .def("remove",  &FixedQuadrupleList::remove)

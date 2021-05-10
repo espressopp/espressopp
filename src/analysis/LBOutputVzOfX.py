@@ -26,7 +26,7 @@ conservation when using MD to LB coupling.
 
 .. py:class:: espressopp.analysis.LBOutputVzOfX(system,lb)
 
-    :param shared_ptr system: system object defined earlier in the python-script
+    :param std::shared_ptr system: system object defined earlier in the python-script
     :param lb_object lb: lattice boltzmann object defined earlier in the python-script
 
 Example:

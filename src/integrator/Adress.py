@@ -54,9 +54,9 @@ Finally, when making use of a RESPA Velocity Verlet integrator, then the multist
                 :param KTI: (default: False) update resolution parameter? (Yes: set False, No: set True)
                 :param regionupdates: (default: 1) after how many steps does the AdResS region needs to be updated?
                 :param multistep: (default: 1) when used with VelocityVerletRESPA (otherwise, ignored), after how many steps of the inner integration loop do we update the slow forces? This parameter should be set consistently with multistep in VelocityVerletRESPA.
-                :type _system: shared_ptr<System>
-                :type _verletlist: shared_ptr<VerletListAdress>
-                :type _fixedtuplelist: shared_ptr<FixedTupleListAdress>
+                :type _system: std::shared_ptr<System>
+                :type _verletlist: std::shared_ptr<VerletListAdress>
+                :type _fixedtuplelist: std::shared_ptr<FixedTupleListAdress>
                 :type KTI: bool
                 :type regionupdates: int
                 :type multistep: int

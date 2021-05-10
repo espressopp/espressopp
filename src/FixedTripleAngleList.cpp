@@ -35,7 +35,7 @@ namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTripleAngleList::theLogger, "FixedTripleAngleList");
 
-  FixedTripleAngleList::FixedTripleAngleList(shared_ptr< storage::Storage > _storage)
+  FixedTripleAngleList::FixedTripleAngleList(std::shared_ptr< storage::Storage > _storage)
   : storage(_storage), triplesAngles()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleAngleList");
@@ -288,8 +288,8 @@ namespace espressopp {
     //bool (FixedTripleAngleList::*pyAdd)(pvec pids)
     //      = &FixedTripleAngleList::add;
 
-    class_< FixedTripleAngleList, shared_ptr< FixedTripleAngleList > >
-      ("FixedTripleAngleList", init< shared_ptr< storage::Storage > >())
+    class_< FixedTripleAngleList, std::shared_ptr< FixedTripleAngleList > >
+      ("FixedTripleAngleList", init< std::shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedTripleAngleList::size)
       .def("getTriples",  &FixedTripleAngleList::getTriples)

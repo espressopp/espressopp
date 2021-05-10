@@ -36,7 +36,7 @@ namespace espressopp {
   LOG4ESPP_LOGGER(FixedSingleList::theLogger, "FixedSingleList");
 
 
-  FixedSingleList::FixedSingleList(shared_ptr< storage::Storage > _storage)
+  FixedSingleList::FixedSingleList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalSingles()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedSingleList");
@@ -153,8 +153,8 @@ namespace espressopp {
 
     bool (FixedSingleList::*pyAdd)(longint pid1) = &FixedSingleList::add;
 
-    class_<FixedSingleList, shared_ptr<FixedSingleList> >
-      ("FixedSingleList", init <shared_ptr<storage::Storage> >())
+    class_<FixedSingleList, std::shared_ptr<FixedSingleList> >
+      ("FixedSingleList", init <std::shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedSingleList::size)
       .def("getSingles",  &FixedSingleList::getSingles)

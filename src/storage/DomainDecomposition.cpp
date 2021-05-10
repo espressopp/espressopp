@@ -68,7 +68,7 @@ namespace espressopp {
   {}
 
   DomainDecomposition::
-  DomainDecomposition(shared_ptr< System > _system,
+  DomainDecomposition(std::shared_ptr< System > _system,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid,
           int _halfCellInt)
@@ -780,7 +780,7 @@ namespace espressopp {
   void DomainDecomposition::registerPython() {
     using namespace espressopp::python;
     class_< DomainDecomposition, bases< Storage >, boost::noncopyable >
-    ("storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D&, int >())
+    ("storage_DomainDecomposition", init< std::shared_ptr< System >, const Int3D&, const Int3D&, int >())
     .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)
     .def("getCellGrid", &DomainDecomposition::getInt3DCellGrid)
     .def("getNodeGrid", &DomainDecomposition::getInt3DNodeGrid)

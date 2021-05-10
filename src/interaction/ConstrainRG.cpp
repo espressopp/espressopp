@@ -45,7 +45,7 @@ namespace espressopp {
 	    
 	    class_< FixedLocalTupleListConstrainRG, bases< Interaction > >
 		("interaction_FixedLocalTupleListConstrainRG",
-		 init< shared_ptr<System>, shared_ptr<FixedLocalTupleList>, shared_ptr<ConstrainRG> >())
+		 init< std::shared_ptr<System>, std::shared_ptr<FixedLocalTupleList>, std::shared_ptr<ConstrainRG> >())
 		.def("getPotential", &FixedLocalTupleListConstrainRG::getPotential)
 		.def("setRG", &FixedLocalTupleListConstrainRG::setRG)
 		;

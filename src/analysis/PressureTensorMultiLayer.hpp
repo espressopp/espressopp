@@ -49,7 +49,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      PressureTensorMultiLayer(shared_ptr< System > system, int _n, real _dz) : AnalysisBaseTemplate< vector<Tensor> >(system), n(_n), dz(_dz){}
+      PressureTensorMultiLayer(std::shared_ptr< System > system, int _n, real _dz) : AnalysisBaseTemplate< vector<Tensor> >(system), n(_n), dz(_dz){}
       virtual ~PressureTensorMultiLayer() {}
       /*
        * calculate the pressure in 'n' layers along Z axis

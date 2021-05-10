@@ -40,7 +40,7 @@ namespace espressopp {
 namespace io {
 class DumpTopology: public ParticleAccess {
  public:
-  DumpTopology(shared_ptr<System> system, shared_ptr<integrator::MDIntegrator> integrator)
+  DumpTopology(std::shared_ptr<System> system, std::shared_ptr<integrator::MDIntegrator> integrator)
       : ParticleAccess(system), integrator_(integrator) { }
   ~DumpTopology() {  }
 
@@ -48,9 +48,9 @@ class DumpTopology: public ParticleAccess {
     saveDataToBuffer();
   }
 
-  void observeTuple(shared_ptr<FixedPairList> fpl);
-  void observeTriple(shared_ptr<FixedTripleList> ftl);
-  void observeQuadruple(shared_ptr<FixedQuadrupleList> fql);
+  void observeTuple(std::shared_ptr<FixedPairList> fpl);
+  void observeTriple(std::shared_ptr<FixedTripleList> ftl);
+  void observeQuadruple(std::shared_ptr<FixedQuadrupleList> fql);
 
   python::list getData();
 
@@ -61,14 +61,14 @@ class DumpTopology: public ParticleAccess {
 
   void clearBuffer();
 
-  shared_ptr<integrator::MDIntegrator> integrator_;
+  std::shared_ptr<integrator::MDIntegrator> integrator_;
 
   typedef std::deque<longint> FplBuffer;
   FplBuffer fpl_buffer_;
 
-  std::vector<shared_ptr<FixedPairList> > fpls_;
-  std::vector<shared_ptr<FixedTripleList> > ftls_;
-  std::vector<shared_ptr<FixedQuadrupleList> > fqls_;
+  std::vector<std::shared_ptr<FixedPairList> > fpls_;
+  std::vector<std::shared_ptr<FixedTripleList> > ftls_;
+  std::vector<std::shared_ptr<FixedQuadrupleList> > fqls_;
 
   void saveDataToBuffer();
 };

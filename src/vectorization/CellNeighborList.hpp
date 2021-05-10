@@ -45,7 +45,7 @@ namespace espressopp {
       typedef typename Super::size_type size_type;
 
       CellNeighborList(){}
-      CellNeighborList(shared_ptr<storage::Storage>& storage)
+      CellNeighborList(std::shared_ptr<storage::Storage>& storage)
       {
         CellList const& localCells = storage->getLocalCells();
         CellList const& realCells  = storage->getRealCells();

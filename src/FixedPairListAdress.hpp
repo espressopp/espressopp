@@ -43,8 +43,8 @@ namespace espressopp {
      */
 	class FixedPairListAdress : public FixedPairList {
 	  public:
-		FixedPairListAdress(shared_ptr<storage::Storage> _storage,
-		        shared_ptr<FixedTupleListAdress> _fixedtupleList);
+		FixedPairListAdress(std::shared_ptr<storage::Storage> _storage,
+		        std::shared_ptr<FixedTupleListAdress> _fixedtupleList);
 		virtual ~FixedPairListAdress();
 
 		/** Add the given particle pair to the list on this processor if the
@@ -66,7 +66,7 @@ namespace espressopp {
 		boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
 	  private:
-		shared_ptr<FixedTupleListAdress> fixedtupleList;
+		std::shared_ptr<FixedTupleListAdress> fixedtupleList;
 		using PairList::add;
 		static LOG4ESPP_DECL_LOGGER(theLogger);
 	};

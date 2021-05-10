@@ -31,7 +31,7 @@ namespace espressopp {
   namespace analysis {
     class SubregionTracking : public Observable {
       public:
-        SubregionTracking(shared_ptr< System > system, real span, int geometry) : Observable(system), span(span), geometry(geometry) {
+        SubregionTracking(std::shared_ptr< System > system, real span, int geometry) : Observable(system), span(span), geometry(geometry) {
           result_type=int_scalar;
         }
         virtual ~SubregionTracking() {}

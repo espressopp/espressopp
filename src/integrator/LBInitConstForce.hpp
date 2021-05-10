@@ -29,8 +29,8 @@ namespace espressopp {
   namespace integrator {
     class LBInitConstForce : public LBInit {
       public:
-      LBInitConstForce(shared_ptr<System> _system,
-											 shared_ptr< LatticeBoltzmann > _latticeboltzmann);
+      LBInitConstForce(std::shared_ptr<System> _system,
+											 std::shared_ptr< LatticeBoltzmann > _latticeboltzmann);
 
         /** Destructor for output. */
 /*        ~LBInitConstForce ();

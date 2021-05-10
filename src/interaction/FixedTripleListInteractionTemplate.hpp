@@ -46,9 +46,9 @@ namespace espressopp {
 
     public:
       FixedTripleListInteractionTemplate
-      (shared_ptr < System > _system,
-       shared_ptr < FixedTripleList > _fixedtripleList,
-       shared_ptr < Potential > _potential)
+      (std::shared_ptr < System > _system,
+       std::shared_ptr < FixedTripleList > _fixedtripleList,
+       std::shared_ptr < Potential > _potential)
         : SystemAccess(_system), fixedtripleList(_fixedtripleList),
           potential(_potential)
       {
@@ -61,11 +61,11 @@ namespace espressopp {
       virtual ~FixedTripleListInteractionTemplate() {};
 
       void
-      setFixedTripleList(shared_ptr < FixedTripleList > _fixedtripleList) {
+      setFixedTripleList(std::shared_ptr < FixedTripleList > _fixedtripleList) {
         fixedtripleList = _fixedtripleList;
       }
 
-      shared_ptr < FixedTripleList > getFixedTripleList() {
+      std::shared_ptr < FixedTripleList > getFixedTripleList() {
         return fixedtripleList;
       }
 
@@ -74,7 +74,7 @@ namespace espressopp {
         potentialArray.at(type1, type2) = potential;
       }*/
       void
-      setPotential(shared_ptr < Potential> _potential) {
+      setPotential(std::shared_ptr < Potential> _potential) {
          if (_potential) {
             potential = _potential;
          } else {
@@ -86,7 +86,7 @@ namespace espressopp {
         return potentialArray.at(0, 0);
       }*/
 
-      shared_ptr < Potential > getPotential() {
+      std::shared_ptr < Potential > getPotential() {
         return potential;
       }
 
@@ -107,9 +107,9 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr<FixedTripleList> fixedtripleList;
+      std::shared_ptr<FixedTripleList> fixedtripleList;
       //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      shared_ptr < Potential > potential;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

@@ -40,10 +40,10 @@ namespace espressopp {
       typedef variate_generator< RNGType&, DistType > Super;
 
       /// store the shared pointer to the RNG
-      shared_ptr< RNG > rng;
+      std::shared_ptr< RNG > rng;
 
     public:
-      GammaVariate(shared_ptr< RNG > _rng,
+      GammaVariate(std::shared_ptr< RNG > _rng,
 		    const int alpha = 1,
 		    const real beta = 1.0);
       using Super::operator();

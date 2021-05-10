@@ -46,7 +46,7 @@ namespace espressopp {
      */
     class ParticleGroup {
         public:
-            ParticleGroup(shared_ptr <storage::Storage> _storage);
+            ParticleGroup(std::shared_ptr <storage::Storage> _storage);
             ~ParticleGroup();
 
             /**
@@ -114,7 +114,7 @@ namespace espressopp {
             std::set<longint> particles;
 
             // pointer to storage object
-            shared_ptr<storage::Storage> storage;
+            std::shared_ptr<storage::Storage> storage;
 
             // some signalling stuff to keep track of the particles in cell
             boost::signals2::connection con_send, con_recv, con_changed;

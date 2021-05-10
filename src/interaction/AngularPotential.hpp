@@ -53,12 +53,12 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
 
-      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl) = 0;
-      virtual shared_ptr<FixedPairList> getColVarBondList() const = 0;
-      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl) = 0;
-      virtual shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
-      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl) = 0;
-      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const = 0;
+      virtual void setColVarBondList(const std::shared_ptr<FixedPairList>& fpl) = 0;
+      virtual std::shared_ptr<FixedPairList> getColVarBondList() const = 0;
+      virtual void setColVarAngleList(const std::shared_ptr<FixedTripleList>& fpl) = 0;
+      virtual std::shared_ptr<FixedTripleList> getColVarAngleList() const = 0;
+      virtual void setColVarDihedList(const std::shared_ptr<FixedQuadrupleList>& fpl) = 0;
+      virtual std::shared_ptr<FixedQuadrupleList> getColVarDihedList() const = 0;
 
       virtual void setColVar(const RealND& cv) = 0;
       virtual void setColVar(const Real3D& dist12,
@@ -102,12 +102,12 @@ namespace espressopp {
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
 
-      virtual void setColVarBondList(const shared_ptr<FixedPairList>& fpl);
-      virtual shared_ptr<FixedPairList> getColVarBondList() const;
-      virtual void setColVarAngleList(const shared_ptr<FixedTripleList>& fpl);
-      virtual shared_ptr<FixedTripleList> getColVarAngleList() const;
-      virtual void setColVarDihedList(const shared_ptr<FixedQuadrupleList>& fpl);
-      virtual shared_ptr<FixedQuadrupleList> getColVarDihedList() const;
+      virtual void setColVarBondList(const std::shared_ptr<FixedPairList>& fpl);
+      virtual std::shared_ptr<FixedPairList> getColVarBondList() const;
+      virtual void setColVarAngleList(const std::shared_ptr<FixedTripleList>& fpl);
+      virtual std::shared_ptr<FixedTripleList> getColVarAngleList() const;
+      virtual void setColVarDihedList(const std::shared_ptr<FixedQuadrupleList>& fpl);
+      virtual std::shared_ptr<FixedQuadrupleList> getColVarDihedList() const;
 
       virtual void setColVar(const RealND& cv);
       virtual void setColVar(const Real3D& dist12,
@@ -143,11 +143,11 @@ namespace espressopp {
       real cutoff;
       real cutoffSqr;
       // List of bonds that correlate with the angle potential
-      shared_ptr<FixedPairList> colVarBondList;
+      std::shared_ptr<FixedPairList> colVarBondList;
       // List of angles that correlate with the bond potential
-      shared_ptr<FixedTripleList> colVarAngleList;
+      std::shared_ptr<FixedTripleList> colVarAngleList;
       // List of dihedrals that correlate with the dihedral potential
-      shared_ptr<FixedQuadrupleList> colVarDihedList;
+      std::shared_ptr<FixedQuadrupleList> colVarDihedList;
       // Collective variables: first itself, then bonds and dihedrals
       RealND colVar;
 
@@ -188,12 +188,12 @@ namespace espressopp {
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    setColVarBondList(const shared_ptr < FixedPairList >& _fpl) {
+    setColVarBondList(const std::shared_ptr < FixedPairList >& _fpl) {
       colVarBondList = _fpl;
     }
 
     template < class Derived >
-    inline shared_ptr < FixedPairList >
+    inline std::shared_ptr < FixedPairList >
     AngularPotentialTemplate< Derived >::
     getColVarBondList() const
     { return colVarBondList; }
@@ -202,12 +202,12 @@ namespace espressopp {
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    setColVarAngleList(const shared_ptr < FixedTripleList >& _fpl) {
+    setColVarAngleList(const std::shared_ptr < FixedTripleList >& _fpl) {
       colVarAngleList = _fpl;
     }
 
     template < class Derived >
-    inline shared_ptr < FixedTripleList >
+    inline std::shared_ptr < FixedTripleList >
     AngularPotentialTemplate< Derived >::
     getColVarAngleList() const
     { return colVarAngleList; }
@@ -216,12 +216,12 @@ namespace espressopp {
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
-    setColVarDihedList(const shared_ptr < FixedQuadrupleList >& _fpl) {
+    setColVarDihedList(const std::shared_ptr < FixedQuadrupleList >& _fpl) {
       colVarDihedList = _fpl;
     }
 
     template < class Derived >
-    inline shared_ptr < FixedQuadrupleList >
+    inline std::shared_ptr < FixedQuadrupleList >
     AngularPotentialTemplate< Derived >::
     getColVarDihedList() const
     { return colVarDihedList; }

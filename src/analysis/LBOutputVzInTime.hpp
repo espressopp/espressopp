@@ -29,8 +29,8 @@ namespace espressopp {
    namespace analysis {
       class LBOutputVzInTime : public LBOutput {
       public:
-         LBOutputVzInTime(shared_ptr<System> _system,
-                          shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
+         LBOutputVzInTime(std::shared_ptr<System> _system,
+                          std::shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
          void writeOutput();
 

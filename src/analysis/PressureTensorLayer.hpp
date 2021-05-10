@@ -48,7 +48,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      PressureTensorLayer(shared_ptr< System > system, real _z0, real _dz) : AnalysisBaseTemplate< Tensor >(system), z0(_z0), dz(_dz){}
+      PressureTensorLayer(std::shared_ptr< System > system, real _z0, real _dz) : AnalysisBaseTemplate< Tensor >(system), z0(_z0), dz(_dz){}
       virtual ~PressureTensorLayer() {}
       /*
        * calculate a pressure for z0 layer

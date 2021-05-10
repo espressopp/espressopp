@@ -37,7 +37,7 @@ namespace espressopp {
     class Isokinetic : public Extension{
 
       public:
-        Isokinetic(shared_ptr< System > system);
+        Isokinetic(std::shared_ptr< System > system);
 
         void setTemperature(real temperature);
 
@@ -60,7 +60,7 @@ namespace espressopp {
         int couplecount;
 
         // not yet needed
-        // shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+        // std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
         void rescaleVelocities();
 

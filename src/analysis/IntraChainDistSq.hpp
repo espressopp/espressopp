@@ -38,8 +38,8 @@ namespace espressopp {
 
     class IntraChainDistSq : public AllParticlePos {
     public:
-      shared_ptr<FixedPairList> fpl;
-      IntraChainDistSq(shared_ptr<System> system, shared_ptr<FixedPairList> _fpl) : AllParticlePos(system), fpl(_fpl) {};
+      std::shared_ptr<FixedPairList> fpl;
+      IntraChainDistSq(std::shared_ptr<System> system, std::shared_ptr<FixedPairList> _fpl) : AllParticlePos(system), fpl(_fpl) {};
       ~IntraChainDistSq() {};
       python::list compute();
       static void registerPython();

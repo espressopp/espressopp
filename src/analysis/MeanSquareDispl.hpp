@@ -40,13 +40,13 @@ namespace espressopp {
         class MeanSquareDispl : public ConfigsParticleDecomp {
         public:
 
-            MeanSquareDispl(shared_ptr<System> system) : ConfigsParticleDecomp(system) {
+            MeanSquareDispl(std::shared_ptr<System> system) : ConfigsParticleDecomp(system) {
                 // by default 
                 setPrint_progress(true);
                 key = "unfolded";
             }
 
-            MeanSquareDispl(shared_ptr<System> system, int chainlength, int start_pid) :
+            MeanSquareDispl(std::shared_ptr<System> system, int chainlength, int start_pid) :
                                 ConfigsParticleDecomp(system, chainlength, start_pid) {
                 // by default 
                 setPrint_progress(true);

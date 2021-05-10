@@ -44,8 +44,8 @@ namespace espressopp {
       class Adress : public Extension {
 
       public:
-        shared_ptr<VerletListAdress> verletList;
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
+        std::shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         bool KTI;
         int regionupdates;
         int multistep;
@@ -57,7 +57,7 @@ namespace espressopp {
         real dexdhy;
         real dexdhy2;
 
-        Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false, int _regionupdates = 1, int _multistep = 1);
+        Adress(std::shared_ptr<System> _system, std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false, int _regionupdates = 1, int _multistep = 1);
 
         ~Adress();
 

@@ -60,7 +60,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         Defines a verletlist-based interaction using a ReactionFieldGeneralized potential.
 
         :param vl: Verletlist object
-        :type vl: shared_ptr<VerletList>
+        :type vl: std::shared_ptr<VerletList>
 
 .. function:: espressopp.interaction.VerletListReactionFieldGeneralized.getPotential(type1, type2)
 
@@ -70,7 +70,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<ReactionFieldGeneralized>
+        :rtype: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListReactionFieldGeneralized.setPotential(type1, type2, potential)
 
@@ -81,7 +81,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized(vl, fixedtupleList)
 
@@ -89,8 +89,8 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
 
@@ -101,7 +101,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
 
@@ -112,7 +112,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListAdressATReactionFieldGeneralized(vl, fixedtupleList)
 
@@ -120,8 +120,8 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListAdressATReactionFieldGeneralized.setPotential(type1, type2, potential)
 
@@ -132,7 +132,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListAdressATReactionFieldGeneralized.getPotential(type1, type2)
 
@@ -142,7 +142,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<ReactionFieldGeneralized>
+        :rtype: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized(vl, fixedtupleList)
 
@@ -150,8 +150,8 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
 
@@ -162,7 +162,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
 
@@ -173,7 +173,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: tabulated interaction potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<Tabulated>
+        :type potential: std::shared_ptr<Tabulated>
 
 .. function:: espressopp.interaction.VerletListHadressATReactionFieldGeneralized(vl, fixedtupleList)
 
@@ -181,8 +181,8 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 
         :param vl: Verletlist AdResS object
         :param fixedtupleList: FixedTupleList object
-        :type vl: shared_ptr<VerletListAdress>
-        :type fixedtupleList: shared_ptr<FixedTupleListAdress>
+        :type vl: std::shared_ptr<VerletListAdress>
+        :type fixedtupleList: std::shared_ptr<FixedTupleListAdress>
 
 .. function:: espressopp.interaction.VerletListHadressATReactionFieldGeneralized.setPotential(type1, type2, potential)
 
@@ -193,7 +193,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.VerletListHadressATReactionFieldGeneralized.getPotential(type1, type2)
 
@@ -203,14 +203,14 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param type2: particle type 2
         :type type1: int
         :type type2: int
-        :rtype: shared_ptr<ReactionFieldGeneralized>
+        :rtype: std::shared_ptr<ReactionFieldGeneralized>
 
 .. function:: espressopp.interaction.CellListReactionFieldGeneralized(stor)
 
         Defines a CellList-based interaction using a ReactionFieldGeneralized potential.
 
         :param stor: storage object
-        :type stor: shared_ptr <storage::Storage>
+        :type stor: std::shared_ptr <storage::Storage>
 
 .. function:: espressopp.interaction.CellListReactionFieldGeneralized.setPotential(type1, type2, potential)
 
@@ -221,7 +221,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
         :param potential: ReactionFieldGeneralized potential object
         :type type1: int
         :type type2: int
-        :type potential: shared_ptr<ReactionFieldGeneralized>
+        :type potential: std::shared_ptr<ReactionFieldGeneralized>
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *

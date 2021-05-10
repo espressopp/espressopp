@@ -43,7 +43,7 @@ namespace espressopp {
     * */
       class AnalysisBase : public ParticleAccess{ //SystemAccess {
       public:
-        AnalysisBase(shared_ptr< System > system) : ParticleAccess(system) {}
+        AnalysisBase(std::shared_ptr< System > system) : ParticleAccess(system) {}
         virtual ~AnalysisBase() {}
       virtual void performMeasurement() = 0;
       virtual void reset() = 0;
@@ -62,7 +62,7 @@ namespace espressopp {
     template < class ResultType >
     class AnalysisBaseTemplate : public AnalysisBase {
     public:
-      AnalysisBaseTemplate(shared_ptr< System > system) : AnalysisBase(system) {
+      AnalysisBaseTemplate(std::shared_ptr< System > system) : AnalysisBase(system) {
     	  //this->reset();
       };
       virtual ~AnalysisBaseTemplate() {};

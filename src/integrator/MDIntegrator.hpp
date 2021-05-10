@@ -45,7 +45,7 @@ namespace espressopp {
 
     class Extension; //fwd declaration
 
-    struct ExtensionList : public std::vector<shared_ptr<Extension> > {
+    struct ExtensionList : public std::vector<std::shared_ptr<Extension> > {
           typedef esutil::ESPPIterator<std::vector<Extension> > Iterator;
     };
 
@@ -55,7 +55,7 @@ namespace espressopp {
             \param system is reference to the system.
             Note: This class will keep a weak reference to the system.
         */
-        MDIntegrator(shared_ptr<System> system);
+        MDIntegrator(std::shared_ptr<System> system);
 
         /** Destructor. */
         virtual ~MDIntegrator();
@@ -75,9 +75,9 @@ namespace espressopp {
         /** This method runs the integration for a certain number of steps. */
         virtual void run(int nsteps) = 0;
 
-        void addExtension(shared_ptr<integrator::Extension> extension);
+        void addExtension(std::shared_ptr<integrator::Extension> extension);
 
-        shared_ptr<integrator::Extension> getExtension(int k);
+        std::shared_ptr<integrator::Extension> getExtension(int k);
 
         int getNumberOfExtensions();
 

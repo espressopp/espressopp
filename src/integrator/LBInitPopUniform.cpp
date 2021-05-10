@@ -26,8 +26,8 @@
 namespace espressopp {
    namespace integrator {
       //    LOG4ESPP_LOGGER(LBInitPopUniform::theLogger, "LBInitPopUniform");
-      LBInitPopUniform::LBInitPopUniform(shared_ptr<System> system,
-                                         shared_ptr< LatticeBoltzmann > latticeboltzmann)
+      LBInitPopUniform::LBInitPopUniform(std::shared_ptr<System> system,
+                                         std::shared_ptr< LatticeBoltzmann > latticeboltzmann)
       : LBInit(system, latticeboltzmann) {
       }
 
@@ -77,8 +77,8 @@ namespace espressopp {
          using namespace espressopp::python;
 
          class_<LBInitPopUniform, bases< LBInit > >
-         ("integrator_LBInit_PopUniform",		init< shared_ptr< System >,
-          shared_ptr< LatticeBoltzmann > >())
+         ("integrator_LBInit_PopUniform",		init< std::shared_ptr< System >,
+          std::shared_ptr< LatticeBoltzmann > >())
          .def("createDenVel", &LBInitPopUniform::createDenVel)
          ;
       }

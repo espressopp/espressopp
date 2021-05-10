@@ -27,7 +27,7 @@
 
 namespace espressopp {
 
-    ParticleGroup::ParticleGroup(shared_ptr <storage::Storage> _storage)
+    ParticleGroup::ParticleGroup(std::shared_ptr <storage::Storage> _storage)
     : storage(_storage) {
         con_send = storage->beforeSendParticles.connect
                 (boost::bind(&ParticleGroup::beforeSendParticles, this, _1, _2));
@@ -127,8 +127,8 @@ namespace espressopp {
 
         using namespace espressopp::python;
 
-        class_< ParticleGroup, shared_ptr <ParticleGroup> >
-                ("ParticleGroup", init <shared_ptr <storage::Storage> >())
+        class_< ParticleGroup, std::shared_ptr <ParticleGroup> >
+                ("ParticleGroup", init <std::shared_ptr <storage::Storage> >())
                 .def("add", &ParticleGroup::add)
                 .def("show", &ParticleGroup::print)
                 .def("has", &ParticleGroup::has)

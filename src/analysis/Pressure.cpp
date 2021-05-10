@@ -54,7 +54,7 @@ namespace espressopp {
       
       if (system.storage->getFixedTuples()){ // AdResS - hence, need to distinguish between CG and AT particles.     
           
-          shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
           for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
                 Particle &vp = *cit;
                 FixedTupleListAdress::iterator it2;
@@ -115,7 +115,7 @@ namespace espressopp {
     void Pressure::registerPython() {
       using namespace espressopp::python;
       class_<Pressure, bases< Observable > >
-        ("analysis_Pressure", init< shared_ptr< System > >())
+        ("analysis_Pressure", init< std::shared_ptr< System > >())
       ;
     }
   }

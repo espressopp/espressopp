@@ -46,10 +46,10 @@ namespace espressopp {
 
       public:
         FixedPairListPIadressInteractionTemplate
-        (shared_ptr < System > system,
-         shared_ptr < FixedPairList > _fixedpairList,
-         shared_ptr <FixedTupleListAdress> _fixedtupleList,
-         shared_ptr < Potential > _potential,
+        (std::shared_ptr < System > system,
+         std::shared_ptr < FixedPairList > _fixedpairList,
+         std::shared_ptr <FixedTupleListAdress> _fixedtupleList,
+         std::shared_ptr < Potential > _potential,
          int _ntrotter,
          bool _speedup)
           : SystemAccess(system), fixedpairList(_fixedpairList), fixedtupleList(_fixedtupleList),
@@ -63,20 +63,20 @@ namespace espressopp {
         virtual ~FixedPairListPIadressInteractionTemplate() {};
 
         void
-        setFixedPairList(shared_ptr < FixedPairList > _fixedpairList) {
+        setFixedPairList(std::shared_ptr < FixedPairList > _fixedpairList) {
           fixedpairList = _fixedpairList;
         }
 
-        shared_ptr < FixedPairList > getFixedPairList() {
+        std::shared_ptr < FixedPairList > getFixedPairList() {
           return fixedpairList;
         }
 
         void
-        setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
+        setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
         }
 
-        shared_ptr < FixedTupleListAdress > getFixedTupleList() {
+        std::shared_ptr < FixedTupleListAdress > getFixedTupleList() {
           return fixedtupleList;
         }
 
@@ -99,7 +99,7 @@ namespace espressopp {
         }
 
         void
-        setPotential(shared_ptr < Potential> _potential) {
+        setPotential(std::shared_ptr < Potential> _potential) {
           if (_potential) {
             potential = _potential;
           } else {
@@ -107,7 +107,7 @@ namespace espressopp {
           }
         }
 
-        shared_ptr < Potential > getPotential() {
+        std::shared_ptr < Potential > getPotential() {
           return potential;
         }
 
@@ -132,9 +132,9 @@ namespace espressopp {
         int ntypes;
         int ntrotter;
         bool speedup; // if true approximate rings in classical region by single particles
-        shared_ptr < FixedPairList > fixedpairList;
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
-        shared_ptr < Potential > potential;
+        std::shared_ptr < FixedPairList > fixedpairList;
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
+        std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

@@ -38,7 +38,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(OnTheFlyFEC::theLogger, "OnTheFlyFEC");
 
-    OnTheFlyFEC::OnTheFlyFEC(shared_ptr<System> system)
+    OnTheFlyFEC::OnTheFlyFEC(std::shared_ptr<System> system)
     :Extension(system), center(0.0,0.0,0.0) {
 
         type = Extension::FreeEnergyCompensation;
@@ -135,7 +135,7 @@ namespace espressopp {
                   
                   // iterate over CG particles
                   CellList cells = system.storage->getRealCells();
-                  shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+                  std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
                   FixedTupleListAdress::iterator it2;
                   for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
@@ -276,8 +276,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
 
-      class_<OnTheFlyFEC, shared_ptr<OnTheFlyFEC>, bases<Extension> >
-        ("integrator_OnTheFlyFEC", init< shared_ptr<System> >())
+      class_<OnTheFlyFEC, std::shared_ptr<OnTheFlyFEC>, bases<Extension> >
+        ("integrator_OnTheFlyFEC", init< std::shared_ptr<System> >())
         .add_property("bins", &OnTheFlyFEC::getBins, &OnTheFlyFEC::setBins)
         .add_property("steps", &OnTheFlyFEC::getSteps, &OnTheFlyFEC::setSteps)
         .add_property("gap", &OnTheFlyFEC::getGap, &OnTheFlyFEC::setGap)

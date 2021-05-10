@@ -40,10 +40,10 @@ namespace espressopp {
       typedef variate_generator< RNGType&, DistType > Super;
 
       /// store the shared pointer to the RNG
-      shared_ptr< RNG > rng;
+      std::shared_ptr< RNG > rng;
 
     public:
-      NormalVariate(shared_ptr< RNG > _rng,
+      NormalVariate(std::shared_ptr< RNG > _rng,
 		    const real mean = 0.0, 
 		    const real sigma = 1.0);
       using Super::operator();

@@ -44,7 +44,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      Temperature(shared_ptr< System > system): Observable(system), eKin_(0.0) {
+      Temperature(std::shared_ptr< System > system): Observable(system), eKin_(0.0) {
         has_types = false;
         result_type = real_scalar;
       }
@@ -58,7 +58,7 @@ namespace espressopp {
       int count = 0;
 
       if (system.storage->getFixedTuples()){  // AdResS - hence, need to distinguish between CG and AT particles.
-          shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
           for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // Iterate over all (CG) particles.
             Particle &vp = *cit;

@@ -56,9 +56,9 @@ namespace espressopp {
 
 	public:
 	    FixedLocalTupleComListInteractionTemplate
-	    (shared_ptr < System > _system,
-	     shared_ptr < FixedLocalTupleList > _fixedtupleList,
-	     shared_ptr < Potential > _potential)
+	    (std::shared_ptr < System > _system,
+	     std::shared_ptr < FixedLocalTupleList > _fixedtupleList,
+	     std::shared_ptr < Potential > _potential)
 	      : SystemAccess(_system), fixedtupleList(_fixedtupleList), potential(_potential) {
 		if (! potential) {
 		    LOG4ESPP_ERROR(theLogger, "NULL potential");
@@ -169,16 +169,16 @@ namespace espressopp {
 	    }
 
 	    void
-	    setFixedLocalTupleList(shared_ptr < FixedLocalTupleList > _fixedtupleList) {
+	    setFixedLocalTupleList(std::shared_ptr < FixedLocalTupleList > _fixedtupleList) {
 		fixedtupleList = _fixedtupleList;
 	    }
 
-	    shared_ptr < FixedLocalTupleList > getFixedLocalTupleList() {
+	    std::shared_ptr < FixedLocalTupleList > getFixedLocalTupleList() {
 		return fixedtupleList;
 	    }
 
 	    void
-	    setPotential(shared_ptr < Potential> _potential) {
+	    setPotential(std::shared_ptr < Potential> _potential) {
 		if (_potential) {
 		    potential = _potential;
 		} else {
@@ -186,7 +186,7 @@ namespace espressopp {
 		}
 	    }
 
-	    shared_ptr < Potential > getPotential() {
+	    std::shared_ptr < Potential > getPotential() {
 		return potential;
 	    }
 
@@ -238,8 +238,8 @@ namespace espressopp {
 	    }
 
 	    int ntypes;
-	    shared_ptr < FixedLocalTupleList > fixedtupleList;
-	    shared_ptr < Potential > potential;
+	    std::shared_ptr < FixedLocalTupleList > fixedtupleList;
+	    std::shared_ptr < Potential > potential;
 	};
 
 	//////////////////////////////////////////////////

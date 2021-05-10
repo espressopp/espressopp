@@ -44,7 +44,7 @@ namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedQuadrupleAngleList::theLogger, "FixedQuadrupleAngleList");
 
-  FixedQuadrupleAngleList::FixedQuadrupleAngleList(shared_ptr< storage::Storage > _storage) 
+  FixedQuadrupleAngleList::FixedQuadrupleAngleList(std::shared_ptr< storage::Storage > _storage)
     : storage(_storage), quadruplesAngles()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleAngleList");
@@ -338,8 +338,8 @@ namespace espressopp {
     bool (FixedQuadrupleAngleList::*pyAdd)(longint pid1, longint pid2,
            longint pid3, longint pid4) = &FixedQuadrupleAngleList::add;
 
-    class_< FixedQuadrupleAngleList, shared_ptr< FixedQuadrupleAngleList > >
-      ("FixedQuadrupleAngleList", init< shared_ptr< storage::Storage > >())
+    class_< FixedQuadrupleAngleList, std::shared_ptr< FixedQuadrupleAngleList > >
+      ("FixedQuadrupleAngleList", init< std::shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedQuadrupleAngleList::size)
       .def("getQuadruples",  &FixedQuadrupleAngleList::getQuadruples)

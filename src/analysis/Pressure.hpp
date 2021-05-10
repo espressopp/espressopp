@@ -32,7 +32,7 @@ namespace espressopp {
     /** Class to compute the pressure. */
     class Pressure : public Observable {
     public:
-      Pressure(shared_ptr< System > system) : Observable(system) {}
+      Pressure(std::shared_ptr< System > system) : Observable(system) {}
       ~Pressure() {}
       virtual real compute() const;
 

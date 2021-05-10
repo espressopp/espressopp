@@ -48,8 +48,8 @@ namespace espressopp {
 
       public:
 
-        shared_ptr<FixedTupleListAdress> fixedtupleList;
-        LangevinThermostatHybrid(shared_ptr<System> system,shared_ptr<FixedTupleListAdress> _fixedtupleList);
+        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
+        LangevinThermostatHybrid(std::shared_ptr<System> system,std::shared_ptr<FixedTupleListAdress> _fixedtupleList);
         virtual ~LangevinThermostatHybrid();
 
         void setGamma(real gamma);
@@ -112,7 +112,7 @@ namespace espressopp {
         real pref2bufferhy; //!< temporary to save value between heatUp/coolDown
         real pref2buffercg; //!< temporary to save value between heatUp/coolDown
 
-        shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+        std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
     };
   }

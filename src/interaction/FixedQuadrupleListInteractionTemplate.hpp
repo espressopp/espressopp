@@ -44,9 +44,9 @@ namespace espressopp {
       typedef _DihedralPotential Potential;
     public:
       FixedQuadrupleListInteractionTemplate
-      (shared_ptr < System > _system,
-       shared_ptr < FixedQuadrupleList > _fixedquadrupleList,
-       shared_ptr < Potential > _potential)
+      (std::shared_ptr < System > _system,
+       std::shared_ptr < FixedQuadrupleList > _fixedquadrupleList,
+       std::shared_ptr < Potential > _potential)
         : SystemAccess(_system), fixedquadrupleList(_fixedquadrupleList),
           potential(_potential)
       {
@@ -57,18 +57,18 @@ namespace espressopp {
       }
 
       void
-      setFixedQuadrupleList(shared_ptr < FixedQuadrupleList > _fixedquadrupleList) {
+      setFixedQuadrupleList(std::shared_ptr < FixedQuadrupleList > _fixedquadrupleList) {
         fixedquadrupleList = _fixedquadrupleList;
       }
 
       virtual ~FixedQuadrupleListInteractionTemplate() {};
 
-      shared_ptr < FixedQuadrupleList > getFixedQuadrupleList() {
+      std::shared_ptr < FixedQuadrupleList > getFixedQuadrupleList() {
         return fixedquadrupleList;
       }
 
       void
-      setPotential(shared_ptr < Potential> _potential) {
+      setPotential(std::shared_ptr < Potential> _potential) {
            if (_potential) {
               potential = _potential;
            } else {
@@ -76,7 +76,7 @@ namespace espressopp {
            }
       }
 
-      shared_ptr < Potential > getPotential() {
+      std::shared_ptr < Potential > getPotential() {
         return potential;
       }
 
@@ -97,8 +97,8 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr < FixedQuadrupleList > fixedquadrupleList;
-      shared_ptr < Potential > potential;
+      std::shared_ptr < FixedQuadrupleList > fixedquadrupleList;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

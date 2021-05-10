@@ -47,9 +47,9 @@ namespace espressopp {
 namespace io {
 class DumpXTCAdress : public ParticleAccess {
  public:
-  DumpXTCAdress(shared_ptr<System> system,
-    shared_ptr<FixedTupleListAdress> _ftpl,
-    shared_ptr<integrator::MDIntegrator> _integrator,
+  DumpXTCAdress(std::shared_ptr<System> system,
+    std::shared_ptr<FixedTupleListAdress> _ftpl,
+    std::shared_ptr<integrator::MDIntegrator> _integrator,
     std::string _file_name,
     bool _unfolded,
     real _length_factor,
@@ -90,8 +90,8 @@ class DumpXTCAdress : public ParticleAccess {
   real xtcprec;
 
   // integrator we need to know an integration step
-  shared_ptr<integrator::MDIntegrator> integrator;
-  shared_ptr<FixedTupleListAdress> ftpl;
+  std::shared_ptr<integrator::MDIntegrator> integrator;
+  std::shared_ptr<FixedTupleListAdress> ftpl;
 
   std::string file_name;
 

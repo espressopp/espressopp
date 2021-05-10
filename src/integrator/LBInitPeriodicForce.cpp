@@ -26,8 +26,8 @@
 
 namespace espressopp {
   namespace integrator {
-    LBInitPeriodicForce::LBInitPeriodicForce(shared_ptr<System> system,
-                                             shared_ptr< LatticeBoltzmann > latticeboltzmann)
+    LBInitPeriodicForce::LBInitPeriodicForce(std::shared_ptr<System> system,
+                                             std::shared_ptr< LatticeBoltzmann > latticeboltzmann)
     : LBInit(system, latticeboltzmann) {
     }
 
@@ -138,8 +138,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<LBInitPeriodicForce, bases< LBInit > >
-          ("integrator_LBInit_PeriodicForce",	init< shared_ptr< System >,
-                                                                                        shared_ptr< LatticeBoltzmann > >())
+          ("integrator_LBInit_PeriodicForce",	init< std::shared_ptr< System >,
+                                                                                        std::shared_ptr< LatticeBoltzmann > >())
           .def("setForce", &LBInitPeriodicForce::setForce)
           .def("addForce", &LBInitPeriodicForce::addForce)
       ;

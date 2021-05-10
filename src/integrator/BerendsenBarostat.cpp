@@ -35,7 +35,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(BerendsenBarostat::theLogger, "BerendsenBarostat");
 
-    BerendsenBarostat::BerendsenBarostat(shared_ptr<System> system): Extension(system){
+    BerendsenBarostat::BerendsenBarostat(std::shared_ptr<System> system): Extension(system){
       tau  = 1.0;
       P0 = 1.0;
       
@@ -137,9 +137,9 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<BerendsenBarostat, shared_ptr<BerendsenBarostat>, bases<Extension> >
+      class_<BerendsenBarostat, std::shared_ptr<BerendsenBarostat>, bases<Extension> >
 
-        ("integrator_BerendsenBarostat", init< shared_ptr<System> >())
+        ("integrator_BerendsenBarostat", init< std::shared_ptr<System> >())
 
         .add_property("tau",
               &BerendsenBarostat::getTau,

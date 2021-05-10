@@ -28,7 +28,7 @@
 namespace espressopp {
   class ParticleAccess : public SystemAccess {
   public:
-    ParticleAccess(shared_ptr< System > system) : SystemAccess(system) {}
+    ParticleAccess(std::shared_ptr< System > system) : SystemAccess(system) {}
     virtual ~ParticleAccess() {}
 
     virtual void perform_action() = 0;

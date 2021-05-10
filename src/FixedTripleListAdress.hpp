@@ -44,8 +44,8 @@ namespace espressopp {
      */
 	class FixedTripleListAdress : public FixedTripleList {
 	  public:
-		FixedTripleListAdress(shared_ptr<storage::Storage> _storage,
-		        shared_ptr<FixedTupleListAdress> _fixedtupleList);
+		FixedTripleListAdress(std::shared_ptr<storage::Storage> _storage,
+		        std::shared_ptr<FixedTupleListAdress> _fixedtupleList);
 		~FixedTripleListAdress();
 
 		/** Add the given particle triple to the list on this processor if the
@@ -66,7 +66,7 @@ namespace espressopp {
 		boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
 	  private:
-		shared_ptr<FixedTupleListAdress> fixedtupleList;
+		std::shared_ptr<FixedTupleListAdress> fixedtupleList;
 		using TripleList::add;
 		static LOG4ESPP_DECL_LOGGER(theLogger);
 	};

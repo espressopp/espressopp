@@ -72,7 +72,7 @@ namespace espressopp {
       pb->len = 0;
     }
 
-    DumpH5MD::DumpH5MD(shared_ptr<System> system, bool is_adress) :
+    DumpH5MD::DumpH5MD(std::shared_ptr<System> system, bool is_adress) :
         SystemAccess(system), is_adress_(is_adress) {
 
       store_position = true;
@@ -146,7 +146,7 @@ namespace espressopp {
 
       int i = 0;
       if (is_adress_) {
-        shared_ptr<FixedTupleListAdress> ftpl = system.storage->getFixedTuples();
+        std::shared_ptr<FixedTupleListAdress> ftpl = system.storage->getFixedTuples();
         FixedTupleListAdress::iterator it3;
         for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
           it3 = ftpl->find(&(*cit));
@@ -306,7 +306,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<DumpH5MD>
-        ("io_DumpH5MD", init< shared_ptr< System >, bool >())
+        ("io_DumpH5MD", init< std::shared_ptr< System >, bool >())
         .def("update", &DumpH5MD::update)
         .def("clear_buffers", &DumpH5MD::clear_buffers)
         .def("getPosition", &DumpH5MD::getPosition)

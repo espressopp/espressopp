@@ -50,7 +50,7 @@ namespace espressopp {
 
     */
 
-    VerletListTriple(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletListTriple(std::shared_ptr< System >, real cut, bool rebuildVL);
 
     ~VerletListTriple();
 
