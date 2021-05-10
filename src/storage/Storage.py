@@ -530,8 +530,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray"],
             pmiproperty = [ "system" ],
-            pmiinvoke = ["getRealParticleIDs", "printRealParticles"],
-            localcall = ["hasAddParticlesArray"]
+            pmiinvoke = ["getRealParticleIDs", "printRealParticles"]
             )
 
         def particleExists(self, pid):

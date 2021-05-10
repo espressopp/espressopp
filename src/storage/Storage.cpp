@@ -40,10 +40,7 @@
 
 #include <iostream>
 #include <boost/unordered/unordered_map.hpp>
-
-#ifdef ESPP_BOOST_HAS_NUMPY
 #include <boost/python/numpy.hpp>
-#endif
 
 using namespace std;
 
@@ -750,8 +747,6 @@ namespace espressopp {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Faster adding of particles by storing data in numpy arrays
-    #ifdef ESPP_BOOST_HAS_NUMPY
-
     void addParticlesCheck(
       python::numpy::ndarray const& part_arr,
       python::numpy::ndarray const& idx_arr
@@ -782,27 +777,6 @@ namespace espressopp {
       const int nidx = part_arr.shape(1);
 
       obj->addParticlesFromArrayImpl(part, idx, npart, nidx);
-    }
-
-    #else
-
-    void addParticlesFromArray(
-      class Storage* obj,
-      python::object const& part_arr,
-      python::object const& idx_arr
-    )
-    {
-      throw std::runtime_error("WARNING: addParticlesFromArray requires boost.numpy extension");
-    }
-    #endif
-
-    bool hasAddParticlesFromArray(python::object const&)
-    {
-      #ifdef ESPP_BOOST_HAS_NUMPY
-        return true;
-      #else
-        return false;
-      #endif
     }
 
     void Storage::addParticlesFromArrayImpl(
@@ -937,10 +911,6 @@ namespace espressopp {
     Storage::registerPython() {
       using namespace espressopp::python;
 
-      #ifdef ESPP_BOOST_HAS_NUMPY
-      numpy::initialize();
-      #endif
-
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 	    .def("clearSavedPositions", &Storage::clearSavedPositions)
 	    .def("savePosition", &Storage::savePosition)
@@ -957,7 +927,6 @@ namespace espressopp {
 	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
         .def("addParticlesFromArray", &addParticlesFromArray)
-        .def("hasAddParticlesArray", &hasAddParticlesFromArray)
 	    ;
     }
   }
