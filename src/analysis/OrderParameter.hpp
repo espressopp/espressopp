@@ -380,7 +380,7 @@ namespace espressopp {
           sendGhostInfo.push_back( opp_map.find( *it )->second );
         }
 
-        maxSize, vecSize  = sendGhostInfo.size();
+        vecSize  = sendGhostInfo.size();
         mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
         while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
 
@@ -429,7 +429,7 @@ namespace espressopp {
           }
         }
 
-        maxSize, vecSize  = sendGhostInfo.size();
+        vecSize  = sendGhostInfo.size();
         mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
         while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
         totID.clear();

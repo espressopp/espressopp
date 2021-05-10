@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE BoundaryConditions
+#define BOOST_TEST_MODULE BoundaryConditions
 
 #include "ut.hpp"
 #include <memory>

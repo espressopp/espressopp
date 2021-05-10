@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE DomainDecomposition
+#define BOOST_TEST_MODULE DomainDecomposition
 
 #include "ut.hpp"
 

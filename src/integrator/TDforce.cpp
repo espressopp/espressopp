@@ -54,7 +54,7 @@ namespace espressopp {
         }
         else
         {
-          center = (0.0,0.0,0.0);
+          center = Real3D(0.0,0.0,0.0);
         }
 
         LOG4ESPP_INFO(theLogger, "TDforce constructed");

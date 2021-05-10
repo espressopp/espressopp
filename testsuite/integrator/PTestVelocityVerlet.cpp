@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE VelocityVerlet
+#define BOOST_TEST_MODULE VelocityVerlet
 #include "ut.hpp"
 
 #include "types.hpp"

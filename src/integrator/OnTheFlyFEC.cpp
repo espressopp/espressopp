@@ -39,14 +39,13 @@ namespace espressopp {
     LOG4ESPP_LOGGER(OnTheFlyFEC::theLogger, "OnTheFlyFEC");
 
     OnTheFlyFEC::OnTheFlyFEC(shared_ptr<System> system)
-    :Extension(system) {
+    :Extension(system), center(0.0,0.0,0.0) {
 
         type = Extension::FreeEnergyCompensation;
         
         bins = 0;
         gap = 0;
         steps = 0;
-        center = (0.0,0.0,0.0);
         
         counter = 0;
         gapcounter = 0;
