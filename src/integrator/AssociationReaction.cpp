@@ -167,10 +167,10 @@ namespace espressopp {
 
       // connect to initialization inside run()
       _initialize = integrator->runInit.connect(
-						boost::bind(&AssociationReaction::initialize, this));
+						std::bind(&AssociationReaction::initialize, this));
 
       _react = integrator->aftIntV.connect(
-					   boost::bind(&AssociationReaction::react, this));
+					   std::bind(&AssociationReaction::react, this));
     }
 
     /** Performs all steps of the reactive scheme.

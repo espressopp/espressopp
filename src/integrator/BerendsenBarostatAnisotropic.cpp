@@ -59,10 +59,10 @@ namespace espressopp {
 
     void BerendsenBarostatAnisotropic::connect(){
       // connection to initialisation
-      _runInit = integrator->runInit.connect( boost::bind(&BerendsenBarostatAnisotropic::initialize, this));
+      _runInit = integrator->runInit.connect( std::bind(&BerendsenBarostatAnisotropic::initialize, this));
 
       // connection to the signal at the end of the run
-      _aftIntV = integrator->aftIntV.connect( boost::bind(&BerendsenBarostatAnisotropic::barostat, this));
+      _aftIntV = integrator->aftIntV.connect( std::bind(&BerendsenBarostatAnisotropic::barostat, this));
     }
 
     // set and get time constant for Berendsen barostat

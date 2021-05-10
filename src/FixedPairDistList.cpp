@@ -22,7 +22,7 @@
 
 #include "python.hpp"
 #include "FixedPairDistList.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 #include "bc/BC.hpp"
@@ -39,11 +39,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedPairDistList");
 
     con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedPairDistList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedPairDistList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedPairDistList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedPairDistList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedPairDistList::onParticlesChanged, this));
+      (std::bind(&FixedPairDistList::onParticlesChanged, this));
   }
 
   FixedPairDistList::~FixedPairDistList() {

@@ -74,9 +74,9 @@ void StochasticVelocityRescaling::disconnect(){
 
 void StochasticVelocityRescaling::connect(){
   // connection to initialization
-  _runInit = integrator->runInit.connect( boost::bind(&StochasticVelocityRescaling::initialize, this));
+  _runInit = integrator->runInit.connect( std::bind(&StochasticVelocityRescaling::initialize, this));
   // connection to the signal at the end of the run
-  _aftIntV = integrator->aftIntV.connect( boost::bind(&StochasticVelocityRescaling::rescaleVelocities, this));
+  _aftIntV = integrator->aftIntV.connect( std::bind(&StochasticVelocityRescaling::rescaleVelocities, this));
 }
 
 void StochasticVelocityRescaling::setTemperature(real _temperature) {

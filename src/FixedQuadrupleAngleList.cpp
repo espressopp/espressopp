@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include <sstream>
 #include "FixedQuadrupleAngleList.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
 #include "Buffer.hpp"
@@ -50,11 +50,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleAngleList");
 
     con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedQuadrupleAngleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedQuadrupleAngleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedQuadrupleAngleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedQuadrupleAngleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedQuadrupleAngleList::onParticlesChanged, this));
+      (std::bind(&FixedQuadrupleAngleList::onParticlesChanged, this));
   }
 
   FixedQuadrupleAngleList::~FixedQuadrupleAngleList() {

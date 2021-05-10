@@ -26,7 +26,7 @@
 #include <sstream>
 #include "FixedQuadrupleListAdress.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -42,10 +42,10 @@ FixedQuadrupleListAdress::FixedQuadrupleListAdress(
   LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleListAdress");
 
   sigBeforeSendAT = fixedtupleList->beforeSendATParticles.connect(
-    boost::bind(&FixedQuadrupleListAdress::beforeSendATParticles, this, _1, _2));
+    std::bind(&FixedQuadrupleListAdress::beforeSendATParticles, this, std::placeholders::_1, std::placeholders::_2));
 
   sigAfterRecvAT = fixedtupleList->afterRecvATParticles.connect
-    (boost::bind(&FixedQuadrupleListAdress::afterRecvParticles, this, _1, _2));
+    (std::bind(&FixedQuadrupleListAdress::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
 
   // We do not need those signals.
   sigBeforeSend.disconnect();

@@ -53,11 +53,11 @@ namespace espressopp {
     void FreeEnergyCompensation::connect(){
       if(slow){
         _applyForce = integrator->aftCalcSlow.connect(
-            boost::bind(&FreeEnergyCompensation::applyForce, this));
+            std::bind(&FreeEnergyCompensation::applyForce, this));
       }
       else{
         _applyForce = integrator->aftCalcF.connect(
-            boost::bind(&FreeEnergyCompensation::applyForce, this));
+            std::bind(&FreeEnergyCompensation::applyForce, this));
       }
     }
 
