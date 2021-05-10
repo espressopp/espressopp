@@ -122,7 +122,7 @@ namespace espressopp {
     void NeighborFluctuation::registerPython() {
       using namespace espressopp::python;
       class_<NeighborFluctuation, bases< Observable > >
-        ("analysis_NeighborFluctuation", init< shared_ptr< System > , real >())
+        ("analysis_NeighborFluctuation", init< std::shared_ptr< System > , real >())
         .def("compute", &NeighborFluctuation::computeValues) 
       ;
     }

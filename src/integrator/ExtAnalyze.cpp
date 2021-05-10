@@ -33,8 +33,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtAnalyze::theLogger, "ExtAnalyze");
 
-    //ExtAnalyze::ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval) : Extension(_analysis->getSystem()), interval(_interval)
-    ExtAnalyze::ExtAnalyze(shared_ptr< ParticleAccess > _particle_access, int _interval) : Extension(_particle_access->getSystem()), interval(_interval){
+    //ExtAnalyze::ExtAnalyze(std::shared_ptr< AnalysisBase > _analysis, int _interval) : Extension(_analysis->getSystem()), interval(_interval)
+    ExtAnalyze::ExtAnalyze(std::shared_ptr< ParticleAccess > _particle_access, int _interval) : Extension(_particle_access->getSystem()), interval(_interval){
       LOG4ESPP_INFO(theLogger, "Analyze observable in integrator");
       //analysis     = _analysis;
       particle_access     = _particle_access;
@@ -65,8 +65,8 @@ namespace espressopp {
     ****************************************************/
     void ExtAnalyze::registerPython() {
       using namespace espressopp::python;
-      class_<ExtAnalyze, shared_ptr<ExtAnalyze>, bases<Extension> >
-        ("integrator_ExtAnalyze", init< shared_ptr< ParticleAccess > , int >())
+      class_<ExtAnalyze, std::shared_ptr<ExtAnalyze>, bases<Extension> >
+        ("integrator_ExtAnalyze", init< std::shared_ptr< ParticleAccess > , int >())
         .def("connect", &ExtAnalyze::connect)
         .def("disconnect", &ExtAnalyze::disconnect)
         ;

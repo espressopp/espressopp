@@ -42,7 +42,7 @@ namespace espressopp { namespace vec {
       {
       public:
 
-        Extension(shared_ptr<System> system);
+        Extension(std::shared_ptr<System> system);
 
         virtual ~Extension();
 
@@ -69,9 +69,9 @@ namespace espressopp { namespace vec {
 
       protected:
 
-        shared_ptr<MDIntegratorVec> integrator; // this is needed for signal connection
+        std::shared_ptr<MDIntegratorVec> integrator; // this is needed for signal connection
 
-        void setIntegrator(shared_ptr<MDIntegratorVec> _integrator);
+        void setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator);
 
         // pure virtual functions
         virtual void connect() = 0;

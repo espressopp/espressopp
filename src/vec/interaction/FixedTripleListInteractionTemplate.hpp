@@ -51,9 +51,9 @@ namespace espressopp { namespace vec {
 
     public:
       FixedTripleListInteractionTemplate(
-        shared_ptr < System > _system,
-        shared_ptr < vec::FixedTripleList > _fixedtripleList,
-        shared_ptr < Potential > _potential)
+        std::shared_ptr < System > _system,
+        std::shared_ptr < vec::FixedTripleList > _fixedtripleList,
+        std::shared_ptr < Potential > _potential)
         : SystemAccess(_system),
           vectorization(getSystem()->vectorization),
           fixedtripleList(_fixedtripleList),
@@ -66,17 +66,17 @@ namespace espressopp { namespace vec {
 
       virtual ~FixedTripleListInteractionTemplate() {};
 
-      void setFixedTripleList(shared_ptr <FixedTripleList> _fixedtripleList)
+      void setFixedTripleList(std::shared_ptr <FixedTripleList> _fixedtripleList)
       {
         fixedtripleList = _fixedtripleList;
       }
 
-      shared_ptr<FixedTripleList> getFixedTripleList()
+      std::shared_ptr<FixedTripleList> getFixedTripleList()
       {
         return fixedtripleList;
       }
 
-      void setPotential(shared_ptr<Potential> _potential)
+      void setPotential(std::shared_ptr<Potential> _potential)
       {
         if (_potential) {
           potential = _potential;
@@ -85,7 +85,7 @@ namespace espressopp { namespace vec {
         }
       }
 
-      shared_ptr<Potential> getPotential()
+      std::shared_ptr<Potential> getPotential()
       {
         return potential;
       }
@@ -107,9 +107,9 @@ namespace espressopp { namespace vec {
 
     protected:
       int ntypes;
-      shared_ptr < vec::Vectorization > vectorization;
-      shared_ptr < FixedTripleList > fixedtripleList;
-      shared_ptr < Potential > potential;
+      std::shared_ptr < vec::Vectorization > vectorization;
+      std::shared_ptr < FixedTripleList > fixedtripleList;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

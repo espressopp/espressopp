@@ -41,7 +41,7 @@ namespace espressopp {
       
     void DumpGROAdress::dump(){
       
-      shared_ptr<System> system = getSystem();
+      std::shared_ptr<System> system = getSystem();
       ConfigurationsExtAdress conf( system,fixedTupleList );
       conf.setUnfolded(unfolded);
       conf.gather();
@@ -139,8 +139,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<DumpGROAdress, bases<ParticleAccess>, boost::noncopyable >
-      ("io_DumpGROAdress", init< shared_ptr< System >, shared_ptr<FixedTupleListAdress>,
-                           shared_ptr< integrator::MDIntegrator >, 
+      ("io_DumpGROAdress", init< std::shared_ptr< System >, std::shared_ptr<FixedTupleListAdress>,
+                           std::shared_ptr< integrator::MDIntegrator >,
                            std::string, 
                            bool,
                            real,

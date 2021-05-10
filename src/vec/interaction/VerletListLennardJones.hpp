@@ -61,7 +61,7 @@ namespace espressopp { namespace vec {
       };
 
     public:
-      VerletListLennardJones(shared_ptr<VerletList> _verletList)
+      VerletListLennardJones(std::shared_ptr<VerletList> _verletList)
         : base(_verletList)
         , np_types(0)
         , p_types(0)

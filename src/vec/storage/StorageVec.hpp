@@ -41,7 +41,7 @@ namespace espressopp { namespace vec {
       : protected SystemAccess
     {
     public:
-      StorageVec(shared_ptr<System> system);
+      StorageVec(std::shared_ptr<System> system);
 
       virtual void loadCells() = 0;
 
@@ -58,7 +58,7 @@ namespace espressopp { namespace vec {
       bool localParticlesEnabled = false;
       LocalParticles localParticlesVec;
       std::vector<size_t> uniqueCells;
-      shared_ptr<Vectorization> vectorization;
+      std::shared_ptr<Vectorization> vectorization;
 
     public:
       void enableLocalParticles() {

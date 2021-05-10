@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE ERROR
+#define BOOST_TEST_MODULE ERROR
 
 #include "include/ut.hpp"
 

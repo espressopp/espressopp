@@ -43,7 +43,7 @@ namespace espressopp {
 	    
 	public:
 	    
-	    LangevinThermostatOnRadius(shared_ptr<System> system, real _dampingmass);
+	    LangevinThermostatOnRadius(std::shared_ptr<System> system, real _dampingmass);
 	    virtual ~LangevinThermostatOnRadius();
 	    
 	    void setGamma(real gamma);
@@ -99,7 +99,7 @@ namespace espressopp {
 	    
 	    real pref2buffer; //!< temporary to save value between heatUp/coolDown
 	    
-	    shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+	    std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 	    
 	};
     }

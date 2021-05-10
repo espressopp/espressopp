@@ -33,8 +33,8 @@ namespace espressopp {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// constructor
     Vectorization::Vectorization(
-      shared_ptr<System> _system,
-      shared_ptr<MDIntegrator> _mdintegrator
+      std::shared_ptr<System> _system,
+      std::shared_ptr<MDIntegrator> _mdintegrator
       )
       : SystemAccess(_system)
       , mdintegrator(_mdintegrator)
@@ -45,7 +45,7 @@ namespace espressopp {
     }
 
     Vectorization::Vectorization(
-      shared_ptr<System> _system
+      std::shared_ptr<System> _system
       )
       : SystemAccess(_system)
       , vecLevel(2)
@@ -154,10 +154,10 @@ namespace espressopp {
     {
       using namespace espressopp::python;
 
-      class_<Vectorization, shared_ptr<Vectorization> >
+      class_<Vectorization, std::shared_ptr<Vectorization> >
         ("vec_Vectorization",
-             init< shared_ptr<System>, shared_ptr<MDIntegrator> >())
-        .def(init< shared_ptr<System>>())
+             init< std::shared_ptr<System>, std::shared_ptr<MDIntegrator> >())
+        .def(init< std::shared_ptr<System>>())
         .add_property("level", &Vectorization::getVecLevel)
         .def_readwrite("storageVec", &Vectorization::storageVec)
         ;

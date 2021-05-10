@@ -79,7 +79,7 @@ namespace espressopp { namespace vec {
     /// \param system is the system for which the verlet list is built
     /// \param cut is the cutoff value for the
     VerletList(
-      shared_ptr<System>,
+      std::shared_ptr<System>,
       real cut,
       bool rebuildVL);
 
@@ -122,7 +122,7 @@ namespace espressopp { namespace vec {
     static void registerPython();
 
   protected:
-    shared_ptr<Vectorization> vectorization;
+    std::shared_ptr<Vectorization> vectorization;
 
     NeighborList neighborList;
     // boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list

@@ -48,7 +48,7 @@ namespace espressopp {
 
     public:
       VerletListVSphereInteractionTemplate
-          (shared_ptr<VerletList> _verletList)
+          (std::shared_ptr<VerletList> _verletList)
           : verletList(_verletList) {
     	  potentialArray    = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes = 0;
@@ -57,11 +57,11 @@ namespace espressopp {
       virtual ~VerletListVSphereInteractionTemplate() {};
 
       void
-      setVerletList(shared_ptr < VerletList > _verletList) {
+      setVerletList(std::shared_ptr < VerletList > _verletList) {
         verletList = _verletList;
       }
 
-      shared_ptr<VerletList> getVerletList() {
+      std::shared_ptr<VerletList> getVerletList() {
         return verletList;
       }
 
@@ -81,8 +81,8 @@ namespace espressopp {
       }
 
       // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-    	return  make_shared<Potential>(potentialArray.at(type1, type2));
+      std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
+    	return  std::make_shared<Potential>(potentialArray.at(type1, type2));
       }
 
 
@@ -103,9 +103,9 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr<VerletList> verletList;
+      std::shared_ptr<VerletList> verletList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
+      esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
     };
 
     //////////////////////////////////////////////////
@@ -122,7 +122,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
         real fsi=0.0, fsj=0.0;
@@ -149,7 +149,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
         e   = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
         es += e;
@@ -217,7 +217,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         real fsi, fsj;
@@ -248,7 +248,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         real fsi, fsj;

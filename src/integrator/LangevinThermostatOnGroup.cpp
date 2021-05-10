@@ -33,7 +33,7 @@ namespace integrator {
 using namespace espressopp::iterator;
 
 LangevinThermostatOnGroup::LangevinThermostatOnGroup(
-    shared_ptr<System> system, shared_ptr<ParticleGroup> _pg)
+    std::shared_ptr<System> system, std::shared_ptr<ParticleGroup> _pg)
         : Extension(system), particle_group(_pg) {
   type = Extension::Thermostat;
 
@@ -154,9 +154,9 @@ void LangevinThermostatOnGroup::coolDown() {
 void LangevinThermostatOnGroup::registerPython() {
   using namespace espressopp::python;
 
-  class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >
+  class_<LangevinThermostatOnGroup, std::shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >
       ("integrator_LangevinThermostatOnGroup",
-           init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
+           init<std::shared_ptr<System>, std::shared_ptr<ParticleGroup> >())
       .def("connect", &LangevinThermostatOnGroup::connect)
       .def("disconnect", &LangevinThermostatOnGroup::disconnect)
       .add_property("gamma",

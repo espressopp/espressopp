@@ -91,7 +91,7 @@ namespace espressopp {
         return configurations[nconfigs - 1 - stackpos];
       } else {
         LOG4ESPP_ERROR(logger, "Configurations::get <out-of-range>");
-        return shared_ptr<Configuration>();
+        return std::shared_ptr<Configuration>();
       }
     }
 
@@ -173,7 +173,7 @@ namespace espressopp {
 
       if (system.comm->rank() == 0) {
 
-         ConfigurationPtr config = make_shared<Configuration> (gatherPos, gatherVel, gatherForce, gatherRadius); //totalN
+         ConfigurationPtr config = std::make_shared<Configuration> (gatherPos, gatherVel, gatherForce, gatherRadius); //totalN
 
          // root process collects data from all processors and sets it
 
@@ -308,8 +308,8 @@ namespace espressopp {
       ;
 
       class_<Configurations>
-        ("analysis_Configurations", init< shared_ptr< System > >())
-      .def(init<shared_ptr< System >,bool,bool,bool,bool,bool>())
+        ("analysis_Configurations", init< std::shared_ptr< System > >())
+      .def(init<std::shared_ptr< System >,bool,bool,bool,bool,bool>())
       .add_property("size", &Configurations::getSize)
       .add_property("capacity", &Configurations::getCapacity, 
                                 &Configurations::setCapacity)

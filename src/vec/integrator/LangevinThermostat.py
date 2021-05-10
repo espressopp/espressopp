@@ -44,7 +44,7 @@ Example:
 .. function:: espressopp.vec.integrator.LangevinThermostat(system)
 
         :param system: system object
-        :type system: shared_ptr<System>
+        :type system: std::shared_ptr<System>
 
 .. function:: espressopp.vec.integrator.LangevinThermostat.addExclusions(pidlist)
 

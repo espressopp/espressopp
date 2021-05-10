@@ -45,7 +45,7 @@ namespace espressopp {
 
     public:
       VerletListTripleInteractionTemplate
-      (shared_ptr < System > _system,shared_ptr < VerletListTriple > _verletlisttriple)
+      (std::shared_ptr < System > _system,std::shared_ptr < VerletListTriple > _verletlisttriple)
       : SystemAccess(_system), verletListTriple(_verletlisttriple)
       {
         potentialArray = esutil::Array3D<Potential, esutil::enlarge>(0, 0, 0, Potential());
@@ -53,10 +53,10 @@ namespace espressopp {
       }
 
       void
-      setVerletListTriple(shared_ptr < VerletListTriple > _verletlisttriple) {
+      setVerletListTriple(std::shared_ptr < VerletListTriple > _verletlisttriple) {
         verletListTriple = _verletlisttriple;
       }
-      shared_ptr < VerletListTriple > getVerletListTriple() {
+      std::shared_ptr < VerletListTriple > getVerletListTriple() {
         return verletListTriple;
       }
 
@@ -93,7 +93,7 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr<VerletListTriple> verletListTriple;
+      std::shared_ptr<VerletListTriple> verletListTriple;
       esutil::Array3D<Potential, esutil::enlarge> potentialArray;
     };
 

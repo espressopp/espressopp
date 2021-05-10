@@ -48,10 +48,10 @@ namespace espressopp { namespace vec {
     boost::signals2::connection sigAfterRecv, sigOnParticlesChanged, sigBeforeSend;
     typedef boost::unordered_multimap <size_t,std::pair <size_t, size_t> > GlobalTriples;
     GlobalTriples globalTriples;
-    shared_ptr<Vectorization> vectorization;
+    std::shared_ptr<Vectorization> vectorization;
 
   public:
-    FixedTripleList(shared_ptr<espressopp::storage::Storage>);
+    FixedTripleList(std::shared_ptr<espressopp::storage::Storage>);
     virtual ~FixedTripleList();
 
     /// Add the given particle triple to the list on this processor if the

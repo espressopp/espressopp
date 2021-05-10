@@ -40,7 +40,7 @@ namespace espressopp {
       
     void DumpGRO::dump(){
       
-      shared_ptr<System> system = getSystem();
+      std::shared_ptr<System> system = getSystem();
       ConfigurationsExt conf( system );
       conf.setUnfolded(unfolded);
       conf.gather();
@@ -128,8 +128,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<DumpGRO, bases<ParticleAccess>, boost::noncopyable >
-      ("io_DumpGRO", init< shared_ptr< System >, 
-                           shared_ptr< integrator::MDIntegrator >, 
+      ("io_DumpGRO", init< std::shared_ptr< System >,
+                           std::shared_ptr< integrator::MDIntegrator >,
                            std::string, 
                            bool,
                            real,

@@ -32,11 +32,11 @@ namespace espressopp {
     class PIAdressIntegrator : public MDIntegrator {
 
       public:
-        PIAdressIntegrator(shared_ptr<class espressopp::System> system, shared_ptr<VerletListAdress> _verletList);
+        PIAdressIntegrator(std::shared_ptr<class espressopp::System> system, std::shared_ptr<VerletListAdress> _verletList);
 
         virtual ~PIAdressIntegrator();
 
-        shared_ptr<VerletListAdress> verletList;
+        std::shared_ptr<VerletListAdress> verletList;
 
         void run(int nsteps);
 
@@ -92,8 +92,8 @@ namespace espressopp {
         void setConstKinMass(bool _constkinmass);
         bool getConstKinMass() { return constkinmass; }
 
-        void setVerletList(shared_ptr<VerletListAdress> _verletList);
-        shared_ptr<VerletListAdress> getVerletList() { return verletList; }
+        void setVerletList(std::shared_ptr<VerletListAdress> _verletList);
+        std::shared_ptr<VerletListAdress> getVerletList() { return verletList; }
 
         real computeRingEnergy();
         real computeRingEnergyRaw();
@@ -144,7 +144,7 @@ namespace espressopp {
         std::vector< real > Eigenvalues;
         std::vector<real> tmpvals;
 
-        shared_ptr< esutil::RNG > rng;
+        std::shared_ptr< esutil::RNG > rng;
 
         void integrateV1(int t, bool doubletime);
         void integrateV2();

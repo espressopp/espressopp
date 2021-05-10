@@ -26,22 +26,22 @@
 namespace espressopp {
 namespace io {
 
-void DumpTopology::observeTuple(shared_ptr<FixedPairList> fpl) {
+void DumpTopology::observeTuple(std::shared_ptr<FixedPairList> fpl) {
   fpls_.push_back(fpl);
 }
 
-void DumpTopology::observeTriple(shared_ptr<FixedTripleList> ftl) {
+void DumpTopology::observeTriple(std::shared_ptr<FixedTripleList> ftl) {
   ftls_.push_back(ftl);
 }
 
-void DumpTopology::observeQuadruple(shared_ptr<FixedQuadrupleList> fql) {
+void DumpTopology::observeQuadruple(std::shared_ptr<FixedQuadrupleList> fql) {
   fqls_.push_back(fql);
 }
 
 void DumpTopology::saveDataToBuffer() {
   // Format: <step1><pair_idx_0><size><pid1><pid2><pid3><pid4><pair_idx_1><size><pid...><step2>..
   int idx = 0;
-  for (std::vector<shared_ptr<FixedPairList> >::iterator it = fpls_.begin(); it != fpls_.end(); ++it) {
+  for (std::vector<std::shared_ptr<FixedPairList> >::iterator it = fpls_.begin(); it != fpls_.end(); ++it) {
     std::vector<longint> pairs = (*it)->getPairList();
     fpl_buffer_.push_front(integrator_->getStep());
     fpl_buffer_.push_front(idx);
@@ -56,7 +56,7 @@ void DumpTopology::saveDataToBuffer() {
 
   // Save data from triplet.
   idx = 0;
-  for (std::vector<shared_ptr<FixedTripleList> >::iterator it = ftls_.begin(); it != ftls_.end(); ++it) {
+  for (std::vector<std::shared_ptr<FixedTripleList> >::iterator it = ftls_.begin(); it != ftls_.end(); ++it) {
     std::vector<longint> triples = (*it)->getTripleList();
     fpl_buffer_.push_front(integrator_->getStep());
     fpl_buffer_.push_front(idx);
@@ -72,7 +72,7 @@ void DumpTopology::saveDataToBuffer() {
 
   // Save data from quadruplets
   idx = 0;
-  for (std::vector<shared_ptr<FixedQuadrupleList> >::iterator it = fqls_.begin(); it != fqls_.end(); ++it) {
+  for (std::vector<std::shared_ptr<FixedQuadrupleList> >::iterator it = fqls_.begin(); it != fqls_.end(); ++it) {
     std::vector<longint> quadruples = (*it)->getQuadrupleList();
     fpl_buffer_.push_front(integrator_->getStep());
     fpl_buffer_.push_front(idx);
@@ -106,7 +106,7 @@ void DumpTopology::registerPython() {
   using namespace espressopp::python;  //NOLINT
 
   class_<DumpTopology, bases<ParticleAccess>, boost::noncopyable>
-      ("io_DumpTopology", init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator> >())
+      ("io_DumpTopology", init<std::shared_ptr<System>, std::shared_ptr<integrator::MDIntegrator> >())
       .def("clear_buffer", &DumpTopology::clearBuffer)
       .def("get_data", &DumpTopology::getData)
       .def("dump", &DumpTopology::saveDataToBuffer)

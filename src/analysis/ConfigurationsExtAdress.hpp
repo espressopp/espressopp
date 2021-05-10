@@ -46,7 +46,7 @@ namespace espressopp {
 
       /** Constructor, allow for unlimited snapshots. */
 
-      ConfigurationsExtAdress(shared_ptr<System> system,shared_ptr<FixedTupleListAdress> _fixedTupleList) : SystemAccess (system),fixedTupleList(_fixedTupleList)
+      ConfigurationsExtAdress(std::shared_ptr<System> system,std::shared_ptr<FixedTupleListAdress> _fixedTupleList) : SystemAccess (system),fixedTupleList(_fixedTupleList)
       { maxConfigs = 0; }
 
       /** set number of maximal snapshots. */
@@ -79,7 +79,7 @@ namespace espressopp {
       void clear() { configurationsExtAdress.clear(); }
 
       void
-      setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
+      setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedTupleList = _fixedtupleList;
       }
 
@@ -88,7 +88,7 @@ namespace espressopp {
     protected:
 
       static LOG4ESPP_DECL_LOGGER(logger);
-      shared_ptr<FixedTupleListAdress> fixedTupleList;
+      std::shared_ptr<FixedTupleListAdress> fixedTupleList;
 
     private:
 

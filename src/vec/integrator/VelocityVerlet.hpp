@@ -41,7 +41,7 @@ namespace espressopp { namespace vec {
       typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
 
       VelocityVerletBase(
-        shared_ptr<System> system
+        std::shared_ptr<System> system
         );
 
       virtual void run(int nsteps);
@@ -105,7 +105,7 @@ namespace espressopp { namespace vec {
     public:
 
       VelocityVerlet(
-        shared_ptr<System> system
+        std::shared_ptr<System> system
         ) : VelocityVerletBase(system)
       {}
 

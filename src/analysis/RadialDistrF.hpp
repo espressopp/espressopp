@@ -34,7 +34,7 @@ namespace espressopp {
     /** Class to compute the radial distribution function of the system. */
     class RadialDistrF : public Observable {
     public:
-      RadialDistrF(shared_ptr< System > system) : Observable(system) {
+      RadialDistrF(std::shared_ptr< System > system) : Observable(system) {
         // by default 
         setPrint_progress(true);
       }

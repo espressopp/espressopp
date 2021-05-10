@@ -58,8 +58,8 @@ namespace espressopp {
 
     public:
       FixedPairListTypesInteractionTemplate
-          (shared_ptr < System > system,
-           shared_ptr<FixedPairList> _fixedpairList)
+          (std::shared_ptr < System > system,
+           std::shared_ptr<FixedPairList> _fixedpairList)
           : SystemAccess(system), fixedpairList(_fixedpairList) {
     	  potentialArray    = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes = 0;
@@ -68,11 +68,11 @@ namespace espressopp {
       virtual ~FixedPairListTypesInteractionTemplate() {};
 
       void
-      setFixedPairList(shared_ptr < FixedPairList > _fixedpairList) {
+      setFixedPairList(std::shared_ptr < FixedPairList > _fixedpairList) {
         fixedpairList = _fixedpairList;
       }
 
-      shared_ptr < FixedPairList > getFixedPairList() {
+      std::shared_ptr < FixedPairList > getFixedPairList() {
         return fixedpairList;
       }
 
@@ -92,8 +92,8 @@ namespace espressopp {
       }
 
       // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-    	return  make_shared<Potential>(potentialArray.at(type1, type2));
+      std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
+    	return  std::make_shared<Potential>(potentialArray.at(type1, type2));
       }
 
 
@@ -114,9 +114,9 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr < FixedPairList > fixedpairList;
+      std::shared_ptr < FixedPairList > fixedpairList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
+      esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
     };
 
     //////////////////////////////////////////////////
@@ -133,7 +133,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
         //if(potential._computeForce(force, p1, p2)) {
@@ -168,7 +168,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         //e   = potential._computeEnergy(p1, p2);
@@ -243,7 +243,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
+        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         Real3D r21;

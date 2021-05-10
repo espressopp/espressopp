@@ -29,7 +29,7 @@ LB/MD simulations. It is implemented as :py:class:`espressopp.integrator.Extensi
                                                     a = 1., tau = 1., \
                                                     numDims = 3, numVels = 19)
 
-    :param shared_ptr system: system object
+    :param std::shared_ptr system: system object
     :param Int3D nodeGrid: arrangement of CPUs in space
     :param real a: lattice spacing (in lattice units).
     :param real tau: time discretization (in lattice units)

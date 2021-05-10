@@ -46,8 +46,8 @@ namespace espressopp {
 
     public:
 
-      DumpGROAdress(shared_ptr<System> system, shared_ptr<FixedTupleListAdress> _fixedTupleList,
-              shared_ptr<integrator::MDIntegrator> _integrator,
+      DumpGROAdress(std::shared_ptr<System> system, std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
+              std::shared_ptr<integrator::MDIntegrator> _integrator,
               std::string _file_name,
               bool _unfolded,
               real _length_factor,
@@ -132,12 +132,12 @@ namespace espressopp {
     protected:
 
       //static LOG4ESPP_DECL_LOGGER(logger);
-      shared_ptr<FixedTupleListAdress> fixedTupleList;
+      std::shared_ptr<FixedTupleListAdress> fixedTupleList;
 
     private:
       
       // integrator we need to know an integration step
-      shared_ptr<integrator::MDIntegrator> integrator;
+      std::shared_ptr<integrator::MDIntegrator> integrator;
       
       std::string file_name;
 

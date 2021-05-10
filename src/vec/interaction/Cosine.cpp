@@ -47,7 +47,7 @@ namespace espressopp { namespace vec {
 
       typedef class FixedTripleListInteractionTemplate<Cosine> FixedTripleListCosine;
       class_<FixedTripleListCosine, bases<Interaction>>("vec_interaction_FixedTripleListCosine",
-        init<shared_ptr<System>, shared_ptr<FixedTripleList>, shared_ptr<Cosine> >())
+        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<Cosine> >())
       .def("setPotential", &FixedTripleListCosine::setPotential)
       .def("getFixedTripleList", &FixedTripleListCosine::getFixedTripleList);
       ;

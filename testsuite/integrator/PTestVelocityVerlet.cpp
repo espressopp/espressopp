@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE VelocityVerlet
+#define BOOST_TEST_MODULE VelocityVerlet
 #include "ut.hpp"
 
 #include "types.hpp"
@@ -51,8 +52,8 @@ static int N = 3;
 static real nSize = N;
 static int halfCellInt = 1;
 
-shared_ptr<DomainDecomposition> domdec;
-shared_ptr<System> esppSystem;
+std::shared_ptr<DomainDecomposition> domdec;
+std::shared_ptr<System> esppSystem;
 
 
 struct Fixture {
@@ -85,11 +86,11 @@ struct Fixture {
 
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
-    esppSystem = make_shared< System >();
-    esppSystem->rng = make_shared< RNG >();
-    esppSystem->bc = make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
+    esppSystem = std::make_shared< System >();
+    esppSystem->rng = std::make_shared< RNG >();
+    esppSystem->bc = std::make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
     esppSystem->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(esppSystem,
+    domdec = std::make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
                                                 cellGrid,
                                                 halfCellInt);
@@ -164,11 +165,11 @@ struct DomainFixture {
 
     BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
-    esppSystem = make_shared< System >();
-    esppSystem->rng = make_shared< RNG >();
-    esppSystem->bc = make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
+    esppSystem = std::make_shared< System >();
+    esppSystem->rng = std::make_shared< RNG >();
+    esppSystem->bc = std::make_shared< OrthorhombicBC >(esppSystem->rng, boxL);
     esppSystem->setSkin(skin);
-    domdec = make_shared< DomainDecomposition >(esppSystem,
+    domdec = std::make_shared< DomainDecomposition >(esppSystem,
                                                 nodeGrid,
                                                 cellGrid,
                                                 halfCellInt);
@@ -226,8 +227,8 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
   BOOST_TEST_MESSAGE("starting to build verlet lists");
 
-  shared_ptr<MDIntegrator> integrator = 
-     make_shared<VelocityVerlet>(esppSystem);
+  std::shared_ptr<MDIntegrator> integrator =
+     std::make_shared<VelocityVerlet>(esppSystem);
 
   integrator->setTimeStep(0.01);
 

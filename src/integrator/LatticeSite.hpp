@@ -100,7 +100,7 @@ namespace espressopp {
 
       class LatticePar {
       public:
-         LatticePar (shared_ptr<System> system,					// constr of lattice parameters
+         LatticePar (std::shared_ptr<System> system,					// constr of lattice parameters
                      int _numVelsLoc, real _aLoc, real _tauLoc);
          ~LatticePar ();																	// destr of lattice parameters
 
@@ -120,7 +120,7 @@ namespace espressopp {
          void initEqWeights();
          void initInvBLoc();
 
-         static shared_ptr< esutil::RNG > rng;						//!< RNG for fluctuations
+         static std::shared_ptr< esutil::RNG > rng;						//!< RNG for fluctuations
       private:
          static int numVelsLoc;													// local number of vels
          static real aLoc;																// local lattice spacing

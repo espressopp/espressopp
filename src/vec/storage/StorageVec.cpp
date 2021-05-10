@@ -26,7 +26,7 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(StorageVec::logger, "StorageVec");
 
-    StorageVec::StorageVec(shared_ptr<System> system)
+    StorageVec::StorageVec(std::shared_ptr<System> system)
       : SystemAccess(system)
     {
       if(!getSystem()->vectorization) {

@@ -35,7 +35,7 @@ namespace espressopp {
         class StaticStructF : public Observable {
         public:
 
-            StaticStructF(shared_ptr< System > system) : Observable(system) {
+            StaticStructF(std::shared_ptr< System > system) : Observable(system) {
             }
 
             ~StaticStructF() {

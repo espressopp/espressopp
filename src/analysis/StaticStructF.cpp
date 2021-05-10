@@ -76,7 +76,7 @@ namespace espressopp {
             }
 
             int num_part = 0;
-            ConfigurationPtr config = make_shared<Configuration > ();
+            ConfigurationPtr config = std::make_shared<Configuration > ();
             // loop over all CPU-numbers - to give all CPUs all particle coords
             for (int rank_i = 0; rank_i < nprocs; rank_i++) {
                 map< size_t, Real3D > conf;
@@ -122,7 +122,7 @@ namespace espressopp {
             Real3D q;
 
             //calculations for binning
-            real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
+            real bin_size = bin_factor * std::min(dqs[0], std::min(dqs[1], dqs[2]));
             real q_sqr_max = nqx * nqx * dqs[0] * dqs[0]
                     + nqy * nqy * dqs[1] * dqs[1]
                     + nqz * nqz * dqs[2] * dqs[2];
@@ -225,7 +225,7 @@ namespace espressopp {
             int myrank = system.comm->rank(); // current CPU's number
 
             int num_part = 0;
-            ConfigurationPtr config = make_shared<Configuration > ();
+            ConfigurationPtr config = std::make_shared<Configuration > ();
             // loop over all CPU-numbers - to give all CPUs all particle coords
             for (int rank_i = 0; rank_i < nprocs; rank_i++) {
                 map< size_t, Real3D > conf;
@@ -265,7 +265,7 @@ namespace espressopp {
             Real3D q;
 
             //calculations for binning
-            real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
+            real bin_size = bin_factor * std::min(dqs[0], std::min(dqs[1], dqs[2]));
             real q_sqr_max = nqx * nqx * dqs[0] * dqs[0]
                     + nqy * nqy * dqs[1] * dqs[1]
                     + nqz * nqz * dqs[2] * dqs[2];
@@ -388,7 +388,7 @@ namespace espressopp {
         void StaticStructF::registerPython() {
             using namespace espressopp::python;
             class_<StaticStructF, bases< Observable > >
-                    ("analysis_StaticStructF", init< shared_ptr< System > >())
+                    ("analysis_StaticStructF", init< std::shared_ptr< System > >())
                     .def("compute", &StaticStructF::computeArray)
                     .def("computeSingleChain", &StaticStructF::computeArraySingleChain)
                     ;

@@ -53,21 +53,21 @@ namespace espressopp {
       ;
 
       class_< VerletListTersoffPairTerm, bases< Interaction > > 
-        ("interaction_VerletListTersoffPairTerm", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListTersoffPairTerm", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListTersoffPairTerm::getVerletList)
         .def("setPotential", &VerletListTersoffPairTerm::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListTersoffPairTerm::getPotential, return_value_policy< reference_existing_object >())
       ;
 
       class_< CellListTersoffPairTerm, bases< Interaction > > 
-        ("interaction_CellListTersoffPairTerm", init< shared_ptr< storage::Storage > >())
+        ("interaction_CellListTersoffPairTerm", init< std::shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListTersoffPairTerm::setPotential);
 	  ;
 
       class_< FixedPairListTersoffPairTerm, bases< Interaction > >
         ("interaction_FixedPairListTersoffPairTerm",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<TersoffPairTerm> >())
-          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<TersoffPairTerm> >())
+          init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<TersoffPairTerm> >())
+          .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<TersoffPairTerm> >())
           .def("setPotential", &FixedPairListTersoffPairTerm::setPotential);
       ;
     }

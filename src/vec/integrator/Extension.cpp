@@ -33,7 +33,7 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    Extension::Extension(shared_ptr<System> system)
+    Extension::Extension(std::shared_ptr<System> system)
       : SystemAccess(system)
     {
       if(!getSystem()->vectorization) {
@@ -52,7 +52,7 @@ namespace espressopp { namespace vec {
       LOG4ESPP_INFO(theLogger, "~Extension");
     }
 
-    void Extension::setIntegrator(shared_ptr<MDIntegratorVec> _integrator)
+    void Extension::setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator)
     {
       integrator = _integrator;
     }

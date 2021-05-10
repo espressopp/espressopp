@@ -41,7 +41,7 @@ namespace espressopp {
 
     class DomainDecomposition: public Storage {
     public:
-      DomainDecomposition(shared_ptr< System > system,
+      DomainDecomposition(std::shared_ptr< System > system,
               const Int3D& _nodeGrid,
               const Int3D& _cellGrid,
               int halfCellInt

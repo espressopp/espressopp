@@ -44,10 +44,10 @@ namespace espressopp {
     LOG4ESPP_LOGGER(AssociationReaction::theLogger, "AssociationReaction");
 
     AssociationReaction::AssociationReaction(
-					     shared_ptr<System> system,
-					     shared_ptr<VerletList> _verletList,
-					     shared_ptr<FixedPairList> _fpl,
-					     shared_ptr<DomainDecomposition> _domdec)
+					     std::shared_ptr<System> system,
+					     std::shared_ptr<VerletList> _verletList,
+					     std::shared_ptr<FixedPairList> _fpl,
+					     std::shared_ptr<DomainDecomposition> _domdec)
       :Extension(system), verletList(_verletList), fpl(_fpl), domdec(_domdec) {
 
       type = Extension::Reaction;
@@ -480,8 +480,8 @@ namespace espressopp {
 
     void AssociationReaction::registerPython() {
       using namespace espressopp::python;
-      class_<AssociationReaction, shared_ptr<AssociationReaction>, bases<Extension> >
-        ("integrator_AssociationReaction", init<shared_ptr<System>, shared_ptr<VerletList>, shared_ptr<FixedPairList>, shared_ptr<DomainDecomposition> >())
+      class_<AssociationReaction, std::shared_ptr<AssociationReaction>, bases<Extension> >
+        ("integrator_AssociationReaction", init<std::shared_ptr<System>, std::shared_ptr<VerletList>, std::shared_ptr<FixedPairList>, std::shared_ptr<DomainDecomposition> >())
         .def("connect", &AssociationReaction::connect)
         .def("disconnect", &AssociationReaction::disconnect)
         .add_property("rate", &AssociationReaction::getRate, &AssociationReaction::setRate)

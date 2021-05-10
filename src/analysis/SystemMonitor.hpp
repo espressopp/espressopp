@@ -49,17 +49,17 @@ class SystemMonitorOutputCSV {
   }
   void write();
 
-  void setSystem(shared_ptr<System> system) {
+  void setSystem(std::shared_ptr<System> system) {
     system_ = system;
   }
 
   static void registerPython();
 
  private:
-  shared_ptr<std::vector<std::string> > keys_;
-  shared_ptr<std::vector<real> > values_;
+  std::shared_ptr<std::vector<std::string> > keys_;
+  std::shared_ptr<std::vector<real> > values_;
   std::string file_name_;
-  shared_ptr<System> system_;
+  std::shared_ptr<System> system_;
   std::string delimiter_;
   bool header_written_;
 };
@@ -67,16 +67,16 @@ class SystemMonitorOutputCSV {
 
 class SystemMonitor : public ParticleAccess {
  public:
-  typedef std::vector<std::pair<std::string, shared_ptr<Observable> > > ObservableList;
-  SystemMonitor(shared_ptr< System > system,
-                shared_ptr<integrator::MDIntegrator> integrator,
-                shared_ptr<SystemMonitorOutputCSV> output):
+  typedef std::vector<std::pair<std::string, std::shared_ptr<Observable> > > ObservableList;
+  SystemMonitor(std::shared_ptr< System > system,
+                std::shared_ptr<integrator::MDIntegrator> integrator,
+                std::shared_ptr<SystemMonitorOutputCSV> output):
         ParticleAccess(system),
         system_(system),
         integrator_(integrator),
         output_(output) {
-    header_ = make_shared<std::vector<std::string> >();
-    values_ = make_shared<std::vector<real> >();
+    header_ = std::make_shared<std::vector<std::string> >();
+    values_ = std::make_shared<std::vector<real> >();
 
     output_->system_ = system;
     output_->keys_ = header_;
@@ -101,18 +101,18 @@ class SystemMonitor : public ParticleAccess {
  private:
   void computeObservables();
 
-  void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
+  void addObservable(std::string name, std::shared_ptr<Observable> obs, bool is_visible);
 
   int current_step_;
   bool header_written_;
   bool header_shown_;
-  shared_ptr<std::vector<real> > values_;
-  shared_ptr<std::vector<std::string> > header_;
+  std::shared_ptr<std::vector<real> > values_;
+  std::shared_ptr<std::vector<std::string> > header_;
   std::vector<int> visible_observables_;
-  shared_ptr<System> system_;
-  shared_ptr<integrator::MDIntegrator> integrator_;
+  std::shared_ptr<System> system_;
+  std::shared_ptr<integrator::MDIntegrator> integrator_;
 
-  shared_ptr<SystemMonitorOutputCSV> output_;
+  std::shared_ptr<SystemMonitorOutputCSV> output_;
   ObservableList observables_;
 };
 

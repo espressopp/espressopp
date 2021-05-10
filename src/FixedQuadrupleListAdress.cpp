@@ -37,7 +37,7 @@ namespace espressopp {
 LOG4ESPP_LOGGER(FixedQuadrupleListAdress::theLogger, "FixedQuadrupleListAdress");
 
 FixedQuadrupleListAdress::FixedQuadrupleListAdress(
-    shared_ptr< storage::Storage > _storage, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+    std::shared_ptr< storage::Storage > _storage, std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
     : FixedQuadrupleList(_storage), fixedtupleList(_fixedtupleList) {
   LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleListAdress");
 
@@ -219,9 +219,9 @@ void FixedQuadrupleListAdress::registerPython() {
   bool (FixedQuadrupleListAdress::*pyAdd)(longint pid1, longint pid2,
          longint pid3, longint pid4) = &FixedQuadrupleListAdress::add;
 
-  class_< FixedQuadrupleListAdress, shared_ptr< FixedQuadrupleListAdress > >
+  class_< FixedQuadrupleListAdress, std::shared_ptr< FixedQuadrupleListAdress > >
     ("FixedQuadrupleListAdress",
-        init<shared_ptr< storage::Storage>, shared_ptr<FixedTupleListAdress> >())
+        init<std::shared_ptr< storage::Storage>, std::shared_ptr<FixedTupleListAdress> >())
     .def("add", pyAdd)
     .def("size", &FixedQuadrupleListAdress::size)
     .def("getQuadruples",  &FixedQuadrupleListAdress::getQuadruples)

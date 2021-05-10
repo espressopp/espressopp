@@ -40,7 +40,7 @@ namespace integrator {
 
 class MinimizeEnergy : public SystemAccess {
  public:
-  MinimizeEnergy(shared_ptr<class espressopp::System> system,
+  MinimizeEnergy(std::shared_ptr<class espressopp::System> system,
                  real gamma,
                  real ftol,
                  real max_displacement,

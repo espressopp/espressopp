@@ -25,8 +25,8 @@
 
 namespace espressopp {
   namespace integrator {
-    LBInitPopWave::LBInitPopWave(shared_ptr<System> system,
-                                                                 shared_ptr< LatticeBoltzmann > latticeboltzmann)
+    LBInitPopWave::LBInitPopWave(std::shared_ptr<System> system,
+                                                                 std::shared_ptr< LatticeBoltzmann > latticeboltzmann)
     : LBInit(system, latticeboltzmann) {
     }
 
@@ -91,8 +91,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<LBInitPopWave, bases< LBInit > >
-          ("integrator_LBInit_PopWave", init< shared_ptr< System >,
-           shared_ptr< LatticeBoltzmann > >())
+          ("integrator_LBInit_PopWave", init< std::shared_ptr< System >,
+           std::shared_ptr< LatticeBoltzmann > >())
           .def("createDenVel", &LBInitPopWave::createDenVel)
       ;
     }

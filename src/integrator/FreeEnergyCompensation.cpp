@@ -38,12 +38,10 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FreeEnergyCompensation::theLogger, "FreeEnergyCompensation");
 
-    FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr, int _ntrotter, bool _slow)
-    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter), slow(_slow) {
+    FreeEnergyCompensation::FreeEnergyCompensation(std::shared_ptr<System> system, bool _sphereAdr, int _ntrotter, bool _slow)
+    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter), slow(_slow), center(0.0,0.0,0.0) {
 
         type = Extension::FreeEnergyCompensation;
-
-        center = (0.0,0.0,0.0);
 
         LOG4ESPP_INFO(theLogger, "FreeEnergyCompensation constructed");
     }
@@ -74,17 +72,17 @@ namespace espressopp {
         Table table;
 
         if (itype == 1) { // create a new InterpolationLinear
-            table = make_shared <interaction::InterpolationLinear> ();
+            table = std::make_shared <interaction::InterpolationLinear> ();
             table->read(world, _filename);
         }
 
         else if (itype == 2) { // create a new InterpolationAkima
-            table = make_shared <interaction::InterpolationAkima> ();
+            table = std::make_shared <interaction::InterpolationAkima> ();
             table->read(world, _filename);
         }
 
         else if (itype == 3) { // create a new InterpolationCubic
-            table = make_shared <interaction::InterpolationCubic> ();
+            table = std::make_shared <interaction::InterpolationCubic> ();
             table->read(world, _filename);
         }
 
@@ -101,7 +99,7 @@ namespace espressopp {
           Table table;
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
-          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           FixedTupleListAdress::iterator it2;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
               tableIt = forces.find(cit->getType());
@@ -198,8 +196,8 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>, bases<Extension> >
-        ("integrator_FreeEnergyCompensation", init< shared_ptr<System>, bool, int, bool >())
+      class_<FreeEnergyCompensation, std::shared_ptr<FreeEnergyCompensation>, bases<Extension> >
+        ("integrator_FreeEnergyCompensation", init< std::shared_ptr<System>, bool, int, bool >())
         .add_property("filename", &FreeEnergyCompensation::getFilename)
         .def("connect", &FreeEnergyCompensation::connect)
         .def("disconnect", &FreeEnergyCompensation::disconnect)

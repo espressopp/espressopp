@@ -50,8 +50,8 @@ namespace espressopp { namespace vec {
       ;
 
       class_< FixedPairListFENE, bases< Interaction > >
-      ("vec_interaction_FixedPairListFENE", init< shared_ptr<System>,
-        shared_ptr<FixedPairList>, shared_ptr<FENE> >())
+      ("vec_interaction_FixedPairListFENE", init< std::shared_ptr<System>,
+        std::shared_ptr<FixedPairList>, std::shared_ptr<FENE> >())
       .def("setPotential", &FixedPairListFENE::setPotential)
       .def("getPotential", &FixedPairListFENE::getPotential)
       .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)

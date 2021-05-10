@@ -42,7 +42,7 @@ namespace espressopp {
       ;
 
       class_< VerletListGravityTruncated, bases< Interaction > >
-        ("interaction_VerletListGravityTruncated", init< shared_ptr<VerletList> >())
+        ("interaction_VerletListGravityTruncated", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListGravityTruncated::getVerletList)
         .def("setPotential", &VerletListGravityTruncated::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListGravityTruncated::getPotential, return_value_policy< reference_existing_object >())

@@ -47,9 +47,9 @@ namespace espressopp {
 
     public:
       FixedPairListInteractionTemplate
-      (shared_ptr < System > system,
-       shared_ptr < FixedPairList > _fixedpairList,
-       shared_ptr < Potential > _potential)
+      (std::shared_ptr < System > system,
+       std::shared_ptr < FixedPairList > _fixedpairList,
+       std::shared_ptr < Potential > _potential)
         : SystemAccess(system), fixedpairList(_fixedpairList),
           potential(_potential)
       {
@@ -61,16 +61,16 @@ namespace espressopp {
       virtual ~FixedPairListInteractionTemplate() {};
 
       void
-      setFixedPairList(shared_ptr < FixedPairList > _fixedpairList) {
+      setFixedPairList(std::shared_ptr < FixedPairList > _fixedpairList) {
         fixedpairList = _fixedpairList;
       }
 
-      shared_ptr < FixedPairList > getFixedPairList() {
+      std::shared_ptr < FixedPairList > getFixedPairList() {
         return fixedpairList;
       }
 
       void
-      setPotential(shared_ptr < Potential> _potential) {
+      setPotential(std::shared_ptr < Potential> _potential) {
         if (_potential) {
           potential = _potential;
         } else {
@@ -78,7 +78,7 @@ namespace espressopp {
         }
       }
 
-      shared_ptr < Potential > getPotential() {
+      std::shared_ptr < Potential > getPotential() {
         return potential;
       }
 
@@ -99,8 +99,8 @@ namespace espressopp {
 
     protected:
       int ntypes;
-      shared_ptr < FixedPairList > fixedpairList;
-      shared_ptr < Potential > potential;
+      std::shared_ptr < FixedPairList > fixedpairList;
+      std::shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////

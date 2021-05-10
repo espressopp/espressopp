@@ -44,10 +44,10 @@ namespace espressopp {
         
       class_ <FixedTripleListAngularHarmonic, bases <Interaction> >
         ("interaction_FixedTripleListAngularHarmonic",
-           init<shared_ptr<System>,
-                shared_ptr<FixedTripleList>,
-                shared_ptr<AngularHarmonic> >())
-        .def(init< shared_ptr<System>, shared_ptr<FixedTripleListAdress>, shared_ptr<AngularHarmonic> >())
+           init<std::shared_ptr<System>,
+                std::shared_ptr<FixedTripleList>,
+                std::shared_ptr<AngularHarmonic> >())
+        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedTripleListAdress>, std::shared_ptr<AngularHarmonic> >())
         .def("setPotential", &FixedTripleListAngularHarmonic::setPotential)
         .def("getFixedTripleList", &FixedTripleListAngularHarmonic::getFixedTripleList);
       ;

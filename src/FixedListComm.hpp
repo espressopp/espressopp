@@ -36,7 +36,7 @@ namespace espressopp {
     class FixedListComm: public PairList, public TripleList, public QuadrupleList {
         protected:
         boost::signals2::connection con1, con2, con3;
-        shared_ptr<storage::Storage> storage;
+        std::shared_ptr<storage::Storage> storage;
         typedef std::vector<longint> pvec;
         typedef boost::unordered_multimap<longint, pvec> GlobalList;
         GlobalList globalLists;
@@ -47,7 +47,7 @@ namespace espressopp {
         //virtual void add(std::vector<Particle*> tmp)=0;
 
         public:
-        FixedListComm(shared_ptr<storage::Storage> _storage);
+        FixedListComm(std::shared_ptr<storage::Storage> _storage);
         ~FixedListComm();
         bool add(pvec pids);
         void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);

@@ -43,13 +43,13 @@ namespace espressopp {
 
 	  protected:
 		boost::signals2::connection sigBeforeSend, sigOnParticlesChanged, sigAfterRecv;
-		shared_ptr <storage::Storage> storage;
+		std::shared_ptr <storage::Storage> storage;
 		GlobalPairs globalPairs;
 		using PairList::add;
 		real longtimeMaxBondSqr;
 
 	  public:
-		FixedPairList(shared_ptr <storage::Storage> _storage);
+		FixedPairList(std::shared_ptr <storage::Storage> _storage);
 		virtual ~FixedPairList();
 
 		real getLongtimeMaxBondSqr();

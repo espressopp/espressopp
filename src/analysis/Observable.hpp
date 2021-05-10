@@ -42,7 +42,7 @@ namespace espressopp {
         KINETIC_ENERGY,
         OTHER
       };
-      Observable(shared_ptr< System > system) : SystemAccess(system) {
+      Observable(std::shared_ptr< System > system) : SystemAccess(system) {
         result_type=old_format;
         observable_type = OTHER;
       };

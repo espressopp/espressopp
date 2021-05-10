@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE BoundaryConditions
+#define BOOST_TEST_MODULE BoundaryConditions
 
 #include "ut.hpp"
 #include <memory>
@@ -43,13 +44,13 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr< bc::BC > bc;
+  std::shared_ptr< bc::BC > bc;
 
   Fixture() {
     Real3D L(10.0, 10.0, 10.0);
-    shared_ptr< esutil::RNG > rng 
-      = make_shared< esutil::RNG >();
-    bc = make_shared< bc::OrthorhombicBC >(rng, L);
+    std::shared_ptr< esutil::RNG > rng
+      = std::make_shared< esutil::RNG >();
+    bc = std::make_shared< bc::OrthorhombicBC >(rng, L);
   }
 };
 

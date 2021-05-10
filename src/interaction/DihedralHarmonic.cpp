@@ -46,9 +46,9 @@ namespace espressopp {
       FixedQuadrupleListDihedralHarmonic;
       class_ <FixedQuadrupleListDihedralHarmonic, bases <Interaction> >
         ("interaction_FixedQuadrupleListDihedralHarmonic",
-                  init< shared_ptr<System>,
-                        shared_ptr<FixedQuadrupleList>,
-                        shared_ptr<DihedralHarmonic> >())
+                  init< std::shared_ptr<System>,
+                        std::shared_ptr<FixedQuadrupleList>,
+                        std::shared_ptr<DihedralHarmonic> >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonic::setPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList)
         ;
@@ -56,7 +56,7 @@ namespace espressopp {
         FixedQuadrupleListTypesDihedralHarmonic;
       class_< FixedQuadrupleListTypesDihedralHarmonic, bases< Interaction > >
         ("interaction_FixedQuadrupleListTypesDihedralHarmonic",
-         init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+         init< std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
         .def("setPotential", &FixedQuadrupleListTypesDihedralHarmonic::setPotential)
         .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonic::getPotentialPtr)
         .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)

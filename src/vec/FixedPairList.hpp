@@ -49,7 +49,7 @@ namespace espressopp {
     {
     public:
       typedef boost::unordered_multimap<size_t, size_t> GlobalPairs;
-      shared_ptr<Vectorization> vectorization;
+      std::shared_ptr<Vectorization> vectorization;
 
     protected:
       boost::signals2::connection sigBeforeSend;
@@ -59,7 +59,7 @@ namespace espressopp {
       real longtimeMaxBondSqr;
 
     public:
-      FixedPairList(shared_ptr< espressopp::storage::Storage > storage);
+      FixedPairList(std::shared_ptr< espressopp::storage::Storage > storage);
       ~FixedPairList();
 
       real getLongtimeMaxBondSqr();

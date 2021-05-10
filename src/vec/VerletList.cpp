@@ -55,7 +55,7 @@ namespace espressopp { namespace vec {
 
   /// cut is a cutoff (without skin)
   VerletList::VerletList(
-    shared_ptr<System> system,
+    std::shared_ptr<System> system,
     real _cut, bool rebuildVL
     ) : SystemAccess(system)
   {
@@ -581,8 +581,8 @@ namespace espressopp { namespace vec {
           = &VerletList::exclude;
 
 
-    class_<VerletList, shared_ptr<VerletList> >
-      ("vec_VerletList", init< shared_ptr<System>, real, bool>())
+    class_<VerletList, std::shared_ptr<VerletList> >
+      ("vec_VerletList", init< std::shared_ptr<System>, real, bool>())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)

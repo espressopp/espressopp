@@ -53,7 +53,7 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(VelocityVerletBase::theLogger, "VelocityVerletBase");
 
-    VelocityVerletBase::VelocityVerletBase(shared_ptr<System> system)
+    VelocityVerletBase::VelocityVerletBase(std::shared_ptr<System> system)
       : MDIntegratorVec(system)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerletBase");
@@ -321,7 +321,7 @@ namespace espressopp { namespace vec {
       class_< vec::integrator::VelocityVerletBase,
               bases<espressopp::integrator::MDIntegrator, MDIntegratorVec>,
               boost::noncopyable >
-        ("vec_integrator_VelocityVerletBase", init< shared_ptr<System> >())
+        ("vec_integrator_VelocityVerletBase", init< std::shared_ptr<System> >())
         .def("run", &vec::integrator::VelocityVerletBase::run)
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerletBase::resetTimers)
@@ -428,7 +428,7 @@ namespace espressopp { namespace vec {
       class_< vec::integrator::VelocityVerlet,
               bases<VelocityVerletBase>,
               boost::noncopyable >
-        ("vec_integrator_VelocityVerlet", init< shared_ptr<System> >())
+        ("vec_integrator_VelocityVerlet", init< std::shared_ptr<System> >())
         ;
     }
 

@@ -47,7 +47,7 @@ namespace espressopp {
 
       /** Constructor, allow for unlimited snapshots. */
 
-      ConfigurationsExt(shared_ptr<System> system) : SystemAccess (system)
+      ConfigurationsExt(std::shared_ptr<System> system) : SystemAccess (system)
       { maxConfigs = 0; }
 
       /** set number of maximal snapshots. */

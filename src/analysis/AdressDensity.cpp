@@ -60,7 +60,7 @@ namespace espressopp {
       int id = 0;
       int bin = 0;
       if(system.storage->getFixedTuples()){
-            shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+            std::shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
             CellList realCells = system.storage->getRealCells();
 
             for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // Iterate over all (CG) particles.
@@ -231,7 +231,7 @@ namespace espressopp {
     void AdressDensity::registerPython() {
       using namespace espressopp::python;
       class_<AdressDensity, bases< Observable > >
-        ("analysis_AdressDensity", init< shared_ptr< System >, shared_ptr<VerletListAdress> >())
+        ("analysis_AdressDensity", init< std::shared_ptr< System >, std::shared_ptr<VerletListAdress> >())
         .def("addExclpid", &AdressDensity::addExclpid)
         .def("compute", &AdressDensity::computeArray)
       ;

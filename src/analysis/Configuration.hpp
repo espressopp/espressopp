@@ -31,7 +31,7 @@
 namespace espressopp {
   namespace analysis {
 
-    typedef shared_ptr<class Configuration> ConfigurationPtr;
+    typedef std::shared_ptr<class Configuration> ConfigurationPtr;
 
     /** Iterator class for configuration to be used in Python
     class ConfigurationIterator {

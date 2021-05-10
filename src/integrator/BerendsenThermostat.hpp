@@ -43,7 +43,7 @@ namespace espressopp {
     class BerendsenThermostat: public Extension {
 
       public:
-        BerendsenThermostat(shared_ptr< System > system);
+        BerendsenThermostat(std::shared_ptr< System > system);
         
         void setTau(real);
         real getTau();

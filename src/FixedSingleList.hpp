@@ -40,12 +40,12 @@ namespace espressopp {
 
 	  protected:
 		boost::signals2::connection con1, con2, con3;
-		shared_ptr <storage::Storage> storage;
+		std::shared_ptr <storage::Storage> storage;
 		GlobalSingles globalSingles;
 		using SingleList::add;
 
 	  public:
-		FixedSingleList(shared_ptr <storage::Storage> _storage);
+		FixedSingleList(std::shared_ptr <storage::Storage> _storage);
 		virtual ~FixedSingleList();
 
 		/** Add the given particle to the list on this processor if the

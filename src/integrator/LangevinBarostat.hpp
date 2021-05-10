@@ -41,7 +41,7 @@ namespace espressopp {
     class LangevinBarostat : public Extension {
 
       public:
-        LangevinBarostat(shared_ptr< System >, shared_ptr< esutil::RNG >, real);
+        LangevinBarostat(std::shared_ptr< System >, std::shared_ptr< esutil::RNG >, real);
 
         void setGammaP(real);
         real getGammaP();
@@ -81,7 +81,7 @@ namespace espressopp {
         real pref5;  // prefactor, for the volume momentum
         real pref6;  // prefactor, for the volume momentum
 
-        shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
+        std::shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
         void initialize();    // initialize barostat prefactors
         

@@ -41,7 +41,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(FixedTupleListAdress::theLogger, "FixedTupleListAdress");
 
-    FixedTupleListAdress::FixedTupleListAdress(shared_ptr<storage::Storage> _storage)
+    FixedTupleListAdress::FixedTupleListAdress(std::shared_ptr<storage::Storage> _storage)
         : storage(_storage), globalTuples(){
 
         LOG4ESPP_INFO(theLogger, "construct FixedTupleListAdress");
@@ -368,8 +368,8 @@ namespace espressopp {
 
       void (FixedTupleListAdress::*pyAdd)(longint pid) = &FixedTupleListAdress::add;
 
-      class_<FixedTupleListAdress, shared_ptr<FixedTupleListAdress>, boost::noncopyable >
-        ("FixedTupleListAdress", init<shared_ptr<storage::Storage> >())
+      class_<FixedTupleListAdress, std::shared_ptr<FixedTupleListAdress>, boost::noncopyable >
+        ("FixedTupleListAdress", init<std::shared_ptr<storage::Storage> >())
         .def("add", pyAdd)
         .def("addTs", &FixedTupleListAdress::addTs)
         ;

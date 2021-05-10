@@ -41,8 +41,8 @@ void PotentialEnergy::registerPython() {
   using namespace espressopp::python;  //NOLINT
   class_<PotentialEnergy, bases<Observable> >
     ("analysis_PotentialEnergy",
-        init< shared_ptr<System>, shared_ptr<interaction::Interaction> >())
-    .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>, bool>())
+        init< std::shared_ptr<System>, std::shared_ptr<interaction::Interaction> >())
+    .def(init<std::shared_ptr<System>, std::shared_ptr<interaction::Interaction>, bool>())
     .add_property("value", &PotentialEnergy::compute_real);
 }
 }  // end namespace analysis

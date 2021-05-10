@@ -38,9 +38,9 @@ Examples:
 .. function:: espressopp.analysis.AdressDensity(system, verletlist)
 
         :param system: system object
-        :type system: shared_ptr<System>
+        :type system: std::shared_ptr<System>
         :param verletlist: verletlist object
-        :type verletlist: shared_ptr<VerletListAdress>
+        :type verletlist: std::shared_ptr<VerletListAdress>
 
 .. function:: espressopp.analysis.AdressDensity.compute(bins)
 

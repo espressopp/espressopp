@@ -32,7 +32,7 @@ namespace espressopp {
     CellListCoulombKSpaceP3M;
 
     CoulombKSpaceP3M::
-    CoulombKSpaceP3M(shared_ptr< System > _system,
+    CoulombKSpaceP3M(std::shared_ptr< System > _system,
                      real _coulomb_prefactor,
                      real _alpha,
                      Int3D _M,
@@ -232,7 +232,7 @@ namespace espressopp {
 
       class_< CoulombKSpaceP3M, bases< Potential > >
       ("interaction_CoulombKSpaceP3M", 
-              init< shared_ptr<System>, real, real, Int3D, int, real, int >() )
+              init< std::shared_ptr<System>, real, real, Int3D, int, real, int >() )
     	.add_property("prefactor", &CoulombKSpaceP3M::getPrefactor, 
                                    &CoulombKSpaceP3M::setPrefactor);
     	//.add_property("alpha", &CoulombKSpaceP3M::getAlpha, &CoulombKSpaceP3M::setAlpha)
@@ -241,8 +241,8 @@ namespace espressopp {
 
       class_< CellListCoulombKSpaceP3M, bases< Interaction > >
         ("interaction_CellListCoulombKSpaceP3M",
-              init< shared_ptr< storage::Storage >,
-                    shared_ptr< CoulombKSpaceP3M > >())
+              init< std::shared_ptr< storage::Storage >,
+                    std::shared_ptr< CoulombKSpaceP3M > >())
         .def("getPotential", &CellListCoulombKSpaceP3M::getPotential)
 	  ;
 

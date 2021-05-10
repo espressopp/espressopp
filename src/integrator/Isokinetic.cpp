@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(Isokinetic::theLogger, "Isokinetic");
 
-    Isokinetic::Isokinetic(shared_ptr<System> system) : Extension(system)
+    Isokinetic::Isokinetic(std::shared_ptr<System> system) : Extension(system)
     {
       temperature = 0.0;
       coupling    = 1; // couple to thermostat in every md step
@@ -135,9 +135,9 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<Isokinetic, shared_ptr<Isokinetic>, bases<Extension> >
+      class_<Isokinetic, std::shared_ptr<Isokinetic>, bases<Extension> >
 
-        ("integrator_Isokinetic", init< shared_ptr<System> >())
+        ("integrator_Isokinetic", init< std::shared_ptr<System> >())
 
         .add_property("temperature", &Isokinetic::getTemperature, &Isokinetic::setTemperature)
         .add_property("coupling", &Isokinetic::getCoupling, &Isokinetic::setCoupling)

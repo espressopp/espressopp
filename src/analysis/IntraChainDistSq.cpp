@@ -60,7 +60,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<IntraChainDistSq, bases< AllParticlePos > >
-        ("analysis_IntraChainDistSq", init< shared_ptr< System >, shared_ptr< FixedPairList > >())
+        ("analysis_IntraChainDistSq", init< std::shared_ptr< System >, std::shared_ptr< FixedPairList > >())
         .def("compute", &IntraChainDistSq::compute)
         ;
 

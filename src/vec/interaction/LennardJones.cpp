@@ -48,14 +48,14 @@ namespace espressopp { namespace vec {
       ;
 
       class_< VerletListLennardJonesBase, bases< Interaction > >
-        ("vec_interaction_VerletListLennardJonesBase", init< shared_ptr<VerletList> >())
+        ("vec_interaction_VerletListLennardJonesBase", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJonesBase::getVerletList)
         .def("setPotential", &VerletListLennardJonesBase::setPotential)
         .def("getPotential", &VerletListLennardJonesBase::getPotentialPtr)
       ;
 
       class_< VerletListLennardJones, bases< Interaction > >
-        ("vec_interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
+        ("vec_interaction_VerletListLennardJones", init< std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
         .def("getPotential", &VerletListLennardJones::getPotentialPtr)

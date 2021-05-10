@@ -30,7 +30,7 @@ namespace espressopp { namespace vec {
 
     LOG4ESPP_LOGGER(MDIntegratorVec::logger, "MDIntegratorVec");
 
-    MDIntegratorVec::MDIntegratorVec(shared_ptr<System> system)
+    MDIntegratorVec::MDIntegratorVec(std::shared_ptr<System> system)
       : MDIntegrator(system)
     {
       if(!getSystem()->vectorization) {
@@ -38,7 +38,7 @@ namespace espressopp { namespace vec {
       }
     }
 
-    void MDIntegratorVec::addExtension(shared_ptr<integrator::Extension> extension) {
+    void MDIntegratorVec::addExtension(std::shared_ptr<integrator::Extension> extension) {
        // add extension to the list
        exList.push_back(extension);
     }
@@ -47,7 +47,7 @@ namespace espressopp { namespace vec {
       return exList.size();
     }
 
-    shared_ptr<vec::integrator::Extension> MDIntegratorVec::getExtension(int k) {
+    std::shared_ptr<vec::integrator::Extension> MDIntegratorVec::getExtension(int k) {
       return exList[k];
     }
 

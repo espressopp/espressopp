@@ -36,7 +36,7 @@ namespace espressopp { namespace vec {
 
   namespace integrator {
 
-    struct ExtensionList : public std::vector<shared_ptr<vec::integrator::Extension> > {
+    struct ExtensionList : public std::vector<std::shared_ptr<vec::integrator::Extension> > {
       typedef espressopp::esutil::ESPPIterator<std::vector<vec::integrator::Extension> > Iterator;
     };
 
@@ -46,11 +46,11 @@ namespace espressopp { namespace vec {
     public:
       typedef espressopp::integrator::MDIntegrator MDIntegrator;
 
-      MDIntegratorVec(shared_ptr<System> system);
+      MDIntegratorVec(std::shared_ptr<System> system);
 
-      void addExtension(shared_ptr<vec::integrator::Extension> extension);
+      void addExtension(std::shared_ptr<vec::integrator::Extension> extension);
 
-      shared_ptr<vec::integrator::Extension> getExtension(int k);
+      std::shared_ptr<vec::integrator::Extension> getExtension(int k);
 
       int getNumberOfExtensions();
 

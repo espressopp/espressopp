@@ -41,7 +41,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
-    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier, bool _slow)
+    TDforce::TDforce(std::shared_ptr<System> system, std::shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier, bool _slow)
     :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier), slow(_slow) {
 
         // startdist & enddist are the distances between which the TD force actually acts.
@@ -54,7 +54,7 @@ namespace espressopp {
         }
         else
         {
-          center = (0.0,0.0,0.0);
+          center = Real3D(0.0,0.0,0.0);
         }
 
         LOG4ESPP_INFO(theLogger, "TDforce constructed");
@@ -87,17 +87,17 @@ namespace espressopp {
         Table table;
 
         if (itype == 1) { // create a new InterpolationLinear
-            table = make_shared <interaction::InterpolationLinear> ();
+            table = std::make_shared <interaction::InterpolationLinear> ();
             table->read(world, _filename);
         }
 
         else if (itype == 2) { // create a new InterpolationAkima
-            table = make_shared <interaction::InterpolationAkima> ();
+            table = std::make_shared <interaction::InterpolationAkima> ();
             table->read(world, _filename);
         }
 
         else if (itype == 3) { // create a new InterpolationCubic
-            table = make_shared <interaction::InterpolationCubic> ();
+            table = std::make_shared <interaction::InterpolationCubic> ();
             table->read(world, _filename);
         }
 
@@ -363,8 +363,8 @@ namespace espressopp {
       void (TDforce::*pyAddForce)(int itype, const char* filename, int type)
                         = &TDforce::addForce;
 
-      class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
-        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int, bool >())
+      class_<TDforce, std::shared_ptr<TDforce>, bases<Extension> >
+        ("integrator_TDforce", init< std::shared_ptr<System>, std::shared_ptr<VerletListAdress>, real, real, int, bool >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)

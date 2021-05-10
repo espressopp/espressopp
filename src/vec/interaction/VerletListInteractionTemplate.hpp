@@ -52,7 +52,7 @@ namespace espressopp { namespace vec {
       typedef _Potential Potential;
 
     public:
-      VerletListInteractionTemplate(shared_ptr<VerletList> _verletList)
+      VerletListInteractionTemplate(std::shared_ptr<VerletList> _verletList)
         : verletList(_verletList)
         , potentialArray(0, 0, Potential())
         , ntypes(0)
@@ -61,11 +61,11 @@ namespace espressopp { namespace vec {
       virtual ~VerletListInteractionTemplate() {};
 
       void
-      setVerletList(shared_ptr < VerletList > _verletList) {
+      setVerletList(std::shared_ptr < VerletList > _verletList) {
         verletList = _verletList;
       }
 
-      shared_ptr<VerletList> getVerletList() {
+      std::shared_ptr<VerletList> getVerletList() {
         return verletList;
       }
 
@@ -87,7 +87,7 @@ namespace espressopp { namespace vec {
       }
 
       // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
+      std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
         return  make_shared<Potential>(potentialArray.at(type1, type2));
       }
 
@@ -108,7 +108,7 @@ namespace espressopp { namespace vec {
 
     protected:
       int ntypes;
-      shared_ptr<VerletList> verletList;
+      std::shared_ptr<VerletList> verletList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
     };
 

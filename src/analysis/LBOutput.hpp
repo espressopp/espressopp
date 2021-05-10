@@ -33,8 +33,8 @@ namespace espressopp {
       class LBOutput : public AnalysisBaseTemplate< real > {
       public:
          /* Constructor for the class */
-         LBOutput(shared_ptr< System > _system,
-                  shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann)
+         LBOutput(std::shared_ptr< System > _system,
+                  std::shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann)
          : AnalysisBaseTemplate< real >(_system) {
             latticeboltzmann = _latticeboltzmann;
          }
@@ -68,7 +68,7 @@ namespace espressopp {
 
          static void registerPython();
       protected:
-         shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann;
+         std::shared_ptr<integrator::LatticeBoltzmann> latticeboltzmann;
       };
    }
 }

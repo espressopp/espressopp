@@ -32,7 +32,7 @@ namespace espressopp { namespace vec {
     const Real3D DomainDecomposition::SHIFT_ZERO {0.,0.,0.};
 
     DomainDecomposition::DomainDecomposition(
-      shared_ptr< System > system,
+      std::shared_ptr< System > system,
       const Int3D& _nodeGrid,
       const Int3D& _cellGrid,
       int _halfCellInt
@@ -528,7 +528,7 @@ namespace espressopp { namespace vec {
       using namespace espressopp::python;
 
       class_< DomainDecomposition, bases<espressopp::storage::DomainDecomposition, StorageVec >, boost::noncopyable >
-        ("vec_storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&,
+        ("vec_storage_DomainDecomposition", init< std::shared_ptr< System >, const Int3D&,
             const Int3D&, int >())
         // .def("initChannels", &DomainDecomposition::initChannels)
         // .def("getChannelIndices", &DomainDecomposition::getChannelIndices)

@@ -48,11 +48,11 @@ namespace espressopp {
 
     public:
       Vectorization(
-        shared_ptr<System> system,
-        shared_ptr<MDIntegrator> mdintegrator);
+        std::shared_ptr<System> system,
+        std::shared_ptr<MDIntegrator> mdintegrator);
 
       Vectorization(
-        shared_ptr<System> system);
+        std::shared_ptr<System> system);
 
       ~Vectorization();
 
@@ -61,7 +61,7 @@ namespace espressopp {
 
       ParticleArray particles;
       CellNeighborList neighborList;
-      shared_ptr<StorageVec> storageVec;
+      std::shared_ptr<StorageVec> storageVec;
 
       inline int getVecLevel() {
         return vecLevel;
@@ -82,7 +82,7 @@ namespace espressopp {
     protected:
       const int vecLevel;
 
-      shared_ptr<MDIntegrator> mdintegrator;
+      std::shared_ptr<MDIntegrator> mdintegrator;
 
       // signals that connect to integrator
       boost::signals2::connection sigBefCalcForces;

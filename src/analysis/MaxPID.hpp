@@ -32,7 +32,7 @@ namespace espressopp {
     /** Class to get the number of particles in the system. */
     class MaxPID : public Observable {
     public:
-      MaxPID(shared_ptr< System > system) : Observable(system) {}
+      MaxPID(std::shared_ptr< System > system) : Observable(system) {}
       virtual ~MaxPID() {}
       virtual real compute() const;
 

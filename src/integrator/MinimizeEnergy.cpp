@@ -32,7 +32,7 @@ namespace espressopp {
 	
 	LOG4ESPP_LOGGER(MinimizeEnergy::theLogger, "MinimizeEnergy");
 	
-	MinimizeEnergy::MinimizeEnergy(shared_ptr<System> system,
+	MinimizeEnergy::MinimizeEnergy(std::shared_ptr<System> system,
 				       real gamma,
 				       real ftol,
 				       real max_displacement,
@@ -205,7 +205,7 @@ namespace espressopp {
 	    
 	    // Note: use noncopyable and no_init for abstract classes
 	    class_<MinimizeEnergy, boost::noncopyable>
-		("integrator_MinimizeEnergy", init<shared_ptr<System>, real, real, real, bool>())
+		("integrator_MinimizeEnergy", init<std::shared_ptr<System>, real, real, real, bool>())
 		.add_property("f_max", &MinimizeEnergy::getFMax)
 		.add_property("displacement", &MinimizeEnergy::getDpMax)
 		.add_property("step", make_getter(&MinimizeEnergy::nstep_), make_setter(&MinimizeEnergy::nstep_))

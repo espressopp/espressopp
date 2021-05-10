@@ -40,7 +40,7 @@ namespace espressopp { namespace vec {
 
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
-  FixedTripleList::FixedTripleList(shared_ptr<espressopp::storage::Storage> storage)
+  FixedTripleList::FixedTripleList(std::shared_ptr<espressopp::storage::Storage> storage)
     : globalTriples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
@@ -279,8 +279,8 @@ namespace espressopp { namespace vec {
     bool (FixedTripleList::*pyAdd)(size_t pid1, size_t pid2, size_t pid3)
       = &FixedTripleList::add;
 
-    class_< FixedTripleList, shared_ptr< FixedTripleList > >
-      ("vec_FixedTripleList", init< shared_ptr<espressopp::storage::Storage> >())
+    class_< FixedTripleList, std::shared_ptr< FixedTripleList > >
+      ("vec_FixedTripleList", init< std::shared_ptr<espressopp::storage::Storage> >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
       .def("remove",  &FixedTripleList::remove)

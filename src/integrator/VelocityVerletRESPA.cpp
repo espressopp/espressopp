@@ -37,7 +37,7 @@ namespace espressopp {
     using namespace esutil;
     using namespace boost::python;
 
-    VelocityVerletRESPA::VelocityVerletRESPA(shared_ptr< System > system) : MDIntegrator(system)
+    VelocityVerletRESPA::VelocityVerletRESPA(std::shared_ptr< System > system) : MDIntegrator(system)
     {
       resortFlag = true;
       maxDist    = 0.0;
@@ -232,7 +232,7 @@ namespace espressopp {
 
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerletRESPA, bases<MDIntegrator>, boost::noncopyable >
-      ("integrator_VelocityVerletRESPA", init< shared_ptr<System> >())
+      ("integrator_VelocityVerletRESPA", init< std::shared_ptr<System> >())
       .def("setmultistep", &VelocityVerletRESPA::setmultistep)
       .def("getmultistep", &VelocityVerletRESPA::getmultistep)
       .add_property("multistep", &VelocityVerletRESPA::getmultistep, &VelocityVerletRESPA::setmultistep)

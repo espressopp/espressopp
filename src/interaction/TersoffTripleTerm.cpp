@@ -77,8 +77,8 @@ namespace espressopp {
       
       class_< VerletListTersoffTripleTerm, bases< Interaction > >(
         "interaction_VerletListTersoffTripleTerm",
-        init< shared_ptr<System>, 
-              shared_ptr<VerletListTriple> >()
+        init< std::shared_ptr<System>,
+              std::shared_ptr<VerletListTriple> >()
       )
       .def("getVerletListTriple", &VerletListTersoffTripleTerm::getVerletListTriple)
       .def("setPotential", &VerletListTersoffTripleTerm::setPotential,
@@ -89,7 +89,7 @@ namespace espressopp {
 
       class_< FixedListTersoffTripleTerm, bases< Interaction > >(
           "interaction_FixedTripleListTersoffTripleTerm",
-          init<shared_ptr<System>, shared_ptr<FixedTripleList>, shared_ptr<TersoffTripleTerm> >()
+          init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<TersoffTripleTerm> >()
       )
       .def("setPotential", &FixedListTersoffTripleTerm::setPotential)
       .def("getFixedTripleList", &FixedListTersoffTripleTerm::getFixedTripleList)
