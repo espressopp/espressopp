@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013, 2017(H)
+#  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -19,21 +19,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from espressopp import *
-from espressopp import unittest
-import mpi4py.MPI as MPI
+import unittest
+import espressopp.tools
+from espressopp.interaction.Morse import *
+from espressopp import Real3D, infinity
 
-class TestParticleLocal(unittest.TestCase) :
-    def test0get(self):
-        system = System()
-        system.rng = esutil.RNG()
-        system.bc = bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
-        system.storage = espressopp.storage.DomainDecomposition(
-            system=system,
-            nodeGrid=(1,1,1), cellGrid=(2,2,2))
-        p = system.storage.addParticle(0, (1.0, 1.0, 1.0))
-        p.v = Real3D(1.0, 1.0, 1.0)
-        self.assertAlmostEqualReal3D(p.v, Real3D(1.0, 1.0, 1.0))
+class Test0Morse(espressopp.tools.TestCase) :
+    def test0Energy(self) :
+        morse=Morse(epsilon=1.0, alpha=1.0, rMin=2.0)
+        self.assertAlmostEqual(morse.computeEnergy(2.0), -1.0)
+        self.assertAlmostEqual(morse.computeEnergy(1.0, 0.0, 0.0), 1.95249244)
+        self.assertAlmostEqual((morse.computeForce(1.0, 0.0, 0.0) - Real3D(0.0, 0.0, 0.0)).sqr(), 87.2645291)
 
 if __name__ == "__main__":
     unittest.main()

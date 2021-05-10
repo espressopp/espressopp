@@ -20,7 +20,6 @@
 
 
 import unittest
-from unittest import *
 from espressopp import Real3D, toReal3D
 
 class TestCase(unittest.TestCase):
