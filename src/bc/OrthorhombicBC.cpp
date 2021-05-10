@@ -140,10 +140,7 @@ namespace espressopp {
       if(pos[dir] < 0 || pos[dir] >= boxL[dir]) {
         /* slow but safe */
         if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
-# warning ERRORHANDLING MISSING
-#if 0
-// errortext: particle coordinate out of range
-#endif
+          throw std::runtime_error("particle coordinate out of range");
           imageBox[dir] = 0;
           pos[dir] = 0;
         }
