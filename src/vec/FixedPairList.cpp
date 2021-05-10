@@ -58,11 +58,11 @@ namespace espressopp { namespace vec {
     storageVec->enableLocalParticles();
 
     sigBeforeSend = storage->beforeSendParticles.connect(
-      boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
+      std::bind(&FixedPairList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigAfterRecv = storage->afterRecvParticles.connect(
-      boost::bind(&FixedPairList::afterRecvParticles, this, _1, _2));
+      std::bind(&FixedPairList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigOnParticlesChanged = storage->onParticlesChanged.connect(
-      boost::bind(&FixedPairList::onParticlesChanged, this));
+      std::bind(&FixedPairList::onParticlesChanged, this));
 
     if(vectorization->getVecLevel() != 2) {
       throw std::runtime_error("espressopp::vec::FixedPairList can only be used for vecLevel=2");

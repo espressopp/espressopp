@@ -68,7 +68,7 @@ namespace espressopp {
       }
 
       void resetCells();
-      void resetCells(Storage*);
+      void resetCellsStorage(Storage*);
 
       void zeroForces();
 

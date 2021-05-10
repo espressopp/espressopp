@@ -56,11 +56,11 @@ namespace espressopp { namespace vec {
     storageVec->enableLocalParticles();
 
     sigBeforeSend = storage->beforeSendParticles.connect
-      (boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedTripleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigAfterRecv = storage->afterRecvParticles.connect
-      (boost::bind(&FixedTripleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedTripleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigOnParticlesChanged = storage->onParticlesChanged.connect(
-      boost::bind(&FixedTripleList::onParticlesChanged, this));
+      std::bind(&FixedTripleList::onParticlesChanged, this));
   }
 
   FixedTripleList::~FixedTripleList()

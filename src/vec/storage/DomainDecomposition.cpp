@@ -58,12 +58,12 @@ namespace espressopp { namespace vec {
       if(!sigResetCells.connected())
         sigResetCells = this->onCellAdjust.connect(
                       boost::signals2::at_back,
-                      boost::bind(&DomainDecomposition::resetCells, this));
+                      std::bind(&DomainDecomposition::resetCells, this));
 
       if(!sigLoadCells.connected())
         sigLoadCells = this->onParticlesChanged.connect(
                       boost::signals2::at_front,
-                      boost::bind(&DomainDecomposition::loadCells, this));
+                      std::bind(&DomainDecomposition::loadCells, this));
 
       LOG4ESPP_INFO(logger, "DomainDecomposition::connect()");
     }
@@ -96,7 +96,7 @@ namespace espressopp { namespace vec {
     void DomainDecomposition::resetCells()
     {
       /// reset realCells and cellNeighborList
-      vectorization->resetCells(this);
+      vectorization->resetCellsStorage(this);
 
       /// Setup ghost communication for this cell grid
       {

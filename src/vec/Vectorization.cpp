@@ -93,10 +93,10 @@ namespace espressopp {
       if(!getSystem()->storage){
         throw std::runtime_error("System has no storage");
       }
-      resetCells(getSystem()->storage.get());
+      resetCellsStorage(getSystem()->storage.get());
     }
 
-    void Vectorization::resetCells(Storage* storage)
+    void Vectorization::resetCellsStorage(Storage* storage)
     {
       CellList const& localCells = storage->getLocalCells();
       CellList const& realCells  = storage->getRealCells();

@@ -90,7 +90,7 @@ namespace espressopp { namespace vec {
   {
     // make a connection to vectorization to invoke rebuild on loadCells
     connectionResort = getSystem()->storage->onParticlesChanged.connect(
-        boost::bind(&VerletList::rebuild, this));
+        std::bind(&VerletList::rebuild, this));
   }
 
   void VerletList::disconnect()
