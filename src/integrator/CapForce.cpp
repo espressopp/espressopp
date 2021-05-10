@@ -79,9 +79,9 @@ namespace espressopp {
     void CapForce::connect(){
       // connection to initialisation
       if (!allParticles) {
-        _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToGroup, this), boost::signals2::at_back);
+        _aftCalcF  = integrator->aftCalcF.connect( std::bind(&CapForce::applyForceCappingToGroup, this), boost::signals2::at_back);
       } else {
-    	_aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToAll, this), boost::signals2::at_back);
+    	_aftCalcF  = integrator->aftCalcF.connect( std::bind(&CapForce::applyForceCappingToAll, this), boost::signals2::at_back);
       }
     }
 

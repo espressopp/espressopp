@@ -135,8 +135,8 @@ namespace espressopp {
       }
 
       void LatticeBoltzmann::connect() {
-         _recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
-         _befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
+         _recalc2 = integrator->recalc2.connect ( std::bind(&LatticeBoltzmann::zeroMDCMVel, this));
+         _befIntV = integrator->befIntV.connect ( std::bind(&LatticeBoltzmann::makeLBStep, this));
       }
 
 /*******************************************************************************************/

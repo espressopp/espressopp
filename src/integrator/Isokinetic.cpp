@@ -63,7 +63,7 @@ namespace espressopp {
 
     void Isokinetic::connect(){
       // connection to the signal at the end of the run
-      _aftIntV = integrator->aftIntV.connect( boost::bind(&Isokinetic::rescaleVelocities, this));
+      _aftIntV = integrator->aftIntV.connect( std::bind(&Isokinetic::rescaleVelocities, this));
     }
     
     void Isokinetic::setTemperature(real _temperature)

@@ -69,11 +69,11 @@ namespace espressopp {
     void TDforce::connect(){
       if(slow){
         _applyForce = integrator->aftCalcSlow.connect(
-            boost::bind(&TDforce::applyForce, this), boost::signals2::at_front);
+            std::bind(&TDforce::applyForce, this), boost::signals2::at_front);
       }
       else{
         _applyForce = integrator->aftCalcF.connect(
-            boost::bind(&TDforce::applyForce, this));
+            std::bind(&TDforce::applyForce, this));
       }
     }
 

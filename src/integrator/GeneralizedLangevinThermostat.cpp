@@ -62,10 +62,10 @@ namespace espressopp {
     void GeneralizedLangevinThermostat::connect() {
 
         _integrate = integrator->aftIntP.connect(
-                boost::bind(&GeneralizedLangevinThermostat::integrate, this));
+                std::bind(&GeneralizedLangevinThermostat::integrate, this));
 
         _friction = integrator->aftCalcF.connect(
-                boost::bind(&GeneralizedLangevinThermostat::friction, this));
+                std::bind(&GeneralizedLangevinThermostat::friction, this));
     }
 
     void GeneralizedLangevinThermostat::addCoeffs(int itype, const char* _filename, int type) {

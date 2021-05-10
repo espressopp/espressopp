@@ -48,9 +48,9 @@ namespace espressopp {
       count_charges(system->storage->getRealCells()); 
 
       // make a connection to boundary conditions to invoke recalculation of KVec if box dimensions change
-      connectionRecalcKVec = system->bc->onBoxDimensionsChanged.connect(boost::bind(&CoulombKSpaceEwald::preset, this));
+      connectionRecalcKVec = system->bc->onBoxDimensionsChanged.connect(std::bind(&CoulombKSpaceEwald::preset, this));
       // make a connection to storage to get number of particles
-      connectionGetParticleNumber = system->storage->onParticlesChanged.connect(boost::bind(&CoulombKSpaceEwald::getParticleNumber, this));
+      connectionGetParticleNumber = system->storage->onParticlesChanged.connect(std::bind(&CoulombKSpaceEwald::getParticleNumber, this));
     }
     
     CoulombKSpaceEwald::~CoulombKSpaceEwald(){

@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include <sstream>
 #include "FixedTripleAngleList.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 #include "bc/BC.hpp"
@@ -41,11 +41,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleAngleList");
     
     con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedTripleAngleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedTripleAngleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedTripleAngleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedTripleAngleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedTripleAngleList::onParticlesChanged, this));
+      (std::bind(&FixedTripleAngleList::onParticlesChanged, this));
   }
 
   FixedTripleAngleList::~FixedTripleAngleList() {

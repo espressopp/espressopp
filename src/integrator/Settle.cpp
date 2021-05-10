@@ -24,7 +24,7 @@
 
 #include "Settle.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "System.hpp"
@@ -46,9 +46,9 @@ namespace espressopp {
 
         /*
         con1 = integrator->saveOldPos.connect
-          (boost::bind(&Settle::saveOldPos, this));
+          (std::bind(&Settle::saveOldPos, this));
         con2 = integrator->applyConstraints.connect
-          (boost::bind(&Settle::applyConstraints, this));
+          (std::bind(&Settle::applyConstraints, this));
         */
 
         // initialize settlep variables
@@ -89,10 +89,10 @@ namespace espressopp {
 
     void Settle::connect(){
       // connection to initialisation
-      _befIntP  = integrator->befIntP.connect( boost::bind(&Settle::saveOldPos, this));
-      _aftIntP  = integrator->aftIntP.connect( boost::bind(&Settle::applyConstraints, this));
-      _aftIntV  = integrator->aftIntV.connect( boost::bind(&Settle::correctVelocities, this));   // OUT AGAIN?
-      _aftIntSlow  = integrator->aftIntSlow.connect( boost::bind(&Settle::correctVelocities, this));
+      _befIntP  = integrator->befIntP.connect( std::bind(&Settle::saveOldPos, this));
+      _aftIntP  = integrator->aftIntP.connect( std::bind(&Settle::applyConstraints, this));
+      _aftIntV  = integrator->aftIntV.connect( std::bind(&Settle::correctVelocities, this));   // OUT AGAIN?
+      _aftIntSlow  = integrator->aftIntSlow.connect( std::bind(&Settle::correctVelocities, this));
     }
 
     void Settle::saveOldPos() {

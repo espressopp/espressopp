@@ -26,7 +26,7 @@
 #include <sstream>
 #include "FixedQuadrupleList.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -50,11 +50,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleList");
 
     sigBeforeSend = storage->beforeSendParticles.connect
-      (boost::bind(&FixedQuadrupleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedQuadrupleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigAfterRecv = storage->afterRecvParticles.connect
-      (boost::bind(&FixedQuadrupleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedQuadrupleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigOnParticlesChanged = storage->onParticlesChanged.connect
-      (boost::bind(&FixedQuadrupleList::onParticlesChanged, this));
+      (std::bind(&FixedQuadrupleList::onParticlesChanged, this));
   }
 
   FixedQuadrupleList::~FixedQuadrupleList() {

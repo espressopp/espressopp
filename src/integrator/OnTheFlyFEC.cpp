@@ -63,7 +63,7 @@ namespace espressopp {
     // Connect & Disconnect
     void OnTheFlyFEC::connect(){
         _gatherStats = integrator->aftIntV.connect(
-            boost::bind(&OnTheFlyFEC::gatherStats, this));
+            std::bind(&OnTheFlyFEC::gatherStats, this));
     }
 
     void OnTheFlyFEC::disconnect(){

@@ -26,7 +26,7 @@
 #include <sstream>
 #include "FixedTripleList.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -49,11 +49,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
 
     sigBeforeSend = storage->beforeSendParticles.connect
-      (boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedTripleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigAfterRecv = storage->afterRecvParticles.connect
-      (boost::bind(&FixedTripleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedTripleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     sigOnParticleChanged = storage->onParticlesChanged.connect
-      (boost::bind(&FixedTripleList::onParticlesChanged, this));
+      (std::bind(&FixedTripleList::onParticlesChanged, this));
   }
 
   FixedTripleList::~FixedTripleList() {

@@ -49,8 +49,8 @@ namespace espressopp {
 
     void FixPositions::connect(){
       // connection to initialisation
-      _befIntP  = integrator->befIntP.connect( boost::bind(&FixPositions::savePositions, this));
-      _aftIntP  = integrator->aftIntP.connect( boost::bind(&FixPositions::restorePositions, this));
+      _befIntP  = integrator->befIntP.connect( std::bind(&FixPositions::savePositions, this));
+      _aftIntP  = integrator->aftIntP.connect( std::bind(&FixPositions::restorePositions, this));
     }
 
     void FixPositions::setParticleGroup(std::shared_ptr< ParticleGroup > _particleGroup) {

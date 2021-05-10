@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include <sstream>
 #include "FixedSingleList.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -42,11 +42,11 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedSingleList");
 
     con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedSingleList::beforeSendParticles, this, _1, _2));
+      (std::bind(&FixedSingleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
     con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedSingleList::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedSingleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
     con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedSingleList::onParticlesChanged, this));
+      (std::bind(&FixedSingleList::onParticlesChanged, this));
   }
 
   FixedSingleList::~FixedSingleList() {
