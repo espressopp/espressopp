@@ -21,6 +21,7 @@
 */
 
 #define PARALLEL_TEST_MODULE RNG
+#define BOOST_TEST_MODULE RNG
 
 #include "include/ut.hpp"
 

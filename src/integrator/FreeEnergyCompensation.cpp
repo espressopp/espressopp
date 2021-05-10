@@ -39,11 +39,9 @@ namespace espressopp {
     LOG4ESPP_LOGGER(FreeEnergyCompensation::theLogger, "FreeEnergyCompensation");
 
     FreeEnergyCompensation::FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr, int _ntrotter, bool _slow)
-    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter), slow(_slow) {
+    :Extension(system), sphereAdr(_sphereAdr), ntrotter(_ntrotter), slow(_slow), center(0.0,0.0,0.0) {
 
         type = Extension::FreeEnergyCompensation;
-
-        center = (0.0,0.0,0.0);
 
         LOG4ESPP_INFO(theLogger, "FreeEnergyCompensation constructed");
     }

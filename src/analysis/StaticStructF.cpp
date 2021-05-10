@@ -122,7 +122,7 @@ namespace espressopp {
             Real3D q;
 
             //calculations for binning
-            real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
+            real bin_size = bin_factor * std::min(dqs[0], std::min(dqs[1], dqs[2]));
             real q_sqr_max = nqx * nqx * dqs[0] * dqs[0]
                     + nqy * nqy * dqs[1] * dqs[1]
                     + nqz * nqz * dqs[2] * dqs[2];
@@ -265,7 +265,7 @@ namespace espressopp {
             Real3D q;
 
             //calculations for binning
-            real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
+            real bin_size = bin_factor * std::min(dqs[0], std::min(dqs[1], dqs[2]));
             real q_sqr_max = nqx * nqx * dqs[0] * dqs[0]
                     + nqy * nqy * dqs[1] * dqs[1]
                     + nqz * nqz * dqs[2] * dqs[2];

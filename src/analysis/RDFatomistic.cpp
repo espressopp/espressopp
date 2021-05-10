@@ -131,7 +131,7 @@ namespace espressopp {
               if (molP1 != molP2) {
 
                 if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ) {
-                  Real3D distVector = (0.0, 0.0, 0.0);
+                  Real3D distVector(0.0, 0.0, 0.0);
                   system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
                   int bin = (int)( distVector.abs() / dr );

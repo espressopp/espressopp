@@ -159,7 +159,7 @@ namespace espressopp {
              //std::cout << "LennardJones, capped Force: " << sqrt(distSqr) * ffactor * (caprad/sqrt(distSqr)) << "\n"; 0.1 LEADS TO 3.15815e+08
              return true;
               
-             /*real frac2 = (sigma/caprad)*(sigma/caprad);
+             real frac2 = (sigma/caprad)*(sigma/caprad);
              real frac6 = frac2 * frac2 * frac2;
              real ffactor = 48.0 * epsilon * frac6 * (frac6-0.5) / (caprad*sqrt(distSqr));
              force = dist * ffactor;
