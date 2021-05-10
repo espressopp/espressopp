@@ -509,10 +509,21 @@ class StorageLocal(object):
                     elif val.lower() == "pib": index_pib = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
 
-            if index_id < 0  : raise "particle property id is mandatory"
-            if index_posx < 0 : raise "particle property pos is mandatory"
-            if index_posy < 0 : raise "particle property pos is mandatory"
-            if index_posz < 0 : raise "particle property pos is mandatory"
+            assert index_id >= 0, "particle property id is mandatory"
+            assert index_posx >= 0, "particle property posx is mandatory"
+            assert index_posy >= 0, "particle property posy is mandatory"
+            assert index_posz >= 0, "particle property posz is mandatory"
+
+            def check3DProperty(prop, ix, iy, iz):
+                assert ((ix>=0)==(iy>=0) and (iy>=0)==(iz>=0)), \
+                    "Missing at least one of the 3d coordinates of property \"{}\"".format(prop)
+
+            check3DProperty("pos", index_posx, index_posy, index_posz)
+            check3DProperty("v", index_vx, index_vy, index_vz)
+            check3DProperty("f", index_fx, index_fy, index_fz)
+            check3DProperty("fm", index_fmx, index_fmy, index_fmz)
+            check3DProperty("modepos", index_modeposx, index_modeposy, index_modeposz)
+            check3DProperty("modemom", index_modemomx, index_modemomy, index_modemomz)
 
             indices = np.array([index_id,
                 index_posx, index_posy, index_posz, index_modeposx, index_modeposy, index_modeposz,

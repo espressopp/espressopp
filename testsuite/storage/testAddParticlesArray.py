@@ -30,20 +30,18 @@ def generate_particles(particles_per_direction):
     vx, vy, vz = velocities.gaussian(T=0.6, N=num_particles, zero_momentum=True)
     return x, y, z, Lx, Ly, Lz, vx, vy, vz
 
-rc = 2.5
-skin = 0.3
-timestep = 0.005
-temperature = 1.0
-comm = MPI.COMM_WORLD
-
 particles_per_direction = 10
 x, y, z, Lx, Ly, Lz, vx, vy, vz = generate_particles(particles_per_direction)
-
 num_particles = len(x)
-density = num_particles / (Lx * Ly * Lz)
-size = (Lx, Ly, Lz)
 
-def generate_system(add_particles_array):
+def generate_system():
+    rc = 2.5
+    skin = 0.3
+    timestep = 0.005
+    temperature = 1.0
+    comm = MPI.COMM_WORLD
+    density = num_particles / (Lx * Ly * Lz)
+    size = (Lx, Ly, Lz)
 
     system = espressopp.System()
     system.rng = espressopp.esutil.RNG()
@@ -52,6 +50,12 @@ def generate_system(add_particles_array):
     nodeGrid = decomp.nodeGrid(comm.size, size, rc, skin)
     cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
     system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+
+    return system
+
+def add_particles(add_particles_array):
+
+    system = generate_system()
 
     if add_particles_array:
 
@@ -92,6 +96,16 @@ def generate_system(add_particles_array):
 
     return pos, vel
 
+def add_missing_props():
+    system = generate_system()
+    props = ['id', 'type', 'mass', 'posx', 'posy', 'posz', 'vx', 'vy']
+    ids      = np.arange(1,num_particles+1)
+    types    = np.zeros(num_particles)
+    mass     = np.ones(num_particles)
+    new_particles = np.stack((ids, types, mass, x, y, z, vx, vy, vz), axis=-1)
+
+    system.storage.addParticlesArray(new_particles, *props)
+
 class TestAddParticlesArray(unittest.TestCase):
 
     def compare(self, prop0, prop1):
@@ -101,11 +115,15 @@ class TestAddParticlesArray(unittest.TestCase):
                 self.assertEqual(prop0[i][j],prop1[i][j])
 
     def test1(self):
-        pos0, vel0 = generate_system(False)
-        pos1, vel1 = generate_system(True)
+        pos0, vel0 = add_particles(False)
+        pos1, vel1 = add_particles(True)
 
         self.compare(pos0, pos1)
         self.compare(vel0, vel1)
+
+    def test2(self):
+        with self.assertRaises(AssertionError):
+            add_missing_props()
 
 if __name__ == "__main__":
     unittest.main()
