@@ -38,19 +38,11 @@ def generate_system(add_particles_array):
 
     if add_particles_array:
 
-        assert(system.storage.hasAddParticlesArray())
-
         tstart = time.time()
         props = ['id', 'type', 'mass', 'posx', 'posy', 'posz', 'vx', 'vy', 'vz']
         ids      = np.arange(1,num_particles+1)
         types    = np.zeros(num_particles)
         mass     = np.ones(num_particles)
-        x        = np.array(x)
-        y        = np.array(y)
-        z        = np.array(z)
-        vx       = np.array(vx)
-        vy       = np.array(vy)
-        vz       = np.array(vz)
         new_particles = np.stack((ids, types, mass, x, y, z, vx, vy, vz), axis=-1)
         tprep = time.time()-tstart
 

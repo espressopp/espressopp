@@ -475,8 +475,7 @@ class StorageLocal(object):
                 index_posz = 3
                 nindex = 4
             else:
-                nindex = 0
-                for val in properties:
+                for nindex, val in enumerate(properties):
                     if val.lower() == "id": index_id = nindex
                     elif val.lower() == "posx": index_posx = nindex
                     elif val.lower() == "posy": index_posy = nindex
@@ -509,7 +508,6 @@ class StorageLocal(object):
                     elif val.lower() == "state": index_state = nindex
                     elif val.lower() == "pib": index_pib = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
-                    nindex += 1
 
             if index_id < 0  : raise "particle property id is mandatory"
             if index_posx < 0 : raise "particle property pos is mandatory"
