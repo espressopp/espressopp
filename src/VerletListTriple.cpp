@@ -53,7 +53,7 @@ namespace espressopp {
 
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
-        boost::bind(&VerletListTriple::rebuild, this));
+        std::bind(&VerletListTriple::rebuild, this));
   }
   
   real VerletListTriple::getVerletCutoff(){
@@ -63,7 +63,7 @@ namespace espressopp {
   void VerletListTriple::connect(){
     // make a connection to System to invoke rebuild on resort
     connectionResort = getSystem()->storage->onParticlesChanged.connect( 
-            boost::bind(&VerletListTriple::rebuild, this));
+            std::bind(&VerletListTriple::rebuild, this));
   }
 
   void VerletListTriple::disconnect(){

@@ -79,16 +79,16 @@ void LangevinThermostatOnGroup::disconnect() {
 void LangevinThermostatOnGroup::connect() {
   // connect to initialization inside run()
   _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostatOnGroup::initialize, this));
+      std::bind(&LangevinThermostatOnGroup::initialize, this));
 
   _heatUp = integrator->recalc1.connect(
-      boost::bind(&LangevinThermostatOnGroup::heatUp, this));
+      std::bind(&LangevinThermostatOnGroup::heatUp, this));
 
   _coolDown = integrator->recalc2.connect(
-      boost::bind(&LangevinThermostatOnGroup::coolDown, this));
+      std::bind(&LangevinThermostatOnGroup::coolDown, this));
 
   _thermalize = integrator->aftCalcF.connect(
-      boost::bind(&LangevinThermostatOnGroup::thermalize, this));
+      std::bind(&LangevinThermostatOnGroup::thermalize, this));
 }
 
 

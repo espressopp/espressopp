@@ -21,7 +21,7 @@
 */
 
 #include "storage/Storage.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "Buffer.hpp"
 #include "FixedListComm.hpp"
 
@@ -38,11 +38,11 @@ namespace espressopp {
 
         LOG4ESPP_INFO(theLogger, "construct FixedPairList");
         con1 = storage->beforeSendParticles.connect
-          (boost::bind(&FixedListComm::beforeSendParticles, this, _1, _2));
+          (std::bind(&FixedListComm::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
         con2 = storage->afterRecvParticles.connect
-          (boost::bind(&FixedListComm::afterRecvParticles, this, _1, _2));
+          (std::bind(&FixedListComm::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
         con3 = storage->onParticlesChanged.connect
-          (boost::bind(&FixedListComm::onParticlesChanged, this));
+          (std::bind(&FixedListComm::onParticlesChanged, this));
     }
 
     FixedListComm::~FixedListComm() {

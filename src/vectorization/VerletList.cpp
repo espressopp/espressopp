@@ -63,7 +63,7 @@ namespace espressopp { namespace vectorization {
 
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
-        boost::bind(&VerletList::rebuild, this));
+        std::bind(&VerletList::rebuild, this));
   }
 
   real VerletList::getVerletCutoff(){
@@ -75,7 +75,7 @@ namespace espressopp { namespace vectorization {
 
   // make a connection to System to invoke rebuild on resort
   connectionResort = getSystem()->storage->onParticlesChanged.connect(
-      boost::bind(&VerletList::rebuild, this));
+      std::bind(&VerletList::rebuild, this));
   }
 
   void VerletList::disconnect()

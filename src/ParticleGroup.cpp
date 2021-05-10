@@ -30,11 +30,11 @@ namespace espressopp {
     ParticleGroup::ParticleGroup(std::shared_ptr <storage::Storage> _storage)
     : storage(_storage) {
         con_send = storage->beforeSendParticles.connect
-                (boost::bind(&ParticleGroup::beforeSendParticles, this, _1, _2));
+                (std::bind(&ParticleGroup::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
         con_recv = storage->afterRecvParticles.connect
-                (boost::bind(&ParticleGroup::afterRecvParticles, this, _1, _2));
+                (std::bind(&ParticleGroup::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
         con_changed = storage->onParticlesChanged.connect
-                (boost::bind(&ParticleGroup::onParticlesChanged, this));
+                (std::bind(&ParticleGroup::onParticlesChanged, this));
     }
 
 

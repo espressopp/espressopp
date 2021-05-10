@@ -64,7 +64,7 @@ namespace espressopp {
 
       // make a connection to System to invoke rebuild on resort
       connectionResort = system->storage->onParticlesChanged.connect(
-          boost::bind(&VerletListAdress::rebuild, this));
+          std::bind(&VerletListAdress::rebuild, this));
     }
 
     /*-------------------------------------------------------------*/

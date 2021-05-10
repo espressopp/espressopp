@@ -50,9 +50,9 @@ namespace espressopp {
 
     void VelocityVerletOnRadius::connect(){
       // connection to initialisation
-      _aftIntP  = integrator->aftIntP.connect( boost::bind(&VelocityVerletOnRadius::integrate1, this));
-      _aftIntV  = integrator->aftIntV.connect( boost::bind(&VelocityVerletOnRadius::integrate2, this));
-      _aftInitF  = integrator->aftInitF.connect( boost::bind(&VelocityVerletOnRadius::initForces, this));
+      _aftIntP  = integrator->aftIntP.connect( std::bind(&VelocityVerletOnRadius::integrate1, this));
+      _aftIntV  = integrator->aftIntV.connect( std::bind(&VelocityVerletOnRadius::integrate2, this));
+      _aftInitF  = integrator->aftInitF.connect( std::bind(&VelocityVerletOnRadius::initForces, this));
     }
 
     void VelocityVerletOnRadius::integrate1() {

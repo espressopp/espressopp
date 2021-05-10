@@ -57,9 +57,9 @@ namespace espressopp {
     void ExtForce::connect(){
       // connection to initialisation
       if (!allParticles) {
-        _aftInitF  = integrator->aftInitF.connect( boost::bind(&ExtForce::applyForceToGroup, this));
+        _aftInitF  = integrator->aftInitF.connect( std::bind(&ExtForce::applyForceToGroup, this));
       } else {
-    	_aftInitF  = integrator->aftInitF.connect( boost::bind(&ExtForce::applyForceToAll, this));
+    	_aftInitF  = integrator->aftInitF.connect( std::bind(&ExtForce::applyForceToAll, this));
       }
     }
 

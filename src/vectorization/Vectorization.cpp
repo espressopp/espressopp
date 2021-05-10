@@ -56,16 +56,16 @@ namespace espressopp {
     {
       sigResetParticles     = getSystem()->storage->onParticlesChanged.connect(
                                 boost::signals2::at_front, // call first due to reordering
-                                boost::bind(&Vectorization::resetParticles, this));
+                                std::bind(&Vectorization::resetParticles, this));
       sigResetCells         = getSystem()->storage->onCellAdjust.connect(
                                 boost::signals2::at_back,
-                                boost::bind(&Vectorization::resetCells, this));
+                                std::bind(&Vectorization::resetCells, this));
       sigBefCalcForces      = mdintegrator->aftInitF.connect(
                                 boost::signals2::at_back,
-                                boost::bind(&Vectorization::befCalcForces,this));
+                                std::bind(&Vectorization::befCalcForces,this));
       sigUpdateForces       = mdintegrator->aftCalcFLocal.connect(
                                 boost::signals2::at_front,
-                                boost::bind(&Vectorization::updateForces,this));
+                                std::bind(&Vectorization::updateForces,this));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

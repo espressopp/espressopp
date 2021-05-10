@@ -22,7 +22,7 @@
 
 #include "Rattle.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "System.hpp"
@@ -59,9 +59,9 @@ namespace espressopp {
     }
 
     void Rattle::connect(){
-      _befIntP  = integrator->befIntP.connect( boost::bind(&Rattle::saveOldPos, this));
-      _aftIntP  = integrator->aftIntP.connect( boost::bind(&Rattle::applyPositionConstraints, this));
-      _aftIntV  = integrator->aftIntV.connect( boost::bind(&Rattle::applyVelocityConstraints, this));
+      _befIntP  = integrator->befIntP.connect( std::bind(&Rattle::saveOldPos, this));
+      _aftIntP  = integrator->aftIntP.connect( std::bind(&Rattle::applyPositionConstraints, this));
+      _aftIntV  = integrator->aftIntV.connect( std::bind(&Rattle::applyVelocityConstraints, this));
     }
 
     void Rattle::addBond(int pid1, int pid2, real constraintDist, real mass1, real mass2) {
