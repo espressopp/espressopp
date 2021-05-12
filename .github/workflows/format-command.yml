@@ -1,0 +1,31 @@
+name: format-command
+on:
+  repository_dispatch:
+    types: [format-command]
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BOT_PAT }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref }}
+
+      - name: Format
+        run: ./format.sh
+
+      - name: Commit to the PR branch
+        run: |
+          git config --global user.name 'espressopp-bot'
+          git config --global user.email 'espressopp-bot@no-reply.com'
+          git commit -am "[BOT] clang-format"
+          git push
+
+      - name: Add reaction
+        uses: peter-evans/create-or-update-comment@38214a08ee61b78dc42bd8f45294668c5bfc1be0
+        with:
+          token: ${{ secrets.BOT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reaction-type: hooray
