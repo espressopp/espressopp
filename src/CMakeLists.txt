@@ -35,6 +35,9 @@ endif (WITH_RC_FILES)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
 
+if(ESPP_WERROR)
+    target_compile_options(_espressopp PRIVATE "-Werror")
+endif()
 # compiler specific configurations
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     if(ESPP_LOCAL_ARCHITECTURE)

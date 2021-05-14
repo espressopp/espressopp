@@ -478,7 +478,7 @@ namespace espressopp {
             d1[i] = ppos[i] * M[i] / sysL[i] + modadd1;
           }
           Gi  = Int3D(d1 + modadd2) + assignshift;
-          arg = Int3D( (d1 - dround(d1) + 0.5)*_2interp );
+          arg = Int3D( (d1 - dround(d1) + 0.5)* _2interp );
 
           // specific for force !!!!!!!!
           g_ca[p.id()] = Gi;

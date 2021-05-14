@@ -47,7 +47,7 @@ namespace espressopp {
 
     void EmptyExtension::connect(){
       // connection to initialisation
-  	  //_aftInitF  = integrator->aftInitF.connect( boost::bind(&EmptyExtension::applyForceToAll, this));
+  	  //_aftInitF  = integrator->aftInitF.connect( std::bind(&EmptyExtension::applyForceToAll, this));
     }
 
     void EmptyExtension::emptyFunction() {

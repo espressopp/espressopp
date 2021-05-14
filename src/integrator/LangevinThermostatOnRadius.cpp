@@ -92,16 +92,16 @@ namespace espressopp {
 	    
 	    // connect to initialization inside run()
 	    _initialize = integrator->runInit.connect(
-                boost::bind(&LangevinThermostatOnRadius::initialize, this));
+                std::bind(&LangevinThermostatOnRadius::initialize, this));
 	    
 	    _heatUp = integrator->recalc1.connect(
-                boost::bind(&LangevinThermostatOnRadius::heatUp, this));
+                std::bind(&LangevinThermostatOnRadius::heatUp, this));
 	    
 	    _coolDown = integrator->recalc2.connect(
-                boost::bind(&LangevinThermostatOnRadius::coolDown, this));
+                std::bind(&LangevinThermostatOnRadius::coolDown, this));
 	    
 	    _thermalize = integrator->aftCalcF.connect(
-                boost::bind(&LangevinThermostatOnRadius::thermalize, this));
+                std::bind(&LangevinThermostatOnRadius::thermalize, this));
 	}
 	
 	

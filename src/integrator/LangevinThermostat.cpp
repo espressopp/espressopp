@@ -105,21 +105,21 @@ namespace espressopp {
 
         // connect to initialization inside run()
         _initialize = integrator->runInit.connect(
-                boost::bind(&LangevinThermostat::initialize, this));
+                std::bind(&LangevinThermostat::initialize, this));
 
         _heatUp = integrator->recalc1.connect(
-                boost::bind(&LangevinThermostat::heatUp, this));
+                std::bind(&LangevinThermostat::heatUp, this));
 
         _coolDown = integrator->recalc2.connect(
-                boost::bind(&LangevinThermostat::coolDown, this));
+                std::bind(&LangevinThermostat::coolDown, this));
 
         if (adress) {
             _thermalizeAdr = integrator->aftCalcF.connect(
-                boost::bind(&LangevinThermostat::thermalizeAdr, this));
+                std::bind(&LangevinThermostat::thermalizeAdr, this));
         }
         else {
             _thermalize = integrator->aftCalcF.connect(
-                boost::bind(&LangevinThermostat::thermalize, this));
+                std::bind(&LangevinThermostat::thermalize, this));
         }
     }
 

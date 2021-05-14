@@ -81,45 +81,45 @@ namespace espressopp {
 
         // connection to after runInit()
         _SetPosVel = integrator->runInit.connect(
-                boost::bind(&Adress::SetPosVel, this), boost::signals2::at_front);
+                std::bind(&Adress::SetPosVel, this), boost::signals2::at_front);
 
         // connection to after initForces()
         _initForces = integrator->aftInitF.connect(
-                boost::bind(&Adress::initForces, this), boost::signals2::at_front);
+                std::bind(&Adress::initForces, this), boost::signals2::at_front);
 
         // connection to inside of integrate1()
         _integrate1 = integrator->inIntP.connect(
-                boost::bind(&Adress::integrate1, this, _1), boost::signals2::at_front);
+                std::bind(&Adress::integrate1, this, std::placeholders::_1), boost::signals2::at_front);
 
         // // connection to inside of integrate1()
         // _inIntP = integrator->inIntP.connect(
-        //         boost::bind(&Adress::communicateAdrPositions, this), boost::signals2::at_front);
+        //         std::bind(&Adress::communicateAdrPositions, this), boost::signals2::at_front);
 
         // connection to after integrate2()
         _integrate2 = integrator->aftIntV.connect(
-                boost::bind(&Adress::integrate2, this), boost::signals2::at_front);
+                std::bind(&Adress::integrate2, this), boost::signals2::at_front);
 
         // connection to after integrate2()
         _integrateSlow = integrator->aftIntSlow.connect(
-                boost::bind(&Adress::integrateSlow, this), boost::signals2::at_front);
+                std::bind(&Adress::integrateSlow, this), boost::signals2::at_front);
 
         // Note: Both this extension as well as Langevin Thermostat access singal aftCalcF. This might lead to undefined behavior.
         // Therefore, we use other signals here, to make sure the Thermostat would be always called first, before force distributions take place.
         // connection to after _aftCalcF()
         //_aftCalcF = integrator->aftCalcF.connect(
-        //        boost::bind(&Adress::aftCalcF, this));
+        //        std::bind(&Adress::aftCalcF, this));
 
         // connection to after aftCalcSlow
         _aftCalcSlow = integrator->aftCalcSlow.connect(
-                boost::bind(&Adress::aftCalcF, this), boost::signals2::at_back);
+                std::bind(&Adress::aftCalcF, this), boost::signals2::at_back);
 
         // connection to after _recalc2()
         _recalc2 = integrator->recalc2.connect(
-                boost::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
+                std::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
 
         // connection to after _befIntV()
         _befIntV = integrator->befIntV.connect(
-                boost::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
+                std::bind(&Adress::aftCalcF, this), boost::signals2::at_front);
     }
 
 

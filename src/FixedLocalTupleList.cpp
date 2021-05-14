@@ -22,7 +22,7 @@
 #include <sstream>
 #include "FixedLocalTupleList.hpp"
 
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -39,11 +39,11 @@ namespace espressopp {
 	LOG4ESPP_INFO(theLogger, "construct FixedLocalTupleList");
 	
 	con1 = storage->beforeSendParticles.connect
-	    (boost::bind(&FixedLocalTupleList::beforeSendParticles, this, _1, _2));
+	    (std::bind(&FixedLocalTupleList::beforeSendParticles, this, std::placeholders::_1, std::placeholders::_2));
 	con2 = storage->afterRecvParticles.connect
-	    (boost::bind(&FixedLocalTupleList::afterRecvParticles, this, _1, _2));
+	    (std::bind(&FixedLocalTupleList::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
 	con3 = storage->onParticlesChanged.connect
-	    (boost::bind(&FixedLocalTupleList::onParticlesChanged, this));
+	    (std::bind(&FixedLocalTupleList::onParticlesChanged, this));
     }
 
     FixedLocalTupleList::~FixedLocalTupleList() {

@@ -27,7 +27,7 @@
 //#include <vector>
 //#include <utility>
 //#include <algorithm>
-#include <boost/bind.hpp>
+#include <functional>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
@@ -45,10 +45,10 @@ FixedTripleListAdress::FixedTripleListAdress(std::shared_ptr< storage::Storage >
   LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
 
   sigBeforeSendAT = fixedtupleList->beforeSendATParticles.connect
-        (boost::bind(&FixedTripleListAdress::beforeSendATParticles, this, _1, _2));
+        (std::bind(&FixedTripleListAdress::beforeSendATParticles, this, std::placeholders::_1, std::placeholders::_2));
 
   sigAfterRecvAT = fixedtupleList->afterRecvATParticles.connect
-    (boost::bind(&FixedTripleListAdress::afterRecvParticles, this, _1, _2));
+    (std::bind(&FixedTripleListAdress::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
 
   // We do not need those signals.
   sigBeforeSend.disconnect();

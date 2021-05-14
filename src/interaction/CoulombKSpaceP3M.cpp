@@ -205,10 +205,10 @@ namespace espressopp {
          dimensions change
       */
       connectionRecalcKVec = system->bc->onBoxDimensionsChanged.
-              connect(boost::bind(&CoulombKSpaceP3M::preset, this));
+              connect(std::bind(&CoulombKSpaceP3M::preset, this));
       // make a connection to storage in order to get number of particles
       connectionGetParticleNumber = system->storage->onParticlesChanged.
-              connect(boost::bind(&CoulombKSpaceP3M::getParticleNumber, this));
+              connect(std::bind(&CoulombKSpaceP3M::getParticleNumber, this));
       
       // sign a signal in order not to recalculate common part twice
       //recalcCommonPart = system.

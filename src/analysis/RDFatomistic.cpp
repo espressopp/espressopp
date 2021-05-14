@@ -160,7 +160,7 @@ namespace espressopp {
                   num_pairs += 1;
 
                   if( resolutionP2 == 1.0 ) {
-                    Real3D distVector = (0.0, 0.0, 0.0);
+                    Real3D distVector(0.0, 0.0, 0.0);
                     system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
                     int bin = (int)( distVector.abs() / dr );

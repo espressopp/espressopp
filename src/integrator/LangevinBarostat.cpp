@@ -83,15 +83,15 @@ namespace espressopp {
 
     void LangevinBarostat::connect(){
       // connection to initialisation
-      _runInit = integrator->runInit.connect( boost::bind(&LangevinBarostat::initialize, this));
+      _runInit = integrator->runInit.connect( std::bind(&LangevinBarostat::initialize, this));
       
-      _befIntP = integrator->befIntP.connect( boost::bind(&LangevinBarostat::upd_Vp, this));
+      _befIntP = integrator->befIntP.connect( std::bind(&LangevinBarostat::upd_Vp, this));
               
-      _inIntP = integrator->inIntP.connect( boost::bind(&LangevinBarostat::updDisplacement, this, _1));
+      _inIntP = integrator->inIntP.connect( std::bind(&LangevinBarostat::updDisplacement, this, std::placeholders::_1));
               
-      _aftIntV = integrator->aftIntV.connect( boost::bind(&LangevinBarostat::upd_pV, this));
+      _aftIntV = integrator->aftIntV.connect( std::bind(&LangevinBarostat::upd_pV, this));
               
-      _aftCalcF = integrator->aftCalcF.connect( boost::bind(&LangevinBarostat::updForces, this));
+      _aftCalcF = integrator->aftCalcF.connect( std::bind(&LangevinBarostat::updForces, this));
     }
     
     void LangevinBarostat::setGammaP(real _gammaP){

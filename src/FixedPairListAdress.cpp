@@ -21,7 +21,7 @@
 */
 
 #include "storage/Storage.hpp"
-#include <boost/bind.hpp>
+#include <functional>
 #include "FixedPairListAdress.hpp"
 #include "Buffer.hpp"
 #include "esutil/Error.hpp"
@@ -40,10 +40,10 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
     
     sigBeforeSendAT = fixedtupleList->beforeSendATParticles.connect
-          (boost::bind(&FixedPairListAdress::beforeSendATParticles, this, _1, _2));
+          (std::bind(&FixedPairListAdress::beforeSendATParticles, this, std::placeholders::_1, std::placeholders::_2));
 
     sigAfterRecvAT = fixedtupleList->afterRecvATParticles.connect
-      (boost::bind(&FixedPairListAdress::afterRecvParticles, this, _1, _2));
+      (std::bind(&FixedPairListAdress::afterRecvParticles, this, std::placeholders::_1, std::placeholders::_2));
 
     // We do not need those signals here.
     sigBeforeSend.disconnect();

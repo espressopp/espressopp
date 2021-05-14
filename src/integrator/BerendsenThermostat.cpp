@@ -58,10 +58,10 @@ namespace espressopp {
 
     void BerendsenThermostat::connect(){
       // connection to initialisation
-      _runInit = integrator->runInit.connect( boost::bind(&BerendsenThermostat::initialize, this));
+      _runInit = integrator->runInit.connect( std::bind(&BerendsenThermostat::initialize, this));
 
       // connection to the signal at the end of the run
-      _aftIntV = integrator->aftIntV.connect( boost::bind(&BerendsenThermostat::thermostat, this));
+      _aftIntV = integrator->aftIntV.connect( std::bind(&BerendsenThermostat::thermostat, this));
     }
     
 
