@@ -35,6 +35,9 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Install Python Dependencies
+        run: pip3 install -r requirements.txt
+
       - name: Configure
         run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
 
@@ -56,6 +59,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: 'espressopp'
+
+      - name: Install Python Dependencies
+        run: pip3 install -r espressopp/requirements.txt
 
       - name: build documentation
         run: |
@@ -132,6 +138,9 @@ jobs:
     container: espressopp/buildenv:fedora
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install Python Dependencies
+        run: pip3 install -r requirements.txt
 
       - name: Coverage build
         run: |
