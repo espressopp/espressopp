@@ -4,7 +4,7 @@ file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
 
-add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
+add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
