@@ -41,7 +41,7 @@ from espressopp.tools import decomp
 from espressopp.tools import timers
 
 # simulation parameters (nvt = False is nve)
-steps = 100
+steps = 10
 rc = 1.12
 skin = 0.3                                 # skin for Verlet lists
 nvt = True
@@ -64,6 +64,12 @@ bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(conffile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
+
+props = ['id', 'pos']
+new_particles = []
+for i in range(num_particles):
+    part = [i + 1, espressopp.Real3D(x[i], y[i], z[i])]
+    new_particles.append(part)
 
 print('\n-- Tabulated Potentials Test --\n')
 print('Steps: %3s' % steps)
@@ -143,8 +149,7 @@ for tabulation in [True, False]:
     system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
 
     # add particles to the system and then decompose
-    for pid in range(num_particles):
-        system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
+    system.storage.addParticles(new_particles, *props)
     system.storage.decompose()
 
 
@@ -231,6 +236,8 @@ for tabulation in [True, False]:
 
     end_time = time.process_time()
     timers.show(integrator.getTimers(), precision=2)
+
+    espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
 
 #os.system('rm '+tabfileLJ+' '+tabfileFENE+' '+tabfileCosine)
 print('\nDone.')
