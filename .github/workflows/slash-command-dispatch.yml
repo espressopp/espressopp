@@ -1,0 +1,14 @@
+name: Slash Command Dispatch
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  slashCommandDispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@8e02cf5c38baa3ddce3b993cef6fa49aa33e22ac
+        with:
+          token: ${{ secrets.BOT_PAT }}
+          commands: format
+          repository: espressopp/espressopp
