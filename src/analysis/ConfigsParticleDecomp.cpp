@@ -134,10 +134,7 @@ namespace espressopp {
       System& system = getSystemRef();
       esutil::Error err(system.comm);
 
-      int nprocs = system.comm->size();
       int myrank = system.comm->rank();
-
-      int localN = system.storage->getNRealParticles();
 
       ConfigurationPtr config = std::make_shared<Configuration> ();
       map< size_t, Real3D > conf;

@@ -552,7 +552,7 @@ namespace espressopp {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 
-        if((p1.type() == atomtype) || (p2.type() == atomtype)) {
+        if((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype)) {
 
           FixedTupleListAdress::iterator it3;
           FixedTupleListAdress::iterator it4;
@@ -592,7 +592,7 @@ namespace espressopp {
               // Calculate energy
               const Potential &potential = getPotential(p3.type(), p4.type());
 
-              if((p1.type() == atomtype) &&  (p2.type() == atomtype)) {
+              if((int_c(p1.type()) == atomtype) &&  (int_c(p2.type()) == atomtype)) {
                 e += (1.0/ntrotter)*potential._computeEnergy(p3, p4);
               }
               else {
@@ -619,7 +619,7 @@ namespace espressopp {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 
-        if((p1.type() == atomtype) || (p2.type() == atomtype)) {
+        if((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype)) {
 
           FixedTupleListAdress::iterator it3;
           FixedTupleListAdress::iterator it4;
@@ -658,7 +658,7 @@ namespace espressopp {
               // Calculate energy
               const Potential &potential = getPotential(p3.type(), p4.type());
 
-              if((p1.type() == atomtype) &&  (p2.type() == atomtype)) {
+              if((int_c(p1.type()) == atomtype) &&  (int_c(p2.type()) == atomtype)) {
                 e += (1.0/ntrotter)*potential._computeEnergy(p3, p4);
               }
               else {
@@ -824,7 +824,7 @@ namespace espressopp {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 
-        if((p1.type() == atomtype) || (p2.type() == atomtype)) {
+        if((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype)) {
 
           FixedTupleListAdress::iterator it3;
           FixedTupleListAdress::iterator it4;
@@ -863,7 +863,7 @@ namespace espressopp {
               // Calculate energy
               const Potential &potential = getPotential(p3.type(), p4.type());
 
-              if((p1.type() == atomtype) &&  (p2.type() == atomtype)) {
+              if((int_c(p1.type()) == atomtype) &&  (int_c(p2.type()) == atomtype)) {
                 e += (1.0/ntrotter)*potential._computeEnergy(p3, p4);
               }
               else {
@@ -891,7 +891,7 @@ namespace espressopp {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 
-        if((p1.type() == atomtype) || (p2.type() == atomtype)) {
+        if((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype)) {
 
           FixedTupleListAdress::iterator it3;
           FixedTupleListAdress::iterator it4;
@@ -930,7 +930,7 @@ namespace espressopp {
               // Calculate energy
               const Potential &potential = getPotential(p3.type(), p4.type());
 
-              if((p1.type() == atomtype) &&  (p2.type() == atomtype)) {
+              if((int_c(p1.type()) == atomtype) &&  (int_c(p2.type()) == atomtype)) {
                 e += (1.0/ntrotter)*potential._computeEnergy(p3, p4);
               }
               else {
@@ -1051,7 +1051,6 @@ namespace espressopp {
 
       // Pairs inside the QM/Hybrid Zone
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
-        real w1, w2;
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 

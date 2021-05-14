@@ -85,7 +85,7 @@ namespace espressopp {
       python::list compute() {
         python::list ret;
         result res = computeRaw();
-        for (int i=0; i<res.size(); i++) {
+        for (int i=0; i<int_c(res.size()); i++) {
           ret.append(res[i]);
         }
         return ret;

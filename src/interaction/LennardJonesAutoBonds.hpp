@@ -184,7 +184,7 @@ namespace espressopp {
     	}
         if (dist.sqr() <= cutoffSqr) {
           FixedPairList::GlobalPairs* globalPairs = bondlist->getGlobalPairs();
-          if (globalPairs->count(p1.id()) + globalPairs->count(p2.id()) < max_crosslinks) {
+          if (int_c(globalPairs->count(p1.id()) + globalPairs->count(p2.id())) < max_crosslinks) {
        	    globalPairs->insert(globalPairs->begin(), std::make_pair(p1.id(), p2.id()));
             bondlist->add(p1.id(), p2.id());
           };

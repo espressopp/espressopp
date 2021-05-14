@@ -191,9 +191,9 @@ FixedTripleListAdress::~FixedTripleListAdress() {
     
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1;
-    Particle *p2;
-    Particle *p3;
+    Particle *p1 = nullptr;
+    Particle *p2 = nullptr;
+    Particle *p3 = nullptr;
 
     for (GlobalTriples::const_iterator it = globalTriples.begin();
         it != globalTriples.end(); ++it) {

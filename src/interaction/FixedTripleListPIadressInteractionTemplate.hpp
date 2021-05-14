@@ -129,11 +129,11 @@ namespace espressopp {
 
       protected:
         int ntypes;
-        int ntrotter;
-        bool speedup; // if true approximate rings in classical region by single particles
         std::shared_ptr<FixedTripleList> fixedtripleList;
         std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         std::shared_ptr < Potential > potential;
+        int ntrotter;
+        bool speedup; // if true approximate rings in classical region by single particles
     };
 
     //////////////////////////////////////////////////

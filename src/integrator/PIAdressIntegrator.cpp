@@ -339,7 +339,7 @@ namespace espressopp {
                 if(at.pib() == 1) { // exclude centroid
                   continue;
                 }
-                else if(at.pib() > 1 && at.pib() <= ntrotter) {
+                else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                   at.modemom() += half_dt4 * at.forcem();
                 }
                 else {
@@ -420,7 +420,7 @@ namespace espressopp {
                 break; // Once we propagated the centroid, we can leave the loop
 
               }
-              else if(at.pib() > 1 && at.pib() <= ntrotter) {
+              else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 continue;
               }
               else {
@@ -438,7 +438,7 @@ namespace espressopp {
                 if(at.pib() == 1) { // exclude centroid
                   continue;
                 }
-                else if(at.pib() > 1 && at.pib() <= ntrotter) {
+                else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                   at.modemom() += half_dt4 * at.forcem();
                 }
                 else {
@@ -660,7 +660,7 @@ namespace espressopp {
                   vp.varmass() = vp.mass()*( w*(1.0-clmassmultiplier) + clmassmultiplier );
                 }
 
-              } else if(at.pib() > 1 && at.pib() <= ntrotter) {
+              } else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 if((speedup == true) && (vp.lambda() < 0.000000001)) {
                   continue;
                 } else {
@@ -716,7 +716,7 @@ namespace espressopp {
                 vp.velocity() = sqrt(ntrotter) * at.modemom()/(vp.mass());
               }
             }
-            else if(at.pib() > 1 && at.pib() <= ntrotter) {
+            else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
               if((speedup == false) || (vp.lambda() > 0.000000001)) {
                 Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
                 if(PILE == false) {
@@ -790,7 +790,7 @@ namespace espressopp {
             for (std::vector<Particle*>::iterator it5 = atList.begin();
                  it5 != atList.end(); ++it5) {
               Particle &at2 = **it5;
-              if(at.pib() <= ntrotter) {
+              if(int_c(at.pib()) <= ntrotter) {
                 at.position()+= at2.modepos()*Tvectors[at.pib()-1][at2.pib()-1];
                 if((at2.pib() == 1) && (at.pib() == 1)) {
                   vp.position() = (1.0/sqrt(ntrotter)) * at2.modepos();
@@ -843,7 +843,7 @@ namespace espressopp {
             for (std::vector<Particle*>::iterator it5 = atList.begin();
                  it5 != atList.end(); ++it5) {
               Particle &at2 = **it5;
-              if(at.pib() <= ntrotter) {
+              if(int_c(at.pib()) <= ntrotter) {
                 at.modepos()+= at2.position()*Eigenvectors[at.pib()-1][at2.pib()-1];
               }
               else {
@@ -887,8 +887,8 @@ namespace espressopp {
             for (std::vector<Particle*>::iterator it5 = atList.begin();
                  it5 != atList.end(); ++it5) {
               Particle &at2 = **it5;
-              if(at.pib() <= ntrotter) {
-                if(at2.pib() > 1 && at2.pib() <= ntrotter) {
+              if(int_c(at.pib()) <= ntrotter) {
+                if(int_c(at2.pib()) > 1 && int_c(at2.pib()) <= ntrotter) {
                   if(constkinmass == false) {
                     if(realkinmass == false) {
                       at.velocity()+= at2.modemom()*Tvectors[at.pib()-1][at2.pib()-1]*ntrotter/((Eigenvalues[at2.pib()-1])*CMDparameter*vp.varmass());
@@ -959,7 +959,7 @@ namespace espressopp {
             for (std::vector<Particle*>::iterator it5 = atList.begin();
                  it5 != atList.end(); ++it5) {
               Particle &at2 = **it5;
-              if(at.pib() <= ntrotter) {
+              if(int_c(at.pib()) <= ntrotter) {
                 at.modemom()+= at2.velocity()*Eigenvectors[at.pib()-1][at2.pib()-1];
               }
               else {
@@ -967,7 +967,7 @@ namespace espressopp {
               }
             }
 
-            if(at.pib() > 1 && at.pib() <= ntrotter) {
+            if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
               if(constkinmass == false) {
                 if(realkinmass == false) {
                   at.modemom() *= (vp.varmass()*CMDparameter* (Eigenvalues[at.pib()-1])/ntrotter);
@@ -1025,7 +1025,7 @@ namespace espressopp {
               if(at.pib() == 1) {
                 at.forcem()+= (1.0/sqrt(ntrotter))* at2.force();
               }
-              else if(at.pib() > 1 && at.pib() <= ntrotter) {
+              else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 at.forcem()+= at2.force()*Eigenvectors[at.pib()-1][at2.pib()-1];
               }
               else {
@@ -1091,7 +1091,7 @@ namespace espressopp {
               for (std::vector<Particle*>::iterator it3 = atList.begin();
                    it3 != atList.end(); ++it3) {
                 Particle &at = **it3;
-                if(at.pib() > 1 && at.pib() <= ntrotter) {
+                if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                   at.forcem() -= at.modepos()*omega2*vp.varmass()*Eigenvalues[at.pib()-1];
                 }
                 else if(at.pib() == 1) {
@@ -1170,7 +1170,7 @@ namespace espressopp {
             for (std::vector<Particle*>::iterator it3 = atList.begin();
                  it3 != atList.end(); ++it3) {
               Particle &at = **it3;
-              if(at.pib() > 1 && at.pib() <= ntrotter) {
+              if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 at.forcem() -= at.modepos()*omega2*vp.varmass()*Eigenvalues[at.pib()-1];
               }
               else if(at.pib() == 1) {
@@ -1369,7 +1369,7 @@ namespace espressopp {
             if(at.pib() == 1) {
               esum += at.modemom().sqr() * ntrotter / vp.mass();
             }
-            else if(at.pib() > 1 && at.pib() <= ntrotter) {
+            else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
               if((speedup == true) && (vp.lambda() < 0.000000001)) {
                 continue;
               } else {
@@ -1426,7 +1426,7 @@ namespace espressopp {
             if(at.pib() == 1) {
               continue;
             }
-            else if(at.pib() > 1 && at.pib() <= ntrotter) {
+            else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
               esum += at.modepos().sqr() * omega2 *  (vp.varmass()*Eigenvalues[at.pib()-1]);
             }
             else {
@@ -1468,11 +1468,11 @@ namespace espressopp {
               pos1 = at.position();
               posN = at.position();
             }
-            else if(at.pib() > 1 && at.pib() <= ntrotter-1) {
+            else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter-1) {
               esum += (at.position()-posN).sqr() * omega2 * vp.varmass();
               posN = at.position();
             }
-            else if(at.pib() == ntrotter) {
+            else if(int_c(at.pib()) == ntrotter) {
               esum += (at.position()-posN).sqr() * omega2 * vp.varmass();
               esum += (at.position()-pos1).sqr() * omega2 * vp.varmass();
             }
@@ -1501,7 +1501,7 @@ namespace espressopp {
       std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
-        if(vp.type() == parttype) {
+        if(int_c(vp.type()) == parttype) {
           FixedTupleListAdress::iterator it3;
           it3 = fixedtupleList->find(&vp);
           if (it3 != fixedtupleList->end()) {
@@ -1513,7 +1513,7 @@ namespace espressopp {
               if(at.pib() == 1) {
                 continue;
               }
-              else if(at.pib() > 1 && at.pib() <= ntrotter) {
+              else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 if(realkinmass == false) {
                   esum += (clmassmultiplier-1.0)*0.5*vp.mass()*ntrotter*at.modemom().sqr()/(vp.varmass()*vp.varmass()*CMDparameter*Eigenvalues[at.pib()-1]);
                 }
@@ -1546,7 +1546,7 @@ namespace espressopp {
       std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
-        if(vp.type() == parttype) {
+        if(int_c(vp.type()) == parttype) {
           FixedTupleListAdress::iterator it3;
           it3 = fixedtupleList->find(&vp);
           if (it3 != fixedtupleList->end()) {
@@ -1558,7 +1558,7 @@ namespace espressopp {
               if(at.pib() == 1) {
                 continue;
               }
-              else if(at.pib() > 1 && at.pib() <= ntrotter) {
+              else if(at.pib() > 1 && int_c(at.pib()) <= ntrotter) {
                 esum -= (clmassmultiplier-1.0)*0.5*vp.mass()*omega2*at.modepos().sqr()*Eigenvalues[at.pib()-1];
               }
               else {
@@ -1749,14 +1749,14 @@ namespace espressopp {
 
 
     void PIAdressIntegrator::transp() { // We need both the regular and the transposed normal mode transformation matrix
-      if (Tvectors.size() != ntrotter)
+      if (int_c(Tvectors.size()) != ntrotter)
       {
         throw std::runtime_error("Number of Eigenvectors not equal to number of Trotter beads!");
       }
       std::vector<real> tmpvec;
-      for (size_t i = 0; i < ntrotter; ++i)
+      for (int i = 0; i < ntrotter; ++i)
       {
-        for (size_t j = 0; j < ntrotter; ++j)
+        for (int j = 0; j < ntrotter; ++j)
         {
           tmpvec.push_back( Tvectors.at(j).at(i) );
         }

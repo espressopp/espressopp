@@ -207,7 +207,6 @@ namespace espressopp {
 
       int iteration = 0;
       bool done = false;
-      real dt = integrator->getTimeStep();
       System& system = getSystemRef();
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 

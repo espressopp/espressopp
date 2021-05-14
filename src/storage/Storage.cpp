@@ -102,7 +102,6 @@ namespace espressopp {
       return cnt;
     }
     longint Storage::getNAdressParticles() const {
-          longint cnt = 0;
             return localAdrATParticles.size();
     }
 
@@ -360,7 +359,7 @@ namespace espressopp {
       AdrATParticles.push_back(n);
       Particle* local = &AdrATParticles.back();
 
-      if (last_capacity != AdrATParticles.capacity()) {
+      if (last_capacity != int_c(AdrATParticles.capacity())) {
           updateLocalParticles(AdrATParticles, true);
       }
       else {
@@ -378,7 +377,7 @@ namespace espressopp {
 	  AdrATParticles.push_back(n);
 	  Particle* local = &AdrATParticles.back();
 
-	  if (last_capacity != AdrATParticles.capacity()) {
+	  if (last_capacity != int_c(AdrATParticles.capacity())) {
 		  updateLocalParticles(AdrATParticles, true);
 	  }
 	  else {
@@ -421,7 +420,7 @@ namespace espressopp {
       l.push_back(part);
       Particle *p = &l.back();
 
-      if (last_capacity != l.capacity()) {
+      if (last_capacity != int_c(l.capacity())) {
           updateLocalParticles(l);
       }
       else {
@@ -447,7 +446,7 @@ namespace espressopp {
       Particle *dst = &dl.back();
 
       // fix up destination list
-      if (dlast_capacity != dl.capacity()) {
+      if (dlast_capacity != int_c(dl.capacity())) {
           updateLocalParticles(dl);
       }
       else {
@@ -456,7 +455,7 @@ namespace espressopp {
 
       // fix up resorted source list; due to moving, the last particle
       // might have been moved to the position of the actually moved one
-      if (slast_capacity != sl.capacity()) {
+      if (slast_capacity != int_c(sl.capacity())) {
           updateLocalParticles(sl);
       }
       else if (i != newSize) {

@@ -223,9 +223,7 @@ namespace espressopp { namespace vectorization {
             size_t cell_id       = cellNborList.at(irow,inbr);
             size_t cell_start    = cellRange[cell_id];
             size_t cell_size     = sizes[cell_id];
-            size_t cell_end      = cell_start + cell_size;
             int* __restrict c_j_ctr = c_j_ptr + c_j_max;
-            int ll = 0;
 
             #pragma vector always
             #pragma vector aligned
@@ -248,7 +246,7 @@ namespace espressopp { namespace vectorization {
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
-            for(size_t ll=0; ll<num_padding; ll++)
+            for(int ll=0; ll<num_padding; ll++)
             {
               c_j_ctr[ll] = padding;
             }
@@ -256,7 +254,7 @@ namespace espressopp { namespace vectorization {
           }
           c_range.push_back(c_j_max);
         }
-        if(c_j_max>c_j.size()) throw std::runtime_error("rebuild_p_nc_pack_stencil: Reserve size exceeded.");
+        if(c_j_max>int_c(c_j.size())) throw std::runtime_error("rebuild_p_nc_pack_stencil: Reserve size exceeded.");
 
         /// fill values
         #pragma vector always
@@ -308,7 +306,6 @@ namespace espressopp { namespace vectorization {
         size_t  cell_id       = cellNborList.cellId(irow);
         size_t  cell_nnbrs    = cellNborList.numNeighbors(irow);
         size_t  cell_start    = cellRange[cell_id];
-        size_t  cell_data_end = cellRange[cell_id+1];
         size_t  cell_size     = sizes[cell_id];
         size_t  cell_end      = cell_start + cell_size;
 
@@ -334,7 +331,6 @@ namespace espressopp { namespace vectorization {
 
             size_t  ncell_start    = cellRange[ncell_id];
             size_t  ncell_data_end = cellRange[ncell_id+1];
-            size_t  ncell_end      = ncell_start + sizes[ncell_id];
             int* __restrict npptr  = &(neighborList.nplist[num_pairs]);
 
             {
@@ -405,7 +401,6 @@ namespace espressopp { namespace vectorization {
 
             size_t  ncell_start     = cellRange[ncell_id];
             size_t  ncell_data_end  = cellRange[ncell_id+1];
-            size_t  ncell_end       = ncell_start + sizes[ncell_id];
             int* __restrict npptr =  &(neighborList.nplist[num_pairs]);
 
             {
@@ -472,7 +467,7 @@ namespace espressopp { namespace vectorization {
             max_type = std::max(max_type, pa_p_type[p]);
       }
 
-      if(num_pairs>nplist_reserve) {
+      if(num_pairs>int_c(nplist_reserve)) {
         LOG4ESPP_WARN(theLogger,"Reserve size exceeded. "
           "Expected "<< nplist_reserve<<". Got "<<num_pairs);
       }
@@ -519,13 +514,11 @@ namespace espressopp { namespace vectorization {
 
   int VerletList::localSize() const
   {
-    System& system = getSystemRef();
-    // return vlPairs.size();
     return num_pairs;
   }
 
   python::tuple VerletList::getPair(int i) {
-    if (i <= 0 || i > vlPairs.size()) {
+    if (i <= 0 || i > int_c(vlPairs.size())) {
       std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
       return python::make_tuple();
     } else {

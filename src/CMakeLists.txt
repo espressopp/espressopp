@@ -40,6 +40,7 @@ if(ESPP_WERROR)
 endif()
 # compiler specific configurations
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    target_compile_options(_espressopp PRIVATE -Wall -Wno-unknown-pragmas)
     if(ESPP_LOCAL_ARCHITECTURE)
         target_compile_options(_espressopp PRIVATE "-march=native")
     endif()

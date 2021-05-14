@@ -197,7 +197,8 @@ namespace espressopp {
         //this->clear();
         longint lastpid1 = -1;
 
-        Particle* p, * pK;
+        Particle* p = nullptr;
+        Particle* pK = nullptr;
         std::vector<Particle*> tmp;
 
         GlobalList::const_iterator it = globalLists.begin();

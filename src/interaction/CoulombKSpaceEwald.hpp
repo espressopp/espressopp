@@ -284,8 +284,6 @@ namespace espressopp {
         for (int k=2; k<=kmax; k++) {
           j=0;
           for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
-            Particle &p = *it;
-
             eikx[     k][j] = eikx[     k-1][j] * eikx[     1][j];
             
             eiky[kmax+k][j] = eiky[kmax+k-1][j] * eiky[kmax+1][j];

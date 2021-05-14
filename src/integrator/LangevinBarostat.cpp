@@ -52,8 +52,8 @@ namespace espressopp {
     LangevinBarostat::LangevinBarostat(std::shared_ptr<System> _system,
                                        std::shared_ptr<esutil::RNG> _rng,
                                        real _temperature) : Extension(_system), 
-                                                            rng(_rng), 
-                                                            desiredTemperature(_temperature){
+                                                            desiredTemperature(_temperature),
+                                                            rng(_rng){
       // external parameters
       gammaP = 0.0;
       mass = 0.0;

@@ -454,7 +454,8 @@ namespace espressopp {
         // TODO assignshift probably should be [3]
         int assignshift = M[0]- floor((real)(P-1)/2.0);
         
-        real  modadd1, modadd2;
+        real modadd1 = 0;
+        real modadd2 = 0;
         // odd and even interpolation order
         switch (P) {
           case 2 : case 4 : case 6 : 

@@ -272,7 +272,7 @@ namespace espressopp {
     prepareGhostCommunication();
     
     // pushing the particles back to the empty cell ("do we have to check particles?")
-    for(int i=0; i<tmp_pl.size(); i++){
+    for(int i=0; i<int_c(tmp_pl.size()); i++){
       for (size_t p = 0; p < tmp_pl[i].size(); ++p) {
         Particle& part = tmp_pl[i][p];
         const Real3D& pos = part.position();

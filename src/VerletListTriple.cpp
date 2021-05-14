@@ -128,12 +128,11 @@ namespace espressopp {
   }
 
   int VerletListTriple::localSize() const{
-    System& system = getSystemRef();
     return vlTriples.size();
   }
 
   python::tuple VerletListTriple::getTriple(int i) {
-    if (i <= 0 || i > vlTriples.size()) {
+    if (i <= 0 || i > int_c(vlTriples.size())) {
       std::cout << "Warning! VerletList pair " << i << " does not exists" << std::endl;
       return python::make_tuple();
     }

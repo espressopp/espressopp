@@ -171,10 +171,10 @@ void FixedQuadrupleListAdress::onParticlesChanged() {
 
   this->clear();
   longint lastpid1 = -1;
-  Particle *p1;
-  Particle *p2;
-  Particle *p3;
-  Particle *p4;
+  Particle *p1 = nullptr;
+  Particle *p2 = nullptr;
+  Particle *p3 = nullptr;
+  Particle *p4 = nullptr;
   for (GlobalQuadruples::const_iterator it = globalQuadruples.begin();
        it != globalQuadruples.end(); ++it) {
     if (it->first != lastpid1) {

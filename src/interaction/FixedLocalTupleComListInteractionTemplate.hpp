@@ -82,7 +82,7 @@ namespace espressopp {
 		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 			std::vector<Particle*> pList = it->second;
 
-			if (pList.size() + 1 != N_Constrain) {
+			if (int_c(pList.size()) + 1 != N_Constrain) {
 			    std::stringstream msg;
 			    msg << "ERROR: Tuple Length is not constant\n";
 			    err.setException(msg.str());
@@ -93,13 +93,13 @@ namespace espressopp {
 		std::vector<int> nList;
 		boost::mpi::all_gather(*system.comm, N_Constrain, nList);
 		int check_N = 0;
-		for (int i = 0; i < nList.size(); i++) {
+		for (int i = 0; i < int_c(nList.size()); i++) {
 		    if (nList[i] != 0) {
 			check_N = nList[i];
 			break;
 		    }
 		}
-		for (int i = 0; i < nList.size(); i++) {
+		for (int i = 0; i < int_c(nList.size()); i++) {
 		    if (nList[i] != 0) {
 			if (nList[i] != check_N) {
 			    std::stringstream msg;
@@ -121,7 +121,7 @@ namespace espressopp {
 		    Particle *p = it->first;
 		    pid_list[pidK] = p->id();
 
-		    for(long unsigned int i = 0; i < pidK; i++) {
+		    for(int i = 0; i < pidK; i++) {
 			if (pid_list[i]/N_Constrain == pid_list[pidK]/N_Constrain) {
 			    std::stringstream msg;
 			    msg << "ERROR: Particle ID is redundant\n";
@@ -221,7 +221,7 @@ namespace espressopp {
 		    real tmp_mass = mass;
 		    std::vector<Particle*> pList = it->second;
 
-		    for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
+		    for (int j = 0; j < N_Constrain - 1; j++) {
 			p = pList[j];
 			Real3D pos_j = p->position();
 			Real3D dist;

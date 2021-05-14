@@ -64,6 +64,7 @@ namespace espressopp {
       typedef STLContainer Super;
     public:
       typedef ESPPIterator<STLContainer> Iterator;
+      virtual ~ESPPContainer() = default;
     };
   }
 }

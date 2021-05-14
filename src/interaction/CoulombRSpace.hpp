@@ -50,14 +50,14 @@ namespace espressopp {
       static void registerPython();
 
       // empty constructor
-      CoulombRSpace(): prefactor(0.0), alpha(0.0) {
+      CoulombRSpace(): alpha(0.0), prefactor(0.0) {
         autoShift = false;
         setCutoff(infinity);
         preset();
       }
       
       // constructor
-      CoulombRSpace(real _prefactor, real _alpha, real _rspacecutoff): prefactor(_prefactor), alpha(_alpha){
+      CoulombRSpace(real _prefactor, real _alpha, real _rspacecutoff): alpha(_alpha), prefactor(_prefactor){
         autoShift = false;
         setCutoff(_rspacecutoff);
         preset();

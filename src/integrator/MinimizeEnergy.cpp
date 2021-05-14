@@ -38,8 +38,8 @@ namespace espressopp {
 				       real max_displacement,
 				       bool variable_step_flag)
 	    
-	    : SystemAccess(system), gamma_(gamma), ftol_sqr_(ftol),
-	      max_displacement_(max_displacement), variable_step_flag_(variable_step_flag) {
+	    : SystemAccess(system), gamma_(gamma),
+	      max_displacement_(max_displacement), ftol_sqr_(ftol), variable_step_flag_(variable_step_flag) {
 	    LOG4ESPP_INFO(theLogger, "construct MinimizeEnergy");
 	    resort_flag_ = true;
 	    dp_MAX = 0.;
@@ -162,7 +162,7 @@ namespace espressopp {
 	    LOG4ESPP_INFO(theLogger, "steepestDescent single step");
 	    System& system = getSystemRef();
 	    
-	    real f_sqr, dp, dp_sqr;
+	    real dp, dp_sqr;
 	    real f_max = sqrt(f_max_sqr_);
 	    real dp_sqr_max = std::numeric_limits<real>::min();
 	    

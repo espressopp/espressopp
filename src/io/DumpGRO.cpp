@@ -83,7 +83,7 @@ namespace espressopp {
           ConfigurationExtIterator cei = conf_real-> getIterator();
           RealND::iterator ii;
           short ind;
-          for(size_t i=0; i<num_of_particles; i++){
+          for(int i=0; i<num_of_particles; i++){
             myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
             myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format, should be resname not atomtype
             stringstream ss;

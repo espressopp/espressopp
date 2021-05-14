@@ -145,10 +145,10 @@ namespace espressopp {
       //we assume, that the type of a particle does not change over time
       std::map<long, short> particleIDToType;
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
-      bool append; //append to existing trajectory file or create a new one
+      real length_factor;
       bool store_pids;
       bool store_velocities;
-      real length_factor;
+      bool append; //append to existing trajectory file or create a new one
       std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
     };
   }

@@ -175,7 +175,6 @@ namespace espressopp {
            if (iproc) {
    
               int nIds, nCoords;   // number of received values
-              int tmp;
 
               boost::mpi::request req;
               boost::mpi::status  stat;

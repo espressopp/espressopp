@@ -49,7 +49,6 @@ namespace espressopp {
 
          python::list compute() {
             python::list _dummy;
-            real res = computeRaw();
             _dummy.append(0.);
             return _dummy;
          }

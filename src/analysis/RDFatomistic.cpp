@@ -113,7 +113,6 @@ namespace espressopp {
 
       if(maxi>num_part) maxi = num_part;
 
-      int perc=0, perc1=0;
       for(int i = mini; i<maxi; i++) {
         Real3D coordP1 = config[i].pos;
         int typeP1 = config[i].type;
@@ -270,7 +269,6 @@ namespace espressopp {
 
       if(maxi>num_part) maxi = num_part;
 
-      int perc=0, perc1=0;
       for(int i = mini; i<maxi; i++) {
         Real3D coordP1 = config[i].pos;
         int typeP1 = config[i].type;
@@ -338,7 +336,6 @@ namespace espressopp {
       if(span > 0.5*Li[0]) {
         subvol = Li[1]*Li[2]*Li[0];
       }
-      real rho = (real)1.0 / (Li[0]*Li[1]*Li[2]);
       for(int i=0; i < rdfN; i++) {
         totHistogram[i] /= ( (real)tot_num_pairs / subvol );
       }

@@ -107,7 +107,8 @@ namespace espressopp {
 
   //////////////////////////////////////////////////
   // Real3D
-  inline Real3D::Real3D() {}
+  inline Real3D::Real3D()
+  { data[0] = data[1] = data[2] = 0; }
 
   inline Real3D::Real3D(real v) 
   { data[0] = data[1] = data[2] = v; }

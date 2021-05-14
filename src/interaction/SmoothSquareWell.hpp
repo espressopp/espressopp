@@ -36,8 +36,8 @@ namespace espressopp {
     */
     class SmoothSquareWell: public PotentialTemplate < SmoothSquareWell > {
     private:
-      real lambda;
       real epsilon;
+      real lambda;
       real halfepsilon;
       real a;
       real sigma;
@@ -45,7 +45,7 @@ namespace espressopp {
       real rb;
     public:
       static void registerPython();
-      SmoothSquareWell(): epsilon(0.0), sigma(0.0), a(0.0), lambda(0.0), halfepsilon(0.0) {
+      SmoothSquareWell(): epsilon(0.0), lambda(0.0), halfepsilon(0.0), a(0.0), sigma(0.0) {
         setShift(0.0);
         setCutoff(infinity);
       }

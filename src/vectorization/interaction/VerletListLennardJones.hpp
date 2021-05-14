@@ -98,7 +98,7 @@ namespace espressopp { namespace vectorization {
 
       // this is used in the innermost force-loop
       Potential &getPotential(int type1, int type2) {
-        if(type1>=potentialArray.size_n() || type2>=potentialArray.size_m()) needRebuildPotential = true;
+        if(type1>=int_c(potentialArray.size_n()) || type2>=int_c(potentialArray.size_m())) needRebuildPotential = true;
         return potentialArray.at(type1, type2);
       }
 

@@ -43,9 +43,9 @@ namespace espressopp {
 
         enum GeometryStates {spherical=0, x_bounded=1, y_bounded=2, z_bounded=3};
 
-        int geometry;
         int parttype;
         real span;
+        int geometry;
         Real3D center;
     };
   }
