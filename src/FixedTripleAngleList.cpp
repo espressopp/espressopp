@@ -243,9 +243,9 @@ namespace espressopp {
     //printf("FixedTripleAngleList: rebuild local triple list from global\n");
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1;
-    Particle *p2;
-    Particle *p3;
+    Particle *p1 = nullptr;
+    Particle *p2 = nullptr;
+    Particle *p3 = nullptr;
     for (TriplesAngles::const_iterator it = triplesAngles.begin(); it!=triplesAngles.end(); ++it) {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid2) {

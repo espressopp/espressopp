@@ -178,7 +178,7 @@ namespace espressopp {
         //CPU0 will use particles 0+start_pid, 1+start_pid, 2+start_pid, ... local_num_particles-1+start_pid.
         //CPU1 will use particles local_num_particles+start_pid, local_num_particles+1+start_pid,...        
         int nodeNum = -1;
-        for(long unsigned int id = 0; id < num_of_part ;id++){
+        for(int id = 0; id < num_of_part ;id++){
             if(id % local_num_part == 0){ ++nodeNum;}
             idToCpu[id+start_pid] = nodeNum;
             //intId++   //...if loop was with iterator
@@ -199,7 +199,7 @@ namespace espressopp {
         //chain 0 consists of particles 0+start_pid, 1+start_pid, 2+start_pid, ... chainlength -1+start_pid
         //chain1 consists of particles chainlength+start_pid, chainlength+1+start_pid,...        
         int cid = -1;
-        for(long unsigned int id = 0; id < num_of_part ;id++){
+        for(int id = 0; id < num_of_part ;id++){
             if(id % chainlength == 0){ ++cid;}
             idToCid[id+start_pid] = cid;           
         }
@@ -220,7 +220,7 @@ namespace espressopp {
         //CPU1 will use particles local_num_particles, local_num_particles+1,...        
         nodeNum = -1;
         //using k instead of cid to avoid conflicts with global cid
-        for(long unsigned int k = 0; k < num_chains ;k++){
+        for(int k = 0; k < num_chains ;k++){
             if(k % local_num_chains == 0){ ++nodeNum;}
             cidToCpu[k] = nodeNum;
             //intId++   //...if loop was with iterator

@@ -44,7 +44,7 @@ namespace espressopp {
     }
 
     ExtForce::ExtForce(std::shared_ptr<System> system, const Real3D& _extForce, std::shared_ptr< ParticleGroup > _particleGroup)
-    : Extension(system), extForce(_extForce), particleGroup(_particleGroup)
+    : Extension(system), particleGroup(_particleGroup), extForce(_extForce)
     {
       LOG4ESPP_INFO(theLogger, "External Force for particle group constructed");
       allParticles = false;

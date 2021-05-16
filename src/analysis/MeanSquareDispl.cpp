@@ -82,7 +82,7 @@ namespace espressopp {
       }
       
       // MSD calculation
-      int perc=0, perc1=0;
+      int perc=0;
       real denom = 100.0 / (real)M;
       for(int m=0; m<M; m++){
         
@@ -320,7 +320,7 @@ namespace espressopp {
                 vector<Real3D> innerList; /**< local chains' COM of one conf/snapshot */
 
         //loop over local particles
-        for(int entry = 0; entry < localIDs.size(); entry++){           
+        for(int entry = 0; entry < int_c(localIDs.size()); entry++){
             longint i = localIDs[entry]; /**< pid */        
             Real3D pos = getConf(m)->getCoordinates(i);
             //testout
@@ -372,7 +372,7 @@ namespace espressopp {
         //local_chainCOMlist[m].size() can be different on each CPU 
         //but should be the same for each snapshot,
         //so local_chainCOMlist[m].size() == local_chainCOMlist[n].size]
-        for(int i = 0; i < local_chainCOMlist[m].size(); i++){      
+        for(int i = 0; i < int_c(local_chainCOMlist[m].size()); i++){
           printf("COM snapshot %i, chain %i : ", m, i); 
           printReal3D(local_chainCOMlist[m][i]); printf("\n");
         }
@@ -387,7 +387,7 @@ namespace espressopp {
         for(int n=0; n<M-m; n++){          
           
           //loop over local chains
-          int local_chains = local_chainCOMlist[0].size(); //looked up only for snapshot 0
+          int local_chains = int_c(local_chainCOMlist[0].size()); //looked up only for snapshot 0
           //int local_chains = local_chainCOMlist[n].size(); //same value as above, but looked up new for every snapshot         
           for(int cid = 0; cid < local_chains; cid++){           
             //cout << "n, m, i, local_cid, part_count   " 

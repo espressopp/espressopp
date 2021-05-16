@@ -202,7 +202,6 @@ namespace espressopp {
       boost::mpi::all_reduce(*mpiWorld, num_part, total_num_part, std::plus<int>());
 
       // normalizing
-      int nconfigs = 1;
       real rho = (real)total_num_part * pow((dr / Li), 3.0);
 
       for(int i=0; i < splitN; i++){

@@ -133,10 +133,10 @@ namespace espressopp {
                             << ", totalN = " << totalN);
 
       int*  ids         = new int [maxN];  // buffer for gather
-      Real3D* coordinates;
-      Real3D* velocities;
-      Real3D* forces;
-      real* radii;
+      Real3D* coordinates = nullptr;
+      Real3D* velocities = nullptr;
+      Real3D* forces = nullptr;
+      real* radii = nullptr;
 
       if (gatherPos)    coordinates = new Real3D [maxN];  // buffer for gather
       if (gatherVel)    velocities  = new Real3D [maxN];  // buffer for gather
@@ -183,7 +183,6 @@ namespace espressopp {
            int nother;
            if (iproc) {
               int nIds, nVals;   // number of received values
-              int tmp;
               boost::mpi::request req;
               boost::mpi::status  stat;
               LOG4ESPP_DEBUG(logger, "receive tags from " << iproc);

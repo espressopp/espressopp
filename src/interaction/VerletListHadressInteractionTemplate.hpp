@@ -675,7 +675,7 @@ namespace espressopp {
               bin2 = floor (p2.position()[0] / Delta_x);
           }
 
-          if (bin1 >= p_xx_local.size() || bin2 >= p_xx_local.size()){
+          if (bin1 >= int_c(p_xx_local.size()) || bin2 >= int_c(p_xx_local.size())){
               std::cout << "p_xx_local.size() " << p_xx_local.size() << "\n";
               std::cout << "bin1 " << bin1 << " bin2 " << bin2 << "\n";
               std::cout << "p1.position()[0] " << p1.position()[0] << " p2.position()[0]" << p2.position()[0] << "\n";

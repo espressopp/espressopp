@@ -67,7 +67,7 @@ namespace espressopp {
 
           ConfigurationExtIterator cei = conf_real-> getIterator();
           std::streamsize p = myfile.precision();
-          for (size_t i=0; i<num_of_particles; i++) {
+          for (int i=0; i<num_of_particles; i++) {
 
                 if (store_pids)  {
                     myfile << cei.currentId() << " ";

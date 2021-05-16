@@ -53,7 +53,6 @@ namespace espressopp {
       pb->shape = (Py_ssize_t *)malloc(pb->ndim*sizeof(Py_ssize_t));
       pb->strides = NULL;
       pb->itemsize = sizeof(T);
-      int old_len = pb->len;
       pb->len = pb->itemsize;
       for (int i=0; i<pb->ndim; i++) {
         pb->shape[i] = shape[i];

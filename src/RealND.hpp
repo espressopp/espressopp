@@ -174,7 +174,7 @@ namespace espressopp {
   }
 
   inline RealND::RealND(const int _dim, const std::vector<real>& v) {
-    if ( v.size() != _dim ) { // BEWARE: compare types of different signs (unsigned and signed, done in ~120 places in E++)
+    if ( int_c(v.size()) != _dim ) {
       std::ostringstream msg;
       msg << "Dimension expected to be set " << _dim <<
         " does not equal dimension of passed vector which is " << v.size() << std::endl;

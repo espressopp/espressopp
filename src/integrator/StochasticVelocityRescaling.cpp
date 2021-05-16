@@ -209,7 +209,7 @@ real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
 				"Error in routine stochasticVR_gammaDeviate2nd"); //TODO: how do I get __FUNCTION__ in here?
 	if (ia < 6) {
 		x = 1.0;
-		for (int j=0; j <= ia; j++)
+		for (int j=0; j <= int_c(ia); j++)
 			x = x * (*rng)();
 		x = -log(x);
 	} else {

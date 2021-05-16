@@ -63,7 +63,7 @@ namespace espressopp {
           FixedTupleListAdress::iterator it2;
           it2 = fixedtupleList->find(&vp);
 
-          if(vp.type() == ptype) {
+          if(int_c(vp.type()) == ptype) {
             pos = vp.position()[0];
             if (pos < 0.0)
             {
@@ -106,8 +106,6 @@ namespace espressopp {
         std::cout << "No tuple list found in RadGyrXProfilePI::computeArray function.";
         exit(1);
       }
-
-      int total_num_part = 0;
 
       real * totHistogram = 0;
       totHistogram = new real[splitN];

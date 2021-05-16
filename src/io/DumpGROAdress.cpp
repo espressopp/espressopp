@@ -85,7 +85,7 @@ namespace espressopp {
           RealND::iterator ii;
           short ind;
           size_t atomnumber;
-          for(size_t i=0; i<num_of_particles; i++){
+          for(int i=0; i<num_of_particles; i++){
           // "%5d%-5s%5s%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f"
             //myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
             myfile << setw(5) << 10000;

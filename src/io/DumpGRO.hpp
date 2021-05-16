@@ -146,8 +146,8 @@ namespace espressopp {
       std::map<long, short> particleIDToType;
       
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
+      real length_factor;  // for example
       bool append; //append to existing trajectory file or create a new one
-      real length_factor;  // for example 
       std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
     };
   }

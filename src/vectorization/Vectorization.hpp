@@ -53,7 +53,6 @@ namespace espressopp {
 
     private:
       ParticleArray particleArray;
-      Mode mode;
       void resetParticles();
       void befCalcForces();
       void updatePositions();
@@ -63,6 +62,7 @@ namespace espressopp {
       void resetCells();
 
       std::shared_ptr<integrator::MDIntegrator> mdintegrator;
+      Mode mode;
 
       // signals that connect to integrator
       boost::signals2::connection sigBefCalcForces;

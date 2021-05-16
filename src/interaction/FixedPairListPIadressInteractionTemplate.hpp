@@ -130,11 +130,11 @@ namespace espressopp {
 
       protected:
         int ntypes;
-        int ntrotter;
-        bool speedup; // if true approximate rings in classical region by single particles
         std::shared_ptr < FixedPairList > fixedpairList;
         std::shared_ptr<FixedTupleListAdress> fixedtupleList;
         std::shared_ptr < Potential > potential;
+        int ntrotter;
+        bool speedup; // if true approximate rings in classical region by single particles
     };
 
     //////////////////////////////////////////////////
@@ -474,7 +474,6 @@ namespace espressopp {
       real w = 0.0;
 
       const bc::BC& bc = *getSystemRef().bc;
-      real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
       for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;

@@ -95,8 +95,6 @@ void LangevinThermostatOnGroup::connect() {
 void LangevinThermostatOnGroup::thermalize() {
   LOG4ESPP_DEBUG(theLogger, "thermalize");
 
-  System &system = getSystemRef();
-
   for (ParticleGroup::iterator it = particle_group->begin(); it != particle_group->end(); it++) {
     frictionThermo(**it);
   }

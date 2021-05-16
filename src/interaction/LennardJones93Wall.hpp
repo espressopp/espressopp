@@ -73,7 +73,7 @@ namespace espressopp {
       real getMaxCutoff() { return 0.; }
 
       void setParams(int type, real _epsilon, real _sigma, real _sigmaCutoff, real _r0) {
-	if (params_list.size()<(type+1)) {
+	if (int_c(params_list.size())<(type+1)) {
 	  params_list.resize(type+1);
 	}
 	params_list.at(type).epsilon = _epsilon;

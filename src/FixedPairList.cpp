@@ -99,8 +99,6 @@ namespace espressopp {
     bool returnVal = true;
     if (pid1 > pid2)
       std::swap(pid1, pid2);
-
-    System& system = storage->getSystemRef();
     
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupRealParticle(pid1);
@@ -270,8 +268,8 @@ namespace espressopp {
     
     this->clear();
     longint lastpid1 = -1;
-    Particle *p1;
-    Particle *p2;
+    Particle *p1 = nullptr;
+    Particle *p2 = nullptr;
     for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
       if (it->first != lastpid1) {
 	    p1 = storage->lookupRealParticle(it->first);

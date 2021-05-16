@@ -39,7 +39,7 @@ namespace espressopp {
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Particle &vp = *cit;
 
-        if(vp.type() == parttype) {
+        if(int_c(vp.type()) == parttype) {
           Real3D dist(0.0, 0.0, 0.0);
           system.bc->getMinimumImageVector(dist, vp.position(), center);
           if(geometry == spherical) {

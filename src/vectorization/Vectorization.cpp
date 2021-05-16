@@ -103,9 +103,11 @@ namespace espressopp {
         real* el = &(f[0].x);
         size_t end = 4*f.size();
 
+        #ifdef __INTEL_COMPILER
         #pragma vector always
         #pragma vector aligned
         #pragma ivdep
+        #endif
         for(size_t i=0; i<end; i++) el[i] = 0.0;
       }
       else

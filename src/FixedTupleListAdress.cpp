@@ -298,7 +298,8 @@ namespace espressopp {
         this->clear();
         //std::cout << " ---- CLEAR TUPLES ----  \n\n";
 
-        Particle* vp, * at;
+        Particle* vp = nullptr;
+        Particle* at = nullptr;
         std::vector<Particle*> tmp;
 
         GlobalTuples::const_iterator it = globalTuples.begin();

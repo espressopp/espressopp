@@ -106,7 +106,7 @@ namespace espressopp {
 
   void System::removeInteraction(int i){
     esutil::Error err(comm);
-    if(i>=shortRangeInteractions.size()){
+    if(i>=int_c(shortRangeInteractions.size())){
       std::stringstream msg;
       msg << "Probably you are trying to remove the interaction "<<i<<
               " which does not exist. Check your script!";

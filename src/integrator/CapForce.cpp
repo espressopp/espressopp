@@ -55,7 +55,7 @@ namespace espressopp {
     }
 
     CapForce::CapForce(std::shared_ptr<System> system, const Real3D& _capForce, std::shared_ptr< ParticleGroup > _particleGroup)
-    : Extension(system), capForce(_capForce), particleGroup(_particleGroup)
+    : Extension(system), particleGroup(_particleGroup), capForce(_capForce)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;
@@ -64,7 +64,7 @@ namespace espressopp {
     }
 
     CapForce::CapForce(std::shared_ptr<System> system, real _absCapForce, std::shared_ptr< ParticleGroup > _particleGroup)
-    : Extension(system), absCapForce(_absCapForce), particleGroup(_particleGroup)
+    : Extension(system), particleGroup(_particleGroup), absCapForce(_absCapForce)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;

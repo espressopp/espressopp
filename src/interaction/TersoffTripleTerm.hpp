@@ -51,14 +51,14 @@ namespace espressopp {
 ///      real sigmaGamma1, sigmaGamma2;
 ///      real sigmarc1, sigmarc2;
 ///      real epsilonLambda;
-      real rc1, rc2;
 
-      real R, D;
       real B, lambda2;
+      real R, D;
       real n, beta;
       real m, lambda3;
       real gamma, c, d, theta0;
       real c2, d2, Pi_2D, cosTheta0;
+      real rc1, rc2;
     public:
       static void registerPython();
 
