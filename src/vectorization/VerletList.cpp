@@ -225,9 +225,11 @@ namespace espressopp { namespace vectorization {
             size_t cell_size     = sizes[cell_id];
             int* __restrict c_j_ctr = c_j_ptr + c_j_max;
 
+            #ifdef __INTEL_COMPILER
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
+            #endif
             for(size_t ll=0; ll<cell_size; ll++)
             {
               c_j_ctr[ll] = cell_start+ll;
@@ -243,9 +245,11 @@ namespace espressopp { namespace vectorization {
             int num_padding  = pad_end - c_j_max;
             int* __restrict c_j_ctr = c_j_ptr + c_j_max;
 
+            #ifdef __INTEL_COMPILER
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
+            #endif
             for(int ll=0; ll<num_padding; ll++)
             {
               c_j_ctr[ll] = padding;
@@ -257,9 +261,11 @@ namespace espressopp { namespace vectorization {
         if(c_j_max>int_c(c_j.size())) throw std::runtime_error("rebuild_p_nc_pack_stencil: Reserve size exceeded.");
 
         /// fill values
+        #ifdef __INTEL_COMPILER
         #pragma vector always
         #pragma vector aligned
         #pragma ivdep
+        #endif
         for(int ii=0; ii<c_j_max; ii++)
         {
           int p = c_j_ptr[ii];
@@ -336,9 +342,11 @@ namespace espressopp { namespace vectorization {
             {
               int ll=0;
 
+              #ifdef __INTEL_COMPILER
               #pragma vector always
               #pragma vector aligned
               #pragma ivdep
+              #endif
               for(size_t np = ncell_start; np<ncell_data_end; np++)
               {
                 {
@@ -377,9 +385,11 @@ namespace espressopp { namespace vectorization {
             int* __restrict npptr =  &(neighborList.nplist[num_pairs]);
             int ll=0;
 
+            #ifdef __INTEL_COMPILER
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
+            #endif
             for(int ii=c_start; ii<c_end; ii++)
             {
               const real dist_x = p_x - c_x_ptr[ii];
@@ -406,9 +416,11 @@ namespace espressopp { namespace vectorization {
             {
               int ll=0;
 
+              #ifdef __INTEL_COMPILER
               #pragma vector always
               #pragma vector aligned
               #pragma ivdep
+              #endif
               for(size_t np = ncell_start; np<ncell_data_end; np++)
               {
                 {

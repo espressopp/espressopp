@@ -241,9 +241,11 @@ namespace espressopp { namespace vectorization {
 
             const int in_max=prange[ip];
 
+            #ifdef __INTEL_COMPILER
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
+            #endif
             for(int in=in_min; in<in_max; in++)
             {
               auto np_ii = nplist[in];

@@ -25,6 +25,7 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 option(ESPP_LOCAL_ARCHITECTURE "Use instruction set of the local architecture." OFF)
 option(ESPP_VEC_REPORT "Enable reporting of loop vectorization." OFF)
 option(ESPP_WERROR "Treat warnings as errors." OFF)
+option(ESPP_WALL "Build with more warnings." ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
     message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
