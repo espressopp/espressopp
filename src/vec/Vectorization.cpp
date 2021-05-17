@@ -101,19 +101,7 @@ void Vectorization::resetCellsStorage(Storage* storage)
 /// set force array/s to zero
 void Vectorization::zeroForces()
 {
-    auto f_zero = [](real* __restrict f, size_t size) {
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
-        for (size_t i = 0; i < size; i++) f[i] = 0.0;
-    };
-    {
-        f_zero(particles.f_x.data(), particles.f_x.size());
-        f_zero(particles.f_y.data(), particles.f_y.size());
-        f_zero(particles.f_z.data(), particles.f_z.size());
-    }
+    particles.zeroForces();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

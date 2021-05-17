@@ -419,6 +419,24 @@ void ParticleArray::addToForceOnly(CellList& srcCells) const
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+void ParticleArray::zeroForces()
+{
+    auto f_zero = [](real* __restrict f, size_t size) {
+#ifdef __INTEL_COMPILER
+#pragma vector always
+#pragma vector aligned
+#pragma ivdep
+#endif
+        for (size_t i = 0; i < size; i++) f[i] = 0.0;
+    };
+    {
+        f_zero(f_x.data(), f_x.size());
+        f_zero(f_y.data(), f_y.size());
+        f_zero(f_z.data(), f_z.size());
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 bool ParticleArray::checkSizes() const
 {
     if (size_ > data_size_) return false;

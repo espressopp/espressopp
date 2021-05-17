@@ -70,6 +70,8 @@ public:
 
     void addToForceOnly(CellList& srcCells) const;
 
+    void zeroForces();
+
     inline size_t size() const { return size_; }
     inline size_t numCells() const { return sizes_.size(); }
     inline std::vector<size_t> const& cellRange() const { return cellRange_; }
