@@ -103,14 +103,18 @@ class VelocityVerlet : public VelocityVerletBase
 public:
     VelocityVerlet(std::shared_ptr<System> system) : VelocityVerletBase(system) {}
 
-    virtual real integrate1();
+    static real integrate1(ParticleArray& particles, real dt);
 
-    virtual void integrate2();
+    static void integrate2(ParticleArray& particles, real dt);
 
     /// Register this class so it can be used from Python
     static void registerPython();
 
 protected:
+    virtual real integrate1();
+
+    virtual void integrate2();
+
     static LOG4ESPP_DECL_LOGGER(theLogger);
 };
 

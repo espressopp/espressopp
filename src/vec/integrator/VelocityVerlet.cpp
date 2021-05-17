@@ -326,85 +326,93 @@ LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
 real VelocityVerlet::integrate1()
 {
-    real maxSqDist = 0.0;
-    {
-        auto& particles = getSystem()->vectorization->particles;
-        const auto& realCells = particles.realCells();
-        const size_t* __restrict cellRange = particles.cellRange().data();
-        const size_t* __restrict sizes = particles.sizes().data();
-        for (const auto& rcell : realCells)
-        {
-            const size_t start = cellRange[rcell];
-            const size_t size = sizes[rcell];
+    auto& particles = getSystem()->vectorization->particles;
+    return integrate1(particles, dt);
+}
 
-            real* __restrict p_x = &(particles.p_x[start]);
-            real* __restrict p_y = &(particles.p_y[start]);
-            real* __restrict p_z = &(particles.p_z[start]);
-            real* __restrict v_x = &(particles.v_x[start]);
-            real* __restrict v_y = &(particles.v_y[start]);
-            real* __restrict v_z = &(particles.v_z[start]);
-            const real* __restrict f_x = &(particles.f_x[start]);
-            const real* __restrict f_y = &(particles.f_y[start]);
-            const real* __restrict f_z = &(particles.f_z[start]);
-            const real* __restrict mass = &(particles.mass[start]);
+real VelocityVerlet::integrate1(ParticleArray& particles, const real dt)
+{
+    real maxSqDist = 0.0;
+
+    const auto& realCells = particles.realCells();
+    const size_t* __restrict cellRange = particles.cellRange().data();
+    const size_t* __restrict sizes = particles.sizes().data();
+    for (const auto& rcell : realCells)
+    {
+        const size_t start = cellRange[rcell];
+        const size_t size = sizes[rcell];
+
+        real* __restrict p_x = &(particles.p_x[start]);
+        real* __restrict p_y = &(particles.p_y[start]);
+        real* __restrict p_z = &(particles.p_z[start]);
+        real* __restrict v_x = &(particles.v_x[start]);
+        real* __restrict v_y = &(particles.v_y[start]);
+        real* __restrict v_z = &(particles.v_z[start]);
+        const real* __restrict f_x = &(particles.f_x[start]);
+        const real* __restrict f_y = &(particles.f_y[start]);
+        const real* __restrict f_z = &(particles.f_z[start]);
+        const real* __restrict mass = &(particles.mass[start]);
 
 #ifdef __INTEL_COMPILER
 #pragma vector always
 #pragma vector aligned
 #pragma ivdep
 #endif
-            for (size_t ip = 0; ip < size; ip++)
-            {
-                const real dtfm = 0.5 * dt / mass[ip];
-                v_x[ip] += dtfm * f_x[ip];
-                v_y[ip] += dtfm * f_y[ip];
-                v_z[ip] += dtfm * f_z[ip];
-                const real dp_x = v_x[ip] * dt;
-                const real dp_y = v_y[ip] * dt;
-                const real dp_z = v_z[ip] * dt;
-                p_x[ip] += dp_x;
-                p_y[ip] += dp_y;
-                p_z[ip] += dp_z;
-                real sqDist = (dp_x * dp_x) + (dp_y * dp_y) + (dp_z * dp_z);
-                maxSqDist = std::max(maxSqDist, sqDist);
-            }
+        for (size_t ip = 0; ip < size; ip++)
+        {
+            const real dtfm = 0.5 * dt / mass[ip];
+            v_x[ip] += dtfm * f_x[ip];
+            v_y[ip] += dtfm * f_y[ip];
+            v_z[ip] += dtfm * f_z[ip];
+            const real dp_x = v_x[ip] * dt;
+            const real dp_y = v_y[ip] * dt;
+            const real dp_z = v_z[ip] * dt;
+            p_x[ip] += dp_x;
+            p_y[ip] += dp_y;
+            p_z[ip] += dp_z;
+            real sqDist = (dp_x * dp_x) + (dp_y * dp_y) + (dp_z * dp_z);
+            maxSqDist = std::max(maxSqDist, sqDist);
         }
     }
+
     return maxSqDist;
 }
 
 void VelocityVerlet::integrate2()
 {
     auto& particles = getSystem()->vectorization->particles;
+    integrate2(particles, dt);
+}
+
+void VelocityVerlet::integrate2(ParticleArray& particles, const real dt)
+{
+    const auto& realCells = particles.realCells();
+    const size_t* __restrict cellRange = particles.cellRange().data();
+
+    for (const auto& rcell : realCells)
     {
-        const auto& realCells = particles.realCells();
-        const size_t* __restrict cellRange = particles.cellRange().data();
+        const size_t start = cellRange[rcell];
+        const size_t size = cellRange[rcell + 1] - start;
 
-        for (const auto& rcell : realCells)
-        {
-            const size_t start = cellRange[rcell];
-            const size_t size = cellRange[rcell + 1] - start;
-
-            real* __restrict v_x = &(particles.v_x[start]);
-            real* __restrict v_y = &(particles.v_y[start]);
-            real* __restrict v_z = &(particles.v_z[start]);
-            const real* __restrict f_x = &(particles.f_x[start]);
-            const real* __restrict f_y = &(particles.f_y[start]);
-            const real* __restrict f_z = &(particles.f_z[start]);
-            const real* __restrict mass = &(particles.mass[start]);
+        real* __restrict v_x = &(particles.v_x[start]);
+        real* __restrict v_y = &(particles.v_y[start]);
+        real* __restrict v_z = &(particles.v_z[start]);
+        const real* __restrict f_x = &(particles.f_x[start]);
+        const real* __restrict f_y = &(particles.f_y[start]);
+        const real* __restrict f_z = &(particles.f_z[start]);
+        const real* __restrict mass = &(particles.mass[start]);
 
 #ifdef __INTEL_COMPILER
 #pragma vector always
 #pragma vector aligned
 #pragma ivdep
 #endif
-            for (size_t ip = 0; ip < size; ip++)
-            {
-                const real dtfm = 0.5 * dt / mass[ip];
-                v_x[ip] += dtfm * f_x[ip];
-                v_y[ip] += dtfm * f_y[ip];
-                v_z[ip] += dtfm * f_z[ip];
-            }
+        for (size_t ip = 0; ip < size; ip++)
+        {
+            const real dtfm = 0.5 * dt / mass[ip];
+            v_x[ip] += dtfm * f_x[ip];
+            v_y[ip] += dtfm * f_y[ip];
+            v_z[ip] += dtfm * f_z[ip];
         }
     }
 }
