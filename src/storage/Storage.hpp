@@ -435,13 +435,14 @@ private:
     // we need to snap shot the particle coordinates
     std::map<size_t, Real3D> savedRealPositions;
     std::map<size_t, Int3D> savedImages;
-    
-public:
 
+public:
     /////////////////////////////////////////////////////////////////////////
     /// Faster adding of particles by storing data in numpy arrays
-    void addParticlesFromArrayImpl(const real* part, const int* idx,
-      const int npart, const int nidx);
+    void addParticlesFromArrayImpl(const real* part,
+                                   const int* idx,
+                                   const int npart,
+                                   const int nidx);
     /////////////////////////////////////////////////////////////////////////
 };
 }  // namespace storage
