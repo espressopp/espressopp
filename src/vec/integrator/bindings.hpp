@@ -21,12 +21,15 @@
 #ifndef VEC_INTEGRATOR_BINDINGS_HPP
 #define VEC_INTEGRATOR_BINDINGS_HPP
 
-namespace espressopp {
-  namespace vec {
-    namespace integrator {
-      void registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+void registerPython();
 }
+}  // namespace vec
+}  // namespace espressopp
 
-#endif//VEC_INTEGRATOR_BINDINGS_HPP
+#endif  // VEC_INTEGRATOR_BINDINGS_HPP

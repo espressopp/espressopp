@@ -32,57 +32,62 @@
 #include <boost/signals2.hpp>
 #include <iostream>
 
-namespace espressopp { namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+struct ExtensionList : public std::vector<std::shared_ptr<vec::integrator::Extension> >
+{
+    typedef espressopp::esutil::ESPPIterator<std::vector<vec::integrator::Extension> > Iterator;
+};
 
-  namespace integrator {
+class MDIntegratorVec : public espressopp::integrator::MDIntegrator
+{
+public:
+    typedef espressopp::integrator::MDIntegrator MDIntegrator;
 
-    struct ExtensionList : public std::vector<std::shared_ptr<vec::integrator::Extension> > {
-      typedef espressopp::esutil::ESPPIterator<std::vector<vec::integrator::Extension> > Iterator;
-    };
+    MDIntegratorVec(std::shared_ptr<System> system);
 
-    class MDIntegratorVec:
-      public espressopp::integrator::MDIntegrator
-    {
-    public:
-      typedef espressopp::integrator::MDIntegrator MDIntegrator;
+    void addExtension(std::shared_ptr<vec::integrator::Extension> extension);
 
-      MDIntegratorVec(std::shared_ptr<System> system);
+    std::shared_ptr<vec::integrator::Extension> getExtension(int k);
 
-      void addExtension(std::shared_ptr<vec::integrator::Extension> extension);
+    int getNumberOfExtensions();
 
-      std::shared_ptr<vec::integrator::Extension> getExtension(int k);
+    // Boost signals for extensions
+    // TODO: These extensions should take futures as arguments as they will be used in
+    // continuation-style programming of integration steps. e.g.
 
-      int getNumberOfExtensions();
+    // signals to extend the integrator
+    boost::signals2::signal<void()> runInit;  // initialization of run()
+    boost::signals2::signal<void()> recalc1;  // inside recalc, before updateForces()
+    // boost::signals2::signal<void ()> aftCalcSlow; // after calculation of slow forces
+    // updateForces(true) in VerlocityVerletRESPA
+    boost::signals2::signal<void()> recalc2;  // inside recalc, after  updateForces()
+    // boost::signals2::signal<void ()> befIntP; // before integrate1()
+    // boost::signals2::signal<void (real&)> inIntP; // inside end of integrate1()
+    // boost::signals2::signal<void ()> aftIntP; // after  integrate1()
+    // boost::signals2::signal<void ()> aftInitF; // after initForces()
+    // boost::signals2::signal<void ()> aftCalcFLocal; // after calcForces in local cells (before
+    // collectGhostForces)
+    boost::signals2::signal<void()> aftCalcF;  // after calcForces()
+    // boost::signals2::signal<void ()> befIntV; // before integrate2()
+    // boost::signals2::signal<void ()> aftIntV; // after  integrate2()
+    // boost::signals2::signal<void ()> aftIntSlow; // after integrateSlow() in VerlocityVerletRESPA
 
-      // Boost signals for extensions
-      // TODO: These extensions should take futures as arguments as they will be used in
-      // continuation-style programming of integration steps. e.g.
+    static void registerPython();
 
-      // signals to extend the integrator
-      boost::signals2::signal<void ()> runInit; // initialization of run()
-      boost::signals2::signal<void ()> recalc1; // inside recalc, before updateForces()
-      // boost::signals2::signal<void ()> aftCalcSlow; // after calculation of slow forces updateForces(true) in VerlocityVerletRESPA
-      boost::signals2::signal<void ()> recalc2; // inside recalc, after  updateForces()
-      // boost::signals2::signal<void ()> befIntP; // before integrate1()
-      // boost::signals2::signal<void (real&)> inIntP; // inside end of integrate1()
-      // boost::signals2::signal<void ()> aftIntP; // after  integrate1()
-      // boost::signals2::signal<void ()> aftInitF; // after initForces()
-      // boost::signals2::signal<void ()> aftCalcFLocal; // after calcForces in local cells (before collectGhostForces)
-      boost::signals2::signal<void ()> aftCalcF; // after calcForces()
-      // boost::signals2::signal<void ()> befIntV; // before integrate2()
-      // boost::signals2::signal<void ()> aftIntV; // after  integrate2()
-      // boost::signals2::signal<void ()> aftIntSlow; // after integrateSlow() in VerlocityVerletRESPA
+protected:
+    ExtensionList exList;
 
-      static void registerPython();
+private:
+    static LOG4ESPP_DECL_LOGGER(logger);
+};
 
-    protected:
-      ExtensionList exList;
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp
 
-    private:
-      static LOG4ESPP_DECL_LOGGER(logger);
-    };
-
-  }
-}}
-
-#endif//VEC_INTEGRATOR_MDINTEGRATORVEC_HPP
+#endif  // VEC_INTEGRATOR_MDINTEGRATORVEC_HPP

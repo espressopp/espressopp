@@ -32,101 +32,100 @@
 
 #include "types.hpp"
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+class DomainDecomposition : public espressopp::storage::DomainDecomposition, public StorageVec
+{
+public:
+    typedef espressopp::storage::DomainDecomposition baseClass;
 
-    class DomainDecomposition:
-      public espressopp::storage::DomainDecomposition,
-      public StorageVec
+    DomainDecomposition(std::shared_ptr<System> system,
+                        const Int3D& nodeGrid,
+                        const Int3D& cellGrid,
+                        int halfCellInt);
+
+    ~DomainDecomposition();
+
+    void connect();
+
+    void disconnect();
+
+    void resetCells();
+
+    void loadCells();
+
+    void unloadCells();
+
+    void updateGhostsVec();
+
+    void collectGhostForcesVec();
+
+    static void registerPython();
+
+protected:
+    boost::signals2::connection sigResetCells;
+
+    boost::signals2::connection sigLoadCells;
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //// members involved in ghost communication
+    struct CommCellIdx
     {
-    public:
-      typedef espressopp::storage::DomainDecomposition baseClass;
-
-      DomainDecomposition(
-        std::shared_ptr< System > system,
-        const Int3D& nodeGrid,
-        const Int3D& cellGrid,
-        int halfCellInt
-        );
-
-      ~DomainDecomposition();
-
-      void connect();
-
-      void disconnect();
-
-      void resetCells();
-
-      void loadCells();
-
-      void unloadCells();
-
-      void updateGhostsVec();
-
-      void collectGhostForcesVec();
-
-      static void registerPython();
-
-    protected:
-
-      boost::signals2::connection sigResetCells;
-
-      boost::signals2::connection sigLoadCells;
-
-      /////////////////////////////////////////////////////////////////////////////////////////////
-      //// members involved in ghost communication
-      struct CommCellIdx {
         std::vector<size_t> reals;
         std::vector<size_t> ghosts;
-        size_t numReals;  /// buffer size of reals
-        size_t numGhosts; /// buffer size of ghosts
-      };
-
-      std::array< CommCellIdx, 6 > commCellIdx;
-
-      AlignedVector< real > buffReal, buffGhost;
-
-      void prepareGhostBuffers();
-
-      template < bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA >
-      void ghostCommunication_impl();
-
-      enum PackedData { PACKED_POSITIONS=0, PACKED_FORCES=1 };
-      enum DataMode { DATA_INSERT=0, DATA_ADD=1 };
-      enum AddShift { NO_SHIFT=0, ADD_SHIFT=1 };
-      static const espressopp::Real3D SHIFT_ZERO;
-
-      template< AddShift DO_SHIFT >
-      void copyRealsToGhostsIntra(size_t dir, Real3D const& shift);
-
-      void addGhostForcesToRealsIntra(size_t dir);
-
-      template<
-        PackedData PACKED_DATA,
-        AddShift DO_SHIFT >
-      void packCells(
-        AlignedVector<real> & sendBuf,
-        bool commReal,
-        size_t dir,
-        Real3D const& shift
-        );
-
-      template<
-        PackedData PACKED_DATA,
-        DataMode DATA_MODE >
-      void unpackCells(
-        AlignedVector<real> const& recvBuf,
-        bool commReal,
-        size_t dir
-        );
-
-      /////////////////////////////////////////////////////////////////////////////////////////////
-
-    private:
-      static LOG4ESPP_DECL_LOGGER(logger);
+        size_t numReals;   /// buffer size of reals
+        size_t numGhosts;  /// buffer size of ghosts
     };
 
-  }
-}}
+    std::array<CommCellIdx, 6> commCellIdx;
 
-#endif//VEC_STORAGE_DOMAINDECOMPOSITION_HPP
+    AlignedVector<real> buffReal, buffGhost;
+
+    void prepareGhostBuffers();
+
+    template <bool SIZES_FIRST, bool REAL_TO_GHOSTS, int EXTRA_DATA>
+    void ghostCommunication_impl();
+
+    enum PackedData
+    {
+        PACKED_POSITIONS = 0,
+        PACKED_FORCES = 1
+    };
+    enum DataMode
+    {
+        DATA_INSERT = 0,
+        DATA_ADD = 1
+    };
+    enum AddShift
+    {
+        NO_SHIFT = 0,
+        ADD_SHIFT = 1
+    };
+    static const espressopp::Real3D SHIFT_ZERO;
+
+    template <AddShift DO_SHIFT>
+    void copyRealsToGhostsIntra(size_t dir, Real3D const& shift);
+
+    void addGhostForcesToRealsIntra(size_t dir);
+
+    template <PackedData PACKED_DATA, AddShift DO_SHIFT>
+    void packCells(AlignedVector<real>& sendBuf, bool commReal, size_t dir, Real3D const& shift);
+
+    template <PackedData PACKED_DATA, DataMode DATA_MODE>
+    void unpackCells(AlignedVector<real> const& recvBuf, bool commReal, size_t dir);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+private:
+    static LOG4ESPP_DECL_LOGGER(logger);
+};
+
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp
+
+#endif  // VEC_STORAGE_DOMAINDECOMPOSITION_HPP

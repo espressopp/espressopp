@@ -36,78 +36,80 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+/** Langevin thermostat */
+class LangevinThermostat : public Extension
+{
+public:
+    LangevinThermostat(std::shared_ptr<System> system);
+    virtual ~LangevinThermostat();
 
-namespace espressopp { namespace vec {
-  namespace integrator {
+    void setGamma(real gamma);
+    real getGamma();
 
-    /** Langevin thermostat */
-    class LangevinThermostat
-      : public Extension
-    {
-    public:
-      LangevinThermostat(std::shared_ptr<System> system);
-      virtual ~LangevinThermostat();
+    void setTemperature(real temperature);
+    real getTemperature();
 
-      void setGamma(real gamma);
-      real getGamma();
+    void setAdress(bool _adress);
+    bool getAdress();
 
-      void setTemperature(real temperature);
-      real getTemperature();
+    void initialize();
 
-      void setAdress(bool _adress);
-      bool getAdress();
+    /** update of forces to thermalize the system */
+    void thermalize();
+    void thermalizeAdr();  // same as above, for AdResS
 
-      void initialize();
+    /** Add pid to exclusionlist */
+    void addExclpid(int pid) { exclusions.insert(pid); }
 
-      /** update of forces to thermalize the system */
-      void thermalize();
-      void thermalizeAdr(); // same as above, for AdResS
+    /** very nasty: if we recalculate force when leaving/reentering the integrator,
+        a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
+        numbers are drawn twice, resulting in a different variance of the random force.
+        This is corrected by additional heat when restarting the integrator here.
+        Currently only works for the Langevin thermostat, although probably also others
+        are affected.
+    */
+    void heatUp();
 
-      /** Add pid to exclusionlist */
-      void addExclpid(int pid) { exclusions.insert(pid); }
+    /** Opposite to heatUp */
+    void coolDown();
 
-      /** very nasty: if we recalculate force when leaving/reentering the integrator,
-          a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
-          numbers are drawn twice, resulting in a different variance of the random force.
-          This is corrected by additional heat when restarting the integrator here.
-          Currently only works for the Langevin thermostat, although probably also others
-          are affected.
-      */
-      void heatUp();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-      /** Opposite to heatUp */
-      void coolDown();
+private:
+    boost::signals2::connection _initialize, _heatUp, _coolDown, _thermalize, _thermalizeAdr;
 
-      /** Register this class so it can be used from Python. */
-      static void registerPython();
+    void frictionThermo(class Particle&);
 
-    private:
-      boost::signals2::connection _initialize, _heatUp, _coolDown,
-                                      _thermalize, _thermalizeAdr;
+    // this connects thermalizeAdr
+    void enableAdress();
+    bool adress;
 
-      void frictionThermo(class Particle&);
+    /** pid eclusion list */
+    std::set<longint> exclusions;
 
-      // this connects thermalizeAdr
-      void enableAdress();
-      bool adress;
+    void connect();
+    void disconnect();
 
-      /** pid eclusion list */
-      std::set<longint> exclusions;
+    real gamma;        //!< friction coefficient
+    real temperature;  //!< desired user temperature
 
-      void connect();
-      void disconnect();
+    real pref1;  //!< prefactor, reduces complexity of thermalize
+    real pref2;  //!< prefactor, reduces complexity of thermalize
 
-      real gamma;        //!< friction coefficient
-      real temperature;  //!< desired user temperature
+    real pref2buffer;  //!< temporary to save value between heatUp/coolDown
 
-      real pref1;  //!< prefactor, reduces complexity of thermalize
-      real pref2;  //!< prefactor, reduces complexity of thermalize
+    std::shared_ptr<espressopp::esutil::RNG>
+        rng;  //!< random number generator used for friction term
+};
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp
 
-      real pref2buffer; //!< temporary to save value between heatUp/coolDown
-
-      std::shared_ptr< espressopp::esutil::RNG > rng;  //!< random number generator used for friction term
-    };
-  }
-}}
-
-#endif//VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
+#endif  // VEC_INTEGRATOR_LANGEVINTHERMOSTAT_HPP

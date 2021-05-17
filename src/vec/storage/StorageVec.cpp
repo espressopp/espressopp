@@ -21,29 +21,31 @@
 #include "vec/storage/StorageVec.hpp"
 #include "python.hpp"
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+LOG4ESPP_LOGGER(StorageVec::logger, "StorageVec");
 
-    LOG4ESPP_LOGGER(StorageVec::logger, "StorageVec");
-
-    StorageVec::StorageVec(std::shared_ptr<System> system)
-      : SystemAccess(system)
+StorageVec::StorageVec(std::shared_ptr<System> system) : SystemAccess(system)
+{
+    if (!getSystem()->vectorization)
     {
-      if(!getSystem()->vectorization) {
         throw std::runtime_error("system has no vectorization");
-      }
-      vectorization = getSystem()->vectorization;
     }
+    vectorization = getSystem()->vectorization;
+}
 
-    void StorageVec::registerPython()
-    {
-      using namespace espressopp::python;
-      class_< StorageVec, boost::noncopyable >("vec_storage_StorageVec", no_init)
-      .def("loadCells", &StorageVec::loadCells)
-      .def("unloadCells", &StorageVec::unloadCells)
-      ;
-    }
+void StorageVec::registerPython()
+{
+    using namespace espressopp::python;
+    class_<StorageVec, boost::noncopyable>("vec_storage_StorageVec", no_init)
+        .def("loadCells", &StorageVec::loadCells)
+        .def("unloadCells", &StorageVec::unloadCells);
+}
 
-  }
-}}
-
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp

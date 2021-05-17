@@ -21,12 +21,15 @@
 #ifndef VEC_STORAGE_BINDINGS_HPP
 #define VEC_STORAGE_BINDINGS_HPP
 
-namespace espressopp {
-  namespace vec {
-    namespace storage {
-      void registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+void registerPython();
 }
+}  // namespace vec
+}  // namespace espressopp
 
-#endif//VEC_STORAGE_BINDINGS_HPP
+#endif  // VEC_STORAGE_BINDINGS_HPP

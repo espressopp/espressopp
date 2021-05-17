@@ -21,24 +21,27 @@
 #ifndef VEC_INCLUDE_TYPES_HPP
 #define VEC_INCLUDE_TYPES_HPP
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+class ParticleArray;
+class Vectorization;
+class VerletList;
 
-    class ParticleArray;
-    class Vectorization;
-    class VerletList;
+namespace integrator
+{
+class Extension;
+class MDIntegratorVec;
+}  // namespace integrator
 
-    namespace integrator {
-      class Extension;
-      class MDIntegratorVec;
-    }
+namespace storage
+{
+class StorageVec;
+class LocalParticles;
+}  // namespace storage
 
-    namespace storage {
-      class StorageVec;
-      class LocalParticles;
-    }
+}  // namespace vec
+}  // namespace espressopp
 
-  }
-}
-
-#endif//VEC_INCLUDE_TYPES_HPP
+#endif  // VEC_INCLUDE_TYPES_HPP

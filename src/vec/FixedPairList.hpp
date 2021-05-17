@@ -38,64 +38,62 @@
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+typedef std::pair<size_t, size_t> ParticlePair;
+typedef AlignedVector<ParticlePair> PairList;
 
-    typedef std::pair<size_t,size_t> ParticlePair;
-    typedef AlignedVector<ParticlePair> PairList;
+class FixedPairList : public PairList
+{
+public:
+    typedef boost::unordered_multimap<size_t, size_t> GlobalPairs;
+    std::shared_ptr<Vectorization> vectorization;
 
-    class FixedPairList
-      : public PairList
-    {
-    public:
-      typedef boost::unordered_multimap<size_t, size_t> GlobalPairs;
-      std::shared_ptr<Vectorization> vectorization;
+protected:
+    boost::signals2::connection sigBeforeSend;
+    boost::signals2::connection sigOnParticlesChanged;
+    boost::signals2::connection sigAfterRecv;
+    GlobalPairs globalPairs;
+    real longtimeMaxBondSqr;
 
-    protected:
-      boost::signals2::connection sigBeforeSend;
-      boost::signals2::connection sigOnParticlesChanged;
-      boost::signals2::connection sigAfterRecv;
-      GlobalPairs globalPairs;
-      real longtimeMaxBondSqr;
+public:
+    FixedPairList(std::shared_ptr<espressopp::storage::Storage> storage);
+    ~FixedPairList();
 
-    public:
-      FixedPairList(std::shared_ptr< espressopp::storage::Storage > storage);
-      ~FixedPairList();
+    real getLongtimeMaxBondSqr();
+    void setLongtimeMaxBondSqr(real d);
+    void resetLongtimeMaxBondSqr();
 
-      real getLongtimeMaxBondSqr();
-      void setLongtimeMaxBondSqr(real d);
-      void resetLongtimeMaxBondSqr();
+    /** Add the given particle pair to the list on this processor if the
+        particle with the lower id belongs to this processor.  Note that
+        this routine does not check whether the pair is inserted on
+        another processor as well.
+        \return whether the particle was inserted on this processor.
+    */
+    bool add(size_t pid1, size_t pid2);
+    void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
+    void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
+    void onParticlesChanged();
+    void remove();
+    std::vector<size_t> getPairList();
+    python::list getBonds();
+    python::list getAllBonds();
+    GlobalPairs* getGlobalPairs() { return &globalPairs; };
 
-      /** Add the given particle pair to the list on this processor if the
-          particle with the lower id belongs to this processor.  Note that
-          this routine does not check whether the pair is inserted on
-          another processor as well.
-          \return whether the particle was inserted on this processor.
-      */
-      bool add(size_t pid1, size_t pid2);
-      void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
-      void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
-      void onParticlesChanged();
-      void remove();
-      std::vector<size_t> getPairList();
-      python::list getBonds();
-      python::list getAllBonds();
-      GlobalPairs* getGlobalPairs() {return &globalPairs;};
+    /** Get the number of bonds in the GlobalPairs list */
+    int size() { return globalPairs.size(); }
 
-      /** Get the number of bonds in the GlobalPairs list */
-      int size() {
-          return globalPairs.size();
-      }
+    int totalSize();
 
-      int totalSize();
+    static void registerPython();
 
-      static void registerPython();
+private:
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
 
-    private:
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
+}  // namespace vec
+}  // namespace espressopp
 
-  }
-}
-
-#endif//VEC_FIXEDPAIRLIST_HPP
+#endif  // VEC_FIXEDPAIRLIST_HPP

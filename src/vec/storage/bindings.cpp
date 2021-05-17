@@ -24,13 +24,17 @@
 #include "python.hpp"
 #include "bindings.hpp"
 
-namespace espressopp {
-  namespace vec {
-    namespace storage {
-      void registerPython() {
-        StorageVec::registerPython();
-        DomainDecomposition::registerPython();
-      }
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+void registerPython()
+{
+    StorageVec::registerPython();
+    DomainDecomposition::registerPython();
 }
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp

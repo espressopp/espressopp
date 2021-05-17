@@ -27,39 +27,40 @@
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListLennardJones.hpp"
 
-namespace espressopp { namespace vec {
-  namespace interaction {
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
 
-    LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void LennardJones::registerPython()
+{
+    using namespace espressopp::python;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    LennardJones::registerPython() {
-      using namespace espressopp::python;
-
-      class_< LennardJones, bases< Potential > >
-        ("vec_interaction_LennardJones", init< real, real, real >())
-        .def(init< real, real, real, real >())
+    class_<LennardJones, bases<Potential> >("vec_interaction_LennardJones",
+                                            init<real, real, real>())
+        .def(init<real, real, real, real>())
         .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
         .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
         .def_pickle(LennardJones_pickle());
 
-      class_< VerletListLennardJonesBase, bases< Interaction > >
-        ("vec_interaction_VerletListLennardJonesBase", init< std::shared_ptr<VerletList> >())
+    class_<VerletListLennardJonesBase, bases<Interaction> >(
+        "vec_interaction_VerletListLennardJonesBase", init<std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJonesBase::getVerletList)
         .def("setPotential", &VerletListLennardJonesBase::setPotential)
-        .def("getPotential", &VerletListLennardJonesBase::getPotentialPtr)
-      ;
+        .def("getPotential", &VerletListLennardJonesBase::getPotentialPtr);
 
-      class_< VerletListLennardJones, bases< Interaction > >
-        ("vec_interaction_VerletListLennardJones", init< std::shared_ptr<VerletList> >())
+    class_<VerletListLennardJones, bases<Interaction> >("vec_interaction_VerletListLennardJones",
+                                                        init<std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
-        .def("getPotential", &VerletListLennardJones::getPotentialPtr)
-      ;
-
-    }
-  }
-}}
+        .def("getPotential", &VerletListLennardJones::getPotentialPtr);
+}
+}  // namespace interaction
+}  // namespace vec
+}  // namespace espressopp

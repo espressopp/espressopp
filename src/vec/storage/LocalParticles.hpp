@@ -26,37 +26,37 @@
 
 #include <unordered_map>
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+typedef std::unordered_map<size_t, size_t> LocalParticlesBase;
 
-    typedef std::unordered_map<size_t, size_t> LocalParticlesBase;
+///////////////////////////////////////////////////////////////////////////
+/// Provides a lookup from particle id to (cellIdx, particleIdx)
+/// where particleIdx is the relative position in the cell list.
+/// This version resets everytime new particles are loaded so it will only
+/// store the index in ParticleArray.
+struct LocalParticles : public LocalParticlesBase
+{
+public:
+    typedef LocalParticlesBase base;
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Provides a lookup from particle id to (cellIdx, particleIdx)
-    /// where particleIdx is the relative position in the cell list.
-    /// This version resets everytime new particles are loaded so it will only
-    /// store the index in ParticleArray.
-    struct LocalParticles :
-      public LocalParticlesBase
-    {
-    public:
-      typedef LocalParticlesBase base;
+    /// Default constructor
+    LocalParticles() {}
 
-      /// Default constructor
-      LocalParticles(){}
+    /// Read-only access
+    inline size_t operator()(size_t const& id) const { return this->at(id); }
 
-      /// Read-only access
-      inline size_t operator() (size_t const& id) const
-      {
-        return this->at(id);
-      }
+    /// Rebuild using all particles in uniqueCells, which should prevent any particles to be
+    /// inserted multiple times
+    void rebuild(ParticleArray const& pa, std::vector<size_t> const& uniqueCells);
+};
 
-      /// Rebuild using all particles in uniqueCells, which should prevent any particles to be
-      /// inserted multiple times
-      void rebuild(ParticleArray const& pa, std::vector<size_t> const& uniqueCells);
-    };
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp
 
-  }
-}}
-
-#endif//VEC_STORAGE_LOCALPARTICLES_HPP
+#endif  // VEC_STORAGE_LOCALPARTICLES_HPP

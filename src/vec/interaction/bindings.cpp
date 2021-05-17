@@ -26,15 +26,19 @@
 #include "FENE.hpp"
 #include "Cosine.hpp"
 
-namespace espressopp {
-  namespace vec {
-    namespace interaction {
-      void registerPython() {
-        LennardJones::registerPython();
-        LennardJonesCapped::registerPython();
-        FENE::registerPython();
-        Cosine::registerPython();
-      }
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+void registerPython()
+{
+    LennardJones::registerPython();
+    LennardJonesCapped::registerPython();
+    FENE::registerPython();
+    Cosine::registerPython();
 }
+}  // namespace interaction
+}  // namespace vec
+}  // namespace espressopp

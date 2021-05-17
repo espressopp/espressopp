@@ -30,100 +30,101 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include <cmath>
 
-namespace espressopp { namespace vec {
-  namespace interaction {
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+using espressopp::interaction::PotentialTemplate;
 
-    using espressopp::interaction::PotentialTemplate;
+class FENE : public PotentialTemplate<FENE>
+{
+private:
+    real K;
+    real r0;
+    real rMax;
+    real rMaxSqr;
 
-    class FENE
-      : public PotentialTemplate< FENE >
+public:
+    static void registerPython();
+
+    FENE() : K(0.0), r0(0.0), rMax(0.0)
     {
-    private:
-      real K;
-      real r0;
-      real rMax;
-      real rMaxSqr;
-
-    public:
-      static void registerPython();
-
-      FENE() : K(0.0), r0(0.0), rMax(0.0)
-      {
         setShift(0.0);
         setCutoff(infinity);
         preset();
-      }
+    }
 
-      FENE(real _K, real _r0, real _rMax, real _cutoff, real _shift)
-        : K(_K), r0(_r0), rMax(_rMax)
-      {
+    FENE(real _K, real _r0, real _rMax, real _cutoff, real _shift) : K(_K), r0(_r0), rMax(_rMax)
+    {
         setShift(_shift);
         setCutoff(_cutoff);
         preset();
-      }
+    }
 
-      FENE(real _K, real _r0, real _rMax, real _cutoff)
-        : K(_K), r0(_r0), rMax(_rMax)
-      {
+    FENE(real _K, real _r0, real _rMax, real _cutoff) : K(_K), r0(_r0), rMax(_rMax)
+    {
         autoShift = false;
         setCutoff(_cutoff);
         setAutoShift();
         preset();
-      }
+    }
 
-      void preset()
-      {
-        rMaxSqr = rMax*rMax;
-      }
+    void preset() { rMaxSqr = rMax * rMax; }
 
-      // Setter and getter
-      void setK(real _K)
-      {
+    // Setter and getter
+    void setK(real _K)
+    {
         K = _K;
         updateAutoShift();
-      }
+    }
 
-      real getK() const { return K; }
+    real getK() const { return K; }
 
-      void setR0(real _r0)
-      {
+    void setR0(real _r0)
+    {
         r0 = _r0;
         updateAutoShift();
-      }
+    }
 
-      real getR0() const { return r0; }
+    real getR0() const { return r0; }
 
-      void setRMax(real _rMax)
-      {
+    void setRMax(real _rMax)
+    {
         rMax = _rMax;
         updateAutoShift();
         preset();
-      }
+    }
 
-      real getRMax() const { return rMax; }
+    real getRMax() const { return rMax; }
 
-      real _computeEnergySqrRaw(real distSqr) const
-      {
+    real _computeEnergySqrRaw(real distSqr) const
+    {
         real energy = -0.5 * rMaxSqr * K * log(1 - pow((sqrt(distSqr) - r0) / rMax, 2));
         return energy;
-      }
+    }
 
-      bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const
-      {
+    bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const
+    {
         real ffactor;
-        if(r0 > ROUND_ERROR_PREC) {
-          real r = sqrt(distSqr);
-          ffactor = -K * (r - r0) / (r * (1 - ((r - r0)*(r - r0) / rMaxSqr)));
-        } else {
-          ffactor = -K / (1.0 - distSqr / rMaxSqr);
+        if (r0 > ROUND_ERROR_PREC)
+        {
+            real r = sqrt(distSqr);
+            ffactor = -K * (r - r0) / (r * (1 - ((r - r0) * (r - r0) / rMaxSqr)));
+        }
+        else
+        {
+            ffactor = -K / (1.0 - distSqr / rMaxSqr);
         }
         force = dist * ffactor;
         return true;
-      }
+    }
 
-      static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}}
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace interaction
+}  // namespace vec
+}  // namespace espressopp
 
-#endif//VEC_INTERACTION_FENE_HPP
+#endif  // VEC_INTERACTION_FENE_HPP

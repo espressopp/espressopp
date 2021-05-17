@@ -28,9 +28,12 @@
 
 #include "interaction/Potential.hpp"
 
-namespace espressopp { namespace vec {
-  namespace interaction {
-
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
 /** This class provides methods to compute forces and energies of
     the Lennard Jones potential.
 
@@ -148,4 +151,4 @@ struct LennardJones_pickle : boost::python::pickle_suite
 }  // namespace vec
 }  // namespace espressopp
 
-#endif//VEC_INTERACTION_LENNARDJONES_HPP
+#endif  // VEC_INTERACTION_LENNARDJONES_HPP

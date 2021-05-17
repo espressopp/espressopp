@@ -27,18 +27,18 @@
 #include "include/esconfig.hpp"
 
 #if defined(__AVX512F__)
- #if __AVX512F__
-  #define ESPP_VECTOR_MASK
- #endif
+#if __AVX512F__
+#define ESPP_VECTOR_MASK
+#endif
 #endif
 
 // NOTE: Padding to 64-byte boundaries
 constexpr size_t ESPP_VECTOR_ALIGNMENT = 64;
-constexpr size_t ESPP_VECTOR_WIDTH     = ESPP_VECTOR_ALIGNMENT / sizeof(espressopp::real);
+constexpr size_t ESPP_VECTOR_WIDTH = ESPP_VECTOR_ALIGNMENT / sizeof(espressopp::real);
 
 constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
 {
-  return ((((SIZE)+ESPP_VECTOR_WIDTH-1)/ESPP_VECTOR_WIDTH)*ESPP_VECTOR_WIDTH);
+    return ((((SIZE) + ESPP_VECTOR_WIDTH - 1) / ESPP_VECTOR_WIDTH) * ESPP_VECTOR_WIDTH);
 }
 
 namespace espressopp
@@ -56,4 +56,4 @@ static const real large_pos = 7.74099e150;
 }  // namespace vec
 }  // namespace espressopp
 
-#endif//VEC_INCLUDE_SIMDCONFIG_HPP
+#endif  // VEC_INCLUDE_SIMDCONFIG_HPP

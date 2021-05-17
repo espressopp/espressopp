@@ -28,29 +28,32 @@
 #include "Cosine.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espressopp { namespace vec {
-  namespace interaction {
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void Cosine::registerPython()
+{
+    using namespace espressopp::python;
+    using espressopp::interaction::Interaction;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    Cosine::registerPython() {
-      using namespace espressopp::python;
-      using espressopp::interaction::Interaction;
+    class_<Cosine, bases<AngularPotential>>("vec_interaction_Cosine", init<real, real>())
+        .add_property("K", &Cosine::getK, &Cosine::setK)
+        .add_property("theta0", &Cosine::getTheta0, &Cosine::setTheta0);
 
-      class_< Cosine, bases< AngularPotential > >
-      ("vec_interaction_Cosine", init< real, real >())
-      .add_property("K", &Cosine::getK, &Cosine::setK)
-      .add_property("theta0", &Cosine::getTheta0, &Cosine::setTheta0)
-      ;
-
-      typedef class FixedTripleListInteractionTemplate<Cosine> FixedTripleListCosine;
-      class_<FixedTripleListCosine, bases<Interaction>>("vec_interaction_FixedTripleListCosine",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<Cosine> >())
-      .def("setPotential", &FixedTripleListCosine::setPotential)
-      .def("getFixedTripleList", &FixedTripleListCosine::getFixedTripleList);
-      ;
-    }
-  }
-}}
+    typedef class FixedTripleListInteractionTemplate<Cosine> FixedTripleListCosine;
+    class_<FixedTripleListCosine, bases<Interaction>>(
+        "vec_interaction_FixedTripleListCosine",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<Cosine>>())
+        .def("setPotential", &FixedTripleListCosine::setPotential)
+        .def("getFixedTripleList", &FixedTripleListCosine::getFixedTripleList);
+    ;
+}
+}  // namespace interaction
+}  // namespace vec
+}  // namespace espressopp

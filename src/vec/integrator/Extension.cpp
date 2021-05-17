@@ -28,49 +28,50 @@
 #include "System.hpp"
 #include "SystemAccess.hpp"
 
-namespace espressopp { namespace vec {
-  namespace integrator {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
-    LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
-
-    Extension::Extension(std::shared_ptr<System> system)
-      : SystemAccess(system)
+Extension::Extension(std::shared_ptr<System> system) : SystemAccess(system)
+{
+    if (!getSystem()->vectorization)
     {
-      if(!getSystem()->vectorization) {
         throw std::runtime_error("system has no vectorization");
-      }
-
-      if (!getSystem()->storage) {
-          throw std::runtime_error("system has no storage");
-      }
-
-      LOG4ESPP_INFO(theLogger, "construct Extension");
     }
 
-    Extension::~Extension()
+    if (!getSystem()->storage)
     {
-      LOG4ESPP_INFO(theLogger, "~Extension");
+        throw std::runtime_error("system has no storage");
     }
 
-    void Extension::setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator)
-    {
-      integrator = _integrator;
-    }
+    LOG4ESPP_INFO(theLogger, "construct Extension");
+}
 
-    /****************************************************
-    ** REGISTRATION WITH PYTHON
-    ****************************************************/
+Extension::~Extension() { LOG4ESPP_INFO(theLogger, "~Extension"); }
 
-    void Extension::registerPython() {
-      using namespace espressopp::python;
+void Extension::setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator)
+{
+    integrator = _integrator;
+}
 
-      class_< Extension, boost::noncopyable >
-        ("vec_integrator_Extension", no_init)
-        .add_property("type",&Extension::getType, &Extension::setType)
+/****************************************************
+** REGISTRATION WITH PYTHON
+****************************************************/
+
+void Extension::registerPython()
+{
+    using namespace espressopp::python;
+
+    class_<Extension, boost::noncopyable>("vec_integrator_Extension", no_init)
+        .add_property("type", &Extension::getType, &Extension::setType)
         .def("setIntegrator", &Extension::setIntegrator)
         .def("connect", &Extension::connect)
-        .def("disconnect", &Extension::disconnect)
-        ;
-    }
-  }
-}}
+        .def("disconnect", &Extension::disconnect);
+}
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp

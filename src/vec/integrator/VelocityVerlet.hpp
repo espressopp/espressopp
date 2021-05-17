@@ -29,98 +29,93 @@
 #include "esutil/Timer.hpp"
 #include <boost/signals2.hpp>
 
-namespace espressopp { namespace vec {
-  namespace integrator {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+/// Velocity Verlet Integrator (Base implementation using ParticleArrayIterator)
+class VelocityVerletBase : public MDIntegratorVec
+{
+public:
+    typedef espressopp::integrator::MDIntegrator MDIntegrator;
+    typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
 
-    /// Velocity Verlet Integrator (Base implementation using ParticleArrayIterator)
-    class VelocityVerletBase
-      : public MDIntegratorVec
-    {
-    public:
-      typedef espressopp::integrator::MDIntegrator MDIntegrator;
-      typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
+    VelocityVerletBase(std::shared_ptr<System> system);
 
-      VelocityVerletBase(
-        std::shared_ptr<System> system
-        );
+    virtual void run(int nsteps);
 
-      virtual void run(int nsteps);
+    real getTimeStep() { return MDIntegratorVec::getTimeStep(); }
 
-      real getTimeStep() { return MDIntegratorVec::getTimeStep(); }
+    /// Load timings in array to export to Python as a tuple
+    void loadTimers(real t[10]);
 
-      /// Load timings in array to export to Python as a tuple
-      void loadTimers(real t[10]);
+    /// Reset timers to zero
+    void resetTimers();
 
-      /// Reset timers to zero
-      void resetTimers();
+    /// Returns the number of resorts done during a single call to integrator.run().
+    /// Its value is reset to zero at the beginning of each run
+    int getNumResorts() const;
 
-      /// Returns the number of resorts done during a single call to integrator.run().
-      /// Its value is reset to zero at the beginning of each run
-      int getNumResorts() const;
+    /// Register this class so it can be used from Python
+    static void registerPython();
 
-      /// Register this class so it can be used from Python
-      static void registerPython();
+protected:
+    bool resortFlag;  //!< true implies need for resort of particles
+    int nResorts;
+    real maxDist;
+    real maxCut;
 
-    protected:
+    virtual real integrate1();
 
-      bool resortFlag;  //!< true implies need for resort of particles
-      int nResorts;
-      real maxDist;
-      real maxCut;
+    virtual void integrate2();
 
-      virtual real integrate1();
+    void calcForces();
 
-      virtual void integrate2();
+    void updateForces();
 
-      void calcForces();
+    // void updateForcesBlock();
 
-      void updateForces();
+    void initForcesPlist();
 
-      // void updateForcesBlock();
+    void initForcesParray();
 
-      void initForcesPlist();
+    espressopp::esutil::WallTimer timeIntegrate;  //!< used for timing
 
-      void initForcesParray();
+    // variables that keep time information about different phases
+    real timeRun;
+    real timeLost;
+    real timeForce;
+    real timeForceComp[100];
+    real timeComm1;
+    real timeComm2;
+    real timeInt1;
+    real timeInt2;
+    real timeResort;
 
-      espressopp::esutil::WallTimer timeIntegrate;  //!< used for timing
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
 
-      // variables that keep time information about different phases
-      real timeRun;
-      real timeLost;
-      real timeForce;
-      real timeForceComp[100];
-      real timeComm1;
-      real timeComm2;
-      real timeInt1;
-      real timeInt2;
-      real timeResort;
+/// Velocity Verlet Integrator (Optimized implementation)
+class VelocityVerlet : public VelocityVerletBase
+{
+public:
+    VelocityVerlet(std::shared_ptr<System> system) : VelocityVerletBase(system) {}
 
-      static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
+    virtual real integrate1();
 
-    /// Velocity Verlet Integrator (Optimized implementation)
-    class VelocityVerlet
-      : public VelocityVerletBase
-    {
-    public:
+    virtual void integrate2();
 
-      VelocityVerlet(
-        std::shared_ptr<System> system
-        ) : VelocityVerletBase(system)
-      {}
+    /// Register this class so it can be used from Python
+    static void registerPython();
 
-      virtual real integrate1();
+protected:
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
 
-      virtual void integrate2();
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp
 
-      /// Register this class so it can be used from Python
-      static void registerPython();
-
-    protected:
-      static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-
-  }
-}}
-
-#endif//VEC_INTEGRATOR_VELOCITYVERLET_HPP
+#endif  // VEC_INTEGRATOR_VELOCITYVERLET_HPP

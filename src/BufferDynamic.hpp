@@ -134,7 +134,6 @@ public:
         readAll<T>(v);
     }
 
-
     void read(Particle& p, int extradata)
     {
         readAll<ParticlePosition>(p.r);
@@ -291,10 +290,7 @@ public:
         // printf("%d: send size = %d to %d\n", comm.rank(), pos, receiver);
     }
 
-    mpi::request isend(longint receiver, int tag)
-    {
-        return comm.isend(receiver, tag, buf, pos);
-    }
+    mpi::request isend(longint receiver, int tag) { return comm.isend(receiver, tag, buf, pos); }
 };
 }  // namespace espressopp
 #endif

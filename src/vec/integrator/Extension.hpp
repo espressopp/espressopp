@@ -34,53 +34,56 @@
 
 #include "MDIntegratorVec.hpp"
 
-namespace espressopp { namespace vec {
-  namespace integrator {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+// abstract base class for extensions
+class Extension : public SystemAccess
+{
+public:
+    Extension(std::shared_ptr<System> system);
 
-      // abstract base class for extensions
-      class Extension : public SystemAccess
-      {
-      public:
+    virtual ~Extension();
 
-        Extension(std::shared_ptr<System> system);
+    enum ExtensionType
+    {
+        all = 0,
+        Thermostat = 1,
+        Barostat = 2,
+        Constraint = 3,
+        Adress = 4,
+        FreeEnergyCompensation = 5,
+        ExtForce = 6,
+        ExtAnalysis = 7,
+        Reaction = 8
+    };
 
-        virtual ~Extension();
+    // type of extension
+    ExtensionType type;
 
-        enum ExtensionType {
-            all=0,
-            Thermostat=1,
-            Barostat=2,
-            Constraint=3,
-            Adress=4,
-            FreeEnergyCompensation=5,
-            ExtForce=6,
-            ExtAnalysis=7,
-            Reaction=8
-        };
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        //type of extension
-        ExtensionType type;
+    ExtensionType getType() { return type; }
+    void setType(ExtensionType k) { type = k; }
 
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+protected:
+    std::shared_ptr<MDIntegratorVec> integrator;  // this is needed for signal connection
 
-        ExtensionType getType() {return type;}
-        void setType(ExtensionType k) {type=k;}
+    void setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator);
 
-      protected:
+    // pure virtual functions
+    virtual void connect() = 0;
+    virtual void disconnect() = 0;
 
-        std::shared_ptr<MDIntegratorVec> integrator; // this is needed for signal connection
+    /** Logger */
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp
 
-        void setIntegrator(std::shared_ptr<MDIntegratorVec> _integrator);
-
-        // pure virtual functions
-        virtual void connect() = 0;
-        virtual void disconnect() = 0;
-
-        /** Logger */
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-      };
-  }
-}}
-
-#endif//VEC_INTEGRATOR_EXTENSION_HPP
+#endif  // VEC_INTEGRATOR_EXTENSION_HPP

@@ -21,32 +21,34 @@
 #include "LocalParticles.hpp"
 #include "vec/ParticleArray.hpp"
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+void LocalParticles::rebuild(ParticleArray const& pa, std::vector<size_t> const& uniqueCells)
+{
+    clear();
 
-    void LocalParticles::rebuild(
-      ParticleArray const& pa,
-      std::vector<size_t> const& uniqueCells)
+    auto const numCells = pa.numCells();
+    auto const& cellRange = pa.cellRange();
+    auto const& cellSizes = pa.sizes();
+    auto const& pids = pa.id;
+
+    for (auto const& ic : uniqueCells)
     {
-      clear();
-
-      auto const numCells  = pa.numCells();
-      auto const& cellRange  = pa.cellRange();
-      auto const& cellSizes  = pa.sizes();
-      auto const& pids       = pa.id;
-
-      for(auto const& ic: uniqueCells)
-      {
         auto const start = cellRange[ic];
-        auto const size  = cellSizes[ic];
-        auto const end   = start+size;
-        for(auto ip=start; ip<end; ip++)
+        auto const size = cellSizes[ic];
+        auto const end = start + size;
+        for (auto ip = start; ip < end; ip++)
         {
-          auto const pid = pids[ip];
-          insert({pid, ip});
+            auto const pid = pids[ip];
+            insert({pid, ip});
         }
-      }
     }
+}
 
-  }
-}}
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp

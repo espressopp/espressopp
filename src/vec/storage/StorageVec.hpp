@@ -34,65 +34,70 @@
 
 #define VEC_PARTICLE_NOT_FOUND (std::numeric_limits<size_t>::max())
 
-namespace espressopp { namespace vec {
-  namespace storage {
+namespace espressopp
+{
+namespace vec
+{
+namespace storage
+{
+class StorageVec : protected SystemAccess
+{
+public:
+    StorageVec(std::shared_ptr<System> system);
 
-    class StorageVec
-      : protected SystemAccess
+    virtual void loadCells() = 0;
+
+    virtual void unloadCells() = 0;
+
+    virtual void updateGhostsVec() = 0;
+
+    virtual void collectGhostForcesVec() = 0;
+
+    static void registerPython();
+
+protected:
+    bool localParticlesEnabled = false;
+    LocalParticles localParticlesVec;
+    std::vector<size_t> uniqueCells;
+    std::shared_ptr<Vectorization> vectorization;
+
+public:
+    void enableLocalParticles()
     {
-    public:
-      StorageVec(std::shared_ptr<System> system);
-
-      virtual void loadCells() = 0;
-
-      virtual void unloadCells() = 0;
-
-      virtual void updateGhostsVec() = 0;
-
-      virtual void collectGhostForcesVec() = 0;
-
-      static void registerPython();
-
-    protected:
-
-      bool localParticlesEnabled = false;
-      LocalParticles localParticlesVec;
-      std::vector<size_t> uniqueCells;
-      std::shared_ptr<Vectorization> vectorization;
-
-    public:
-      void enableLocalParticles() {
-        if(!localParticlesEnabled){
-          localParticlesEnabled = true;
-          loadCells();
+        if (!localParticlesEnabled)
+        {
+            localParticlesEnabled = true;
+            loadCells();
         }
-      }
+    }
 
-      inline size_t lookupLocalParticleVec(size_t id)
-      {
+    inline size_t lookupLocalParticleVec(size_t id)
+    {
         const auto it = localParticlesVec.find(id);
-        return (it != localParticlesVec.end()) ?
-          it->second : VEC_PARTICLE_NOT_FOUND;
-      }
+        return (it != localParticlesVec.end()) ? it->second : VEC_PARTICLE_NOT_FOUND;
+    }
 
-      inline size_t lookupRealParticleVec(size_t id)
-      {
+    inline size_t lookupRealParticleVec(size_t id)
+    {
         const auto it = localParticlesVec.find(id);
 
         size_t ret = VEC_PARTICLE_NOT_FOUND;
-        if(it!=localParticlesVec.end()) {
-          if(!(vectorization->particles.ghost[it->second])) {
-            ret = it->second;
-          }
+        if (it != localParticlesVec.end())
+        {
+            if (!(vectorization->particles.ghost[it->second]))
+            {
+                ret = it->second;
+            }
         }
         return ret;
-      }
+    }
 
-    private:
-      static LOG4ESPP_DECL_LOGGER(logger);
-    };
+private:
+    static LOG4ESPP_DECL_LOGGER(logger);
+};
 
-  }
-}}
+}  // namespace storage
+}  // namespace vec
+}  // namespace espressopp
 
-#endif//VEC_STORAGEVEC_HPP
+#endif  // VEC_STORAGEVEC_HPP

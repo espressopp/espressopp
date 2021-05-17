@@ -25,41 +25,44 @@
 #include "log4espp.hpp"
 #include <iostream>
 
-namespace espressopp { namespace vec {
-  namespace integrator {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+LOG4ESPP_LOGGER(MDIntegratorVec::logger, "MDIntegratorVec");
 
-    LOG4ESPP_LOGGER(MDIntegratorVec::logger, "MDIntegratorVec");
-
-    MDIntegratorVec::MDIntegratorVec(std::shared_ptr<System> system)
-      : MDIntegrator(system)
+MDIntegratorVec::MDIntegratorVec(std::shared_ptr<System> system) : MDIntegrator(system)
+{
+    if (!getSystem()->vectorization)
     {
-      if(!getSystem()->vectorization) {
         throw std::runtime_error("system has no vectorization");
-      }
     }
+}
 
-    void MDIntegratorVec::addExtension(std::shared_ptr<integrator::Extension> extension) {
-       // add extension to the list
-       exList.push_back(extension);
-    }
+void MDIntegratorVec::addExtension(std::shared_ptr<integrator::Extension> extension)
+{
+    // add extension to the list
+    exList.push_back(extension);
+}
 
-    int MDIntegratorVec::getNumberOfExtensions() {
-      return exList.size();
-    }
+int MDIntegratorVec::getNumberOfExtensions() { return exList.size(); }
 
-    std::shared_ptr<vec::integrator::Extension> MDIntegratorVec::getExtension(int k) {
-      return exList[k];
-    }
+std::shared_ptr<vec::integrator::Extension> MDIntegratorVec::getExtension(int k)
+{
+    return exList[k];
+}
 
-    void
-    MDIntegratorVec::registerPython() {
-      using namespace espressopp::python;
-      class_< MDIntegratorVec, boost::noncopyable >("vec_integrator_MDIntegratorVec", no_init)
+void MDIntegratorVec::registerPython()
+{
+    using namespace espressopp::python;
+    class_<MDIntegratorVec, boost::noncopyable>("vec_integrator_MDIntegratorVec", no_init)
         .def("addExtension", &MDIntegratorVec::addExtension)
         .def("getNumberOfExtensions", &MDIntegratorVec::getNumberOfExtensions)
-        .def("getExtension", &MDIntegratorVec::getExtension)
-        ;
-    }
+        .def("getExtension", &MDIntegratorVec::getExtension);
+}
 
-  }
-}}
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp

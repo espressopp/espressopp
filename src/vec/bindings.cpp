@@ -30,20 +30,21 @@
 #include "vec/integrator/bindings.hpp"
 #include "vec/interaction/bindings.hpp"
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+void registerPython()
+{
+    vec::FixedPairList::registerPython();
+    vec::FixedTripleList::registerPython();
+    vec::Vectorization::registerPython();
+    vec::VerletList::registerPython();
 
-    void registerPython()
-    {
-      vec::FixedPairList::registerPython();
-      vec::FixedTripleList::registerPython();
-      vec::Vectorization::registerPython();
-      vec::VerletList::registerPython();
-
-      vec::storage::registerPython();
-      vec::integrator::registerPython();
-      vec::interaction::registerPython();
-    }
-
-  }
+    vec::storage::registerPython();
+    vec::integrator::registerPython();
+    vec::interaction::registerPython();
 }
+
+}  // namespace vec
+}  // namespace espressopp

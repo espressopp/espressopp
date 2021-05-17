@@ -26,38 +26,39 @@
 #include "FENE.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espressopp { namespace vec {
-  namespace interaction {
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+typedef class FixedPairListInteractionTemplate<FENE> FixedPairListFENE;
 
-    typedef class FixedPairListInteractionTemplate< FENE > FixedPairListFENE;
+LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
 
-    LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void FENE::registerPython()
+{
+    using namespace espressopp::python;
+    using espressopp::interaction::Interaction;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    FENE::registerPython() {
-      using namespace espressopp::python;
-      using espressopp::interaction::Interaction;
+    class_<FENE, bases<Potential> >("vec_interaction_FENE", init<real, real, real, real>())
+        .def(init<real, real, real, real, real>())
+        .add_property("K", &FENE::getK, &FENE::setK)
+        .add_property("r0", &FENE::getR0, &FENE::setR0)
+        .add_property("rMax", &FENE::getRMax, &FENE::setRMax);
 
-      class_< FENE, bases< Potential > >
-      ("vec_interaction_FENE", init< real, real, real, real >())
-      .def(init< real, real, real, real, real >())
-      .add_property("K", &FENE::getK, &FENE::setK)
-      .add_property("r0", &FENE::getR0, &FENE::setR0)
-      .add_property("rMax", &FENE::getRMax, &FENE::setRMax)
-      ;
+    class_<FixedPairListFENE, bases<Interaction> >(
+        "vec_interaction_FixedPairListFENE",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<FENE> >())
+        .def("setPotential", &FixedPairListFENE::setPotential)
+        .def("getPotential", &FixedPairListFENE::getPotential)
+        .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListFENE::getFixedPairList);
+}
 
-      class_< FixedPairListFENE, bases< Interaction > >
-      ("vec_interaction_FixedPairListFENE", init< std::shared_ptr<System>,
-        std::shared_ptr<FixedPairList>, std::shared_ptr<FENE> >())
-      .def("setPotential", &FixedPairListFENE::setPotential)
-      .def("getPotential", &FixedPairListFENE::getPotential)
-      .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)
-      .def("getFixedPairList", &FixedPairListFENE::getFixedPairList)
-      ;
-    }
-
-  }
-}}
+}  // namespace interaction
+}  // namespace vec
+}  // namespace espressopp

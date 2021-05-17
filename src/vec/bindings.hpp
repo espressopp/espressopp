@@ -21,11 +21,12 @@
 #ifndef VEC_BINDINGS_HPP
 #define VEC_BINDINGS_HPP
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+void registerPython();
 
-    void registerPython();
-
-  }
 }
-#endif//VEC_BINDINGS_HPP
+}  // namespace espressopp
+#endif  // VEC_BINDINGS_HPP

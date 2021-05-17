@@ -25,54 +25,56 @@
 #include "storage/Storage.hpp"
 #include "vec/include/simdconfig.hpp"
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// stores neighbor cells used for all-pair loops (following Newton's 3rd law) as 2d array
+/// second index corresponds to one cell in particleArray
+/// first index corresponds to neighbor cells
+/// zeroth column contains the index in localcells
+/// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
+class CellNeighborList : private espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge>
+{
+private:
+    typedef espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge> Super;
+    size_t startCell = 0;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    /// stores neighbor cells used for all-pair loops (following Newton's 3rd law) as 2d array
-    /// second index corresponds to one cell in particleArray
-    /// first index corresponds to neighbor cells
-    /// zeroth column contains the index in localcells
-    /// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
-    class CellNeighborList
-      : private espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge>
+public:
+    typedef size_t T;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef typename Super::size_type size_type;
+
+    CellNeighborList() {}
+    CellNeighborList(Cell* const cell0,
+                     CellList const& localCells,
+                     std::vector<size_t> const& realCellIdx);
+
+    inline void clear() { Super::clear(); }
+    // inline reference at(size_type row, size_type nbr) { return Super::at(nbr+2,row); }
+    inline const_reference& at(size_type row, size_type nbr) const
     {
-    private:
-      typedef espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge> Super;
-      size_t startCell = 0;
-    public:
-      typedef size_t T;
-      typedef T value_type;
-      typedef T& reference;
-      typedef const T& const_reference;
-      typedef typename Super::size_type size_type;
+        return Super::operator()(nbr + 2, row);
+    }
+    inline size_type numCells() const { return Super::size_m(); }
+    inline size_type maxNumNeighbors() const { return Super::size_n() - 2; }
+    // inline reference& cellId(size_type row) { return Super::at(0,row); }
+    inline const_reference& cellId(size_type row) const { return Super::operator()(0, row); }
+    // inline reference& numNeighbors(size_type row) { return Super::at(1,row); }
+    inline const_reference& numNeighbors(size_type row) const { return Super::operator()(1, row); }
 
-      CellNeighborList(){}
-      CellNeighborList(
-        Cell* const cell0,
-        CellList const& localCells,
-        std::vector<size_t> const& realCellIdx
-      );
+    void print();
 
-      inline void clear() { Super::clear(); }
-      // inline reference at(size_type row, size_type nbr) { return Super::at(nbr+2,row); }
-      inline const_reference& at(size_type row, size_type nbr) const { return Super::operator()(nbr+2,row); }
-      inline size_type numCells() const { return Super::size_m(); }
-      inline size_type maxNumNeighbors() const { return Super::size_n()-2; }
-      // inline reference& cellId(size_type row) { return Super::at(0,row); }
-      inline const_reference& cellId(size_type row) const { return Super::operator()(0,row); }
-      // inline reference& numNeighbors(size_type row) { return Super::at(1,row); }
-      inline const_reference& numNeighbors(size_type row) const { return Super::operator()(1,row); }
+protected:
+    inline reference& at(size_type row, size_type nbr) { return Super::at(nbr + 2, row); }
+    inline reference& cellId(size_type row) { return Super::at(0, row); }
+    inline reference& numNeighbors(size_type row) { return Super::at(1, row); }
+};
+/////////////////////////////////////////////////////////////////////////////////////////////
+}  // namespace vec
+}  // namespace espressopp
 
-      void print();
-
-    protected:
-      inline reference& at(size_type row, size_type nbr) { return Super::at(nbr+2,row); }
-      inline reference& cellId(size_type row) { return Super::at(0,row); }
-      inline reference& numNeighbors(size_type row) { return Super::at(1,row); }
-    };
-    /////////////////////////////////////////////////////////////////////////////////////////////
-  }
-}
-
-#endif//VEC_CELLNEIGHBORLIST_HPP
+#endif  // VEC_CELLNEIGHBORLIST_HPP

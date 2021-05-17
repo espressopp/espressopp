@@ -24,39 +24,29 @@
 
 #include "storage/Storage.hpp"
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+///////////////////////////////////////////////////////////////////////////////////////////////
+LOG4ESPP_LOGGER(Vectorization::logger, "Vectorization");
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    LOG4ESPP_LOGGER(Vectorization::logger, "Vectorization");
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+Vectorization::Vectorization(std::shared_ptr<System> _system,
+                             std::shared_ptr<MDIntegrator> _mdintegrator)
+    : SystemAccess(_system), mdintegrator(_mdintegrator), vecLevel(1)
+{
+    connect();
+    resetCells();  // immediately retrieve cell information
+}
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// constructor
-    Vectorization::Vectorization(
-      std::shared_ptr<System> _system,
-      std::shared_ptr<MDIntegrator> _mdintegrator
-      )
-      : SystemAccess(_system)
-      , mdintegrator(_mdintegrator)
-      , vecLevel(1)
-    {
-      connect();
-      resetCells(); // immediately retrieve cell information
-    }
-
-    Vectorization::Vectorization(
-      std::shared_ptr<System> _system
-      )
-      : SystemAccess(_system)
-      , vecLevel(2)
-    {
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// destructor
-    Vectorization::~Vectorization()
-    {
-      disconnect();
-    }
+Vectorization::Vectorization(std::shared_ptr<System> _system) : SystemAccess(_system), vecLevel(2)
+{
+}
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// destructor
+Vectorization::~Vectorization() { disconnect(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// connect to boost signals in integrator and storage
@@ -83,83 +73,78 @@ void Vectorization::disconnect()
     sigUpdateForces.disconnect();
 }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// reset and update cell mapping and neighbor lists from current storage
-    void Vectorization::resetCells()
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// reset and update cell mapping and neighbor lists from current storage
+void Vectorization::resetCells()
+{
+    if (!getSystem()->storage)
     {
-      if(!getSystem()->storage){
         throw std::runtime_error("System has no storage");
-      }
-      resetCellsStorage(getSystem()->storage.get());
     }
+    resetCellsStorage(getSystem()->storage.get());
+}
 
-    void Vectorization::resetCellsStorage(Storage* storage)
-    {
-      CellList const& localCells = storage->getLocalCells();
-      CellList const& realCells  = storage->getRealCells();
-      Cell* const cell0 = localCells[0];
-      const auto realCellIdx = CellListToIdx(realCells, cell0);
-      particles.markRealCells(realCellIdx, localCells.size());
-      neighborList = CellNeighborList(cell0, localCells, realCellIdx);
-      LOG4ESPP_TRACE(logger,"neighborList, ncells: "<<neighborList.numCells()
-        <<" nnbrs: "<<neighborList.maxNumNeighbors());
-    }
+void Vectorization::resetCellsStorage(Storage* storage)
+{
+    CellList const& localCells = storage->getLocalCells();
+    CellList const& realCells = storage->getRealCells();
+    Cell* const cell0 = localCells[0];
+    const auto realCellIdx = CellListToIdx(realCells, cell0);
+    particles.markRealCells(realCellIdx, localCells.size());
+    neighborList = CellNeighborList(cell0, localCells, realCellIdx);
+    LOG4ESPP_TRACE(logger, "neighborList, ncells: " << neighborList.numCells() << " nnbrs: "
+                                                    << neighborList.maxNumNeighbors());
+}
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// set force array/s to zero
-    void Vectorization::zeroForces()
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// set force array/s to zero
+void Vectorization::zeroForces()
+{
+    auto f_zero = [](real* __restrict f, size_t size) {
+#ifdef __INTEL_COMPILER
+#pragma vector always
+#pragma vector aligned
+#pragma ivdep
+#endif
+        for (int i = 0; i < size; i++) f[i] = 0.0;
+    };
     {
-      auto f_zero = [](real* __restrict f, size_t size)
-      {
-        #ifdef __INTEL_COMPILER
-        #pragma vector always
-        #pragma vector aligned
-        #pragma ivdep
-        #endif
-        for(int i=0; i<size; i++) f[i] = 0.0;
-      };
-      {
         f_zero(particles.f_x.data(), particles.f_x.size());
         f_zero(particles.f_y.data(), particles.f_y.size());
         f_zero(particles.f_z.data(), particles.f_z.size());
-      }
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// reset and update particles from current storage
-    void Vectorization::resetParticles()
-    {
-      particles.copyFrom(getSystem()->storage->getLocalCells());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// set force array/s to zero and overwrite particles position data
-    void Vectorization::befCalcForces()
-    {
-      zeroForces();
-      particles.updateFromPositionOnly(getSystem()->storage->getLocalCells());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// add forces back to storage
-    void Vectorization::updateForces()
-    {
-      particles.addToForceOnly(getSystem()->storage->getLocalCells());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// registration with python
-    void Vectorization::registerPython()
-    {
-      using namespace espressopp::python;
-
-      class_<Vectorization, std::shared_ptr<Vectorization> >
-        ("vec_Vectorization",
-             init< std::shared_ptr<System>, std::shared_ptr<MDIntegrator> >())
-        .def(init< std::shared_ptr<System>>())
-        .add_property("level", &Vectorization::getVecLevel)
-        .def_readwrite("storageVec", &Vectorization::storageVec)
-        ;
-    }
-  }
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// reset and update particles from current storage
+void Vectorization::resetParticles() { particles.copyFrom(getSystem()->storage->getLocalCells()); }
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// set force array/s to zero and overwrite particles position data
+void Vectorization::befCalcForces()
+{
+    zeroForces();
+    particles.updateFromPositionOnly(getSystem()->storage->getLocalCells());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// add forces back to storage
+void Vectorization::updateForces()
+{
+    particles.addToForceOnly(getSystem()->storage->getLocalCells());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// registration with python
+void Vectorization::registerPython()
+{
+    using namespace espressopp::python;
+
+    class_<Vectorization, std::shared_ptr<Vectorization>>(
+        "vec_Vectorization", init<std::shared_ptr<System>, std::shared_ptr<MDIntegrator>>())
+        .def(init<std::shared_ptr<System>>())
+        .add_property("level", &Vectorization::getVecLevel)
+        .def_readwrite("storageVec", &Vectorization::storageVec);
+}
+}  // namespace vec
+}  // namespace espressopp

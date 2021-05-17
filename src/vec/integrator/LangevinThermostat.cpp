@@ -33,108 +33,91 @@
 #include "storage/Storage.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espressopp { namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+LangevinThermostat::LangevinThermostat(std::shared_ptr<System> system) : Extension(system)
+{
+    type = Extension::Thermostat;
+    gamma = 0.0;
+    temperature = 0.0;
+    adress = false;
+    exclusions.clear();
 
-  namespace integrator {
-
-    LangevinThermostat::LangevinThermostat(std::shared_ptr<System> system)
-      : Extension(system)
+    if (!getSystem()->rng)
     {
-      type = Extension::Thermostat;
-      gamma  = 0.0;
-      temperature = 0.0;
-      adress = false;
-      exclusions.clear();
-
-      if (!getSystem()->rng) {
         throw std::runtime_error("system has no RNG");
-      }
-      rng = getSystem()->rng;
-
-      LOG4ESPP_INFO(theLogger, "Langevin constructed");
     }
+    rng = getSystem()->rng;
 
-    void LangevinThermostat::setGamma(real _gamma)
-    {
-      gamma = _gamma;
-    }
+    LOG4ESPP_INFO(theLogger, "Langevin constructed");
+}
 
-    real LangevinThermostat::getGamma()
-    {
-      return gamma;
-    }
+void LangevinThermostat::setGamma(real _gamma) { gamma = _gamma; }
 
-    void LangevinThermostat::setAdress(bool _adress)
+real LangevinThermostat::getGamma() { return gamma; }
+
+void LangevinThermostat::setAdress(bool _adress)
+{
+    if (_adress)
     {
-      if(_adress){
         throw std::runtime_error("LangevinThermostat::setAdress Not implemented for _adress=true");
-      }
-      adress = _adress;
     }
+    adress = _adress;
+}
 
-    bool LangevinThermostat::getAdress()
+bool LangevinThermostat::getAdress() { return adress; }
+
+void LangevinThermostat::setTemperature(real _temperature) { temperature = _temperature; }
+
+real LangevinThermostat::getTemperature() { return temperature; }
+
+LangevinThermostat::~LangevinThermostat() { disconnect(); }
+
+void LangevinThermostat::disconnect()
+{
+    _initialize.disconnect();
+    _heatUp.disconnect();
+    _coolDown.disconnect();
+    _thermalize.disconnect();
+    _thermalizeAdr.disconnect();
+}
+
+void LangevinThermostat::connect()
+{
+    // connect to initialization inside run()
+    _initialize = integrator->runInit.connect(std::bind(&LangevinThermostat::initialize, this));
+
+    _heatUp = integrator->recalc1.connect(std::bind(&LangevinThermostat::heatUp, this));
+
+    _coolDown = integrator->recalc2.connect(std::bind(&LangevinThermostat::coolDown, this));
+
+    if (adress)
     {
-      return adress;
+        _thermalizeAdr =
+            integrator->aftCalcF.connect(std::bind(&LangevinThermostat::thermalizeAdr, this));
     }
-
-    void LangevinThermostat::setTemperature(real _temperature)
+    else
     {
-      temperature = _temperature;
+        _thermalize =
+            integrator->aftCalcF.connect(std::bind(&LangevinThermostat::thermalize, this));
     }
+}
 
-    real LangevinThermostat::getTemperature()
+void LangevinThermostat::thermalize()
+{
+    LOG4ESPP_DEBUG(theLogger, "thermalize");
+
+    if (!exclusions.empty())
+        throw std::runtime_error("LangevinThermostat::thermalize exclusions not implemented");
+
+    auto& particles = getSystem()->vectorization->particles;
+    for (iterator::ParticleArrayIterator pit(particles, true); pit.isValid(); ++pit)
     {
-      return temperature;
-    }
-
-    LangevinThermostat::~LangevinThermostat()
-    {
-      disconnect();
-    }
-
-    void LangevinThermostat::disconnect()
-    {
-      _initialize.disconnect();
-      _heatUp.disconnect();
-      _coolDown.disconnect();
-      _thermalize.disconnect();
-      _thermalizeAdr.disconnect();
-    }
-
-    void LangevinThermostat::connect()
-    {
-      // connect to initialization inside run()
-      _initialize = integrator->runInit.connect(
-              std::bind(&LangevinThermostat::initialize, this));
-
-      _heatUp = integrator->recalc1.connect(
-              std::bind(&LangevinThermostat::heatUp, this));
-
-      _coolDown = integrator->recalc2.connect(
-              std::bind(&LangevinThermostat::coolDown, this));
-
-      if (adress) {
-          _thermalizeAdr = integrator->aftCalcF.connect(
-              std::bind(&LangevinThermostat::thermalizeAdr, this));
-      }
-      else {
-          _thermalize = integrator->aftCalcF.connect(
-              std::bind(&LangevinThermostat::thermalize, this));
-      }
-    }
-
-
-    void LangevinThermostat::thermalize()
-    {
-      LOG4ESPP_DEBUG(theLogger, "thermalize");
-
-      if(!exclusions.empty()) throw std::runtime_error(
-        "LangevinThermostat::thermalize exclusions not implemented");
-
-      auto& particles = getSystem()->vectorization->particles;
-      for(iterator::ParticleArrayIterator pit(particles, true); pit.isValid(); ++pit)
-      {
-        const real mass  = pit.mass();
+        const real mass = pit.mass();
         const real massf = sqrt(mass);
 
         const real ranval_x = (*rng)() - 0.5;
@@ -144,15 +127,15 @@ namespace espressopp { namespace vec {
         pit.f_x() += pref1 * pit.v_x() * mass + pref2 * ranval_x * massf;
         pit.f_y() += pref1 * pit.v_y() * mass + pref2 * ranval_y * massf;
         pit.f_z() += pref1 * pit.v_z() * mass + pref2 * ranval_z * massf;
-      }
     }
+}
 
-    // for AdResS
-    void LangevinThermostat::thermalizeAdr()
-    {
-      throw std::runtime_error("LangevinThermostat::thermalizeAdr Function not implemented");
+// for AdResS
+void LangevinThermostat::thermalizeAdr()
+{
+    throw std::runtime_error("LangevinThermostat::thermalizeAdr Function not implemented");
 
-    #if 0
+#if 0
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
       System& system = getSystemRef();
@@ -165,63 +148,62 @@ namespace espressopp { namespace vec {
           frictionThermo(*it);
         }
       }
-    #endif
-    }
+#endif
+}
 
-    void LangevinThermostat::initialize()
-    {
-      // calculate the prefactors
-      real timestep = integrator->getTimeStep();
-      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-        ", gamma = " << gamma <<
-        ", temperature = " << temperature);
+void LangevinThermostat::initialize()
+{
+    // calculate the prefactors
+    real timestep = integrator->getTimeStep();
+    LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep << ", gamma = " << gamma
+                                                 << ", temperature = " << temperature);
 
-      pref1 = -gamma;
-      pref2 = sqrt(24.0 * temperature * gamma / timestep);
-    }
+    pref1 = -gamma;
+    pref2 = sqrt(24.0 * temperature * gamma / timestep);
+}
 
-    /** very nasty: if we recalculate force when leaving/reentering the integrator,
-        a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
-        numbers are drawn twice, resulting in a different variance of the random force.
-        This is corrected by additional heat when restarting the integrator here.
-        Currently only works for the Langevin thermostat, although probably also others
-        are affected.
-    */
-    void LangevinThermostat::heatUp()
-    {
-      LOG4ESPP_INFO(theLogger, "heatUp");
+/** very nasty: if we recalculate force when leaving/reentering the integrator,
+    a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
+    numbers are drawn twice, resulting in a different variance of the random force.
+    This is corrected by additional heat when restarting the integrator here.
+    Currently only works for the Langevin thermostat, although probably also others
+    are affected.
+*/
+void LangevinThermostat::heatUp()
+{
+    LOG4ESPP_INFO(theLogger, "heatUp");
 
-      pref2buffer = pref2;
-      pref2       *= sqrt(3.0);
-    }
+    pref2buffer = pref2;
+    pref2 *= sqrt(3.0);
+}
 
-    /** Opposite to heatUp */
+/** Opposite to heatUp */
 
-    void LangevinThermostat::coolDown()
-    {
-      LOG4ESPP_INFO(theLogger, "coolDown");
+void LangevinThermostat::coolDown()
+{
+    LOG4ESPP_INFO(theLogger, "coolDown");
 
-      pref2 = pref2buffer;
-    }
+    pref2 = pref2buffer;
+}
 
-    /****************************************************
-    ** REGISTRATION WITH PYTHON
-    ****************************************************/
+/****************************************************
+** REGISTRATION WITH PYTHON
+****************************************************/
 
-    void LangevinThermostat::registerPython()
-    {
-      using namespace espressopp::python;
+void LangevinThermostat::registerPython()
+{
+    using namespace espressopp::python;
 
-      class_<LangevinThermostat, std::shared_ptr<LangevinThermostat>, bases<Extension> >
-        ("vec_integrator_LangevinThermostat", init<std::shared_ptr<System>>())
+    class_<LangevinThermostat, std::shared_ptr<LangevinThermostat>, bases<Extension>>(
+        "vec_integrator_LangevinThermostat", init<std::shared_ptr<System>>())
         .def("connect", &LangevinThermostat::connect)
         .def("disconnect", &LangevinThermostat::disconnect)
         .def("addExclpid", &LangevinThermostat::addExclpid)
         .add_property("adress", &LangevinThermostat::getAdress, &LangevinThermostat::setAdress)
         .add_property("gamma", &LangevinThermostat::getGamma, &LangevinThermostat::setGamma)
-        .add_property("temperature", &LangevinThermostat::getTemperature, &LangevinThermostat::setTemperature)
-        ;
-    }
-  }
-}}
-
+        .add_property("temperature", &LangevinThermostat::getTemperature,
+                      &LangevinThermostat::setTemperature);
+}
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp

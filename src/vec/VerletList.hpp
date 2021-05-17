@@ -38,50 +38,47 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
-namespace espressopp { namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+using storage::StorageVec;
 
-  using storage::StorageVec;
-
-  class VerletList
-    : public SystemAccess
-  {
-  public:
-
+class VerletList : public SystemAccess
+{
+public:
     /// Hierarchical storage of chunk indices
     struct NeighborList
     {
-      AlignedVector< int > plist;
-      AlignedVector< std::pair<int,int> > prange;
-      AlignedVector< int > nplist;
-      int num_pairs = 0;
-      size_t max_type = 0;
+        AlignedVector<int> plist;
+        AlignedVector<std::pair<int, int> > prange;
+        AlignedVector<int> nplist;
+        int num_pairs = 0;
+        size_t max_type = 0;
 
-      AlignedVector<int> c_j;
-      AlignedVector<real> c_x,c_y,c_z;
+        AlignedVector<int> c_j;
+        AlignedVector<real> c_x, c_y, c_z;
 
-      void reset()
-      {
-        plist.clear();
-        prange.clear();
-        num_pairs = 0;
-        max_type = 0;
-      }
+        void reset()
+        {
+            plist.clear();
+            prange.clear();
+            num_pairs = 0;
+            max_type = 0;
+        }
 
-      void clear()
-      {
-        reset();
-        nplist.clear();
-      }
+        void clear()
+        {
+            reset();
+            nplist.clear();
+        }
     };
 
     /// Build a verlet list of all particle pairs stored in Vectorization
     /// whose distance is less than a given cutoff.
     /// \param system is the system for which the verlet list is built
     /// \param cut is the cutoff value for the
-    VerletList(
-      std::shared_ptr<System>,
-      real cut,
-      bool rebuildVL);
+    VerletList(std::shared_ptr<System>, real cut, bool rebuildVL);
 
     ~VerletList();
 
@@ -121,7 +118,7 @@ namespace espressopp { namespace vec {
     /// Register this class so it can be used from Python.
     static void registerPython();
 
-  protected:
+protected:
     std::shared_ptr<Vectorization> vectorization;
 
     NeighborList neighborList;
@@ -143,4 +140,4 @@ namespace espressopp { namespace vec {
 }  // namespace vec
 }  // namespace espressopp
 
-#endif//VEC_VERLETLIST_HPP
+#endif  // VEC_VERLETLIST_HPP

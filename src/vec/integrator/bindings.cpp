@@ -27,15 +27,19 @@
 #include "python.hpp"
 #include "bindings.hpp"
 
-namespace espressopp {
-  namespace vec {
-    namespace integrator {
-      void registerPython() {
-        MDIntegratorVec::registerPython();
-        VelocityVerlet::registerPython();
-        Extension::registerPython();
-        LangevinThermostat::registerPython();
-      }
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace integrator
+{
+void registerPython()
+{
+    MDIntegratorVec::registerPython();
+    VelocityVerlet::registerPython();
+    Extension::registerPython();
+    LangevinThermostat::registerPython();
 }
+}  // namespace integrator
+}  // namespace vec
+}  // namespace espressopp

@@ -32,84 +32,78 @@
 #include "log4espp.hpp"
 #include "boost/signals2.hpp"
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// facilitates offloading of particle data to vectorization-friendly form
+class Vectorization : public SystemAccess
+{
+    typedef espressopp::storage::Storage Storage;
+    typedef espressopp::vec::storage::StorageVec StorageVec;
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// facilitates offloading of particle data to vectorization-friendly form
-    class Vectorization
-      : public SystemAccess
+    typedef espressopp::integrator::MDIntegrator MDIntegrator;
+    typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
+
+public:
+    Vectorization(std::shared_ptr<System> system, std::shared_ptr<MDIntegrator> mdintegrator);
+
+    Vectorization(std::shared_ptr<System> system);
+
+    ~Vectorization();
+
+    void connect();
+    void disconnect();
+
+    ParticleArray particles;
+    CellNeighborList neighborList;
+    std::shared_ptr<StorageVec> storageVec;
+
+    inline int getVecLevel() { return vecLevel; }
+
+    void resetCells();
+    void resetCellsStorage(Storage*);
+
+    void zeroForces();
+
+    void resetParticles();
+    void befCalcForces();
+    void updatePositions();
+    void updateForces();
+
+    static void registerPython();
+
+protected:
+    const int vecLevel;
+
+    std::shared_ptr<MDIntegrator> mdintegrator;
+
+    // signals that connect to integrator
+    boost::signals2::connection sigBefCalcForces;
+    boost::signals2::connection sigUpdateForces;
+
+    // signals that connect to system
+    boost::signals2::connection sigResetParticles;
+    boost::signals2::connection sigResetCells;
+
+    static LOG4ESPP_DECL_LOGGER(logger);
+};
+
+/// converts cell list to list of indices
+template <typename T = size_t>
+std::vector<T> CellListToIdx(std::vector<Cell*> const& cellList, Cell* const refCell)
+{
+    std::vector<T> idx;
+    idx.reserve(cellList.size());
+    for (Cell* const cell : cellList)
     {
-      typedef espressopp::storage::Storage Storage;
-      typedef espressopp::vec::storage::StorageVec StorageVec;
-
-      typedef espressopp::integrator::MDIntegrator MDIntegrator;
-      typedef espressopp::vec::integrator::MDIntegratorVec MDIntegratorVec;
-
-    public:
-      Vectorization(
-        std::shared_ptr<System> system,
-        std::shared_ptr<MDIntegrator> mdintegrator);
-
-      Vectorization(
-        std::shared_ptr<System> system);
-
-      ~Vectorization();
-
-      void connect();
-      void disconnect();
-
-      ParticleArray particles;
-      CellNeighborList neighborList;
-      std::shared_ptr<StorageVec> storageVec;
-
-      inline int getVecLevel() {
-        return vecLevel;
-      }
-
-      void resetCells();
-      void resetCellsStorage(Storage*);
-
-      void zeroForces();
-
-      void resetParticles();
-      void befCalcForces();
-      void updatePositions();
-      void updateForces();
-
-      static void registerPython();
-
-    protected:
-      const int vecLevel;
-
-      std::shared_ptr<MDIntegrator> mdintegrator;
-
-      // signals that connect to integrator
-      boost::signals2::connection sigBefCalcForces;
-      boost::signals2::connection sigUpdateForces;
-
-      // signals that connect to system
-      boost::signals2::connection sigResetParticles;
-      boost::signals2::connection sigResetCells;
-
-      static LOG4ESPP_DECL_LOGGER(logger);
-    };
-
-    /// converts cell list to list of indices
-    template<typename T = size_t>
-    std::vector<T> CellListToIdx (
-      std::vector<Cell*> const& cellList,
-      Cell* const refCell)
-    {
-      std::vector<T> idx;
-      idx.reserve(cellList.size());
-      for(Cell* const cell: cellList) {
-        idx.push_back(T(cell-refCell));
-      }
-      return std::move(idx);
+        idx.push_back(T(cell - refCell));
     }
-
-  }
+    return std::move(idx);
 }
 
-#endif//VEC_VECTORIZATION_HPP
+}  // namespace vec
+}  // namespace espressopp
+
+#endif  // VEC_VECTORIZATION_HPP
