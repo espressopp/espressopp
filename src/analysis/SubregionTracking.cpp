@@ -30,55 +30,62 @@ using namespace espressopp;
 using namespace iterator;
 using namespace std;
 
-namespace espressopp {
-  namespace analysis {
-    int SubregionTracking::compute_int() const {
+namespace espressopp
+{
+namespace analysis
+{
+int SubregionTracking::compute_int() const
+{
+    int myN, systemN;
+    myN = 0;
+    System& system = getSystemRef();
+    CellList realCells = system.storage->getRealCells();
 
-      int myN, systemN;
-      myN = 0;
-      System& system = getSystemRef();
-      CellList realCells = system.storage->getRealCells();
+    for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+    {
+        if (particlelist.count(cit->id()))
+        {
+            Particle& vp = *cit;
+            Real3D dist(0.0, 0.0, 0.0);
+            system.bc->getMinimumImageVector(dist, vp.position(), center);
 
-      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        if(particlelist.count(cit->id())) {
-          Particle &vp = *cit;
-          Real3D dist(0.0, 0.0, 0.0);
-          system.bc->getMinimumImageVector(dist, vp.position(), center);
-
-          if(geometry == spherical) {
-            if (dist.abs() <= span) myN += 1;
-          }
-          else if(geometry == x_bounded) {
-            if (fabs(dist[0]) <= span) myN += 1;
-          }
-          else if(geometry == y_bounded) {
-            if (fabs(dist[1]) <= span) myN += 1;
-          }
-          else if(geometry == z_bounded) {
-            if (fabs(dist[2]) <= span) myN += 1;
-          }
-          else {
-            throw std::invalid_argument("Invalid geometry parameter.");
-          }
+            if (geometry == spherical)
+            {
+                if (dist.abs() <= span) myN += 1;
+            }
+            else if (geometry == x_bounded)
+            {
+                if (fabs(dist[0]) <= span) myN += 1;
+            }
+            else if (geometry == y_bounded)
+            {
+                if (fabs(dist[1]) <= span) myN += 1;
+            }
+            else if (geometry == z_bounded)
+            {
+                if (fabs(dist[2]) <= span) myN += 1;
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid geometry parameter.");
+            }
         }
-      }
-
-      boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
-      return systemN;
     }
 
-    void SubregionTracking::setCenter(real x, real y, real z) {
-      center = Real3D(x, y, z);
-    }
-
-    void SubregionTracking::registerPython() {
-      using namespace espressopp::python;
-      void (SubregionTracking::*pySetCenter)(real x, real y, real z) = &SubregionTracking::setCenter;
-      class_<SubregionTracking, bases< Observable > >
-      ("analysis_SubregionTracking", init< std::shared_ptr< System >, real, int >())
-      .def("setCenter", pySetCenter)
-      .def("addPID", &SubregionTracking::addPID)
-      ;
-    }
-  }
+    boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
+    return systemN;
 }
+
+void SubregionTracking::setCenter(real x, real y, real z) { center = Real3D(x, y, z); }
+
+void SubregionTracking::registerPython()
+{
+    using namespace espressopp::python;
+    void (SubregionTracking::*pySetCenter)(real x, real y, real z) = &SubregionTracking::setCenter;
+    class_<SubregionTracking, bases<Observable> >("analysis_SubregionTracking",
+                                                  init<std::shared_ptr<System>, real, int>())
+        .def("setCenter", pySetCenter)
+        .def("addPID", &SubregionTracking::addPID);
+}
+}  // namespace analysis
+}  // namespace espressopp

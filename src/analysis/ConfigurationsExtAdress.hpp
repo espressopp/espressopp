@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -29,78 +29,80 @@
 #include "ConfigurationExt.hpp"
 #include "FixedTupleListAdress.hpp"
 
-namespace espressopp {
-  namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+/** Class that stores atomistic particle positions for later analysis.
 
-    /** Class that stores atomistic particle positions for later analysis.
+    Important: this class can also be used if the number of
+    particles changes between different snapshots.
+*/
 
-        Important: this class can also be used if the number of
-        particles changes between different snapshots.
-    */
+typedef std::vector<ConfigurationExtPtr> ConfigurationExtList;
 
-    typedef std::vector<ConfigurationExtPtr> ConfigurationExtList;
+class ConfigurationsExtAdress : public SystemAccess
+{
+public:
+    /** Constructor, allow for unlimited snapshots. */
 
-    class ConfigurationsExtAdress : public SystemAccess {
+    ConfigurationsExtAdress(std::shared_ptr<System> system,
+                            std::shared_ptr<FixedTupleListAdress> _fixedTupleList)
+        : SystemAccess(system), fixedTupleList(_fixedTupleList)
+    {
+        maxConfigs = 0;
+    }
 
-    public:
+    /** set number of maximal snapshots. */
 
-      /** Constructor, allow for unlimited snapshots. */
+    void setCapacity(int max);
 
-      ConfigurationsExtAdress(std::shared_ptr<System> system,std::shared_ptr<FixedTupleListAdress> _fixedTupleList) : SystemAccess (system),fixedTupleList(_fixedTupleList)
-      { maxConfigs = 0; }
+    /** get number of maximal snapshots. */
 
-      /** set number of maximal snapshots. */
+    int getCapacity();
 
-      void setCapacity(int max);
+    /** get number of available snapshots. */
 
-      /** get number of maximal snapshots. */
+    int getSize();
 
-      int getCapacity();
+    ~ConfigurationsExtAdress() {}
 
-      /** get number of available snapshots. */
+    bool getUnfolded() { return unfolded; }
+    void setUnfolded(bool v) { unfolded = v; }
 
-      int getSize();
+    /** Gake a snapshot of all current particle positions. */
 
-      ~ConfigurationsExtAdress() {}
-      
-      bool getUnfolded(){return unfolded;}
-      void setUnfolded(bool v){unfolded = v;}
+    void gather();
 
-      /** Gake a snapshot of all current particle positions. */
+    ConfigurationExtPtr get(int stackpos);
 
-      void gather();
+    ConfigurationExtPtr back();
 
-      ConfigurationExtPtr get(int stackpos);
+    ConfigurationExtList all();
 
-      ConfigurationExtPtr back();
+    void clear() { configurationsExtAdress.clear(); }
 
-      ConfigurationExtList all();
+    void setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList)
+    {
+        fixedTupleList = _fixedtupleList;
+    }
 
-      void clear() { configurationsExtAdress.clear(); }
+    static void registerPython();
 
-      void
-      setFixedTupleList(std::shared_ptr<FixedTupleListAdress> _fixedtupleList) {
-          fixedTupleList = _fixedtupleList;
-      }
+protected:
+    static LOG4ESPP_DECL_LOGGER(logger);
+    std::shared_ptr<FixedTupleListAdress> fixedTupleList;
 
-      static void registerPython();
-    
-    protected:
+private:
+    void pushConfig(ConfigurationExtPtr config);
 
-      static LOG4ESPP_DECL_LOGGER(logger);
-      std::shared_ptr<FixedTupleListAdress> fixedTupleList;
+    ConfigurationExtList configurationsExtAdress;
 
-    private:
+    int maxConfigs;
 
-      void pushConfig(ConfigurationExtPtr config);
- 
-      ConfigurationExtList configurationsExtAdress;
-
-      int maxConfigs;
-      
-      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
-    };
-  }
-}
+    bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

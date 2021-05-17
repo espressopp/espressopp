@@ -33,59 +33,62 @@
 #include "Extension.hpp"
 #include "VelocityVerlet.hpp"
 
-
 #include "boost/signals2.hpp"
 
+namespace espressopp
+{
+namespace integrator
+{
+class Adress : public Extension
+{
+public:
+    std::shared_ptr<VerletListAdress> verletList;
+    std::shared_ptr<FixedTupleListAdress> fixedtupleList;
+    bool KTI;
+    int regionupdates;
+    int multistep;
 
-namespace espressopp {
+    real dhy;
+    real pidhy2;
+    real dex;
+    real dex2;
+    real dexdhy;
+    real dexdhy2;
 
-  namespace integrator {
+    Adress(std::shared_ptr<System> _system,
+           std::shared_ptr<VerletListAdress> _verletList,
+           std::shared_ptr<FixedTupleListAdress> _fixedtupleList,
+           bool _KTI = false,
+           int _regionupdates = 1,
+           int _multistep = 1);
 
-      class Adress : public Extension {
+    ~Adress();
 
-      public:
-        std::shared_ptr<VerletListAdress> verletList;
-        std::shared_ptr<FixedTupleListAdress> fixedtupleList;
-        bool KTI;
-        int regionupdates;
-        int multistep;
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        real dhy;
-        real pidhy2;
-        real dex;
-        real dex2;
-        real dexdhy;
-        real dexdhy2;
+private:
+    boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _integrateSlow,
+        _aftCalcSlow, _recalc2, _befIntV;  //_aftCalcF;
 
-        Adress(std::shared_ptr<System> _system, std::shared_ptr<VerletListAdress> _verletList, std::shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false, int _regionupdates = 1, int _multistep = 1);
+    void integrate1(real&);
+    void initForces();
+    void SetPosVel();
+    void integrate2();
+    void integrateSlow();
+    void aftCalcF();
+    void communicateAdrPositions();
 
-        ~Adress();
+    void connect();
+    void disconnect();
 
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+    real weight(real);
+    real weightderivative(real);
+    int updatecount;
+};
 
-      private:
+}  // namespace integrator
 
-        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _integrateSlow, _aftCalcSlow, _recalc2, _befIntV;  //_aftCalcF;
-
-        void integrate1(real&);
-        void initForces();
-        void SetPosVel();
-        void integrate2();
-        void integrateSlow();
-        void aftCalcF();
-        void communicateAdrPositions();
-
-        void connect();
-        void disconnect();
-
-        real weight(real);
-        real weightderivative(real);
-        int updatecount;
-      };
-
-  }
-
-}
+}  // namespace espressopp
 
 #endif

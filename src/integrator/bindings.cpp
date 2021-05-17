@@ -64,50 +64,51 @@
 
 #include "EmptyExtension.hpp"
 
-namespace espressopp {
-  namespace integrator {
-    void registerPython() {
-      MDIntegrator::registerPython();
-      VelocityVerlet::registerPython();
-      PIAdressIntegrator::registerPython();
-      VelocityVerletOnGroup::registerPython();
-      VelocityVerletRESPA::registerPython();
-      Extension::registerPython();
-      Adress::registerPython();
-      BerendsenBarostat::registerPython();
-      BerendsenBarostatAnisotropic::registerPython();
-      BerendsenThermostat::registerPython();
-      LangevinBarostat::registerPython();
-      Isokinetic::registerPython();
-      StochasticVelocityRescaling::registerPython();
-      TDforce::registerPython();
-      FreeEnergyCompensation::registerPython();
-      OnTheFlyFEC::registerPython();
-      LangevinThermostat::registerPython();
-      LangevinThermostat1D::registerPython();
-      LangevinThermostatHybrid::registerPython();
-      GeneralizedLangevinThermostat::registerPython();
-      LangevinThermostatOnGroup::registerPython();
-      LangevinThermostatOnRadius::registerPython();
-      DPDThermostat::registerPython();
-      FixPositions::registerPython();
-      LatticeBoltzmann::registerPython();
-      LBInit::registerPython();
-      LBInitConstForce::registerPython();
-      LBInitPeriodicForce::registerPython();
-      LBInitPopUniform::registerPython();
-      LBInitPopWave::registerPython();
-      ExtForce::registerPython();
-      CapForce::registerPython();
-      ExtAnalyze::registerPython();
-      Settle::registerPython();
-      Rattle::registerPython();
-      VelocityVerletOnRadius::registerPython();
-      AssociationReaction::registerPython();
-      MinimizeEnergy::registerPython();
-      EmptyExtension::registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace integrator
+{
+void registerPython()
+{
+    MDIntegrator::registerPython();
+    VelocityVerlet::registerPython();
+    PIAdressIntegrator::registerPython();
+    VelocityVerletOnGroup::registerPython();
+    VelocityVerletRESPA::registerPython();
+    Extension::registerPython();
+    Adress::registerPython();
+    BerendsenBarostat::registerPython();
+    BerendsenBarostatAnisotropic::registerPython();
+    BerendsenThermostat::registerPython();
+    LangevinBarostat::registerPython();
+    Isokinetic::registerPython();
+    StochasticVelocityRescaling::registerPython();
+    TDforce::registerPython();
+    FreeEnergyCompensation::registerPython();
+    OnTheFlyFEC::registerPython();
+    LangevinThermostat::registerPython();
+    LangevinThermostat1D::registerPython();
+    LangevinThermostatHybrid::registerPython();
+    GeneralizedLangevinThermostat::registerPython();
+    LangevinThermostatOnGroup::registerPython();
+    LangevinThermostatOnRadius::registerPython();
+    DPDThermostat::registerPython();
+    FixPositions::registerPython();
+    LatticeBoltzmann::registerPython();
+    LBInit::registerPython();
+    LBInitConstForce::registerPython();
+    LBInitPeriodicForce::registerPython();
+    LBInitPopUniform::registerPython();
+    LBInitPopWave::registerPython();
+    ExtForce::registerPython();
+    CapForce::registerPython();
+    ExtAnalyze::registerPython();
+    Settle::registerPython();
+    Rattle::registerPython();
+    VelocityVerletOnRadius::registerPython();
+    AssociationReaction::registerPython();
+    MinimizeEnergy::registerPython();
+    EmptyExtension::registerPython();
 }
-
-
+}  // namespace integrator
+}  // namespace espressopp

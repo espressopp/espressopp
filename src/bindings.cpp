@@ -63,44 +63,45 @@
 
 #include <vec/bindings.hpp>
 
-void espressopp::registerPython() {
-  espressopp::Particle::registerPython();
-  espressopp::ParticleGroup::registerPython();
-  espressopp::System::registerPython();
-  espressopp::VerletList::registerPython();
-  espressopp::VerletListAdress::registerPython();
-  espressopp::VerletListTriple::registerPython();
-  espressopp::FixedSingleList::registerPython();
-  espressopp::FixedPairList::registerPython();
-  espressopp::FixedPairDistList::registerPython();
-  espressopp::FixedPairListAdress::registerPython();
-  espressopp::FixedTripleList::registerPython();
-  espressopp::FixedTripleAngleList::registerPython();
-  espressopp::FixedTripleListAdress::registerPython();
-  espressopp::FixedQuadrupleList::registerPython();
-  espressopp::FixedQuadrupleListAdress::registerPython();
-  espressopp::FixedQuadrupleAngleList::registerPython();
-  espressopp::FixedTupleList::registerPython();
-  espressopp::FixedTupleListAdress::registerPython();
-  espressopp::FixedLocalTupleList::registerPython();
-  espressopp::Real3D::registerPython();
-  espressopp::Quaternion::registerPython();
-  espressopp::RealND::registerPython();
-  espressopp::Tensor::registerPython();
-  espressopp::Int3D::registerPython();
-  espressopp::Version::registerPython();
-  espressopp::ParticleAccess::registerPython();
-  espressopp::RealNDs::registerPython();
+void espressopp::registerPython()
+{
+    espressopp::Particle::registerPython();
+    espressopp::ParticleGroup::registerPython();
+    espressopp::System::registerPython();
+    espressopp::VerletList::registerPython();
+    espressopp::VerletListAdress::registerPython();
+    espressopp::VerletListTriple::registerPython();
+    espressopp::FixedSingleList::registerPython();
+    espressopp::FixedPairList::registerPython();
+    espressopp::FixedPairDistList::registerPython();
+    espressopp::FixedPairListAdress::registerPython();
+    espressopp::FixedTripleList::registerPython();
+    espressopp::FixedTripleAngleList::registerPython();
+    espressopp::FixedTripleListAdress::registerPython();
+    espressopp::FixedQuadrupleList::registerPython();
+    espressopp::FixedQuadrupleListAdress::registerPython();
+    espressopp::FixedQuadrupleAngleList::registerPython();
+    espressopp::FixedTupleList::registerPython();
+    espressopp::FixedTupleListAdress::registerPython();
+    espressopp::FixedLocalTupleList::registerPython();
+    espressopp::Real3D::registerPython();
+    espressopp::Quaternion::registerPython();
+    espressopp::RealND::registerPython();
+    espressopp::Tensor::registerPython();
+    espressopp::Int3D::registerPython();
+    espressopp::Version::registerPython();
+    espressopp::ParticleAccess::registerPython();
+    espressopp::RealNDs::registerPython();
 
-  espressopp::esutil::registerPython();
-  espressopp::bc::registerPython();
-  espressopp::storage::registerPython();
-  espressopp::integrator::registerPython();
-  espressopp::interaction::registerPython();
-  espressopp::analysis::registerPython();
-  espressopp::io::registerPython();
+    espressopp::esutil::registerPython();
+    espressopp::bc::registerPython();
+    espressopp::storage::registerPython();
+    espressopp::integrator::registerPython();
+    espressopp::interaction::registerPython();
+    espressopp::analysis::registerPython();
+    espressopp::io::registerPython();
 
-  espressopp::vec::registerPython();
+    espressopp::vec::registerPython();
 
-  log4espp::PyLogger::registerPython();
+    log4espp::PyLogger::registerPython();
 }

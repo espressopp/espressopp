@@ -26,7 +26,6 @@
 
 //#include <typeinfo>
 
-
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
@@ -41,93 +40,97 @@
 
 #include "storage/Storage.hpp"
 
-//In FixedPairListInteractionTemplate.hpp, one potential is used for the entire FixedPairList.
-//Here, the potential used for each FixedPair comes from an array of potentials, as a function of the types of the two particles in the FixedPair (i.e. same as how it works in VerletListInteractionTemplate.hpp)
-//This is needed e.g. for non-bonded fixed-pair interactions, such as 1-4 LJ and Coulomb interactions in protein forcefields.
+// In FixedPairListInteractionTemplate.hpp, one potential is used for the entire FixedPairList.
+// Here, the potential used for each FixedPair comes from an array of potentials, as a function of
+// the types of the two particles in the FixedPair (i.e. same as how it works in
+// VerletListInteractionTemplate.hpp) This is needed e.g. for non-bonded fixed-pair interactions,
+// such as 1-4 LJ and Coulomb interactions in protein forcefields.
 
-//Unlike in FixedPairListInteractionTemplate.hpp, no ltMaxBondSqr variable is calculated here. (The FixedPairListInteractionTemplate.hpp variable seems to be unused.)
+// Unlike in FixedPairListInteractionTemplate.hpp, no ltMaxBondSqr variable is calculated here. (The
+// FixedPairListInteractionTemplate.hpp variable seems to be unused.)
 
+namespace espressopp
+{
+namespace interaction
+{
+template <typename _Potential>
+class FixedPairListTypesInteractionTemplate : public Interaction, SystemAccess
+{
+protected:
+    typedef _Potential Potential;
 
-namespace espressopp {
-  namespace interaction {
-    template < typename _Potential >
-    class FixedPairListTypesInteractionTemplate: public Interaction, SystemAccess {
-
-    protected:
-      typedef _Potential Potential;
-
-    public:
-      FixedPairListTypesInteractionTemplate
-          (std::shared_ptr < System > system,
-           std::shared_ptr<FixedPairList> _fixedpairList)
-          : SystemAccess(system), fixedpairList(_fixedpairList) {
-    	  potentialArray    = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+public:
+    FixedPairListTypesInteractionTemplate(std::shared_ptr<System> system,
+                                          std::shared_ptr<FixedPairList> _fixedpairList)
+        : SystemAccess(system), fixedpairList(_fixedpairList)
+    {
+        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes = 0;
-      }
+    }
 
-      virtual ~FixedPairListTypesInteractionTemplate() {};
+    virtual ~FixedPairListTypesInteractionTemplate(){};
 
-      void
-      setFixedPairList(std::shared_ptr < FixedPairList > _fixedpairList) {
+    void setFixedPairList(std::shared_ptr<FixedPairList> _fixedpairList)
+    {
         fixedpairList = _fixedpairList;
-      }
+    }
 
-      std::shared_ptr < FixedPairList > getFixedPairList() {
-        return fixedpairList;
-      }
+    std::shared_ptr<FixedPairList> getFixedPairList() { return fixedpairList; }
 
-      void
-      setPotential(int type1, int type2, const Potential &potential) {
+    void setPotential(int type1, int type2, const Potential &potential)
+    {
         // typeX+1 because i<ntypes
-        ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
         potentialArray.at(type1, type2) = potential;
-        if (type1 != type2) { // add potential in the other direction
-           potentialArray.at(type2, type1) = potential;
+        if (type1 != type2)
+        {  // add potential in the other direction
+            potentialArray.at(type2, type1) = potential;
         }
-      }
+    }
 
-      // this is used in the innermost force-loop
-      Potential &getPotential(int type1, int type2) {
-        return potentialArray.at(type1, type2);
-      }
+    // this is used in the innermost force-loop
+    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
-      // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-    	return  std::make_shared<Potential>(potentialArray.at(type1, type2));
-      }
+    // this is mainly used to access the potential from Python (e.g. to change parameters of the
+    // potential)
+    std::shared_ptr<Potential> getPotentialPtr(int type1, int type2)
+    {
+        return std::make_shared<Potential>(potentialArray.at(type1, type2));
+    }
 
+    virtual void addForces();
+    virtual real computeEnergy();
+    virtual real computeEnergyDeriv();
+    virtual real computeEnergyAA();
+    virtual real computeEnergyCG();
+    virtual real computeEnergyAA(int atomtype);
+    virtual real computeEnergyCG(int atomtype);
+    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual real computeVirial();
+    virtual void computeVirialTensor(Tensor &w);
+    virtual void computeVirialTensor(Tensor &w, real z);
+    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual real getMaxCutoff();
+    virtual int bondType() { return Pair; }
 
-      virtual void addForces();
-      virtual real computeEnergy();
-      virtual real computeEnergyDeriv();
-      virtual real computeEnergyAA();
-      virtual real computeEnergyCG();
-      virtual real computeEnergyAA(int atomtype);
-      virtual real computeEnergyCG(int atomtype);
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
-      virtual real computeVirial();
-      virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real z);
-      virtual void computeVirialTensor(Tensor *w, int n);
-      virtual real getMaxCutoff();
-      virtual int bondType() { return Pair; }
+protected:
+    int ntypes;
+    std::shared_ptr<FixedPairList> fixedpairList;
+    esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+    esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
+};
 
-    protected:
-      int ntypes;
-      std::shared_ptr < FixedPairList > fixedpairList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
-    };
+//////////////////////////////////////////////////
+// INLINE IMPLEMENTATION
+//////////////////////////////////////////////////
+template <typename _Potential>
+inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
+{
+    LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
+    const bc::BC &bc = *getSystemRef().bc;
 
-    //////////////////////////////////////////////////
-    // INLINE IMPLEMENTATION
-    //////////////////////////////////////////////////
-    template < typename _Potential > inline void
-    FixedPairListTypesInteractionTemplate < _Potential >::addForces() {
-      LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
-      const bc::BC& bc = *getSystemRef().bc;
-
-      for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
+    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -136,33 +139,34 @@ namespace espressopp {
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
-        //if(potential._computeForce(force, p1, p2)) {
+        // if(potential._computeForce(force, p1, p2)) {
         ////if(potential->_computeForce(force, p1, p2)) {
         //  p1.force() += force;
         //  p2.force() -= force;
-        //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
+        //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" <<
+        //  force);
         //}
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         potential.computeColVarWeights(dist, bc);
-        if(potential._computeForce(force, p1, p2, dist)) {
-          p1.force() += force;
-          p2.force() -= force;
+        if (potential._computeForce(force, p1, p2, dist))
+        {
+            p1.force() += force;
+            p2.force() -= force;
         }
-      }
     }
+}
 
-    template < typename _Potential >
-    inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergy() {
-      LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
+{
+    LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
 
-      real e = 0.0;
-      real es = 0.0;
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {
+    real e = 0.0;
+    real es = 0.0;
+    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -171,73 +175,91 @@ namespace espressopp {
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-        //e   = potential._computeEnergy(p1, p2);
+        // e   = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
         potential.computeColVarWeights(r21, bc);
-        e = potential._computeEnergy(p1,p2,r21);
+        e = potential._computeEnergy(p1, p2, r21);
         es += e;
-        LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
-        //std::cout << "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e << std::endl;
-      }
-
-      // reduce over all CPUs
-      real esum;
-      boost::mpi::all_reduce(*mpiWorld, es, esum, std::plus<real>());
-      return esum;
+        LOG4ESPP_TRACE(theLogger,
+                       "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+        // std::cout << "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e <<
+        // std::endl;
     }
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergyDeriv() {
-      std::cout << "Warning! At the moment computeEnergyDeriv() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      return 0.0;
-    }
+    // reduce over all CPUs
+    real esum;
+    boost::mpi::all_reduce(*mpiWorld, es, esum, std::plus<real>());
+    return esum;
+}
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergyAA() {
-      std::cout << "Warning! At the moment computeEnergyAA() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      return 0.0;
-    }
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyDeriv()
+{
+    std::cout << "Warning! At the moment computeEnergyDeriv() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergyAA(int atomtype) {
-      std::cout << "Warning! At the moment computeEnergyAA(int atomtype) in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      return 0.0;
-    }
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyAA()
+{
+    std::cout << "Warning! At the moment computeEnergyAA() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergyCG() {
-      std::cout << "Warning! At the moment computeEnergyCG() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      return 0.0;
-    }
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyAA(int atomtype)
+{
+    std::cout << "Warning! At the moment computeEnergyAA(int atomtype) in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeEnergyCG(int atomtype) {
-      std::cout << "Warning! At the moment computeEnergyCG(int atomtype) in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      return 0.0;
-    }
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyCG()
+{
+    std::cout << "Warning! At the moment computeEnergyCG() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    return 0.0;
+}
 
-    template < typename _Potential >
-    inline void
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeVirialX(std::vector<real> &p_xx_total, int bins) {
-        std::cout << "Warning! At the moment computeVirialX in FixedPairListTypesInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
-    }
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyCG(int atomtype)
+{
+    std::cout << "Warning! At the moment computeEnergyCG(int atomtype) in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeVirial() {
-      LOG4ESPP_INFO(theLogger, "compute the virial for the Fixed Pair List with types");
-      std::cout << "Warning! computeVirial in FixedPairListTypesInteractionTemplate has not been tested." << std::endl;
+template <typename _Potential>
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialX(
+    std::vector<real> &p_xx_total, int bins)
+{
+    std::cout << "Warning! At the moment computeVirialX in FixedPairListTypesInteractionTemplate "
+                 "does not work."
+              << std::endl
+              << "Therefore, the corresponding interactions won't be included in calculation."
+              << std::endl;
+}
 
-      real w = 0.0;
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
+{
+    LOG4ESPP_INFO(theLogger, "compute the virial for the Fixed Pair List with types");
+    std::cout
+        << "Warning! computeVirial in FixedPairListTypesInteractionTemplate has not been tested."
+        << std::endl;
+
+    real w = 0.0;
+    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -249,37 +271,79 @@ namespace espressopp {
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         potential.computeColVarWeights(r21, bc);
-        if(potential._computeForce(force, p1, p2, r21)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          //Real3D r21 = p1.position() - p2.position();
-          w = w + r21 * force;
+        if (potential._computeForce(force, p1, p2, r21))
+        {
+            // if(potential->_computeForce(force, p1, p2)) {
+            // Real3D r21 = p1.position() - p2.position();
+            w = w + r21 * force;
         }
-      }
-
-      // reduce over all CPUs
-      real wsum;
-      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
-      return wsum;
     }
 
-    template < typename _Potential > inline void
-    FixedPairListTypesInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
+    // reduce over all CPUs
+    real wsum;
+    boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+    return wsum;
+}
 
-      std::cout << "Warning! At the moment computeVirialTensor() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
+template <typename _Potential>
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+{
+    std::cout << "Warning! At the moment computeVirialTensor() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
 
-      /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+    /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-      Tensor wlocal(0.0);
-      //const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+    Tensor wlocal(0.0);
+    //const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    for (FixedPairList::PairList::Iterator it(*fixedpairList);
+         it.isValid(); ++it) {
+      const Particle &p1 = *it->first;
+      const Particle &p2 = *it->second;
+      Real3D r21;
+      //bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+      int type1 = p1.type();
+      int type2 = p2.type();
+      const Potential &potential = getPotential(type1, type2);
+      Real3D force(0.0, 0.0, 0.0);
+      if(potential._computeForce(force, p1, p2)) {
+      // if(potential->_computeForce(force, p1, p2)) {
+        Real3D r21 = p1.position() - p2.position();
+        wlocal += Tensor(r21, force);
+      }
+    }
+
+    // reduce over all CPUs
+    Tensor wsum(0.0);
+    boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+    w += wsum;*/
+}
+
+template <typename _Potential>
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+                                                                                   real z)
+{
+    std::cout << "Warning! At the moment computeVirialTensor() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+
+    Tensor wlocal(0.0);
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    for (FixedPairList::PairList::Iterator it(*fixedpairList);
+         it.isValid(); ++it) {
+      const Particle &p1 = *it->first;
+      const Particle &p2 = *it->second;
+      Real3D p1pos = p1.position();
+      Real3D p2pos = p2.position();
+      int type1 = p1.type();
+      int type2 = p2.type();
+      const Potential &potential = getPotential(type1, type2);
+
+      if(  (p1pos[2]>=z && p2pos[2]<=z) ||
+           (p1pos[2]<=z && p2pos[2]>=z) ){
         Real3D r21;
-        //bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
         // if(potential->_computeForce(force, p1, p2)) {
@@ -287,116 +351,84 @@ namespace espressopp {
           wlocal += Tensor(r21, force);
         }
       }
-
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
-      w += wsum;*/
     }
 
-    template < typename _Potential > inline void
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor& w, real z){
-      std::cout << "Warning! At the moment computeVirialTensor() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+    // reduce over all CPUs
+    Tensor wsum(0.0);
+    boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+    w += wsum;*/
+}
 
-      Tensor wlocal(0.0);
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        Real3D p1pos = p1.position();
-        Real3D p2pos = p2.position();
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+template <typename _Potential>
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+{
+    std::cout << "Warning! At the moment computeVirialTensor() in "
+                 "FixedPairListTypesInteractionTemplate does not work."
+              << std::endl;
+    /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-        if(  (p1pos[2]>=z && p2pos[2]<=z) ||
-             (p1pos[2]<=z && p2pos[2]>=z) ){
-          Real3D r21;
-          bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
-          Real3D force(0.0, 0.0, 0.0);
-          if(potential._computeForce(force, p1, p2)) {
-          // if(potential->_computeForce(force, p1, p2)) {
-            Real3D r21 = p1.position() - p2.position();
-            wlocal += Tensor(r21, force);
-          }
-        }
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    Real3D Li = bc.getBoxL();
+    Tensor *wlocal = new Tensor[n];
+    for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
+    for (FixedPairList::PairList::Iterator it(*fixedpairList);
+         it.isValid(); ++it) {
+      const Particle &p1 = *it->first;
+      const Particle &p2 = *it->second;
+      Real3D p1pos = p1.position();
+      Real3D p2pos = p2.position();
+      int type1 = p1.type();
+      int type2 = p2.type();
+      const Potential &potential = getPotential(type1, type2);
+
+      int position1 = (int)( n * p1pos[2]/Li[2]);
+      int position2 = (int)( n * p1pos[2]/Li[2]);
+
+      int maxpos = std::max(position1, position2);
+      int minpos = std::min(position1, position2);
+
+      Real3D r21;
+      bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
+      Real3D force(0.0, 0.0, 0.0);
+      Tensor ww;
+      if(potential._computeForce(force, p1, p2)) {
+      // if(potential->_computeForce(force, p1, p2)) {
+        Real3D r21 = p1.position() - p2.position();
+        ww += Tensor(r21, force);
       }
 
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
-      w += wsum;*/
+      int i = minpos + 1;
+      while(i<=maxpos){
+        wlocal[i] += ww;
+        i++;
+      }
     }
 
-    template < typename _Potential > inline void
-    FixedPairListTypesInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor *w, int n){
-      std::cout << "Warning! At the moment computeVirialTensor() in FixedPairListTypesInteractionTemplate does not work." << std::endl;
-      /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+    Tensor *wsum = new Tensor[n];
+    boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
 
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      Real3D Li = bc.getBoxL();
-      Tensor *wlocal = new Tensor[n];
-      for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
-      for (FixedPairList::PairList::Iterator it(*fixedpairList);
-           it.isValid(); ++it) {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        Real3D p1pos = p1.position();
-        Real3D p2pos = p2.position();
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
-
-        int position1 = (int)( n * p1pos[2]/Li[2]);
-        int position2 = (int)( n * p1pos[2]/Li[2]);
-
-        int maxpos = std::max(position1, position2);
-        int minpos = std::min(position1, position2);
-
-        Real3D r21;
-        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
-        Real3D force(0.0, 0.0, 0.0);
-        Tensor ww;
-        if(potential._computeForce(force, p1, p2)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          Real3D r21 = p1.position() - p2.position();
-          ww += Tensor(r21, force);
-        }
-
-        int i = minpos + 1;
-        while(i<=maxpos){
-          wlocal[i] += ww;
-          i++;
-        }
-      }
-
-      Tensor *wsum = new Tensor[n];
-      boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
-
-      for(int j=0; j<n; j++){
-        w[j] += wsum[j];
-      }
-
-      delete [] wsum;
-      delete [] wlocal;*/
+    for(int j=0; j<n; j++){
+      w[j] += wsum[j];
     }
 
-    template < typename _Potential >
-    inline real
-    FixedPairListTypesInteractionTemplate< _Potential >::getMaxCutoff() {
-      real cutoff = 0.0;
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
+    delete [] wsum;
+    delete [] wlocal;*/
+}
+
+template <typename _Potential>
+inline real FixedPairListTypesInteractionTemplate<_Potential>::getMaxCutoff()
+{
+    real cutoff = 0.0;
+    for (int i = 0; i < ntypes; i++)
+    {
+        for (int j = 0; j < ntypes; j++)
+        {
             cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
             // cutoff = std::max(cutoff, getPotential(i, j)->getCutoff());
         }
-      }
-      return cutoff;
     }
-  }
+    return cutoff;
 }
+}  // namespace interaction
+}  // namespace espressopp
 #endif

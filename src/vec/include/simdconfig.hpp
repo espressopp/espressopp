@@ -41,18 +41,19 @@ constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
   return ((((SIZE)+ESPP_VECTOR_WIDTH-1)/ESPP_VECTOR_WIDTH)*ESPP_VECTOR_WIDTH);
 }
 
-namespace espressopp {
-  namespace vec {
+namespace espressopp
+{
+namespace vec
+{
+// aligned
+template <typename T, std::size_t Alignment = ESPP_VECTOR_ALIGNMENT>
+using AlignedVector = std::vector<T, boost::alignment::aligned_allocator<T, Alignment>>;
 
-    // aligned
-    template <typename T, std::size_t Alignment=ESPP_VECTOR_ALIGNMENT>
-    using AlignedVector = std::vector<T, boost::alignment::aligned_allocator<T,Alignment>>;
+// represents a very large number for padding positions of "fake" particles = sqrt(max/3)
+// compatible only with real = double
+static const real large_pos = 7.74099e150;
 
-    // represents a very large number for padding positions of "fake" particles = sqrt(max/3)
-    // compatible only with real = double
-    static const real large_pos = 7.74099e150;
-
-  }
-}
+}  // namespace vec
+}  // namespace espressopp
 
 #endif//VEC_INCLUDE_SIMDCONFIG_HPP

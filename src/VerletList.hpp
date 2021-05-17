@@ -5,21 +5,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -36,37 +36,40 @@
 #include "boost/unordered_set.hpp"
 #include "esutil/Array2D.hpp"
 
-namespace espressopp {
-
+namespace espressopp
+{
 /** Class that builds and stores verlet lists.
 
     ToDo: register at system for rebuild
 
 */
 
-  class VerletList : public SystemAccess {
-
-  public:
-
+class VerletList : public SystemAccess
+{
+public:
     /** Build a verlet list of all particle pairs in the storage
-	whose distance is less than a given cutoff.
+        whose distance is less than a given cutoff.
 
-	\param system is the system for which the verlet list is built
-	\param cut is the cutoff value for the 
+        \param system is the system for which the verlet list is built
+        \param cut is the cutoff value for the
 
     */
 
-    VerletList(std::shared_ptr< System >, real cut, bool rebuildVL, bool useBuffers=true, bool useSOA=false);
+    VerletList(std::shared_ptr<System>,
+               real cut,
+               bool rebuildVL,
+               bool useBuffers = true,
+               bool useSOA = false);
 
     ~VerletList();
 
     PairList& getPairs() { return vlPairs; }
 
     python::tuple getPair(int i);
-    
+
     inline size_t getMaxType() { return max_type; }
 
-    real getVerletCutoff(); // returns cutoff + skin
+    real getVerletCutoff();  // returns cutoff + skin
 
     void connect();
 
@@ -96,43 +99,45 @@ namespace espressopp {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
-  protected:
-
-    std::vector<real> c_x,c_y,c_z;
+protected:
+    std::vector<real> c_x, c_y, c_z;
     std::vector<Real3D> c_pos;
     std::vector<Particle*> c_p;
     std::vector<size_t> c_id, c_type;
 
     inline void rebuildUsingBuffers(bool useExList, bool useSOA)
     {
-      if(useExList) {
-        if(useSOA)
-          _rebuildUsingBuffers<true,true>();
+        if (useExList)
+        {
+            if (useSOA)
+                _rebuildUsingBuffers<true, true>();
+            else
+                _rebuildUsingBuffers<true, false>();
+        }
         else
-          _rebuildUsingBuffers<true,false>();
-      } else {
-        if(useSOA)
-          _rebuildUsingBuffers<false,true>();
-        else
-          _rebuildUsingBuffers<false,false>();
-      }
+        {
+            if (useSOA)
+                _rebuildUsingBuffers<false, true>();
+            else
+                _rebuildUsingBuffers<false, false>();
+        }
     }
 
-    template< bool USE_EXCLUSION_LIST, bool USE_SOA >
+    template <bool USE_EXCLUSION_LIST, bool USE_SOA>
     void _rebuildUsingBuffers();
 
     bool useBuffers = false;
     bool useSOA = false;
 
-    void checkPair(Particle &pt1, Particle &pt2);
+    void checkPair(Particle& pt1, Particle& pt2);
     PairList vlPairs;
-    boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
-    
+    boost::unordered_set<std::pair<longint, longint> > exList;  // exclusion list
+
     size_t max_type;
     real cutsq;
     real cut;
     real cutVerlet;
-    
+
     int builds;
     boost::signals2::connection connectionResort;
 
@@ -140,8 +145,8 @@ namespace espressopp {
     real timeRebuild;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
-  };
+};
 
-}
+}  // namespace espressopp
 
 #endif

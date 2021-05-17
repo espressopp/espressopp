@@ -30,72 +30,69 @@
 #include "SystemAccess.hpp"
 #include "ConfigurationExt.hpp"
 
-namespace espressopp {
-  namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+/** Class that stores particle positions for later analysis.
 
-    /** Class that stores particle positions for later analysis.
+    Important: this class can also be used if the number of
+    particles changes between different snapshots.
+*/
 
-        Important: this class can also be used if the number of
-        particles changes between different snapshots.
-    */
+typedef std::vector<ConfigurationExtPtr> ConfigurationExtList;
 
-    typedef std::vector<ConfigurationExtPtr> ConfigurationExtList;
+class ConfigurationsExt : public SystemAccess
+{
+public:
+    /** Constructor, allow for unlimited snapshots. */
 
-    class ConfigurationsExt : public SystemAccess {
+    ConfigurationsExt(std::shared_ptr<System> system) : SystemAccess(system) { maxConfigs = 0; }
 
-    public:
+    /** set number of maximal snapshots. */
 
-      /** Constructor, allow for unlimited snapshots. */
+    void setCapacity(int max);
 
-      ConfigurationsExt(std::shared_ptr<System> system) : SystemAccess (system)
-      { maxConfigs = 0; }
+    /** get number of maximal snapshots. */
 
-      /** set number of maximal snapshots. */
+    int getCapacity();
 
-      void setCapacity(int max);
+    /** get number of available snapshots. */
 
-      /** get number of maximal snapshots. */
+    int getSize();
 
-      int getCapacity();
+    ~ConfigurationsExt() {}
 
-      /** get number of available snapshots. */
+    bool getUnfolded() { return unfolded; }
+    void setUnfolded(bool v) { unfolded = v; }
 
-      int getSize();
+    /** Take a snapshot of all current particle positions. */
 
-      ~ConfigurationsExt() {}
+    void gather();
 
-      bool getUnfolded(){return unfolded;}
-      void setUnfolded(bool v){unfolded = v;}
+    ConfigurationExtPtr get(int stackpos);
 
-      /** Take a snapshot of all current particle positions. */
+    ConfigurationExtPtr back();
 
-      void gather();
+    ConfigurationExtList all();
 
-      ConfigurationExtPtr get(int stackpos);
+    void clear() { configurationsExt.clear(); }
 
-      ConfigurationExtPtr back();
+    static void registerPython();
 
-      ConfigurationExtList all();
+protected:
+    static LOG4ESPP_DECL_LOGGER(logger);
 
-      void clear() { configurationsExt.clear(); }
+private:
+    void pushConfig(ConfigurationExtPtr config);
 
-      static void registerPython();
+    ConfigurationExtList configurationsExt;
 
-    protected:
+    int maxConfigs;
 
-      static LOG4ESPP_DECL_LOGGER(logger);
-
-    private:
-
-      void pushConfig(ConfigurationExtPtr config);
-
-      ConfigurationExtList configurationsExt;
-
-      int maxConfigs;
-
-      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
-    };
-  }
-}
+    bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

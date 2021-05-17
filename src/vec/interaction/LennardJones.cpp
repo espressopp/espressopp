@@ -44,8 +44,7 @@ namespace espressopp { namespace vec {
         .def(init< real, real, real, real >())
         .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
         .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
-        .def_pickle(LennardJones_pickle())
-      ;
+        .def_pickle(LennardJones_pickle());
 
       class_< VerletListLennardJonesBase, bases< Interaction > >
         ("vec_interaction_VerletListLennardJonesBase", init< std::shared_ptr<VerletList> >())

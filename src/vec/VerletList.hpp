@@ -91,7 +91,7 @@ namespace espressopp { namespace vec {
 
     inline auto getVectorization() { return vectorization; }
 
-    real getVerletCutoff(); // returns cutoff + skin
+    real getVerletCutoff();  // returns cutoff + skin
 
     void connect();
 
@@ -138,8 +138,9 @@ namespace espressopp { namespace vec {
     real timeRebuild;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
-  };
+};
 
-}}
+}  // namespace vec
+}  // namespace espressopp
 
 #endif//VEC_VERLETLIST_HPP

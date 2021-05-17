@@ -24,54 +24,42 @@
 #include "Potential.hpp"
 #include "logging.hpp"
 
-namespace espressopp {
-  namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(Potential::theLogger, "Potential");
 
-    LOG4ESPP_LOGGER(Potential::theLogger, "Potential");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void Potential::registerPython()
+{
+    using namespace espressopp::python;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void Potential::registerPython() {
-        using namespace espressopp::python;
+    real (Potential::*computeEnergy1)(const Real3D& dist) const = &Potential::computeEnergy;
 
-        real (Potential::*computeEnergy1)(const Real3D& dist) const =
-            &Potential::computeEnergy;
+    real (Potential::*computeEnergy2)(real dist) const = &Potential::computeEnergy;
 
-        real (Potential::*computeEnergy2)(real dist) const =
-            &Potential::computeEnergy;
+    Real3D (Potential::*computeForce)(const Real3D& dist) const = &Potential::computeForce;
 
-        Real3D (Potential::*computeForce)(const Real3D& dist) const =
-            &Potential::computeForce;
-
-        class_< Potential, boost::noncopyable >
-            ("interaction_Potential", no_init)
-            .add_property("cutoff",
-                &Potential::getCutoff,
-                &Potential::setCutoff)
-            .add_property("shift",
-                &Potential::getShift,
-                &Potential::setShift)
-            .def("setAutoShift", pure_virtual(&Potential::setAutoShift))
-            .add_property("colVarBondList",
-                &Potential::getColVarBondList,
-                &Potential::setColVarBondList)
-            .add_property("colVarAngleList",
-                &Potential::getColVarAngleList,
-                &Potential::setColVarAngleList)
-            .add_property("colVarDihedList",
-                &Potential::getColVarDihedList,
-                &Potential::setColVarDihedList)
-            .add_property("colVar",
-                &Potential::getColVar)
-            .def("computeEnergy", pure_virtual(computeEnergy1))
-            .def("computeEnergy", pure_virtual(computeEnergy2))
-            .def("computeForce", pure_virtual(computeForce))
-        ;
-    }
-  }
+    class_<Potential, boost::noncopyable>("interaction_Potential", no_init)
+        .add_property("cutoff", &Potential::getCutoff, &Potential::setCutoff)
+        .add_property("shift", &Potential::getShift, &Potential::setShift)
+        .def("setAutoShift", pure_virtual(&Potential::setAutoShift))
+        .add_property("colVarBondList", &Potential::getColVarBondList,
+                      &Potential::setColVarBondList)
+        .add_property("colVarAngleList", &Potential::getColVarAngleList,
+                      &Potential::setColVarAngleList)
+        .add_property("colVarDihedList", &Potential::getColVarDihedList,
+                      &Potential::setColVarDihedList)
+        .add_property("colVar", &Potential::getColVar)
+        .def("computeEnergy", pure_virtual(computeEnergy1))
+        .def("computeEnergy", pure_virtual(computeEnergy2))
+        .def("computeForce", pure_virtual(computeForce));
 }
-
+}  // namespace interaction
+}  // namespace espressopp
 
 //     class PythonPotential
 //       : public espressopp::python::wrapper< Potential >,

@@ -20,8 +20,10 @@
 
 #include "CellListAllTriplesIterator.hpp"
 
-namespace espressopp {
-  namespace iterator {
-    LOG4ESPP_LOGGER(CellListAllTriplesIterator::theLogger, "CellListAllTriplesIterator");
-  }
+namespace espressopp
+{
+namespace iterator
+{
+LOG4ESPP_LOGGER(CellListAllTriplesIterator::theLogger, "CellListAllTriplesIterator");
 }
+}  // namespace espressopp

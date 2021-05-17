@@ -21,12 +21,15 @@
 #ifndef VEC_INTERACTION_BINDINGS_HPP
 #define VEC_INTERACTION_BINDINGS_HPP
 
-namespace espressopp {
-  namespace vec {
-    namespace interaction {
-      void registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace vec
+{
+namespace interaction
+{
+void registerPython();
 }
+}  // namespace vec
+}  // namespace espressopp
 
-#endif//VEC_INTERACTION_BINDINGS_HPP
+#endif  // VEC_INTERACTION_BINDINGS_HPP

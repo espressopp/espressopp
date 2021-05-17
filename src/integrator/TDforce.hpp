@@ -34,54 +34,60 @@
 #include "interaction/Interpolation.hpp"
 #include <unordered_map>
 
-
 #include "Extension.hpp"
 #include "VelocityVerlet.hpp"
 
 #include "boost/signals2.hpp"
 
+namespace espressopp
+{
+namespace integrator
+{
+class TDforce : public Extension
+{
+public:
+    std::shared_ptr<VerletListAdress> verletList;
+    real startdist;
+    real enddist;
+    int edgeweightmultiplier;
+    bool slow;
+    TDforce(std::shared_ptr<System> system,
+            std::shared_ptr<VerletListAdress> _verletList,
+            real _startdist = 0.0,
+            real _enddist = 0.0,
+            int _edgeweightmultiplier = 1,
+            bool _slow = false);
 
-namespace espressopp {
-  namespace integrator {
+    ~TDforce();
 
-    class TDforce : public Extension {
+    /** Setter for the filename, will read in the table. */
+    void addForce(int itype, const char* _filename, int type);
+    const char* getFilename() const { return filename.c_str(); }
 
-      public:
-        std::shared_ptr<VerletListAdress> verletList;
-        real startdist;
-        real enddist;
-        int edgeweightmultiplier;
-        bool slow;
-        TDforce(std::shared_ptr<System> system, std::shared_ptr<VerletListAdress> _verletList, real _startdist = 0.0, real _enddist = 0.0, int _edgeweightmultiplier = 1, bool _slow = false);
+    void applyForce();
+    real computeTDEnergy();
 
-        ~TDforce();
+    static void registerPython();
 
-        /** Setter for the filename, will read in the table. */
-        void addForce(int itype, const char* _filename, int type);
-        const char* getFilename() const { return filename.c_str(); }
+private:
+    boost::signals2::connection _applyForce;
 
-        void applyForce();
-        real computeTDEnergy();
+    void connect();
+    void disconnect();
+    real getForce(longint type_id, real dist);
 
-        static void registerPython();
+    Real3D
+        center;  // center of adress zone, from verletlistadress (assumes only one point as center)
+    bool sphereAdr;  // true: adress region is spherical centered on point x,y,z or particle pid;
+                     // false: adress region is slab centered on point x or particle pid, from
+                     // verletlistadres
+    std::string filename;
+    typedef std::shared_ptr<interaction::Interpolation> Table;
+    std::unordered_map<int, Table> forces;  // map type to force
 
-      private:
-
-        boost::signals2::connection _applyForce;
-
-        void connect();
-        void disconnect();
-        real getForce(longint type_id, real dist);
-
-        Real3D center; // center of adress zone, from verletlistadress (assumes only one point as center)
-        bool sphereAdr; // true: adress region is spherical centered on point x,y,z or particle pid; false: adress region is slab centered on point x or particle pid, from verletlistadres
-        std::string filename;
-        typedef std::shared_ptr <interaction::Interpolation> Table;
-        std::unordered_map<int, Table> forces; // map type to force
-
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

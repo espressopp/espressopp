@@ -29,153 +29,155 @@
 #include "Int3D.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espressopp {
-  namespace bc {
-    /* Constructor */
-    SlabBC::
-    SlabBC(std::shared_ptr< esutil::RNG > _rng, const Real3D& _boxL) : BC(_rng) {
-      setBoxL(_boxL);
-      slabDir=0;
-    }
-
-    /* Setter method for the box length */
-    void SlabBC::setBoxL(const Real3D& _boxL) {
-      boxL = _boxL;
-      for (int i = 0; i < 3; i++) {
-	    invBoxL[i] = 1.0/boxL[i];
-	    boxL2[i] = 0.5*boxL[i];
-      }
-      onBoxDimensionsChanged();
-    }
-    void SlabBC::scaleVolume(real s) {
-  	  boxL *= s;
-  	  boxL2 *= s;
-  	  invBoxL /= s;
-  	  onBoxDimensionsChanged();
-    }
-    void SlabBC::scaleVolume(Real3D s) {
-  	  boxL[0] *= s[0];
-  	  boxL[1] *= s[1];
-  	  boxL[2] *= s[2];
-  	  boxL2[0] *= s[0];
-  	  boxL2[1] *= s[1];
-  	  boxL2[2] *= s[2];
-  	  invBoxL[0] /= s[0];
-  	  invBoxL[1] /= s[1];
-  	  invBoxL[2] /= s[2];
-  	  onBoxDimensionsChanged();
-    }
-
-    /* Returns the minimum image vector between two positions */
-    void
-    SlabBC::
-    getMinimumImageVector(Real3D& dist,
-			  const Real3D& pos1,
-			  const Real3D& pos2) const {
-      dist = pos1;
-      dist -= pos2;
-
-      for (int i=0; i<3; i++) {
-	if (i!=slabDir) {
-	  dist[i] -= round(dist[i] * invBoxL[i]) * boxL[i];
-	}
-      }
-    }
-
-    /* Returns the minimum image vector between two positions */
-    void
-    SlabBC::
-    getMinimumImageVectorBox(Real3D& dist,
-                             const Real3D& pos1,
-                             const Real3D& pos2) const {
-      dist = pos1;
-      dist -= pos2;
-
-      for (int i=0; i<3; i++) {
-	if (i!=slabDir) {
-	  if (dist[i] < -boxL2[i]) dist[i] += boxL[i];
-	  else if (dist[i] > boxL2[i]) dist[i] -= boxL[i];
-	}
-      }
-    }
-
-    /* Fold back a nearby position into box */
-
-    void
-    SlabBC::getMinimumDistance(Real3D& dist) const {
-
-      for (int i=0; i<3; i++) {
-	if (i!=slabDir) {
-	  if (dist[i] < -0.5 * boxL[i]) dist[i] += boxL[i];
-	  else if (dist[i] > 0.5 * boxL[i]) dist[i] -= boxL[i];
-	}
-      }
-    }
-
-    /* Returns the minimum image vector between two positions */
-    void
-    SlabBC::
-    getMinimumImageVectorX(real dist[3],
-                          const real pos1[3],
-                          const real pos2[3]) const {
-
-      for (int i=0; i<3; i++) {
-	if (i!=slabDir) {
-	  dist[i] = pos1[i];
-	  dist[i] -= pos2[i];
-	  dist[i] -= round(dist[i] * invBoxL[i]) * boxL[i];
-	}
-      }
-    }
-
-    /* Fold an individual coordinate in the specified direction */
-    void
-    SlabBC::
-    foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
-      int tmp = static_cast<int>(floor(pos[dir]*invBoxL[dir]));
-
-      imageBox[dir] += tmp;
-      pos[dir] -= tmp*boxL[dir];
-
-      if(pos[dir] < 0 || pos[dir] >= boxL[dir]) {
-        /* slow but safe */
-        if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
-          throw std::runtime_error("particle coordinate out of range");
-          imageBox[dir] = 0;
-          pos[dir] = 0;
-        }
-      }
-
-    }
-
-    /* Unfold an individual coordinate in the specified direction */
-    void
-    SlabBC::
-    unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
-      pos[dir] += imageBox[dir]*boxL[dir];
-      imageBox[dir] = 0;
-    }
-
-    /* Get random position in the central image box */
-    void
-    SlabBC::
-    getRandomPos(Real3D& res) const {
-      for(int k = 0; k < 3; k++)
-        res[k] = boxL[k];
-
-      res[0] *= (*rng)();
-      res[1] *= (*rng)();
-      res[2] *= (*rng)();
-    }
-
-    void
-    SlabBC::
-    registerPython() {
-      using namespace espressopp::python;
-      class_<SlabBC, bases< BC >, boost::noncopyable >
-	("bc_SlabBC", init< std::shared_ptr< esutil::RNG >, Real3D& >())
-	.add_property("boxL", &SlabBC::getBoxL, &SlabBC::setBoxL)
-      ;
-    }
-  }
+namespace espressopp
+{
+namespace bc
+{
+/* Constructor */
+SlabBC::SlabBC(std::shared_ptr<esutil::RNG> _rng, const Real3D& _boxL) : BC(_rng)
+{
+    setBoxL(_boxL);
+    slabDir = 0;
 }
+
+/* Setter method for the box length */
+void SlabBC::setBoxL(const Real3D& _boxL)
+{
+    boxL = _boxL;
+    for (int i = 0; i < 3; i++)
+    {
+        invBoxL[i] = 1.0 / boxL[i];
+        boxL2[i] = 0.5 * boxL[i];
+    }
+    onBoxDimensionsChanged();
+}
+void SlabBC::scaleVolume(real s)
+{
+    boxL *= s;
+    boxL2 *= s;
+    invBoxL /= s;
+    onBoxDimensionsChanged();
+}
+void SlabBC::scaleVolume(Real3D s)
+{
+    boxL[0] *= s[0];
+    boxL[1] *= s[1];
+    boxL[2] *= s[2];
+    boxL2[0] *= s[0];
+    boxL2[1] *= s[1];
+    boxL2[2] *= s[2];
+    invBoxL[0] /= s[0];
+    invBoxL[1] /= s[1];
+    invBoxL[2] /= s[2];
+    onBoxDimensionsChanged();
+}
+
+/* Returns the minimum image vector between two positions */
+void SlabBC::getMinimumImageVector(Real3D& dist, const Real3D& pos1, const Real3D& pos2) const
+{
+    dist = pos1;
+    dist -= pos2;
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != slabDir)
+        {
+            dist[i] -= round(dist[i] * invBoxL[i]) * boxL[i];
+        }
+    }
+}
+
+/* Returns the minimum image vector between two positions */
+void SlabBC::getMinimumImageVectorBox(Real3D& dist, const Real3D& pos1, const Real3D& pos2) const
+{
+    dist = pos1;
+    dist -= pos2;
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != slabDir)
+        {
+            if (dist[i] < -boxL2[i])
+                dist[i] += boxL[i];
+            else if (dist[i] > boxL2[i])
+                dist[i] -= boxL[i];
+        }
+    }
+}
+
+/* Fold back a nearby position into box */
+
+void SlabBC::getMinimumDistance(Real3D& dist) const
+{
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != slabDir)
+        {
+            if (dist[i] < -0.5 * boxL[i])
+                dist[i] += boxL[i];
+            else if (dist[i] > 0.5 * boxL[i])
+                dist[i] -= boxL[i];
+        }
+    }
+}
+
+/* Returns the minimum image vector between two positions */
+void SlabBC::getMinimumImageVectorX(real dist[3], const real pos1[3], const real pos2[3]) const
+{
+    for (int i = 0; i < 3; i++)
+    {
+        if (i != slabDir)
+        {
+            dist[i] = pos1[i];
+            dist[i] -= pos2[i];
+            dist[i] -= round(dist[i] * invBoxL[i]) * boxL[i];
+        }
+    }
+}
+
+/* Fold an individual coordinate in the specified direction */
+void SlabBC::foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const
+{
+    int tmp = static_cast<int>(floor(pos[dir] * invBoxL[dir]));
+
+    imageBox[dir] += tmp;
+    pos[dir] -= tmp * boxL[dir];
+
+    if (pos[dir] < 0 || pos[dir] >= boxL[dir])
+    {
+        /* slow but safe */
+        if (fabs(pos[dir] * invBoxL[dir]) >= INT_MAX / 2)
+        {
+            throw std::runtime_error("particle coordinate out of range");
+            imageBox[dir] = 0;
+            pos[dir] = 0;
+        }
+    }
+}
+
+/* Unfold an individual coordinate in the specified direction */
+void SlabBC::unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const
+{
+    pos[dir] += imageBox[dir] * boxL[dir];
+    imageBox[dir] = 0;
+}
+
+/* Get random position in the central image box */
+void SlabBC::getRandomPos(Real3D& res) const
+{
+    for (int k = 0; k < 3; k++) res[k] = boxL[k];
+
+    res[0] *= (*rng)();
+    res[1] *= (*rng)();
+    res[2] *= (*rng)();
+}
+
+void SlabBC::registerPython()
+{
+    using namespace espressopp::python;
+    class_<SlabBC, bases<BC>, boost::noncopyable>("bc_SlabBC",
+                                                  init<std::shared_ptr<esutil::RNG>, Real3D&>())
+        .add_property("boxL", &SlabBC::getBoxL, &SlabBC::setBoxL);
+}
+}  // namespace bc
+}  // namespace espressopp

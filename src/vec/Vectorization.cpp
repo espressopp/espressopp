@@ -58,33 +58,30 @@ namespace espressopp {
       disconnect();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// connect to boost signals in integrator and storage
-    void Vectorization::connect()
-    {
-      sigResetParticles     = getSystem()->storage->onParticlesChanged.connect(
-                                boost::signals2::at_front, // call first due to reordering
-                                std::bind(&Vectorization::resetParticles, this));
-      sigResetCells         = getSystem()->storage->onCellAdjust.connect(
-                                boost::signals2::at_back,
-                                std::bind(&Vectorization::resetCells, this));
-      sigBefCalcForces      = mdintegrator->aftInitF.connect(
-                                boost::signals2::at_back,
-                                std::bind(&Vectorization::befCalcForces,this));
-      sigUpdateForces       = mdintegrator->aftCalcFLocal.connect(
-                                boost::signals2::at_front,
-                                std::bind(&Vectorization::updateForces,this));
-    }
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// connect to boost signals in integrator and storage
+void Vectorization::connect()
+{
+    sigResetParticles = getSystem()->storage->onParticlesChanged.connect(
+        boost::signals2::at_front,  // call first due to reordering
+        std::bind(&Vectorization::resetParticles, this));
+    sigResetCells = getSystem()->storage->onCellAdjust.connect(
+        boost::signals2::at_back, std::bind(&Vectorization::resetCells, this));
+    sigBefCalcForces = mdintegrator->aftInitF.connect(
+        boost::signals2::at_back, std::bind(&Vectorization::befCalcForces, this));
+    sigUpdateForces = mdintegrator->aftCalcFLocal.connect(
+        boost::signals2::at_front, std::bind(&Vectorization::updateForces, this));
+}
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// disconnect boost signals made with connect()
-    void Vectorization::disconnect()
-    {
-      sigResetParticles.disconnect();
-      sigResetCells.disconnect();
-      sigBefCalcForces.disconnect();
-      sigUpdateForces.disconnect();
-    }
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// disconnect boost signals made with connect()
+void Vectorization::disconnect()
+{
+    sigResetParticles.disconnect();
+    sigResetCells.disconnect();
+    sigBefCalcForces.disconnect();
+    sigUpdateForces.disconnect();
+}
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /// reset and update cell mapping and neighbor lists from current storage
@@ -164,6 +161,5 @@ namespace espressopp {
         .def_readwrite("storageVec", &Vectorization::storageVec)
         ;
     }
-
   }
 }

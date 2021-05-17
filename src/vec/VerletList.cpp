@@ -325,9 +325,11 @@ namespace espressopp { namespace vec {
             int* __restrict npptr =  &(neighborList.nplist[c_np_start+c_nplist_size]);
             int ll=0;
 
+            #ifdef __INTEL_COMPILER
             #pragma vector always
             #pragma vector aligned
             #pragma ivdep
+            #endif
             for(int ii=0; ii<c_j_size; ii++)
             {
               const real dist_x = p_x - c_x_ptr[ii];

@@ -26,7 +26,6 @@
 
 //#include <typeinfo>
 
-
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
@@ -38,90 +37,89 @@
 
 #include "storage/Storage.hpp"
 
-namespace espressopp {
-  namespace interaction {
-    template < typename _Potential >
-    class VerletListInteractionTemplate: public Interaction {
+namespace espressopp
+{
+namespace interaction
+{
+template <typename _Potential>
+class VerletListInteractionTemplate : public Interaction
+{
+protected:
+    typedef _Potential Potential;
 
-    protected:
-      typedef _Potential Potential;
-
-    public:
-      VerletListInteractionTemplate
-          (std::shared_ptr<VerletList> _verletList)
-          : verletList(_verletList) {
-    	  potentialArray    = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+public:
+    VerletListInteractionTemplate(std::shared_ptr<VerletList> _verletList) : verletList(_verletList)
+    {
+        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes = 0;
-      }
+    }
 
-      virtual ~VerletListInteractionTemplate() {};
+    virtual ~VerletListInteractionTemplate(){};
 
-      void
-      setVerletList(std::shared_ptr < VerletList > _verletList) {
-        verletList = _verletList;
-      }
+    void setVerletList(std::shared_ptr<VerletList> _verletList) { verletList = _verletList; }
 
-      std::shared_ptr<VerletList> getVerletList() {
-        return verletList;
-      }
+    std::shared_ptr<VerletList> getVerletList() { return verletList; }
 
-      void
-      setPotential(int type1, int type2, const Potential &potential) {
+    void setPotential(int type1, int type2, const Potential &potential)
+    {
         // typeX+1 because i<ntypes
-        ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
         potentialArray.at(type1, type2) = potential;
-        LOG4ESPP_INFO(_Potential::theLogger, "added potential for type1=" << type1 << " type2=" << type2);
-        if (type1 != type2) { // add potential in the other direction
-           potentialArray.at(type2, type1) = potential;
-           LOG4ESPP_INFO(_Potential::theLogger, "automatically added the same potential for type1=" << type2 << " type2=" << type1);
+        LOG4ESPP_INFO(_Potential::theLogger,
+                      "added potential for type1=" << type1 << " type2=" << type2);
+        if (type1 != type2)
+        {  // add potential in the other direction
+            potentialArray.at(type2, type1) = potential;
+            LOG4ESPP_INFO(_Potential::theLogger, "automatically added the same potential for type1="
+                                                     << type2 << " type2=" << type1);
         }
-      }
+    }
 
-      // this is used in the innermost force-loop
-      Potential &getPotential(int type1, int type2) {
-        return potentialArray.at(type1, type2);
-      }
+    // this is used in the innermost force-loop
+    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
-      // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
-      std::shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
-    	return  std::make_shared<Potential>(potentialArray.at(type1, type2));
-      }
+    // this is mainly used to access the potential from Python (e.g. to change parameters of the
+    // potential)
+    std::shared_ptr<Potential> getPotentialPtr(int type1, int type2)
+    {
+        return std::make_shared<Potential>(potentialArray.at(type1, type2));
+    }
 
+    virtual void addForces();
+    virtual real computeEnergy();
+    virtual real computeEnergyDeriv();
+    virtual real computeEnergyAA();
+    virtual real computeEnergyCG();
+    virtual real computeEnergyAA(int atomtype);
+    virtual real computeEnergyCG(int atomtype);
+    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual real computeVirial();
+    virtual void computeVirialTensor(Tensor &w);
+    virtual void computeVirialTensor(Tensor &w, real z);
+    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual real getMaxCutoff();
+    virtual int bondType() { return Nonbonded; }
 
-      virtual void addForces();
-      virtual real computeEnergy();
-      virtual real computeEnergyDeriv();
-      virtual real computeEnergyAA();
-      virtual real computeEnergyCG();
-      virtual real computeEnergyAA(int atomtype);
-      virtual real computeEnergyCG(int atomtype);
-      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
-      virtual real computeVirial();
-      virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real z);
-      virtual void computeVirialTensor(Tensor *w, int n);
-      virtual real getMaxCutoff();
-      virtual int bondType() { return Nonbonded; }
+protected:
+    int ntypes;
+    std::shared_ptr<VerletList> verletList;
+    esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+    // not needed esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
+};
 
-    protected:
-      int ntypes;
-      std::shared_ptr<VerletList> verletList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      // not needed esutil::Array2D<std::shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
-    };
+//////////////////////////////////////////////////
+// INLINE IMPLEMENTATION
+//////////////////////////////////////////////////
+template <typename _Potential>
+inline void VerletListInteractionTemplate<_Potential>::addForces()
+{
+    LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and add forces");
 
-    //////////////////////////////////////////////////
-    // INLINE IMPLEMENTATION
-    //////////////////////////////////////////////////
-    template < typename _Potential > inline void
-    VerletListInteractionTemplate < _Potential >::
-    addForces() {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and add forces");
+    int vlmaxtype = verletList->getMaxType();
+    Potential max_pot = potentialArray.at(vlmaxtype, vlmaxtype);  // force a resize
 
-      int vlmaxtype = verletList->getMaxType();
-      Potential max_pot = potentialArray.at(vlmaxtype,vlmaxtype); // force a resize
-
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -130,92 +128,98 @@ namespace espressopp {
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
-        if(potential._computeForce(force, p1, p2)) {
-        //if(potential->_computeForce(force, p1, p2)) {
-          p1.force() += force;
-          p2.force() -= force;
-          LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
+        if (potential._computeForce(force, p1, p2))
+        {
+            // if(potential->_computeForce(force, p1, p2)) {
+            p1.force() += force;
+            p2.force() -= force;
+            LOG4ESPP_TRACE(_Potential::theLogger,
+                           "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
-      }
     }
+}
 
-    template < typename _Potential >
-    inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergy() {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up potential energies");
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergy()
+{
+    LOG4ESPP_DEBUG(_Potential::theLogger,
+                   "loop over verlet list pairs and sum up potential energies");
 
-      real e = 0.0;
-      real es = 0.0;
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
+    real e = 0.0;
+    real es = 0.0;
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
-        e   = potential._computeEnergy(p1, p2);
+        e = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
         es += e;
-        LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
-      }
-
-      // reduce over all CPUs
-      real esum;
-      boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
-      return esum;
+        LOG4ESPP_TRACE(_Potential::theLogger,
+                       "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
     }
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergyDeriv() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyDeriv() is not yet implemented.");
-      return 0.0;
-    }
+    // reduce over all CPUs
+    real esum;
+    boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
+    return esum;
+}
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergyAA() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA() is not yet implemented.");
-      return 0.0;
-    }
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergyDeriv()
+{
+    LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyDeriv() is not yet implemented.");
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergyAA(int atomtype) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA(int atomtype) is not yet implemented.");
-      return 0.0;
-    }
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergyAA()
+{
+    LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA() is not yet implemented.");
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergyCG() {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG() is not yet implemented.");
-      return 0.0;
-    }
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergyAA(int atomtype)
+{
+    LOG4ESPP_WARN(_Potential::theLogger,
+                  "Warning! computeEnergyAA(int atomtype) is not yet implemented.");
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeEnergyCG(int atomtype) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG(int atomtype) is not yet implemented.");
-      return 0.0;
-    }
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergyCG()
+{
+    LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG() is not yet implemented.");
+    return 0.0;
+}
 
-    template < typename _Potential >
-    inline void
-    VerletListInteractionTemplate < _Potential >::
-    computeVirialX(std::vector<real> &p_xx_total, int bins) {
-      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialX() is not yet implemented.");
-    }
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeEnergyCG(int atomtype)
+{
+    LOG4ESPP_WARN(_Potential::theLogger,
+                  "Warning! computeEnergyCG(int atomtype) is not yet implemented.");
+    return 0.0;
+}
 
-    template < typename _Potential > inline real
-    VerletListInteractionTemplate < _Potential >::
-    computeVirial() {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial");
+template <typename _Potential>
+inline void VerletListInteractionTemplate<_Potential>::computeVirialX(std::vector<real> &p_xx_total,
+                                                                      int bins)
+{
+    LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialX() is not yet implemented.");
+}
 
-      real w = 0.0;
-      for (PairList::Iterator it(verletList->getPairs());
-           it.isValid(); ++it) {
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::computeVirial()
+{
+    LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial");
+
+    real w = 0.0;
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -224,27 +228,28 @@ namespace espressopp {
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
-        if(potential._computeForce(force, p1, p2)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          Real3D r21 = p1.position() - p2.position();
-          w = w + r21 * force;
+        if (potential._computeForce(force, p1, p2))
+        {
+            // if(potential->_computeForce(force, p1, p2)) {
+            Real3D r21 = p1.position() - p2.position();
+            w = w + r21 * force;
         }
-      }
-
-      // reduce over all CPUs
-      real wsum;
-      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
-      return wsum;
     }
 
-    template < typename _Potential > inline void
-    VerletListInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor& w) {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor");
+    // reduce over all CPUs
+    real wsum;
+    boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+    return wsum;
+}
 
-      Tensor wlocal(0.0);
-      for (PairList::Iterator it(verletList->getPairs());
-           it.isValid(); ++it) {
+template <typename _Potential>
+inline void VerletListInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+{
+    LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor");
+
+    Tensor wlocal(0.0);
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -253,89 +258,94 @@ namespace espressopp {
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
-        if(potential._computeForce(force, p1, p2)) {
-        // if(potential->_computeForce(force, p1, p2)) {
-          Real3D r21 = p1.position() - p2.position();
-          wlocal += Tensor(r21, force);
+        if (potential._computeForce(force, p1, p2))
+        {
+            // if(potential->_computeForce(force, p1, p2)) {
+            Real3D r21 = p1.position() - p2.position();
+            wlocal += Tensor(r21, force);
         }
-      }
-
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
-      w += wsum;
     }
 
-    // local pressure tensor for layer, plane is defined by z coordinate
-    template < typename _Potential > inline void
-    VerletListInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor& w, real z) {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor over one z-layer");
+    // reduce over all CPUs
+    Tensor wsum(0.0);
+    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    w += wsum;
+}
 
-      System& system = verletList->getSystemRef();
-      Real3D Li = system.bc->getBoxL();
+// local pressure tensor for layer, plane is defined by z coordinate
+template <typename _Potential>
+inline void VerletListInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w, real z)
+{
+    LOG4ESPP_DEBUG(_Potential::theLogger,
+                   "loop over verlet list pairs and sum up virial tensor over one z-layer");
 
-      real rc_cutoff = verletList->getVerletCutoff();
+    System &system = verletList->getSystemRef();
+    Real3D Li = system.bc->getBoxL();
 
-      // boundaries should be taken into account
-      bool ghost_layer = false;
-      real zghost = -100.0;
-      if(z<rc_cutoff){
+    real rc_cutoff = verletList->getVerletCutoff();
+
+    // boundaries should be taken into account
+    bool ghost_layer = false;
+    real zghost = -100.0;
+    if (z < rc_cutoff)
+    {
         zghost = z + Li[2];
         ghost_layer = true;
-      }
-      else if(z>=Li[2]-rc_cutoff){
+    }
+    else if (z >= Li[2] - rc_cutoff)
+    {
         zghost = z - Li[2];
         ghost_layer = true;
-      }
+    }
 
-      Tensor wlocal(0.0);
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
+    Tensor wlocal(0.0);
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
+        if ((p1pos[2] > z && p2pos[2] < z) || (p1pos[2] < z && p2pos[2] > z) ||
+            (ghost_layer && ((p1pos[2] > zghost && p2pos[2] < zghost) ||
+                             (p1pos[2] < zghost && p2pos[2] > zghost))))
+        {
+            int type1 = p1.type();
+            int type2 = p2.type();
+            const Potential &potential = getPotential(type1, type2);
 
-        if( (p1pos[2]>z && p2pos[2]<z) ||
-            (p1pos[2]<z && p2pos[2]>z) ||
-                (ghost_layer &&
-                    ((p1pos[2]>zghost && p2pos[2]<zghost) ||
-                    (p1pos[2]<zghost && p2pos[2]>zghost))
-                )
-          ){
-          int type1 = p1.type();
-          int type2 = p2.type();
-          const Potential &potential = getPotential(type1, type2);
-
-          Real3D force(0.0, 0.0, 0.0);
-          if(potential._computeForce(force, p1, p2)) {
-            Real3D r21 = p1pos - p2pos;
-            wlocal += Tensor(r21, force) / fabs(r21[2]);
-          }
+            Real3D force(0.0, 0.0, 0.0);
+            if (potential._computeForce(force, p1, p2))
+            {
+                Real3D r21 = p1pos - p2pos;
+                wlocal += Tensor(r21, force) / fabs(r21[2]);
+            }
         }
-      }
-
-      // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
-      w += wsum;
     }
 
-    // it will calculate the pressure in 'n' layers along Z axis
-    // the first layer has coordinate 0.0 the last - (Lz - Lz/n)
-    template < typename _Potential > inline void
-    VerletListInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor *w, int n) {
-      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor in bins along z-direction");
+    // reduce over all CPUs
+    Tensor wsum(0.0);
+    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    w += wsum;
+}
 
-      System& system = verletList->getSystemRef();
-      Real3D Li = system.bc->getBoxL();
+// it will calculate the pressure in 'n' layers along Z axis
+// the first layer has coordinate 0.0 the last - (Lz - Lz/n)
+template <typename _Potential>
+inline void VerletListInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+{
+    LOG4ESPP_DEBUG(
+        _Potential::theLogger,
+        "loop over verlet list pairs and sum up virial tensor in bins along z-direction");
 
-      real z_dist = Li[2] / float(n);  // distance between two layers
-      Tensor *wlocal = new Tensor[n];
-      for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
-      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
+    System &system = verletList->getSystemRef();
+    Real3D Li = system.bc->getBoxL();
+
+    real z_dist = Li[2] / float(n);  // distance between two layers
+    Tensor *wlocal = new Tensor[n];
+    for (int i = 0; i < n; i++) wlocal[i] = Tensor(0.0);
+    for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
+    {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -347,69 +357,79 @@ namespace espressopp {
 
         Real3D force(0.0, 0.0, 0.0);
         Tensor ww;
-        if(potential._computeForce(force, p1, p2)) {
-          Real3D r21 = p1pos - p2pos;
-          ww = Tensor(r21, force) / fabs(r21[2]);
+        if (potential._computeForce(force, p1, p2))
+        {
+            Real3D r21 = p1pos - p2pos;
+            ww = Tensor(r21, force) / fabs(r21[2]);
 
-          int position1 = (int)( p1pos[2]/z_dist );
-          int position2 = (int)( p2pos[2]/z_dist );
+            int position1 = (int)(p1pos[2] / z_dist);
+            int position2 = (int)(p2pos[2] / z_dist);
 
-          int maxpos = std::max(position1, position2);
-          int minpos = std::min(position1, position2);
+            int maxpos = std::max(position1, position2);
+            int minpos = std::min(position1, position2);
 
-          // boundaries should be taken into account
-          bool boundaries1 = false;
-          bool boundaries2 = false;
-          if(minpos < 0){
-            minpos += n;
-            boundaries1 =true;
-          }
-          if(maxpos >=n){
-            maxpos -= n;
-            boundaries2 =true;
-          }
-
-          if(boundaries1 || boundaries2){
-            for(int i = 0; i<=maxpos; i++){
-              wlocal[i] += ww;
+            // boundaries should be taken into account
+            bool boundaries1 = false;
+            bool boundaries2 = false;
+            if (minpos < 0)
+            {
+                minpos += n;
+                boundaries1 = true;
             }
-            for(int i = minpos+1; i<n; i++){
-              wlocal[i] += ww;
+            if (maxpos >= n)
+            {
+                maxpos -= n;
+                boundaries2 = true;
             }
-          }
-          else{
-            for(int i = minpos+1; i<=maxpos; i++){
-              wlocal[i] += ww;
+
+            if (boundaries1 || boundaries2)
+            {
+                for (int i = 0; i <= maxpos; i++)
+                {
+                    wlocal[i] += ww;
+                }
+                for (int i = minpos + 1; i < n; i++)
+                {
+                    wlocal[i] += ww;
+                }
             }
-          }
+            else
+            {
+                for (int i = minpos + 1; i <= maxpos; i++)
+                {
+                    wlocal[i] += ww;
+                }
+            }
         }
-      }
-
-      // reduce over all CPUs
-      Tensor *wsum = new Tensor[n];
-      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
-
-      for(int j=0; j<n; j++){
-        w[j] += wsum[j];
-      }
-
-      delete [] wsum;
-      delete [] wlocal;
     }
 
-    template < typename _Potential >
-    inline real
-    VerletListInteractionTemplate< _Potential >::
-    getMaxCutoff() {
-      real cutoff = 0.0;
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
+    // reduce over all CPUs
+    Tensor *wsum = new Tensor[n];
+    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, n, (double *)&wsum, std::plus<double>());
+
+    for (int j = 0; j < n; j++)
+    {
+        w[j] += wsum[j];
+    }
+
+    delete[] wsum;
+    delete[] wlocal;
+}
+
+template <typename _Potential>
+inline real VerletListInteractionTemplate<_Potential>::getMaxCutoff()
+{
+    real cutoff = 0.0;
+    for (int i = 0; i < ntypes; i++)
+    {
+        for (int j = 0; j < ntypes; j++)
+        {
             cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
             // cutoff = std::max(cutoff, getPotential(i, j)->getCutoff());
         }
-      }
-      return cutoff;
     }
-  }
+    return cutoff;
 }
+}  // namespace interaction
+}  // namespace espressopp
 #endif

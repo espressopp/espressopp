@@ -27,186 +27,180 @@
 #include "RealND.hpp"
 #include "bc/BC.hpp"
 
-namespace espressopp {
-    namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+class TabulatedSubEnsAngular : public AngularPotentialTemplate<TabulatedSubEnsAngular>
+{
+private:
+    int numInteractions;
+    std::vector<std::string> filenames;
+    std::vector<std::shared_ptr<Interpolation>> tables;
+    int interpolationType;
+    // Reference values of the collective variable centers
+    RealNDs colVarRef;
+    // Weights of each table
+    RealND weights;
+    // Target probability of each table
+    RealND targetProb;
+    // Running sum of each weight and number of counts
+    RealND weightSum;
+    int weightCounts;
+    // Renormalize collective variables: std
+    RealND colVarSd;
+    // characteristic decay length of the interpolation
+    real alpha;
+    // Size of CV partners
+    int colVarBondListSize;
+    int colVarAngleListSize;
+    int colVarDihedListSize;
 
-        class TabulatedSubEnsAngular: public AngularPotentialTemplate<TabulatedSubEnsAngular> {
+public:
+    static void registerPython();
 
-            private:
-                int numInteractions;
-                std::vector<std::string> filenames;
-                std::vector<std::shared_ptr <Interpolation>> tables;
-                int interpolationType;
-                // Reference values of the collective variable centers
-                RealNDs colVarRef;
-                // Weights of each table
-                RealND weights;
-                // Target probability of each table
-                RealND targetProb;
-                // Running sum of each weight and number of counts
-                RealND weightSum;
-                int weightCounts;
-                // Renormalize collective variables: std
-                RealND colVarSd;
-                // characteristic decay length of the interpolation
-                real alpha;
-                // Size of CV partners
-                int colVarBondListSize;
-                int colVarAngleListSize;
-                int colVarDihedListSize;
+    TabulatedSubEnsAngular() : numInteractions(0)
+    {
+        setCutoff(infinity);
+        weights.setDimension(0);
+        weightSum.setDimension(0);
+        targetProb.setDimension(0);
+        weightCounts = 0;
+        colVarSd.setDimension(3);
+        colVarRef.setDimension(0);
+        alpha = 1.;
+        colVarBondListSize = 0;
+        colVarAngleListSize = 0;
+        colVarDihedListSize = 0;
+    }
 
+    void addInteraction(int itype, boost::python::str fname, const RealND& _cvref);
 
-            public:
-                static void registerPython();
+    void setDimension(int _dim)
+    {
+        numInteractions = _dim;
+        colVarRef.setDimension(numInteractions);
+        tables.resize(numInteractions);
+        filenames.resize(numInteractions);
+        weights.setDimension(numInteractions);
+        weightSum.setDimension(numInteractions);
+        targetProb.setDimension(numInteractions);
+    }
 
-                TabulatedSubEnsAngular() :
-                    numInteractions(0) {
-                    setCutoff(infinity);
-                    weights.setDimension(0);
-                    weightSum.setDimension(0);
-                    targetProb.setDimension(0);
-                    weightCounts = 0;
-                    colVarSd.setDimension(3);
-                    colVarRef.setDimension(0);
-                    alpha = 1.;
-                    colVarBondListSize = 0;
-                    colVarAngleListSize = 0;
-                    colVarDihedListSize = 0;
-                }
+    int getDimension() const { return numInteractions; }
 
-                void addInteraction(int itype, boost::python::str fname,
-                                    const RealND& _cvref);
+    /** Setter for the interpolation type */
+    void setInterpolationType(int itype) { interpolationType = itype; }
 
-                void setDimension(int _dim) {
-                  numInteractions = _dim;
-                  colVarRef.setDimension( numInteractions );
-                  tables.resize( numInteractions );
-                  filenames.resize( numInteractions );
-                  weights.setDimension( numInteractions );
-                  weightSum.setDimension( numInteractions );
-                  targetProb.setDimension( numInteractions );
-                }
+    /** Getter for the interpolation type */
+    int getInterpolationType() const { return interpolationType; }
 
-                int getDimension() const { return numInteractions; }
+    RealND getTargetProb() const { return targetProb; }
 
-                /** Setter for the interpolation type */
-                void setInterpolationType(int itype) { interpolationType = itype; }
+    void setTargetProb(int index, real _r) { return targetProb.setItem(index, _r); }
 
-                /** Getter for the interpolation type */
-                int getInterpolationType() const { return interpolationType; }
+    RealND getColVarSds() const { return colVarSd; }
 
-                RealND getTargetProb() const { return targetProb; }
+    void setColVarSd(int index, real _r) { return colVarSd.setItem(index, _r); }
 
-                void setTargetProb(int index, real _r) {
-                    return targetProb.setItem(index, _r);
-                }
+    RealND getColVarRef(int i) const { return colVarRef[i]; }
 
-                RealND getColVarSds() const { return colVarSd; }
+    RealNDs getColVarRefs() const { return colVarRef; }
 
-                void setColVarSd(int index, real _r) {
-                    return colVarSd.setItem(index, _r);
-                }
+    void setColVarRef(const RealNDs& cvRefs);
 
-                RealND getColVarRef(int i) const { return colVarRef[i]; }
+    void setColVarRefs(const RealNDs& c) { colVarRef = c; }
 
-                RealNDs getColVarRefs() const { return colVarRef; }
+    boost::python::list getFilenames() const { return boost::python::list(filenames); }
 
-                void setColVarRef(const RealNDs& cvRefs);
+    boost::python::list getFilename(int index) const
+    {
+        return boost::python::list(filenames[index]);
+    }
 
-                void setColVarRefs(const RealNDs& c) { colVarRef = c; }
+    void setFilename(int index, boost::python::list _f)
+    {
+        filenames[index] = boost::python::extract<std::string>(_f);
+    }
 
-                boost::python::list getFilenames() const {
-                    return boost::python::list(filenames); }
+    void setFilenames(int dim, int itype, boost::python::list _filenames);
 
-                boost::python::list getFilename(int index) const {
-                    return boost::python::list(filenames[index]);
-                }
+    RealND getWeights() const { return weights; }
 
-                void setFilename(int index, boost::python::list _f) {
-                    filenames[index] = boost::python::extract<std::string>(_f);
-                }
+    void setWeights(const RealND& r) { weights = r; }
 
-                void setFilenames(int dim, int itype, boost::python::list _filenames);
+    real getWeight(int index) const { return weights.getItem(index); }
 
-                RealND getWeights() const { return weights; }
+    void setWeight(int index, real _w) { return weights.setItem(index, _w); }
 
-                void setWeights(const RealND& r) { weights = r; }
+    real getAlpha() const { return alpha; }
 
-                real getWeight(int index) const {
-                    return weights.getItem(index);
-                }
+    void setAlpha(real _r) { alpha = _r; }
 
-                void setWeight(int index, real _w) {
-                    return weights.setItem(index, _w);
-                }
+    void computeColVarWeights(const Real3D& dist12, const Real3D& dist32, const bc::BC& bc);
 
-                real getAlpha() const { return alpha; }
+    void setColVar(const Real3D& dist12, const Real3D& dist32, const bc::BC& bc);
 
-                void setAlpha(real _r) { alpha = _r; }
+    real _computeEnergyRaw(real theta) const
+    {
+        real e = 0.;
+        for (int i = 0; i < numInteractions; ++i) e += weights[i] * tables[i]->getEnergy(theta);
+        return e;
+    }
 
-                void computeColVarWeights(const Real3D& dist12,
-                    const Real3D& dist32, const bc::BC& bc);
+    bool _computeForceRaw(Real3D& force12,
+                          Real3D& force32,
+                          const Real3D& dist12,
+                          const Real3D& dist32) const
+    {
+        real dist12_sqr = dist12 * dist12;
+        real dist32_sqr = dist32 * dist32;
+        real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
+        real cos_theta = dist12 * dist32 / dist1232;
+        real theta = acos(cos_theta);
 
-                void setColVar(const Real3D& dist12,
-                    const Real3D& dist32, const bc::BC& bc);
+        real a = 0.;
+        for (int i = 0; i < numInteractions; ++i) a += weights[i] * tables[i]->getForce(theta);
 
-                real _computeEnergyRaw(real theta) const {
-                    real e = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        e += weights[i] * tables[i]->getEnergy(theta);
-                    return e;
-                }
+        a *= 1.0 / (sqrt(1.0 - cos_theta * cos_theta));
 
-                bool _computeForceRaw(Real3D& force12, Real3D& force32,
-                                      const Real3D& dist12, const Real3D& dist32) const {
-                    real dist12_sqr = dist12 * dist12;
-                    real dist32_sqr = dist32 * dist32;
-                    real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
-                    real cos_theta = dist12 * dist32 / dist1232;
-                    real theta = acos(cos_theta);
+        real a11 = a * cos_theta / dist12_sqr;
+        real a12 = -a / dist1232;
+        real a22 = a * cos_theta / dist32_sqr;
 
-                    real a = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        a += weights[i] * tables[i]->getForce(theta);
+        force12 = a11 * dist12 + a12 * dist32;
+        force32 = a22 * dist32 + a12 * dist12;
+        return true;
+    }
 
-                    a*=1.0/(sqrt(1.0-cos_theta*cos_theta));
+    real _computeForceRaw(real theta) const
+    {
+        real f = 0.;
+        for (int i = 0; i < numInteractions; ++i) f += weights[i] * tables[i]->getForce(theta);
+        return f;
+    }
 
-                    real a11 = a * cos_theta / dist12_sqr;
-                    real a12 = -a / dist1232;
-                    real a22 = a * cos_theta / dist32_sqr;
+};  // class
 
-                    force12 = a11 * dist12 + a12 * dist32;
-                    force32 = a22 * dist32 + a12 * dist12;
-                    return true;
-                }
+// provide pickle support
+struct TabulatedSubEnsAngular_pickle : boost::python::pickle_suite
+{
+    static boost::python::tuple getinitargs(TabulatedSubEnsAngular const& pot)
+    {
+        int itp = pot.getInterpolationType();
+        boost::python::list fns;
+        RealNDs cvrefs = pot.getColVarRefs();
+        int dim = pot.getDimension();
+        fns = pot.getFilenames();
+        RealND cvsd = pot.getColVarSds();
+        real rc = pot.getCutoff();
+        real alp = pot.getAlpha();
+        return boost::python::make_tuple(dim, itp, fns, cvrefs, cvsd, alp, rc);
+    }
+};
 
-                real _computeForceRaw(real theta) const {
-                    real f = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        f += weights[i] * tables[i]->getForce(theta);
-                    return f;
-                }
+}  // namespace interaction
 
-        }; // class
-
-        // provide pickle support
-        struct TabulatedSubEnsAngular_pickle : boost::python::pickle_suite {
-            static boost::python::tuple getinitargs(TabulatedSubEnsAngular const& pot) {
-                int itp = pot.getInterpolationType();
-                boost::python::list fns;
-                RealNDs cvrefs = pot.getColVarRefs();
-                int dim = pot.getDimension();
-                fns = pot.getFilenames();
-                RealND cvsd = pot.getColVarSds();
-                real rc = pot.getCutoff();
-                real alp = pot.getAlpha();
-                return boost::python::make_tuple(dim, itp, fns, cvrefs,
-                                                 cvsd, alp, rc);
-            }
-        };
-
-    } // ns interaction
-
-} //ns espressopp
+}  // namespace espressopp
 
 #endif
