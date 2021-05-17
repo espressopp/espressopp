@@ -96,9 +96,9 @@ private:
 // INLINE IMPLEMENTATION
 inline ParticleArrayIterator::ParticleArrayIterator(ParticleArray& pa, bool realCellsOnly)
     : particles(pa),
+      realCellsOnly(realCellsOnly),
       cit(0),
-      cend(realCellsOnly ? particles.realCells().size() : particles.numCells()),
-      realCellsOnly(realCellsOnly)
+      cend(realCellsOnly ? particles.realCells().size() : particles.numCells())
 {
     if (cit == cend) return;
     renewParticleIterator();

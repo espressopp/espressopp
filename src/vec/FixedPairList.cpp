@@ -278,7 +278,8 @@ void FixedPairList::onParticlesChanged()
 
     this->clear();
     size_t lastpid1 = VEC_PARTICLE_NOT_FOUND;
-    size_t p1, p2;
+    size_t p1 = VEC_PARTICLE_NOT_FOUND;
+    size_t p2 = VEC_PARTICLE_NOT_FOUND;
     for (auto it = globalPairs.cbegin(); it != globalPairs.cend(); ++it)
     {
         if (it->first != lastpid1)

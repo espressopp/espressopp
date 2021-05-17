@@ -75,9 +75,8 @@ public:
     static void registerPython();
 
 protected:
-    const int vecLevel;
-
     std::shared_ptr<MDIntegrator> mdintegrator;
+    const int vecLevel;
 
     // signals that connect to integrator
     boost::signals2::connection sigBefCalcForces;
@@ -100,7 +99,7 @@ std::vector<T> CellListToIdx(std::vector<Cell*> const& cellList, Cell* const ref
     {
         idx.push_back(T(cell - refCell));
     }
-    return std::move(idx);
+    return idx;
 }
 
 }  // namespace vec

@@ -113,7 +113,6 @@ void DomainDecomposition::resetCells()
             for (int lr = 0; lr < 2; ++lr)
             {
                 int const dir = 2 * coord + lr;
-                int const oppDir = 2 * coord + (1 - lr);
                 if (doPeriodic)
                 {
                     auto const& ghosts = commCellIdx[dir].ghosts;
@@ -143,7 +142,6 @@ void DomainDecomposition::prepareGhostBuffers()
         for (size_t lr = 0; lr < 2; ++lr)
         {
             size_t const dir = 2 * coord + lr;
-            size_t const oppDir = 2 * coord + (1 - lr);
 
             auto f_countParticles = [cr](auto const& cellIdx) {
                 size_t total = 0;

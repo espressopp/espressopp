@@ -55,7 +55,7 @@ protected:
 
 public:
     VerletListInteractionTemplate(std::shared_ptr<VerletList> _verletList)
-        : verletList(_verletList), potentialArray(0, 0, Potential()), ntypes(0)
+        : verletList(_verletList), ntypes(0), potentialArray(0, 0, Potential())
     {
     }
 
@@ -106,8 +106,8 @@ public:
     virtual int bondType() { return Nonbonded; }
 
 protected:
-    int ntypes;
     std::shared_ptr<VerletList> verletList;
+    int ntypes;
     esutil::Array2D<Potential, esutil::enlarge> potentialArray;
 };
 
@@ -369,8 +369,6 @@ inline void VerletListInteractionTemplate<_Potential>::computeVirialTensor(Tenso
             const int p2 = nplist[in];
             const auto type2 = particles.getType(p2);
             const auto pos2 = particles.getPosition(p2);
-
-            const Potential& potential = getPotential(type1, type2);
 
             if ((pos1[2] > z && pos2[2] < z) || (pos1[2] < z && pos2[2] > z) ||
                 (ghost_layer && ((pos1[2] > zghost && pos2[2] < zghost) ||

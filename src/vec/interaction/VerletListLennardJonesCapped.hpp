@@ -146,16 +146,14 @@ inline void VerletListLennardJonesCapped::addForces_impl(
     using namespace vec::storage;
 
     {
-        real ff1_, ff2_, caprad_, capradSqr_, sigma_, epsilon_, cutoffSqr_, cfrac2_, cfrac6_;
+        real ff1_, ff2_, caprad_, capradSqr_, epsilon_, cutoffSqr_, cfrac6_;
         if (ONETYPE)
         {
             ff1_ = ffs[0].ff1;
             ff2_ = ffs[0].ff2;
             caprad_ = ffs[0].caprad;
             capradSqr_ = ffs[0].capradSqr;
-            sigma_ = ffs[0].sigma;
             epsilon_ = ffs[0].epsilon;
-            cfrac2_ = ffs[0].cfrac2;
             cfrac6_ = ffs[0].cfrac6;
             cutoffSqr_ = cutoffSqr[0];
         }

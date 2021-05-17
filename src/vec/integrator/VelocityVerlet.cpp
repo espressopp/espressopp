@@ -72,7 +72,6 @@ void VelocityVerletBase::run(int nsteps)
     }
 
     nResorts = 0;
-    real time;
     timeIntegrate.reset();
     resetTimers();
 
@@ -87,12 +86,12 @@ void VelocityVerletBase::run(int nsteps)
     // Before start make sure that particles are on the right processor
     if (resortFlag)
     {
-        time = timeIntegrate.getElapsedTime();
+        real time = timeIntegrate.getElapsedTime();
         LOG4ESPP_INFO(theLogger, "resort particles");
         storage.decompose();
         maxDist = 0.0;
         resortFlag = false;
-        timeResort += timeIntegrate.getElapsedTime();
+        timeResort += timeIntegrate.getElapsedTime() - time;
     }
 
     bool recalcForces = true;  // TODO: more intelligent
@@ -380,7 +379,6 @@ void VelocityVerlet::integrate2()
     {
         const auto& realCells = particles.realCells();
         const size_t* __restrict cellRange = particles.cellRange().data();
-        const size_t* __restrict sizes = particles.sizes().data();
 
         for (const auto& rcell : realCells)
         {

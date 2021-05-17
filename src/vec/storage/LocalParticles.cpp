@@ -31,7 +31,6 @@ void LocalParticles::rebuild(ParticleArray const& pa, std::vector<size_t> const&
 {
     clear();
 
-    auto const numCells = pa.numCells();
     auto const& cellRange = pa.cellRange();
     auto const& cellSizes = pa.sizes();
     auto const& pids = pa.id;

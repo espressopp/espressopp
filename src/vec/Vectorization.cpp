@@ -44,6 +44,7 @@ Vectorization::Vectorization(std::shared_ptr<System> _system,
 Vectorization::Vectorization(std::shared_ptr<System> _system) : SystemAccess(_system), vecLevel(2)
 {
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// destructor
 Vectorization::~Vectorization() { disconnect(); }
@@ -106,7 +107,7 @@ void Vectorization::zeroForces()
 #pragma vector aligned
 #pragma ivdep
 #endif
-        for (int i = 0; i < size; i++) f[i] = 0.0;
+        for (size_t i = 0; i < size; i++) f[i] = 0.0;
     };
     {
         f_zero(particles.f_x.data(), particles.f_x.size());

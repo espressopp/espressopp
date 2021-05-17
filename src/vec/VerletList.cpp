@@ -132,7 +132,6 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
 
         // number of cells with neighbors
         const size_t numRealCells = cellNborList.numCells();
-        const size_t numCells = particleArray.sizes().size();
 
         if (PACK_NEIGHBORS)
         {
@@ -181,7 +180,6 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
             const size_t cell_id = cellNborList.cellId(irow);
             const size_t cell_nnbrs = cellNborList.numNeighbors(irow);
             const size_t cell_start = cellRange[cell_id];
-            const size_t cell_data_end = cellRange[cell_id + 1];
             const size_t cell_size = sizes[cell_id];
             const size_t cell_end = cell_start + cell_size;
 
@@ -189,7 +187,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
             if (PACK_NEIGHBORS)
             {
                 int& nc_ctr = c_j_size;
-                for (int inbr = 0; inbr < cell_nnbrs; inbr++)
+                for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     const int ncell_id = cellNborList.at(irow, inbr);
                     const int ncell_start = cellRange[ncell_id];
@@ -222,7 +220,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
 #pragma vector aligned
 #pragma ivdep
 #endif
-                    for (size_t ll = 0; ll < num_pad; ll++)
+                    for (int ll = 0; ll < num_pad; ll++)
                     {
                         c_j_ctr[ll] = padding;
                     }
@@ -247,7 +245,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
             else
             {
                 /// just count the total number of neighbors
-                for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
+                for (int inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     auto ncell_id = cellNborList.at(irow, inbr);
                     auto ncell_start = cellRange[ncell_id];
@@ -287,7 +285,6 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
 
                     size_t ncell_start = cellRange[ncell_id];
                     size_t ncell_data_end = cellRange[ncell_id + 1];
-                    size_t ncell_end = ncell_start + sizes[ncell_id];
                     int* __restrict npptr = &(neighborList.nplist[c_np_start + c_nplist_size]);
 
                     {
@@ -355,13 +352,12 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                     // track the last cell to have a neighbor of p
                 }
                 else
+                {
                     for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                     {
                         size_t ncell_id = cellNborList.at(irow, inbr);
-
                         size_t ncell_start = cellRange[ncell_id];
                         size_t ncell_data_end = cellRange[ncell_id + 1];
-                        size_t ncell_end = ncell_start + sizes[ncell_id];
                         int* __restrict npptr = &(neighborList.nplist[c_np_start + c_nplist_size]);
 
                         {
@@ -396,6 +392,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                         if (c_nplist_size - prev_nplist_size_nbrloop) last_ncell = ncell_id;
                         prev_nplist_size_nbrloop = c_nplist_size;
                     }
+                }
 
                 const int new_pairs = c_nplist_size - prev_c_nplist_size;
 
@@ -586,7 +583,7 @@ void VerletList::registerPython()
 {
     using namespace espressopp::python;
 
-    bool (VerletList::*pyExclude)(longint pid1, longint pid2) = &VerletList::exclude;
+    // bool (VerletList::*pyExclude)(longint pid1, longint pid2) = &VerletList::exclude;
 
     class_<VerletList, std::shared_ptr<VerletList> >("vec_VerletList",
                                                      init<std::shared_ptr<System>, real, bool>())

@@ -129,7 +129,6 @@ inline void FixedTripleListInteractionTemplate<_AngularPotential>::addForces()
     real* __restrict f_x = particles.f_x.data();
     real* __restrict f_y = particles.f_y.data();
     real* __restrict f_z = particles.f_z.data();
-    const size_t* __restrict id = particles.id.data();
 
     for (const auto& triple : ftl)
     {
