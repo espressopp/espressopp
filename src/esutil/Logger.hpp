@@ -3,27 +3,27 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef _ESUTIL_LOGGER_HPP
 #define _ESUTIL_LOGGER_HPP
 /** \file Logger.hpp    Class for logging.
-*/
+ */
 
 #include <string>
 #include <vector>
@@ -31,13 +31,13 @@
 #if !defined(LOG4ESPP_LOCATION)
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1300
-      #define __LOG4ESPP_FUNC__ __FUNCSIG__
+#define __LOG4ESPP_FUNC__ __FUNCSIG__
 #endif
 #else
 #if defined(__GNUC__) and defined(LOG4ESPP_LONGNAMES)
-      #define __LOG4ESPP_FUNC__ __PRETTY_FUNCTION__
+#define __LOG4ESPP_FUNC__ __PRETTY_FUNCTION__
 #else
-      #define __LOG4ESPP_FUNC__ __FUNCTION__
+#define __LOG4ESPP_FUNC__ __FUNCTION__
 #endif
 #endif
 
@@ -50,82 +50,82 @@
 
 /** Namespace for logging in Espresso */
 
-namespace log4espp {
+namespace log4espp
+{
+/**************************************************************************
+ *  class Location                                                         *
+ **************************************************************************/
 
-  /**************************************************************************
-  *  class Location                                                         *
-  **************************************************************************/
+/** Location is a class containing file, line and function info; it
+    specifies a location in a source file, e.g. for logging statement  */
 
-  /** Location is a class containing file, line and function info; it
-      specifies a location in a source file, e.g. for logging statement  */
+class Location
+{
+public:
+    const char* filename;  //!< Name of the source file
+    const char* funcname;  //!< Name of the function
+    int line;              //!< Line number of location in source file
 
-  class Location {
+    /** Constructor of a location */
 
-   public:
+    Location(const char* _filename, const char* _funcname, int _line)
+    {
+        filename = _filename;
+        funcname = _funcname;
+        line = _line;
+    }
+};
 
-     const char* filename;   //!< Name of the source file
-     const char* funcname;   //!< Name of the function 
-     int line;               //!< Line number of location in source file
+/**************************************************************************
+ *  class Logger                                                           *
+ **************************************************************************/
 
-     /** Constructor of a location */
+/** Logger is a an abstract class for hierarchical organization of logging objects
 
-     Location(const char* _filename, const char* _funcname, int _line) {
-       filename = _filename;
-       funcname = _funcname;
-       line     = _line;
-     }
+*/
 
-  };
+class Logger
+{
+public:
+    typedef enum
+    {
+        TRACE = 10,  //!< even more detailed than DEBUG
+        DEBUG = 20,  //!< designates fine-grained informational events
+        INFO = 30,   //!< informational messages highlighting progress
+        WARN = 40,   //!< for potentially harmful situations
+        ERROR = 50,  //!< for errors that might still allow the application to continue
+        FATAL = 60   //!< servere errors that will presumably lead to aborts
+    } Level;
 
-  /**************************************************************************
-  *  class Logger                                                           *
-  **************************************************************************/
-
-  /** Logger is a an abstract class for hierarchical organization of logging objects 
-
-  */
-
-  class Logger {
-
-  public:
-
-     typedef enum {TRACE  = 10, //!< even more detailed than DEBUG
-                   DEBUG  = 20, //!< designates fine-grained informational events
-                   INFO   = 30, //!< informational messages highlighting progress
-                   WARN   = 40, //!< for potentially harmful situations
-                   ERROR  = 50, //!< for errors that might still allow the application to continue
-                   FATAL  = 60  //!< servere errors that will presumably lead to aborts
-     } Level;
-
-  protected:
-
+protected:
     std::string name;  //!< name of the logger
-    bool  setFlag;     //!< This flag indicates that level has been set explicitly.
+    bool setFlag;      //!< This flag indicates that level has been set explicitly.
 
-    Level myLevel;     //!< Current level of this logger.
+    Level myLevel;  //!< Current level of this logger.
 
     class Logger* parent;  //!< points back to the parent logger, NULL for root
 
-    std::vector<class Logger*> sons;   //!< sub loggers of this logger
+    std::vector<class Logger*> sons;  //!< sub loggers of this logger
 
     static std::vector<std::string> context;  //!< stack for different context
 
-  public:
-
-    /** General constructor for a logger 
+public:
+    /** General constructor for a logger
 
         \param _name is the name of this logger (not full name)
         \param _parent is pointer to the parent logger
     */
 
-    Logger(std::string _name, class Logger* _parent) {
-        name     = _name;
-        parent   = _parent;
-        setFlag  = false;
-        myLevel  = WARN;
-        if (parent != NULL) {
-           parent->sons.push_back(this);
-           myLevel = parent->getLevel();
+    Logger(std::string _name, class Logger* _parent)
+    {
+        name = _name;
+        parent = _parent;
+        setFlag = false;
+        myLevel = WARN;
+        if (parent != NULL)
+        {
+            parent->sons.push_back(this);
+            myLevel = parent->getLevel();
         }
     }
 
@@ -151,11 +151,12 @@ namespace log4espp {
 
     /** Asks for the full name of the logger, e.g. "X.Y.Z" */
 
-    std::string getFullName() {
-      if (parent == NULL) return name;
-      std::string fullname = parent->getFullName();
-      if (fullname == "") return name;
-      return fullname + "." + name;
+    std::string getFullName()
+    {
+        if (parent == NULL) return name;
+        std::string fullname = parent->getFullName();
+        if (fullname == "") return name;
+        return fullname + "." + name;
     }
 
     /** Configuration of the logging system. */
@@ -172,11 +173,11 @@ namespace log4espp {
 
     /** Check if logging statements of level INFO are enabled. */
 
-    bool isInfoEnabled()  { return myLevel <= INFO; }
+    bool isInfoEnabled() { return myLevel <= INFO; }
 
     /** Check if logging statements of level WARN are enabled. */
 
-    bool isWarnEnabled()  { return myLevel <= WARN; }
+    bool isWarnEnabled() { return myLevel <= WARN; }
 
     /** Check if logging statements of level ERROR are enabled. */
 
@@ -190,48 +191,51 @@ namespace log4espp {
 
     Level getLevel() { return myLevel; }
 
-    /** Getter routine for the effective logging level of 
+    /** Getter routine for the effective logging level of
         this object. If level has not been set explicitly it
-        will ask the ancestors for the level 
+        will ask the ancestors for the level
     */
 
-    Level getEffectiveLevel() 
-    { if (setFlag || parent == NULL) return myLevel; 
-      return parent->getEffectiveLevel();
+    Level getEffectiveLevel()
+    {
+        if (setFlag || parent == NULL) return myLevel;
+        return parent->getEffectiveLevel();
     }
 
-    /** Getter routine for the logging level of this object. 
+    /** Getter routine for the logging level of this object.
 
         \return the logging level as a string.
     */
 
-    static const char* getLevelString(int level) { 
-
-       if (level == TRACE) return "TRACE";
-       if (level == DEBUG) return "DEBUG";
-       if (level == INFO)  return "INFO";
-       if (level == WARN)  return "WARN";
-       if (level == ERROR) return "ERROR";
-       if (level == FATAL) return "FATAL";
-       return "UNKNOWN";
+    static const char* getLevelString(int level)
+    {
+        if (level == TRACE) return "TRACE";
+        if (level == DEBUG) return "DEBUG";
+        if (level == INFO) return "INFO";
+        if (level == WARN) return "WARN";
+        if (level == ERROR) return "ERROR";
+        if (level == FATAL) return "FATAL";
+        return "UNKNOWN";
     }
 
-    /** Setter routine for the logging level of this object. 
+    /** Setter routine for the logging level of this object.
 
         \param level is the new logging level for this object
         \param force true specifies that this is an explicit set
 
-        This routine will set implicitly the levels recursively 
+        This routine will set implicitly the levels recursively
         for the descendants whose level has not been set explicitly.
     */
 
     void setLevel(Level level, bool force = true)
-    { if (!force && setFlag) return;
-      myLevel = level;
-      setFlag = force;
-      for (size_t i = 0; i < sons.size(); i++) {
-         sons[i]->setLevel(level, false);
-      }
+    {
+        if (!force && setFlag) return;
+        myLevel = level;
+        setFlag = force;
+        for (size_t i = 0; i < sons.size(); i++)
+        {
+            sons[i]->setLevel(level, false);
+        }
     }
 
     /** Logging output for level TRACE. This routine should
@@ -246,7 +250,6 @@ namespace log4espp {
 
     virtual void trace(Location loc, const std::string& msg) = 0;
 
-
     /** Logging output for level DEBUG. This routine should
         only be called if isDebugEnabled() returns true.
 
@@ -259,7 +262,6 @@ namespace log4espp {
 
     virtual void debug(Location loc, const std::string& msg) = 0;
 
-
     /** Logging output for level INFO. This routine should
         only be called if isInfoEnabled() returns true.
 
@@ -270,7 +272,7 @@ namespace log4espp {
         abstract class does not handle output of logging at all.
     */
 
-    virtual void info (Location loc, const std::string& msg) = 0;
+    virtual void info(Location loc, const std::string& msg) = 0;
 
     /** Logging output for level WARN. This routine should
         only be called if isWarnEnabled() returns true.
@@ -282,7 +284,7 @@ namespace log4espp {
         abstract class does not handle output of logging at all.
     */
 
-    virtual void warn (Location loc, const std::string& msg) = 0;
+    virtual void warn(Location loc, const std::string& msg) = 0;
 
     /** Logging output for level ERROR. This routine should
         only be called if isErrorEnabled() returns true.
@@ -310,59 +312,61 @@ namespace log4espp {
 
     // static method to create instance of a derived logger
 
-    template<class DerivedLogger>
+    template <class DerivedLogger>
     static Logger& createInstance(std::string name);
+};
 
-  };
+/** This routine  creates a logger instance for a given name.
+    The template argument specifies the class of the logger.
+*/
 
-  /** This routine  creates a logger instance for a given name.
-      The template argument specifies the class of the logger.
-  */
+template <class DerivedLogger>
+Logger& Logger::createInstance(std::string name)
 
-  template<class DerivedLogger>
-  Logger& Logger::createInstance(std::string name)
+{  // tokenize the name with delimiter "."
 
-  { // tokenize the name with delimiter "."
-  
     std::vector<std::string> tokens;
-    
+
     // Skip delimiters at beginning.
     std::string::size_type lastPos = name.find_first_not_of(".", 0);
     // Find first "non-delimiter".
-    std::string::size_type pos     = name.find_first_of(".", lastPos);
-  
-    while (std::string::npos != pos || std::string::npos != lastPos) {
+    std::string::size_type pos = name.find_first_of(".", lastPos);
 
-      // Found a token, add it to the vector.
-      tokens.push_back(name.substr(lastPos, pos - lastPos));
-      // Skip delimiters.  Note the "not_of"
-      lastPos = name.find_first_not_of(".", pos);
-      // Find next "non-delimiter"
-      pos = name.find_first_of(".", lastPos);
+    while (std::string::npos != pos || std::string::npos != lastPos)
+    {
+        // Found a token, add it to the vector.
+        tokens.push_back(name.substr(lastPos, pos - lastPos));
+        // Skip delimiters.  Note the "not_of"
+        lastPos = name.find_first_not_of(".", pos);
+        // Find next "non-delimiter"
+        pos = name.find_first_of(".", lastPos);
     }
-  
+
     // now find the logger in the hierarchy tree
 
     Logger* instance = &getRoot();
 
-    for (size_t i = 0; i < tokens.size(); i++) {
-
+    for (size_t i = 0; i < tokens.size(); i++)
+    {
         // find a son for the next token
 
         Logger* son = NULL;
-        for (size_t s = 0; s < instance->sons.size(); s++) {
+        for (size_t s = 0; s < instance->sons.size(); s++)
+        {
             Logger* candidate = instance->sons[s];
-            if (candidate->name == tokens[i]) {
+            if (candidate->name == tokens[i])
+            {
                 son = candidate;
                 break;
             }
         }
- 
+
         // create a new son if not found
 
-        if (son == NULL) {
-           // logger not available, so create it
-           son = new DerivedLogger(tokens[i], instance);
+        if (son == NULL)
+        {
+            // logger not available, so create it
+            son = new DerivedLogger(tokens[i], instance);
         }
 
         // got to the next deeper level
@@ -371,8 +375,8 @@ namespace log4espp {
     }
 
     return *instance;
-  }
-
 }
+
+}  // namespace log4espp
 
 #endif

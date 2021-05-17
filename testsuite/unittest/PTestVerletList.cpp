@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #define BOOST_TEST_MODULE VerletList
@@ -42,14 +42,14 @@ using namespace esutil;
 using namespace espressopp::iterator;
 
 /***********************************************************************************
-*                                                                                  *
-*  Global settings for problem                                                     *
-*                                                                                  *
-***********************************************************************************/
+ *                                                                                  *
+ *  Global settings for problem                                                     *
+ *                                                                                  *
+ ***********************************************************************************/
 
 static real cutoff = 1.733;  // largest cutoff
 
-static int  N = 6;  // particles in each dimension
+static int N = 6;  // particles in each dimension
 
 static real density = 1.0;
 
@@ -57,155 +57,157 @@ static int halfCellInt = 1;
 
 // sets up a storage with particles in a lattice
 
-struct DomainFixture {
+struct DomainFixture
+{
+    std::shared_ptr<DomainDecomposition> domdec;
+    std::shared_ptr<System> system;
 
-  std::shared_ptr<DomainDecomposition> domdec;
-  std::shared_ptr<System> system;
+    real SIZE;
 
-  real SIZE;
+    DomainFixture(double density)
+    {
+        SIZE = pow(N * N * N / density, 1.0 / 3.0);
 
-  DomainFixture(double density) {
+        BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
 
-    SIZE = pow(N * N * N / density, 1.0/3.0) ;
+        Real3D boxL(SIZE, SIZE, SIZE);
 
-    BOOST_TEST_MESSAGE("box SIZE = " << SIZE << ", density = 1.0");
+        real skin = 0.001;
 
-    Real3D boxL(SIZE, SIZE, SIZE);
+        int nodeGrid[3] = {1, 1, mpiWorld->size()};
 
-    real skin   = 0.001;
-    
-    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
+        int cellGrid[3] = {1, 1, 1};
 
-    int cellGrid[3] = { 1, 1, 1 };
+        for (int i = 0; i < 3; i++)
+        {
+            // take largest number of cells, but cell size must be >= cutoff
+            // so cutoff used here should be the largest cutoff
 
-    for (int i = 0; i < 3; i++) {
+            int ncells = 1;
 
-       // take largest number of cells, but cell size must be >= cutoff
-       // so cutoff used here should be the largest cutoff
+            while (SIZE / (ncells * nodeGrid[i]) >= cutoff)
+            {
+                ncells++;
+            }
 
-       int ncells = 1;
+            ncells--;
 
-       while (SIZE / (ncells * nodeGrid[i]) >= cutoff) {
-          ncells ++;
-       }
-  
-       ncells--;
+            cellGrid[i] = ncells;
+        }
 
-       cellGrid[i] = ncells;
+        BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " << cellGrid[1]
+                                                         << " x " << cellGrid[2]);
+
+        system = std::make_shared<System>();
+        system->rng = std::make_shared<esutil::RNG>();
+        system->bc = std::make_shared<OrthorhombicBC>(system->rng, boxL);
+        system->setSkin(skin);
+        domdec = std::make_shared<DomainDecomposition>(system, nodeGrid, cellGrid, halfCellInt);
+        system->storage = domdec;
+        system->rng = std::make_shared<esutil::RNG>();
     }
-
-    BOOST_TEST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
-                                 cellGrid[1] << " x " << cellGrid[2]);
-
-    system = std::make_shared< System >();
-    system->rng = std::make_shared< esutil::RNG >();
-    system->bc = std::make_shared< OrthorhombicBC >(system->rng, boxL);
-    system->setSkin(skin);
-    domdec = std::make_shared< DomainDecomposition >(system, nodeGrid, cellGrid, halfCellInt);
-    system->storage = domdec;
-    system->rng = std::make_shared< esutil::RNG >();
-  }
 };
 
 // sets up a storage with random particles
 
-struct RandomFixture : DomainFixture {
+struct RandomFixture : DomainFixture
+{
+    RandomFixture() : DomainFixture(density)
+    {
+        esutil::RNG rng;
 
-  RandomFixture() : DomainFixture(density) {
+        int id = 0;
 
-    esutil::RNG rng;
+        for (int i = 0; i < N * N * N; i++)
+        {
+            real x = rng() * SIZE;
+            real y = rng() * SIZE;
+            real z = rng() * SIZE;
 
-    int id = 0;
+            real pos[3] = {x, y, z};
 
-    for (int i = 0; i < N * N * N; i++) {
+            if (mpiWorld->rank() == 0)
+            {
+                BOOST_TEST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
+                domdec->addParticle(id, pos);
+            }
 
-      real x = rng() * SIZE;
-      real y = rng() * SIZE;
-      real z = rng() * SIZE;
+            id++;
+        }
 
-      real pos[3] = { x, y, z };
+        system->storage = domdec;
 
-      if (mpiWorld->rank() == 0) {
-        BOOST_TEST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
-        domdec->addParticle(id, pos);
-      }
+        BOOST_TEST_MESSAGE(
+            "number of random particles in storage = " << domdec->getNRealParticles());
 
-      id++;
+        domdec->decompose();
     }
-
-    system->storage = domdec;
-
-    BOOST_TEST_MESSAGE("number of random particles in storage = " <<
-                   domdec->getNRealParticles());
-
-    domdec->decompose();
-  }
 };
 
 real getDistSqr(const Particle& p1, const Particle& p2)
 {
-  return (p1.position() - p2.position()).sqr();
+    return (p1.position() - p2.position()).sqr();
 }
 
 BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 {
-  real cutoff = 1.5;
+    real cutoff = 1.5;
 
-  BOOST_TEST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
+    BOOST_TEST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
 
-  std::shared_ptr< VerletList > vl = std::make_shared< VerletList >(system, cutoff, true);
+    std::shared_ptr<VerletList> vl = std::make_shared<VerletList>(system, cutoff, true);
 
-  PairList pairs = vl->getPairs();
+    PairList pairs = vl->getPairs();
 
-  for (size_t i = 0; i < pairs.size(); i++) {
-     Particle *p1 = pairs[i].first;
-     Particle *p2 = pairs[i].second;
-     BOOST_TEST_MESSAGE("pair " << i << ": " << p1->id() << " " << p2->id()
-                 << ", dist = " << sqrt(getDistSqr(*p1, *p2)));
-  }
-
-  int totalPairs1 = 0;
-  int pairsSize = pairs.size();
-
-  boost::mpi::all_reduce(*mpiWorld, pairsSize, totalPairs1, std::plus<int>());
-
-  BOOST_TEST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries local = " << pairsSize);
-
-  BOOST_TEST_MESSAGE("RandomTest: check cells");
-
-  // count pairs in a N square loop
-
-  int count = 0;
-
-  CellList realCells = system->storage->getRealCells();
-  CellList localCells = system->storage->getLocalCells();
-
-  real cutoff_skin = cutoff + system->getSkin();
- 
-  for(CellListIterator cit1(realCells); !cit1.isDone(); ++cit1) {
-
-    for(CellListIterator cit2(localCells); !cit2.isDone(); ++cit2) {
-
-      if (cit1->id() >= cit2->id()) continue;
-
-      real distsqr = getDistSqr(*cit1, *cit2);
-
-      if (distsqr >= cutoff_skin * cutoff_skin) continue;
-
-      BOOST_TEST_MESSAGE("pair " << count << ": "
-                 << cit1->id() << " " << cit2->id()
-                 << ", dist = " << sqrt(distsqr));
-
-      count++;
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        Particle* p1 = pairs[i].first;
+        Particle* p2 = pairs[i].second;
+        BOOST_TEST_MESSAGE("pair " << i << ": " << p1->id() << " " << p2->id()
+                                   << ", dist = " << sqrt(getDistSqr(*p1, *p2)));
     }
-  }
 
-  int totalPairs2;
+    int totalPairs1 = 0;
+    int pairsSize = pairs.size();
 
-  boost::mpi::all_reduce(*mpiWorld, count, totalPairs2, std::plus<int>());
+    boost::mpi::all_reduce(*mpiWorld, pairsSize, totalPairs1, std::plus<int>());
 
-  BOOST_CHECK_EQUAL(totalPairs1, totalPairs2);
+    BOOST_TEST_MESSAGE("RandomTest: VerletList has = " << totalPairs1
+                                                       << " entries local = " << pairsSize);
 
-  // BOOST_CHECK_EQUAL(pairs.size(), count) on each processor is not always the case
+    BOOST_TEST_MESSAGE("RandomTest: check cells");
+
+    // count pairs in a N square loop
+
+    int count = 0;
+
+    CellList realCells = system->storage->getRealCells();
+    CellList localCells = system->storage->getLocalCells();
+
+    real cutoff_skin = cutoff + system->getSkin();
+
+    for (CellListIterator cit1(realCells); !cit1.isDone(); ++cit1)
+    {
+        for (CellListIterator cit2(localCells); !cit2.isDone(); ++cit2)
+        {
+            if (cit1->id() >= cit2->id()) continue;
+
+            real distsqr = getDistSqr(*cit1, *cit2);
+
+            if (distsqr >= cutoff_skin * cutoff_skin) continue;
+
+            BOOST_TEST_MESSAGE("pair " << count << ": " << cit1->id() << " " << cit2->id()
+                                       << ", dist = " << sqrt(distsqr));
+
+            count++;
+        }
+    }
+
+    int totalPairs2;
+
+    boost::mpi::all_reduce(*mpiWorld, count, totalPairs2, std::plus<int>());
+
+    BOOST_CHECK_EQUAL(totalPairs1, totalPairs2);
+
+    // BOOST_CHECK_EQUAL(pairs.size(), count) on each processor is not always the case
 }
-

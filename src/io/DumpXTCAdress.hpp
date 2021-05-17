@@ -22,7 +22,6 @@
 #ifndef _IO_DUMPXTCADRESS_HPP
 #define _IO_DUMPXTCADRESS_HPP
 
-
 #include <boost/serialization/map.hpp>
 #include <string>
 #include <iostream>
@@ -42,66 +41,68 @@
 #include <gromacs/trajectory/trajectoryframe.h>
 #include <gromacs/fileio/trxio.h>
 
-
-namespace espressopp {
-namespace io {
-class DumpXTCAdress : public ParticleAccess {
- public:
-  DumpXTCAdress(std::shared_ptr<System> system,
-    std::shared_ptr<FixedTupleListAdress> _ftpl,
-    std::shared_ptr<integrator::MDIntegrator> _integrator,
-    std::string _file_name,
-    bool _unfolded,
-    real _length_factor,
-    bool _append):
-      ParticleAccess(system),
-      ftpl(_ftpl),
-      fio(NULL),
-      xtcprec(1000),
-      integrator(_integrator),
-      file_name(_file_name),
-      unfolded(_unfolded),
-      length_factor(_length_factor),
-      append(_append) {
-    if (system->comm->rank() == 0 && !append) {
-      FileBackup backup(file_name);  // backup trajectory if it already exists
+namespace espressopp
+{
+namespace io
+{
+class DumpXTCAdress : public ParticleAccess
+{
+public:
+    DumpXTCAdress(std::shared_ptr<System> system,
+                  std::shared_ptr<FixedTupleListAdress> _ftpl,
+                  std::shared_ptr<integrator::MDIntegrator> _integrator,
+                  std::string _file_name,
+                  bool _unfolded,
+                  real _length_factor,
+                  bool _append)
+        : ParticleAccess(system),
+          ftpl(_ftpl),
+          fio(NULL),
+          xtcprec(1000),
+          integrator(_integrator),
+          file_name(_file_name),
+          unfolded(_unfolded),
+          length_factor(_length_factor),
+          append(_append)
+    {
+        if (system->comm->rank() == 0 && !append)
+        {
+            FileBackup backup(file_name);  // backup trajectory if it already exists
+        }
     }
-  }
-  ~DumpXTCAdress() { }
+    ~DumpXTCAdress() {}
 
-  void perform_action() {
-    dump();
-  }
+    void perform_action() { dump(); }
 
-  void dump();
+    void dump();
 
-  std::string getFilename() { return file_name; }
-  void setFilename(std::string v) { file_name = v; }
-  bool getUnfolded() { return unfolded; }
-  void setUnfolded(bool v) { unfolded = v; }
-  bool getAppend() { return append; }
-  void setAppend(bool v) { append = v; }
+    std::string getFilename() { return file_name; }
+    void setFilename(std::string v) { file_name = v; }
+    bool getUnfolded() { return unfolded; }
+    void setUnfolded(bool v) { unfolded = v; }
+    bool getAppend() { return append; }
+    void setAppend(bool v) { append = v; }
 
-  static void registerPython();
+    static void registerPython();
 
- private:
-  t_trxstatus *fio;
-  static const int dim = 3;
-  real xtcprec;
+private:
+    t_trxstatus *fio;
+    static const int dim = 3;
+    real xtcprec;
 
-  // integrator we need to know an integration step
-  std::shared_ptr<integrator::MDIntegrator> integrator;
-  std::shared_ptr<FixedTupleListAdress> ftpl;
+    // integrator we need to know an integration step
+    std::shared_ptr<integrator::MDIntegrator> integrator;
+    std::shared_ptr<FixedTupleListAdress> ftpl;
 
-  std::string file_name;
+    std::string file_name;
 
-  bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
-  bool append;  // append to existing trajectory file or create a new one
-  real length_factor;
+    bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
+    bool append;    // append to existing trajectory file or create a new one
+    real length_factor;
 
-  bool open(const char *mode);
-  void close();
-  void write(int natoms, int step, float time, Real3D *box, Real3D *x, float prec);
+    bool open(const char *mode);
+    void close();
+    void write(int natoms, int step, float time, Real3D *box, Real3D *x, float prec);
 };
 }  // end namespace io
 }  // end namespace espressopp

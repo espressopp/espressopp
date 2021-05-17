@@ -24,57 +24,45 @@
 #include "AngularPotential.hpp"
 #include "logging.hpp"
 
-namespace espressopp {
-  namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(AngularPotential::theLogger, "AngularPotential");
 
-    LOG4ESPP_LOGGER(AngularPotential::theLogger, "AngularPotential");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void AngularPotential::registerPython()
+{
+    using namespace espressopp::python;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void AngularPotential::registerPython() {
-        using namespace espressopp::python;
+    real (AngularPotential::*computeEnergy1)(const Real3D& dist12, const Real3D& dist32) const =
+        &AngularPotential::computeEnergy;
 
-        real (AngularPotential::*computeEnergy1)
-            (const Real3D& dist12, const Real3D& dist32) const =
-                &AngularPotential::computeEnergy;
+    real (AngularPotential::*computeEnergy2)(real theta) const = &AngularPotential::computeEnergy;
 
-        real (AngularPotential::*computeEnergy2)
-            (real theta) const =
-                &AngularPotential::computeEnergy;
+    void (AngularPotential::*computeForce1)(Real3D & force12, Real3D & force32,
+                                            const Real3D& dist12, const Real3D& dist32) const =
+        &AngularPotential::computeForce;
 
-        void (AngularPotential::*computeForce1)
-            (Real3D& force12, Real3D& force32,
-            const Real3D& dist12, const Real3D& dist32) const =
-                &AngularPotential::computeForce;
+    real (AngularPotential::*computeForce2)(real theta) const = &AngularPotential::computeForce;
 
-        real (AngularPotential::*computeForce2)(real theta) const =
-                &AngularPotential::computeForce;
-
-        class_< AngularPotential, boost::noncopyable >
-            ("interaction_AngularPotential", no_init)
-            .add_property("cutoff",
-                &AngularPotential::getCutoff,
-                &AngularPotential::setCutoff)
-            .add_property("colVarBondList",
-                &AngularPotential::getColVarBondList,
-                &AngularPotential::setColVarBondList)
-            .add_property("colVarAngleList",
-                          &AngularPotential::getColVarAngleList,
-                          &AngularPotential::setColVarAngleList)
-            .add_property("colVarDihedList",
-                &AngularPotential::getColVarDihedList,
-                &AngularPotential::setColVarDihedList)
-            .add_property("colVar",
-                &AngularPotential::getColVar)
-            .add_property("addCVBond",
-                &AngularPotential::getColVarBondList,
-                &AngularPotential::setColVarBondList)
-            .def("computeEnergy", pure_virtual(computeEnergy1))
-            .def("computeEnergy", pure_virtual(computeEnergy2))
-            .def("computeForce", pure_virtual(computeForce1))
-            .def("computeForce", pure_virtual(computeForce2))
-        ;
-    }
-  }
+    class_<AngularPotential, boost::noncopyable>("interaction_AngularPotential", no_init)
+        .add_property("cutoff", &AngularPotential::getCutoff, &AngularPotential::setCutoff)
+        .add_property("colVarBondList", &AngularPotential::getColVarBondList,
+                      &AngularPotential::setColVarBondList)
+        .add_property("colVarAngleList", &AngularPotential::getColVarAngleList,
+                      &AngularPotential::setColVarAngleList)
+        .add_property("colVarDihedList", &AngularPotential::getColVarDihedList,
+                      &AngularPotential::setColVarDihedList)
+        .add_property("colVar", &AngularPotential::getColVar)
+        .add_property("addCVBond", &AngularPotential::getColVarBondList,
+                      &AngularPotential::setColVarBondList)
+        .def("computeEnergy", pure_virtual(computeEnergy1))
+        .def("computeEnergy", pure_virtual(computeEnergy2))
+        .def("computeForce", pure_virtual(computeForce1))
+        .def("computeForce", pure_virtual(computeForce2));
 }
+}  // namespace interaction
+}  // namespace espressopp

@@ -26,30 +26,35 @@
 #include "Observable.hpp"
 #include "Temperature.hpp"
 
-namespace espressopp {
-namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+class KineticEnergy : public Observable
+{
+public:
+    KineticEnergy(std::shared_ptr<System> system, std::shared_ptr<Temperature> temperature)
+        : Observable(system), temperature_(temperature)
+    {
+        result_type = real_scalar;
+        observable_type = KINETIC_ENERGY;
+        precomputed_ = true;
+    }
+    KineticEnergy(std::shared_ptr<System> system) : Observable(system)
+    {
+        result_type = real_scalar;
+        observable_type = KINETIC_ENERGY;
+        precomputed_ = false;
+        temperature_ = std::make_shared<Temperature>(system);
+    }
+    ~KineticEnergy() {}
+    real compute_real() const;
 
-class KineticEnergy : public Observable {
- public:
-  KineticEnergy(std::shared_ptr<System> system, std::shared_ptr<Temperature> temperature):
-      Observable(system), temperature_(temperature) {
-    result_type = real_scalar;
-    observable_type = KINETIC_ENERGY;
-    precomputed_ = true;
-  }
-  KineticEnergy(std::shared_ptr<System> system): Observable(system) {
-    result_type = real_scalar;
-    observable_type = KINETIC_ENERGY;
-    precomputed_ = false;
-    temperature_ = std::make_shared<Temperature>(system);
-  }
-  ~KineticEnergy() {}
-  real compute_real() const;
+    static void registerPython();
 
-  static void registerPython();
- private:
-  std::shared_ptr<Temperature> temperature_;
-  bool precomputed_;
+private:
+    std::shared_ptr<Temperature> temperature_;
+    bool precomputed_;
 };
 }  // end namespace analysis
 }  // end namespace espressopp

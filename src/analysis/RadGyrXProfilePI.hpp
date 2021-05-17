@@ -27,19 +27,23 @@
 
 #include "python.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    // Class to compute the radius of gyration profile in adaptive path integral-based simulations along slabs in the x-direction of the system.
-    class RadGyrXProfilePI : public Observable {
-      public:
-        RadGyrXProfilePI(std::shared_ptr< System > system) : Observable(system) {}
-        ~RadGyrXProfilePI() {}
-        virtual real compute() const;
-        virtual python::list computeArray(int, int, int) const;
+namespace espressopp
+{
+namespace analysis
+{
+// Class to compute the radius of gyration profile in adaptive path integral-based simulations along
+// slabs in the x-direction of the system.
+class RadGyrXProfilePI : public Observable
+{
+public:
+    RadGyrXProfilePI(std::shared_ptr<System> system) : Observable(system) {}
+    ~RadGyrXProfilePI() {}
+    virtual real compute() const;
+    virtual python::list computeArray(int, int, int) const;
 
-        static void registerPython();
-    };
-  }
-}
+    static void registerPython();
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

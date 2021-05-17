@@ -26,152 +26,157 @@
 #include <boost/signals2.hpp>
 #include "VerletListAdress.hpp"
 
-namespace espressopp {
-  namespace integrator {
+namespace espressopp
+{
+namespace integrator
+{
+class PIAdressIntegrator : public MDIntegrator
+{
+public:
+    PIAdressIntegrator(std::shared_ptr<class espressopp::System> system,
+                       std::shared_ptr<VerletListAdress> _verletList);
 
-    class PIAdressIntegrator : public MDIntegrator {
+    virtual ~PIAdressIntegrator();
 
-      public:
-        PIAdressIntegrator(std::shared_ptr<class espressopp::System> system, std::shared_ptr<VerletListAdress> _verletList);
+    std::shared_ptr<VerletListAdress> verletList;
 
-        virtual ~PIAdressIntegrator();
+    void run(int nsteps);
 
-        std::shared_ptr<VerletListAdress> verletList;
+    void addEVcomponent(real val) { tmpvals.push_back(val); }
+    void addTransposedEigenVector()
+    {
+        Tvectors.push_back(tmpvals);
+        tmpvals.clear();
+    }
+    void addEigenValues(real val) { Eigenvalues.push_back(val); }
+    void transp();
 
-        void run(int nsteps);
+    int getVerletlistBuilds() { return verletlistBuilds; }
 
-        void addEVcomponent(real val) { tmpvals.push_back(val); }
-        void addTransposedEigenVector() { Tvectors.push_back(tmpvals); tmpvals.clear();}
-        void addEigenValues(real val) { Eigenvalues.push_back(val); }
-        void transp();
+    void setTimeStep(real _dt);
+    real getTimeStep() { return dt; }
 
-        int getVerletlistBuilds() { return verletlistBuilds; }
+    void setmStep(int _mStep);
+    int getmStep() { return mStep; }
 
-        void setTimeStep(real _dt);
-        real getTimeStep() { return dt; }
+    void setsStep(int _sStep);
+    int getsStep() { return sStep; }
 
-        void setmStep(int _mStep);
-        int getmStep() { return mStep; }
+    void setNtrotter(int _ntrotter);
+    int getNtrotter() { return ntrotter; }
 
-        void setsStep(int _sStep);
-        int getsStep() { return sStep; }
+    void setTemperature(real _temperature);
+    real getTemperature() { return temperature; }
 
-        void setNtrotter(int _ntrotter);
-        int getNtrotter() { return ntrotter; }
+    void setGamma(real _gamma);
+    real getGamma() { return gamma; }
 
-        void setTemperature(real _temperature);
-        real getTemperature() { return temperature; }
+    void setCMDparameter(real _CMDparameter);
+    real getCMDparameter() { return CMDparameter; }
 
-        void setGamma(real _gamma);
-        real getGamma() { return gamma; }
+    void setPILElambda(real _PILElambda);
+    real getPILElambda() { return PILElambda; }
 
-        void setCMDparameter(real _CMDparameter);
-        real getCMDparameter() { return CMDparameter; }
+    void setClmassmultiplier(real _clmassmultiplier);
+    real getClmassmultiplier() { return clmassmultiplier; }
 
-        void setPILElambda(real _PILElambda);
-        real getPILElambda() { return PILElambda; }
+    void setSpeedup(bool _speedup);
+    bool getSpeedup() { return speedup; }
 
-        void setClmassmultiplier(real _clmassmultiplier);
-        real getClmassmultiplier() { return clmassmultiplier; }
+    void setKTI(bool _KTI);
+    bool getKTI() { return KTI; }
 
-        void setSpeedup(bool _speedup);
-        bool getSpeedup() { return speedup; }
+    void setCentroidThermostat(bool _centroidthermostat);
+    bool getCentroidThermostat() { return centroidthermostat; }
 
-        void setKTI(bool _KTI);
-        bool getKTI() { return KTI; }
+    void setPILE(bool _PILE);
+    bool getPILE() { return PILE; }
 
-        void setCentroidThermostat(bool _centroidthermostat);
-        bool getCentroidThermostat() { return centroidthermostat; }
+    void setRealKinMass(bool _realkinmass);
+    bool getRealKinMass() { return realkinmass; }
 
-        void setPILE(bool _PILE);
-        bool getPILE() { return PILE; }
+    void setConstKinMass(bool _constkinmass);
+    bool getConstKinMass() { return constkinmass; }
 
-        void setRealKinMass(bool _realkinmass);
-        bool getRealKinMass() { return realkinmass; }
+    void setVerletList(std::shared_ptr<VerletListAdress> _verletList);
+    std::shared_ptr<VerletListAdress> getVerletList() { return verletList; }
 
-        void setConstKinMass(bool _constkinmass);
-        bool getConstKinMass() { return constkinmass; }
+    real computeRingEnergy();
+    real computeRingEnergyRaw();
+    real computeKineticEnergy();
 
-        void setVerletList(std::shared_ptr<VerletListAdress> _verletList);
-        std::shared_ptr<VerletListAdress> getVerletList() { return verletList; }
+    real computePositionDrift(int parttype);
+    real computeMomentumDrift(int parttype);
 
-        real computeRingEnergy();
-        real computeRingEnergyRaw();
-        real computeKineticEnergy();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        real computePositionDrift(int parttype);
-        real computeMomentumDrift(int parttype);
+protected:
+    int sStep;
+    int mStep;
+    int ntrotter;
+    int verletlistBuilds;
+    bool resortFlag;
+    bool speedup;
+    bool KTI;
+    bool constkinmass;
+    bool realkinmass;
+    bool centroidthermostat;
+    bool PILE;
 
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+    real omega2;
+    real clmassmultiplier;
 
-      protected:
+    real CMDparameter;
+    real PILElambda;
 
-        int sStep;
-        int mStep;
-        int ntrotter;
-        int verletlistBuilds;
-        bool resortFlag;
-        bool speedup;
-        bool KTI;
-        bool constkinmass;
-        bool realkinmass;
-        bool centroidthermostat;
-        bool PILE;
+    real gamma;
+    real temperature;
 
-        real omega2;
-        real clmassmultiplier;
+    real maxDist;
+    real dt2;
+    real dt3;
 
-        real CMDparameter;
-        real PILElambda;
+    real dhy;
+    real pidhy2;
+    real dex;
+    real dex2;
+    real dexdhy;
+    real dexdhy2;
 
-        real gamma;
-        real temperature;
+    std::vector<std::vector<real> > Eigenvectors;
+    std::vector<std::vector<real> > Tvectors;
+    std::vector<real> Eigenvalues;
+    std::vector<real> tmpvals;
 
-        real maxDist;
-        real dt2;
-        real dt3;
+    std::shared_ptr<esutil::RNG> rng;
 
-        real dhy;
-        real pidhy2;
-        real dex;
-        real dex2;
-        real dexdhy;
-        real dexdhy2;
+    void integrateV1(int t, bool doubletime);
+    void integrateV2();
+    void integrateModePos();
+    void OUintegrate();
 
-        std::vector< std::vector<real> > Eigenvectors;
-        std::vector< std::vector<real> > Tvectors;
-        std::vector< real > Eigenvalues;
-        std::vector<real> tmpvals;
+    void initForces(int f);
+    void updateForces(int f);
+    void distributeForces();
 
-        std::shared_ptr< esutil::RNG > rng;
+    void calcForcesF();
+    void calcForcesM();
+    void calcForcesS();
 
-        void integrateV1(int t, bool doubletime);
-        void integrateV2();
-        void integrateModePos();
-        void OUintegrate();
+    void transForces();
+    void transPos1();
+    void transPos2();
+    void transMom1();
+    void transMom2();
 
-        void initForces(int f);
-        void updateForces(int f);
-        void distributeForces();
-
-        void calcForcesF();
-        void calcForcesM();
-        void calcForcesS();
-
-        void transForces();
-        void transPos1();
-        void transPos2();
-        void transMom1();
-        void transMom2();
-
-        void initializeSetup();
-        void setWeights();
-        void setOmegaSquared();
-        real weight(real distanceSqr);
-        real weightderivative(real distanceSqr);
-    };
-  }
-}
+    void initializeSetup();
+    void setWeights();
+    void setOmegaSquared();
+    real weight(real distanceSqr);
+    real weightderivative(real distanceSqr);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

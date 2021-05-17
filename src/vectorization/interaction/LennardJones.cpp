@@ -26,33 +26,34 @@
 #include "LennardJones.hpp"
 #include "VerletListLennardJones.hpp"
 
+namespace espressopp
+{
+namespace vectorization
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
 
-namespace espressopp { namespace vectorization {
-  namespace interaction {
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void LennardJones::registerPython()
+{
+    using namespace espressopp::python;
 
-    LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
-
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    LennardJones::registerPython() {
-      using namespace espressopp::python;
-
-      class_< LennardJones, bases< Potential > >
-        ("vectorization_interaction_LennardJones", init< real, real, real >())
-        .def(init< real, real, real, real >())
+    class_<LennardJones, bases<Potential> >("vectorization_interaction_LennardJones",
+                                            init<real, real, real>())
+        .def(init<real, real, real, real>())
         .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
         .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
-        .def_pickle(LennardJones_pickle())
-      ;
+        .def_pickle(LennardJones_pickle());
 
-      class_< VerletListLennardJones, bases< Interaction > >
-        ("vectorization_interaction_VerletListLennardJones", init< std::shared_ptr<VerletList> >())
+    class_<VerletListLennardJones, bases<Interaction> >(
+        "vectorization_interaction_VerletListLennardJones", init<std::shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
-        .def("getPotential", &VerletListLennardJones::getPotentialPtr)
-      ;
-    }
-  }
-}}
+        .def("getPotential", &VerletListLennardJones::getPotentialPtr);
+}
+}  // namespace interaction
+}  // namespace vectorization
+}  // namespace espressopp

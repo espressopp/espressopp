@@ -35,42 +35,45 @@
 #include "FixedQuadrupleList.hpp"
 #include "esutil/Error.hpp"
 
+namespace espressopp
+{
+namespace io
+{
+class DumpTopology : public ParticleAccess
+{
+public:
+    DumpTopology(std::shared_ptr<System> system,
+                 std::shared_ptr<integrator::MDIntegrator> integrator)
+        : ParticleAccess(system), integrator_(integrator)
+    {
+    }
+    ~DumpTopology() {}
 
-namespace espressopp {
-namespace io {
-class DumpTopology: public ParticleAccess {
- public:
-  DumpTopology(std::shared_ptr<System> system, std::shared_ptr<integrator::MDIntegrator> integrator)
-      : ParticleAccess(system), integrator_(integrator) { }
-  ~DumpTopology() {  }
+    void perform_action() { saveDataToBuffer(); }
 
-  void perform_action() {
-    saveDataToBuffer();
-  }
+    void observeTuple(std::shared_ptr<FixedPairList> fpl);
+    void observeTriple(std::shared_ptr<FixedTripleList> ftl);
+    void observeQuadruple(std::shared_ptr<FixedQuadrupleList> fql);
 
-  void observeTuple(std::shared_ptr<FixedPairList> fpl);
-  void observeTriple(std::shared_ptr<FixedTripleList> ftl);
-  void observeQuadruple(std::shared_ptr<FixedQuadrupleList> fql);
+    python::list getData();
 
-  python::list getData();
+    static void registerPython();
 
-  static void registerPython();
+private:
+    static LOG4ESPP_DECL_LOGGER(theLogger);
 
- private:
-  static LOG4ESPP_DECL_LOGGER(theLogger);
+    void clearBuffer();
 
-  void clearBuffer();
+    std::shared_ptr<integrator::MDIntegrator> integrator_;
 
-  std::shared_ptr<integrator::MDIntegrator> integrator_;
+    typedef std::deque<longint> FplBuffer;
+    FplBuffer fpl_buffer_;
 
-  typedef std::deque<longint> FplBuffer;
-  FplBuffer fpl_buffer_;
+    std::vector<std::shared_ptr<FixedPairList> > fpls_;
+    std::vector<std::shared_ptr<FixedTripleList> > ftls_;
+    std::vector<std::shared_ptr<FixedQuadrupleList> > fqls_;
 
-  std::vector<std::shared_ptr<FixedPairList> > fpls_;
-  std::vector<std::shared_ptr<FixedTripleList> > ftls_;
-  std::vector<std::shared_ptr<FixedQuadrupleList> > fqls_;
-
-  void saveDataToBuffer();
+    void saveDataToBuffer();
 };
 
 }  // end namespace io

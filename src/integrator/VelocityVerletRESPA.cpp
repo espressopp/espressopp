@@ -29,89 +29,96 @@
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
 
-namespace espressopp {
-  using namespace std;
-  namespace integrator {
-    using namespace interaction;
-    using namespace iterator;
-    using namespace esutil;
-    using namespace boost::python;
+namespace espressopp
+{
+using namespace std;
+namespace integrator
+{
+using namespace interaction;
+using namespace iterator;
+using namespace esutil;
+using namespace boost::python;
 
-    VelocityVerletRESPA::VelocityVerletRESPA(std::shared_ptr< System > system) : MDIntegrator(system)
+VelocityVerletRESPA::VelocityVerletRESPA(std::shared_ptr<System> system) : MDIntegrator(system)
+{
+    resortFlag = true;
+    maxDist = 0.0;
+    multistep = 1;
+    dtlong = dt * multistep;
+}
+
+VelocityVerletRESPA::~VelocityVerletRESPA() {}
+
+void VelocityVerletRESPA::run(int nsteps)
+{
+    int nResorts = 0;
+    System& system = getSystemRef();
+    storage::Storage& storage = *system.storage;
+    real skinHalf = 0.5 * system.getSkin();
+    dtlong = dt * multistep;
+
+    runInit();  // signal
+
+    // Before start make sure that particles are on the right processor
+    if (resortFlag)
     {
-      resortFlag = true;
-      maxDist    = 0.0;
-      multistep = 1;
-      dtlong = dt*multistep;
-    }
-
-    VelocityVerletRESPA::~VelocityVerletRESPA() {}
-
-    void VelocityVerletRESPA::run(int nsteps)
-    {
-      int nResorts = 0;
-      System& system = getSystemRef();
-      storage::Storage& storage = *system.storage;
-      real skinHalf = 0.5 * system.getSkin();
-      dtlong = dt*multistep;
-
-      runInit(); // signal
-
-      // Before start make sure that particles are on the right processor
-      if (resortFlag) {
         storage.decompose();
         maxDist = 0.0;
         resortFlag = false;
-      }
+    }
 
-      updateForces(true);
-      aftCalcSlow(); // signal
+    updateForces(true);
+    aftCalcSlow();  // signal
 
-      for (int i = 0; i < nsteps; i++) {
+    for (int i = 0; i < nsteps; i++)
+    {
         integrate2(true);
-        aftIntSlow(); // signal
+        aftIntSlow();  // signal
 
-        recalc1(); // signal
+        recalc1();  // signal
         updateForces(false);
-        recalc2(); // signal
+        recalc2();  // signal
 
-        for (int j = 0; j < multistep; j++) {
-          befIntP(); // signal
+        for (int j = 0; j < multistep; j++)
+        {
+            befIntP();  // signal
 
-          maxDist += integrate1();
-          aftIntP(); // signal
+            maxDist += integrate1();
+            aftIntP();  // signal
 
-          if (maxDist > skinHalf) resortFlag = true;
-          if (resortFlag) {
-            storage.decompose();
-            maxDist  = 0.0;
-            resortFlag = false;
-            nResorts ++;
-          }
+            if (maxDist > skinHalf) resortFlag = true;
+            if (resortFlag)
+            {
+                storage.decompose();
+                maxDist = 0.0;
+                resortFlag = false;
+                nResorts++;
+            }
 
-          updateForces(false);
-          befIntV(); // signal
+            updateForces(false);
+            befIntV();  // signal
 
-          integrate2(false);
-          aftIntV(); // signal
+            integrate2(false);
+            aftIntV();  // signal
         }
 
         updateForces(true);
-        aftCalcSlow(); // signal
+        aftCalcSlow();  // signal
 
         integrate2(true);
-        aftIntSlow(); // signal
-      }
+        aftIntSlow();  // signal
     }
+}
 
-    real VelocityVerletRESPA::integrate1()
+real VelocityVerletRESPA::integrate1()
+{
+    System& system = getSystemRef();
+    CellList realCells = system.storage->getRealCells();
+
+    // loop over particles
+    real maxSqDist = 0.0;
+    for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-      System& system = getSystemRef();
-      CellList realCells = system.storage->getRealCells();
-
-      // loop over particles
-      real maxSqDist = 0.0;
-      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real sqDist = 0.0;
         real dtfm = 0.5 * dt / cit->mass();
 
@@ -125,118 +132,131 @@ namespace espressopp {
         cit->position() += deltaP;
         sqDist += deltaP * deltaP;
         maxSqDist = std::max(maxSqDist, sqDist);
-      }
-
-      inIntP(maxSqDist); // signal
-
-      real maxAllSqDist;
-      mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
-      return sqrt(maxAllSqDist);
     }
 
-    void VelocityVerletRESPA::integrate2(bool slow)
-    {
-      System& system = getSystemRef();
-      CellList realCells = system.storage->getRealCells();
+    inIntP(maxSqDist);  // signal
 
-      // loop over particles
-      real half_dt = 0.0;
-      if(slow) {
+    real maxAllSqDist;
+    mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
+    return sqrt(maxAllSqDist);
+}
+
+void VelocityVerletRESPA::integrate2(bool slow)
+{
+    System& system = getSystemRef();
+    CellList realCells = system.storage->getRealCells();
+
+    // loop over particles
+    real half_dt = 0.0;
+    if (slow)
+    {
         half_dt = 0.5 * dtlong;
-      }
-      else {
+    }
+    else
+    {
         half_dt = 0.5 * dt;
-      }
-      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    }
+    for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+    {
         real dtfm = half_dt / cit->mass();
         // propagate velocities
         cit->velocity() += dtfm * cit->force();
-      }
-
-      step++;
     }
 
-    void VelocityVerletRESPA::calcForces(bool slow)
+    step++;
+}
+
+void VelocityVerletRESPA::calcForces(bool slow)
+{
+    initForces();
+    aftInitF();  // signal
+
+    System& sys = getSystemRef();
+    const InteractionList& srIL = sys.shortRangeInteractions;
+
+    if (slow == true)
     {
-      initForces();
-      aftInitF(); // signal
-
-      System& sys = getSystemRef();
-      const InteractionList& srIL = sys.shortRangeInteractions;
-
-      if(slow == true) {
-        for (size_t i = 0; i < srIL.size(); i++) {
-          if(srIL[i]->bondType() == NonbondedSlow) {
-            srIL[i]->addForces();
-          }
+        for (size_t i = 0; i < srIL.size(); i++)
+        {
+            if (srIL[i]->bondType() == NonbondedSlow)
+            {
+                srIL[i]->addForces();
+            }
         }
-      }
-      else {
-        for (size_t i = 0; i < srIL.size(); i++) {
-          if(srIL[i]->bondType() != NonbondedSlow) {
-            srIL[i]->addForces();
-          }
+    }
+    else
+    {
+        for (size_t i = 0; i < srIL.size(); i++)
+        {
+            if (srIL[i]->bondType() != NonbondedSlow)
+            {
+                srIL[i]->addForces();
+            }
         }
-      }
     }
+}
 
-    void VelocityVerletRESPA::updateForces(bool slow)
+void VelocityVerletRESPA::updateForces(bool slow)
+{
+    storage::Storage& storage = *getSystemRef().storage;
+    storage.updateGhosts();
+    calcForces(slow);
+    storage.collectGhostForces();
+
+    if (slow == false)
     {
-      storage::Storage& storage = *getSystemRef().storage;
-      storage.updateGhosts();
-      calcForces(slow);
-      storage.collectGhostForces();
-
-      if (slow == false) {
-        aftCalcF(); // signal
-      }
+        aftCalcF();  // signal
     }
+}
 
-    void VelocityVerletRESPA::initForces()
+void VelocityVerletRESPA::initForces()
+{
+    // forces are initialized for real + ghost particles
+    System& system = getSystemRef();
+    CellList localCells = system.storage->getLocalCells();
+
+    for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-      // forces are initialized for real + ghost particles
-      System& system = getSystemRef();
-      CellList localCells = system.storage->getLocalCells();
-
-      for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         cit->force() = 0.0;
         cit->drift() = 0.0;
-      }
     }
-
-    void VelocityVerletRESPA::setmultistep(int _multistep)
-    {
-      if (_multistep <= 0) {
-        throw std::invalid_argument("multistep must be larger than zero!");
-      }
-      multistep = _multistep;
-      dtlong = dt*multistep;
-    }
-
-    void VelocityVerletRESPA::setTimeStep(real _dt)
-    {
-      if (_dt == 0.0) {
-        throw std::invalid_argument("Timestep 'dt' must be non-zero!");
-      }
-      dt = _dt;
-      dtlong = dt*multistep;
-    }
-
-    /****************************************************
-    ** REGISTRATION WITH PYTHON
-    ****************************************************/
-
-    void VelocityVerletRESPA::registerPython() {
-
-      using namespace espressopp::python;
-
-      // Note: use noncopyable and no_init for abstract classes
-      class_<VelocityVerletRESPA, bases<MDIntegrator>, boost::noncopyable >
-      ("integrator_VelocityVerletRESPA", init< std::shared_ptr<System> >())
-      .def("setmultistep", &VelocityVerletRESPA::setmultistep)
-      .def("getmultistep", &VelocityVerletRESPA::getmultistep)
-      .add_property("multistep", &VelocityVerletRESPA::getmultistep, &VelocityVerletRESPA::setmultistep)
-      ;
-    }
-  }
 }
+
+void VelocityVerletRESPA::setmultistep(int _multistep)
+{
+    if (_multistep <= 0)
+    {
+        throw std::invalid_argument("multistep must be larger than zero!");
+    }
+    multistep = _multistep;
+    dtlong = dt * multistep;
+}
+
+void VelocityVerletRESPA::setTimeStep(real _dt)
+{
+    if (_dt == 0.0)
+    {
+        throw std::invalid_argument("Timestep 'dt' must be non-zero!");
+    }
+    dt = _dt;
+    dtlong = dt * multistep;
+}
+
+/****************************************************
+** REGISTRATION WITH PYTHON
+****************************************************/
+
+void VelocityVerletRESPA::registerPython()
+{
+    using namespace espressopp::python;
+
+    // Note: use noncopyable and no_init for abstract classes
+    class_<VelocityVerletRESPA, bases<MDIntegrator>, boost::noncopyable>(
+        "integrator_VelocityVerletRESPA", init<std::shared_ptr<System> >())
+        .def("setmultistep", &VelocityVerletRESPA::setmultistep)
+        .def("getmultistep", &VelocityVerletRESPA::getmultistep)
+        .add_property("multistep", &VelocityVerletRESPA::getmultistep,
+                      &VelocityVerletRESPA::setmultistep);
+}
+}  // namespace integrator
+}  // namespace espressopp

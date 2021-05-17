@@ -30,99 +30,83 @@
 #include "VerletListHadressATInteractionTemplate.hpp"
 #include "VerletListHadressCGInteractionTemplate.hpp"
 
-namespace espressopp {
-  namespace interaction {
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    Harmonic::registerPython() {
-      using namespace espressopp::python;
+namespace espressopp
+{
+namespace interaction
+{
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void Harmonic::registerPython()
+{
+    using namespace espressopp::python;
 
-      class_< Harmonic, bases< Potential > >
-    	("interaction_Harmonic", init< real, real, real >())
-	.def(init< real, real, real, real >())
-	.add_property("K", &Harmonic::getK, &Harmonic::setK)
-	.add_property("r0", &Harmonic::getR0, &Harmonic::setR0)
-    	;
+    class_<Harmonic, bases<Potential> >("interaction_Harmonic", init<real, real, real>())
+        .def(init<real, real, real, real>())
+        .add_property("K", &Harmonic::getK, &Harmonic::setK)
+        .add_property("r0", &Harmonic::getR0, &Harmonic::setR0);
 
-      typedef class FixedPairListInteractionTemplate< Harmonic >
-        FixedPairListHarmonic;
-      typedef class FixedPairListTypesInteractionTemplate< Harmonic >
-        FixedPairListTypesHarmonic;
-      typedef class VerletListHadressATInteractionTemplate< Harmonic >
-        VerletListHadressATHarmonic;
-      typedef class VerletListHadressCGInteractionTemplate< Harmonic >
-        VerletListHadressCGHarmonic;
-      typedef class VerletListAdressATInteractionTemplate< Harmonic >
-        VerletListAdressATHarmonic;
-      typedef class VerletListAdressCGInteractionTemplate< Harmonic >
-        VerletListAdressCGHarmonic;
-      typedef class VerletListInteractionTemplate< Harmonic >
-        VerletListHarmonic;
+    typedef class FixedPairListInteractionTemplate<Harmonic> FixedPairListHarmonic;
+    typedef class FixedPairListTypesInteractionTemplate<Harmonic> FixedPairListTypesHarmonic;
+    typedef class VerletListHadressATInteractionTemplate<Harmonic> VerletListHadressATHarmonic;
+    typedef class VerletListHadressCGInteractionTemplate<Harmonic> VerletListHadressCGHarmonic;
+    typedef class VerletListAdressATInteractionTemplate<Harmonic> VerletListAdressATHarmonic;
+    typedef class VerletListAdressCGInteractionTemplate<Harmonic> VerletListAdressCGHarmonic;
+    typedef class VerletListInteractionTemplate<Harmonic> VerletListHarmonic;
 
-      class_< FixedPairListHarmonic, bases< Interaction > >
-        ("interaction_FixedPairListHarmonic",
-           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<Harmonic> >())
-        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<Harmonic> >())
+    class_<FixedPairListHarmonic, bases<Interaction> >(
+        "interaction_FixedPairListHarmonic",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<Harmonic> >())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>,
+                  std::shared_ptr<Harmonic> >())
         .def("setPotential", &FixedPairListHarmonic::setPotential)
         .def("getPotential", &FixedPairListHarmonic::getPotential)
         .def("setFixedPairList", &FixedPairListHarmonic::setFixedPairList)
         .def("getFixedPairList", &FixedPairListHarmonic::getFixedPairList);
-      ;
-      class_< FixedPairListTypesHarmonic, bases< Interaction > >
-        ("interaction_FixedPairListTypesHarmonic",
-           init< std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
-        .def(init< std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
+    ;
+    class_<FixedPairListTypesHarmonic, bases<Interaction> >(
+        "interaction_FixedPairListTypesHarmonic",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList> >())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListTypesHarmonic::setPotential)
         .def("getPotential", &FixedPairListTypesHarmonic::getPotentialPtr)
         .def("setFixedPairList", &FixedPairListTypesHarmonic::setFixedPairList)
         .def("getFixedPairList", &FixedPairListTypesHarmonic::getFixedPairList);
-     ;
+    ;
 
-      class_< VerletListHarmonic, bases< Interaction > >
-        ("interaction_VerletListHarmonic",
-           init< std::shared_ptr<VerletList> >())
+    class_<VerletListHarmonic, bases<Interaction> >("interaction_VerletListHarmonic",
+                                                    init<std::shared_ptr<VerletList> >())
         .def("setPotential", &VerletListHarmonic::setPotential)
-        .def("getPotential", &VerletListHarmonic::getPotentialPtr)
-      ;
+        .def("getPotential", &VerletListHarmonic::getPotentialPtr);
 
-            class_< VerletListAdressATHarmonic, bases< Interaction > >
-        ("interaction_VerletListAdressATHarmonic",
-           init< std::shared_ptr<VerletListAdress>,
-                  std::shared_ptr<FixedTupleListAdress> >())
+    class_<VerletListAdressATHarmonic, bases<Interaction> >(
+        "interaction_VerletListAdressATHarmonic",
+        init<std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListAdressATHarmonic::getVerletList)
         .def("setPotential", &VerletListAdressATHarmonic::setPotential)
-        .def("getPotential", &VerletListAdressATHarmonic::getPotentialPtr)
-      ;
+        .def("getPotential", &VerletListAdressATHarmonic::getPotentialPtr);
 
-      class_< VerletListAdressCGHarmonic, bases< Interaction > >
-        ("interaction_VerletListAdressCGHarmonic",
-           init< std::shared_ptr<VerletListAdress>,
-                  std::shared_ptr<FixedTupleListAdress> >())
+    class_<VerletListAdressCGHarmonic, bases<Interaction> >(
+        "interaction_VerletListAdressCGHarmonic",
+        init<std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListAdressCGHarmonic::getVerletList)
         .def("setPotential", &VerletListAdressCGHarmonic::setPotential)
-        .def("getPotential", &VerletListAdressCGHarmonic::getPotentialPtr)
-      ;
+        .def("getPotential", &VerletListAdressCGHarmonic::getPotentialPtr);
 
-            class_< VerletListHadressATHarmonic, bases< Interaction > >
-        ("interaction_VerletListHadressATHarmonic",
-           init< std::shared_ptr<VerletListAdress>,
-                  std::shared_ptr<FixedTupleListAdress> >())
+    class_<VerletListHadressATHarmonic, bases<Interaction> >(
+        "interaction_VerletListHadressATHarmonic",
+        init<std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListHadressATHarmonic::getVerletList)
         .def("setPotential", &VerletListHadressATHarmonic::setPotential)
-        .def("getPotential", &VerletListHadressATHarmonic::getPotentialPtr)
-      ;
+        .def("getPotential", &VerletListHadressATHarmonic::getPotentialPtr);
 
-      class_< VerletListHadressCGHarmonic, bases< Interaction > >
-        ("interaction_VerletListHadressCGHarmonic",
-           init< std::shared_ptr<VerletListAdress>,
-                  std::shared_ptr<FixedTupleListAdress> >())
+    class_<VerletListHadressCGHarmonic, bases<Interaction> >(
+        "interaction_VerletListHadressCGHarmonic",
+        init<std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
         .def("getVerletList", &VerletListHadressCGHarmonic::getVerletList)
         .def("setPotential", &VerletListHadressCGHarmonic::setPotential)
-        .def("getPotential", &VerletListHadressCGHarmonic::getPotentialPtr)
-      ;
-    }
-
-  }
+        .def("getPotential", &VerletListHadressCGHarmonic::getPotentialPtr);
 }
+
+}  // namespace interaction
+}  // namespace espressopp

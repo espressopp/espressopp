@@ -27,101 +27,96 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espressopp {
-namespace integrator {
-
+namespace espressopp
+{
+namespace integrator
+{
 using namespace espressopp::iterator;
 
-LangevinThermostatOnGroup::LangevinThermostatOnGroup(
-    std::shared_ptr<System> system, std::shared_ptr<ParticleGroup> _pg)
-        : Extension(system), particle_group(_pg) {
-  type = Extension::Thermostat;
+LangevinThermostatOnGroup::LangevinThermostatOnGroup(std::shared_ptr<System> system,
+                                                     std::shared_ptr<ParticleGroup> _pg)
+    : Extension(system), particle_group(_pg)
+{
+    type = Extension::Thermostat;
 
-  gamma = 0.0;
-  temperature = 0.0;
+    gamma = 0.0;
+    temperature = 0.0;
 
-  if (!system->rng) {
-    throw std::runtime_error("system has no RNG");
-  }
+    if (!system->rng)
+    {
+        throw std::runtime_error("system has no RNG");
+    }
 
-  rng = system->rng;
+    rng = system->rng;
 
-  LOG4ESPP_INFO(theLogger, "Langevin constructed");
+    LOG4ESPP_INFO(theLogger, "Langevin constructed");
 }
 
-void LangevinThermostatOnGroup::setGamma(real _gamma) {
-  gamma = _gamma;
+void LangevinThermostatOnGroup::setGamma(real _gamma) { gamma = _gamma; }
+
+real LangevinThermostatOnGroup::getGamma() { return gamma; }
+
+void LangevinThermostatOnGroup::setTemperature(real _temperature) { temperature = _temperature; }
+
+real LangevinThermostatOnGroup::getTemperature() { return temperature; }
+
+LangevinThermostatOnGroup::~LangevinThermostatOnGroup() { disconnect(); }
+
+void LangevinThermostatOnGroup::disconnect()
+{
+    _initialize.disconnect();
+    _heatUp.disconnect();
+    _coolDown.disconnect();
+    _thermalize.disconnect();
 }
 
-real LangevinThermostatOnGroup::getGamma() {
-  return gamma;
+void LangevinThermostatOnGroup::connect()
+{
+    // connect to initialization inside run()
+    _initialize =
+        integrator->runInit.connect(std::bind(&LangevinThermostatOnGroup::initialize, this));
+
+    _heatUp = integrator->recalc1.connect(std::bind(&LangevinThermostatOnGroup::heatUp, this));
+
+    _coolDown = integrator->recalc2.connect(std::bind(&LangevinThermostatOnGroup::coolDown, this));
+
+    _thermalize =
+        integrator->aftCalcF.connect(std::bind(&LangevinThermostatOnGroup::thermalize, this));
 }
 
-void LangevinThermostatOnGroup::setTemperature(real _temperature) {
-  temperature = _temperature;
+void LangevinThermostatOnGroup::thermalize()
+{
+    LOG4ESPP_DEBUG(theLogger, "thermalize");
+
+    for (ParticleGroup::iterator it = particle_group->begin(); it != particle_group->end(); it++)
+    {
+        frictionThermo(**it);
+    }
 }
 
-real LangevinThermostatOnGroup::getTemperature() {
-  return temperature;
+void LangevinThermostatOnGroup::frictionThermo(Particle &p)
+{
+    real massf = sqrt(p.mass());
+
+    // get a random value for each vector component
+
+    Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
+
+    p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
+
+    LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
 }
 
-LangevinThermostatOnGroup::~LangevinThermostatOnGroup() {
-  disconnect();
-}
+void LangevinThermostatOnGroup::initialize()
+{  // calculate the prefactors
+    real timestep = integrator->getTimeStep();
 
-void LangevinThermostatOnGroup::disconnect() {
-  _initialize.disconnect();
-  _heatUp.disconnect();
-  _coolDown.disconnect();
-  _thermalize.disconnect();
-}
+    pref1 = -gamma;
+    pref2 = sqrt(24.0 * temperature * gamma / timestep);
 
-void LangevinThermostatOnGroup::connect() {
-  // connect to initialization inside run()
-  _initialize = integrator->runInit.connect(
-      std::bind(&LangevinThermostatOnGroup::initialize, this));
-
-  _heatUp = integrator->recalc1.connect(
-      std::bind(&LangevinThermostatOnGroup::heatUp, this));
-
-  _coolDown = integrator->recalc2.connect(
-      std::bind(&LangevinThermostatOnGroup::coolDown, this));
-
-  _thermalize = integrator->aftCalcF.connect(
-      std::bind(&LangevinThermostatOnGroup::thermalize, this));
-}
-
-
-void LangevinThermostatOnGroup::thermalize() {
-  LOG4ESPP_DEBUG(theLogger, "thermalize");
-
-  for (ParticleGroup::iterator it = particle_group->begin(); it != particle_group->end(); it++) {
-    frictionThermo(**it);
-  }
-}
-
-void LangevinThermostatOnGroup::frictionThermo(Particle &p) {
-  real massf = sqrt(p.mass());
-
-  // get a random value for each vector component
-
-  Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
-
-  p.force() += pref1 * p.velocity() * p.mass() +
-      pref2 * ranval * massf;
-
-  LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
-}
-
-void LangevinThermostatOnGroup::initialize() {  // calculate the prefactors
-  real timestep = integrator->getTimeStep();
-
-  pref1 = -gamma;
-  pref2 = sqrt(24.0 * temperature * gamma / timestep);
-
-  LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-      ", gamma = " << gamma <<
-      ", temperature = " << temperature << " pref2=" << pref2);
+    LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep << ", gamma = " << gamma
+                                                 << ", temperature = " << temperature
+                                                 << " pref2=" << pref2);
 }
 
 /** very nasty: if we recalculate force when leaving/reentering the integrator,
@@ -131,38 +126,39 @@ This is corrected by additional heat when restarting the integrator here.
 Currently only works for the Langevin thermostat, although probably also others
 are affected.
 */
-void LangevinThermostatOnGroup::heatUp() {
-  LOG4ESPP_INFO(theLogger, "heatUp");
+void LangevinThermostatOnGroup::heatUp()
+{
+    LOG4ESPP_INFO(theLogger, "heatUp");
 
-  pref2buffer = pref2;
-  pref2 *= sqrt(3.0);
+    pref2buffer = pref2;
+    pref2 *= sqrt(3.0);
 }
 
 /** Opposite to heatUp */
 
-void LangevinThermostatOnGroup::coolDown() {
-  LOG4ESPP_INFO(theLogger, "coolDown");
+void LangevinThermostatOnGroup::coolDown()
+{
+    LOG4ESPP_INFO(theLogger, "coolDown");
 
-  pref2 = pref2buffer;
+    pref2 = pref2buffer;
 }
 
 /****************************************************
 ** REGISTRATION WITH PYTHON
 ****************************************************/
-void LangevinThermostatOnGroup::registerPython() {
-  using namespace espressopp::python;
+void LangevinThermostatOnGroup::registerPython()
+{
+    using namespace espressopp::python;
 
-  class_<LangevinThermostatOnGroup, std::shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >
-      ("integrator_LangevinThermostatOnGroup",
-           init<std::shared_ptr<System>, std::shared_ptr<ParticleGroup> >())
-      .def("connect", &LangevinThermostatOnGroup::connect)
-      .def("disconnect", &LangevinThermostatOnGroup::disconnect)
-      .add_property("gamma",
-                    &LangevinThermostatOnGroup::getGamma,
-                    &LangevinThermostatOnGroup::setGamma)
-      .add_property("temperature",
-                    &LangevinThermostatOnGroup::getTemperature,
-                    &LangevinThermostatOnGroup::setTemperature);
+    class_<LangevinThermostatOnGroup, std::shared_ptr<LangevinThermostatOnGroup>,
+           bases<Extension> >("integrator_LangevinThermostatOnGroup",
+                              init<std::shared_ptr<System>, std::shared_ptr<ParticleGroup> >())
+        .def("connect", &LangevinThermostatOnGroup::connect)
+        .def("disconnect", &LangevinThermostatOnGroup::disconnect)
+        .add_property("gamma", &LangevinThermostatOnGroup::getGamma,
+                      &LangevinThermostatOnGroup::setGamma)
+        .add_property("temperature", &LangevinThermostatOnGroup::getTemperature,
+                      &LangevinThermostatOnGroup::setTemperature);
 }
 
 }  // end namespace integrator

@@ -38,328 +38,363 @@ using namespace espressopp;
 using namespace iterator;
 using namespace std;
 
-namespace espressopp {
-  namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+// TODO currently works correctly if L_y is shortest side length (it's fine if L_x and/or L_z are
+// equal to L_y) rdfN is a level of discretisation of rdf (how many elements it contains)
+python::list RDFatomistic::computeArray(int rdfN) const
+{
+    System &system = getSystemRef();
+    esutil::Error err(system.comm);
+    Real3D Li = system.bc->getBoxL();
+    Real3D Li_half = Li / 2.;
 
-    // TODO currently works correctly if L_y is shortest side length (it's fine if L_x and/or L_z are equal to L_y)
-    // rdfN is a level of discretisation of rdf (how many elements it contains)
-    python::list RDFatomistic::computeArray(int rdfN) const {
+    int nprocs = system.comm->size();
+    int myrank = system.comm->rank();
 
-      System& system = getSystemRef();
-      esutil::Error err(system.comm);
-      Real3D Li = system.bc->getBoxL();
-      Real3D Li_half = Li / 2.;
+    real histogram[rdfN];
+    for (int i = 0; i < rdfN; i++) histogram[i] = 0;
 
-      int nprocs = system.comm->size();
-      int myrank = system.comm->rank();
+    real dr = Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
+    // should use for Li_half[XXX] the shortest side length. Currently using L_y
 
-      real histogram [rdfN];
-      for(int i=0; i<rdfN; i++) histogram[i]=0;
+    int num_part = 0;
+    map<size_t, data> config;
+    for (int rank_i = 0; rank_i < nprocs; rank_i++)
+    {
+        map<size_t, data> conf;
+        if (rank_i == myrank)
+        {
+            std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+            CellList realCells = system.storage->getRealCells();
+            for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+            {
+                Particle &vp = *cit;
+                FixedTupleListAdress::iterator it2;
+                it2 = fixedtupleList->find(&vp);
 
-      real dr = Li_half[1] / (real)rdfN; // If you work with nonuniform Lx, Ly, Lz, you
-      // should use for Li_half[XXX] the shortest side length. Currently using L_y
+                if (it2 != fixedtupleList->end())
+                {  // Are there atomistic particles for given CG particle? If yes, use those for
+                   // calculation.
+                    std::vector<Particle *> atList;
+                    atList = it2->second;
+                    for (std::vector<Particle *>::iterator it3 = atList.begin();
+                         it3 != atList.end(); ++it3)
+                    {
+                        Particle &at = **it3;
+                        int id = at.id();
+                        data tmp = {at.position(), at.type(), vp.id(), vp.lambda()};
+                        conf[id] = tmp;
+                    }
+                }
 
-      int num_part = 0;
-      map< size_t, data > config;
-      for (int rank_i=0; rank_i<nprocs; rank_i++) {
-        map< size_t, data > conf;
-        if (rank_i == myrank) {
-          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
-          CellList realCells = system.storage->getRealCells();
-          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-
-            Particle &vp = *cit;
-            FixedTupleListAdress::iterator it2;
-            it2 = fixedtupleList->find(&vp);
-
-            if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.
-              std::vector<Particle*> atList;
-              atList = it2->second;
-              for (std::vector<Particle*>::iterator it3 = atList.begin();
-                   it3 != atList.end(); ++it3) {
-                Particle &at = **it3;
-                int id = at.id();
-                data tmp = { at.position(), at.type(), vp.id(), vp.lambda() };
-                conf[id] = tmp;
-              }
+                else
+                {  // If not, use CG particle itself for calculation.
+                    std::cout << "WARNING! In RDFatomistic, no atomistic AdResS particle found!\n";
+                    exit(1);
+                }
             }
-
-            else {  // If not, use CG particle itself for calculation.
-              std::cout << "WARNING! In RDFatomistic, no atomistic AdResS particle found!\n";
-              exit(1);
-            }
-
-          }
         }
 
         boost::mpi::broadcast(*system.comm, conf, rank_i);
 
         // for simplicity we will number the particles from 0
-        for (map<size_t,data>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
-          data p = itr->second;
-          config[num_part] = p;
-          num_part ++;
+        for (map<size_t, data>::iterator itr = conf.begin(); itr != conf.end(); ++itr)
+        {
+            data p = itr->second;
+            config[num_part] = p;
+            num_part++;
         }
-      }
+    }
 
-      int num_pairs = 0;
-      // now all CPUs have all particle coords and num_part is the total number of particles
+    int num_pairs = 0;
+    // now all CPUs have all particle coords and num_part is the total number of particles
 
-      // use all cpus
-      // TODO it could be a problem if   n_nodes > num_part
-      int numi = num_part / nprocs + 1;
-      int mini = myrank * numi;
-      int maxi = mini + numi;
+    // use all cpus
+    // TODO it could be a problem if   n_nodes > num_part
+    int numi = num_part / nprocs + 1;
+    int mini = myrank * numi;
+    int maxi = mini + numi;
 
-      if(maxi>num_part) maxi = num_part;
+    if (maxi > num_part) maxi = num_part;
 
-      for(int i = mini; i<maxi; i++) {
+    for (int i = mini; i < maxi; i++)
+    {
         Real3D coordP1 = config[i].pos;
         int typeP1 = config[i].type;
         int molP1 = config[i].molecule;
         real resolutionP1 = config[i].resolution;
 
+        if (spanbased == true)
+        {
+            if ((coordP1[0] < Li_half[0] + span) && (coordP1[0] > Li_half[0] - span))
+            {
+                for (int j = i + 1; j < num_part; j++)
+                {
+                    Real3D coordP2 = config[j].pos;
+                    int typeP2 = config[j].type;
+                    int molP2 = config[j].molecule;
 
-        if (spanbased == true) {
-          if((coordP1[0] < Li_half[0]+span) && (coordP1[0] > Li_half[0]-span) ) {
-            for(int j = i+1; j<num_part; j++) {
-              Real3D coordP2 = config[j].pos;
-              int typeP2 = config[j].type;
-              int molP2 = config[j].molecule;
+                    if (molP1 != molP2)
+                    {
+                        if (((typeP1 == target1) && (typeP2 == target2)) ||
+                            ((typeP1 == target2) && (typeP2 == target1)))
+                        {
+                            Real3D distVector(0.0, 0.0, 0.0);
+                            system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
-              if (molP1 != molP2) {
-
-                if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ) {
-                  Real3D distVector(0.0, 0.0, 0.0);
-                  system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
-
-                  int bin = (int)( distVector.abs() / dr );
-                  if( bin < rdfN) {
-                    histogram[bin] += 1.0;
-                  }
-                  num_pairs += 1;
-
-                }
-              }
-            }
-          }
-        }
-        else {
-          if( resolutionP1 == 1.0 ) {
-            for(int j = i+1; j<num_part; j++) {
-              Real3D coordP2 = config[j].pos;
-              int typeP2 = config[j].type;
-              int molP2 = config[j].molecule;
-              real resolutionP2 = config[j].resolution;
-
-              if (molP1 != molP2) {
-
-                if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ) {
-
-                  num_pairs += 1;
-
-                  if( resolutionP2 == 1.0 ) {
-                    Real3D distVector(0.0, 0.0, 0.0);
-                    system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
-
-                    int bin = (int)( distVector.abs() / dr );
-                    if( bin < rdfN) {
-                      histogram[bin] += 1.0;
+                            int bin = (int)(distVector.abs() / dr);
+                            if (bin < rdfN)
+                            {
+                                histogram[bin] += 1.0;
+                            }
+                            num_pairs += 1;
+                        }
                     }
-                  }
-
                 }
-              }
             }
-          }
         }
-      }
+        else
+        {
+            if (resolutionP1 == 1.0)
+            {
+                for (int j = i + 1; j < num_part; j++)
+                {
+                    Real3D coordP2 = config[j].pos;
+                    int typeP2 = config[j].type;
+                    int molP2 = config[j].molecule;
+                    real resolutionP2 = config[j].resolution;
 
-      real totHistogram[rdfN];
-      boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
+                    if (molP1 != molP2)
+                    {
+                        if (((typeP1 == target1) && (typeP2 == target2)) ||
+                            ((typeP1 == target2) && (typeP2 == target1)))
+                        {
+                            num_pairs += 1;
 
-      int tot_num_pairs = 0;
-      boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
-      int nconfigs = 1;
-      real rho = (real)1.0 / (Li[0]*Li[1]*Li[2]);
-      real factor = 4.0 * M_PIl * dr * rho * (real)nconfigs * (real)tot_num_pairs;
+                            if (resolutionP2 == 1.0)
+                            {
+                                Real3D distVector(0.0, 0.0, 0.0);
+                                system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
-      for(int i=0; i < rdfN; i++) {
-        real radius = (i + 0.5) * dr;
-        totHistogram[i] /= factor * (radius*radius + dr*dr / 12.0);
-      }
-
-      python::list pyli;
-      for(int i=0; i < rdfN; i++) {
-        pyli.append( totHistogram[i] );
-      }
-      return pyli;
+                                int bin = (int)(distVector.abs() / dr);
+                                if (bin < rdfN)
+                                {
+                                    histogram[bin] += 1.0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const {
+    real totHistogram[rdfN];
+    boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
 
-      System& system = getSystemRef();
-      esutil::Error err(system.comm);
-      Real3D Li = system.bc->getBoxL();
-      Real3D Li_half = Li / 2.;
+    int tot_num_pairs = 0;
+    boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
+    int nconfigs = 1;
+    real rho = (real)1.0 / (Li[0] * Li[1] * Li[2]);
+    real factor = 4.0 * M_PIl * dr * rho * (real)nconfigs * (real)tot_num_pairs;
 
-      real Xmax = Li_half[0] + span;
-      real Xmin = Li_half[0] - span;
+    for (int i = 0; i < rdfN; i++)
+    {
+        real radius = (i + 0.5) * dr;
+        totHistogram[i] /= factor * (radius * radius + dr * dr / 12.0);
+    }
 
-      int nprocs = system.comm->size();
-      int myrank = system.comm->rank();
+    python::list pyli;
+    for (int i = 0; i < rdfN; i++)
+    {
+        pyli.append(totHistogram[i]);
+    }
+    return pyli;
+}
 
-      real histogram [rdfN];
-      for(int i=0; i<rdfN; i++) histogram[i]=0;
+python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
+{
+    System &system = getSystemRef();
+    esutil::Error err(system.comm);
+    Real3D Li = system.bc->getBoxL();
+    Real3D Li_half = Li / 2.;
 
-      real dr = Li_half[1] / (real)rdfN; // If you work with nonuniform Lx, Ly, Lz, you
-      // should use for Li_half[XXX] the shortest side length. Currently using L_y
+    real Xmax = Li_half[0] + span;
+    real Xmin = Li_half[0] - span;
 
-      int num_part = 0;
-      map< size_t, dataPathIntegral > config;
-      for (int rank_i=0; rank_i<nprocs; rank_i++) {
-        map< size_t, dataPathIntegral > conf;
-        if (rank_i == myrank) {
-          std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
-          CellList realCells = system.storage->getRealCells();
-          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    int nprocs = system.comm->size();
+    int myrank = system.comm->rank();
 
-            Particle &vp = *cit;
-            FixedTupleListAdress::iterator it2;
-            it2 = fixedtupleList->find(&vp);
+    real histogram[rdfN];
+    for (int i = 0; i < rdfN; i++) histogram[i] = 0;
 
-            if (it2 != fixedtupleList->end()) {
-              std::vector<Particle*> atList;
-              atList = it2->second;
-              for (std::vector<Particle*>::iterator it3 = atList.begin();
-                   it3 != atList.end(); ++it3) {
-                Particle &at = **it3;
+    real dr = Li_half[1] / (real)rdfN;  // If you work with nonuniform Lx, Ly, Lz, you
+    // should use for Li_half[XXX] the shortest side length. Currently using L_y
 
-                if ( (at.position()[0] < Xmax) && (at.position()[0] > Xmin) ) {
-                  int id = at.id();
-                  dataPathIntegral tmp = { at.position(), at.type(), vp.id(), at.pib() };
-                  conf[id] = tmp;
+    int num_part = 0;
+    map<size_t, dataPathIntegral> config;
+    for (int rank_i = 0; rank_i < nprocs; rank_i++)
+    {
+        map<size_t, dataPathIntegral> conf;
+        if (rank_i == myrank)
+        {
+            std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+            CellList realCells = system.storage->getRealCells();
+            for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+            {
+                Particle &vp = *cit;
+                FixedTupleListAdress::iterator it2;
+                it2 = fixedtupleList->find(&vp);
+
+                if (it2 != fixedtupleList->end())
+                {
+                    std::vector<Particle *> atList;
+                    atList = it2->second;
+                    for (std::vector<Particle *>::iterator it3 = atList.begin();
+                         it3 != atList.end(); ++it3)
+                    {
+                        Particle &at = **it3;
+
+                        if ((at.position()[0] < Xmax) && (at.position()[0] > Xmin))
+                        {
+                            int id = at.id();
+                            dataPathIntegral tmp = {at.position(), at.type(), vp.id(), at.pib()};
+                            conf[id] = tmp;
+                        }
+                    }
                 }
-              }
-            }
 
-            else {  // If not, use CG particle itself for calculation.
-              std::cout << "WARNING! In RDFpathintegral, no atomistic AdResS particle found!\n";
-              exit(1);
+                else
+                {  // If not, use CG particle itself for calculation.
+                    std::cout
+                        << "WARNING! In RDFpathintegral, no atomistic AdResS particle found!\n";
+                    exit(1);
+                }
             }
-
-          }
         }
 
         boost::mpi::broadcast(*system.comm, conf, rank_i);
 
         // for simplicity we will number the particles from 0
-        for (map<size_t, dataPathIntegral>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
-          dataPathIntegral p = itr->second;
-          config[num_part] = p;
-          num_part ++;
+        for (map<size_t, dataPathIntegral>::iterator itr = conf.begin(); itr != conf.end(); ++itr)
+        {
+            dataPathIntegral p = itr->second;
+            config[num_part] = p;
+            num_part++;
         }
-      }
+    }
 
-      int num_pairs = 0;
+    int num_pairs = 0;
 
-      int numi = num_part / nprocs + 1;
-      int mini = myrank * numi;
-      int maxi = mini + numi;
+    int numi = num_part / nprocs + 1;
+    int mini = myrank * numi;
+    int maxi = mini + numi;
 
-      if(maxi>num_part) maxi = num_part;
+    if (maxi > num_part) maxi = num_part;
 
-      for(int i = mini; i<maxi; i++) {
+    for (int i = mini; i < maxi; i++)
+    {
         Real3D coordP1 = config[i].pos;
         int typeP1 = config[i].type;
         int molP1 = config[i].molecule;
         int pibP1 = config[i].pib;
 
-        if( (coordP1[0] < Xmax) && (coordP1[0] > Xmin) ) {
-          for(int j = i+1; j<num_part; j++) {
-            Real3D coordP2 = config[j].pos;
-            int typeP2 = config[j].type;
-            int molP2 = config[j].molecule;
-            int pibP2 = config[j].pib;
+        if ((coordP1[0] < Xmax) && (coordP1[0] > Xmin))
+        {
+            for (int j = i + 1; j < num_part; j++)
+            {
+                Real3D coordP2 = config[j].pos;
+                int typeP2 = config[j].type;
+                int molP2 = config[j].molecule;
+                int pibP2 = config[j].pib;
 
-            if ( (molP1 != molP2) && (pibP1 == pibP2) && (coordP2[0] < Xmax) && (coordP2[0] > Xmin) ) {
+                if ((molP1 != molP2) && (pibP1 == pibP2) && (coordP2[0] < Xmax) &&
+                    (coordP2[0] > Xmin))
+                {
+                    if (((typeP1 == target1) && (typeP2 == target2)) ||
+                        ((typeP1 == target2) && (typeP2 == target1)))
+                    {
+                        Real3D distVector = coordP1 - coordP2;
 
-              if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ) {
+                        // minimize the distance in simulation box
+                        for (int ii = 0; ii < 3; ii++)
+                        {
+                            if (distVector[ii] < -Li_half[ii]) distVector[ii] += Li[ii];
+                            if (distVector[ii] > Li_half[ii]) distVector[ii] -= Li[ii];
+                        }
 
-                Real3D distVector = coordP1 - coordP2;
+                        real absdist = distVector.abs();
 
-                // minimize the distance in simulation box
-                for(int ii=0; ii<3; ii++) {
-                  if( distVector[ii] < -Li_half[ii] ) distVector[ii] += Li[ii];
-                  if( distVector[ii] >  Li_half[ii] ) distVector[ii] -= Li[ii];
+                        int bin = (int)(absdist / dr);
+                        if (bin < rdfN)
+                        {
+                            // Normalization (see R. Potestio et al., Phys. Rev. Lett. 111, 060601
+                            // (2013), Supp. Info.)
+                            real Xplus = Xmax - coordP1[0];
+                            real Xminus = coordP1[0] - Xmin;
+
+                            real h_norm = 0.0;
+
+                            if (Xplus <= absdist)
+                            {
+                                h_norm += absdist - Xplus;
+                            }
+                            if (Xminus <= absdist)
+                            {
+                                h_norm += absdist - Xminus;
+                            }
+
+                            real v_norm =
+                                1.0 / (2.0 * M_PIl * dr * absdist * (2.0 * absdist - h_norm));
+
+                            histogram[bin] += v_norm;
+                        }
+                        num_pairs += 1;
+                    }
                 }
-
-                real absdist = distVector.abs();
-
-                int bin = (int)( absdist / dr );
-                if( bin < rdfN) {
-
-                  // Normalization (see R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info.)
-                  real Xplus = Xmax - coordP1[0];
-                  real Xminus = coordP1[0] - Xmin;
-
-                  real h_norm = 0.0;
-
-                  if (Xplus <= absdist) {
-                    h_norm += absdist - Xplus;
-                  }
-                  if (Xminus <= absdist) {
-                    h_norm += absdist - Xminus;
-                  }
-
-                  real v_norm = 1.0/(2.0*M_PIl*dr*absdist*(2.0*absdist - h_norm));
-
-                  histogram[bin] += v_norm;
-                }
-                num_pairs += 1;
-
-              }
             }
-          }
         }
-
-      }
-
-      real totHistogram[rdfN];
-      boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
-
-      int tot_num_pairs = 0;
-      boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
-
-      // Normalization (see R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info.)
-      real subvol = 2.0*Li[1]*Li[2]*span;
-      if(span > 0.5*Li[0]) {
-        subvol = Li[1]*Li[2]*Li[0];
-      }
-      for(int i=0; i < rdfN; i++) {
-        totHistogram[i] /= ( (real)tot_num_pairs / subvol );
-      }
-      // Normalization
-
-      python::list pyli;
-      for(int i=0; i < rdfN; i++) {
-        pyli.append( totHistogram[i] );
-      }
-      return pyli;
     }
 
-    // TODO: this dummy routine is still needed as we have not yet ObservableVector
-    real RDFatomistic::compute() const {
-      return -1.0;
-    }
+    real totHistogram[rdfN];
+    boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
 
-    void RDFatomistic::registerPython() {
-      using namespace espressopp::python;
-      class_<RDFatomistic, bases< Observable > >
-      ("analysis_RDFatomistic", init< std::shared_ptr< System >, int, int, real, bool >())
-      .def("compute", &RDFatomistic::computeArray)
-      .def("computePathIntegral", &RDFatomistic::computeArrayPathIntegral)
-      ;
+    int tot_num_pairs = 0;
+    boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
+
+    // Normalization (see R. Potestio et al., Phys. Rev. Lett. 111, 060601 (2013), Supp. Info.)
+    real subvol = 2.0 * Li[1] * Li[2] * span;
+    if (span > 0.5 * Li[0])
+    {
+        subvol = Li[1] * Li[2] * Li[0];
     }
-  }
+    for (int i = 0; i < rdfN; i++)
+    {
+        totHistogram[i] /= ((real)tot_num_pairs / subvol);
+    }
+    // Normalization
+
+    python::list pyli;
+    for (int i = 0; i < rdfN; i++)
+    {
+        pyli.append(totHistogram[i]);
+    }
+    return pyli;
 }
+
+// TODO: this dummy routine is still needed as we have not yet ObservableVector
+real RDFatomistic::compute() const { return -1.0; }
+
+void RDFatomistic::registerPython()
+{
+    using namespace espressopp::python;
+    class_<RDFatomistic, bases<Observable> >("analysis_RDFatomistic",
+                                             init<std::shared_ptr<System>, int, int, real, bool>())
+        .def("compute", &RDFatomistic::computeArray)
+        .def("computePathIntegral", &RDFatomistic::computeArrayPathIntegral);
+}
+}  // namespace analysis
+}  // namespace espressopp

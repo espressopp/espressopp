@@ -26,30 +26,28 @@
 #include "HarmonicTrap.hpp"
 #include "Real3D.hpp"
 
-namespace espressopp {
-  namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+typedef class SingleParticleInteractionTemplate<HarmonicTrap> SingleParticleHarmonicTrap;
 
-    typedef class SingleParticleInteractionTemplate <HarmonicTrap>
-    SingleParticleHarmonicTrap;
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void HarmonicTrap::registerPython()
+{
+    using namespace espressopp::python;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    HarmonicTrap::registerPython() {
-      using namespace espressopp::python;
-
-      class_< HarmonicTrap, bases< SingleParticlePotential > >
-        ("interaction_HarmonicTrap", init<>())
+    class_<HarmonicTrap, bases<SingleParticlePotential> >("interaction_HarmonicTrap", init<>())
         .add_property("k", &HarmonicTrap::getK, &HarmonicTrap::setK)
-        .add_property("center", &HarmonicTrap::getCenter, &HarmonicTrap::setCenter)
-        ;
+        .add_property("center", &HarmonicTrap::getCenter, &HarmonicTrap::setCenter);
 
-      class_< SingleParticleHarmonicTrap, bases< Interaction > >
-        ("interaction_SingleParticleHarmonicTrap", init< std::shared_ptr<System>, std::shared_ptr<HarmonicTrap> >())
+    class_<SingleParticleHarmonicTrap, bases<Interaction> >(
+        "interaction_SingleParticleHarmonicTrap",
+        init<std::shared_ptr<System>, std::shared_ptr<HarmonicTrap> >())
         .def("setPotential", &SingleParticleHarmonicTrap::setPotential)
-        .def("getPotential", &SingleParticleHarmonicTrap::getPotential)
-      ;
-    }
-  }
+        .def("getPotential", &SingleParticleHarmonicTrap::getPotential);
 }
+}  // namespace interaction
+}  // namespace espressopp

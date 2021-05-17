@@ -25,13 +25,15 @@
 #include "vectorization/VerletList.hpp"
 #include "vectorization/interaction/bindings.hpp"
 
-namespace espressopp {
-  namespace vectorization {
-    void registerPython()
-    {
-      Vectorization::registerPython();
-      VerletList::registerPython();
-      vectorization::interaction::registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace vectorization
+{
+void registerPython()
+{
+    Vectorization::registerPython();
+    VerletList::registerPython();
+    vectorization::interaction::registerPython();
 }
+}  // namespace vectorization
+}  // namespace espressopp

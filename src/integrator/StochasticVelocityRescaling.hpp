@@ -34,108 +34,102 @@
 
 #include "boost/signals2.hpp"
 
-namespace espressopp {
-namespace integrator {
-
-class GammaDistribution {
+namespace espressopp
+{
+namespace integrator
+{
+class GammaDistribution
+{
 public:
-	GammaDistribution(std::shared_ptr<esutil::RNG> _rng) :
-			rng(_rng) {
-	}
-	virtual ~GammaDistribution() {
-	}
-	;
-	virtual real drawNumber(const unsigned int alpha) = 0;
+    GammaDistribution(std::shared_ptr<esutil::RNG> _rng) : rng(_rng) {}
+    virtual ~GammaDistribution(){};
+    virtual real drawNumber(const unsigned int alpha) = 0;
 
 protected:
-	std::shared_ptr<esutil::RNG> rng;
+    std::shared_ptr<esutil::RNG> rng;
 };
 
 /** Gamma distribution, from Boost */
-class GammaDistributionBoost: public GammaDistribution {
+class GammaDistributionBoost : public GammaDistribution
+{
 public:
-	GammaDistributionBoost(std::shared_ptr<esutil::RNG> _rng) :
-			GammaDistribution(_rng) {
-	}
-	real drawNumber(const unsigned int ia);
+    GammaDistributionBoost(std::shared_ptr<esutil::RNG> _rng) : GammaDistribution(_rng) {}
+    real drawNumber(const unsigned int ia);
 };
 
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
-class GammaDistributionNR2nd: public GammaDistribution {
+class GammaDistributionNR2nd : public GammaDistribution
+{
 public:
-	GammaDistributionNR2nd(std::shared_ptr<esutil::RNG> _rng) :
-			GammaDistribution(_rng) {
-	}
-	real drawNumber(const unsigned int ia);
+    GammaDistributionNR2nd(std::shared_ptr<esutil::RNG> _rng) : GammaDistribution(_rng) {}
+    real drawNumber(const unsigned int ia);
 };
 
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
-class GammaDistributionNR3rd: public GammaDistribution {
+class GammaDistributionNR3rd : public GammaDistribution
+{
 public:
-	GammaDistributionNR3rd(std::shared_ptr<esutil::RNG> _rng) :
-			GammaDistribution(_rng) {
-	}
-	real drawNumber(const unsigned int ia);
+    GammaDistributionNR3rd(std::shared_ptr<esutil::RNG> _rng) : GammaDistribution(_rng) {}
+    real drawNumber(const unsigned int ia);
 };
 
-class StochasticVelocityRescaling: public Extension {
-
+class StochasticVelocityRescaling : public Extension
+{
 public:
+    StochasticVelocityRescaling(std::shared_ptr<System> system);
 
-	StochasticVelocityRescaling(std::shared_ptr<System> system);
+    void setTemperature(real temperature);
 
-	void setTemperature(real temperature);
+    real getTemperature();
 
-	real getTemperature();
+    void setCoupling(real coupling);
 
-	void setCoupling(real coupling);
+    real getCoupling();
 
-	real getCoupling();
+    ~StochasticVelocityRescaling();
 
-	~StochasticVelocityRescaling();
+    /** Sum n squared Gaussian numbers - shortcut via Gamma distribution */
+    real stochasticVR_sumGaussians(const int n);
 
-	/** Sum n squared Gaussian numbers - shortcut via Gamma distribution */
-	real stochasticVR_sumGaussians(const int n);
+    /** Pull new value for the kinetic energy following the canonical distribution
+     *  Cite: Bussi et al JCP (2007) (there's a typo in the paper - this code is correct
+     *  Ekin: current kinetic energy
+     *  Ekin_ref: reference kinetic energy
+     *  dof: degrees of freedom
+     *  taut: coupling time/strength
+     *  */
+    real stochasticVR_pullEkin(
+        real Ekin, real Ekin_ref, int dof, real taut, std::shared_ptr<esutil::RNG> rng);
 
-	/** Pull new value for the kinetic energy following the canonical distribution
-	 *  Cite: Bussi et al JCP (2007) (there's a typo in the paper - this code is correct
-	 *  Ekin: current kinetic energy
-	 *  Ekin_ref: reference kinetic energy
-	 *  dof: degrees of freedom
-	 *  taut: coupling time/strength
-	 *  */
-	real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
-			real taut, std::shared_ptr<esutil::RNG> rng);
-
-	/** Register this class so it can be used from Python. */
-	static void registerPython();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
 private:
     boost::signals2::connection _runInit, _aftIntV;
 
-	real temperature; //!< desired user temperature
-	real coupling; // how strong is the coupling, i.e., tau_t coupling time
-  real pref; // factor in the rescaling part
+    real temperature;  //!< desired user temperature
+    real coupling;     // how strong is the coupling, i.e., tau_t coupling time
+    real pref;         // factor in the rescaling part
 
-  int NPart, NPart_local, DegreesOfFreedom;
-  real EKin_ref;
+    int NPart, NPart_local, DegreesOfFreedom;
+    real EKin_ref;
 
-  void initialize();
+    void initialize();
 
-	std::shared_ptr<esutil::RNG> rng; //!< random number generator
+    std::shared_ptr<esutil::RNG> rng;  //!< random number generator
 
-	GammaDistribution *gammaDist;
+    GammaDistribution *gammaDist;
 
-	void rescaleVelocities();
+    void rescaleVelocities();
 
     void connect();
     void disconnect();
 
-	/** Logger */
-	static LOG4ESPP_DECL_LOGGER(theLogger);
+    /** Logger */
+    static LOG4ESPP_DECL_LOGGER(theLogger);
 };
 
-}
-}
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

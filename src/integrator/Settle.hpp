@@ -36,47 +36,52 @@
 #include "FixedTupleListAdress.hpp"
 #include "boost/signals2.hpp"
 
-namespace espressopp {
-  namespace integrator {
-    class Settle : public Extension {
+namespace espressopp
+{
+namespace integrator
+{
+class Settle : public Extension
+{
+public:
+    Settle(std::shared_ptr<System> _system,
+           std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
+           real mO,
+           real mH,
+           real distHH,
+           real distOH);
+    ~Settle();
 
-        public:
-            Settle(std::shared_ptr<System> _system, std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
-            		real mO, real mH, real distHH, real distOH);
-            ~Settle();
+    void add(longint pid) { molIDs.insert(pid); }  // add molecule id (called from python)
+    void saveOldPos();
+    void applyConstraints();
+    void correctVelocities();
+    void settlep(longint molID);
+    void settlev(longint molID);
 
-            void add(longint pid) { molIDs.insert(pid); } // add molecule id (called from python)
-            void saveOldPos();
-            void applyConstraints();
-            void correctVelocities();
-            void settlep(longint molID);
-            void settlev(longint molID);
+    static void registerPython();
 
-            static void registerPython();
+private:
+    boost::signals2::connection _befIntP, _aftIntP, _aftIntV, _aftIntSlow;
+    std::set<longint> molIDs;  // IDs of water molecules
 
-        private:
-            boost::signals2::connection _befIntP, _aftIntP, _aftIntV, _aftIntSlow;
-            std::set<longint> molIDs; // IDs of water molecules
+    real mO, mH, distHH, distOH;
+    real mOrmT, mHrmT;
+    real rc, ra, rb;
+    real rra;  // inverse ra
+    real mOmH, mOmH2;
+    real twicemO, twicemH, mH2;
 
-            real mO, mH, distHH, distOH;
-    	    real mOrmT, mHrmT;
-    	    real rc, ra, rb;
-    	    real rra; // inverse ra
-            real mOmH, mOmH2;
-            real twicemO,twicemH,mH2;
+    // positions in previous timestep
+    // key is molecule ID (first member of fixedtuplelist), value is OHH coordinates
+    typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
+    OldPos oldPos;
 
-    	    // positions in previous timestep
-    	    // key is molecule ID (first member of fixedtuplelist), value is OHH coordinates
-    	    typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
-    	    OldPos oldPos;
-
-	    std::shared_ptr<FixedTupleListAdress> fixedTupleList;
-	    void connect();
-	    void disconnect();
-            static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}
+    std::shared_ptr<FixedTupleListAdress> fixedTupleList;
+    void connect();
+    void disconnect();
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif
-

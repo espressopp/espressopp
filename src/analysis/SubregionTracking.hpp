@@ -27,31 +27,40 @@
 #include "Real3D.hpp"
 #include "python.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    class SubregionTracking : public Observable {
-      public:
-        SubregionTracking(std::shared_ptr< System > system, real span, int geometry) : Observable(system), span(span), geometry(geometry) {
-          result_type=int_scalar;
-        }
-        virtual ~SubregionTracking() {}
-        virtual int compute_int() const;
+namespace espressopp
+{
+namespace analysis
+{
+class SubregionTracking : public Observable
+{
+public:
+    SubregionTracking(std::shared_ptr<System> system, real span, int geometry)
+        : Observable(system), span(span), geometry(geometry)
+    {
+        result_type = int_scalar;
+    }
+    virtual ~SubregionTracking() {}
+    virtual int compute_int() const;
 
-        static void registerPython();
+    static void registerPython();
 
-        enum GeometryStates {spherical=0, x_bounded=1, y_bounded=2, z_bounded=3};
-
-        int parttype;
-        real span;
-        int geometry;
-        Real3D center;
-        std::set<longint> particlelist;
-        void setCenter(real x, real y, real z);
-        void addPID(int pid) {
-          particlelist.insert(pid);
-        }
+    enum GeometryStates
+    {
+        spherical = 0,
+        x_bounded = 1,
+        y_bounded = 2,
+        z_bounded = 3
     };
-  }
-}
+
+    int parttype;
+    real span;
+    int geometry;
+    Real3D center;
+    std::set<longint> particlelist;
+    void setCenter(real x, real y, real z);
+    void addPID(int pid) { particlelist.insert(pid); }
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

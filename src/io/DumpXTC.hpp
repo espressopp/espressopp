@@ -2,22 +2,22 @@
   Copyright (C) 2020
       Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2017
-      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
- 
+      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -42,71 +42,67 @@
 #include <gromacs/trajectory/trajectoryframe.h>
 #include <gromacs/fileio/trxio.h>
 
-namespace espressopp {
-  namespace io{
-
-    class DumpXTC : public ParticleAccess {
-
-    public:
-
-      DumpXTC(std::shared_ptr<System> system,
-              std::shared_ptr<integrator::MDIntegrator> _integrator,
-              std::string _file_name,
-              bool _unfolded,
-              real _length_factor,
-              bool _append):
-                        ParticleAccess(system),
-                        fio(NULL),
-                        xtcprec(1000),
-                        integrator(_integrator),
-                        file_name( _file_name ),
-                        unfolded(_unfolded),
-                        length_factor(_length_factor),
-                        append(_append){
-
-        if( system->comm->rank()==0 && !append){
-          FileBackup backup(file_name); //backup trajectory if it already exists
+namespace espressopp
+{
+namespace io
+{
+class DumpXTC : public ParticleAccess
+{
+public:
+    DumpXTC(std::shared_ptr<System> system,
+            std::shared_ptr<integrator::MDIntegrator> _integrator,
+            std::string _file_name,
+            bool _unfolded,
+            real _length_factor,
+            bool _append)
+        : ParticleAccess(system),
+          fio(NULL),
+          xtcprec(1000),
+          integrator(_integrator),
+          file_name(_file_name),
+          unfolded(_unfolded),
+          length_factor(_length_factor),
+          append(_append)
+    {
+        if (system->comm->rank() == 0 && !append)
+        {
+            FileBackup backup(file_name);  // backup trajectory if it already exists
         }
+    }
+    ~DumpXTC() { std::cout << "DumpXTC destructor" << std::endl; }  // never called, right?
 
-      }
-      ~DumpXTC() {std::cout << "DumpXTC destructor" << std::endl;} // never called, right?
+    void perform_action() { dump(); }
 
-      void perform_action(){
-        dump();
-      }
-      
-      void dump();
-      
-      std::string getFilename(){return file_name;}
-      void setFilename(std::string v){file_name = v;}
-      bool getUnfolded(){return unfolded;}
-      void setUnfolded(bool v){unfolded = v;}
-      bool getAppend(){return append;}
-      void setAppend(bool v){append = v;}
+    void dump();
 
-      static void registerPython();
-    
-    private:
-      
-      t_trxstatus *fio;
-      static const int dim=3;
-      real xtcprec;
+    std::string getFilename() { return file_name; }
+    void setFilename(std::string v) { file_name = v; }
+    bool getUnfolded() { return unfolded; }
+    void setUnfolded(bool v) { unfolded = v; }
+    bool getAppend() { return append; }
+    void setAppend(bool v) { append = v; }
 
-      // integrator we need to know an integration step
-      std::shared_ptr<integrator::MDIntegrator> integrator;
-      
-      std::string file_name;
+    static void registerPython();
 
-      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
-      bool append; //append to existing trajectory file or create a new one
-      real length_factor;   
+private:
+    t_trxstatus *fio;
+    static const int dim = 3;
+    real xtcprec;
 
-      bool open(const char *mode);
-      void close();
-      void write(int natoms,int step,float time,Real3D *box,Real3D *x,float prec);
+    // integrator we need to know an integration step
+    std::shared_ptr<integrator::MDIntegrator> integrator;
 
-    };
-  }
-}
+    std::string file_name;
+
+    bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
+    bool append;    // append to existing trajectory file or create a new one
+    real length_factor;
+
+    bool open(const char *mode);
+    void close();
+    void write(int natoms, int step, float time, Real3D *box, Real3D *x, float prec);
+};
+}  // namespace io
+}  // namespace espressopp
 
 #endif

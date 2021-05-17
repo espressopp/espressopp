@@ -21,12 +21,15 @@
 #ifndef _VECTORIZATION_INTERACTION_BINDINGS_HPP
 #define _VECTORIZATION_INTERACTION_BINDINGS_HPP
 
-namespace espressopp {
-  namespace vectorization {
-    namespace interaction {
-      void registerPython();
-    }
-  }
+namespace espressopp
+{
+namespace vectorization
+{
+namespace interaction
+{
+void registerPython();
 }
+}  // namespace vectorization
+}  // namespace espressopp
 
 #endif

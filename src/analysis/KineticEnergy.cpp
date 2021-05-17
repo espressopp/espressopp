@@ -22,25 +22,25 @@
 #include "KineticEnergy.hpp"
 #include "interaction/Interaction.hpp"
 
-using namespace espressopp;  //NOLINT
+using namespace espressopp;  // NOLINT
 
-namespace espressopp {
-namespace analysis {
-
-real KineticEnergy::compute_real() const {
-  if (!precomputed_)
-    temperature_->compute_real();
-  return temperature_->getEkin();
+namespace espressopp
+{
+namespace analysis
+{
+real KineticEnergy::compute_real() const
+{
+    if (!precomputed_) temperature_->compute_real();
+    return temperature_->getEkin();
 }
 
-
-void KineticEnergy::registerPython() {
-  using namespace espressopp::python;  //NOLINT
-  class_<KineticEnergy, bases<Observable> >
-    ("analysis_KineticEnergy",
-        init< std::shared_ptr<System>, std::shared_ptr<Temperature> >())
-    .def(init<std::shared_ptr<System> >())
-    .add_property("value", &KineticEnergy::compute_real);
+void KineticEnergy::registerPython()
+{
+    using namespace espressopp::python;  // NOLINT
+    class_<KineticEnergy, bases<Observable> >(
+        "analysis_KineticEnergy", init<std::shared_ptr<System>, std::shared_ptr<Temperature> >())
+        .def(init<std::shared_ptr<System> >())
+        .add_property("value", &KineticEnergy::compute_real);
 }
 }  // end namespace analysis
 }  // end namespace espressopp

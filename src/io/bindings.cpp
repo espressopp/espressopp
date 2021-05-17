@@ -37,18 +37,21 @@
 #include "DumpXTCAdress.hpp"
 #endif
 
-namespace espressopp {
-  namespace io{
-    void registerPython() {
-      DumpXYZ::registerPython();
-      DumpGRO::registerPython();
-      DumpGROAdress::registerPython();
-      DumpH5MD::registerPython();
-      DumpTopology::registerPython();
+namespace espressopp
+{
+namespace io
+{
+void registerPython()
+{
+    DumpXYZ::registerPython();
+    DumpGRO::registerPython();
+    DumpGROAdress::registerPython();
+    DumpH5MD::registerPython();
+    DumpTopology::registerPython();
 #ifdef HAS_GROMACS
-      DumpXTC::registerPython();
-      DumpXTCAdress::registerPython();
+    DumpXTC::registerPython();
+    DumpXTCAdress::registerPython();
 #endif
-    }
-  }
 }
+}  // namespace io
+}  // namespace espressopp

@@ -33,65 +33,69 @@
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
-namespace espressopp {
-    namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+void TabulatedDihedral::setFilename(int itype, const char* _filename)
+{
+    boost::mpi::communicator world;
+    filename = _filename;
 
-        void TabulatedDihedral::setFilename(int itype, const char* _filename) {
-            boost::mpi::communicator world;
-            filename = _filename;
+    if (itype == 1)
+    {  // create a new InterpolationLinear
+        table = std::make_shared<InterpolationLinear>();
+        table->read(world, _filename);
+    }
 
+    else if (itype == 2)
+    {  // create a new InterpolationAkima
+        table = std::make_shared<InterpolationAkima>();
+        table->read(world, _filename);
+    }
 
-            if (itype == 1) { // create a new InterpolationLinear
-                table = std::make_shared <InterpolationLinear> ();
-                table->read(world, _filename);
-            }
+    else if (itype == 3)
+    {  // create a new InterpolationCubic
+        table = std::make_shared<InterpolationCubic>();
+        table->read(world, _filename);
+    }
+}
 
-            else if (itype == 2) { // create a new InterpolationAkima
-                table = std::make_shared <InterpolationAkima> ();
-                table->read(world, _filename);
-            }
+typedef class FixedQuadrupleListInteractionTemplate<TabulatedDihedral>
+    FixedQuadrupleListTabulatedDihedral;
 
-            else if (itype == 3) { // create a new InterpolationCubic
-                table = std::make_shared <InterpolationCubic> ();
-                table->read(world, _filename);
-            }
-        }
+typedef class FixedQuadrupleListTypesInteractionTemplate<TabulatedDihedral>
+    FixedQuadrupleListTypesTabulatedDihedral;
 
-        typedef class FixedQuadrupleListInteractionTemplate <TabulatedDihedral>
-            FixedQuadrupleListTabulatedDihedral;
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void TabulatedDihedral::registerPython()
+{
+    using namespace espressopp::python;
 
-        typedef class FixedQuadrupleListTypesInteractionTemplate<TabulatedDihedral>
-            FixedQuadrupleListTypesTabulatedDihedral;
+    class_<TabulatedDihedral, bases<DihedralPotential> >("interaction_TabulatedDihedral",
+                                                         init<int, const char*>())
+        .add_property("filename", &TabulatedDihedral::getFilename, &TabulatedDihedral::setFilename)
+        .def_pickle(TabulatedDihedral_pickle());
 
-        //////////////////////////////////////////////////
-        // REGISTRATION WITH PYTHON
-        //////////////////////////////////////////////////
-        void TabulatedDihedral::registerPython() {
-            using namespace espressopp::python;
+    class_<FixedQuadrupleListTabulatedDihedral, bases<Interaction> >(
+        "interaction_FixedQuadrupleListTabulatedDihedral",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<TabulatedDihedral> >())
+        .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential)
+        .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedDihedral::getFixedQuadrupleList);
 
-            class_ <TabulatedDihedral, bases <DihedralPotential> >
-                ("interaction_TabulatedDihedral", init <int, const char*>())
-                .add_property("filename", &TabulatedDihedral::getFilename, &TabulatedDihedral::setFilename)
-                .def_pickle(TabulatedDihedral_pickle())
-                ;
+    class_<FixedQuadrupleListTypesTabulatedDihedral, bases<Interaction> >(
+        "interaction_FixedQuadrupleListTypesTabulatedDihedral",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
+        .def("setPotential", &FixedQuadrupleListTypesTabulatedDihedral::setPotential)
+        .def("getPotential", &FixedQuadrupleListTypesTabulatedDihedral::getPotentialPtr)
+        .def("setFixedQuadrupleList",
+             &FixedQuadrupleListTypesTabulatedDihedral::setFixedQuadrupleList)
+        .def("getFixedQuadrupleList",
+             &FixedQuadrupleListTypesTabulatedDihedral::getFixedQuadrupleList);
+}
 
-            class_ <FixedQuadrupleListTabulatedDihedral, bases <Interaction> >
-                ("interaction_FixedQuadrupleListTabulatedDihedral",
-                        init <std::shared_ptr<System>,
-                              std::shared_ptr<FixedQuadrupleList>,
-                              std::shared_ptr<TabulatedDihedral> >())
-                .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential)
-                .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedDihedral::getFixedQuadrupleList);
-
-            class_< FixedQuadrupleListTypesTabulatedDihedral, bases< Interaction > >
-                ("interaction_FixedQuadrupleListTypesTabulatedDihedral",
-                 init< std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
-                .def("setPotential", &FixedQuadrupleListTypesTabulatedDihedral::setPotential)
-                .def("getPotential", &FixedQuadrupleListTypesTabulatedDihedral::getPotentialPtr)
-                .def("setFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::setFixedQuadrupleList)
-                .def("getFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::getFixedQuadrupleList);
-
-        }
-
-    } // ns interaction
-} // ns espressopp
+}  // namespace interaction
+}  // namespace espressopp

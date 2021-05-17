@@ -73,60 +73,63 @@
 #include "PotentialEnergy.hpp"
 #include "KineticEnergy.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    void registerPython() {
-      Observable::registerPython();
-      AnalysisBase::registerPython();
-      Temperature::registerPython();
-      Pressure::registerPython();
-      PressureTensor::registerPython();
-      PressureTensorLayer::registerPython();
-      PressureTensorMultiLayer::registerPython();
-      Configuration::registerPython();
-      Configurations::registerPython();
-      ConfigurationExt::registerPython();
-      ConfigurationsExt::registerPython();
-      ConfigurationsExtAdress::registerPython();
-      Velocities::registerPython();
-      CenterOfMass::registerPython();
-      NPart::registerPython();
-      NPartSubregion::registerPython();
-      SubregionTracking::registerPython();
-      MaxPID::registerPython();
-      AllParticlePos::registerPython();
-      IntraChainDistSq::registerPython();
-      NeighborFluctuation::registerPython();
-      OrderParameter::registerPython();
-      CMVelocity::registerPython();
+namespace espressopp
+{
+namespace analysis
+{
+void registerPython()
+{
+    Observable::registerPython();
+    AnalysisBase::registerPython();
+    Temperature::registerPython();
+    Pressure::registerPython();
+    PressureTensor::registerPython();
+    PressureTensorLayer::registerPython();
+    PressureTensorMultiLayer::registerPython();
+    Configuration::registerPython();
+    Configurations::registerPython();
+    ConfigurationExt::registerPython();
+    ConfigurationsExt::registerPython();
+    ConfigurationsExtAdress::registerPython();
+    Velocities::registerPython();
+    CenterOfMass::registerPython();
+    NPart::registerPython();
+    NPartSubregion::registerPython();
+    SubregionTracking::registerPython();
+    MaxPID::registerPython();
+    AllParticlePos::registerPython();
+    IntraChainDistSq::registerPython();
+    NeighborFluctuation::registerPython();
+    OrderParameter::registerPython();
+    CMVelocity::registerPython();
 
-      ConfigsParticleDecomp::registerPython();
-      VelocityAutocorrelation::registerPython();
-      MeanSquareDispl::registerPython();
-      MeanSquareInternalDist::registerPython();
-      RadialDistrF::registerPython();
-      StaticStructF::registerPython();
-      RDFatomistic::registerPython();
-      XDensity::registerPython();
-      XTemperature::registerPython();
-      XPressure::registerPython();
-      AdressDensity::registerPython();
-      RadGyrXProfilePI::registerPython();
-      Test::registerPython();
-      ParticleRadiusDistribution::registerPython();
+    ConfigsParticleDecomp::registerPython();
+    VelocityAutocorrelation::registerPython();
+    MeanSquareDispl::registerPython();
+    MeanSquareInternalDist::registerPython();
+    RadialDistrF::registerPython();
+    StaticStructF::registerPython();
+    RDFatomistic::registerPython();
+    XDensity::registerPython();
+    XTemperature::registerPython();
+    XPressure::registerPython();
+    AdressDensity::registerPython();
+    RadGyrXProfilePI::registerPython();
+    Test::registerPython();
+    ParticleRadiusDistribution::registerPython();
 
-      Autocorrelation::registerPython();
-      Viscosity::registerPython();
+    Autocorrelation::registerPython();
+    Viscosity::registerPython();
 
-      LBOutput::registerPython();
-      LBOutputScreen::registerPython();
-      LBOutputVzInTime::registerPython();
-      LBOutputVzOfX::registerPython();
+    LBOutput::registerPython();
+    LBOutputScreen::registerPython();
+    LBOutputVzInTime::registerPython();
+    LBOutputVzOfX::registerPython();
 
-      SystemMonitorOutputCSV::registerPython();
-      SystemMonitor::registerPython();
-      PotentialEnergy::registerPython();
-      KineticEnergy::registerPython();
-    }
-  }
+    SystemMonitorOutputCSV::registerPython();
+    SystemMonitor::registerPython();
+    PotentialEnergy::registerPython();
+    KineticEnergy::registerPython();
 }
+}  // namespace analysis
+}  // namespace espressopp

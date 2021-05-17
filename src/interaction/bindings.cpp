@@ -83,71 +83,74 @@
 #include "ConstrainRG.hpp"
 #include "SmoothSquareWell.hpp"
 
-namespace espressopp {
-  namespace interaction {
-    void registerPython() {
-      Interaction::registerPython();
-      Potential::registerPython();
-      PotentialVSpherePair::registerPython();
-      SingleParticlePotential::registerPython();
-      Zero::registerPython();
-      LennardJones::registerPython();
-      LJcos::registerPython();
-      LennardJonesAutoBonds::registerPython();
-      LennardJonesCapped::registerPython();
-      LennardJonesEnergyCapped::registerPython();
-      LennardJonesExpand::registerPython();
-      LennardJonesGromacs::registerPython();
-      LennardJonesSoftcoreTI::registerPython();
-      LennardJonesGeneric::registerPython();
-      Morse::registerPython();
-      CoulombTruncatedUniqueCharge::registerPython();
-      CoulombTruncated::registerPython();
-      GravityTruncated::registerPython();
-      ReactionFieldGeneralized::registerPython();
-      ReactionFieldGeneralizedTI::registerPython();
-      SoftCosine::registerPython();
-      Tabulated::registerPython();
-      TabulatedSubEns::registerPython();
-      FENE::registerPython();
-      FENECapped::registerPython();
-      Harmonic::registerPython();
-      Quartic::registerPython();
-      VSphereSelf::registerPython();
-      VSpherePair::registerPython();
-      HarmonicTrap::registerPython();
-      LennardJones93Wall::registerPython();
-      MirrorLennardJones::registerPython();
+namespace espressopp
+{
+namespace interaction
+{
+void registerPython()
+{
+    Interaction::registerPython();
+    Potential::registerPython();
+    PotentialVSpherePair::registerPython();
+    SingleParticlePotential::registerPython();
+    Zero::registerPython();
+    LennardJones::registerPython();
+    LJcos::registerPython();
+    LennardJonesAutoBonds::registerPython();
+    LennardJonesCapped::registerPython();
+    LennardJonesEnergyCapped::registerPython();
+    LennardJonesExpand::registerPython();
+    LennardJonesGromacs::registerPython();
+    LennardJonesSoftcoreTI::registerPython();
+    LennardJonesGeneric::registerPython();
+    Morse::registerPython();
+    CoulombTruncatedUniqueCharge::registerPython();
+    CoulombTruncated::registerPython();
+    GravityTruncated::registerPython();
+    ReactionFieldGeneralized::registerPython();
+    ReactionFieldGeneralizedTI::registerPython();
+    SoftCosine::registerPython();
+    Tabulated::registerPython();
+    TabulatedSubEns::registerPython();
+    FENE::registerPython();
+    FENECapped::registerPython();
+    Harmonic::registerPython();
+    Quartic::registerPython();
+    VSphereSelf::registerPython();
+    VSpherePair::registerPython();
+    HarmonicTrap::registerPython();
+    LennardJones93Wall::registerPython();
+    MirrorLennardJones::registerPython();
 
-      AngularPotential::registerPython();
-      TabulatedAngular::registerPython();
-      TabulatedSubEnsAngular::registerPython();
-      Cosine::registerPython();
-      AngularHarmonic::registerPython();
-      AngularCosineSquared::registerPython();
+    AngularPotential::registerPython();
+    TabulatedAngular::registerPython();
+    TabulatedSubEnsAngular::registerPython();
+    Cosine::registerPython();
+    AngularHarmonic::registerPython();
+    AngularCosineSquared::registerPython();
 
-      DihedralPotential::registerPython();
-      TabulatedDihedral::registerPython();
-      TabulatedSubEnsDihedral::registerPython();
-      OPLS::registerPython();
-      DihedralHarmonicCos::registerPython();
-      DihedralHarmonicNCos::registerPython();
-      DihedralRB::registerPython();
-      DihedralHarmonic::registerPython();
+    DihedralPotential::registerPython();
+    TabulatedDihedral::registerPython();
+    TabulatedSubEnsDihedral::registerPython();
+    OPLS::registerPython();
+    DihedralHarmonicCos::registerPython();
+    DihedralHarmonicNCos::registerPython();
+    DihedralRB::registerPython();
+    DihedralHarmonic::registerPython();
 
-      CoulombKSpaceEwald::registerPython();
-      CoulombRSpace::registerPython();
-      StillingerWeberPairTerm::registerPython();
-      StillingerWeberTripleTerm::registerPython();
-      StillingerWeberPairTermCapped::registerPython();
-      TersoffPairTerm::registerPython();
-      TersoffTripleTerm::registerPython();
+    CoulombKSpaceEwald::registerPython();
+    CoulombRSpace::registerPython();
+    StillingerWeberPairTerm::registerPython();
+    StillingerWeberTripleTerm::registerPython();
+    StillingerWeberPairTermCapped::registerPython();
+    TersoffPairTerm::registerPython();
+    TersoffTripleTerm::registerPython();
 
-      CoulombKSpaceP3M::registerPython();
+    CoulombKSpaceP3M::registerPython();
 
-      ConstrainCOM::registerPython();
-      ConstrainRG::registerPython();
-      SmoothSquareWell::registerPython();
-    }
-  }
+    ConstrainCOM::registerPython();
+    ConstrainRG::registerPython();
+    SmoothSquareWell::registerPython();
 }
+}  // namespace interaction
+}  // namespace espressopp
