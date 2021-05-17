@@ -1,4 +1,5 @@
 h5py
 mpi4py >= 3.0.0
 pyh5md
+numpy
 sphinx

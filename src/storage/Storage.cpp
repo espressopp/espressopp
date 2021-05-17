@@ -40,6 +40,8 @@
 
 #include <iostream>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/python/numpy.hpp>
+
 using namespace std;
 
 using namespace boost;
@@ -742,12 +744,172 @@ namespace espressopp {
     }
     
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Faster adding of particles by storing data in numpy arrays
+    void addParticlesCheck(
+      python::numpy::ndarray const& part_arr,
+      python::numpy::ndarray const& idx_arr
+    )
+    {
+      using namespace espressopp::python;
+      if(!(part_arr.get_dtype() == numpy::dtype::get_builtin<real>()))
+        throw std::runtime_error("Invalid dtype of part_arr");
+      if(!(idx_arr.get_dtype() == numpy::dtype::get_builtin<int>()))
+        throw std::runtime_error("Invalid dtype of idx_arr");
+      if(!(part_arr.get_flags() & numpy::ndarray::C_CONTIGUOUS))
+        throw std::runtime_error("part_arr must have C_CONTIGUOUS flag");
+      if(idx_arr.shape(0)!=31)
+        throw std::runtime_error("Invalid idx_arr shape. axis=0 must have shape=31");
+    }
+
+    void addParticlesFromArray(
+      class Storage* obj,
+      python::numpy::ndarray const& part_arr,
+      python::numpy::ndarray const& idx_arr
+    )
+    {
+      addParticlesCheck(part_arr, idx_arr);
+
+      const real* part = (real*)(part_arr.get_data());
+      const int* idx = (int*)(idx_arr.get_data());
+      const int npart = part_arr.shape(0);
+      const int nidx = part_arr.shape(1);
+
+      obj->addParticlesFromArrayImpl(part, idx, npart, nidx);
+    }
+
+    void Storage::addParticlesFromArrayImpl(
+      const real* part,
+      const int* idx,
+      const int npart,
+      const int nidx
+    )
+    {
+      boost::mpi::communicator & comm = *(getSystem()->comm);
+      int nidx_ = 0;
+      for(int i=0; i<31; i++) nidx_ += ( idx[i] >= 0 );
+      if(nidx_!=nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
+
+      const int index_id          = idx[0];
+      const int index_posx        = idx[1];
+      const int index_posy        = idx[2];
+      const int index_posz        = idx[3];
+      const int index_modeposx    = idx[4];
+      const int index_modeposy    = idx[5];
+      const int index_modeposz    = idx[6];
+      const int index_vx          = idx[7];
+      const int index_vy          = idx[8];
+      const int index_vz          = idx[9];
+      const int index_modemomx    = idx[10];
+      const int index_modemomy    = idx[11];
+      const int index_modemomz    = idx[12];
+      const int index_fx          = idx[13];
+      const int index_fy          = idx[14];
+      const int index_fz          = idx[15];
+      const int index_fmx         = idx[16];
+      const int index_fmy         = idx[17];
+      const int index_fmz         = idx[18];
+      const int index_q           = idx[19];
+      const int index_radius      = idx[20];
+      const int index_fradius     = idx[21];
+      const int index_vradius     = idx[22];
+      const int index_type        = idx[23];
+      const int index_mass        = idx[24];
+      const int index_varmass     = idx[25];
+      const int index_adrAT       = idx[26];
+      const int index_lambda_adr  = idx[27];
+      const int index_lambda_adrd = idx[28];
+      const int index_state       = idx[29];
+      const int index_pib         = idx[30];
+
+      {
+        bool particleExists = false;
+        for(int p=0; p<npart; p++) {
+          const longint id = part[p*nidx + index_id];
+          Particle* lp = this->lookupRealParticle(id);
+          if(lp!=0) {
+            particleExists = true;
+            std::cout << "[" << comm.rank() << "] WARNING: Particle " << id << " already exists" << std::endl;
+          }
+        }
+        const bool anyParticleExists = boost::mpi::all_reduce(comm, particleExists, std::logical_or<bool>());
+        if(anyParticleExists) {
+          std::cout << "[" << comm.rank() << "] WARNING: Some particles already exist. The list of particles was not added." << std::endl;
+          return;
+        }
+      }
+
+      if(index_adrAT >= 0) {
+        LOG4ESPP_ERROR(logger, "Not implemented for adress");
+      }
+
+      for(int p=0; p<npart; p++)
+      {
+        const int offset = p * nidx;
+        const longint id = part[offset + index_id];
+        Real3D pos(part[offset + index_posx], part[offset + index_posy], part[offset + index_posz]);
+        Particle* sp = this->addParticle(id, pos);
+
+        if(sp==NULL) continue;
+
+        if((index_vx >= 0) && (index_vy >= 0) && (index_vz >= 0))
+          sp->velocity() = Real3D(part[offset+index_vx],part[offset+index_vy],part[offset+index_vz]);
+
+        if((index_modeposx >= 0) && (index_modeposy >= 0) && (index_modeposz >= 0))
+          sp->modepos() = Real3D(part[offset+index_modeposx],part[offset+index_modeposy],part[offset+index_modeposz]);
+
+        if((index_modemomx >= 0) && (index_modemomy >= 0) && (index_modemomz >= 0))
+          sp->modemom() = Real3D(part[offset+index_modemomx],part[offset+index_modemomy],part[offset+index_modemomz]);
+
+        if((index_fx >= 0) && (index_fy >= 0) && (index_fz >= 0))
+          sp->force() = Real3D(part[offset+index_fx],part[offset+index_fy],part[offset+index_fz]);
+
+        if((index_fmx >= 0) && (index_fmy >= 0) && (index_fmz >= 0))
+          sp->forcem() = Real3D(part[offset+index_fmx],part[offset+index_fmy],part[offset+index_fmz]);
+
+        if(index_q >= 0)
+          sp->q() = part[offset+index_q];
+
+        if(index_radius >= 0)
+          sp->radius() = part[offset+index_radius];
+
+        if(index_fradius >= 0)
+          sp->fradius() = part[offset+index_fradius];
+
+        if(index_vradius >= 0)
+          sp->vradius() = part[offset+index_vradius];
+
+        if(index_type >= 0)
+          sp->type() = int(part[offset+index_type]);
+
+        if(index_pib >= 0)
+          sp->pib() = int(part[offset+index_pib]);
+
+        if(index_mass >= 0)
+          sp->mass() = part[offset+index_mass];
+
+        if(index_varmass >= 0)
+          sp->varmass() = part[offset+index_varmass];
+
+        if(index_lambda_adr >= 0)
+          sp->lambda() = part[offset+index_lambda_adr];
+
+        if(index_lambda_adrd >= 0)
+          sp->lambdaDeriv() = part[offset+index_lambda_adrd];
+
+        if(index_state >= 0)
+          sp->state() = int(part[offset+index_state]);
+      }
+    }
+    ///////////////////////////////////////////////////////////////////////////
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void
     Storage::registerPython() {
       using namespace espressopp::python;
+
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 	    .def("clearSavedPositions", &Storage::clearSavedPositions)
 	    .def("savePosition", &Storage::savePosition)
@@ -763,6 +925,7 @@ namespace espressopp {
 	    .def("decompose", &Storage::decompose)
 	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
+        .def("addParticlesFromArray", &addParticlesFromArray)
 	    ;
     }
   }
