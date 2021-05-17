@@ -11,4 +11,4 @@ jobs:
         with:
           token: ${{ secrets.BOT_PAT }}
           commands: format
-          repository: espressopp/espressopp
+          issue-type: pull-request

@@ -91,7 +91,7 @@ execute_process(COMMAND ${Python3_EXECUTABLE}
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} unit_test_framework)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 if(EXTERNAL_MPI4PY)
