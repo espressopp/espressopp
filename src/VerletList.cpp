@@ -285,12 +285,11 @@ namespace espressopp {
 
   int VerletList::localSize() const
   {
-    System& system = getSystemRef();
     return vlPairs.size();
   }
 
   python::tuple VerletList::getPair(int i) {
-	  if (i <= 0 || i > vlPairs.size()) {
+	  if (i <= 0 || i > int_c(vlPairs.size())) {
 	    std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
 	    return python::make_tuple();
 	  } else {

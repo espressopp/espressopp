@@ -50,20 +50,20 @@ namespace espressopp {
   class Int3D;
   class Tensor;
 
-  class Particle;
-  class ParticleList;
+  struct Particle;
+  struct ParticleList;
   class ParticlePair;
-  class PairList;
+  struct PairList;
 
   class ParticleTriple;
-  class TripleList;
+  struct TripleList;
   class ParticleQuadruple;
-  class QuadrupleList;
+  struct QuadrupleList;
 
-  class Cell;
-  class CellList;
-  class NeighborCellList;
-  class LocalCellList;
+  struct Cell;
+  struct CellList;
+  struct NeighborCellList;
+  struct LocalCellList;
 
   class VerletList;
 
@@ -81,10 +81,13 @@ namespace espressopp {
 
   namespace interaction {
     class Interaction;
-    class InteractionList;
+    struct InteractionList;
   }
 
   class NoDefault: public std::exception {};
+
+  template <typename T>
+  int int_c(const T& val) {return static_cast<T>(val);}
 }
 
 #endif

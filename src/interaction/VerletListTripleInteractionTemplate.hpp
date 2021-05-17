@@ -202,7 +202,6 @@ namespace espressopp {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
-      const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;

@@ -39,12 +39,12 @@ namespace espressopp {
         PotentialTemplate<ReactionFieldGeneralized> {
             private:
                 //real qq; // p1.q() * p2.q()
+                real prefactor;
                 real kappa;
                 real epsilon1, epsilon2;
                 real rc, rc3; // cutoff, cutoff^3
                 real rc2;
                 real B1, B0, B1_half;
-                real prefactor;
                 real crf; /* const to make potential zero at cutoff, corresponding
                  to the shift, which we cannot use because it depends on qq*/
 

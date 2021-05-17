@@ -39,8 +39,8 @@ namespace espressopp {
 
     Settle::Settle(std::shared_ptr<System> _system, std::shared_ptr<FixedTupleListAdress> _fixedTupleList,
       real _mO, real _mH, real _distHH, real _distOH)
-    : Extension(_system), fixedTupleList(_fixedTupleList),
-      mO(_mO), mH(_mH), distHH(_distHH), distOH(_distOH){
+    : Extension(_system),
+      mO(_mO), mH(_mH), distHH(_distHH), distOH(_distOH), fixedTupleList(_fixedTupleList){
 
         LOG4ESPP_INFO(theLogger, "construct Settle");
 
@@ -291,7 +291,6 @@ namespace espressopp {
         //settlev never called, not necessarily debugged
 
         real dt = integrator->getTimeStep();
-        real invdt = 1.0/dt;
 
         System& system = getSystemRef();
         const bc::BC& bc = *getSystemRef().bc;  // boundary conditions

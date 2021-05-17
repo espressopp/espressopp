@@ -178,8 +178,6 @@ namespace espressopp {
     void AssociationReaction::react() {
       if (integrator->getStep() % interval != 0) return;
 
-      System& system = getSystemRef();
-
       LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
 
       dt = integrator->getTimeStep();
@@ -211,8 +209,6 @@ namespace espressopp {
     void AssociationReaction::reactPair(Particle& p1, Particle& p2) {
       Real3D r = p1.position() - p2.position();
       real dist2 = r.sqr();
-      bool found;
-      found=false;
       if ((dist2 < cutoff_sqr) && ((*rng)() < rate*dt*interval)){
 	if ((p1.type()==typeA) && (p2.type()==typeB) && (p1.state() >= stateAMin) && (p2.state()==0)) {
 	  Alist.insert(std::make_pair(p1.id(), p2.id()));
@@ -240,7 +236,6 @@ namespace espressopp {
       InBuffer inBuffer0(*getSystem()->comm);
       InBuffer inBuffer1(*getSystem()->comm);
       OutBuffer outBuffer(*getSystem()->comm);
-      System& system = getSystemRef();
       const NodeGrid& nodeGrid = domdec->getNodeGrid();
 
       /* direction loop: x, y, z.
@@ -254,8 +249,6 @@ namespace espressopp {
 	   to ghost forces, which only eventually go back to the real
 	   particle.
 	*/
-
-	real curCoordBoxL = system.bc->getBoxL()[coord];
 
 	outBuffer.reset();
 	// fill outBuffer from mm
@@ -308,8 +301,6 @@ namespace espressopp {
 	// add content of inBuffer to mm
 	int lengthA, Aidx, Bidx;
 	for (int lr = 0; lr < 2; ++lr) {
-	  int dir         = 2 * coord + lr;
-	  int oppositeDir = 2 * coord + (1 - lr);
 	  int dirSize = nodeGrid.getGridSize(coord);
 	  if (dirSize == 1) {
 	  } else {

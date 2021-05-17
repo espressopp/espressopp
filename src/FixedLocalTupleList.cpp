@@ -61,7 +61,8 @@ namespace espressopp {
         System& system = storage->getSystemRef();
         esutil::Error err(system.comm);
         
-        Particle* vp, *at;
+        Particle* vp = nullptr;
+        Particle* at = nullptr;
         longint pidK; // the pid used as key
         std::vector<Particle*> tmp; // temporary vector
         std::vector<longint> pids; //used to extract from tuple;

@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.12)
 project(espressopp LANGUAGES CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(ESPP_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${ESPP_CMAKE_DIR})
 
 enable_testing()
 
@@ -25,6 +26,7 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 option(ESPP_LOCAL_ARCHITECTURE "Use instruction set of the local architecture." OFF)
 option(ESPP_VEC_REPORT "Enable reporting of loop vectorization." OFF)
 option(ESPP_WERROR "Treat warnings as errors." OFF)
+option(ESPP_WALL "Build with more warnings." ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
     message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -89,7 +91,7 @@ execute_process(COMMAND ${Python3_EXECUTABLE}
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} unit_test_framework)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 if(EXTERNAL_MPI4PY)

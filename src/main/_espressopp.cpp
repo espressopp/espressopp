@@ -28,11 +28,15 @@
 #include "espressopp_common.hpp"
 #include "python.hpp"
 
+#include <boost/python/numpy.hpp>
+
 static void finalize();
 
 BOOST_PYTHON_MODULE(_espressopp)
 {
   initMPIEnv();
+
+  boost::python::numpy::initialize();
 
   // register all classes with python 
   espressopp::registerPython();

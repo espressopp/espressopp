@@ -153,3 +153,14 @@ jobs:
 
       - name: Upload Report to codecov.io
         uses: codecov/codecov-action@v1
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: run formatter
+        run: ./format.sh
+
+      - name: check formatting
+        run: git diff --exit-code

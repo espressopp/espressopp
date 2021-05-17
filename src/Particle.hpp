@@ -408,10 +408,10 @@ namespace espressopp {
 
   // singles
   class ParticleSingle
-    : public Single< class Particle* >
+    : public Single< struct Particle* >
   {
   private:
-    typedef Single< class Particle* > Super;
+    typedef Single< struct Particle* > Super;
   public:
     ParticleSingle() : Super() {}
     ParticleSingle(Particle *p) : Super(p) {}
@@ -436,10 +436,10 @@ namespace espressopp {
 
   // pairs
   class ParticlePair
-    : public std::pair< class Particle*, class Particle* >
+    : public std::pair< struct Particle*, struct Particle* >
   {
   private:
-    typedef std::pair< class Particle*, class Particle* > Super;
+    typedef std::pair< struct Particle*, struct Particle* > Super;
   public:
     ParticlePair() : Super() {}
     ParticlePair(Particle* p1, Particle* p2)
@@ -465,10 +465,10 @@ namespace espressopp {
 
   // triples
   class ParticleTriple
-    : public Triple< class Particle*, class Particle*, class Particle* >
+    : public Triple< struct Particle*, struct Particle*, struct Particle* >
   {
   private:
-    typedef Triple< class Particle*, class Particle*, class Particle* > Super;
+    typedef Triple< struct Particle*, struct Particle*, struct Particle* > Super;
   public:
     ParticleTriple() : Super() {}
     ParticleTriple(Particle* p1, Particle* p2, Particle* p3)
@@ -494,12 +494,12 @@ namespace espressopp {
 
   // quadruples
   class ParticleQuadruple
-    : public Quadruple< class Particle*, class Particle*,
-                        class Particle*, class Particle* >
+    : public Quadruple< struct Particle*, struct Particle*,
+                        struct Particle*, struct Particle* >
   {
   private:
-    typedef Quadruple< class Particle*, class Particle*,
-                       class Particle*, class Particle* > Super;
+    typedef Quadruple< struct Particle*, struct Particle*,
+                       struct Particle*, struct Particle* > Super;
   public:
     ParticleQuadruple() : Super() {}
     ParticleQuadruple(Particle* p1, Particle* p2, Particle* p3, Particle* p4)

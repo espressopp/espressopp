@@ -229,8 +229,8 @@ namespace espressopp {
     
     this->clear();
     longint lastpid1 = -1;
-    Particle *p1;
-    Particle *p2;
+    Particle *p1 = nullptr;
+    Particle *p2 = nullptr;
     for (PairsDist::const_iterator it = pairsDist.begin();
 	 it != pairsDist.end(); ++it) {
       if (it->first != lastpid1) {

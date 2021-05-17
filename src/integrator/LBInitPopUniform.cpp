@@ -44,7 +44,6 @@ namespace espressopp {
 
          real invCs4 = invCs2*invCs2;
          real scalp, value;
-         int _offset = latticeboltzmann->getHaloSkin();
          Int3D _Ni = latticeboltzmann->getMyNi();
          int _numVels = latticeboltzmann->getNumVels();	// number of velocities in the model
 

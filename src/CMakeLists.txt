@@ -4,7 +4,7 @@ file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
 
-add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
+add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
@@ -40,6 +40,9 @@ if(ESPP_WERROR)
 endif()
 # compiler specific configurations
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    if(ESPP_WALL)
+        target_compile_options(_espressopp PRIVATE -Wall)
+    endif()
     if(ESPP_LOCAL_ARCHITECTURE)
         target_compile_options(_espressopp PRIVATE "-march=native")
     endif()
@@ -64,7 +67,7 @@ message(STATUS "_espressopp compiler flags are: ${ESPP_CFLAGS}")
 target_include_directories(_espressopp PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>)
 
-target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::system Boost::filesystem Boost::python${PYTHON_VERSION_NO_DOT})
+target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::system Boost::filesystem Boost::python${PYTHON_VERSION_NO_DOT} Boost::numpy${PYTHON_VERSION_NO_DOT})
 target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
@@ -84,13 +87,3 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/esp
         FILES_MATCHING PATTERN "*.py"
         PATTERN "CMakeFiles" EXCLUDE)
 
-find_program(CLANG_FORMAT "clang-format")
-if (CLANG_FORMAT)
-    add_custom_target(
-            format
-            COMMAND ${CLANG_FORMAT}
-            -style=file
-            -i
-            ${ESPRESSO_SOURCES}
-    )
-endif()

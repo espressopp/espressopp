@@ -114,9 +114,11 @@ namespace espressopp {
     {
       auto f_zero = [](real* __restrict f, size_t size)
       {
+        #ifdef __INTEL_COMPILER
         #pragma vector always
         #pragma vector aligned
         #pragma ivdep
+        #endif
         for(int i=0; i<size; i++) f[i] = 0.0;
       };
       {

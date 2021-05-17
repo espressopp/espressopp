@@ -127,7 +127,7 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "rebuild local fixed single list from global\n");
     System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
-    Particle *p1;
+    Particle *p1 = nullptr;
     
     this->clear();
     for (GlobalSingles::const_iterator it=globalSingles.begin(); it != globalSingles.end(); ++it) {

@@ -38,14 +38,15 @@ namespace espressopp {
      */
     class StillingerWeberTripleTerm : public AngularPotentialTemplate< StillingerWeberTripleTerm > {
     private:
+      real epsilon;
+      real sigma1, sigma2;
+      real rc1, rc2;
       real gamma1, gamma2;
-      real sigma1, rc1, sigma2, rc2;
+
       
       // 3 body
       real theta0, lambda;
-      
-      real epsilon;
-      
+
       real cosTeta0;
       
       real sigmaGamma1, sigmaGamma2;
@@ -54,16 +55,16 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      StillingerWeberTripleTerm(): gamma1(0.0), gamma2(0.0), theta0(0.0), lambda(0.0),
-            epsilon(0.0), sigma1(0.0), sigma2(0.0), rc1(0.0), rc2(0.0) {
+      StillingerWeberTripleTerm():
+            epsilon(0.0), sigma1(0.0), sigma2(0.0), rc1(0.0), rc2(0.0), gamma1(0.0), gamma2(0.0), theta0(0.0), lambda(0.0) {
         preset();
       }
       StillingerWeberTripleTerm(real _gamma1, real _gamma2, real _theta0, real _lambda,
                       real _epsilon, real _sigma1, real _sigma2,
                       real _cutoff1, real _cutoff2):
-            gamma1(_gamma1), gamma2(_gamma2), theta0(_theta0), lambda(_lambda),
             epsilon(_epsilon), sigma1(_sigma1), sigma2(_sigma2),
-            rc1(_cutoff1), rc2(_cutoff2) {
+            rc1(_cutoff1), rc2(_cutoff2),
+            gamma1(_gamma1), gamma2(_gamma2), theta0(_theta0), lambda(_lambda) {
         preset();
       }
 

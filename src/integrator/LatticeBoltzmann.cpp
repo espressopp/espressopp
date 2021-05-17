@@ -51,11 +51,11 @@ namespace espressopp {
       LatticeBoltzmann::LatticeBoltzmann(std::shared_ptr<System> _system, Int3D _nodeGrid,
                                          real _a, real _tau, int _numDims, int _numVels)
       : Extension(_system)
-      , nodeGrid(_nodeGrid)
-      , a(_a)
-      , tau(_tau)
       , numDims(_numDims)
       , numVels(_numVels)
+      , a(_a)
+      , tau(_tau)
+      , nodeGrid(_nodeGrid)
       {
          /* create storage for static variables (not changing on the run) */
          gamma = std::vector<real>(4, 0.);
@@ -648,7 +648,6 @@ namespace espressopp {
          real _a = getA();
          real _invA = 1. / _a;
          real _fricCoeff = getFricCoeff();
-         Real3D Li = getSystem()->bc->getBoxL();
 
          // account for particle's positions with respect to CPU's left border
          Real3D _pos = p.position() - getMyLeft();

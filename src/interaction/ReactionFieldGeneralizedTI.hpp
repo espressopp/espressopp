@@ -40,16 +40,16 @@ namespace espressopp {
         class ReactionFieldGeneralizedTI: public
         PotentialTemplate<ReactionFieldGeneralizedTI> {
             private:
+                real prefactor;
                 real kappa;
                 real epsilon1, epsilon2;
                 real rc, rc3; // cutoff, cutoff^3
                 real rc2;
                 real B1, B0, B1_half;
-                real prefactor;
-                bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
                 real crf; /* const to make potential zero at cutoff, corresponding
                  to the shift, which we cannot use because it depends on qq*/
                 real lambdaTI; //not to be confused with the lambda used in AdResS simulations
+                bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
                 real complLambdaTI; //1-lambdaTI
                 std::set<longint> pidsTI; //PIDs of particles whose charge is zero in TI state B
 

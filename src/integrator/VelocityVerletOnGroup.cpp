@@ -239,8 +239,6 @@ namespace espressopp {
 
     void VelocityVerletOnGroup::integrate2()
     {
-      System& system = getSystemRef();
-
       // loop over all particles of the local cells
 
       for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {

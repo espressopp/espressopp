@@ -154,14 +154,14 @@ namespace espressopp {
       void addQlmVector(vector<dcomplex> v){
         if( v.size() != qlm.size() )
           cout<<"Vectors have not the same size. Local: "<< qlm.size() << "  added  "<< v.size() <<endl;
-        for(int i=0; i<qlm.size(); i++){
+        for(int i=0; i<int_c(qlm.size()); i++){
           qlm[ i ] += v[ i ];
         }
       }
       void setQlm(vector<dcomplex> v){
         if( v.size() != qlm.size() )
           cout<<"Vectors have not the same size. Local: "<< qlm.size() << "  new  "<< v.size() <<endl;
-        for(int i=0; i<qlm.size(); i++){
+        for(int i=0; i<int_c(qlm.size()); i++){
           qlm[ i ] = v[ i ];
         }
       }
@@ -283,7 +283,6 @@ namespace espressopp {
 
         std::shared_ptr< storage::Storage > stor = getSystem()->storage;
         std::shared_ptr< mpi::communicator > cmm = getSystem()->comm;
-        int this_node = cmm -> rank();
 
         // ------------------------------------------------------------------------------
         // iterate over local particles, create a map of additional properties
@@ -342,7 +341,7 @@ namespace espressopp {
 
         int maxSize, vecSize  = sendGhostInfo.size();
         mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
-        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        while(int_c(sendGhostInfo.size())<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
 
         vector< OrderParticleProps > totID;
         boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
@@ -382,7 +381,7 @@ namespace espressopp {
 
         vecSize  = sendGhostInfo.size();
         mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
-        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        while(int_c(sendGhostInfo.size())<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
 
         totID.clear();
         boost::mpi::all_gather( *cmm, &sendGhostInfo[0], sendGhostInfo.size(), totID);
@@ -431,7 +430,7 @@ namespace espressopp {
 
         vecSize  = sendGhostInfo.size();
         mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
-        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        while(int_c(sendGhostInfo.size())<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
         totID.clear();
         boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
 
@@ -501,7 +500,7 @@ namespace espressopp {
 
           int maxSize, vecSize  = sendGhostInfo.size();
           mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
-          while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+          while(int_c(sendGhostInfo.size())<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
           vector< OrderParticleProps > totID;
           mpi::all_gather( *cmm, &sendGhostInfo[0], maxSize, totID);
 
@@ -569,7 +568,7 @@ namespace espressopp {
         mpi::all_reduce(*getSystem()->comm, locSize, maxSize, mpi::maximum<int>());
 
         communicate_label cccc; cccc.pid = -1; cccc.label = -1; cccc.cpu = -1;
-        while(outside_id.size()<maxSize) outside_id.push_back( cccc );
+        while(int_c(outside_id.size())<maxSize) outside_id.push_back( cccc );
 
         int numProc = getSystem()->comm->size();
         vector<communicate_label> tot_label_info = vector<communicate_label>( numProc * maxSize, cccc );
@@ -628,7 +627,7 @@ namespace espressopp {
         // ******* collect all wrong labels to 0 cpu
         locSize = wl.size(); maxSize=0;
         mpi::all_reduce(*getSystem()->comm, locSize, maxSize, mpi::maximum<int>());
-        while(wl.size()<maxSize){ wl.push_back( -1 ); cl.push_back( -1 ); }
+        while(int_c(wl.size())<maxSize){ wl.push_back( -1 ); cl.push_back( -1 ); }
 
         numProc = getSystem()->comm->size();
         vector<int> totWL = vector<int>( numProc * maxSize, -1 );
@@ -643,7 +642,7 @@ namespace espressopp {
 
 
         if( getSystem()->comm->rank()==0 ){
-          for(int i=0; i<totWL.size(); i++){
+          for(int i=0; i<int_c(totWL.size()); i++){
             if( totWL[i]>-1 && totCL[i]>-1 ){
               relab22(totCL[i], totWL[i]);
             }
@@ -670,7 +669,7 @@ namespace espressopp {
         mpi::broadcast( *getSystem()->comm, &cl0[0], cl0.size(), 0);
 
         wrong_label_local.clear();
-        for(int i=0; i<wl0.size(); i++){
+        for(int i=0; i<int_c(wl0.size()); i++){
           wrong_label_local.insert( make_pair(wl0[i], cl0[i]) );
         }
 
@@ -857,7 +856,7 @@ namespace espressopp {
         for(vector<int>::iterator it = sendSizes.begin(); it!=sendSizes.end(); ++it){
           maxSize = max(maxSize, *it);
         }
-        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        while(int_c(sendGhostInfo.size())<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
 
         int numProc = getSystem()->comm->size();
         vector<OrderParticleProps> totID = vector<OrderParticleProps>( numProc * maxSize, OrderParticleProps() );
@@ -894,13 +893,9 @@ namespace espressopp {
         }
         */
 
-          int max_pos = -1;
           int max_size = 0;
           int empty = 0;
           for (vector< vector<int> >::iterator it = clusters.begin() ; it != clusters.end(); ++it){
-            if( max_size != max(max_size, (int)( (*it).size() ) ) ){
-              max_pos = it - clusters.begin();
-            }
             max_size = max(max_size, (int)( (*it).size() ) );
 
             if( (int)( (*it).size() )==0 ){
@@ -909,16 +904,7 @@ namespace espressopp {
             }
           }
 
-          /*
-          cout<<"  cpu: "<< getSystem()->comm->rank() <<  " max pos: "<< max_pos << endl;
-          int count=0;
-          for (vector<int>::iterator it = clusters[max_pos].begin() ; it != clusters[max_pos].end(); ++it){
-            cout<<count<<"  BIGGEST CL  cpu: "<< getSystem()->comm->rank() <<  " id: "<< *it << endl;
-            count++;
-          }
-          */
-
-          int num_clusters = clusters.size();
+          int num_clusters = int_c(clusters.size());
           setNum_of_Cl(num_clusters-empty);
           setMax_Cl(max_size);
         }

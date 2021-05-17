@@ -64,7 +64,7 @@ namespace espressopp {
     }
     
     python::list Autocorrelation::compute() {
-      size_t M = getListSize();
+      auto M = getListSize();
       
       System& system = getSystemRef();
       
@@ -149,7 +149,7 @@ namespace espressopp {
       
       if(this_node == 0){
         int count = 0;
-        for(int m=0; m<M; m++){
+        for(unsigned int m=0; m<M; m++){
           if( m >= num_m[count] ) count ++;
           pyli.append( totZ[M*count + m] );
         }

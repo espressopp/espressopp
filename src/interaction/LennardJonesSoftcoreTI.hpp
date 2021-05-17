@@ -37,16 +37,16 @@ namespace espressopp {
     **/
     class LennardJonesSoftcoreTI : public PotentialTemplate< LennardJonesSoftcoreTI > {
     private:
-      real epsilonA, epsilonB;
+      real epsilonA, sigmaSC_A;
+      real epsilonB, sigmaSC_B;
       real ff1A, ff2A;
       real ff1B, ff2B;
-      bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
       std::set<longint> pidsTI; //PIDs of particles whose LJ interaction is zero in TI state B
-      real lambdaTI;
       real complLambdaTI; //1-lambdaTI
       real alphaSC;
-      real sigmaSC_A, sigmaSC_B;
       real powerSC;
+      real lambdaTI;
+      bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
       real sigmaSC_A6; //pow(sigmaSC_A,6);
       real sigmaSC_B6; //pow(sigmaSC_B,6);
       real lambdaTI_powerSC; //pow(lambdaTI,powerSC);
@@ -140,8 +140,8 @@ namespace espressopp {
 
         real frac2, frac6;
         real energyA, energyB;
-        real rA, rB, rA5, rB5, rA2, rB2;
-        real r6, r5;
+        real rA, rB, rA2, rB2;
+        real r6;
 
         if (checkTIpair(p1.id(),p2.id())) { //use softcore and lambdaTI
           r6 = distSqr*distSqr*distSqr;
@@ -224,7 +224,7 @@ namespace espressopp {
           real energyA, energyB;
 
           real rA, rB, rA5, rB5, rA2, rB2;
-          real r6, r5;
+          real r6;
 
           r6 = distSqr*distSqr*distSqr;
 
@@ -241,8 +241,6 @@ namespace espressopp {
           energyB = 4.0 * epsilonB * (frac6 * frac6 - frac6);
 
           real forceA, forceB; //dV/dr not dV/dr * 1/r
-
-          r5 = distSqr*distSqr*sqrt(distSqr);
 
           rA5 = rA2*rA2*rA;
           frac2 = 1.0 / rA2;

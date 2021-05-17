@@ -257,9 +257,9 @@ namespace espressopp {
     //printf("FixedTripleList: rebuild local triple list from global\n");
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1;
-    Particle *p2;
-    Particle *p3;
+    Particle *p1 = nullptr;
+    Particle *p2 = nullptr;
+    Particle *p3 = nullptr;
     for (GlobalTriples::const_iterator it = globalTriples.begin();
 	it != globalTriples.end(); ++it) {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
