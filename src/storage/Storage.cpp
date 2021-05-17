@@ -979,8 +979,8 @@ void Storage::registerPython()
              return_value_policy<reference_existing_object>())
         .def("decompose", &Storage::decompose)
         .def("getRealParticleIDs", &Storage::getRealParticleIDs)
-        .add_property("system", &Storage::getSystem);
-        .def("addParticlesFromArray", &addParticlesFromArray)
+        .add_property("system", &Storage::getSystem)
+        .def("addParticlesFromArray", &addParticlesFromArray);
 }
 }  // namespace storage
 }  // namespace espressopp
