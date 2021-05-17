@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(SSW_force)
     Real3D dist(0.85, 0.5, 0.4);
     Real3D f = ssw.computeForce(dist);
 
-    BOOST_CHECK_CLOSE(f[0], -0.0005493, 0.01);
-    BOOST_CHECK_CLOSE(f[1], -0.0003231, 0.01);
-    BOOST_CHECK_CLOSE(f[2], -0.0002585, 0.01);
+    BOOST_CHECK_CLOSE(f[0], -0.00054933, 0.01);
+    BOOST_CHECK_CLOSE(f[1], -0.00032314, 0.01);
+    BOOST_CHECK_CLOSE(f[2], -0.00025851, 0.01);
 }
