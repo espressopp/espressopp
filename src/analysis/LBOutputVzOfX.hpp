@@ -25,18 +25,21 @@
 
 #include "LBOutput.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    class LBOutputVzOfX : public LBOutput {
-      public:
-        LBOutputVzOfX(std::shared_ptr<System> _system,
-                          std::shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
+namespace espressopp
+{
+namespace analysis
+{
+class LBOutputVzOfX : public LBOutput
+{
+public:
+    LBOutputVzOfX(std::shared_ptr<System> _system,
+                  std::shared_ptr<integrator::LatticeBoltzmann> _latticeboltzmann);
 
-        void writeOutput();
+    void writeOutput();
 
-        static void registerPython();
-    };
-  }
-}
+    static void registerPython();
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

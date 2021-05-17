@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -28,62 +28,59 @@
 #include "SystemAccess.hpp"
 #include "Configuration.hpp"
 
-namespace espressopp {
-  namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+/** Class that stores particle positions for later analysis.
 
-    /** Class that stores particle positions for later analysis.
+    Important: this class can also be used if the number of
+    particles changes between different snapshots.
+*/
 
-        Important: this class can also be used if the number of
-        particles changes between different snapshots.
-    */
+typedef std::vector<ConfigurationPtr> ConfigurationList;
 
-    typedef std::vector<ConfigurationPtr> ConfigurationList;
+class Velocities : public SystemAccess
+{
+public:
+    /** Constructor, allow for unlimited snapshots. */
+    Velocities(std::shared_ptr<System> system) : SystemAccess(system) { maxConfigs = 0; }
 
-    class Velocities : public SystemAccess {
+    /** set number of maximal snapshots. */
+    void setCapacity(int max);
 
-    public:
+    /** get number of maximal snapshots. */
+    int getCapacity();
 
-      /** Constructor, allow for unlimited snapshots. */
-      Velocities(std::shared_ptr<System> system) : SystemAccess (system)
-      { maxConfigs = 0; }
+    /** get number of available snapshots. */
+    int getSize();
 
-      /** set number of maximal snapshots. */
-      void setCapacity(int max);
+    ~Velocities() {}
 
-      /** get number of maximal snapshots. */
-      int getCapacity();
+    /** Gake a snapshot of all current particle positions. */
+    void gather();
 
-      /** get number of available snapshots. */
-      int getSize();
+    ConfigurationPtr get(int stackpos);
 
-      ~Velocities() {}
+    ConfigurationPtr back();
 
-      /** Gake a snapshot of all current particle positions. */
-      void gather();
+    ConfigurationList all();
 
-      ConfigurationPtr get(int stackpos);
+    void clear() { configurations.clear(); }
 
-      ConfigurationPtr back();
+    static void registerPython();
 
-      ConfigurationList all();
+protected:
+    static LOG4ESPP_DECL_LOGGER(logger);
 
-      void clear() { configurations.clear(); }
+private:
+    void pushConfig(ConfigurationPtr config);
 
-      static void registerPython();
-    
-    protected:
+    ConfigurationList configurations;
 
-      static LOG4ESPP_DECL_LOGGER(logger);
-
-    private:
-
-      void pushConfig(ConfigurationPtr config);
- 
-      ConfigurationList configurations;
-
-      int maxConfigs;
-    };
-  }
-}
+    int maxConfigs;
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

@@ -30,41 +30,39 @@ using namespace interaction;
 
 BOOST_AUTO_TEST_CASE(SSW_NoCutoff)
 {
+    SmoothSquareWell ssw(1.0, 1.0, infinity);
+    ssw.setLambda(1.05);
+    ssw.setA(0.002);
 
-  SmoothSquareWell ssw(1.0, 1.0, infinity);
-  ssw.setLambda(1.05);
-  ssw.setA(0.002);
+    // minimum
+    BOOST_CHECK_CLOSE(ssw.computeEnergy(1.025), -1.0, 0.001);
 
-  // minimum
-  BOOST_CHECK_CLOSE(ssw.computeEnergy(1.025), -1.0, 0.001);
+    // small at large values
+    BOOST_CHECK_SMALL(ssw.computeEnergy(1.06), 0.0001);
 
-  // small at large values
-  BOOST_CHECK_SMALL(ssw.computeEnergy(1.06), 0.0001);
-
-  // larget at small values
-  BOOST_CHECK_GT(ssw.computeEnergy(0.95), 36002449667);
-
+    // larget at small values
+    BOOST_CHECK_GT(ssw.computeEnergy(0.95), 36002449667);
 }
 
 BOOST_AUTO_TEST_CASE(SSW)
 {
-  SmoothSquareWell ssw(1.0, 1.0, 2.5);
-  ssw.setLambda(1.05);
-  ssw.setA(0.002);
+    SmoothSquareWell ssw(1.0, 1.0, 2.5);
+    ssw.setLambda(1.05);
+    ssw.setA(0.002);
 
-  // zero after cutoff
-  BOOST_CHECK_EQUAL(ssw.computeEnergy(10.0), 0.0);
+    // zero after cutoff
+    BOOST_CHECK_EQUAL(ssw.computeEnergy(10.0), 0.0);
 }
 
 BOOST_AUTO_TEST_CASE(SSW_force)
 {
-  SmoothSquareWell ssw(1.0, 1.0, 2.5);
-  ssw.setLambda(1.05);
-  ssw.setA(0.002);
-  Real3D dist(0.85, 0.5, 0.4);
-  Real3D f = ssw.computeForce(dist);
+    SmoothSquareWell ssw(1.0, 1.0, 2.5);
+    ssw.setLambda(1.05);
+    ssw.setA(0.002);
+    Real3D dist(0.85, 0.5, 0.4);
+    Real3D f = ssw.computeForce(dist);
 
-  BOOST_CHECK_CLOSE(f[0], -0.0005493, 0.01);
-  BOOST_CHECK_CLOSE(f[1], -0.0003231, 0.01);
-  BOOST_CHECK_CLOSE(f[2], -0.0002585, 0.01);
+    BOOST_CHECK_CLOSE(f[0], -0.0005493, 0.01);
+    BOOST_CHECK_CLOSE(f[1], -0.0003231, 0.01);
+    BOOST_CHECK_CLOSE(f[2], -0.0002585, 0.01);
 }

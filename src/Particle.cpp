@@ -25,35 +25,34 @@
 #include <python.hpp>
 #include "Particle.hpp"
 
-namespace espressopp {
-  void
-  Particle::
-  registerPython() {
+namespace espressopp
+{
+void Particle::registerPython()
+{
     using namespace python;
-    class_< Particle >("_TmpParticle", no_init)
-      .add_property("id", &Particle::getId)
-      .add_property("type", &Particle::getType, &Particle::setType)
-      .add_property("pib", &Particle::getPib, &Particle::setPib)
-      .add_property("mass", &Particle::getMass, &Particle::setMass)
-      .add_property("pos", &Particle::getPos, &Particle::setPos)
-      .add_property("f", &Particle::getF, &Particle::setF)
-      .add_property("fm", &Particle::getFm, &Particle::setFm)
-      .add_property("v", &Particle::getV, &Particle::setV)
-      .add_property("modepos", &Particle::getModepos, &Particle::setModepos)
-      .add_property("modemom", &Particle::getModemom, &Particle::setModemom)
-      .add_property("q", &Particle::getQ, &Particle::setQ)
-      .add_property("radius", &Particle::getRadius, &Particle::setRadius)
-      .add_property("fradius", &Particle::getFRadius, &Particle::setFRadius)
-      .add_property("vradius", &Particle::getVRadius, &Particle::setVRadius)
-      .add_property("imageBox", &Particle::getImageBox, &Particle::setImageBox)
-      .add_property("isGhost", &Particle::getGhostStatus, &Particle::setGhostStatus)
-      .add_property("lambda_adr", &Particle::getLambda, &Particle::setLambda)
-      .add_property("lambda_adrd", &Particle::getLambdaDeriv, &Particle::setLambdaDeriv)
-      .add_property("varmass", &Particle::getVarmass, &Particle::setVarmass)
-      .add_property("state", &Particle::getState, &Particle::setState)
-      .add_property("res_id", &Particle::getResId, &Particle::setResId)
-      .add_property("extVar", &Particle::getExtVar, &Particle::setExtVar)
-      .add_property("drift_f", &Particle::getDrift, &Particle::setDrift)
-      ;
-  }
+    class_<Particle>("_TmpParticle", no_init)
+        .add_property("id", &Particle::getId)
+        .add_property("type", &Particle::getType, &Particle::setType)
+        .add_property("pib", &Particle::getPib, &Particle::setPib)
+        .add_property("mass", &Particle::getMass, &Particle::setMass)
+        .add_property("pos", &Particle::getPos, &Particle::setPos)
+        .add_property("f", &Particle::getF, &Particle::setF)
+        .add_property("fm", &Particle::getFm, &Particle::setFm)
+        .add_property("v", &Particle::getV, &Particle::setV)
+        .add_property("modepos", &Particle::getModepos, &Particle::setModepos)
+        .add_property("modemom", &Particle::getModemom, &Particle::setModemom)
+        .add_property("q", &Particle::getQ, &Particle::setQ)
+        .add_property("radius", &Particle::getRadius, &Particle::setRadius)
+        .add_property("fradius", &Particle::getFRadius, &Particle::setFRadius)
+        .add_property("vradius", &Particle::getVRadius, &Particle::setVRadius)
+        .add_property("imageBox", &Particle::getImageBox, &Particle::setImageBox)
+        .add_property("isGhost", &Particle::getGhostStatus, &Particle::setGhostStatus)
+        .add_property("lambda_adr", &Particle::getLambda, &Particle::setLambda)
+        .add_property("lambda_adrd", &Particle::getLambdaDeriv, &Particle::setLambdaDeriv)
+        .add_property("varmass", &Particle::getVarmass, &Particle::setVarmass)
+        .add_property("state", &Particle::getState, &Particle::setState)
+        .add_property("res_id", &Particle::getResId, &Particle::setResId)
+        .add_property("extVar", &Particle::getExtVar, &Particle::setExtVar)
+        .add_property("drift_f", &Particle::getDrift, &Particle::setDrift);
 }
+}  // namespace espressopp

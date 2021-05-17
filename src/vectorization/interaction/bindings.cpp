@@ -23,12 +23,13 @@
 
 #include "LennardJones.hpp"
 
-namespace espressopp {
-  namespace vectorization {
-    namespace interaction {
-      void registerPython() {
-        LennardJones::registerPython();
-      }
-    }
-  }
-}
+namespace espressopp
+{
+namespace vectorization
+{
+namespace interaction
+{
+void registerPython() { LennardJones::registerPython(); }
+}  // namespace interaction
+}  // namespace vectorization
+}  // namespace espressopp

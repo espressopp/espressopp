@@ -26,47 +26,45 @@
 #include "MDIntegrator.hpp"
 #include <boost/signals2.hpp>
 
-namespace espressopp {
-  namespace integrator {
+namespace espressopp
+{
+namespace integrator
+{
+/** Velocity Verlet Integrator */
+class VelocityVerletRESPA : public MDIntegrator
+{
+public:
+    VelocityVerletRESPA(std::shared_ptr<class espressopp::System> system);
 
-    /** Velocity Verlet Integrator */
-    class VelocityVerletRESPA : public MDIntegrator {
+    virtual ~VelocityVerletRESPA();
 
-      public:
+    void run(int nsteps);
 
-        VelocityVerletRESPA(std::shared_ptr<class espressopp::System> system);
+    /** Setter routine for multistep. */
+    void setmultistep(int _multistep);
+    /** Getter routine for multistep. */
+    int getmultistep() { return multistep; }
 
-        virtual ~VelocityVerletRESPA();
+    /** Setter routine for timestep. */
+    void setTimeStep(real _dt);
 
-        void run(int nsteps);
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        /** Setter routine for multistep. */
-        void setmultistep(int _multistep);
-        /** Getter routine for multistep. */
-        int getmultistep() {
-          return multistep;
-        }
+protected:
+    bool resortFlag;
+    real maxDist;
+    real maxCut;
+    int multistep;
+    real dtlong;
 
-        /** Setter routine for timestep. */
-        void setTimeStep(real _dt);
-
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
-
-      protected:
-        bool resortFlag;
-        real maxDist;
-        real maxCut;
-        int multistep;
-        real dtlong;
-
-        real integrate1();
-        void integrate2(bool slow);
-        void initForces();
-        void updateForces(bool slow);
-        void calcForces(bool slow);
-    };
-  }
-}
+    real integrate1();
+    void integrate2(bool slow);
+    void initForces();
+    void updateForces(bool slow);
+    void calcForces(bool slow);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

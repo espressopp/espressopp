@@ -20,9 +20,11 @@
 
 #ifndef _VECTORIZATION_BINDINGS_HPP
 #define _VECTORIZATION_BINDINGS_HPP
-namespace espressopp {
-  namespace vectorization {
-    void registerPython();
-  }
+namespace espressopp
+{
+namespace vectorization
+{
+void registerPython();
 }
+}  // namespace espressopp
 #endif

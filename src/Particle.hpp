@@ -5,7 +5,7 @@
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   Copyright (C) 2017
       Jakub Krajniak (jkrajniak at gmail.com)
-  
+
   This file is part of ESPResSo++.
 
   ESPResSo++ is free software: you can redistribute it and/or modify
@@ -39,9 +39,10 @@
 #include "Int3D.hpp"
 #include <map>
 
-namespace espressopp {
-
-  struct ParticleProperties {
+namespace espressopp
+{
+struct ParticleProperties
+{
     size_t id;
     size_t type;
     size_t pib;
@@ -54,141 +55,142 @@ namespace espressopp {
     Real3D fm;
     int state;
     longint res_id;
-  private:
+
+private:
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
     {
-      for (int i = 0; i < 3; ++i)
-        ar & fm[i];
-      ar & id;
-      ar & type;
-      ar & pib;
-      ar & mass;
-      ar & q;
-      ar & lambda;
-      ar & varmass;
-      ar & drift;
-      ar & lambdaDeriv;
-      ar & state;
-      ar & res_id;
+        for (int i = 0; i < 3; ++i) ar& fm[i];
+        ar& id;
+        ar& type;
+        ar& pib;
+        ar& mass;
+        ar& q;
+        ar& lambda;
+        ar& varmass;
+        ar& drift;
+        ar& lambdaDeriv;
+        ar& state;
+        ar& res_id;
     }
-  };
+};
 
-  /**
-   * \brief position-like properties
-   *
-   * This class contains all properties of a particle that behave like
-   * positions. Further extensions might be orientations. This is useful
-   * to classify how properties behave e.g. on communication.
-   */
-  struct ParticlePosition {
-
+/**
+ * \brief position-like properties
+ *
+ * This class contains all properties of a particle that behave like
+ * positions. Further extensions might be orientations. This is useful
+ * to classify how properties behave e.g. on communication.
+ */
+struct ParticlePosition
+{
     Real3D p;
     Real3D modepos;
     real radius;
     real extVar;
 
-    void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
-      dst.p = p + shift;
-      dst.radius = radius;
-      dst.extVar = extVar;
+    void copyShifted(ParticlePosition& dst, const Real3D& shift) const
+    {
+        dst.p = p + shift;
+        dst.radius = radius;
+        dst.extVar = extVar;
     }
-  private:
+
+private:
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version) {
-      for (int i = 0; i < 3; ++i)
-        ar & p[i];
-      for (int i = 0; i < 3; ++i)
-        ar & modepos[i];
-      ar & radius;
-      ar & extVar;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        for (int i = 0; i < 3; ++i) ar& p[i];
+        for (int i = 0; i < 3; ++i) ar& modepos[i];
+        ar& radius;
+        ar& extVar;
     }
-  };
+};
 
-
-  /**
-   * \brief force-like properties
-   *
-   * This class contains all properties of a particle that behave like
-   * forces. Further extensions might contain torques. This is useful
-   * to classify how properties behave e.g. on communication.
-   * Important: combiner operatior += must be available
-   * to combine results of ghosts with real particles.
-   */
-  struct ParticleForce {
-
+/**
+ * \brief force-like properties
+ *
+ * This class contains all properties of a particle that behave like
+ * forces. Further extensions might contain torques. This is useful
+ * to classify how properties behave e.g. on communication.
+ * Important: combiner operatior += must be available
+ * to combine results of ghosts with real particles.
+ */
+struct ParticleForce
+{
     Real3D f;
     // force associated with second derivative of particle radius
     real fradius;
 
     /** add all force type properties of two particles
-	(typically used between a real particle and its
-	ghost image(s))
+        (typically used between a real particle and its
+        ghost image(s))
     */
-    ParticleForce& operator+=(const ParticleForce& otherF) {
-      f += otherF.f;
-      fradius += otherF.fradius;
-      return *this;
+    ParticleForce& operator+=(const ParticleForce& otherF)
+    {
+        f += otherF.f;
+        fradius += otherF.fradius;
+        return *this;
     }
-  private:
+
+private:
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version){
-      for (int i = 0; i < 3; ++i)
-        ar & f[i];
-      ar & fradius;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        for (int i = 0; i < 3; ++i) ar& f[i];
+        ar& fradius;
     }
-  };
+};
 
-
-  /**
-   * \brief momentum-like properties
-   *
-   * This class contains all properties of a particle that behave like
-   * a momentum. Further extensions might contain angular momentum. This is useful
-   * to classify how properties behave e.g. on communication.
-   */
-  struct ParticleMomentum {
-
+/**
+ * \brief momentum-like properties
+ *
+ * This class contains all properties of a particle that behave like
+ * a momentum. Further extensions might contain angular momentum. This is useful
+ * to classify how properties behave e.g. on communication.
+ */
+struct ParticleMomentum
+{
     Real3D v;
     Real3D modemom;
     // force associated with first derivative of particle radius
     real vradius;
-  private:
+
+private:
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version) {
-      for (int i = 0; i < 3; ++i)
-        ar & v[i];
-      for (int i = 0; i < 3; ++i)
-        ar & modemom[i];
-      ar & vradius;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        for (int i = 0; i < 3; ++i) ar& v[i];
+        for (int i = 0; i < 3; ++i) ar& modemom[i];
+        ar& vradius;
     }
-  };
+};
 
-
-  struct ParticleLocal {
-
+struct ParticleLocal
+{
     // the image of the particle
     Int3D i;
     bool ghost;
     bool dummy1;
     bool dummy2;
     bool dummy3;
-  private:
+
+private:
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version) {
-      for (int ii = 0; ii < 3; ++ii)
-        ar & i[ii];
-      ar & ghost;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        for (int ii = 0; ii < 3; ++ii) ar& i[ii];
+        ar& ghost;
     }
-  };
+};
 
-  struct Particle {
-
+struct Particle
+{
     friend class InBuffer;
     friend class OutBuffer;
 
@@ -196,33 +198,35 @@ namespace espressopp {
         ghost sending
     */
 
-    enum ExtraDataElements {
-      DATA_PROPERTIES=1,
-      DATA_MOMENTUM=2,
-      DATA_LOCAL=4
+    enum ExtraDataElements
+    {
+        DATA_PROPERTIES = 1,
+        DATA_MOMENTUM = 2,
+        DATA_LOCAL = 4
     };
 
     Particle() { init(); }
 
-    void init() {
-      m.v[0] = m.v[1] = m.v[2] = 0.0;
-      m.modemom[0] = m.modemom[1] = m.modemom[2] = 0.0;
-      p.type         = 0;
-      p.mass         = 1.0;
-      p.q            = 0.0;
-      r.radius       = 1.0;
-      f.fradius      = 0.0;
-      p.fm           = 0.0;
-      m.vradius      = 0.0;
-      l.ghost        = false;
-      p.lambda       = 0.0;
-      p.varmass       = 0.0;
-      p.drift        = 0.0;
-      p.lambdaDeriv  = 0.0;
-      r.extVar       = 0.0;
-      p.state        = 0;
-      p.pib          = 0;
-      p.res_id       = 0;
+    void init()
+    {
+        m.v[0] = m.v[1] = m.v[2] = 0.0;
+        m.modemom[0] = m.modemom[1] = m.modemom[2] = 0.0;
+        p.type = 0;
+        p.mass = 1.0;
+        p.q = 0.0;
+        r.radius = 1.0;
+        f.fradius = 0.0;
+        p.fm = 0.0;
+        m.vradius = 0.0;
+        l.ghost = false;
+        p.lambda = 0.0;
+        p.varmass = 0.0;
+        p.drift = 0.0;
+        p.lambdaDeriv = 0.0;
+        r.extVar = 0.0;
+        p.state = 0;
+        p.pib = 0;
+        p.res_id = 0;
     }
 
     // getter and setter used for export in Python
@@ -292,11 +296,11 @@ namespace espressopp {
     Real3D getF() const { return f.f; }
     void setF(const Real3D& force) { f.f = force; }
 
-    real& fradius() {return f.fradius; }
+    real& fradius() { return f.fradius; }
     const real& fradius() const { return f.fradius; }
 
     real getFRadius() const { return f.fradius; }
-    void setFRadius(const real &fr) { f.fradius = fr; }
+    void setFRadius(const real& fr) { f.fradius = fr; }
 
     Real3D& forcem() { return p.fm; }
     const Real3D& forcem() const { return p.fm; }
@@ -320,7 +324,7 @@ namespace espressopp {
     const real& vradius() const { return m.vradius; }
 
     real getVRadius() const { return m.vradius; }
-    void setVRadius(const real& vr) { m.vradius = vr;}
+    void setVRadius(const real& vr) { m.vradius = vr; }
 
     // Image, Ghost
 
@@ -372,22 +376,25 @@ namespace espressopp {
 
     static void registerPython();
 
-    void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
-
-      src.r.copyShifted(r, shift);
-      if (extradata & DATA_PROPERTIES) {
-        p = src.p;
-      }
-      if (extradata & DATA_MOMENTUM) {
-        m = src.m;
-      }
-      if (extradata & DATA_LOCAL) {
-        l = src.l;
-      }
-      ghost() = 1;
+    void copyAsGhost(const Particle& src, int extradata, const Real3D& shift)
+    {
+        src.r.copyShifted(r, shift);
+        if (extradata & DATA_PROPERTIES)
+        {
+            p = src.p;
+        }
+        if (extradata & DATA_MOMENTUM)
+        {
+            m = src.m;
+        }
+        if (extradata & DATA_LOCAL)
+        {
+            l = src.l;
+        }
+        ghost() = 1;
     }
 
-  private:
+private:
     ParticleProperties p;
     ParticlePosition r;
     ParticleMomentum m;
@@ -395,144 +402,132 @@ namespace espressopp {
     ParticleForce f;
 
     friend class boost::serialization::access;
-    template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
     {
-      ar &p &r &m &f &l;
+        ar& p& r& m& f& l;
     }
-  };
+};
 
-  struct ParticleList
-    : public esutil::ESPPContainer < std::vector< Particle > >
-  {};
+struct ParticleList : public esutil::ESPPContainer<std::vector<Particle> >
+{
+};
 
-  // singles
-  class ParticleSingle
-    : public Single< struct Particle* >
-  {
-  private:
-    typedef Single< struct Particle* > Super;
-  public:
+// singles
+class ParticleSingle : public Single<struct Particle*>
+{
+private:
+    typedef Single<struct Particle*> Super;
+
+public:
     ParticleSingle() : Super() {}
-    ParticleSingle(Particle *p) : Super(p) {}
-    ParticleSingle(Particle &p) : Super(&p) {}
-  };
+    ParticleSingle(Particle* p) : Super(p) {}
+    ParticleSingle(Particle& p) : Super(&p) {}
+};
 
-  struct SingleList
-    : public esutil::ESPPContainer< std::vector< ParticleSingle > >
-  {
-    void add(Particle *p) {
-    	this->push_back(ParticleSingle(p));
-    }
+struct SingleList : public esutil::ESPPContainer<std::vector<ParticleSingle> >
+{
+    void add(Particle* p) { this->push_back(ParticleSingle(p)); }
 
-    void add(Particle &p) {
-    	this->add(&p);
-    }
+    void add(Particle& p) { this->add(&p); }
 
-    void add(std::vector<Particle*> particles) {
-    	this->add(particles.at(0));
-    }
-  };
+    void add(std::vector<Particle*> particles) { this->add(particles.at(0)); }
+};
 
-  // pairs
-  class ParticlePair
-    : public std::pair< struct Particle*, struct Particle* >
-  {
-  private:
-    typedef std::pair< struct Particle*, struct Particle* > Super;
-  public:
+// pairs
+class ParticlePair : public std::pair<struct Particle*, struct Particle*>
+{
+private:
+    typedef std::pair<struct Particle*, struct Particle*> Super;
+
+public:
     ParticlePair() : Super() {}
-    ParticlePair(Particle* p1, Particle* p2)
-      : Super(p1, p2) {}
-    ParticlePair(Particle &p1, Particle &p2)
-      : Super(&p1, &p2) {}
-  };
+    ParticlePair(Particle* p1, Particle* p2) : Super(p1, p2) {}
+    ParticlePair(Particle& p1, Particle& p2) : Super(&p1, &p2) {}
+};
 
-  struct PairList
-    : public esutil::ESPPContainer< std::vector< ParticlePair > >
-  {
-    void add(Particle *p1, Particle *p2) {
-        this->push_back(ParticlePair(p1, p2));
-    }
+struct PairList : public esutil::ESPPContainer<std::vector<ParticlePair> >
+{
+    void add(Particle* p1, Particle* p2) { this->push_back(ParticlePair(p1, p2)); }
 
-    void add(Particle &p1, Particle &p2)
-    { this->add(&p1, &p2); }
+    void add(Particle& p1, Particle& p2) { this->add(&p1, &p2); }
 
-    void add(std::vector<Particle*> particles) {
-        this->add(particles.at(0), particles.at(1));
-    }
-  };
+    void add(std::vector<Particle*> particles) { this->add(particles.at(0), particles.at(1)); }
+};
 
-  // triples
-  class ParticleTriple
-    : public Triple< struct Particle*, struct Particle*, struct Particle* >
-  {
-  private:
-    typedef Triple< struct Particle*, struct Particle*, struct Particle* > Super;
-  public:
+// triples
+class ParticleTriple : public Triple<struct Particle*, struct Particle*, struct Particle*>
+{
+private:
+    typedef Triple<struct Particle*, struct Particle*, struct Particle*> Super;
+
+public:
     ParticleTriple() : Super() {}
-    ParticleTriple(Particle* p1, Particle* p2, Particle* p3)
-      : Super(p1, p2, p3) {}
-    ParticleTriple(Particle &p1, Particle &p2, Particle &p3)
-      : Super(&p1, &p2, &p3) {}
-  };
+    ParticleTriple(Particle* p1, Particle* p2, Particle* p3) : Super(p1, p2, p3) {}
+    ParticleTriple(Particle& p1, Particle& p2, Particle& p3) : Super(&p1, &p2, &p3) {}
+};
 
-  struct TripleList
-    : public esutil::ESPPContainer< std::vector< ParticleTriple > >
-  {
-    void add(Particle *p1, Particle *p2, Particle *p3) {
+struct TripleList : public esutil::ESPPContainer<std::vector<ParticleTriple> >
+{
+    void add(Particle* p1, Particle* p2, Particle* p3)
+    {
         this->push_back(ParticleTriple(p1, p2, p3));
     }
 
-    void add(Particle &p1, Particle &p2, Particle &p3)
-    { this->add(&p1, &p2, &p3); }
+    void add(Particle& p1, Particle& p2, Particle& p3) { this->add(&p1, &p2, &p3); }
 
-    void add(std::vector<Particle*> particles) {
+    void add(std::vector<Particle*> particles)
+    {
         this->add(particles.at(0), particles.at(1), particles.at(2));
     }
-  };
+};
 
-  // quadruples
-  class ParticleQuadruple
-    : public Quadruple< struct Particle*, struct Particle*,
-                        struct Particle*, struct Particle* >
-  {
-  private:
-    typedef Quadruple< struct Particle*, struct Particle*,
-                       struct Particle*, struct Particle* > Super;
-  public:
+// quadruples
+class ParticleQuadruple
+    : public Quadruple<struct Particle*, struct Particle*, struct Particle*, struct Particle*>
+{
+private:
+    typedef Quadruple<struct Particle*, struct Particle*, struct Particle*, struct Particle*> Super;
+
+public:
     ParticleQuadruple() : Super() {}
     ParticleQuadruple(Particle* p1, Particle* p2, Particle* p3, Particle* p4)
-      : Super(p1, p2, p3, p4) {}
-    ParticleQuadruple(Particle &p1, Particle &p2, Particle &p3, Particle &p4)
-      : Super(&p1, &p2, &p3, &p4) {}
-  };
+        : Super(p1, p2, p3, p4)
+    {
+    }
+    ParticleQuadruple(Particle& p1, Particle& p2, Particle& p3, Particle& p4)
+        : Super(&p1, &p2, &p3, &p4)
+    {
+    }
+};
 
-  struct QuadrupleList
-    : public esutil::ESPPContainer< std::vector< ParticleQuadruple > >
-  {
-    void add(Particle* p1, Particle* p2, Particle* p3, Particle* p4) {
+struct QuadrupleList : public esutil::ESPPContainer<std::vector<ParticleQuadruple> >
+{
+    void add(Particle* p1, Particle* p2, Particle* p3, Particle* p4)
+    {
         this->push_back(ParticleQuadruple(p1, p2, p3, p4));
     }
 
     void add(Particle& p1, Particle& p2, Particle& p3, Particle& p4)
-    { this->add(&p1, &p2, &p3, &p4); }
-
-    void add(std::vector<Particle*> particles) {
-        this->add(particles.at(0), particles.at(1),
-                particles.at(2), particles.at(3));
+    {
+        this->add(&p1, &p2, &p3, &p4);
     }
-  };
 
-  struct TupleList
-   : public esutil::ESPPContainer< std::map<Particle*, std::vector<Particle*> > >  {
-     void add(Particle* p, std::vector<Particle*> particles) {
-         this->insert(make_pair(p, particles));
-     }
-  };
+    void add(std::vector<Particle*> particles)
+    {
+        this->add(particles.at(0), particles.at(1), particles.at(2), particles.at(3));
+    }
+};
 
-}
+struct TupleList : public esutil::ESPPContainer<std::map<Particle*, std::vector<Particle*> > >
+{
+    void add(Particle* p, std::vector<Particle*> particles)
+    {
+        this->insert(make_pair(p, particles));
+    }
+};
 
+}  // namespace espressopp
 
 BOOST_IS_MPI_DATATYPE(espressopp::ParticleProperties)
 BOOST_IS_MPI_DATATYPE(espressopp::ParticlePosition)
@@ -541,11 +536,11 @@ BOOST_IS_MPI_DATATYPE(espressopp::ParticleMomentum)
 BOOST_IS_MPI_DATATYPE(espressopp::ParticleLocal)
 BOOST_IS_MPI_DATATYPE(espressopp::Particle)
 
-BOOST_CLASS_TRACKING(espressopp::ParticleProperties,track_never)
-BOOST_CLASS_TRACKING(espressopp::ParticlePosition,track_never)
-BOOST_CLASS_TRACKING(espressopp::ParticleForce,track_never)
-BOOST_CLASS_TRACKING(espressopp::ParticleMomentum,track_never)
-BOOST_CLASS_TRACKING(espressopp::ParticleLocal,track_never)
-BOOST_CLASS_TRACKING(espressopp::Particle,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleProperties, track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticlePosition, track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleForce, track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleMomentum, track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleLocal, track_never)
+BOOST_CLASS_TRACKING(espressopp::Particle, track_never)
 
 #endif

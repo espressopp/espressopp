@@ -23,25 +23,26 @@
 #include <python.hpp>
 #include "Interaction.hpp"
 
-namespace espressopp {
-  namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(Interaction::theLogger, "Interaction");
 
-    LOG4ESPP_LOGGER(Interaction::theLogger, "Interaction");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
+void Interaction::registerPython()
+{
+    using namespace espressopp::python;
 
-    void
-    Interaction::registerPython() {
-      using namespace espressopp::python;
+    real (Interaction::*pyComputeEnergyAAraw)() = &Interaction::computeEnergyAA;
+    real (Interaction::*pyComputeEnergyAAtype)(int) = &Interaction::computeEnergyAA;
+    real (Interaction::*pyComputeEnergyCGraw)() = &Interaction::computeEnergyCG;
+    real (Interaction::*pyComputeEnergyCGtype)(int) = &Interaction::computeEnergyCG;
 
-      real (Interaction::*pyComputeEnergyAAraw)() = &Interaction::computeEnergyAA;
-      real (Interaction::*pyComputeEnergyAAtype)(int) = &Interaction::computeEnergyAA;
-      real (Interaction::*pyComputeEnergyCGraw)() = &Interaction::computeEnergyCG;
-      real (Interaction::*pyComputeEnergyCGtype)(int) = &Interaction::computeEnergyCG;
-
-      class_< Interaction, boost::noncopyable >("interaction_Interaction", no_init)
+    class_<Interaction, boost::noncopyable>("interaction_Interaction", no_init)
         .def("computeEnergy", &Interaction::computeEnergy)
         .def("computeEnergyDeriv", &Interaction::computeEnergyDeriv)
         .def("computeEnergyAA", pyComputeEnergyAAraw)
@@ -49,8 +50,7 @@ namespace espressopp {
         .def("computeEnergyCG", pyComputeEnergyCGraw)
         .def("computeEnergyCG", pyComputeEnergyCGtype)
         .def("computeVirial", &Interaction::computeVirial)
-        .def("bondType", &Interaction::bondType)
-      ;
-    }
-  }
+        .def("bondType", &Interaction::bondType);
 }
+}  // namespace interaction
+}  // namespace espressopp

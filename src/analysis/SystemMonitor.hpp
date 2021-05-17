@@ -36,84 +36,83 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espressopp {
-namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+class SystemMonitorOutputCSV
+{
+    friend class SystemMonitor;
 
+public:
+    SystemMonitorOutputCSV(std::string file_name, std::string delimiter)
+        : file_name_(file_name), delimiter_(delimiter)
+    {
+        header_written_ = false;
+    }
+    void write();
 
-class SystemMonitorOutputCSV {
-  friend class SystemMonitor;
- public:
-  SystemMonitorOutputCSV(std::string file_name, std::string delimiter) :
-      file_name_(file_name), delimiter_(delimiter) {
-    header_written_ = false;
-  }
-  void write();
+    void setSystem(std::shared_ptr<System> system) { system_ = system; }
 
-  void setSystem(std::shared_ptr<System> system) {
-    system_ = system;
-  }
+    static void registerPython();
 
-  static void registerPython();
-
- private:
-  std::shared_ptr<std::vector<std::string> > keys_;
-  std::shared_ptr<std::vector<real> > values_;
-  std::string file_name_;
-  std::shared_ptr<System> system_;
-  std::string delimiter_;
-  bool header_written_;
+private:
+    std::shared_ptr<std::vector<std::string> > keys_;
+    std::shared_ptr<std::vector<real> > values_;
+    std::string file_name_;
+    std::shared_ptr<System> system_;
+    std::string delimiter_;
+    bool header_written_;
 };
 
+class SystemMonitor : public ParticleAccess
+{
+public:
+    typedef std::vector<std::pair<std::string, std::shared_ptr<Observable> > > ObservableList;
+    SystemMonitor(std::shared_ptr<System> system,
+                  std::shared_ptr<integrator::MDIntegrator> integrator,
+                  std::shared_ptr<SystemMonitorOutputCSV> output)
+        : ParticleAccess(system), system_(system), integrator_(integrator), output_(output)
+    {
+        header_ = std::make_shared<std::vector<std::string> >();
+        values_ = std::make_shared<std::vector<real> >();
 
-class SystemMonitor : public ParticleAccess {
- public:
-  typedef std::vector<std::pair<std::string, std::shared_ptr<Observable> > > ObservableList;
-  SystemMonitor(std::shared_ptr< System > system,
-                std::shared_ptr<integrator::MDIntegrator> integrator,
-                std::shared_ptr<SystemMonitorOutputCSV> output):
-        ParticleAccess(system),
-        system_(system),
-        integrator_(integrator),
-        output_(output) {
-    header_ = std::make_shared<std::vector<std::string> >();
-    values_ = std::make_shared<std::vector<real> >();
+        output_->system_ = system;
+        output_->keys_ = header_;
+        output_->values_ = values_;
 
-    output_->system_ = system;
-    output_->keys_ = header_;
-    output_->values_ = values_;
-
-    header_shown_ = false;
-    if (system->comm->rank() == 0) {
-      header_->push_back("step");
-      header_->push_back("time");
-      visible_observables_.push_back(1);
-      visible_observables_.push_back(1);
+        header_shown_ = false;
+        if (system->comm->rank() == 0)
+        {
+            header_->push_back("step");
+            header_->push_back("time");
+            visible_observables_.push_back(1);
+            visible_observables_.push_back(1);
+        }
     }
-  }
 
-  ~SystemMonitor() {
-  }
-  void perform_action();
-  void info();
+    ~SystemMonitor() {}
+    void perform_action();
+    void info();
 
-  static void registerPython();
+    static void registerPython();
 
- private:
-  void computeObservables();
+private:
+    void computeObservables();
 
-  void addObservable(std::string name, std::shared_ptr<Observable> obs, bool is_visible);
+    void addObservable(std::string name, std::shared_ptr<Observable> obs, bool is_visible);
 
-  int current_step_;
-  bool header_written_;
-  bool header_shown_;
-  std::shared_ptr<std::vector<real> > values_;
-  std::shared_ptr<std::vector<std::string> > header_;
-  std::vector<int> visible_observables_;
-  std::shared_ptr<System> system_;
-  std::shared_ptr<integrator::MDIntegrator> integrator_;
+    int current_step_;
+    bool header_written_;
+    bool header_shown_;
+    std::shared_ptr<std::vector<real> > values_;
+    std::shared_ptr<std::vector<std::string> > header_;
+    std::vector<int> visible_observables_;
+    std::shared_ptr<System> system_;
+    std::shared_ptr<integrator::MDIntegrator> integrator_;
 
-  std::shared_ptr<SystemMonitorOutputCSV> output_;
-  ObservableList observables_;
+    std::shared_ptr<SystemMonitorOutputCSV> output_;
+    ObservableList observables_;
 };
 
 }  // end namespace analysis

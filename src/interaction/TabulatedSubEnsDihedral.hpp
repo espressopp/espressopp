@@ -27,266 +27,274 @@
 #include "RealND.hpp"
 #include "bc/BC.hpp"
 
-namespace espressopp {
-    namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+class TabulatedSubEnsDihedral : public DihedralPotentialTemplate<TabulatedSubEnsDihedral>
+{
+private:
+    int numInteractions;
+    std::vector<std::string> filenames;
+    std::vector<std::shared_ptr<Interpolation>> tables;
+    int interpolationType;
+    // Reference values of the collective variable centers
+    RealNDs colVarRef;
+    // Weights of each table
+    RealND weights;
+    // Target probability of each table
+    RealND targetProb;
+    // Running sum of each weight and number of counts
+    RealND weightSum;
+    int weightCounts;
+    // Renormalize collective variables: std
+    RealND colVarSd;
+    // characteristic decay length of the interpolation
+    real alpha;
+    // Size of CV partners
+    int colVarBondListSize;
+    int colVarAngleListSize;
+    int colVarDihedListSize;
 
-        class TabulatedSubEnsDihedral: public DihedralPotentialTemplate <TabulatedSubEnsDihedral> {
+public:
+    static void registerPython();
 
-            private:
-                int numInteractions;
-                std::vector<std::string> filenames;
-                std::vector<std::shared_ptr <Interpolation>> tables;
-                int interpolationType;
-                // Reference values of the collective variable centers
-                RealNDs colVarRef;
-                // Weights of each table
-                RealND weights;
-                // Target probability of each table
-                RealND targetProb;
-                // Running sum of each weight and number of counts
-                RealND weightSum;
-                int weightCounts;
-                // Renormalize collective variables: std
-                RealND colVarSd;
-                // characteristic decay length of the interpolation
-                real alpha;
-                // Size of CV partners
-                int colVarBondListSize;
-                int colVarAngleListSize;
-                int colVarDihedListSize;
+    TabulatedSubEnsDihedral() : numInteractions(0)
+    {
+        setCutoff(infinity);
+        weights.setDimension(0);
+        weightSum.setDimension(0);
+        targetProb.setDimension(0);
+        weightCounts = 0;
+        colVarSd.setDimension(3);
+        colVarRef.setDimension(0);
+        alpha = 1.;
+        colVarBondListSize = 0;
+        colVarAngleListSize = 0;
+        colVarDihedListSize = 0;
+    }
 
-            public:
-                static void registerPython();
+    void addInteraction(int itype, boost::python::str fname, const RealND& _cvref);
 
-                TabulatedSubEnsDihedral() :
-                    numInteractions(0) {
-                    setCutoff(infinity);
-                    weights.setDimension(0);
-                    weightSum.setDimension(0);
-                    targetProb.setDimension(0);
-                    weightCounts = 0;
-                    colVarSd.setDimension(3);
-                    colVarRef.setDimension(0);
-                    alpha = 1.;
-                    colVarBondListSize = 0;
-                    colVarAngleListSize = 0;
-                    colVarDihedListSize = 0;
-                }
+    void setDimension(int _dim)
+    {
+        numInteractions = _dim;
+        colVarRef.setDimension(numInteractions);
+        tables.resize(numInteractions);
+        filenames.resize(numInteractions);
+        weights.setDimension(numInteractions);
+        weightSum.setDimension(numInteractions);
+        targetProb.setDimension(numInteractions);
+    }
 
-                void addInteraction(int itype, boost::python::str fname,
-                                    const RealND& _cvref);
+    int getDimension() const { return numInteractions; }
 
-                void setDimension(int _dim) {
-                  numInteractions = _dim;
-                  colVarRef.setDimension( numInteractions );
-                  tables.resize( numInteractions );
-                  filenames.resize( numInteractions );
-                  weights.setDimension( numInteractions );
-                  weightSum.setDimension( numInteractions );
-                  targetProb.setDimension( numInteractions );
-                }
+    /** Setter for the interpolation type */
+    void setInterpolationType(int itype) { interpolationType = itype; }
 
-                int getDimension() const { return numInteractions; }
+    /** Getter for the interpolation type */
+    int getInterpolationType() const { return interpolationType; }
 
-                /** Setter for the interpolation type */
-                void setInterpolationType(int itype) { interpolationType = itype; }
+    RealND getTargetProb() const { return targetProb; }
 
-                /** Getter for the interpolation type */
-                int getInterpolationType() const { return interpolationType; }
+    void setTargetProb(int index, real _r) { return targetProb.setItem(index, _r); }
 
-                RealND getTargetProb() const { return targetProb; }
+    RealND getColVarSds() const { return colVarSd; }
 
-                void setTargetProb(int index, real _r) {
-                    return targetProb.setItem(index, _r);
-                }
+    void setColVarSd(int index, real _r) { return colVarSd.setItem(index, _r); }
 
-                RealND getColVarSds() const { return colVarSd; }
+    RealND getColVarRef(int i) const { return colVarRef[i]; }
 
-                void setColVarSd(int index, real _r) {
-                    return colVarSd.setItem(index, _r);
-                }
+    RealNDs getColVarRefs() const { return colVarRef; }
 
-                RealND getColVarRef(int i) const { return colVarRef[i]; }
+    void setColVarRef(const RealNDs& cvRefs);
 
-                RealNDs getColVarRefs() const { return colVarRef; }
+    void setColVarRefs(const RealNDs& c) { colVarRef = c; }
 
-                void setColVarRef(const RealNDs& cvRefs);
+    boost::python::list getFilenames() const { return boost::python::list(filenames); }
 
-                void setColVarRefs(const RealNDs& c) { colVarRef = c; }
+    boost::python::list getFilename(int index) const
+    {
+        return boost::python::list(filenames[index]);
+    }
 
-                boost::python::list getFilenames() const {
-                    return boost::python::list(filenames); }
+    void setFilename(int index, boost::python::list _f)
+    {
+        filenames[index] = boost::python::extract<std::string>(_f);
+    }
 
-                boost::python::list getFilename(int index) const {
-                    return boost::python::list(filenames[index]);
-                }
+    void setFilenames(int dim, int itype, boost::python::list _filenames);
 
-                void setFilename(int index, boost::python::list _f) {
-                    filenames[index] = boost::python::extract<std::string>(_f);
-                }
+    RealND getWeights() const { return weights; }
 
-                void setFilenames(int dim, int itype, boost::python::list _filenames);
+    void setWeights(const RealND& r) { weights = r; }
 
-                RealND getWeights() const { return weights; }
+    real getWeight(int index) const { return weights.getItem(index); }
 
-                void setWeights(const RealND& r) { weights = r; }
+    void setWeight(int index, real _w) { return weights.setItem(index, _w); }
 
-                real getWeight(int index) const {
-                    return weights.getItem(index);
-                }
+    real getAlpha() const { return alpha; }
 
-                void setWeight(int index, real _w) {
-                    return weights.setItem(index, _w);
-                }
+    void setAlpha(real _r) { alpha = _r; }
 
-                real getAlpha() const { return alpha; }
+    void computeColVarWeights(const Real3D& dist21,
+                              const Real3D& dist32,
+                              const Real3D& dist43,
+                              const bc::BC& bc);
 
-                void setAlpha(real _r) { alpha = _r; }
+    void setColVar(const Real3D& dist21,
+                   const Real3D& dist32,
+                   const Real3D& dist43,
+                   const bc::BC& bc);
 
-                void computeColVarWeights(const Real3D& dist21, const Real3D& dist32,
-                                const Real3D& dist43, const bc::BC& bc);
+    real _computeEnergyRaw(real phi) const
+    {
+        real e = 0.;
+        for (int i = 0; i < numInteractions; ++i) e += weights[i] * tables[i]->getEnergy(phi);
+        return e;
+    }
 
-                void setColVar(const Real3D& dist21, const Real3D& dist32,
-                                const Real3D& dist43, const bc::BC& bc);
+    // Kroneker delta function
+    real d(int i, int j) const
+    {
+        if (i == j)
+            return 1.0;
+        else
+            return 0.0;
+    }
 
-                real _computeEnergyRaw(real phi) const {
-                    real e = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        e += weights[i] * tables[i]->getEnergy(phi);
-                    return e;
-                }
-
-                // Kroneker delta function
-                real d(int i, int j) const {
-                  if(i==j)
-                    return 1.0;
-                  else
-                    return 0.0;
-                }
-
-                /** Compute dot product of two vectors */
-                Real3D prod(Real3D a, Real3D b) const {
-                  Real3D res(0.0, 0.0, 0.0);
-                  for(int i=0; i<3; i++){
-                    for(int j=0; j<3; j++){
-                      res[i]+=(1.0-d(i, j))*a[j]*b[j];
-                    }
-                  }
-                  return res;
-                }
-
-                void _computeForceRaw(Real3D& force1,
-                                        Real3D& force2,
-                                        Real3D& force3,
-                                        Real3D& force4,
-                                        const Real3D& r21,
-                                        const Real3D& r32,
-                                        const Real3D& r43) const {
-                    Real3D retF[4];
-
-                    Real3D rijjk = r21.cross(r32); // [r21 x r32]
-                    Real3D rjkkn = r32.cross(r43); // [r32 x r43]
-
-                    real rijjk_sqr = rijjk.sqr();
-                    real rjkkn_sqr = rjkkn.sqr();
-
-                    real rijjk_abs = sqrt(rijjk_sqr);
-                    real rjkkn_abs = sqrt(rjkkn_sqr);
-
-                    real inv_rijjk = 1.0 / rijjk_abs;
-                    real inv_rjkkn = 1.0 / rjkkn_abs;
-
-                    // cosine between planes
-                    real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-                    real _phi = acos(cos_phi);
-                    if (cos_phi > 1.0) {
-                      cos_phi = 1.0;
-                      _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
-                    } else if (cos_phi < -1.0) {
-                      cos_phi = -1.0;
-                      _phi = M_PI-1e-10;
-                    }
-
-                    //get sign of phi
-                    //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
-                    Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
-                    real signcheck = rcross * r32;
-                    if (signcheck < 0.0) _phi *= -1.0;
-
-                    // read table
-                    real a = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        a += weights[i] * tables[i]->getForce(_phi);
-
-                    real coef1 = -(1.0/sin(_phi)) * a;
-
-                    real A1 = inv_rijjk * inv_rjkkn;
-                    real A2 = inv_rijjk * inv_rijjk;
-                    real A3 = inv_rjkkn * inv_rjkkn;
-
-                    Real3D p3232 ( prod(r32,r32) );
-                    Real3D p3243 ( prod(r32,r43) );
-                    Real3D p2132 ( prod(r21,r32) );
-                    Real3D p2143 ( prod(r21,r43) );
-                    Real3D p2121 ( prod(r21,r21) );
-                    Real3D p4343 ( prod(r43,r43) );
-
-                    // we have 4 particles 1,2,3,4
-                    for(int l=0; l<4; l++){
-                      Real3D B1, B2, B3;
-
-                      for(int i=0; i<3; i++){
-                        B1[i]= r21[i] * ( p3232[i] * (d(l,2)-d(l,3)) + p3243[i] * (d(l,2)-d(l,1)) ) +
-                               r32[i] * ( p2132[i] * (d(l,3)-d(l,2)) + p3243[i] * (d(l,1)-d(l,0)) ) +
-                               r43[i] * ( p2132[i] * (d(l,2)-d(l,1)) + p3232[i] * (d(l,0)-d(l,1)) ) +
-                               2.0 * r32[i] * p2143[i] * (d(l,1)-d(l,2));
-
-                        B2[i]= 2.0 * r21[i] * ( p3232[i] * (d(l,1)-d(l,0)) + p2132[i] * (d(l,1)-d(l,2)) ) +
-                               2.0 * r32[i] * ( p2121[i] * (d(l,2)-d(l,1)) + p2132[i] * (d(l,0)-d(l,1)));
-
-                        B3[i]= 2.0 * r43[i] * ( p3232[i] * (d(l,3)-d(l,2)) + p3243[i] * (d(l,1)-d(l,2)) ) +
-                               2.0 * r32[i] * ( p4343[i] * (d(l,2)-d(l,1)) + p3243[i] * (d(l,2)-d(l,3)));
-                      }
-
-                      retF[l] = coef1 * ( A1*B1 - 0.5*cos_phi*(A2*B2 + A3*B3) );
-                    }
-
-                    force1 = retF[0];
-                    force2 = retF[1];
-                    force3 = retF[2];
-                    force4 = retF[3];
-
-                }
-
-                real _computeForceRaw(real phi) const {
-                    real f = 0.;
-                    for	(int i=0; i<numInteractions; ++i)
-                        f += weights[i] * tables[i]->getForce(phi);
-                    return f;
-                }
-
-        }; // class
-        // provide pickle support
-        struct TabulatedSubEnsDihedral_pickle : boost::python::pickle_suite
+    /** Compute dot product of two vectors */
+    Real3D prod(Real3D a, Real3D b) const
+    {
+        Real3D res(0.0, 0.0, 0.0);
+        for (int i = 0; i < 3; i++)
         {
-          static
-          boost::python::tuple
-          getinitargs(TabulatedSubEnsDihedral const& pot)
-          {
-              int itp = pot.getInterpolationType();
-              boost::python::list fns;
-              RealNDs cvrefs = pot.getColVarRefs();
-              int dim = pot.getDimension();
-              fns = pot.getFilenames();
-              RealND cvsd = pot.getColVarSds();
-              real rc = pot.getCutoff();
-              real alp = pot.getAlpha();
-              return boost::python::make_tuple(dim, itp, fns, cvrefs,
-                                                cvsd, alp, rc);
-          }
-        };
+            for (int j = 0; j < 3; j++)
+            {
+                res[i] += (1.0 - d(i, j)) * a[j] * b[j];
+            }
+        }
+        return res;
+    }
 
-    } //ns espressopp
+    void _computeForceRaw(Real3D& force1,
+                          Real3D& force2,
+                          Real3D& force3,
+                          Real3D& force4,
+                          const Real3D& r21,
+                          const Real3D& r32,
+                          const Real3D& r43) const
+    {
+        Real3D retF[4];
 
-}
+        Real3D rijjk = r21.cross(r32);  // [r21 x r32]
+        Real3D rjkkn = r32.cross(r43);  // [r32 x r43]
+
+        real rijjk_sqr = rijjk.sqr();
+        real rjkkn_sqr = rjkkn.sqr();
+
+        real rijjk_abs = sqrt(rijjk_sqr);
+        real rjkkn_abs = sqrt(rjkkn_sqr);
+
+        real inv_rijjk = 1.0 / rijjk_abs;
+        real inv_rjkkn = 1.0 / rjkkn_abs;
+
+        // cosine between planes
+        real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+        real _phi = acos(cos_phi);
+        if (cos_phi > 1.0)
+        {
+            cos_phi = 1.0;
+            _phi = 1e-10;  // not 0.0, because 1.0/sin(_phi) would cause a singularity
+        }
+        else if (cos_phi < -1.0)
+        {
+            cos_phi = -1.0;
+            _phi = M_PI - 1e-10;
+        }
+
+        // get sign of phi
+        // positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise
+        // (see DLPOLY manual)
+        Real3D rcross = rijjk.cross(rjkkn);  //(rij x rjk) x (rjk x rkn)
+        real signcheck = rcross * r32;
+        if (signcheck < 0.0) _phi *= -1.0;
+
+        // read table
+        real a = 0.;
+        for (int i = 0; i < numInteractions; ++i) a += weights[i] * tables[i]->getForce(_phi);
+
+        real coef1 = -(1.0 / sin(_phi)) * a;
+
+        real A1 = inv_rijjk * inv_rjkkn;
+        real A2 = inv_rijjk * inv_rijjk;
+        real A3 = inv_rjkkn * inv_rjkkn;
+
+        Real3D p3232(prod(r32, r32));
+        Real3D p3243(prod(r32, r43));
+        Real3D p2132(prod(r21, r32));
+        Real3D p2143(prod(r21, r43));
+        Real3D p2121(prod(r21, r21));
+        Real3D p4343(prod(r43, r43));
+
+        // we have 4 particles 1,2,3,4
+        for (int l = 0; l < 4; l++)
+        {
+            Real3D B1, B2, B3;
+
+            for (int i = 0; i < 3; i++)
+            {
+                B1[i] = r21[i] * (p3232[i] * (d(l, 2) - d(l, 3)) + p3243[i] * (d(l, 2) - d(l, 1))) +
+                        r32[i] * (p2132[i] * (d(l, 3) - d(l, 2)) + p3243[i] * (d(l, 1) - d(l, 0))) +
+                        r43[i] * (p2132[i] * (d(l, 2) - d(l, 1)) + p3232[i] * (d(l, 0) - d(l, 1))) +
+                        2.0 * r32[i] * p2143[i] * (d(l, 1) - d(l, 2));
+
+                B2[i] = 2.0 * r21[i] *
+                            (p3232[i] * (d(l, 1) - d(l, 0)) + p2132[i] * (d(l, 1) - d(l, 2))) +
+                        2.0 * r32[i] *
+                            (p2121[i] * (d(l, 2) - d(l, 1)) + p2132[i] * (d(l, 0) - d(l, 1)));
+
+                B3[i] = 2.0 * r43[i] *
+                            (p3232[i] * (d(l, 3) - d(l, 2)) + p3243[i] * (d(l, 1) - d(l, 2))) +
+                        2.0 * r32[i] *
+                            (p4343[i] * (d(l, 2) - d(l, 1)) + p3243[i] * (d(l, 2) - d(l, 3)));
+            }
+
+            retF[l] = coef1 * (A1 * B1 - 0.5 * cos_phi * (A2 * B2 + A3 * B3));
+        }
+
+        force1 = retF[0];
+        force2 = retF[1];
+        force3 = retF[2];
+        force4 = retF[3];
+    }
+
+    real _computeForceRaw(real phi) const
+    {
+        real f = 0.;
+        for (int i = 0; i < numInteractions; ++i) f += weights[i] * tables[i]->getForce(phi);
+        return f;
+    }
+
+};  // class
+// provide pickle support
+struct TabulatedSubEnsDihedral_pickle : boost::python::pickle_suite
+{
+    static boost::python::tuple getinitargs(TabulatedSubEnsDihedral const& pot)
+    {
+        int itp = pot.getInterpolationType();
+        boost::python::list fns;
+        RealNDs cvrefs = pot.getColVarRefs();
+        int dim = pot.getDimension();
+        fns = pot.getFilenames();
+        RealND cvsd = pot.getColVarSds();
+        real rc = pot.getCutoff();
+        real alp = pot.getAlpha();
+        return boost::python::make_tuple(dim, itp, fns, cvrefs, cvsd, alp, rc);
+    }
+};
+
+}  // namespace interaction
+
+}  // namespace espressopp
 #endif

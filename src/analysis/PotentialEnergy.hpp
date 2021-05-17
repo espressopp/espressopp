@@ -26,30 +26,37 @@
 #include "Observable.hpp"
 #include "interaction/Interaction.hpp"
 
-namespace espressopp {
-namespace analysis {
+namespace espressopp
+{
+namespace analysis
+{
+class PotentialEnergy : public Observable
+{
+public:
+    PotentialEnergy(std::shared_ptr<System> system,
+                    std::shared_ptr<interaction::Interaction> interaction,
+                    bool compute_at)
+        : Observable(system), interaction_(interaction), compute_at_(compute_at)
+    {
+        result_type = real_scalar;
+        compute_global_ = false;
+    }
+    PotentialEnergy(std::shared_ptr<System> system,
+                    std::shared_ptr<interaction::Interaction> interaction)
+        : Observable(system), interaction_(interaction)
+    {
+        result_type = real_scalar;
+        compute_global_ = true;
+    }
+    ~PotentialEnergy() {}
+    real compute_real() const;
 
-class PotentialEnergy : public Observable {
- public:
-  PotentialEnergy(std::shared_ptr<System> system, std::shared_ptr<interaction::Interaction> interaction,
-                  bool compute_at):
-      Observable(system), interaction_(interaction), compute_at_(compute_at) {
-    result_type = real_scalar;
-    compute_global_ = false;
-  }
-  PotentialEnergy(std::shared_ptr<System> system, std::shared_ptr<interaction::Interaction> interaction)
-      : Observable(system), interaction_(interaction) {
-    result_type = real_scalar;
-    compute_global_ = true;
-  }
-  ~PotentialEnergy() {}
-  real compute_real() const;
+    static void registerPython();
 
-  static void registerPython();
- private:
-  std::shared_ptr<interaction::Interaction> interaction_;
-  bool compute_at_;  // set to true then computeEnergyAA, otherwise computeEnergyCG
-  bool compute_global_;
+private:
+    std::shared_ptr<interaction::Interaction> interaction_;
+    bool compute_at_;  // set to true then computeEnergyAA, otherwise computeEnergyCG
+    bool compute_global_;
 };
 }  // end namespace analysis
 }  // end namespace espressopp

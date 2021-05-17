@@ -3,60 +3,57 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
 #include "PotentialVSpherePair.hpp"
 #include "logging.hpp"
 
-namespace espressopp {
-  namespace interaction {
+namespace espressopp
+{
+namespace interaction
+{
+LOG4ESPP_LOGGER(PotentialVSpherePair::theLogger, "PotentialVSpherePair");
 
-    LOG4ESPP_LOGGER(PotentialVSpherePair::theLogger, "PotentialVSpherePair");
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void PotentialVSpherePair::registerPython()
+{
+    using namespace espressopp::python;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void PotentialVSpherePair::registerPython() {
-        using namespace espressopp::python;
-        
-        real (PotentialVSpherePair::*computeEnergy1)(const Real3D& dist, real& sigmaij) const =
-            &PotentialVSpherePair::computeEnergy;
-            
-        real (PotentialVSpherePair::*computeEnergy2)(real dist, real sigmaij) const =
-            &PotentialVSpherePair::computeEnergy;
-            
-        python::list (PotentialVSpherePair::*computeForce)(const Real3D& dist, const real& sigmai, const real& sigmaj) const =
-            &PotentialVSpherePair::computeForce;
-        
-        class_< PotentialVSpherePair, boost::noncopyable >
-            ("interaction_PotentialVSpherePair", no_init)
-            .add_property("cutoff",  
-                &PotentialVSpherePair::getCutoff,
-                &PotentialVSpherePair::setCutoff)
-            .add_property("shift",  
-                &PotentialVSpherePair::getShift,
-                &PotentialVSpherePair::setShift)
-            .def("setAutoShift", pure_virtual(&PotentialVSpherePair::setAutoShift))
-            .def("computeEnergy", pure_virtual(computeEnergy1))
-            .def("computeEnergy", pure_virtual(computeEnergy2))
-            .def("computeForce", pure_virtual(computeForce))
-        ;
-    }
-  }
+    real (PotentialVSpherePair::*computeEnergy1)(const Real3D& dist, real& sigmaij) const =
+        &PotentialVSpherePair::computeEnergy;
+
+    real (PotentialVSpherePair::*computeEnergy2)(real dist, real sigmaij) const =
+        &PotentialVSpherePair::computeEnergy;
+
+    python::list (PotentialVSpherePair::*computeForce)(const Real3D& dist, const real& sigmai,
+                                                       const real& sigmaj) const =
+        &PotentialVSpherePair::computeForce;
+
+    class_<PotentialVSpherePair, boost::noncopyable>("interaction_PotentialVSpherePair", no_init)
+        .add_property("cutoff", &PotentialVSpherePair::getCutoff, &PotentialVSpherePair::setCutoff)
+        .add_property("shift", &PotentialVSpherePair::getShift, &PotentialVSpherePair::setShift)
+        .def("setAutoShift", pure_virtual(&PotentialVSpherePair::setAutoShift))
+        .def("computeEnergy", pure_virtual(computeEnergy1))
+        .def("computeEnergy", pure_virtual(computeEnergy2))
+        .def("computeForce", pure_virtual(computeForce));
 }
+}  // namespace interaction
+}  // namespace espressopp

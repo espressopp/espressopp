@@ -26,29 +26,40 @@
 #include "Observable.hpp"
 #include "Real3D.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    /** Class to get the number of particles in the system. */
-    class NPartSubregion : public Observable {
-      public:
-        NPartSubregion(std::shared_ptr< System > system, int parttype, real span, int geometry) : Observable(system), parttype(parttype), span(span), geometry(geometry) {
-          result_type=int_scalar;
-        }
-        virtual ~NPartSubregion() {}
-        virtual int compute_int() const;
+namespace espressopp
+{
+namespace analysis
+{
+/** Class to get the number of particles in the system. */
+class NPartSubregion : public Observable
+{
+public:
+    NPartSubregion(std::shared_ptr<System> system, int parttype, real span, int geometry)
+        : Observable(system), parttype(parttype), span(span), geometry(geometry)
+    {
+        result_type = int_scalar;
+    }
+    virtual ~NPartSubregion() {}
+    virtual int compute_int() const;
 
-        static void registerPython();
+    static void registerPython();
 
-        void setCenter(real x, real y, real z);
+    void setCenter(real x, real y, real z);
 
-        enum GeometryStates {spherical=0, x_bounded=1, y_bounded=2, z_bounded=3};
-
-        int parttype;
-        real span;
-        int geometry;
-        Real3D center;
+    enum GeometryStates
+    {
+        spherical = 0,
+        x_bounded = 1,
+        y_bounded = 2,
+        z_bounded = 3
     };
-  }
-}
+
+    int parttype;
+    real span;
+    int geometry;
+    Real3D center;
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

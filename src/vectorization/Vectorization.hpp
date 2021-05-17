@@ -31,53 +31,55 @@
 #include "log4espp.hpp"
 #include "boost/signals2.hpp"
 
-namespace espressopp {
-  namespace vectorization {
+namespace espressopp
+{
+namespace vectorization
+{
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// facilitates offloading of particle data to vectorization-friendly form
+class Vectorization : public SystemAccess
+{
+public:
+    Vectorization(std::shared_ptr<System> system,
+                  std::shared_ptr<integrator::MDIntegrator> mdintegrator,
+                  Mode mode = ESPP_VEC_MODE_DEFAULT);
+    ~Vectorization();
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// facilitates offloading of particle data to vectorization-friendly form
-    class Vectorization : public SystemAccess
-    {
-    public:
-      Vectorization(std::shared_ptr<System> system, std::shared_ptr<integrator::MDIntegrator> mdintegrator,
-        Mode mode = ESPP_VEC_MODE_DEFAULT);
-      ~Vectorization();
+    void connect();
+    void disconnect();
 
-      void connect();
-      void disconnect();
+    ParticleArray& getParticleArray() { return particleArray; }
+    CellNeighborList const& getNeighborList() const { return neighborList; }
 
-      ParticleArray& getParticleArray() { return particleArray; }
-      CellNeighborList const& getNeighborList() const { return neighborList; }
+    static void registerPython();
 
-      static void registerPython();
+private:
+    ParticleArray particleArray;
+    void resetParticles();
+    void befCalcForces();
+    void updatePositions();
+    void updateForces();
 
-    private:
-      ParticleArray particleArray;
-      void resetParticles();
-      void befCalcForces();
-      void updatePositions();
-      void updateForces();
+    CellNeighborList neighborList;
+    void resetCells();
 
-      CellNeighborList neighborList;
-      void resetCells();
+    std::shared_ptr<integrator::MDIntegrator> mdintegrator;
+    Mode mode;
 
-      std::shared_ptr<integrator::MDIntegrator> mdintegrator;
-      Mode mode;
+    // signals that connect to integrator
+    boost::signals2::connection sigBefCalcForces;
+    boost::signals2::connection sigUpdateForces;
 
-      // signals that connect to integrator
-      boost::signals2::connection sigBefCalcForces;
-      boost::signals2::connection sigUpdateForces;
+    // signals that connect to system
+    boost::signals2::connection sigResetParticles;
+    boost::signals2::connection sigResetCells;
 
-      // signals that connect to system
-      boost::signals2::connection sigResetParticles;
-      boost::signals2::connection sigResetCells;
+    std::shared_ptr<storage::DomainDecomposition> decomp;
 
-      std::shared_ptr<storage::DomainDecomposition> decomp;
+    static LOG4ESPP_DECL_LOGGER(logger);
+};
 
-      static LOG4ESPP_DECL_LOGGER(logger);
-    };
-
-  }
-}
+}  // namespace vectorization
+}  // namespace espressopp
 
 #endif

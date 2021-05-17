@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -27,25 +27,26 @@
 #include "types.hpp"
 #include "Real3D.hpp"
 
-namespace espressopp {
-  namespace esutil {
-    using namespace boost;
-    /** This class generates random vectors that are uniformly
-	distributed on a sphere. */
-    class UniformOnSphere
-      : variate_generator< RNGType&, uniform_on_sphere< real, Real3D > > 
-    {
-      typedef uniform_on_sphere< real, Real3D > DistType;
-      typedef variate_generator< RNGType&, DistType > Super;
-      
-      /// store the shared pointer to the RNG
-      std::shared_ptr< RNG > rng;
-      
-    public:
-      UniformOnSphere(std::shared_ptr< RNG > _rng);
-      using Super::operator();
-      static void registerPython();
-    };
-  }
-}
+namespace espressopp
+{
+namespace esutil
+{
+using namespace boost;
+/** This class generates random vectors that are uniformly
+    distributed on a sphere. */
+class UniformOnSphere : variate_generator<RNGType&, uniform_on_sphere<real, Real3D> >
+{
+    typedef uniform_on_sphere<real, Real3D> DistType;
+    typedef variate_generator<RNGType&, DistType> Super;
+
+    /// store the shared pointer to the RNG
+    std::shared_ptr<RNG> rng;
+
+public:
+    UniformOnSphere(std::shared_ptr<RNG> _rng);
+    using Super::operator();
+    static void registerPython();
+};
+}  // namespace esutil
+}  // namespace espressopp
 #endif

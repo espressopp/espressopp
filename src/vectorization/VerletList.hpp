@@ -36,41 +36,42 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
-namespace espressopp { namespace vectorization {
-
+namespace espressopp
+{
+namespace vectorization
+{
 /** Class that builds and stores verlet lists.
 
     ToDo: register at system for rebuild
 
 */
 
-  class VerletList : public SystemAccess {
-
-  public:
-
+class VerletList : public SystemAccess
+{
+public:
     /** Hierarchical storage of chunk indices
      */
     struct NeighborList
     {
-      std::vector< longint > clist;
-      std::vector< int > crange;
-      std::vector< int > plist;
-      std::vector< int > prange;
-      AlignedVector< int > nplist;
+        std::vector<longint> clist;
+        std::vector<int> crange;
+        std::vector<int> plist;
+        std::vector<int> prange;
+        AlignedVector<int> nplist;
 
-      void reset()
-      {
-        clist.clear();
-        crange.clear();
-        plist.clear();
-        prange.clear();
-      }
+        void reset()
+        {
+            clist.clear();
+            crange.clear();
+            plist.clear();
+            prange.clear();
+        }
 
-      void clear()
-      {
-        reset();
-        nplist.clear();
-      }
+        void clear()
+        {
+            reset();
+            nplist.clear();
+        }
     };
 
     /** Build a verlet list of all particle pairs stored in Vectorization
@@ -95,7 +96,7 @@ namespace espressopp { namespace vectorization {
 
     std::uint64_t getMaxType() { return max_type; }
 
-    real getVerletCutoff(); // returns cutoff + skin
+    real getVerletCutoff();  // returns cutoff + skin
 
     void connect();
 
@@ -128,20 +129,21 @@ namespace espressopp { namespace vectorization {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
-  protected:
+protected:
     std::shared_ptr<Vectorization> vec;
 
     int num_pairs = 0;
-    void checkPair(Particle &pt1, Particle &pt2);
+    void checkPair(Particle& pt1, Particle& pt2);
 
     AlignedVector<int> c_j;
-    AlignedVector<real> c_x,c_y,c_z;
+    AlignedVector<real> c_x, c_y, c_z;
 
-    template< bool VEC_MODE_AOS, bool PACK_NEIGHBORS > void rebuild_p_nc_pack_stencil();
+    template <bool VEC_MODE_AOS, bool PACK_NEIGHBORS>
+    void rebuild_p_nc_pack_stencil();
 
     PairList vlPairs;
     NeighborList neighborList;
-    boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
+    boost::unordered_set<std::pair<longint, longint> > exList;  // exclusion list
 
     std::uint64_t max_type;
     real cutsq;
@@ -155,8 +157,9 @@ namespace espressopp { namespace vectorization {
     real timeRebuild;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
-  };
+};
 
-}}
+}  // namespace vectorization
+}  // namespace espressopp
 
 #endif
