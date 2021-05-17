@@ -250,7 +250,9 @@ void FixedTripleList::onParticlesChanged()
     this->clear();
     size_t lastpid2 = VEC_PARTICLE_NOT_FOUND;
     auto const& storageVec = vectorization->storageVec;
-    size_t p1, p2, p3;
+    size_t p1 = VEC_PARTICLE_NOT_FOUND;
+    size_t p2 = VEC_PARTICLE_NOT_FOUND;
+    size_t p3 = VEC_PARTICLE_NOT_FOUND;
     for (auto it = globalTriples.cbegin(); it != globalTriples.cend(); ++it)
     {
         // printf("lookup global triple %d %d %d\n", it->first, it->second.first,
