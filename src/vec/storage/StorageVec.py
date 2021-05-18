@@ -32,7 +32,6 @@ class StorageVecLocal(vec_storage_StorageVec):
 
 if pmi.isController:
     class StorageVec(object):
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espressopp.vec.storage.StorageVecLocal',
             pmicall = ['loadCells','unloadCells']

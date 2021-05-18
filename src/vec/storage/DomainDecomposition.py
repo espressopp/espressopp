@@ -39,9 +39,9 @@ class DomainDecompositionLocal(
 if pmi.isController:
     class DomainDecomposition(
         espressopp.storage.DomainDecomposition,
-        StorageVec
+        StorageVec,
+        metaclass=pmi.Proxy
     ):
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espressopp.vec.storage.DomainDecompositionLocal'
         )

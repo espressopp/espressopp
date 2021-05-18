@@ -85,14 +85,12 @@ if pmi.isController:
             )
 
     class VerletListLennardJonesBase(Interaction):
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.vec.interaction.VerletListLennardJonesBaseLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
     class VerletListLennardJones(Interaction):
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.vec.interaction.VerletListLennardJonesLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']

@@ -70,8 +70,6 @@ if pmi.isController :
         espressopp.integrator.MDIntegrator,
         MDIntegratorVec
         ):
-
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.vec.integrator.VelocityVerletBaseLocal',
             pmicall = ['run','resetTimers','getNumResorts'],
@@ -81,8 +79,6 @@ if pmi.isController :
     class VelocityVerlet(
         VelocityVerletBase
         ):
-
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.vec.integrator.VelocityVerletLocal'
         )

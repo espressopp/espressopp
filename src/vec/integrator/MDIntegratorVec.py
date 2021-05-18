@@ -46,7 +46,6 @@ class MDIntegratorVecLocal(object):
 
 if pmi.isController:
     class MDIntegratorVec(object):
-        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ 'addExtension', 'getExtension', 'getNumberOfExtensions' ]
         )

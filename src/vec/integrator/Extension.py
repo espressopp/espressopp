@@ -65,10 +65,8 @@ class ExtensionLocal(object):
 
 if pmi.isController :
     class Extension(metaclass=pmi.Proxy):
-        # __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            # cls =  'espressopp.vec.integrator.Extension',
+            cls =  'espressopp.vec.integrator.ExtensionLocal',
             pmiproperty = [ 'type'],
-            #pmicall = ['addForce']
             pmicall = [ 'connect', 'disconnect' ]
         )
