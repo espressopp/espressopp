@@ -99,10 +99,7 @@ void Vectorization::resetCellsStorage(Storage* storage)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// set force array/s to zero
-void Vectorization::zeroForces()
-{
-    particles.zeroForces();
-}
+void Vectorization::zeroForces() { particles.zeroForces(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /// reset and update particles from current storage
