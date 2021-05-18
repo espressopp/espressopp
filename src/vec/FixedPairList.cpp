@@ -33,7 +33,6 @@
 #include "boost/serialization/vector.hpp"
 #include "esutil/Error.hpp"
 #include "Buffer.hpp"
-#include "checks.hpp"
 
 #include <sstream>
 
@@ -181,7 +180,6 @@ python::list FixedPairList::getAllBonds()
         mpi::gather(*system.comm, local_bonds, global_bonds, 0);
         for (auto it = global_bonds.begin(); it != global_bonds.end(); ++it)
         {
-            CHECK_EQUAL(it->size() % 2, 0, "Size needs to be a multiple of two!");
             for (auto iit = it->begin(); iit != it->end(); iit += 2)
             {
                 size_t pid1 = *(iit);
