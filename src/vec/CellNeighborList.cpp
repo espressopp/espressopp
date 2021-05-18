@@ -24,9 +24,28 @@ namespace espressopp
 {
 namespace vec
 {
+static const std::map<int, int> EMPTY_MAP;
+
 CellNeighborList::CellNeighborList(Cell* const cell0,
                                    CellList const& localCells,
                                    std::vector<size_t> const& realCellIdx)
+{
+    init<0>(cell0, localCells, realCellIdx, {});
+}
+
+CellNeighborList::CellNeighborList(Cell* const cell0,
+                                   CellList const& localCells,
+                                   std::vector<size_t> const& realCellIdx,
+                                   std::map<int, int> const& cellMap)
+{
+    init<1>(cell0, localCells, realCellIdx, cellMap);
+}
+
+template <bool USE_CELL_MAP>
+void CellNeighborList::init(Cell* const cell0,
+                            CellList const& localCells,
+                            std::vector<size_t> const& realCellIdx,
+                            std::map<int, int> const& cellMap)
 {
     // const size_t numCells = localCells.size();
     const size_t numCells = realCellIdx.size();
@@ -53,7 +72,8 @@ CellNeighborList::CellNeighborList(Cell* const cell0,
         {
             if (!nc.useForAllPairs)
             {
-                const auto vidx = (nc.cell - cell0);  /// map global cell idx to virtual cell idx
+                auto vidx = (nc.cell - cell0);  /// map global cell idx to virtual cell idx
+                if (USE_CELL_MAP) vidx = cellMap.at(vidx);
                 this->at(irow, jnbr++) = vidx;
             }
         }

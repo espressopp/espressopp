@@ -53,6 +53,11 @@ public:
                      CellList const& localCells,
                      std::vector<size_t> const& realCellIdx);
 
+    CellNeighborList(Cell* const cell0,
+                     CellList const& localCells,
+                     std::vector<size_t> const& realCellIdx,
+                     std::map<int, int> const& cellMap);
+
     inline void clear() { Super::clear(); }
     // inline reference at(size_type row, size_type nbr) { return Super::at(nbr+2,row); }
     inline const_reference& at(size_type row, size_type nbr) const
@@ -72,6 +77,12 @@ protected:
     inline reference& at(size_type row, size_type nbr) { return Super::at(nbr + 2, row); }
     inline reference& cellId(size_type row) { return Super::at(0, row); }
     inline reference& numNeighbors(size_type row) { return Super::at(1, row); }
+
+    template <bool USE_CELL_MAP>
+    void init(Cell* const cell0,
+              CellList const& localCells,
+              std::vector<size_t> const& realCellIdx,
+              std::map<int, int> const& cellMap);
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
 }  // namespace vec
