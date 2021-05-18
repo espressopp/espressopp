@@ -44,7 +44,7 @@ private:
 
 public:
     System();
-    System(python::object _pyobj);
+    explicit System(int fComm);
 
     std::shared_ptr<mpi::communicator> comm;
 

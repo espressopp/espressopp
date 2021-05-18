@@ -113,11 +113,11 @@ class SystemLocal(_espressopp.System):
 
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm())
+                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm().py2f())
             else :
                 pass
         else :
-            cxxinit(self, _espressopp.System, pmi._MPIcomm)
+            cxxinit(self, _espressopp.System, pmi._MPIcomm.py2f())
 
         self._integrator = None
         self._interaction2id = {}

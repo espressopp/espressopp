@@ -31,8 +31,6 @@
 
 #include <limits>
 
-#include <mpi4py/mpi4py.h>
-
 #ifdef VTRACE
 #include "vampirtrace/vt_user.h"
 #else
@@ -50,28 +48,14 @@ System::System()
     maxCutoff = 0.0;
 }
 
-System::System(python::object _pyobj)
+/// \param fComm Fortran-style MPI communicator
+///
+/// This function is used to synchronize the MPI communicators of mpi4py and C++.
+/// Since MPI_Comm is a complicated struct not directly exposed by mpi4py the coupling is done
+/// via the Fortran communicator that is a plain int.
+System::System(int fComm)
 {
-    // This is defined in mpi4py.h
-    // struct __pyx_obj_6mpi4py_3MPI_Comm {
-    //  PyObject_HEAD
-    //  MPI_Comm ob_mpi;
-    //  int flags;
-    //};
-
-    // Following is some extreme typecasting which we need to convert the
-    // pmi python object pmi._MPIcomm into a std::shared_ptr< boost::mpi::communicator >
-    // I have not yet figured out how to do it in a more elegant way
-    PyObject* pyobj = _pyobj.ptr();
-    // in mpi4py.1.2.1 this has to be:
-    // __pyx_obj_6mpi4py_3MPI_Comm * pyMPIComm = (__pyx_obj_6mpi4py_3MPI_Comm *) pyobj;
-    // in version >= mpi4py.1.2.2 this has to be:
-    PyMPICommObject* pyMPIComm = (PyMPICommObject*)pyobj;
-    MPI_Comm* comm_p = &pyMPIComm->ob_mpi;
-    std::shared_ptr<mpi::communicator> newcomm =
-        std::make_shared<mpi::communicator>(*comm_p, mpi::comm_attach);
-
-    comm = newcomm;
+    comm = std::make_shared<mpi::communicator>(MPI_Comm_f2c(fComm), mpi::comm_attach);
     maxCutoff = 0.0;
 }
 
@@ -209,7 +193,7 @@ void System::registerPython()
     class_<System>("System", init<>())
         .add_property("skin", &System::getSkin, &System::setSkin)
 
-        .def(init<python::object>())
+        .def(init<int>())
         .def_readwrite("storage", &System::storage)
         .def_readwrite("bc", &System::bc)
         .def_readwrite("rng", &System::rng)
