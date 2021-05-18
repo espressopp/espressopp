@@ -41,8 +41,6 @@ simple maths
 
 #pragma once
 
-#include <boost/stacktrace.hpp>
-
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -63,10 +61,7 @@ std::string generateAssertionMessage(const T& lhs,
     std::stringstream ss;
     int length = static_cast<int>(lhsExpression.length());
     ss << "========================================================================\n"
-       << "Stacktrace:\n"
-       << boost::stacktrace::stacktrace()
-       << "\n========================================================================\n"
-       << "\nASSUMPTION FAILED! (" << filename << ":" << lineno << ")\n\n"
+       << "ASSUMPTION FAILED! (" << filename << ":" << lineno << ")\n\n"
        << "Expression: " << opString << lhsExpression << "\n"
        << "Value:      " << std::setw(length) << std::setfill(' ') << lhsExpression << " = " << lhs;
     return ss.str();
@@ -85,10 +80,7 @@ std::string generateAssertionMessage(const T& lhs,
     std::stringstream ss;
     int length = static_cast<int>(std::max(lhsExpression.length(), rhsExpression.length()));
     ss << "========================================================================\n"
-       << "Stacktrace:\n"
-       << boost::stacktrace::stacktrace()
-       << "\n========================================================================\n"
-       << "\nASSUMPTION FAILED! (" << filename << ":" << lineno << ")\n\n"
+       << "ASSUMPTION FAILED! (" << filename << ":" << lineno << ")\n\n"
        << "Expression: " << lhsExpression << opString << rhsExpression << "\n"
        << "Values:     " << std::setw(length) << std::setfill(' ') << lhsExpression << " = " << lhs
        << "\n"
