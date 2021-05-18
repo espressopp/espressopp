@@ -33,6 +33,7 @@
 #include "boost/serialization/vector.hpp"
 #include "esutil/Error.hpp"
 #include "Buffer.hpp"
+#include "checks.hpp"
 
 #include <sstream>
 
@@ -180,6 +181,7 @@ python::list FixedPairList::getAllBonds()
         mpi::gather(*system.comm, local_bonds, global_bonds, 0);
         for (auto it = global_bonds.begin(); it != global_bonds.end(); ++it)
         {
+            CHECK_EQUAL(it->size() % 2, 0, "Size needs to be a multiple of two!");
             for (auto iit = it->begin(); iit != it->end(); iit += 2)
             {
                 size_t pid1 = *(iit);
@@ -239,8 +241,6 @@ void FixedPairList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
 void FixedPairList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
 {
     std::vector<size_t> received;
-    int n;
-    size_t pid1, pid2;
     auto it = globalPairs.begin();
     // receive the bond list
     buf.read(received);
@@ -249,12 +249,12 @@ void FixedPairList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
     while (i < size)
     {
         // unpack the list
-        pid1 = received[i++];
-        n = received[i++];
+        size_t pid1 = received[i++];
+        int n = received[i++];
         LOG4ESPP_DEBUG(theLogger, "recv particle " << pid1 << ", has " << n << " global pairs");
         for (; n > 0; --n)
         {
-            pid2 = received[i++];
+            size_t pid2 = received[i++];
             // add the bond to the global list
             LOG4ESPP_DEBUG(theLogger, "received pair " << pid1 << " , " << pid2);
             it = globalPairs.insert(it, std::make_pair(pid1, pid2));
@@ -262,7 +262,7 @@ void FixedPairList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
     }
     if (i != size)
     {
-        LOG4ESPP_ERROR(theLogger, "ATTETNTION:  recv particles might have read garbage\n");
+        LOG4ESPP_ERROR(theLogger, "ATTENTION:  recv particles might have read garbage\n");
     }
     LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
 }
