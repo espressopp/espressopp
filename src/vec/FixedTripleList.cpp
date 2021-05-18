@@ -209,24 +209,22 @@ void FixedTripleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
 void FixedTripleList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
 {
     std::vector<size_t> received;
-    size_t n;
-    size_t pid1, pid2, pid3;
     auto it = globalTriples.begin();
     // receive the triple list
     buf.read(received);
-    size_t size = received.size();
+    size_t const size = received.size();
     size_t i = 0;
     while (i < size)
     {
         // unpack the list
-        pid2 = received[i++];
-        n = received[i++];
+        size_t const pid2 = received[i++];
+        size_t n = received[i++];
         // printf ("me = %d: recv particle with pid %d, has %d global triples\n",
         // mpiWorld->rank(), pid1, n);
         for (; n > 0; --n)
         {
-            pid1 = received[i++];
-            pid3 = received[i++];
+            size_t const pid1 = received[i++];
+            size_t const pid3 = received[i++];
             // add the triple to the global list
             // printf("received triple %d %d %d, add triple to global list\n", pid1, pid2, pid3);
             it = globalTriples.insert(it,
