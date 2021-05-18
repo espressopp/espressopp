@@ -57,16 +57,6 @@ After successfully building all the Makefiles you should build |espp| with:
 
 (This will take several minutes)
 
-Before beeing able to use the espressopp  module in Python you need to source the ESPRC file:
-
-.. code-block:: bash
-
-   source ESPRC
-
-(This sets all corresponding environment variables to point to the module, e.g. PYTHONPATH)
-You have to source this file every time you want to work with espressopp. It would advisable to
-e.g. source the file in your .bashrc file ( "source <path_to_espressopp>/ESPRC" )
-
 In order to use matplotlib.pyplot for graphical output get the open source code from:
 
   http://sourceforge.net/projects/matplotlib
