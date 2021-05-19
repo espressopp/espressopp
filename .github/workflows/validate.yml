@@ -59,7 +59,7 @@ jobs:
         run: cmake --build build --verbose --target all -j 2
 
       - name: Install
-        run: cmake --install build
+        run: pip3 install -v build/.
 
       - name: Test
         working-directory: build

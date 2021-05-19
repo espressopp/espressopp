@@ -131,3 +131,5 @@ add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
         ${CMAKE_SOURCE_DIR}/src espressopp)
 
 add_subdirectory(doc)
+
+configure_file(${CMAKE_SOURCE_DIR}/setup.py ${CMAKE_BINARY_DIR}/. COPYONLY)
