@@ -75,12 +75,6 @@ endif()
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
-if(NOT PYTHON_INSTDIR)
-    execute_process(COMMAND ${Python3_EXECUTABLE}
-            -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
-            OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-
 execute_process(COMMAND ${Python3_EXECUTABLE}
         -c "import sys; print(sys.version[:3].replace('.', ''))"
         OUTPUT_VARIABLE PYTHON_VERSION_NO_DOT
