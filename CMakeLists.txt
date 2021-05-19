@@ -93,12 +93,6 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
-if (APPLE)
-    set ( RT_LIBRARIES )
-else()
-    set ( RT_LIBRARIES rt )
-endif()
-
 ######################################
 # Automatic CCache detection         #
 ######################################
