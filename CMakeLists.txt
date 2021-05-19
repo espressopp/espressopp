@@ -132,4 +132,4 @@ add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
 
 add_subdirectory(doc)
 
-configure_file(${CMAKE_SOURCE_DIR}/setup.py ${CMAKE_BINARY_DIR}/. COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/setup.py ${CMAKE_BINARY_DIR}/. @ONLY)
