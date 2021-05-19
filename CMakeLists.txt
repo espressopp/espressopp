@@ -93,14 +93,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
-option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
-if(EXTERNAL_MPI4PY)
-    find_package(MPI4PY 3.0.0 REQUIRED)
-    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-else(EXTERNAL_MPI4PY)
-    add_subdirectory(contrib/mpi4py)
-    set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
-endif(EXTERNAL_MPI4PY)
+set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
 
 if (APPLE)
     set ( RT_LIBRARIES )

@@ -10,12 +10,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
 #build .env for pipenv
-#CMAKE_BINARY_DIR for espressopp, CMAKE_CURRENT_BINARY_DIR for for _espressopps.so and contrib for MPI.so
-if (EXTERNAL_MPI4PY)
-    set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
-else (EXTERNAL_MPI4PY)
-    set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
-endif (EXTERNAL_MPI4PY)
+set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
         ${CMAKE_BINARY_DIR}/.env @ONLY)
 
