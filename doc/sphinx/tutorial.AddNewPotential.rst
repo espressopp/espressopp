@@ -135,13 +135,9 @@ Move to the directory ``$ESPRESSOHOME``. Update the makefiles and compile using 
 .. Step 5
 .. ......
 
-.. Now test your code using the sample python script and input configuration ``FourthPowerSystem`` supplied with this pdf before the tutorial (or on a USB stick during the tutorial). Remember to run
+.. Now test your code using the sample python script and input configuration ``FourthPowerSystem`` supplied with this pdf before the tutorial (or on a USB stick during the tutorial).
 
-.. .. code-block:: c
-
-..   source $ESPRESSOHOME/ESPRC
-
-.. in your working directory if necessary. Analyse the bond-length fluctuations using the script provided and compare them to the reference data provided.
+.. Analyse the bond-length fluctuations using the script provided and compare them to the reference data provided.
 
 Advanced exercise
 -----------------

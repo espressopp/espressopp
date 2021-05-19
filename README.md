@@ -44,14 +44,15 @@ ESPResSo++ requires Python 3.7 or newer. All required Python packages are listed
 
 ```sh
 $ cd espressopp
-$ cmake .
+$ cmake -DCMAKE_INSTALL_PREFIX=/where/to/install/espressopp .
 $ make -j2
-$ source ESPRC
+$ make install
+$ export PYTHONPATH=/where/to/install/espressopp/lib/python3*/site-packages:${PYTHONPATH}
 ```
 
 After building go to the `examples` directory and have a look at the Python scripts.
 
-Instead of calling `source ESPRC` you can also use [Pipenv](https://github.com/pypa/pipenv), simply after compilation call in the root directory
+You can also use [Pipenv](https://github.com/pypa/pipenv), simply after compilation call in the root directory
 ```sh
 $ pipenv install
 $ pipenv shell

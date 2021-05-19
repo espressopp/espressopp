@@ -35,7 +35,7 @@ are different software packages.
    :maxdepth: 2
    :titlesonly:
 
-   instalation.rst
+   installation.rst
    tutorial.rst
    classdescription.rst
    credits.rst
