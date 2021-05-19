@@ -2,6 +2,8 @@ if(USE_GCOV)
   set(PY_COV_OPTS "-m" "coverage" "run" "-a")
 endif()
 
+get_target_property(ESP_PY_ENV _espressopp ESP_PY_ENV)
+
 file(GLOB ALL_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 foreach(DIR ${ALL_DIRS})
     if(IS_DIRECTORY ${DIR})

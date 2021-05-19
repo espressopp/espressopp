@@ -44,6 +44,8 @@ endif()
 get_target_property(ESPP_CFLAGS _espressopp COMPILE_OPTIONS)
 message(STATUS "_espressopp compiler flags are: ${ESPP_CFLAGS}")
 
+set_target_properties(_espressopp PROPERTIES ESP_PY_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
+
 target_include_directories(_espressopp PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>)
 

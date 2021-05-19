@@ -19,6 +19,8 @@ find_program(SPHINX_EXECUTABLE
         DOC "Sphinx documentation generation tool (http://www.sphinx-doc.org/)"
         )
 
+get_target_property(ESP_PY_ENV _espressopp ESP_PY_ENV)
+
 if (SPHINX_EXECUTABLE)
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/sphinx)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)

@@ -93,8 +93,6 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
 
-set (ESP_PY_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-
 if (APPLE)
     set ( RT_LIBRARIES )
 else()
