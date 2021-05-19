@@ -10,7 +10,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
 #build .env for pipenv
-set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
         ${CMAKE_BINARY_DIR}/.env @ONLY)
 
