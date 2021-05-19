@@ -24,7 +24,6 @@
 
 #include "Vectorization.hpp"
 #include "VerletList.hpp"
-#include "vec/storage/StorageVec.hpp"
 
 #include "python.hpp"
 #include "Real3D.hpp"
@@ -42,12 +41,6 @@ namespace espressopp
 namespace vec
 {
 using namespace espressopp::iterator;
-
-template <bool PACK_NEIGHBORS>
-void rebuild_p_nc_pack_stencil(real const cutsq,
-                               CellNeighborList const& cellNborList,
-                               ParticleArray const& particleArray,
-                               VerletList::NeighborList& neighborList);
 
 LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
 
@@ -111,7 +104,7 @@ void VerletList::rebuild()
 
         if (particles.size())
         {
-            rebuild_p_nc_pack_stencil<1>(cutsq, cellnbrs, particles, neighborList);
+            neighborList.rebuild<1>(cutsq, cellnbrs, particles);
         }
     }
     timeRebuild += timer.getElapsedTime() - currTime;
@@ -121,10 +114,9 @@ void VerletList::rebuild()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <bool PACK_NEIGHBORS>
-void rebuild_p_nc_pack_stencil(real const cutsq,
-                               CellNeighborList const& cellNborList,
-                               ParticleArray const& particleArray,
-                               VerletList::NeighborList& neighborList)
+void VerletList::NeighborList::rebuild(real const cutsq,
+                                       CellNeighborList const& cellNborList,
+                                       ParticleArray const& particleArray)
 {
     {
         const size_t* __restrict cellRange = particleArray.cellRange().data();
@@ -151,12 +143,12 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                 max_reserve = std::max(max_reserve, c_reserve);
             }
 
-            if (max_reserve > neighborList.c_j.size())
+            if (max_reserve > c_j.size())
             {
-                neighborList.c_j.resize(max_reserve);
-                neighborList.c_x.resize(max_reserve);
-                neighborList.c_y.resize(max_reserve);
-                neighborList.c_z.resize(max_reserve);
+                c_j.resize(max_reserve);
+                c_x.resize(max_reserve);
+                c_y.resize(max_reserve);
+                c_z.resize(max_reserve);
             }
 
             // timePack += timer.getElapsedTime() - currTime;
@@ -169,10 +161,10 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
         const auto* __restrict pa_p_z = particleArray.p_z.data();
         const auto* __restrict pa_p_type = particleArray.type.data();
 
-        auto* __restrict c_x_ptr = neighborList.c_x.data();
-        auto* __restrict c_y_ptr = neighborList.c_y.data();
-        auto* __restrict c_z_ptr = neighborList.c_z.data();
-        auto* __restrict c_j_ptr = neighborList.c_j.data();
+        auto* __restrict c_x_ptr = c_x.data();
+        auto* __restrict c_y_ptr = c_y.data();
+        auto* __restrict c_z_ptr = c_z.data();
+        auto* __restrict c_j_ptr = c_j.data();
 
         int c_np_start = 0;
         for (size_t irow = 0; irow < numRealCells; irow++)
@@ -261,12 +253,12 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                     ESPP_FIT_TO_VECTOR_WIDTH((cell_size * (cell_size + c_j_size)));
                 const size_t np_size_max = c_np_start + c_np_size_max;
 
-                if (np_size_max > neighborList.nplist.size())
+                if (np_size_max > nplist.size())
                 {
-                    neighborList.nplist.resize(2 * np_size_max);
+                    nplist.resize(2 * np_size_max);
                 }
             }
-            auto* __restrict nplist = neighborList.nplist.data();
+            // auto* __restrict nplist = this->nplist.data();
 
             /// track counts of p and np for this cell
             int c_nplist_size = 0;
@@ -285,7 +277,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
 
                     size_t ncell_start = cellRange[ncell_id];
                     size_t ncell_data_end = cellRange[ncell_id + 1];
-                    int* __restrict npptr = &(neighborList.nplist[c_np_start + c_nplist_size]);
+                    int* __restrict npptr = &(nplist[c_np_start + c_nplist_size]);
 
                     {
                         int ll = 0;
@@ -321,12 +313,12 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                 /// neighbor-loop
                 if (PACK_NEIGHBORS)
                 {
-                    auto* __restrict c_x_ptr = neighborList.c_x.data();
-                    auto* __restrict c_y_ptr = neighborList.c_y.data();
-                    auto* __restrict c_z_ptr = neighborList.c_z.data();
-                    auto* __restrict c_j_ptr = neighborList.c_j.data();
+                    auto* __restrict c_x_ptr = c_x.data();
+                    auto* __restrict c_y_ptr = c_y.data();
+                    auto* __restrict c_z_ptr = c_z.data();
+                    auto* __restrict c_j_ptr = c_j.data();
 
-                    int* __restrict npptr = &(neighborList.nplist[c_np_start + c_nplist_size]);
+                    int* __restrict npptr = &(nplist[c_np_start + c_nplist_size]);
                     int ll = 0;
 
 #ifdef __INTEL_COMPILER
@@ -358,7 +350,7 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                         size_t ncell_id = cellNborList.at(irow, inbr);
                         size_t ncell_start = cellRange[ncell_id];
                         size_t ncell_data_end = cellRange[ncell_id + 1];
-                        int* __restrict npptr = &(neighborList.nplist[c_np_start + c_nplist_size]);
+                        int* __restrict npptr = &(nplist[c_np_start + c_nplist_size]);
 
                         {
                             int ll = 0;
@@ -404,15 +396,15 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
                     size_t padding = cellRange[last_ncell] + sizes[last_ncell];
                     for (size_t pad = 0; pad < num_pad; pad++)
                         nplist[c_np_start + (c_nplist_size++)] = padding;
-                    neighborList.plist.push_back(p);
+                    plist.push_back(p);
 
                     const int prange_start = c_np_start + prev_c_nplist_size;
                     const int prange_end = c_np_start + c_nplist_size;
-                    neighborList.prange.push_back({prange_start, prange_end});
+                    prange.push_back({prange_start, prange_end});
                 }
             }
             c_np_start += c_nplist_size;
-            // VEC_ASSERT_LEQ(c_np_start, neighborList.nplist.size())
+            // VEC_ASSERT_LEQ(c_np_start, nplist.size())
 
             // TODO: require reduction for num_pairs or atomic update
             // num_pairs += c_nplist_size;
@@ -420,110 +412,14 @@ void rebuild_p_nc_pack_stencil(real const cutsq,
             size_t max_type_cell = 0;
             for (size_t p = cell_start; p < cell_end; p++)
                 max_type_cell = std::max(max_type_cell, pa_p_type[p]);
-            neighborList.max_type = std::max(neighborList.max_type, max_type_cell);
+            max_type = std::max(max_type, max_type_cell);
         }
-        neighborList.num_pairs = c_np_start;
-
-#if 0
-      {
-        // real currTime = timer.getElapsedTime();
-#if 1
-        {
-          for(size_t irow=0; irow < numRealCells; irow++) f_cell(irow);
-        }
-#else
-        {
-          // executeInScheduler(f_cell);
-          using hpx::parallel::execution::par;
-          using hpx::parallel::execution::seq;
-          using hpx::parallel::for_loop;
-          utils::parallelForLoop(size_t(0), numRealCells, f_cell);
-        }
-#endif
-        // timeExecute += timer.getElapsedTime() - currTime;
-      }
-#endif
-
-#if 0
-      {
-        int num_pairs_check = 0;
-        for(size_t irow=0; irow < numRealCells; irow++)
-        {
-          const auto& crange = neighborList.crange[irow];
-          for(int ip=crange.first; ip<crange.second; ip++){
-            const auto& prange = neighborList.prange[ip];
-            num_pairs_check += (prange.second - prange.first);
-          }
-        }
-        if(num_pairs_check!=num_pairs){
-          VEC_THROW_EXCEPTION(hpx::assertion_failure,"VerletList::rebuild_p_nc_pack_stencil",
-            "num_pairs_check: Expected "<<num_pairs<<" got "<<num_pairs_check);
-        }
-      }
-#endif
-
-#if 0
-      {
-        const auto* __restrict pa_p_type = particleArray.type.data();
-
-        size_t max_type_check = 0;
-        for(size_t irow=0; irow < numRealCells; irow++)
-        {
-          const size_t cell_id       = cellNborList.cellId(irow);
-          const size_t cell_start    = cellRange[cell_id];
-          const size_t cell_size     = sizes[cell_id];
-          const size_t cell_end      = cell_start + cell_size;
-          for(size_t p=cell_start; p < cell_end; p++)
-            max_type_check = std::max(max_type_check, pa_p_type[p]);
-        }
-        if(max_type_check!=max_type){
-          VEC_THROW_EXCEPTION(hpx::assertion_failure,"VerletList::rebuild_p_nc_pack_stencil",
-            "max_type_check: Expected "<<max_type<<" got "<<max_type_check);
-        }
-      }
-#endif
-
-#if 0
-      {
-        const size_t nplist_reserve = neighborList.nplist.size();
-        if((num_pairs>nplist_reserve)&&(nplist_reserve>0)) {
-          LOG4ESPP_WARN(theLogger,"Reserve size exceeded. "
-            "Expected "<< nplist_reserve<<". Got "<<num_pairs);
-        }
-        std::cout << "nplist_alloc: " << nplist_alloc << "num_pairs: " << num_pairs
-          << " wasted: " << double(nplist_alloc-num_pairs)/double(nplist_alloc) << std::endl;
-      }
-#endif
+        num_pairs = c_np_start;
     }
 
     // LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
     //              << " local size = " << vlPairs.size());
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if 0
-  void VerletList::checkPair(Particle& pt1, Particle& pt2)
-  {
-
-    Real3D d = pt1.position() - pt2.position();
-    real distsq = d.sqr();
-
-    LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
-                   << " @ " << pt1.position()
-       << " - p2: " << pt2.id() << " @ " << pt2.position()
-       << " -> distsq = " << distsq);
-
-    if (distsq > cutsq) return;
-
-    // see if it's in the exclusion list (both directions)
-    if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
-    if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
-
-    max_type = std::max(max_type, (std::max(pt1.type(), pt2.type())) );
-    vlPairs.add(pt1, pt2); // add pair to Verlet List
-  }
-#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 

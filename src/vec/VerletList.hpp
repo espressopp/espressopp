@@ -28,6 +28,7 @@
 
 #include "vec/include/types.hpp"
 #include "vec/include/simdconfig.hpp"
+#include "vec/CellNeighborList.hpp"
 
 #include "log4espp.hpp"
 #include "types.hpp"
@@ -42,8 +43,6 @@ namespace espressopp
 {
 namespace vec
 {
-using storage::StorageVec;
-
 class VerletList : public SystemAccess
 {
 public:
@@ -72,6 +71,11 @@ public:
             reset();
             nplist.clear();
         }
+
+        template <bool PACK_NEIGHBORS>
+        void rebuild(real const cutsq,
+                     CellNeighborList const& cellNborList,
+                     ParticleArray const& particleArray);
     };
 
     /// Build a verlet list of all particle pairs stored in Vectorization
