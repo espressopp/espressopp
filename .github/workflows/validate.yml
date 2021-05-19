@@ -77,10 +77,22 @@ jobs:
       - name: Install Python Dependencies
         run: pip3 install -r espressopp/requirements.txt
 
-      - name: build documentation
+      - name: build espressopp
         run: |
           cmake -S espressopp -B espressopp-build
-          cmake --build espressopp-build --target doxygen sphinx sphinx-pdf -j 2
+          cmake --build espressopp-build -j 2
+
+      - name: build doxygen
+        run: |
+          cmake --build espressopp-build --target doxygen -j 2
+
+      - name: build sphinx
+        run: |
+          cmake --build espressopp-build --target sphinx -j 2
+
+      - name: build sphinx-pdf
+        run: |
+          cmake --build espressopp-build --target sphinx-pdf -j 2
 
       - uses: actions/checkout@v2
         with:
