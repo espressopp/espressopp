@@ -40,14 +40,6 @@ tell cmake manually, where to find them by typing:
    ccmake .
 
 This will open an interactive page where all configuration information can be specified.
-Alternatively, if cmake . complains on missing BOOST or MPI4PY libraries and you had not
-installed them, you can try
-
-.. code-block:: bash
-
-   cmake . -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF
-
-In this case, |espp| will try to use internal Boost and mpi4py libraries.
 
 After successfully building all the Makefiles you should build |espp| with:
 

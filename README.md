@@ -65,14 +65,13 @@ then you can go to `examples` and have a look at the Python scripts.
 You can customize the build process by applying following CMake flags
 
  - `WITH_XTC` - build E++ with support of dumping trajectory to GROMACS xtc files (default: OFF).
- - `EXTERNAL_MPI4PY` - use externally installed mpi4py library (default: ON).
  - `CMAKE_INSTALL_PREFIX` - where the E++ should be installed.
  - `CMAKE_CXX_FLAGS` - put specific compilation flags.
 
 Then, the flags can be used in `cmake`
 
 ```sh
-$ cmake . -DWITH_XTC=ON -DEXTERNAL_MPI4PY=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3
+$ cmake . -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3
 $ make
 ```
 

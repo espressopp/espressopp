@@ -27,16 +27,13 @@ jobs:
         BUILD_TYPE: [Release, Debug]
         DISTRO: ['fedora']
         CXX: ['g++', 'clang++']
-        EXTERNAL_MPI4PY: ['On']
         include:
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CXX: 'icpc'
-            EXTERNAL_MPI4PY: 'On'
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CXX: 'icpx'
-            EXTERNAL_MPI4PY: 'On'
 
     runs-on: ubuntu-latest
     container: espressopp/buildenv:${{ matrix.distro }}
@@ -53,7 +50,7 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2
