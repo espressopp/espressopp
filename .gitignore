@@ -1,7 +1,6 @@
 *build*
 
 # cmake generated files
-ESPRC
 .env
 espressopp
 src/acconfig.hpp
