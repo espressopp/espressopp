@@ -55,6 +55,7 @@ protected:
     typedef _Potential Potential;
     typedef VerletListLennardJonesBase base;
 
+public:
     struct LJCoefficients
     {
         LJCoefficients(real const& ff1, real const& ff2) : ff1(ff1), ff2(ff2) {}
@@ -62,7 +63,6 @@ protected:
         real ff1, ff2;
     };
 
-public:
     VerletListLennardJones(std::shared_ptr<VerletList> _verletList)
         : base(_verletList), np_types(0), p_types(0)
     {
@@ -85,10 +85,14 @@ public:
     }
     virtual void addForces();
 
-protected:
     template <bool ONETYPE>
-    void addForces_impl(ParticleArray& particleArray, VerletList::NeighborList const& neighborList);
+    static void addForces_impl(ParticleArray& particles,
+                               VerletList::NeighborList const& neighborList,
+                               AlignedVector<LJCoefficients> const& ffs,
+                               AlignedVector<real> const& cutoffSqr,
+                               size_t np_types);
 
+protected:
     size_t np_types, p_types;
     AlignedVector<LJCoefficients> ffs;
     AlignedVector<real> cutoffSqr;
@@ -114,20 +118,21 @@ inline void VerletListLennardJones::addForces()
 
     if (np_types == 1 && p_types == 1)
     {
-        addForces_impl<true>(pa, nl);
+        addForces_impl<true>(pa, nl, ffs, cutoffSqr, np_types);
     }
     else
     {
-        addForces_impl<false>(pa, nl);
+        addForces_impl<false>(pa, nl, ffs, cutoffSqr, np_types);
     }
 }
 
 template <bool ONETYPE>
-inline void VerletListLennardJones::addForces_impl(ParticleArray& particleArray,
-                                                   VerletList::NeighborList const& neighborList)
+inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
+                                                   VerletList::NeighborList const& neighborList,
+                                                   AlignedVector<LJCoefficients> const& ffs,
+                                                   AlignedVector<real> const& cutoffSqr,
+                                                   size_t np_types)
 {
-    using namespace vec::storage;
-
     {
         real ff1_, ff2_, cutoffSqr_;
         if (ONETYPE)
@@ -137,13 +142,13 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particleArray,
             cutoffSqr_ = cutoffSqr[0];
         }
 
-        const size_t* __restrict pa_type = particleArray.type.data();
-        const real* __restrict pa_p_x = particleArray.p_x.data();
-        const real* __restrict pa_p_y = particleArray.p_y.data();
-        const real* __restrict pa_p_z = particleArray.p_z.data();
-        real* __restrict pa_f_x = particleArray.f_x.data();
-        real* __restrict pa_f_y = particleArray.f_y.data();
-        real* __restrict pa_f_z = particleArray.f_z.data();
+        const size_t* __restrict pa_type = particles.type.data();
+        const real* __restrict pa_p_x = particles.p_x.data();
+        const real* __restrict pa_p_y = particles.p_y.data();
+        const real* __restrict pa_p_z = particles.p_z.data();
+        real* __restrict pa_f_x = particles.f_x.data();
+        real* __restrict pa_f_y = particles.f_y.data();
+        real* __restrict pa_f_z = particles.f_z.data();
 
         const auto* __restrict plist = neighborList.plist.data();
         const auto* __restrict prange = neighborList.prange.data();
