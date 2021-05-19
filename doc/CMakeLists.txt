@@ -24,7 +24,7 @@ if (SPHINX_EXECUTABLE)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 
     add_custom_target(sphinx
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${TEST_ENV} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
             DEPENDS ${SPHINX_SOURCE}/conf.py _espressopp
             )
 
