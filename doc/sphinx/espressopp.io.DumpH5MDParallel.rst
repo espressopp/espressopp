@@ -16,6 +16,17 @@ Dumping a simulation with ``espressopp.io.DumpH5MDParallel``
     dump_h5md_parallel = espressopp.io.DumpH5MDParallel(system, 'dump.h5')
     dump_h5md_parallel.dump()
 
+**ATTENTION**
+
+Only V=const (NVT, NVE) simulation are dumped correctly since we do not save box
+dimensions at every simulation step.
+
+Configuration
+^^^^^^^^^^^^^
+
+  * ``dump*`` controls which properties are saved to file.
+  * ``*Dataset`` controls the dataset name within the file of the corresponding property.
+
 
 Restore Simulation
 ------------------
@@ -36,3 +47,9 @@ Restoring a simulation with ``espressopp.io.RestoreH5MDParallel``
  *  Particles are inserted equally among the processes without obeying subdomains.
     You have to call ``decompose`` to ensure particles are located on the correct
     process after restoration.
+
+Configuration
+^^^^^^^^^^^^^
+
+  * ``restore*`` controls which properties are loaded from file.
+  * ``*Dataset`` controls the dataset name within the file of the corresponding property.
