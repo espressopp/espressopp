@@ -30,6 +30,7 @@ input to an ESPResSo++ simulation.
 
 import math
 
+
 def read(file):
     """ Read ESPResSo data files.
 
@@ -55,28 +56,27 @@ def read(file):
         f = open(file)
         for line in f:
             if line.strip() == "":
-                continue # skip empty lines
+                continue  # skip empty lines
 
             # read variables
             if line[1:9] == 'variable':
                 variable = True
-                continue # goto next line
+                continue  # goto next line
 
-            if variable == True:
+            if variable:
                 if line.strip() == "}":  # reached the end of variable section
                     variable = False
                     continue
 
-                line = line.replace('{','').replace('}','')
+                line = line.replace('{', '').replace('}', '')
                 tmp = line.split()
                 if tmp[0] == "box_l":
                     Lx, Ly, Lz = list(map(float, [tmp[1], tmp[2], tmp[3]]))
-                continue # goto next line
-
+                continue  # goto next line
 
             # read particle properties
             if line[1:10] == 'particles':
-                line = line.replace('}','')
+                line = line.replace('}', '')
                 tmp = line[12:len(line)].split()
                 particles = True
                 for prop in tmp:
@@ -92,53 +92,52 @@ def read(file):
                         props.append(prop)
                     if prop == "f":
                         props.append(prop)
-                continue # goto next line
+                continue  # goto next line
 
             # read particle data
-            if particles == True:
+            if particles:
                 if line.strip() == "}":  # reached the end of particles section
                     particles = False
                     continue
 
-                line = line.replace('{','').replace('}','')
+                line = line.replace('{', '').replace('}', '')
                 tmp = line.split()
                 index = -1
                 for prop in props:
-                    index = index+1
+                    index = index + 1
                     if prop == "id":
                         continue
                     if prop == "pos":
                         x.append(float(tmp[index]))
-                        y.append(float(tmp[index+1]))
-                        z.append(float(tmp[index+2]))
-                        index = index+2
+                        y.append(float(tmp[index + 1]))
+                        z.append(float(tmp[index + 2]))
+                        index = index + 2
                     if prop == "type":
                         type.append(int(tmp[index]))
                     if prop == "q":
                         q.append(float(tmp[index]))
                     if prop == "v":
                         vx.append(float(tmp[index]))
-                        vy.append(float(tmp[index+1]))
-                        vz.append(float(tmp[index+2]))
-                        index = index+2
+                        vy.append(float(tmp[index + 1]))
+                        vz.append(float(tmp[index + 2]))
+                        index = index + 2
                     if prop == "f":
                         fx.append(float(tmp[index]))
-                        fy.append(float(tmp[index+1]))
-                        fz.append(float(tmp[index+2]))
-                        index = index+2
-
+                        fy.append(float(tmp[index + 1]))
+                        fz.append(float(tmp[index + 2]))
+                        index = index + 2
 
             # read bond information
             if line[1:6] == 'bonds':
                 bonds = True
-                continue # goto next line
+                continue  # goto next line
 
-            if bonds == True:
+            if bonds:
                 if line.strip() == "}":  # reached the end of bonds section
                     bonds = False
                     continue
 
-                line = line.replace('{','').replace('}','')
+                line = line.replace('{', '').replace('}', '')
                 tmp = line.split()
 
                 if len(tmp) > 2:

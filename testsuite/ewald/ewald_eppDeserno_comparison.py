@@ -35,7 +35,15 @@
 #  Deserno's results and Espresso++ implementation are printed at the end of the script.
 '''
 
-# this is an auxiliary function. It reads the results of Deserno from "deserno_ewald.dat"
+# this is an auxiliary function. It reads the results of Deserno from
+# "deserno_ewald.dat"
+from espressopp.tools import espresso_old
+from espressopp import Real3D
+import espressopp
+import mpi4py.MPI as MPI
+import sys
+
+
 def readingDesernoForcesFile():
     # forces x,y,z
     fx, fy, fz = [], [], []
@@ -47,36 +55,32 @@ def readingDesernoForcesFile():
     i = 0
     for line in file:
         # energy
-        if i==6:
+        if i == 6:
             tmp = line.split()
             energy = float(tmp[0])
 
         # forces
-        if i>=9:
-            line = line.replace('{','').replace('}','')
+        if i >= 9:
+            line = line.replace('{', '').replace('}', '')
             tmp = line.split()
             fx.append(float(tmp[0]))
             fy.append(float(tmp[1]))
             fz.append(float(tmp[2]))
 
-        i=i+1
+        i = i + 1
 
     return energy, fx, fy, fz
 # end of the function readingDesernoForcesFile
 
 
 # The script itself
-import sys
-import mpi4py.MPI as MPI
-import espressopp
 
-from espressopp import Real3D
-from espressopp.tools import espresso_old
 
 # reading the particle coordinates, charges and box size from old espressopp data file
 # file 'ini_struct_deserno.dat' contains the data we need
 print("Reading system data:")
-Lx, Ly, Lz, x, y, z, type, q, vx,vy,vz,fx,fy,fz,bondpairs = espresso_old.read('ini_struct_deserno.dat')
+Lx, Ly, Lz, x, y, z, type, q, vx, vy, vz, fx, fy, fz, bondpairs = espresso_old.read(
+    'ini_struct_deserno.dat')
 
 # creating the system box
 box = (Lx, Ly, Lz)
@@ -94,31 +98,33 @@ print("The first particle has coordinates", x[0], y[0], z[0])
 #  rspacecutoff - the cutoff in real space
 #  kspacecutoff - the cutoff in reciprocal space
 '''
-alpha          = 1.112583061
-rspacecutoff   = 4.9
-kspacecutoff   = 30
+alpha = 1.112583061
+rspacecutoff = 4.9
+kspacecutoff = 30
 
 # seting the skin for Verlet list (it is not important here)
-skin           = 0.09
+skin = 0.09
 
 # Coulomb prefactor parameters
-bjerrumlength  = 1.0
-temperature    = 1.0
+bjerrumlength = 1.0
+temperature = 1.0
 coulomb_prefactor = bjerrumlength * temperature
 
-nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rspacecutoff,skin)
-cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
-system         = espressopp.System()
-system.rng     = espressopp.esutil.RNG()
-system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
-system.skin    = skin
-system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+nodeGrid = espressopp.tools.decomp.nodeGrid(
+    MPI.COMM_WORLD.size, box, rspacecutoff, skin)
+cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
+system.skin = skin
+system.storage = espressopp.storage.DomainDecomposition(
+    system, nodeGrid, cellGrid)
 
 # Adding the particles
 props = ['id', 'pos', 'type', 'q']
 new_particles = []
 for i in range(0, num_particles):
-    part = [ i, Real3D(x[i], y[i], z[i]), type[i], q[i] ]
+    part = [i, Real3D(x[i], y[i], z[i]), type[i], q[i]]
     new_particles.append(part)
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
@@ -126,7 +132,7 @@ system.storage.decompose()
 ## potential and interaction ##
 
 # setting the Verlet list
-vl = espressopp.VerletList(system, rspacecutoff+skin)
+vl = espressopp.VerletList(system, rspacecutoff + skin)
 
 # the R space part of electrostatic interaction according to the Ewald method
 '''
@@ -135,11 +141,12 @@ vl = espressopp.VerletList(system, rspacecutoff+skin)
   It is based on the Coulomb prefactor (coulomb_prefactor), Ewald parameter (alpha),
   and the cutoff in R space (rspacecutoff)
 '''
-coulombR_pot = espressopp.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
+coulombR_pot = espressopp.interaction.CoulombRSpace(
+    coulomb_prefactor, alpha, rspacecutoff)
 # creating the interaction based on the Verlet list
 coulombR_int = espressopp.interaction.VerletListCoulombRSpace(vl)
 # setting the potential for the interaction between particles of type 0 and 0
-coulombR_int.setPotential(type1=0, type2=0, potential = coulombR_pot)
+coulombR_int.setPotential(type1=0, type2=0, potential=coulombR_pot)
 # adding the interaction to the system
 system.addInteraction(coulombR_int)
 
@@ -150,14 +157,17 @@ system.addInteraction(coulombR_int)
   It is based on the system information (system), Coulomb prefactor (coulomb_prefactor),
   Ewald parameter (alpha), and the cutoff in K space (kspacecutoff)
 '''
-ewaldK_pot = espressopp.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alpha, kspacecutoff)
-# creating the interaction based on the Cell list for all particle interaction and potential in K space
-ewaldK_int = espressopp.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
+ewaldK_pot = espressopp.interaction.CoulombKSpaceEwald(
+    system, coulomb_prefactor, alpha, kspacecutoff)
+# creating the interaction based on the Cell list for all particle
+# interaction and potential in K space
+ewaldK_int = espressopp.interaction.CellListCoulombKSpaceEwald(
+    system.storage, ewaldK_pot)
 # adding the interaction to the system
 system.addInteraction(ewaldK_int)
 
 # creating the integrator which based on the Verlet algorithm
-integrator    = espressopp.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 # seting the time step (it is not important here)
 integrator.dt = 0.0001
 
@@ -174,14 +184,14 @@ format1 = '%3s %20s %20s %20s %10s %20s %25s %25s\n'
 print((format1 % ('id', 'fx', 'fy', 'fz', ' ', 'dfx', 'dfy', 'dfz')))
 format2 = '%3d %3s %3.17f %3s %3.17f %3s %3.17f %10s %3.17f %3s %3.17f %3s %3.17f'
 for j in range(0, num_particles):
-    print((format2 % (j, ' ', \
-                         system.storage.getParticle(j).f.x, ' ', \
-                         system.storage.getParticle(j).f.y, ' ', \
-                         system.storage.getParticle(j).f.z, \
-                         ' ', \
-                         abs(system.storage.getParticle(j).f.x-forceX_Deserno[j]), ' ', \
-                         abs(system.storage.getParticle(j).f.y-forceY_Deserno[j]), ' ', \
-                         abs(system.storage.getParticle(j).f.z-forceZ_Deserno[j])) ))
+    print((format2 % (j, ' ',
+                         system.storage.getParticle(j).f.x, ' ',
+                         system.storage.getParticle(j).f.y, ' ',
+                         system.storage.getParticle(j).f.z,
+                         ' ',
+                         abs(system.storage.getParticle(j).f.x - forceX_Deserno[j]), ' ',
+                         abs(system.storage.getParticle(j).f.y - forceY_Deserno[j]), ' ',
+                         abs(system.storage.getParticle(j).f.z - forceZ_Deserno[j]))))
 
 # calculating the R space part of electrostatic energy
 enR = coulombR_int.computeEnergy()
@@ -191,6 +201,8 @@ enK = ewaldK_int.computeEnergy()
 enTot = enR + enK
 
 # printing the total energy and the difference with Deserno results
-print('\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno))
+print(
+    '\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' %
+     (enTot, enTot - energy_Deserno))
 
 sys.exit()

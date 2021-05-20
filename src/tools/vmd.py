@@ -27,34 +27,35 @@ import struct
 import espressopp
 
 IMD_HANDSHAKE = 4
-IMDVERSION    = 2
+IMDVERSION = 2
 
 IMD_DISCONNECT, \
-IMD_ENERGIES,   \
-IMD_FCOORDS,    \
-IMD_GO,         \
-IMD_HANDSHAKE,  \
-IMD_KILL,       \
-IMD_MDCOMM,     \
-IMD_PAUSE,      \
-IMD_TRATE,      \
-IMD_IOERROR = list(range(10))
+    IMD_ENERGIES,   \
+    IMD_FCOORDS,    \
+    IMD_GO,         \
+    IMD_HANDSHAKE,  \
+    IMD_KILL,       \
+    IMD_MDCOMM,     \
+    IMD_PAUSE,      \
+    IMD_TRATE,      \
+    IMD_IOERROR = list(range(10))
+
 
 def handshake(initsock):
     print("before")
     (sock, sock_port) = initsock.accept()
     print("after")
     header = struct.Struct('!II')
-    msg    = header.pack(IMD_HANDSHAKE, IMDVERSION)
+    msg = header.pack(IMD_HANDSHAKE, IMDVERSION)
     sock.send(msg)
     res = []
     cnt = 100
     while len(res) == 0 and cnt > 0:
-        res = select.select([sock],[],[],0)[0]
+        res = select.select([sock], [], [], 0)[0]
         cnt -= 1
         time.sleep(0.1)
     if len(res) == 1:
-        msg = struct.unpack('!II',sock.recv(8))
+        msg = struct.unpack('!II', sock.recv(8))
         if msg[0] == IMD_GO:
             print("VMD sent IMD_GO")
             return sock
@@ -65,16 +66,18 @@ def handshake(initsock):
         print("VMD did not answer.")
         return 0
 
+
 def drain_socket(sock):
-    res = select.select([sock],[],[],0)[0]
+    res = select.select([sock], [], [], 0)[0]
     while len(res) > 0:
-        buf  = sock.recv(8)
+        buf = sock.recv(8)
         bufl = len(buf)
         if bufl == 0:
             break
         # msg = struct.unpack('B'*bufl,buf)
-        res = select.select([sock],[],[],0)[0]
+        res = select.select([sock], [], [], 0)[0]
     return
+
 
 def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
     """Connects to the VMD.
@@ -88,27 +91,31 @@ def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
       :returns: Socket to the VMD.
 
     """
-    espressopp.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)
-    if pqrfile==True:
+    espressopp.tools.psfwrite(
+        "vmd.psf",
+        system,
+        molsize=molsize,
+        maxdist=system.bc.boxL[0] / 2)
+    if pqrfile:
         espressopp.tools.pqrwrite("vmd.pqr", system, molsize=molsize)
     else:
         espressopp.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
     initsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
     hostname = socket.gethostname()
-    port     = 10000
+    port = 10000
     while port < 65000:
         try:
             initsock.bind((hostname, port))
             initsock.listen(1)
             break
-        except:
+        except BaseException:
             port += 1
     if port == 65000:
         print("no free port for vmd socket found.")
         return initsock
 
-    vmdfile = open("vmd.tcl","w")
-    if pqrfile == True:
+    vmdfile = open("vmd.tcl", "w")
+    if pqrfile:
         vmdfile.write("mol load psf vmd.psf pqr vmd.pqr\n")
     else:
         vmdfile.write("mol load psf vmd.psf pdb vmd.pdb\n")
@@ -148,10 +155,11 @@ def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
 
     return sock
 
+
 def imd_positions(system, sock, folded=True):
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
-    count  = 0
-    pid    = 0
+    count = 0
+    pid = 0
     coords = struct.pack('')
     while pid <= maxParticleID:
         if system.storage.particleExists(pid):
@@ -159,12 +167,13 @@ def imd_positions(system, sock, folded=True):
             if folded:
                 p = particle.pos
             else:
-                p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
+                p = system.bc.getUnfoldedPosition(
+                    particle.pos, particle.imageBox)
             coords += struct.pack('!fff', p[0], p[1], p[2])
-            count  += 1
-            pid    += 1
+            count += 1
+            pid += 1
         else:
-            pid    += 1
-    header = struct.pack('!II',IMD_FCOORDS,count)
-    msg    = header + coords
+            pid += 1
+    header = struct.pack('!II', IMD_FCOORDS, count)
+    msg = header + coords
     sock.send(msg)

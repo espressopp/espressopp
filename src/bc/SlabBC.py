@@ -56,21 +56,25 @@ from espressopp import toReal3D
 from espressopp.bc.BC import *
 from _espressopp import bc_SlabBC
 
+
 class SlabBCLocal(BCLocal, bc_SlabBC):
     def __init__(self, rng, boxL=1.0):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
+        if not (pmi._PMIComm and pmi._PMIComm.isActive(
+        )) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             cxxinit(self, bc_SlabBC, rng, toReal3D(boxL))
 
     # override length property
     def setBoxL(self, boxL):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.boxL.fset(self, toReal3D(boxL))
 
     boxL = property(bc_SlabBC.boxL.fget, setBoxL)
 
-if pmi.isController :
+
+if pmi.isController:
     class SlabBC(BC):
         pmiproxydefs = dict(
-            cls =  'espressopp.bc.SlabBCLocal',
-            pmiproperty = [ 'boxL' ]
-            )
+            cls='espressopp.bc.SlabBCLocal',
+            pmiproperty=['boxL']
+        )

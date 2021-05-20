@@ -252,17 +252,39 @@ from espressopp import Int3D
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_LatticeBoltzmann
 
+
 class LatticeBoltzmannLocal(ExtensionLocal, integrator_LatticeBoltzmann):
     def __init__(self, system, nodeGrid,
-                 a = 1., tau = 1., numDims = 3, numVels = 19):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+                 a=1., tau=1., numDims=3, numVels=19):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LatticeBoltzmann,
                     system, nodeGrid, a, tau, numDims, numVels)
 
-if pmi.isController :
+
+if pmi.isController:
     class LatticeBoltzmann(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-                            cls = 'espressopp.integrator.LatticeBoltzmannLocal',
-                            pmiproperty = ['nodeGrid', 'a', 'tau', 'numDims', 'numVels', 'visc_b', 'visc_s', 'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff', 'nSteps', 'profStep', 'getMyNi'],
-                            pmicall = ["getLBMom","setLBMom","saveLBConf","keepLBDump"]
-                            )
+            cls='espressopp.integrator.LatticeBoltzmannLocal',
+            pmiproperty=[
+                'nodeGrid',
+                'a',
+                'tau',
+                'numDims',
+                'numVels',
+                'visc_b',
+                'visc_s',
+                'gamma_b',
+                'gamma_s',
+                'gamma_odd',
+                'gamma_even',
+                'lbTemp',
+                'fricCoeff',
+                'nSteps',
+                'profStep',
+                'getMyNi'],
+            pmicall=[
+                "getLBMom",
+                "setLBMom",
+                "saveLBConf",
+                "keepLBDump"])

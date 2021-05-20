@@ -141,8 +141,10 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
     def observe_triple(self, ftl, name, particle_group='atoms'):
         if pmi.workerIsActive():
             self.cxxclass.observe_triple(self, ftl)
-            g = pyh5md.element(self.connectivity, name, store='time', maxshape=(None, 3), shape=(self.chunk_size, 3),
-                               dtype=self.h5md_file.int_type, fillvalue=-1)
+            g = pyh5md.element(
+                self.connectivity, name, store='time', maxshape=(
+                    None, 3), shape=(
+                    self.chunk_size, 3), dtype=self.h5md_file.int_type, fillvalue=-1)
             g.attrs['particle_group'] = particle_group
             self.triple_data[self.triple_index] = g
             self.triple_index += 1
@@ -168,8 +170,9 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             NMaxLocal = np.array(len(bonds), 'i')
             NMaxGlobal = np.array(0, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
-            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
-            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            size_per_cpu = (
+                (NMaxGlobal // self.chunk_size) + 1) * self.chunk_size
+            total_size = MPI.COMM_WORLD.size * size_per_cpu
             # Prepares Dataset.
             g = pyh5md.element(
                 self.connectivity,
@@ -180,7 +183,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                 shape=(total_size, 2))
             g.attrs['particle_group'] = particle_group
             # Calculates index per cpu.
-            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_0 = MPI.COMM_WORLD.rank * size_per_cpu
             idx_1 = idx_0 + NMaxLocal
             # Writes data.
             g[idx_0:idx_1] = bonds
@@ -191,8 +194,9 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             NMaxLocal = np.array(len(triplets), 'i')
             NMaxGlobal = np.array(0, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
-            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
-            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            size_per_cpu = (
+                (NMaxGlobal // self.chunk_size) + 1) * self.chunk_size
+            total_size = MPI.COMM_WORLD.size * size_per_cpu
             g = pyh5md.element(
                 self.connectivity,
                 name,
@@ -201,7 +205,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                 fillvalue=-1,
                 shape=(total_size, 3))
             g.attrs['particle_group'] = particle_group
-            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_0 = MPI.COMM_WORLD.rank * size_per_cpu
             idx_1 = idx_0 + NMaxLocal
             g[idx_0:idx_1] = triplets
 
@@ -211,8 +215,9 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             NMaxLocal = np.array(len(quadruplets), 'i')
             NMaxGlobal = np.array(0, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
-            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
-            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            size_per_cpu = (
+                (NMaxGlobal // self.chunk_size) + 1) * self.chunk_size
+            total_size = MPI.COMM_WORLD.size * size_per_cpu
             g = pyh5md.element(
                 self.connectivity,
                 name,
@@ -221,7 +226,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                 fillvalue=-1,
                 shape=(total_size, 4))
             g.attrs['particle_group'] = particle_group
-            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_0 = MPI.COMM_WORLD.rank * size_per_cpu
             idx_1 = idx_0 + NMaxLocal
             g[idx_0:idx_1] = quadruplets
 
@@ -230,7 +235,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
         if pmi.workerIsActive():
             raw_data = self.cxxclass.get_data(self)
             step_data = {}
-            max_sizes = [0, 0, 0] # {2: 0, 3: 0, 4: 0}
+            max_sizes = [0, 0, 0]  # {2: 0, 3: 0, 4: 0}
             while raw_data != []:
                 step = raw_data.pop()
                 fpl_idx = raw_data.pop()
@@ -254,36 +259,44 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                         b4 = raw_data.pop()
                         data.append((b1, b2, b3, b4))
                     else:
-                        raise RuntimeError('Wrong fpl_type: {}'.format(fpl_type))
-                max_sizes[fpl_type-2] = max(len(data), max_sizes[fpl_type-2])
+                        raise RuntimeError(
+                            'Wrong fpl_type: {}'.format(fpl_type))
+                max_sizes[fpl_type -
+                          2] = max(len(data), max_sizes[fpl_type - 2])
                 if step not in step_data:
                     step_data[step] = {}
                 if fpl_type not in step_data[step]:
                     step_data[step][fpl_type] = {}
-                step_data[step][fpl_type][fpl_idx] = np.array(data, dtype=self.h5md_file.int_type)
+                step_data[step][fpl_type][fpl_idx] = np.array(
+                    data, dtype=self.h5md_file.int_type)
 
             MPI.COMM_WORLD.Barrier()
 
             NMaxLocal = np.array(max_sizes, 'i')
             NMaxGlobal = np.zeros(3, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
-            cpu_size = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
-            total_size = MPI.COMM_WORLD.size*cpu_size
-            idx_0 = MPI.COMM_WORLD.rank*cpu_size
+            cpu_size = ((NMaxGlobal // self.chunk_size) + 1) * self.chunk_size
+            total_size = MPI.COMM_WORLD.size * cpu_size
+            idx_0 = MPI.COMM_WORLD.rank * cpu_size
             idx_1 = idx_0 + NMaxLocal
             for step in sorted(step_data):
                 for fpl_type in step_data[step]:
                     for fpl_idx in step_data[step][fpl_type]:
                         data = step_data[step][fpl_type][fpl_idx]
-                        if data.shape[0] < NMaxLocal[fpl_type-2]:
+                        if data.shape[0] < NMaxLocal[fpl_type - 2]:
                             old_shape = data.shape
                             if len(data):
-                                linear_data = data.reshape((old_shape[0]*old_shape[1],))
+                                linear_data = data.reshape(
+                                    (old_shape[0] * old_shape[1],))
                             else:
                                 linear_data = data
-                            data = np.pad(linear_data, (0, fpl_type*NMaxLocal[fpl_type-2]-linear_data.shape[0]),
-                                          'constant', constant_values=-1)
-                            data = data.reshape((NMaxLocal[fpl_type-2], fpl_type))
+                            data = np.pad(linear_data, (0, fpl_type *
+                                                        NMaxLocal[fpl_type -
+                                                                  2] -
+                                                        linear_data.shape[0]), 'constant', constant_values=-
+                                          1)
+                            data = data.reshape(
+                                (NMaxLocal[fpl_type - 2], fpl_type))
                         if fpl_type == 2:
                             ds = self.tuple_data[fpl_idx]
                         elif fpl_type == 3:
@@ -291,18 +304,28 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                         elif fpl_type == 4:
                             ds = self.quadruple_data[fpl_idx]
                         else:
-                            raise RuntimeError('Wrong fpl_type: {}'.format(fpl_type))
-                        if total_size[fpl_type-2] > ds.value.shape[1]:
-                            ds.value.resize(total_size[fpl_type-2], axis=1)
-                        ds.append(data, step, step*self.dt, region=(idx_0[fpl_type-2], idx_1[fpl_type-2]))
+                            raise RuntimeError(
+                                'Wrong fpl_type: {}'.format(fpl_type))
+                        if total_size[fpl_type - 2] > ds.value.shape[1]:
+                            ds.value.resize(total_size[fpl_type - 2], axis=1)
+                        ds.append(data, step, step * self.dt,
+                                  region=(idx_0[fpl_type - 2], idx_1[fpl_type - 2]))
             self.cxxclass.clear_buffer(self)
+
 
 if pmi.isController:
     class DumpTopology(ParticleAccess, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.io.DumpTopologyLocal',
-            pmicall=['dump', 'clear_buffer', 'observe_tuple', 'observe_triple', 'observe_quadruple', 'update',
-                     'add_static_tuple', 'add_static_triple', 'add_static_quadruple'],
+            pmicall=[
+                'dump',
+                'clear_buffer',
+                'observe_tuple',
+                'observe_triple',
+                'observe_quadruple',
+                'update',
+                'add_static_tuple',
+                'add_static_triple',
+                'add_static_quadruple'],
             pmiproperty=[],
-            pmiinvoke=['get_data']
-        )
+            pmiinvoke=['get_data'])

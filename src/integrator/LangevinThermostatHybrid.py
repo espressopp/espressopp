@@ -24,7 +24,7 @@
 espressopp.integrator.LangevinThermostatHybrid
 **********************************************
 
-As LangevinThermostat, but for use in AdResS systems, to allow the application of different thermostat friction constants (:math:`\gamma`) to different AdResS regions. Uses three values of :math:`\gamma`, one for the atomistic region, one for the hybrid region, and one for the coarse-grained region.
+As LangevinThermostat, but for use in AdResS systems, to allow the application of different thermostat friction constants (:math:`\\gamma`) to different AdResS regions. Uses three values of :math:`\\gamma`, one for the atomistic region, one for the hybrid region, and one for the coarse-grained region.
 
   >>> # create FixedTupleList object
   >>> ftpl = espressopp.FixedTupleListAdress(system.storage)
@@ -61,15 +61,23 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinThermostatHybrid
 
-class LangevinThermostatHybridLocal(ExtensionLocal, integrator_LangevinThermostatHybrid):
+
+class LangevinThermostatHybridLocal(
+        ExtensionLocal,
+        integrator_LangevinThermostatHybrid):
     def __init__(self, system, fixedtuplelist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_LangevinThermostatHybrid, system,fixedtuplelist)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_LangevinThermostatHybrid,
+                system,
+                fixedtuplelist)
 
 
-if pmi.isController :
+if pmi.isController:
     class LangevinThermostatHybrid(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LangevinThermostatHybridLocal',
-            pmiproperty = [ 'gamma', 'gammahy','gammacg','temperature' ]
-            )
+            cls='espressopp.integrator.LangevinThermostatHybridLocal',
+            pmiproperty=['gamma', 'gammahy', 'gammacg', 'temperature']
+        )

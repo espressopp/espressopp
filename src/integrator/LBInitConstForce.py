@@ -45,16 +45,23 @@ from espressopp import pmi
 from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_ConstForce
 
+
 class LBInitConstForceLocal(LBInitLocal, integrator_LBInit_ConstForce):
     def __init__(self, system, latticeboltzmann):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_LBInit_ConstForce, system, latticeboltzmann)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_LBInit_ConstForce,
+                system,
+                latticeboltzmann)
 
-if pmi.isController :
+
+if pmi.isController:
     class LBInitConstForce(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LBInitConstForceLocal',
-            pmicall = [
-                       "setForce",
-                       "addForce"]
-            )
+            cls='espressopp.integrator.LBInitConstForceLocal',
+            pmicall=[
+                "setForce",
+                "addForce"]
+        )

@@ -29,15 +29,17 @@ espressopp.esutil.Grid
 from espressopp import pmi
 from _espressopp import esutil_Grid
 
+
 class GridLocal(esutil_Grid):
     pass
+
 
 if pmi.isController:
     class Grid(metaclass=pmi.Proxy):
         'Grid class'
         pmiproxydefs = dict(
-            cls = 'espressopp.esutil.GridLocal',
-            localcall = [ 'mapIndexToPosition' ]
+            cls='espressopp.esutil.GridLocal',
+            localcall=['mapIndexToPosition']
             #localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
             #pmicall = [ 'seed' ]
         )

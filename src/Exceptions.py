@@ -45,57 +45,67 @@ espressopp.Exceptions
                 :param msg:
                 :type msg:
 """
-import sys, traceback
+import sys
+import traceback
+
 
 class Error(Exception):
 
-
     def __init__(self, msg):
         try:
             raise Exception
-        except:
+        except BaseException:
             file, lineno, module, line = traceback.extract_stack()[0]
-            self.msg = 'ERROR while executing ' + str(file) + ' line ' + str(lineno) + ': ' + str(line) + '\n-> ' + msg
-    def __str__(self) :
+            self.msg = 'ERROR while executing ' + \
+                str(file) + ' line ' + str(lineno) + ': ' + str(line) + '\n-> ' + msg
+
+    def __str__(self):
         return self.msg
-    def __repr__(self) :
+
+    def __repr__(self):
         return str(self)
+
 
 class ParticleDoesNotExistHere(Exception):
 
-
     def __init__(self, msg):
         try:
             raise Exception
-        except:
+        except BaseException:
             self.msg = msg
-    def __str__(self) :
+
+    def __str__(self):
         return self.msg
-    def __repr__(self) :
+
+    def __repr__(self):
         return str(self)
+
 
 class UnknownParticleProperty(Exception):
 
-
     def __init__(self, msg):
         try:
             raise Exception
-        except:
+        except BaseException:
             self.msg = msg
-    def __str__(self) :
+
+    def __str__(self):
         return self.msg
-    def __repr__(self) :
+
+    def __repr__(self):
         return str(self)
+
 
 class MissingFixedPairList(Exception):
 
-
     def __init__(self, msg):
         try:
             raise Exception
-        except:
+        except BaseException:
             self.msg = msg
-    def __str__(self) :
+
+    def __str__(self):
         return self.msg
-    def __repr__(self) :
+
+    def __repr__(self):
         return str(self)

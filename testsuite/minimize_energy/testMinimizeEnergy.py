@@ -36,16 +36,18 @@ class TestMinimizeEnergy(unittest.TestCase):
     def setUp(self):
 
         system = espressopp.System()
-        box=(10,10,10)
+        box = (10, 10, 10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
 
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
-        system.storage = espressopp.storage.DomainDecomposition(system,nodeGrid,cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.3)
+        system.storage = espressopp.storage.DomainDecomposition(
+            system, nodeGrid, cellGrid)
         self.system = system
-
 
     def test_no_potential(self):
         particle_list = [
@@ -54,9 +56,10 @@ class TestMinimizeEnergy(unittest.TestCase):
         ]
         self.system.storage.addParticles(particle_list, 'id', 'pos', 'mass')
         self.system.storage.decompose()
-        minimize_energy = espressopp.integrator.MinimizeEnergy(self.system, 0.001, 0.0, 0.001)
+        minimize_energy = espressopp.integrator.MinimizeEnergy(
+            self.system, 0.001, 0.0, 0.001)
         minimize_energy.run(10)
-        self.assertEqual(minimize_energy.f_max, 0.0);
+        self.assertEqual(minimize_energy.f_max, 0.0)
 
     def test_potential(self):
         particle_list = [
@@ -69,7 +72,8 @@ class TestMinimizeEnergy(unittest.TestCase):
             self.system, gamma=0.00001, ftol=1.0, max_displacement=0.001)
 
         vl = espressopp.VerletList(self.system, cutoff=2.5)
-        lj = espressopp.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.5)
+        lj = espressopp.interaction.LennardJones(
+            sigma=1.0, epsilon=1.0, cutoff=2.5)
         interaction = espressopp.interaction.VerletListLennardJones(vl)
         interaction.setPotential(type1=0, type2=0, potential=lj)
         self.system.addInteraction(interaction)

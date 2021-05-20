@@ -90,50 +90,69 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombTruncated, \
-                      interaction_VerletListCoulombTruncated, \
-                      interaction_FixedPairListTypesCoulombTruncated
+    interaction_VerletListCoulombTruncated, \
+    interaction_FixedPairListTypesCoulombTruncated
+
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
     def __init__(self, prefactor=1.0, cutoff=infinity):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CoulombTruncated, prefactor, cutoff)
 
-class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
+
+class VerletListCoulombTruncatedLocal(
+        InteractionLocal,
+        interaction_VerletListCoulombTruncated):
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombTruncated, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListTypesCoulombTruncated):
+
+class FixedPairListTypesCoulombTruncatedLocal(
+        InteractionLocal,
+        interaction_FixedPairListTypesCoulombTruncated):
     def __init__(self, system, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListTypesCoulombTruncated, system, vl)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListTypesCoulombTruncated,
+                system,
+                vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
+
 
 if pmi.isController:
     class CoulombTruncated(Potential):
         'The CoulombTruncated potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.CoulombTruncatedLocal',
-            pmiproperty = ['prefactor', 'alpha']
-            )
+            cls='espressopp.interaction.CoulombTruncatedLocal',
+            pmiproperty=['prefactor', 'alpha']
+        )
+
     class VerletListCoulombTruncated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListCoulombTruncatedLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListCoulombTruncatedLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
+
     class FixedPairListTypesCoulombTruncated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListTypesCoulombTruncatedLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListTypesCoulombTruncatedLocal',
+            pmicall=['setPotential'])

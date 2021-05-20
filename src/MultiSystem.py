@@ -72,6 +72,7 @@ from espressopp.esutil import cxxinit
 from espressopp import pmi
 import mpi4py.MPI as MPI
 
+
 class MultiSystemLocal(object):
     """Local MultiSystem to simulate and analyze several systems in parallel."""
 
@@ -107,34 +108,47 @@ class MultiSystemLocal(object):
 
     def runAnalysisTemperature(self):
         if self.groupRank == 0:
-            return self.analysisTemperature.cxxclass.compute(self.analysisTemperature)
-        else :
+            return self.analysisTemperature.cxxclass.compute(
+                self.analysisTemperature)
+        else:
             self.analysisTemperature.cxxclass.compute(self.analysisTemperature)
 
     def runAnalysisPotential(self):
         if self.groupRank == 0:
-            return self.analysisPotential.cxxclass.computeEnergy(self.analysisPotential)
-        else :
-            self.analysisPotential.cxxclass.computeEnergy(self.analysisPotential)
+            return self.analysisPotential.cxxclass.computeEnergy(
+                self.analysisPotential)
+        else:
+            self.analysisPotential.cxxclass.computeEnergy(
+                self.analysisPotential)
 
     def runAnalysisNPart(self):
         if self.groupRank == 0:
             return int(self.analysisNPart.cxxclass.compute(self.analysisNPart))
-        else :
+        else:
             self.analysisNPart.cxxclass.compute(self.analysisNPart)
 
     def runDumpConfXYZ(self):
         if self.groupRank == 0:
             return self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
-        else :
+        else:
             self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
 
-if pmi.isController :
+
+if pmi.isController:
     class MultiSystem(metaclass=pmi.Proxy):
         """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
         pmiproxydefs = dict(
-            cls =  'espressopp.MultiSystemLocal',
-            pmicall = [ 'setIntegrator', 'runIntegrator', 'setAnalysisTemperature', 'beginSystemDefinition',
-                        'setAnalysisPotential','setAnalysisNPart', 'setDumpConfXYZ'],
-            pmiinvoke = [ 'runAnalysisTemperature', 'runAnalysisPotential','runAnalysisNPart','runDumpConfXYZ' ]
-            )
+            cls='espressopp.MultiSystemLocal',
+            pmicall=[
+                'setIntegrator',
+                'runIntegrator',
+                'setAnalysisTemperature',
+                'beginSystemDefinition',
+                'setAnalysisPotential',
+                'setAnalysisNPart',
+                'setDumpConfXYZ'],
+            pmiinvoke=[
+                'runAnalysisTemperature',
+                'runAnalysisPotential',
+                'runAnalysisNPart',
+                'runDumpConfXYZ'])

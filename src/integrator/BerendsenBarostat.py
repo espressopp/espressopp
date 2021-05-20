@@ -120,6 +120,7 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_BerendsenBarostat
 
+
 class BerendsenBarostatLocal(ExtensionLocal, integrator_BerendsenBarostat):
     def __init__(self, system):
 
@@ -127,9 +128,10 @@ class BerendsenBarostatLocal(ExtensionLocal, integrator_BerendsenBarostat):
                 pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_BerendsenBarostat, system)
 
+
 if pmi.isController:
     class BerendsenBarostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.BerendsenBarostatLocal',
-          pmiproperty = [ 'tau', 'pressure', 'fixed' ]
+            cls='espressopp.integrator.BerendsenBarostatLocal',
+            pmiproperty=['tau', 'pressure', 'fixed']
         )

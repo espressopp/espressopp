@@ -47,6 +47,11 @@ Stolen and modified from
 http://code.activestate.com/recipes/412717/ and
 http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
 """
+from espressopp.esutil.Grid import *
+from espressopp.esutil.GammaVariate import *
+from espressopp.esutil.NormalVariate import *
+from espressopp.esutil.UniformOnSphere import *
+from espressopp.esutil.RNG import *
 from espressopp import pmi
 
 if pmi.isController:
@@ -58,13 +63,6 @@ else:
 
 pmiimport('espressopp.esutil')
 
-from espressopp.esutil.RNG import *
-from espressopp.esutil.UniformOnSphere import *
-from espressopp.esutil.NormalVariate import *
-from espressopp.esutil.GammaVariate import *
-
-from espressopp.esutil.Grid import *
-
 
 class ExtendBaseClass(type):
     def __new__(self, name, bases, dict):
@@ -73,20 +71,22 @@ class ExtendBaseClass(type):
 
         theClass = bases[0]
         # loop over all items in the class and replace it
-        for k,v in dict.iteritems():
+        for k, v in dict.iteritems():
             setattr(theClass, k, v)
         return theClass
 
-def choose(val, altval) :
-    if (val is None) :
+
+def choose(val, altval):
+    if (val is None):
         return altval
-    else :
+    else:
         return val
 
+
 def cxxinit(obj, cls, *args, **kwds):
-#     # check whether the class is a boost.python class
-#     if not issubclass(cls, type):
-#         raise TypeError('cxxinit requires a class input argument.')
+    #     # check whether the class is a boost.python class
+    #     if not issubclass(cls, type):
+    #         raise TypeError('cxxinit requires a class input argument.')
     if not hasattr(obj, 'cxxclass'):
         obj.cxxclass = cls
         cls.__init__(obj, *args, **kwds)

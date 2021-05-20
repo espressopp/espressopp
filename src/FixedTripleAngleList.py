@@ -73,13 +73,14 @@ import _espressopp
 #import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
 
+class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
 
     def __init__(self, storage):
 
-        #if pmi.workerIsActive():
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        # if pmi.workerIsActive():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, _espressopp.FixedTripleAngleList, storage)
 
     def add(self, pid1, pid2, pid3):
@@ -110,6 +111,7 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
             return triples
 
     'returns the list of (pid1, pid2, pid3, angle(123))'
+
     def getTriplesAngles(self):
 
         if pmi.workerIsActive():
@@ -120,17 +122,18 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
         if pmi.workerIsActive():
             return self.cxxclass.getAngle(self, pid1, pid2, pid3)
 
+
 if pmi.isController:
     class FixedTripleAngleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedTripleAngleListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addTriples" ],
-            pmiinvoke = ["getTriples", "getTriplesAngles", "size"]
+            cls='espressopp.FixedTripleAngleListLocal',
+            localcall=["add"],
+            pmicall=["addTriples"],
+            pmiinvoke=["getTriples", "getTriplesAngles", "size"]
         )
 
-    def getAngle(self, pid1, pid2, pid3 ):
-        angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
+    def getAngle(self, pid1, pid2, pid3):
+        angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3)
         for i in angles:
-            if( i != -1 ):
+            if(i != -1):
                 return i

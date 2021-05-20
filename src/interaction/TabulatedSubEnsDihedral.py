@@ -88,34 +88,53 @@ from espressopp.esutil import *
 from espressopp.interaction.DihedralPotential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TabulatedSubEnsDihedral, \
-                        interaction_FixedQuadrupleListTabulatedSubEnsDihedral, \
-                        interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral
+    interaction_FixedQuadrupleListTabulatedSubEnsDihedral, \
+    interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral
 
 
-class TabulatedSubEnsDihedralLocal(DihedralPotentialLocal, interaction_TabulatedSubEnsDihedral):
+class TabulatedSubEnsDihedralLocal(
+        DihedralPotentialLocal,
+        interaction_TabulatedSubEnsDihedral):
 
     def __init__(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedSubEnsDihedral)
 
-class FixedQuadrupleListTabulatedSubEnsDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTabulatedSubEnsDihedral):
+
+class FixedQuadrupleListTabulatedSubEnsDihedralLocal(
+        InteractionLocal, interaction_FixedQuadrupleListTabulatedSubEnsDihedral):
 
     def __init__(self, system, fql, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedQuadrupleListTabulatedSubEnsDihedral, system, fql, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListTabulatedSubEnsDihedral,
+                system,
+                fql,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
-class FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral):
+
+class FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal(
+        InteractionLocal, interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral):
     def __init__(self, system, fql):
         if pmi.workerIsActive():
-            cxxinit(self, interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral, system, fql)
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListTypesTabulatedSubEnsDihedral,
+                system,
+                fql)
 
     def setPotential(self, type1, type2, type3, type4, potential):
         if pmi.workerIsActive():
-            self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+            self.cxxclass.setPotential(
+                self, type1, type2, type3, type4, potential)
 
     def getPotential(self, type1, type2, type3, type4):
         if pmi.workerIsActive():
@@ -129,27 +148,43 @@ class FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal(InteractionLocal, inte
         if pmi.workerIsActive():
             return self.cxxclass.getFixedQuadrupleList(self)
 
+
 if pmi.isController:
     class TabulatedSubEnsDihedral(DihedralPotential):
         'The TabulatedSubEnsDihedral potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.TabulatedSubEnsDihedralLocal',
-            pmicall = ['weight_get', 'weight_set',
-                       'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
-                                       'colVarSd_get', 'colVarSd_set',
-                                       'dimension_get', 'filenames_get', 'filename_get',
-                                       'filename_set', 'addInteraction', 'colVarRefs_get',
-                                       'colVarRef_get']
-            )
+            cls='espressopp.interaction.TabulatedSubEnsDihedralLocal',
+            pmicall=[
+                'weight_get',
+                'weight_set',
+                'alpha_get',
+                'alpha_set',
+                'targetProb_get',
+                'targetProb_set',
+                'colVarSd_get',
+                'colVarSd_set',
+                'dimension_get',
+                'filenames_get',
+                'filename_get',
+                'filename_set',
+                'addInteraction',
+                'colVarRefs_get',
+                'colVarRef_get'])
 
-    class FixedQuadrupleListTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
+    class FixedQuadrupleListTabulatedSubEnsDihedral(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedralLocal',
-            pmicall = ['setPotential', 'getFixedQuadrupleList']
-            )
+            cls='espressopp.interaction.FixedQuadrupleListTabulatedSubEnsDihedralLocal',
+            pmicall=[
+                'setPotential',
+                'getFixedQuadrupleList'])
 
-    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(Interaction, metaclass=pmi.Proxy):
+    class FixedQuadrupleListTypesTabulatedSubEnsDihedral(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal',
-            pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
-        )
+            cls='espressopp.interaction.FixedQuadrupleListTypesTabulatedSubEnsDihedralLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedQuadrupleList',
+                'getFixedQuadrupleList'])

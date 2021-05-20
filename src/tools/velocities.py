@@ -24,7 +24,13 @@
 import random
 
 
-def gaussian(T, N, particle_mass=None, zero_momentum=True, seed=7654321, kb=1.0):
+def gaussian(
+        T,
+        N,
+        particle_mass=None,
+        zero_momentum=True,
+        seed=7654321,
+        kb=1.0):
     """Generates velocities with temperature T according to a Maxwell-Boltzmann distribution.
 
     Args:
@@ -41,7 +47,7 @@ def gaussian(T, N, particle_mass=None, zero_momentum=True, seed=7654321, kb=1.0)
 
     random.seed(seed)
 
-    boltzmann_factor = kb*T
+    boltzmann_factor = kb * T
     E_kin = 0.0
 
     vx = []
@@ -53,24 +59,24 @@ def gaussian(T, N, particle_mass=None, zero_momentum=True, seed=7654321, kb=1.0)
             mass = particle_mass[i]
         else:
             mass = 1.0
-        sd = (boltzmann_factor/mass)**0.5
+        sd = (boltzmann_factor / mass)**0.5
 
-        v_x = sd*random.gauss(0.0, 1.0)
-        E_kin += 0.5*mass*v_x*v_x
+        v_x = sd * random.gauss(0.0, 1.0)
+        E_kin += 0.5 * mass * v_x * v_x
         vx.append(v_x)
 
-        v_y = sd*random.gauss(0.0, 1.0)
-        E_kin += 0.5*mass*v_y*v_y
+        v_y = sd * random.gauss(0.0, 1.0)
+        E_kin += 0.5 * mass * v_y * v_y
         vy.append(v_y)
 
-        v_z = sd*random.gauss(0.0, 1.0)
-        E_kin += 0.5*mass*v_z*v_z
+        v_z = sd * random.gauss(0.0, 1.0)
+        E_kin += 0.5 * mass * v_z * v_z
         vz.append(v_z)
 
     # Scale the temperature
-    local_temp = (2.0*E_kin)/(3*N*kb)
+    local_temp = (2.0 * E_kin) / (3 * N * kb)
     if local_temp > 0:
-        temp_scale = (T/local_temp)**0.5
+        temp_scale = (T / local_temp)**0.5
         for i in range(N):
             vx[i] *= temp_scale
             vy[i] *= temp_scale

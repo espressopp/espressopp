@@ -65,8 +65,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedTripleListLocal(_espressopp.FixedTripleList):
 
+class FixedTripleListLocal(_espressopp.FixedTripleList):
 
     def __init__(self, storage):
 
@@ -118,11 +118,12 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
             triples = self.cxxclass.getTriples(self)
             return triples
 
+
 if pmi.isController:
     class FixedTripleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedTripleListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addTriples","remove" ],
-            pmiinvoke = ["getTriples", "size"]
+            cls='espressopp.FixedTripleListLocal',
+            localcall=["add"],
+            pmicall=["addTriples", "remove"],
+            pmiinvoke=["getTriples", "size"]
         )

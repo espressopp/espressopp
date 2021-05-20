@@ -100,19 +100,34 @@ from espressopp import pmi
 
 from _espressopp import integrator_MinimizeEnergy
 
+
 class MinimizeEnergyLocal(integrator_MinimizeEnergy):
-    def __init__(self, system, gamma, ftol, max_displacement, variable_step_flag=False):
+    def __init__(
+            self,
+            system,
+            gamma,
+            ftol,
+            max_displacement,
+            variable_step_flag=False):
         if pmi.workerIsActive():
-            cxxinit(self, integrator_MinimizeEnergy, system, gamma, ftol*ftol, max_displacement, variable_step_flag)
+            cxxinit(
+                self,
+                integrator_MinimizeEnergy,
+                system,
+                gamma,
+                ftol * ftol,
+                max_displacement,
+                variable_step_flag)
 
     def run(self, niter, verbose=False):
         if pmi.workerIsActive():
             return self.cxxclass.run(self, niter, verbose)
 
+
 if pmi.isController:
     class MinimizeEnergy(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.MinimizeEnergyLocal',
-            pmiproperty = ('f_max', 'displacement', 'step'),
-            pmicall = ('run', )
+            cls='espressopp.integrator.MinimizeEnergyLocal',
+            pmiproperty=('f_max', 'displacement', 'step'),
+            pmicall=('run', )
         )

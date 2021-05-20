@@ -41,12 +41,14 @@ from _espressopp import analysis_KineticEnergy
 
 class KineticEnergyLocal(ObservableLocal, analysis_KineticEnergy):
     """The (local) compute of potential energy."""
+
     def __init__(self, system, temperature=None):
         if pmi.workerIsActive():
             if temperature is None:
                 cxxinit(self, analysis_KineticEnergy, system)
             else:
                 cxxinit(self, analysis_KineticEnergy, system, temperature)
+
 
 if pmi.isController:
     class KineticEnergy(Observable, metaclass=pmi.Proxy):

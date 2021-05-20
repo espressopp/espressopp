@@ -38,10 +38,10 @@ espressopp.integrator.Extension
 from espressopp import pmi
 from _espressopp import integrator_Extension
 
+
 class ExtensionLocal(object):
 
-
-    #def __init__(self, integrator):
+    # def __init__(self, integrator):
     #    if pmi.workerIsActive():
     #        cxxinit(self, integrator)
 
@@ -49,7 +49,7 @@ class ExtensionLocal(object):
     #        if (center != []):
     #            self.cxxclass.setCenter(self, center[0], center[1], center[2])
 
-    #def addForce(self, itype, filename, type):
+    # def addForce(self, itype, filename, type):
     #        """
     #        Each processor takes the broadcasted interpolation type,
     #        filename and particle type
@@ -59,14 +59,16 @@ class ExtensionLocal(object):
 
     def connect(self):
         return self.cxxclass.connect(self)
+
     def disconnect(self):
         return self.cxxclass.disconnect(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class Extension(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             #cls =  'espressopp.integrator.Extension',
-            pmiproperty = [ 'type'],
+            pmiproperty=['type'],
             #pmicall = ['addForce']
-            pmicall = [ 'connect', 'disconnect' ]
+            pmicall=['connect', 'disconnect']
         )

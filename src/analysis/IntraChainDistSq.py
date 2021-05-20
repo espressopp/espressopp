@@ -42,17 +42,21 @@ from espressopp import pmi
 from espressopp.analysis.AllParticlePos import *
 from _espressopp import analysis_IntraChainDistSq
 
+
 class IntraChainDistSqLocal(AllParticlePosLocal, analysis_IntraChainDistSq):
 
     def __init__(self, system, fpl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_IntraChainDistSq, system, fpl)
+
     def compute(self):
         return self.cxxclass.compute(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class IntraChainDistSq(AllParticlePos, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.IntraChainDistSqLocal',
-            pmicall = [ "compute" ]
-            )
+            cls='espressopp.analysis.IntraChainDistSqLocal',
+            pmicall=["compute"]
+        )

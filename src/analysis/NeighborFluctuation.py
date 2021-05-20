@@ -38,14 +38,17 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_NeighborFluctuation
 
+
 class NeighborFluctuationLocal(ObservableLocal, analysis_NeighborFluctuation):
 
     def __init__(self, system, radius):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NeighborFluctuation, system, radius)
 
-if pmi.isController :
+
+if pmi.isController:
     class NeighborFluctuation(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.NeighborFluctuationLocal'
-            )
+            cls='espressopp.analysis.NeighborFluctuationLocal'
+        )

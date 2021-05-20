@@ -57,18 +57,22 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_RadGyrXProfilePI
 
+
 class RadGyrXProfilePILocal(ObservableLocal, analysis_RadGyrXProfilePI):
     'The (local) class for computing the radius of gyration profile in x-direction of path integral ring polymers.'
+
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_RadGyrXProfilePI, system)
 
     def compute(self, bins, ntrotter, ptype):
         return self.cxxclass.compute(self, bins, ntrotter, ptype)
 
-if pmi.isController :
+
+if pmi.isController:
     class RadGyrXProfilePI(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          pmicall = [ "compute" ],
-          cls = 'espressopp.analysis.RadGyrXProfilePILocal'
+            pmicall=["compute"],
+            cls='espressopp.analysis.RadGyrXProfilePILocal'
         )

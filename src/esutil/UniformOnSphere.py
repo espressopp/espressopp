@@ -30,14 +30,16 @@ from espressopp import pmi
 
 from _espressopp import esutil_UniformOnSphere
 
+
 class UniformOnSphereLocal(esutil_UniformOnSphere):
     pass
+
 
 if pmi.isController:
     class UniformOnSphere(metaclass=pmi.Proxy):
         """A random variate that generates 3D vectors that are uniformly
         distributed on a sphere."""
         pmiproxydefs = dict(
-            cls = 'espressopp.esutil.UniformOnSphereLocal',
-            localcall = [ '__call__' ],
-            )
+            cls='espressopp.esutil.UniformOnSphereLocal',
+            localcall=['__call__'],
+        )

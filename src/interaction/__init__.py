@@ -20,72 +20,62 @@
 
 
 # -*- coding: iso-8859-1 -*-
+from espressopp.interaction.SmoothSquareWell import *
+from espressopp.interaction.ConstrainRG import *
+from espressopp.interaction.ConstrainCOM import *
+from espressopp.interaction.LennardJones93Wall import *
+from espressopp.interaction.HarmonicTrap import *
+from espressopp.interaction.SingleParticlePotential import *
+from espressopp.interaction.CoulombKSpaceP3M import *
+from espressopp.interaction.TersoffTripleTerm import *
+from espressopp.interaction.TersoffPairTerm import *
+from espressopp.interaction.StillingerWeberPairTermCapped import *
+from espressopp.interaction.StillingerWeberTripleTerm import *
+from espressopp.interaction.StillingerWeberPairTerm import *
+from espressopp.interaction.CoulombRSpace import *
+from espressopp.interaction.CoulombKSpaceEwald import *
+from espressopp.interaction.DihedralRB import *
+from espressopp.interaction.DihedralHarmonic import *
+from espressopp.interaction.DihedralHarmonicNCos import *
+from espressopp.interaction.DihedralHarmonicCos import *
+from espressopp.interaction.OPLS import *
+from espressopp.interaction.TabulatedSubEnsDihedral import *
+from espressopp.interaction.TabulatedDihedral import *
+from espressopp.interaction.DihedralPotential import *
+from espressopp.interaction.TabulatedSubEnsAngular import *
+from espressopp.interaction.TabulatedAngular import *
+from espressopp.interaction.Cosine import *
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.AngularHarmonic import *
+from espressopp.interaction.AngularCosineSquared import *
+from espressopp.interaction.MirrorLennardJones import *
+from espressopp.interaction.VSpherePair import *
+from espressopp.interaction.VSphereSelf import *
+from espressopp.interaction.Quartic import *
+from espressopp.interaction.Harmonic import *
+from espressopp.interaction.FENECapped import *
+from espressopp.interaction.FENE import *
+from espressopp.interaction.TabulatedSubEns import *
+from espressopp.interaction.Tabulated import *
+from espressopp.interaction.SoftCosine import *
+from espressopp.interaction.ReactionFieldGeneralizedTI import *
+from espressopp.interaction.ReactionFieldGeneralized import *
+from espressopp.interaction.GravityTruncated import *
+from espressopp.interaction.CoulombTruncated import *
+from espressopp.interaction.CoulombTruncatedUniqueCharge import *
+from espressopp.interaction.Morse import *
+from espressopp.interaction.LJcos import *
+from espressopp.interaction.LennardJonesGeneric import *
+from espressopp.interaction.LennardJonesSoftcoreTI import *
+from espressopp.interaction.LennardJonesGromacs import *
+from espressopp.interaction.LennardJonesExpand import *
+from espressopp.interaction.LennardJonesEnergyCapped import *
+from espressopp.interaction.LennardJonesCapped import *
+from espressopp.interaction.LennardJonesAutoBonds import *
+from espressopp.interaction.LennardJones import *
+from espressopp.interaction.Zero import *
+from espressopp.interaction.PotentialVSpherePair import *
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.interaction')
-
-from espressopp.interaction.Interaction import *
-
-from espressopp.interaction.Potential import *
-from espressopp.interaction.PotentialVSpherePair import *
-
-from espressopp.interaction.Zero import *
-from espressopp.interaction.LennardJones import *
-from espressopp.interaction.LennardJonesAutoBonds import *
-from espressopp.interaction.LennardJonesCapped import *
-from espressopp.interaction.LennardJonesEnergyCapped import *
-from espressopp.interaction.LennardJonesExpand import *
-from espressopp.interaction.LennardJonesGromacs import *
-from espressopp.interaction.LennardJonesSoftcoreTI import *
-from espressopp.interaction.LennardJonesGeneric import *
-from espressopp.interaction.LJcos import *
-from espressopp.interaction.Morse import *
-from espressopp.interaction.CoulombTruncatedUniqueCharge import *
-from espressopp.interaction.CoulombTruncated import *
-from espressopp.interaction.GravityTruncated import *
-from espressopp.interaction.ReactionFieldGeneralized import *
-from espressopp.interaction.ReactionFieldGeneralizedTI import *
-from espressopp.interaction.SoftCosine import *
-from espressopp.interaction.Tabulated import *
-from espressopp.interaction.TabulatedSubEns import *
-from espressopp.interaction.FENE import *
-from espressopp.interaction.FENECapped import *
-from espressopp.interaction.Harmonic import *
-from espressopp.interaction.Quartic import *
-from espressopp.interaction.VSphereSelf import *
-from espressopp.interaction.VSpherePair import *
-from espressopp.interaction.MirrorLennardJones import *
-
-from espressopp.interaction.AngularCosineSquared import *
-from espressopp.interaction.AngularHarmonic import *
-from espressopp.interaction.AngularPotential import *
-from espressopp.interaction.Cosine import *
-
-from espressopp.interaction.TabulatedAngular import *
-from espressopp.interaction.TabulatedSubEnsAngular import *
-
-from espressopp.interaction.DihedralPotential import *
-from espressopp.interaction.TabulatedDihedral import *
-from espressopp.interaction.TabulatedSubEnsDihedral import *
-from espressopp.interaction.OPLS import *
-from espressopp.interaction.DihedralHarmonicCos import *
-from espressopp.interaction.DihedralHarmonicNCos import *
-from espressopp.interaction.DihedralHarmonic import *
-from espressopp.interaction.DihedralRB import *
-
-from espressopp.interaction.CoulombKSpaceEwald import *
-from espressopp.interaction.CoulombRSpace import *
-from espressopp.interaction.StillingerWeberPairTerm import *
-from espressopp.interaction.StillingerWeberTripleTerm import *
-from espressopp.interaction.StillingerWeberPairTermCapped import *
-from espressopp.interaction.TersoffPairTerm import *
-from espressopp.interaction.TersoffTripleTerm import *
-
-from espressopp.interaction.CoulombKSpaceP3M import *
-
-from espressopp.interaction.SingleParticlePotential import *
-from espressopp.interaction.HarmonicTrap import *
-from espressopp.interaction.LennardJones93Wall import *
-
-from espressopp.interaction.ConstrainCOM import *
-from espressopp.interaction.ConstrainRG import *
-from espressopp.interaction.SmoothSquareWell import *

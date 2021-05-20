@@ -35,6 +35,8 @@ import os
 from espressopp import pmi
 
 # set up logging
+
+
 def _setupLogging():
     logConfigFile = "espressopp_log.conf"
     if os.path.exists(logConfigFile):
@@ -45,7 +47,9 @@ def _setupLogging():
         logging.basicConfig(
             format="%(process)d %(asctime)s %(name)s (%(filename)s::%(lineno)s,%(funcName)s) %(levelname)s: %(message)s")
         log = logging.getLogger('root')
-        log.info('Did not find log config file %s, using basic configuration.', logConfigFile)
+        log.info(
+            'Did not find log config file %s, using basic configuration.',
+            logConfigFile)
 
         # This initialization routine will change existing and future loggers
         # to make a connection with their Python logger and change their class
@@ -61,6 +65,7 @@ def _setupLogging():
         logging.addLevelName('TRACE', logging.TRACE)
         _espressopp.setLogger()
 
+
 # define pmiimport and update logging
 if pmi.isController:
     def pmiimport(module):
@@ -70,4 +75,3 @@ if pmi.isController:
 else:
     def pmiimport(module):
         pass
-

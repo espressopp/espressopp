@@ -19,9 +19,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from espressopp.bc.SlabBC import *
+from espressopp.bc.OrthorhombicBC import *
+from espressopp.bc.BC import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.bc')
-
-from espressopp.bc.BC import *
-from espressopp.bc.OrthorhombicBC import *
-from espressopp.bc.SlabBC import *

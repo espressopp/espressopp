@@ -95,47 +95,64 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_FENE, interaction_FixedPairListFENE
 
+
 class FENELocal(PotentialLocal, interaction_FENE):
 
     def __init__(self, K=30.0, r0=0.0, rMax=1.5,
                  cutoff=infinity, shift=0.0):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
             else:
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff, shift)
 
+
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
 
     def __init__(self, system, bondlist, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENE, system, bondlist, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListFENE,
+                system,
+                bondlist,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
     def setFixedPairList(self, fixedpairlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
     def getFixedPairList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
+
 
 if pmi.isController:
     class FENE(Potential):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.FENELocal',
-            pmiproperty = ['K', 'r0', 'rMax']
-            )
+            cls='espressopp.interaction.FENELocal',
+            pmiproperty=['K', 'r0', 'rMax']
+        )
 
     class FixedPairListFENE(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListFENELocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListFENELocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedPairList',
+                'getFixedPairList'])

@@ -28,6 +28,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestCaseConstrainRG(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -46,9 +47,12 @@ class TestCaseConstrainRG(unittest.TestCase):
 
     def test_constrain_rg(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,self.box, rc=1.5, skin=0.3)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, rc=1.5, skin=0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, self.box, rc=1.5, skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, rc=1.5, skin=0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
@@ -58,7 +62,15 @@ class TestCaseConstrainRG(unittest.TestCase):
             (4, 1, 0, espressopp.Real3D(5.5, 4.134, 5.0), 1.0, 0, 1.),
             (5, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -72,11 +84,12 @@ class TestCaseConstrainRG(unittest.TestCase):
         integrator.addExtension(langevin)
 
         # Harmonic bonds
-        bondlist  = espressopp.FixedPairList(self.system.storage)
+        bondlist = espressopp.FixedPairList(self.system.storage)
         for i in range(1, 5):
             bondlist.add(i, i + 1)
-        potBond = espressopp.interaction.Harmonic(K=100., r0 = 1.0)
-        interBond = espressopp.interaction.FixedPairListHarmonic(self.system, bondlist, potBond)
+        potBond = espressopp.interaction.Harmonic(K=100., r0=1.0)
+        interBond = espressopp.interaction.FixedPairListHarmonic(
+            self.system, bondlist, potBond)
         self.system.addInteraction(interBond)
 
         # constrain center of mass
@@ -86,7 +99,8 @@ class TestCaseConstrainRG(unittest.TestCase):
             tuple.append(i)
         tuplelist.addTuple(tuple)
         potRG = espressopp.interaction.ConstrainRG(2000.)
-        interRG = espressopp.interaction.FixedLocalTupleListConstrainRG(self.system, tuplelist, potRG)
+        interRG = espressopp.interaction.FixedLocalTupleListConstrainRG(
+            self.system, tuplelist, potRG)
         self.system.addInteraction(interRG, 'Constrain_RG')
 
         # radius of gyration of particles before integration
@@ -103,7 +117,7 @@ class TestCaseConstrainRG(unittest.TestCase):
             diff = []
             for j in range(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
-                x_i = x_i - round(x_i/self.L)*self.L
+                x_i = x_i - round(x_i / self.L) * self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
         for i in range(5):
@@ -123,7 +137,7 @@ class TestCaseConstrainRG(unittest.TestCase):
         integrator.run(20000)
 
         # center of mass of particles after integration
-        after= [0., 0., 0.]
+        after = [0., 0., 0.]
 
         particle = self.system.storage.getParticle(1)
         dmy_p = []
@@ -136,7 +150,7 @@ class TestCaseConstrainRG(unittest.TestCase):
             diff = []
             for j in range(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
-                x_i = x_i - round(x_i/self.L)*self.L
+                x_i = x_i - round(x_i / self.L) * self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
         for i in range(5):
@@ -153,7 +167,8 @@ class TestCaseConstrainRG(unittest.TestCase):
         print("after  Rg =", after_rg)
 
         # run checks
-        self.assertTrue(fabs((before_rg - after_rg)/before_rg) < 0.03)
+        self.assertTrue(fabs((before_rg - after_rg) / before_rg) < 0.03)
+
 
 if __name__ == '__main__':
     unittest.main()

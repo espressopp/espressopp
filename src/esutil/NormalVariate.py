@@ -36,15 +36,18 @@ from espressopp import pmi
 
 from _espressopp import esutil_NormalVariate
 
+
 class NormalVariateLocal(esutil_NormalVariate):
     def __init__(self, mean=0.0, sigma=1.0):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, esutil_NormalVariate, mean, sigma)
+
 
 if pmi.isController:
     class NormalVariate(metaclass=pmi.Proxy):
         """A random normal variate."""
         pmiproxydefs = dict(
-            cls = 'espressopp.esutil.NormalVariateLocal',
-            localcall = [ '__call__' ],
-            )
+            cls='espressopp.esutil.NormalVariateLocal',
+            localcall=['__call__'],
+        )

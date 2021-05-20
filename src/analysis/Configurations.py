@@ -92,27 +92,50 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_Configurations
 
+
 class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
 
-    def __init__(self, system, pos=True, vel=False, force=False, radius=False, folded=True):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_Configurations, system, pos, vel, force, radius, folded)
+    def __init__(
+            self,
+            system,
+            pos=True,
+            vel=False,
+            force=False,
+            radius=False,
+            folded=True):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                analysis_Configurations,
+                system,
+                pos,
+                vel,
+                force,
+                radius,
+                folded)
+
     def gather(self):
         return self.cxxclass.gather(self)
+
     def clear(self):
         return self.cxxclass.clear(self)
+
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+
     def __next__(self):
         return self.cxxclass.all(self).next()
+
     def back(self):
         return self.cxxclass.back(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class Configurations(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.ConfigurationsLocal',
-            pmicall = [ "gather", "clear", "back" ],
-            localcall = ["__getitem__", "__iter__", "__next__"],
-            pmiproperty = ["capacity", "size"]
-            )
+            cls='espressopp.analysis.ConfigurationsLocal',
+            pmicall=["gather", "clear", "back"],
+            localcall=["__getitem__", "__iter__", "__next__"],
+            pmiproperty=["capacity", "size"]
+        )

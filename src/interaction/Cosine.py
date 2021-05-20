@@ -56,36 +56,50 @@ from espressopp.interaction.AngularPotential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_Cosine, interaction_FixedTripleListCosine
 
+
 class CosineLocal(AngularPotentialLocal, interaction_Cosine):
 
     def __init__(self, K=1.0, theta0=0.0):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Cosine, K, theta0)
 
-class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCosine):
+
+class FixedTripleListCosineLocal(
+        InteractionLocal,
+        interaction_FixedTripleListCosine):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListCosine, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedTripleListCosine,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getFixedTripleList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedTripleList(self)
+
 
 if pmi.isController:
     class Cosine(AngularPotential):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.CosineLocal',
-            pmiproperty = ['K', 'theta0']
-            )
+            cls='espressopp.interaction.CosineLocal',
+            pmiproperty=['K', 'theta0']
+        )
 
     class FixedTripleListCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedTripleListCosineLocal',
-            pmicall = ['setPotential','getFixedTripleList']
-            )
+            cls='espressopp.interaction.FixedTripleListCosineLocal',
+            pmicall=['setPotential', 'getFixedTripleList']
+        )

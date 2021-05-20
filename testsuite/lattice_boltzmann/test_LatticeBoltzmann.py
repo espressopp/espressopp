@@ -33,14 +33,17 @@ initDen = 1.
 initVel = 0.
 initVelSin = 0.1
 
+
 class TestPureLB(unittest.TestCase):
     def setUp(self):
         # set up system
         temperature = 1.0
         runSteps = 600
 
-        system, integrator = espressopp.standard_system.LennardJones(0, box=(Nx, Ny, Nz), temperature=temperature)
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        system, integrator = espressopp.standard_system.LennardJones(
+            0, box=(Nx, Ny, Nz), temperature=temperature)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
 
         # set up LB fluid
         lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
@@ -58,7 +61,7 @@ class TestPureLB(unittest.TestCase):
 
         # set initial populations
         global initDen, initVel
-        initPop = espressopp.integrator.LBInitPopUniform(self.system,self.lb)
+        initPop = espressopp.integrator.LBInitPopUniform(self.system, self.lb)
         initPop.createDenVel(initDen, Real3D(initVel))
 
         self.integrator.run(self.runSteps)
@@ -70,14 +73,14 @@ class TestPureLB(unittest.TestCase):
 
         # set initial populations
         global initDen, initVel, initVelSin
-        initPop = espressopp.integrator.LBInitPopWave(self.system,self.lb)
+        initPop = espressopp.integrator.LBInitPopWave(self.system, self.lb)
         initPop.createDenVel(initDen, Real3D(initVel, initVel, initVelSin))
 
         # set temperature
         self.lb.lbTemp = self.temperature
         self.integrator.run(self.runSteps)
 
-        self.check_averages(initVel) # sin-like wave is killed by temperature
+        self.check_averages(initVel)  # sin-like wave is killed by temperature
 
     def check_averages(self, _v):
         # variables to hold average density and mass flux
@@ -89,14 +92,14 @@ class TestPureLB(unittest.TestCase):
         myNi = self.lb.getMyNi
         area_yz = (myNi[1] - 2 * halo) * (myNi[2] - 2 * halo)
 
-        for i in range (halo, myNi[0]-halo):
-            for j in range (halo, myNi[1]-halo):
-                for k in range (halo, myNi[2]-halo):
-                    av_den += self.lb.getLBMom(Int3D(i,j,k), 0)
+        for i in range(halo, myNi[0] - halo):
+            for j in range(halo, myNi[1] - halo):
+                for k in range(halo, myNi[2] - halo):
+                    av_den += self.lb.getLBMom(Int3D(i, j, k), 0)
 
-                    jx = self.lb.getLBMom(Int3D(i,j,k), 1)
-                    jy = self.lb.getLBMom(Int3D(i,j,k), 2)
-                    jz = self.lb.getLBMom(Int3D(i,j,k), 3)
+                    jx = self.lb.getLBMom(Int3D(i, j, k), 1)
+                    jy = self.lb.getLBMom(Int3D(i, j, k), 2)
+                    jz = self.lb.getLBMom(Int3D(i, j, k), 3)
                     av_j += Real3D(jx, jy, jz)
             av_den /= area_yz
             av_j /= area_yz
@@ -110,6 +113,7 @@ class TestPureLB(unittest.TestCase):
 
             av_den = 0.
             av_j = Real3D(0.)
+
 
 if __name__ == '__main__':
     unittest.main()

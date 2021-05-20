@@ -24,12 +24,23 @@ import espressopp.tools
 from espressopp.interaction.Morse import *
 from espressopp import Real3D, infinity
 
-class Test0Morse(espressopp.tools.TestCase) :
-    def test0Energy(self) :
-        morse=Morse(epsilon=1.0, alpha=1.0, rMin=2.0)
+
+class Test0Morse(espressopp.tools.TestCase):
+    def test0Energy(self):
+        morse = Morse(epsilon=1.0, alpha=1.0, rMin=2.0)
         self.assertAlmostEqual(morse.computeEnergy(2.0), -1.0)
         self.assertAlmostEqual(morse.computeEnergy(1.0, 0.0, 0.0), 1.95249244)
-        self.assertAlmostEqual((morse.computeForce(1.0, 0.0, 0.0) - Real3D(0.0, 0.0, 0.0)).sqr(), 87.2645291)
+        self.assertAlmostEqual(
+            (morse.computeForce(
+                1.0,
+                0.0,
+                0.0) -
+                Real3D(
+                0.0,
+                0.0,
+                0.0)).sqr(),
+            87.2645291)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -39,8 +39,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedTupleListLocal(_espressopp.FixedTupleList):
 
+class FixedTupleListLocal(_espressopp.FixedTupleList):
 
     def __init__(self, storage):
 
@@ -52,19 +52,17 @@ class FixedTupleListLocal(_espressopp.FixedTupleList):
         if pmi.workerIsActive():
             return self.cxxclass.addTuple(self, tuplelist)"""
 
-
     def size(self):
 
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
 
-
 if pmi.isController:
     class FixedTupleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedTupleListLocal',
+            cls='espressopp.FixedTupleListLocal',
             #localcall = [ "add" ],
-            pmicall = [ "addTuple", "getTuples" ],
-            pmiinvoke = ["size"]
+            pmicall=["addTuple", "getTuples"],
+            pmiinvoke=["size"]
         )

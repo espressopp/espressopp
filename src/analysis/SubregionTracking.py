@@ -59,20 +59,37 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_SubregionTracking
 
+
 class SubregionTrackingLocal(ObservableLocal, analysis_SubregionTracking):
     'The (local) class for computing the number of particles that are present in a specified subregion of the system and that belong to a specified group of particles.'
+
     def __init__(self, system, span, geometry, center, pidlist):
-        if geometry not in ['spherical', 'bounded-x', 'bounded-y', 'bounded-z']:
-            raise ValueError('Error: Geometry must be in ["spherical", "bounded-x", "bounded-y", "bounded-z"]. Your input: {}'.format(geometry))
+        if geometry not in [
+            'spherical',
+            'bounded-x',
+            'bounded-y',
+                'bounded-z']:
+            raise ValueError(
+                'Error: Geometry must be in ["spherical", "bounded-x", "bounded-y", "bounded-z"]. Your input: {}'.format(geometry))
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            geometrydict = {'spherical': 0, 'bounded-x': 1, 'bounded-y': 2, 'bounded-z': 3}
-            cxxinit(self, analysis_SubregionTracking, system, span, geometrydict[geometry])
+            geometrydict = {
+                'spherical': 0,
+                'bounded-x': 1,
+                'bounded-y': 2,
+                'bounded-z': 3}
+            cxxinit(
+                self,
+                analysis_SubregionTracking,
+                system,
+                span,
+                geometrydict[geometry])
             self.cxxclass.setCenter(self, center[0], center[1], center[2])
             for pid in pidlist:
                 self.cxxclass.addPID(self, pid)
 
-if pmi.isController :
+
+if pmi.isController:
     class SubregionTracking(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls = 'espressopp.analysis.SubregionTrackingLocal'
+            cls='espressopp.analysis.SubregionTrackingLocal'
         )

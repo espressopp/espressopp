@@ -63,18 +63,22 @@ from espressopp import pmi
 from espressopp.integrator.LatticeBoltzmann import *
 from _espressopp import integrator_LBInit
 
-class LBInitLocal(integrator_LBInit):
-    def createDenVel(self,rho0,u0):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.createDenVel(self,rho0,u0)
-    def setForce(self,force):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setForce(self,force)
-    def addForce(self,force):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.addForce(self,force)
 
-if pmi.isController :
+class LBInitLocal(integrator_LBInit):
+    def createDenVel(self, rho0, u0):
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.createDenVel(self, rho0, u0)
+
+    def setForce(self, force):
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setForce(self, force)
+
+    def addForce(self, force):
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.addForce(self, force)
+
+
+if pmi.isController:
     class LBInit(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            )
+        )

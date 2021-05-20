@@ -56,30 +56,42 @@ import mpi4py.MPI as MPI
 
 from espressopp.storage.Storage import *
 
+
 class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
 
     def __init__(self, system, nodeGrid, cellGrid, halfCellInt):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid, halfCellInt)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                storage_DomainDecomposition,
+                system,
+                nodeGrid,
+                cellGrid,
+                halfCellInt)
 
     def getCellGrid(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getCellGrid(self)
 
     def getNodeGrid(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getNodeGrid(self)
+
 
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(
-          cls = 'espressopp.storage.DomainDecompositionLocal',
-          pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust']
+            cls='espressopp.storage.DomainDecompositionLocal',
+            pmicall=['getCellGrid', 'getNodeGrid', 'cellAdjust']
         )
+
         def __init__(self, system,
                      nodeGrid='auto',
                      cellGrid='auto',
-                     halfCellInt = 'auto',
+                     halfCellInt='auto',
                      nocheck=False):
             # do sanity checks for the system first
             if nocheck:
@@ -92,14 +104,14 @@ if pmi.isController:
                     else:
                         nodeGrid = toInt3DFromVector(nodeGrid)
                     if cellGrid == 'auto':
-                        cellGrid = Int3D(2,2,2)
+                        cellGrid = Int3D(2, 2, 2)
                     else:
                         cellGrid = toInt3DFromVector(cellGrid)
                     if halfCellInt == 'auto':
                         halfCellInt = 1
                     # minimum image convention check:
                     for k in range(3):
-                        if nodeGrid[k]*cellGrid[k] == 1 :
+                        if nodeGrid[k] * cellGrid[k] == 1:
                             print(("Warning! cellGrid[{}] has been "
                                    "adjusted to 2 (was={})".format(k, cellGrid[k])))
                             cellGrid[k] = 2

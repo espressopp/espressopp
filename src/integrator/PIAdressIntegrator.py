@@ -349,24 +349,55 @@ from _espressopp import integrator_PIAdressIntegrator
 
 import numpy as np
 
-class PIAdressIntegratorLocal(MDIntegratorLocal, integrator_PIAdressIntegrator):
+
+class PIAdressIntegratorLocal(
+        MDIntegratorLocal,
+        integrator_PIAdressIntegrator):
     'The (local) PIAdress Integrator.'
-    def __init__(self, system, verletlist, timestep = 0.0, sSteps = 1, mSteps = 1, nTrotter = 32, realKinMass = True, constKinMass = False, temperature = 2.494353, gamma = 1.0, centroidThermostat = True, CMDparameter = 1.0, PILE = True, PILElambda = 0.5, CLmassmultiplier = 100.0, speedup = True, KTI = False):
+
+    def __init__(
+            self,
+            system,
+            verletlist,
+            timestep=0.0,
+            sSteps=1,
+            mSteps=1,
+            nTrotter=32,
+            realKinMass=True,
+            constKinMass=False,
+            temperature=2.494353,
+            gamma=1.0,
+            centroidThermostat=True,
+            CMDparameter=1.0,
+            PILE=True,
+            PILElambda=0.5,
+            CLmassmultiplier=100.0,
+            speedup=True,
+            KTI=False):
         if mSteps <= 0 or sSteps <= 0:
-            raise ValueError('mSteps and sSteps must be larger than zero. Your inputs: mSteps={}, sSteps={}'.format(mSteps, sSteps))
+            raise ValueError(
+                'mSteps and sSteps must be larger than zero. Your inputs: mSteps={}, sSteps={}'.format(
+                    mSteps, sSteps))
         if nTrotter <= 0 or nTrotter % 2 != 0:
-            raise ValueError('nTrotter must be even and larger than zero. Your input: {}'.format(nTrotter))
+            raise ValueError(
+                'nTrotter must be even and larger than zero. Your input: {}'.format(nTrotter))
         if temperature < 0.0:
-            raise ValueError('temperature must be larger or equal zero. Your input: {}'.format(temperature))
+            raise ValueError(
+                'temperature must be larger or equal zero. Your input: {}'.format(temperature))
         if gamma < 0.0:
-            raise ValueError('gamma must be larger or equal zero. Your input: {}'.format(gamma))
+            raise ValueError(
+                'gamma must be larger or equal zero. Your input: {}'.format(gamma))
         if CMDparameter <= 0.0:
-            raise ValueError('CMDparameter must be larger than zero. Your input: {}'.format(CMDparameter))
+            raise ValueError(
+                'CMDparameter must be larger than zero. Your input: {}'.format(CMDparameter))
         if PILElambda < 0.0:
-            raise ValueError('PILElambda must be larger or equal zero. Your input: {}'.format(PILElambda))
+            raise ValueError(
+                'PILElambda must be larger or equal zero. Your input: {}'.format(PILElambda))
         if CLmassmultiplier <= 0.0:
-            raise ValueError('CLmassmultiplier must be larger than zero. Your input: {}'.format(CLmassmultiplier))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'CLmassmultiplier must be larger than zero. Your input: {}'.format(CLmassmultiplier))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_PIAdressIntegrator, system, verletlist)
             self.setTimeStep(timestep)
             self.setsStep(sSteps)
@@ -385,197 +416,331 @@ class PIAdressIntegratorLocal(MDIntegratorLocal, integrator_PIAdressIntegrator):
             self.setKTI(KTI)
 
     def setTimeStep(self, timestep):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setTimeStep(self, timestep)
 
     def getTimeStep(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getTimeStep(self)
 
     def setsStep(self, sSteps):
         if sSteps <= 0:
-            raise ValueError('sSteps must be larger than zero. Your input: {}'.format(sSteps))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'sSteps must be larger than zero. Your input: {}'.format(sSteps))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setsStep(self, sSteps)
 
     def getsStep(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getsStep(self)
 
     def setmStep(self, mSteps):
         if mSteps <= 0:
-            raise ValueError('mSteps must be larger than zero. Your input: {}'.format(mSteps))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'mSteps must be larger than zero. Your input: {}'.format(mSteps))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setmStep(self, mSteps)
 
     def getmStep(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getmStep(self)
 
     def setNtrotter(self, nTrotter):
         if nTrotter <= 0:
-            raise ValueError('nTrotter must be larger than zero. Your input: {}'.format(nTrotter))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'nTrotter must be larger than zero. Your input: {}'.format(nTrotter))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setNtrotter(self, nTrotter)
 
             # Calculate eigenvalues of the normal mode transformation
-            for i in range(0,nTrotter):
-                self.cxxclass.addEigenValues(self, 4.0*np.sin(np.pi*i/nTrotter)*np.sin(np.pi*i/nTrotter))
+            for i in range(0, nTrotter):
+                self.cxxclass.addEigenValues(
+                    self,
+                    4.0 *
+                    np.sin(
+                        np.pi *
+                        i /
+                        nTrotter) *
+                    np.sin(
+                        np.pi *
+                        i /
+                        nTrotter))
 
-            # Calculate the transformation matrix of the normal mode transformation
+            # Calculate the transformation matrix of the normal mode
+            # transformation
             transposed_eigenvectors = []
-            for k in range(1,nTrotter+1):
+            for k in range(1, nTrotter + 1):
                 vector = []
-                for i in range(0,nTrotter):
+                for i in range(0, nTrotter):
                     if i == 0:
-                        self.cxxclass.addEVcomponent(self, 1.0/np.sqrt(nTrotter))
-                    if i != 0 and i < nTrotter/2:
-                        self.cxxclass.addEVcomponent(self, np.sqrt(2.0/nTrotter) * np.cos(2.0*np.pi*k*i/nTrotter))
-                    if i == nTrotter/2:
-                        self.cxxclass.addEVcomponent(self, (1.0/np.sqrt(nTrotter)) * ((-1.0)**k))
-                    if i > nTrotter/2:
-                        self.cxxclass.addEVcomponent(self, np.sqrt(2.0/nTrotter) * np.sin(2.0*np.pi*k*i/nTrotter))
+                        self.cxxclass.addEVcomponent(
+                            self, 1.0 / np.sqrt(nTrotter))
+                    if i != 0 and i < nTrotter / 2:
+                        self.cxxclass.addEVcomponent(
+                            self,
+                            np.sqrt(
+                                2.0 /
+                                nTrotter) *
+                            np.cos(
+                                2.0 *
+                                np.pi *
+                                k *
+                                i /
+                                nTrotter))
+                    if i == nTrotter / 2:
+                        self.cxxclass.addEVcomponent(
+                            self, (1.0 / np.sqrt(nTrotter)) * ((-1.0)**k))
+                    if i > nTrotter / 2:
+                        self.cxxclass.addEVcomponent(
+                            self,
+                            np.sqrt(
+                                2.0 /
+                                nTrotter) *
+                            np.sin(
+                                2.0 *
+                                np.pi *
+                                k *
+                                i /
+                                nTrotter))
                 self.cxxclass.addTransposedEigenVector(self)
             self.cxxclass.transp(self)
 
     def getNtrotter(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getNtrotter(self)
 
     def setTemperature(self, temperature):
         if temperature < 0.0:
-            raise ValueError('temperature must be larger or equal zero. Your input: {}'.format(temperature))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'temperature must be larger or equal zero. Your input: {}'.format(temperature))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setTemperature(self, temperature)
 
     def getTemperature(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getTemperature(self)
 
     def setGamma(self, gamma):
         if gamma < 0.0:
-            raise ValueError('gamma must be larger or equal zero. Your input: {}'.format(gamma))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'gamma must be larger or equal zero. Your input: {}'.format(gamma))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setGamma(self, gamma)
 
     def getGamma(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getGamma(self)
 
     def setCMDparameter(self, CMDparameter):
         if CMDparameter <= 0.0:
-            raise ValueError('CMDparameter must be larger than zero. Your input: {}'.format(CMDparameter))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'CMDparameter must be larger than zero. Your input: {}'.format(CMDparameter))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setCMDparameter(self, CMDparameter)
 
     def getCMDparameter(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getCMDparameter(self)
 
     def setPILElambda(self, PILElambda):
         if PILElambda < 0.0:
-            raise ValueError('PILElambda must be larger or equal zero. Your input: {}'.format(PILElambda))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'PILElambda must be larger or equal zero. Your input: {}'.format(PILElambda))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPILElambda(self, PILElambda)
 
     def getPILElambda(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPILElambda(self)
 
     def setClmassmultiplier(self, CLmassmultiplier):
         if CLmassmultiplier <= 0.0:
-            raise ValueError('CLmassmultiplier must be larger than zero. Your input: {}'.format(CLmassmultiplier))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'CLmassmultiplier must be larger than zero. Your input: {}'.format(CLmassmultiplier))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setClmassmultiplier(self, CLmassmultiplier)
 
     def getClmassmultiplier(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getClmassmultiplier(self)
 
     def setSpeedup(self, speedup):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setSpeedup(self, speedup)
 
     def getSpeedup(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getSpeedup(self)
 
     def setKTI(self, KTI):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setKTI(self, KTI)
 
     def getKTI(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getKTI(self)
 
     def setCentroidThermostat(self, centroidThermostat):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setCentroidThermostat(self, centroidThermostat)
 
     def getCentroidThermostat(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getCentroidThermostat(self)
 
     def setPILE(self, PILE):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPILE(self, PILE)
 
     def getPILE(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPILE(self)
 
     def setRealKinMass(self, realKinMass):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setRealKinMass(self, realKinMass)
 
     def getRealKinMass(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getRealKinMass(self)
 
     def setConstKinMass(self, constKinMass):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setConstKinMass(self, constKinMass)
 
     def getConstKinMass(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getConstKinMass(self)
 
     def setVerletList(self, verletlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setVerletList(self, verletlist)
 
     def getVerletList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
     def computeRingEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeRingEnergy(self)
 
     def computeRingEnergyRaw(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeRingEnergyRaw(self)
 
     def computeKineticEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeKineticEnergy(self)
 
     def computePositionDrift(self, parttype):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computePositionDrift(self, parttype)
 
     def computeMomentumDrift(self, parttype):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeMomentumDrift(self, parttype)
 
     def getVerletlistBuilds(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletlistBuilds(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class PIAdressIntegrator(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.PIAdressIntegratorLocal',
-          pmiproperty = ['timestep', 'sSteps', 'mSteps', 'nTrotter', 'gamma', 'CMDparameter', 'PILElambda', 'temperature', 'CLmassmultiplier', 'speedup', 'KTI', 'constKinMass', 'verletList', 'centroidThermostat', 'PILE', 'realKinMass', 'verletlistBuilds' ],
-          pmicall = ['setTimeStep', 'setmStep', 'setsStep', 'setNtrotter', 'setTemperature', 'setGamma', 'setCMDparameter', 'setPILElambda', 'setClmassmultiplier', 'setSpeedup', 'setKTI', 'setPILE', 'setRealKinMass', 'setCentroidThermostat', 'setConstKinMass', 'setVerletList', 'computeKineticEnergy', 'computeRingEnergy', 'computeRingEnergyRaw', 'computeMomentumDrift', 'computePositionDrift', 'getTimeStep', 'getmStep', 'getsStep', 'getNtrotter', 'getTemperature', 'getGamma', 'getCMDparameter', 'getPILElambda', 'getClmassmultiplier', 'getSpeedup', 'getKTI', 'getPILE', 'getRealKinMass', 'getCentroidThermostat', 'getConstKinMass', 'getVerletList', 'getVerletlistBuilds']
-        )
+            cls='espressopp.integrator.PIAdressIntegratorLocal',
+            pmiproperty=[
+                'timestep',
+                'sSteps',
+                'mSteps',
+                'nTrotter',
+                'gamma',
+                'CMDparameter',
+                'PILElambda',
+                'temperature',
+                'CLmassmultiplier',
+                'speedup',
+                'KTI',
+                'constKinMass',
+                'verletList',
+                'centroidThermostat',
+                'PILE',
+                'realKinMass',
+                'verletlistBuilds'],
+            pmicall=[
+                'setTimeStep',
+                'setmStep',
+                'setsStep',
+                'setNtrotter',
+                'setTemperature',
+                'setGamma',
+                'setCMDparameter',
+                'setPILElambda',
+                'setClmassmultiplier',
+                'setSpeedup',
+                'setKTI',
+                'setPILE',
+                'setRealKinMass',
+                'setCentroidThermostat',
+                'setConstKinMass',
+                'setVerletList',
+                'computeKineticEnergy',
+                'computeRingEnergy',
+                'computeRingEnergyRaw',
+                'computeMomentumDrift',
+                'computePositionDrift',
+                'getTimeStep',
+                'getmStep',
+                'getsStep',
+                'getNtrotter',
+                'getTemperature',
+                'getGamma',
+                'getCMDparameter',
+                'getPILElambda',
+                'getClmassmultiplier',
+                'getSpeedup',
+                'getKTI',
+                'getPILE',
+                'getRealKinMass',
+                'getCentroidThermostat',
+                'getConstKinMass',
+                'getVerletList',
+                'getVerletlistBuilds'])

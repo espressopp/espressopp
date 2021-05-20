@@ -37,15 +37,24 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_VelocityVerletOnRadius
 
-class VelocityVerletOnRadiusLocal(ExtensionLocal, integrator_VelocityVerletOnRadius):
+
+class VelocityVerletOnRadiusLocal(
+        ExtensionLocal,
+        integrator_VelocityVerletOnRadius):
 
     def __init__(self, system, dampingmass):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_VelocityVerletOnRadius, system, dampingmass)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_VelocityVerletOnRadius,
+                system,
+                dampingmass)
 
-if pmi.isController :
+
+if pmi.isController:
     class VelocityVerletOnRadius(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.VelocityVerletOnRadiusLocal',
-            pmiproperty = [ 'radialDampingMass' ]
-            )
+            cls='espressopp.integrator.VelocityVerletOnRadiusLocal',
+            pmiproperty=['radialDampingMass']
+        )

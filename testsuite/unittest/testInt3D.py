@@ -22,8 +22,9 @@
 import unittest
 from espressopp import *
 
-class Test0Int3D(unittest.TestCase) :
-    def test0Create(self) :
+
+class Test0Int3D(unittest.TestCase):
+    def test0Create(self):
         'Test the creation of Int3D instances.'
         x = Int3D()
         self.assertEqual(x[0], 0)
@@ -55,23 +56,23 @@ class Test0Int3D(unittest.TestCase) :
         self.assertRaises(TypeError, Int3D, (1, 2))
         self.assertRaises(TypeError, Int3D, (1, 2, 3, 4))
 
-    def test1OutOfRange(self) :
+    def test1OutOfRange(self):
         'Test out-of-range Int3D element access.'
         v = Int3D()
         self.assertRaises(IndexError, v.__getitem__, -1)
         self.assertRaises(IndexError, v.__getitem__, 3)
 
-    def test2SetItem(self) :
+    def test2SetItem(self):
         'Test setting Int3D elements.'
-        x = Int3D();
-        x[0] = 1;
-        x[1] = 2;
-        x[2] = 3;
+        x = Int3D()
+        x[0] = 1
+        x[1] = 2
+        x[2] = 3
         self.assertEqual(x[0], 1)
         self.assertEqual(x[1], 2)
         self.assertEqual(x[2], 3)
 
-    def test3Properties(self) :
+    def test3Properties(self):
         'Test Int3D properties.'
         v = Int3D(1, 2, 3)
         self.assertEqual(v.x, 1)
@@ -86,7 +87,7 @@ class Test0Int3D(unittest.TestCase) :
         self.assertEqual(v[1], 2)
         self.assertEqual(v[2], 3)
 
-    def test4Conversion(self) :
+    def test4Conversion(self):
         'Test conversion of Int3D to other types.'
         v = Int3D(1, 2, 3)
         self.assertEqual(tuple(v), (1, 2, 3))
@@ -94,7 +95,7 @@ class Test0Int3D(unittest.TestCase) :
         self.assertEqual(str(v), '(1, 2, 3)')
         self.assertEqual(repr(v), 'Int3D(1, 2, 3)')
 
-    def test5Comparison(self) :
+    def test5Comparison(self):
         'Test Int3D comparison operations.'
         v = Int3D(1, 2, 3)
         v2 = Int3D(1, 2, 3)
@@ -102,7 +103,7 @@ class Test0Int3D(unittest.TestCase) :
         self.assertFalse(v != v2)
         self.assertTrue(v is not v2)
 
-    def test7Pickle(self) :
+    def test7Pickle(self):
         'Test pickling Int3D.'
         import pickle
         v = Int3D(1, 2, 3)
@@ -112,6 +113,7 @@ class Test0Int3D(unittest.TestCase) :
         v2 = pickle.loads(s)
         self.assertTrue(v is not v2)
         self.assertEqual(v, v2)
+
 
 if __name__ == "__main__":
     unittest.main()

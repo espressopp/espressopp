@@ -27,9 +27,11 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestLangevinThermostat(unittest.TestCase):
     global box
     box = (10, 10, 10)
+
     def setUp(self):
         # set up system
         system = espressopp.System()
@@ -43,9 +45,12 @@ class TestLangevinThermostat(unittest.TestCase):
 
     def test_normal(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=0.3)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
@@ -53,7 +58,8 @@ class TestLangevinThermostat(unittest.TestCase):
             (2, 1, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 0),
             (3, 1, 0, espressopp.Real3D(7.5, 5.0, 5.0), 1.0, 0),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         self.system.storage.decompose()
 
         # generate a verlet list
@@ -72,15 +78,18 @@ class TestLangevinThermostat(unittest.TestCase):
         integrator.addExtension(langevin)
 
         # coordinates of particles before integration
-        before =[self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 4) for j in range(3)]
 
         # run ten steps
         integrator.run(10)
 
         # coordinates of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 4) for j in range(3)]
 
-        # run checks (first particle excluded, hence it should not move. The other should have moved, however, as they feel the thermostat)
+        # run checks (first particle excluded, hence it should not move. The
+        # other should have moved, however, as they feel the thermostat)
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
@@ -93,9 +102,12 @@ class TestLangevinThermostat(unittest.TestCase):
 
     def test_AdResS(self):
         # set up AdResS domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=0.3)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
-        self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=0.3)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.3)
+        self.system.storage = espressopp.storage.DomainDecompositionAdress(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (atomistic and coarse-grained particles now)
         particle_list = [
@@ -106,16 +118,26 @@ class TestLangevinThermostat(unittest.TestCase):
             (5, 0, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 1),
             (6, 0, 0, espressopp.Real3D(7.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,4),(2,5),(3,6)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 4), (2, 5), (3, 6)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=1.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=1.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # integrator including AdResS
         integrator = espressopp.integrator.VelocityVerlet(self.system)
@@ -132,13 +154,15 @@ class TestLangevinThermostat(unittest.TestCase):
         integrator.addExtension(langevin)
 
         # coordinates of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 4) for j in range(3)]
 
         # run ten steps
         integrator.run(10)
 
         # coordinates of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 4) for j in range(3)]
 
         # run checks (same as test before)
         self.assertEqual(before[0], after[0])

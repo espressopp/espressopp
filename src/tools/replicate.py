@@ -19,7 +19,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def replicate (bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
+def replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
     """
     Replicates configuration in each dimension.
 
@@ -59,12 +59,13 @@ def replicate (bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
                 if(i + j + k != 0):
                     ct = ct + 1
                     for p1, p2 in bonds:
-                        bonds_replicated.append((p1 + ct * num_particles_original, \
-                                                 p2 + ct * num_particles_original))
+                        bonds_replicated.append(
+                            (p1 + ct * num_particles_original, p2 + ct * num_particles_original))
                     for p1, p2, p3 in angles:
-                        angles_replicated.append((p1 + ct * num_particles_original, \
-                                                  p2 + ct * num_particles_original, \
-                                                  p3 + ct * num_particles_original))
+                        angles_replicated.append(
+                            (p1 + ct * num_particles_original,
+                             p2 + ct * num_particles_original,
+                             p3 + ct * num_particles_original))
 
     # modify the box size
     Lx = xdim * Lx

@@ -148,28 +148,56 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJonesSoftcoreTI, \
-                      interaction_VerletListAdressLennardJonesSoftcoreTI
-                      #interaction_VerletListLennardJonesSoftcoreTI, \
-                      #interaction_VerletListHadressLennardJonesSoftcoreTI
+    interaction_VerletListAdressLennardJonesSoftcoreTI
+# interaction_VerletListLennardJonesSoftcoreTI, \
+# interaction_VerletListHadressLennardJonesSoftcoreTI
 
-#NOTE: to use LennardJonesSoftcoreTI with VerletList or VerletListHadress, uncomment and check the relevant code in this file and LennardJonesSoftcoreTI.cpp, and implement computeEnergyDeriv in the relevant interaction template
+# NOTE: to use LennardJonesSoftcoreTI with VerletList or
+# VerletListHadress, uncomment and check the relevant code in this file
+# and LennardJonesSoftcoreTI.cpp, and implement computeEnergyDeriv in the
+# relevant interaction template
 
-class LennardJonesSoftcoreTILocal(PotentialLocal, interaction_LennardJonesSoftcoreTI):
-    def __init__(self, epsilonA=1.0, sigmaA=1.0, epsilonB=0.0, sigmaB=1.0, alpha=1.0, power=1.0,
-                 cutoff=infinity, lambdaTI=0.0, annihilate=True):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+
+class LennardJonesSoftcoreTILocal(
+        PotentialLocal,
+        interaction_LennardJonesSoftcoreTI):
+    def __init__(
+            self,
+            epsilonA=1.0,
+            sigmaA=1.0,
+            epsilonB=0.0,
+            sigmaB=1.0,
+            alpha=1.0,
+            power=1.0,
+            cutoff=infinity,
+            lambdaTI=0.0,
+            annihilate=True):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if sigmaB == 0.0:
-                print('Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0')
+                print(
+                    'Error in LennardJonesSoftcoreTI!\n sigmaB should never be 0.0 even when epsilonB is 0.0')
                 return
-            cxxinit(self, interaction_LennardJonesSoftcoreTI,
-                    epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
+            cxxinit(
+                self,
+                interaction_LennardJonesSoftcoreTI,
+                epsilonA,
+                sigmaA,
+                epsilonB,
+                sigmaB,
+                alpha,
+                power,
+                cutoff,
+                lambdaTI,
+                annihilate)
 
     def addPids(self, pidlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             for pid in pidlist:
                 self.cxxclass.addPid(self, pid)
 
-#class VerletListLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListLennardJonesSoftcoreTI):
+# class VerletListLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListLennardJonesSoftcoreTI):
 #    def __init__(self, vl):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            cxxinit(self, interaction_VerletListLennardJonesSoftcoreTI, vl)
@@ -186,20 +214,30 @@ class LennardJonesSoftcoreTILocal(PotentialLocal, interaction_LennardJonesSoftco
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            return self.cxxclass.getVerletList(self)
 
-class VerletListAdressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListAdressLennardJonesSoftcoreTI):
+
+class VerletListAdressLennardJonesSoftcoreTILocal(
+        InteractionLocal,
+        interaction_VerletListAdressLennardJonesSoftcoreTI):
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressLennardJonesSoftcoreTI, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressLennardJonesSoftcoreTI,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-#class VerletListHadressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListHadressLennardJonesSoftcoreTI):
+# class VerletListHadressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_VerletListHadressLennardJonesSoftcoreTI):
 #    def __init__(self, vl, fixedtupleList):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            cxxinit(self, interaction_VerletListHadressLennardJonesSoftcoreTI, vl, fixedtupleList)
@@ -212,28 +250,31 @@ class VerletListAdressLennardJonesSoftcoreTILocal(InteractionLocal, interaction_
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 #            self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
+
 if pmi.isController:
     class LennardJonesSoftcoreTI(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.LennardJonesSoftcoreTILocal',
-            pmicall = [ 'addPids' ]
-            )
+            cls='espressopp.interaction.LennardJonesSoftcoreTILocal',
+            pmicall=['addPids']
+        )
 
-    #class VerletListLennardJonesSoftcoreTI(Interaction):
+    # class VerletListLennardJonesSoftcoreTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
     #        cls =  'espressopp.interaction.VerletListLennardJonesSoftcoreTILocal',
     #        pmicall = ['setPotential', 'getPotential', 'getVerletList']
     #        )
 
-    class VerletListAdressLennardJonesSoftcoreTI(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressLennardJonesSoftcoreTI(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressLennardJonesSoftcoreTILocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListAdressLennardJonesSoftcoreTILocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
-    #class VerletListHadressLennardJonesSoftcoreTI(Interaction):
+    # class VerletListHadressLennardJonesSoftcoreTI(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
     #        cls =  'espressopp.interaction.VerletListHadressLennardJonesSoftcoreTILocal',

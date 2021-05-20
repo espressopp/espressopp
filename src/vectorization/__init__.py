@@ -16,9 +16,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from espressopp.vectorization.interaction import *
+from espressopp.vectorization.VerletList import *
+from espressopp.vectorization.Vectorization import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.vectorization')
-
-from espressopp.vectorization.Vectorization import *
-from espressopp.vectorization.VerletList import *
-from espressopp.vectorization.interaction import *

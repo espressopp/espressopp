@@ -69,10 +69,12 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_Temperature
 
+
 class TemperatureLocal(ObservableLocal, analysis_Temperature):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Temperature, system)
 
     def add_type(self, type_id):
@@ -86,9 +88,9 @@ class TemperatureLocal(ObservableLocal, analysis_Temperature):
                 print(('Warning, type {} not found'.format(type_id)))
 
 
-if pmi.isController :
+if pmi.isController:
     class Temperature(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.TemperatureLocal',
-            pmicall = ['add_type', 'remove_type']
-            )
+            cls='espressopp.analysis.TemperatureLocal',
+            pmicall=['add_type', 'remove_type']
+        )

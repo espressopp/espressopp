@@ -73,33 +73,46 @@ from espressopp.interaction.DihedralPotential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_OPLS, interaction_FixedQuadrupleListOPLS
 
+
 class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
 
     def __init__(self, K1=1.0, K2=0.0, K3=0.0, K4=0.0):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_OPLS, K1, K2, K3, K4)
 
-class FixedQuadrupleListOPLSLocal(InteractionLocal, interaction_FixedQuadrupleListOPLS):
+
+class FixedQuadrupleListOPLSLocal(
+        InteractionLocal,
+        interaction_FixedQuadrupleListOPLS):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListOPLS,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
+
 
 if pmi.isController:
     class OPLS(DihedralPotential):
         'The OPLS potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.OPLSLocal',
-            pmiproperty = ['K1', 'K2', 'K3', 'K4']
-            )
+            cls='espressopp.interaction.OPLSLocal',
+            pmiproperty=['K1', 'K2', 'K3', 'K4']
+        )
 
     class FixedQuadrupleListOPLS(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedQuadrupleListOPLSLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedQuadrupleListOPLSLocal',
+            pmicall=['setPotential']
+        )

@@ -30,17 +30,19 @@ def remove_file(file_name):
     if os.path.exists(file_name):
         os.unlink(file_name)
 
+
 class TestH5MD(ut.TestCase):
     def setUp(self):
         self.h5md_file = 'output.h5'
         remove_file(self.h5md_file)
-        self.system, self.integrator = espressopp.standard_system.Default((10., 10., 10.), dt=0.1)
+        self.system, self.integrator = espressopp.standard_system.Default(
+            (10., 10., 10.), dt=0.1)
 
         self.particles = [
-            (1, espressopp.Real3D(1,2,3), 1),
-            (2, espressopp.Real3D(2,3,4), 2),
-            (3, espressopp.Real3D(3,4,5), 3),
-            (4, espressopp.Real3D(4,5,6), 4)]
+            (1, espressopp.Real3D(1, 2, 3), 1),
+            (2, espressopp.Real3D(2, 3, 4), 2),
+            (3, espressopp.Real3D(3, 4, 5), 3),
+            (4, espressopp.Real3D(4, 5, 6), 4)]
 
         self.system.storage.addParticles(self.particles, 'id', 'pos', 'type')
 
@@ -84,11 +86,13 @@ class TestH5MDNVT(TestH5MD):
 
         ids = h5['/particles/atoms/id/value']
         for id_set in ids:
-            self.assertListEqual([x for x in id_set if x != -1], [p[0] for p in self.particles])
+            self.assertListEqual(
+                [x for x in id_set if x != -1], [p[0] for p in self.particles])
 
         types = h5['/particles/atoms/species/value']
         for type_set in types:
-            self.assertListEqual([x for x in type_set if x != -1], [p[2] for p in self.particles])
+            self.assertListEqual(
+                [x for x in type_set if x != -1], [p[2] for p in self.particles])
 
     def test_check_static_box(self):
         self.dump_h5md.dump()
@@ -98,7 +102,8 @@ class TestH5MDNVT(TestH5MD):
 
         h5 = h5py.File(self.h5md_file, 'r')
 
-        self.assertListEqual(list(h5['/particles/atoms/box/edges']), [10.0, 10.0, 10.0])
+        self.assertListEqual(
+            list(h5['/particles/atoms/box/edges']), [10.0, 10.0, 10.0])
 
 
 class TestH5MDDynamicBox(TestH5MD):

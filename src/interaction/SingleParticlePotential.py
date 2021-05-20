@@ -67,15 +67,20 @@ from _espressopp import interaction_SingleParticlePotential
 # Python base class for angular potentials
 class SingleParticlePotentialLocal(object):
     def computeEnergy(self, position, bc):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.computeEnergy(self, toReal3DFromVector(position), bc)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.computeEnergy(
+                self, toReal3DFromVector(position), bc)
 
     def computeForce(self, position, bc):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.computeForce(self, toReal3DFromVector(position), bc)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.computeForce(
+                self, toReal3DFromVector(position), bc)
+
 
 if pmi.isController:
     class SingleParticlePotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            localcall = ['computeForce', 'computeEnergy'],
-            )
+            localcall=['computeForce', 'computeEnergy'],
+        )

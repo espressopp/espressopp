@@ -43,9 +43,12 @@ from espressopp import toReal3DFromVector
 from _espressopp import interaction_AngularPotential
 
 # Python base class for angular potentials
+
+
 class AngularPotentialLocal(object):
     def computeEnergy(self, *args):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if len(args) == 1:
                 arg0 = args[0]
                 if isinstance(arg0, float) or isinstance(arg0, int):
@@ -53,16 +56,24 @@ class AngularPotentialLocal(object):
             return self.cxxclass.computeEnergy(self, toReal3DFromVector(*args))
 
     def computeForce(self, *args):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if len(args) == 1: # in case theta is passed
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if len(args) == 1:  # in case theta is passed
                 arg0 = args[0]
                 if isinstance(arg0, float) or isinstance(arg0, int):
                     return self.cxxclass.computeForce(self, arg0)
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
+
 if pmi.isController:
     class AngularPotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            localcall = [ 'computeForce', 'computeEnergy' ],
-            pmiproperty = [ 'cutoff', 'colVarBondList', 'colVarAngleList', 'colVarDihedList', 'colVar' ]
-            )
+            localcall=[
+                'computeForce',
+                'computeEnergy'],
+            pmiproperty=[
+                'cutoff',
+                'colVarBondList',
+                'colVarAngleList',
+                'colVarDihedList',
+                'colVar'])

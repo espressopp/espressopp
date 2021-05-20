@@ -49,15 +49,23 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinThermostatOnGroup
 
-class LangevinThermostatOnGroupLocal(ExtensionLocal, integrator_LangevinThermostatOnGroup):
+
+class LangevinThermostatOnGroupLocal(
+        ExtensionLocal,
+        integrator_LangevinThermostatOnGroup):
 
     def __init__(self, system, particle_group):
         if pmi.workerIsActive():
-            cxxinit(self, integrator_LangevinThermostatOnGroup, system, particle_group)
+            cxxinit(
+                self,
+                integrator_LangevinThermostatOnGroup,
+                system,
+                particle_group)
 
-if pmi.isController :
+
+if pmi.isController:
     class LangevinThermostatOnGroup(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LangevinThermostatOnGroupLocal',
-            pmiproperty = [ 'gamma', 'temperature']
-            )
+            cls='espressopp.integrator.LangevinThermostatOnGroupLocal',
+            pmiproperty=['gamma', 'temperature']
+        )

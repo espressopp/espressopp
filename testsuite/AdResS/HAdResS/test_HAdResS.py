@@ -27,6 +27,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestHAdResS(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -35,9 +36,12 @@ class TestHAdResS(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
-        system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=system.skin)
+        system.storage = espressopp.storage.DomainDecompositionAdress(
+            system, nodeGrid, cellGrid)
         self.system = system
 
     def test_slab(self):
@@ -54,44 +58,63 @@ class TestHAdResS(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # add interaction
-        interNB = espressopp.interaction.VerletListHadressLennardJones2(vl, ftpl)
-        potWCA1  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
-        potWCA2 = espressopp.interaction.LennardJones(epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
-        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1) # AT
-        interNB.setPotentialCG(type1=1, type2=1, potential=potWCA2) # CG
+        interNB = espressopp.interaction.VerletListHadressLennardJones2(
+            vl, ftpl)
+        potWCA1 = espressopp.interaction.LennardJones(
+            epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
+        potWCA2 = espressopp.interaction.LennardJones(
+            epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
+        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1)  # AT
+        interNB.setPotentialCG(type1=1, type2=1, potential=potWCA2)  # CG
         self.system.addInteraction(interNB)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
         integrator.dt = 0.01
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNB.computeEnergy()
 
         # run ten steps and compute energy
         integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNB.computeEnergy()
 
-        # run checks (only particles in atomistic, hybrid and first part of coarse-grained region should move, i.e. the first 4 particles - as the WCA's epsilon is 0.0 in the coarse-grained region. Furthermore they should move along the x-axis only given their setup. Additionally, check energies)
+        # run checks (only particles in atomistic, hybrid and first part of
+        # coarse-grained region should move, i.e. the first 4 particles - as
+        # the WCA's epsilon is 0.0 in the coarse-grained region. Furthermore
+        # they should move along the x-axis only given their setup.
+        # Additionally, check energies)
         self.assertAlmostEqual(after[0], 5.413650, places=5)
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
@@ -108,7 +131,7 @@ class TestHAdResS(unittest.TestCase):
         self.assertEqual(before[13], after[13])
         self.assertEqual(before[14], after[14])
 
-        self.assertAlmostEqual(energy_before,0.921374, places=5)
+        self.assertAlmostEqual(energy_before, 0.921374, places=5)
         self.assertAlmostEqual(energy_after, -0.468436, places=5)
 
     def test_sphere(self):
@@ -125,44 +148,61 @@ class TestHAdResS(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(5.0, 8.5, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(5.0, 9.5, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=True)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=True)
 
         # add interaction
-        interNB = espressopp.interaction.VerletListHadressLennardJones2(vl, ftpl)
-        potWCA1  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
-        potWCA2 = espressopp.interaction.LennardJones(epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
-        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1) # AT
-        interNB.setPotentialCG(type1=0, type2=0, potential=potWCA2) # CG
+        interNB = espressopp.interaction.VerletListHadressLennardJones2(
+            vl, ftpl)
+        potWCA1 = espressopp.interaction.LennardJones(
+            epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
+        potWCA2 = espressopp.interaction.LennardJones(
+            epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
+        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1)  # AT
+        interNB.setPotentialCG(type1=0, type2=0, potential=potWCA2)  # CG
         self.system.addInteraction(interNB)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
         integrator.dt = 0.01
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNB.computeEnergy()
 
         # run ten steps and compute energy
         integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNB.computeEnergy()
 
-        # run checks (as before, just that particles should now move along the y-axis only, given their setup and the spherical adaptive resolution geometry)
+        # run checks (as before, just that particles should now move along the
+        # y-axis only, given their setup and the spherical adaptive resolution
+        # geometry)
         self.assertEqual(before[0], after[0])
         self.assertAlmostEqual(after[1], 5.413650, places=5)
         self.assertEqual(before[2], after[2])
@@ -178,7 +218,7 @@ class TestHAdResS(unittest.TestCase):
         self.assertEqual(before[12], after[12])
         self.assertEqual(before[13], after[13])
         self.assertEqual(before[14], after[14])
-        self.assertAlmostEqual(energy_before,0.921374, places=5)
+        self.assertAlmostEqual(energy_before, 0.921374, places=5)
         self.assertAlmostEqual(energy_after, -0.468436, places=5)
 
     def test_ATATCG_template(self):
@@ -195,21 +235,39 @@ class TestHAdResS(unittest.TestCase):
             (9, 0, 1.0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
             (10, 0, 1.0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # add interactions
-        interNB = espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic(vl, ftpl)
-        potLJ  = espressopp.interaction.LennardJones(epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
-        potQQ  = espressopp.interaction.ReactionFieldGeneralized(prefactor=138.935485, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff= 1.4, shift="auto")
+        interNB = espressopp.interaction.VerletListHadressATLJReacFieldGenHarmonic(
+            vl, ftpl)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
+        potQQ = espressopp.interaction.ReactionFieldGeneralized(
+            prefactor=138.935485,
+            kappa=0.0,
+            epsilon1=1.0,
+            epsilon2=80.0,
+            cutoff=1.4,
+            shift="auto")
         potCG = espressopp.interaction.Harmonic(K=500.0, r0=1.4, cutoff=1.4)
         interNB.setPotentialAT1(type1=0, type2=0, potential=potLJ)
         interNB.setPotentialAT2(type1=0, type2=0, potential=potQQ)
@@ -224,14 +282,16 @@ class TestHAdResS(unittest.TestCase):
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNB.computeEnergy()
 
         # run ten steps and compute energy
         integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNB.computeEnergy()
 
         # run checks
@@ -252,6 +312,7 @@ class TestHAdResS(unittest.TestCase):
         self.assertEqual(before[14], after[14])
         self.assertAlmostEqual(energy_before, 191.685729, places=5)
         self.assertAlmostEqual(energy_after, 43.035403, places=5)
+
 
 if __name__ == '__main__':
     unittest.main()

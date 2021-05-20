@@ -83,45 +83,63 @@ from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
 from _espressopp import interaction_FixedQuadrupleListTypesDihedralHarmonicNCos
 
 
-class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
+class DihedralHarmonicNCosLocal(
+        DihedralPotentialLocal,
+        interaction_DihedralHarmonicNCos):
 
     def __init__(self, K=0.0, phi0=0.0, multiplicity=1):
 
         # pylint: disable=W0212
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
-            or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
-            cxxinit(self, interaction_DihedralHarmonicNCos, K, phi0, multiplicity)
+                or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
+            cxxinit(
+                self,
+                interaction_DihedralHarmonicNCos,
+                K,
+                phi0,
+                multiplicity)
 
 
 class FixedQuadrupleListDihedralHarmonicNCosLocal(
-    InteractionLocal,
-    interaction_FixedQuadrupleListDihedralHarmonicNCos):
+        InteractionLocal,
+        interaction_FixedQuadrupleListDihedralHarmonicNCos):
     'The (local) DihedralHarmonicNCos interaction using FixedQuadruple lists.'
+
     def __init__(self, system, fql, potential):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
-            or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
-            cxxinit(self, interaction_FixedQuadrupleListDihedralHarmonicNCos, system, fql, potential)
+                or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListDihedralHarmonicNCos,
+                system,
+                fql,
+                potential)
 
     def setPotential(self, potential):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
-            or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
+                or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             self.cxxclass.setPotential(self, potential)
 
     def getFixedQuadrupleList(self):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
-            or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
+                or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             return self.cxxclass.getFixedQuadrupleList(self)
 
 
-class FixedQuadrupleListTypesDihedralHarmonicNCosLocal(InteractionLocal,
-                                                   interaction_FixedQuadrupleListTypesDihedralHarmonicNCos):
+class FixedQuadrupleListTypesDihedralHarmonicNCosLocal(
+        InteractionLocal, interaction_FixedQuadrupleListTypesDihedralHarmonicNCos):
     def __init__(self, system, fql):
         if pmi.workerIsActive():
-            cxxinit(self, interaction_FixedQuadrupleListTypesDihedralHarmonicNCos, system, fql)
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListTypesDihedralHarmonicNCos,
+                system,
+                fql)
 
     def setPotential(self, type1, type2, type3, type4, potential):
         if pmi.workerIsActive():
-            self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+            self.cxxclass.setPotential(
+                self, type1, type2, type3, type4, potential)
 
     def getPotential(self, type1, type2, type3, type4):
         if pmi.workerIsActive():
@@ -132,18 +150,24 @@ if pmi.isController:
     class DihedralHarmonicNCos(DihedralPotential):
         'The DihedralHarmonicNCos potential.'
         pmiproxydefs = dict(
-          cls='espressopp.interaction.DihedralHarmonicNCosLocal',
-          pmiproperty=['K', 'phi0', 'multiplicity']
+            cls='espressopp.interaction.DihedralHarmonicNCosLocal',
+            pmiproperty=['K', 'phi0', 'multiplicity']
         )
 
-    class FixedQuadrupleListDihedralHarmonicNCos(Interaction, metaclass=pmi.Proxy):
+    class FixedQuadrupleListDihedralHarmonicNCos(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls='espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCosLocal',
-          pmicall=['setPotential', 'getFixedQuadrupleList']
-        )
+            cls='espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCosLocal',
+            pmicall=[
+                'setPotential',
+                'getFixedQuadrupleList'])
 
-    class FixedQuadrupleListTypesDihedralHarmonicNCos(Interaction, metaclass=pmi.Proxy):
+    class FixedQuadrupleListTypesDihedralHarmonicNCos(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralHarmonicNCosLocal',
-          pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
-        )
+            cls='espressopp.interaction.FixedQuadrupleListTypesDihedralHarmonicNCosLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedQuadrupleList',
+                'getFixedQuadrupleList'])

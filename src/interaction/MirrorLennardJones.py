@@ -84,45 +84,64 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_MirrorLennardJones, interaction_FixedPairListMirrorLennardJones
 
+
 class MirrorLennardJonesLocal(PotentialLocal, interaction_MirrorLennardJones):
 
     def __init__(self, epsilon=1.0, sigma=0.0):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_MirrorLennardJones, epsilon, sigma)
 
-class FixedPairListMirrorLennardJonesLocal(InteractionLocal, interaction_FixedPairListMirrorLennardJones):
+
+class FixedPairListMirrorLennardJonesLocal(
+        InteractionLocal,
+        interaction_FixedPairListMirrorLennardJones):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListMirrorLennardJones, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListMirrorLennardJones,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
     def setFixedPairList(self, fixedpairlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
     def getFixedPairList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
+
 
 if pmi.isController:
     class MirrorLennardJones(Potential):
         'The MirrorLennardJones potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.MirrorLennardJonesLocal',
-            pmiproperty = ['epsilon', 'sigma']
-            )
+            cls='espressopp.interaction.MirrorLennardJonesLocal',
+            pmiproperty=['epsilon', 'sigma']
+        )
 
     class FixedPairListMirrorLennardJones(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListMirrorLennardJonesLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListMirrorLennardJonesLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedPairList',
+                'getFixedPairList'])

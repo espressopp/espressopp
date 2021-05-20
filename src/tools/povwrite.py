@@ -85,9 +85,9 @@ def povwrite(system, integrator, filename, append=False, box=True):
     frameblue = 1.0
     transparent = 0.0
 
-    boxsizex = system.bc.boxL[0]/2
-    boxsizey = system.bc.boxL[1]/2
-    boxsizez = system.bc.boxL[2]/2
+    boxsizex = system.bc.boxL[0] / 2
+    boxsizey = system.bc.boxL[1] / 2
+    boxsizez = system.bc.boxL[2] / 2
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
 
     f = 0.7  # size
@@ -230,38 +230,146 @@ def povwrite(system, integrator, filename, append=False, box=True):
     file.write("#declare VMD_line_width=0.0020;\n\
 #declare VMD_line_width=0.0060; \n")
 
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*f, boxsizez /
-                                                                        g*-f, boxsizex/g*f, boxsizey/g*-f, boxsizez/g*-f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*-f, boxsizez /
-                                                                        g*-f, boxsizex/g*-f, boxsizey/g*-f, boxsizez/g*-f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*-f,
-                                                                        boxsizez/g*-f, boxsizex/g*-f, boxsizey/g*f, boxsizez/g*-f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*f,
-                                                                        boxsizez/g*-f, boxsizex/g*f, boxsizey/g*f, boxsizez/g*-f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*f, boxsizez /
-                                                                        g*-f, boxsizex/g*f, boxsizey/g * f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*-f,
-                                                                        boxsizez/g*-f, boxsizex/g*f, boxsizey/g*-f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*-f,
-                                                                        boxsizez/g*-f, boxsizex/g*-f, boxsizey/g*-f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*f,
-                                                                        boxsizez/g*-f, boxsizex/g*-f, boxsizey/g*f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*f,
-                                                                        boxsizez/g*f, boxsizex/g*f, boxsizey/g*-f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*f, boxsizey/g*-f, boxsizez /
-                                                                        g*f, boxsizex/g*-f, boxsizey/g * -f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*-f,
-                                                                        boxsizez/g*f, boxsizex/g*-f, boxsizey/g*f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
-    file.write("VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex/g*-f, boxsizey/g*f,
-                                                                        boxsizez/g*f, boxsizex/g*f, boxsizey/g * f, boxsizez/g*f, framered, framegreen, frameblue, transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * -f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * -f,
+                                                                 boxsizez / g * f,
+                                                                 boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
+    file.write(
+        "VMD_line(<%f,%f,%f>,<%f,%f,%f>,rgbt<%f,%f,%f,%f>)\n" % (boxsizex / g * -f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 boxsizex / g * f,
+                                                                 boxsizey / g * f,
+                                                                 boxsizez / g * f,
+                                                                 framered,
+                                                                 framegreen,
+                                                                 frameblue,
+                                                                 transparent))
 
     file.write("// MoleculeID: 0 ReprID: 0 Beginning VDW\n")
     pid = 0
     while pid < maxParticleID:
-        x = (boxsizex-xpos[pid])/g*f
-        y = (boxsizey-ypos[pid])/g*f
-        z = (boxsizez-zpos[pid])/g*f
-        radius = r[pid]/2/g*f
+        x = (boxsizex - xpos[pid]) / g * f
+        y = (boxsizey - ypos[pid]) / g * f
+        z = (boxsizez - zpos[pid]) / g * f
+        radius = r[pid] / 2 / g * f
         file.write("VMD_sphere(<%f,%f,%f>,%f,rgbt<%f,%f,%f>)\n" %
                    (x, y, z, radius, red, green, blue))
         pid += 1

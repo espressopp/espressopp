@@ -36,15 +36,20 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_StochasticVelocityRescaling
 
-class StochasticVelocityRescalingLocal(ExtensionLocal, integrator_StochasticVelocityRescaling):
+
+class StochasticVelocityRescalingLocal(
+        ExtensionLocal,
+        integrator_StochasticVelocityRescaling):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_StochasticVelocityRescaling, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class StochasticVelocityRescaling(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.StochasticVelocityRescalingLocal',
-            pmiproperty = [ 'temperature', 'coupling' ]
+            cls='espressopp.integrator.StochasticVelocityRescalingLocal',
+            pmiproperty=['temperature', 'coupling']
         )

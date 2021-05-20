@@ -67,11 +67,27 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_FreeEnergyCompensation
 
-class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
 
-    def __init__(self, system, center=[], sphereAdr = False, ntrotter=1, slow=False):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_FreeEnergyCompensation, system, sphereAdr, ntrotter, slow)
+class FreeEnergyCompensationLocal(
+        ExtensionLocal,
+        integrator_FreeEnergyCompensation):
+
+    def __init__(
+            self,
+            system,
+            center=[],
+            sphereAdr=False,
+            ntrotter=1,
+            slow=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_FreeEnergyCompensation,
+                system,
+                sphereAdr,
+                ntrotter,
+                slow)
 
             # set center of FreeEnergyCompensation force
             if (center != []):
@@ -86,13 +102,15 @@ class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensat
             self.cxxclass.addForce(self, itype, filename, type)
 
     def computeCompEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeCompEnergy(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class FreeEnergyCompensation(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.FreeEnergyCompensationLocal',
-            pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addForce' , 'computeCompEnergy']
-            )
+            cls='espressopp.integrator.FreeEnergyCompensationLocal',
+            pmiproperty=['itype', 'filename'],
+            pmicall=['addForce', 'computeCompEnergy']
+        )

@@ -42,19 +42,22 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_RadialDistrF
 
+
 class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_RadialDistrF, system)
 
     def compute(self, rdfN):
         return self.cxxclass.compute(self, rdfN)
 
-if pmi.isController :
+
+if pmi.isController:
     class RadialDistrF(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          pmiproperty = [ 'print_progress' ],
-          pmicall = [ "compute" ],
-          cls = 'espressopp.analysis.RadialDistrFLocal'
+            pmiproperty=['print_progress'],
+            pmicall=["compute"],
+            cls='espressopp.analysis.RadialDistrFLocal'
         )

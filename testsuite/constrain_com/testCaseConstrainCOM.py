@@ -29,6 +29,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestCaseConstrainCOM(unittest.TestCase):
 
     def setUp(self):
@@ -45,13 +46,16 @@ class TestCaseConstrainCOM(unittest.TestCase):
         self.system = system
         self.L = L
         self.box = box
-        self.skin =system.skin
+        self.skin = system.skin
 
     def test_constrain_com(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,self.box,rc=1.5, skin=self.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, rc=1.5, skin=self.skin)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, self.box, rc=1.5, skin=self.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, rc=1.5, skin=self.skin)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
@@ -61,7 +65,15 @@ class TestCaseConstrainCOM(unittest.TestCase):
             (4, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 2.0, 0, 1.),
             (5, 1, 0, espressopp.Real3D(7.0, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -75,11 +87,12 @@ class TestCaseConstrainCOM(unittest.TestCase):
         integrator.addExtension(langevin)
 
         # Harmonic bonds
-        bondlist  = espressopp.FixedPairList(self.system.storage)
+        bondlist = espressopp.FixedPairList(self.system.storage)
         for i in range(1, 5):
             bondlist.add(i, i + 1)
-        potBond = espressopp.interaction.Harmonic(K=100., r0 = 1.0)
-        interBond = espressopp.interaction.FixedPairListHarmonic(self.system, bondlist, potBond)
+        potBond = espressopp.interaction.Harmonic(K=100., r0=1.0)
+        interBond = espressopp.interaction.FixedPairListHarmonic(
+            self.system, bondlist, potBond)
         self.system.addInteraction(interBond)
 
         # constrain center of mass
@@ -89,7 +102,8 @@ class TestCaseConstrainCOM(unittest.TestCase):
             tuple.append(i)
         tuplelist.addTuple(tuple)
         potCOM = espressopp.interaction.ConstrainCOM(1000.)
-        interCOM = espressopp.interaction.FixedLocalTupleListConstrainCOM(self.system, tuplelist, potCOM)
+        interCOM = espressopp.interaction.FixedLocalTupleListConstrainCOM(
+            self.system, tuplelist, potCOM)
         self.system.addInteraction(interCOM, 'Constrain_COM')
 
         # center of mass of particles before integration
@@ -109,14 +123,14 @@ class TestCaseConstrainCOM(unittest.TestCase):
             diff = []
             for j in range(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
-                x_i = x_i - round(x_i/self.L)*self.L
+                x_i = x_i - round(x_i / self.L) * self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
         total_mass = 0.
         for i in range(5):
             total_mass += mass[i]
             for j in range(3):
-                before[j] += mass[i]*dmy_p[i][j]
+                before[j] += mass[i] * dmy_p[i][j]
         for i in range(3):
             before[i] /= total_mass
         print("before", before)
@@ -125,7 +139,7 @@ class TestCaseConstrainCOM(unittest.TestCase):
         integrator.run(20000)
 
         # center of mass of particles after integration
-        after= [0., 0., 0.]
+        after = [0., 0., 0.]
 
         particle = self.system.storage.getParticle(1)
         dmy_p = []
@@ -141,14 +155,14 @@ class TestCaseConstrainCOM(unittest.TestCase):
             diff = []
             for j in range(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
-                x_i = x_i - round(x_i/self.L)*self.L
+                x_i = x_i - round(x_i / self.L) * self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
         total_mass = 0.
         for i in range(5):
             total_mass += mass[i]
             for j in range(3):
-                after[j] += mass[i]*dmy_p[i][j]
+                after[j] += mass[i] * dmy_p[i][j]
         for i in range(3):
             after[i] /= total_mass
         print("after", after)

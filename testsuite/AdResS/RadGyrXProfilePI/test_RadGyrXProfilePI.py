@@ -25,6 +25,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestRadGyrXProfilePI(unittest.TestCase):
     def setUp(self):
         self.system = espressopp.System()
@@ -32,8 +33,10 @@ class TestRadGyrXProfilePI(unittest.TestCase):
         self.system.rng = espressopp.esutil.RNG()
         self.system.bc = espressopp.bc.OrthorhombicBC(self.system.rng, box)
         nodeGrid = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.5)
-        self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.5)
+        self.system.storage = espressopp.storage.DomainDecompositionAdress(
+            self.system, nodeGrid, cellGrid)
 
         particle_list = [
             (1, 1, espressopp.Real3D(3.0, 5.0, 5.0), 0, 0),
@@ -58,18 +61,33 @@ class TestRadGyrXProfilePI(unittest.TestCase):
             (20, 0, espressopp.Real3D(9.0, 5.0, 5.2), 1, 4)
         ]
 
-        tuples = [(1,2,3,4,5),(6,7,8,9,10),(11,12,13,14,15),(16,17,18,19,20)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'pos', 'adrat', 'pib')
+        tuples = [(1, 2, 3, 4, 5), (6, 7, 8, 9, 10),
+                  (11, 12, 13, 14, 15), (16, 17, 18, 19, 20)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'pos', 'adrat', 'pib')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5, dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
-        integrator = espressopp.integrator.PIAdressIntegrator(system=self.system, verletlist=vl, nTrotter=4)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
+        integrator = espressopp.integrator.PIAdressIntegrator(
+            system=self.system, verletlist=vl, nTrotter=4)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
     def test_radius_of_gyration_profile_PI(self):
-        gyrationprofile_instance = espressopp.analysis.RadGyrXProfilePI(system=self.system)
-        gyrationprofile_list = gyrationprofile_instance.compute(bins=5, ntrotter=4, ptype=1)
+        gyrationprofile_instance = espressopp.analysis.RadGyrXProfilePI(
+            system=self.system)
+        gyrationprofile_list = gyrationprofile_instance.compute(
+            bins=5, ntrotter=4, ptype=1)
 
         self.assertAlmostEqual(gyrationprofile_list[0], 0.0, places=5)
         self.assertAlmostEqual(gyrationprofile_list[1], 0.1, places=5)

@@ -25,6 +25,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestMTSAdResS(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -33,9 +34,12 @@ class TestMTSAdResS(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
-        system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=system.skin)
+        system.storage = espressopp.storage.DomainDecompositionAdress(
+            system, nodeGrid, cellGrid)
         self.system = system
 
         # add some particles
@@ -51,35 +55,48 @@ class TestMTSAdResS(unittest.TestCase):
             (9, 0, 1.0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
             (10, 0, 1.0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         self.ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         self.ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(self.ftpl)
         self.system.storage.decompose()
 
         # set up a verlet list
-        self.vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        self.vl = espressopp.VerletListAdress(
+            self.system, cutoff=1.5, adrcut=1.5, dEx=2.0, dHy=1.0, adrCenter=[
+                5.0, 5.0, 5.0], sphereAdr=False)
 
         # set up integrator
-        self.integrator = espressopp.integrator.VelocityVerletRESPA(self.system)
+        self.integrator = espressopp.integrator.VelocityVerletRESPA(
+            self.system)
         self.integrator.dt = 0.01
         self.integrator.multistep = 4
-        adress = espressopp.integrator.Adress(self.system, self.vl, self.ftpl, multistep=4)
+        adress = espressopp.integrator.Adress(
+            self.system, self.vl, self.ftpl, multistep=4)
         self.integrator.addExtension(adress)
 
     def test_ATAT_CG_templates_HAdResS(self):
         # add atomistic interactions
-        interNBat = espressopp.interaction.VerletListHadressATLenJonesReacFieldGen(self.vl, self.ftpl)
-        potLJ  = espressopp.interaction.LennardJones(epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
-        potQQ  = espressopp.interaction.ReactionFieldGeneralized(prefactor=138.935485, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff= 1.4, shift="auto")
+        interNBat = espressopp.interaction.VerletListHadressATLenJonesReacFieldGen(
+            self.vl, self.ftpl)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
+        potQQ = espressopp.interaction.ReactionFieldGeneralized(
+            prefactor=138.935485,
+            kappa=0.0,
+            epsilon1=1.0,
+            epsilon2=80.0,
+            cutoff=1.4,
+            shift="auto")
         interNBat.setPotential1(type1=0, type2=0, potential=potLJ)
         interNBat.setPotential2(type1=0, type2=0, potential=potQQ)
         self.system.addInteraction(interNBat)
 
         # add coarse-grained interaction
-        interNBcg = espressopp.interaction.VerletListHadressCGHarmonic(self.vl, self.ftpl)
+        interNBcg = espressopp.interaction.VerletListHadressCGHarmonic(
+            self.vl, self.ftpl)
         potCG = espressopp.interaction.Harmonic(K=500.0, r0=1.4, cutoff=1.4)
         interNBcg.setPotential(type1=1, type2=1, potential=potCG)
         self.system.addInteraction(interNBcg)
@@ -88,14 +105,16 @@ class TestMTSAdResS(unittest.TestCase):
         espressopp.tools.AdressDecomp(self.system, self.integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run ten steps and compute energy
         self.integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run checks
@@ -119,13 +138,16 @@ class TestMTSAdResS(unittest.TestCase):
 
     def test_AT_CG_templates_HAdResS(self):
         # add atomistic interaction
-        interNBat = espressopp.interaction.VerletListHadressATLennardJones(self.vl, self.ftpl)
-        potLJ  = espressopp.interaction.LennardJones(epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
+        interNBat = espressopp.interaction.VerletListHadressATLennardJones(
+            self.vl, self.ftpl)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
         interNBat.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interNBat)
 
         # add coarse-grained interaction
-        interNBcg = espressopp.interaction.VerletListHadressCGHarmonic(self.vl, self.ftpl)
+        interNBcg = espressopp.interaction.VerletListHadressCGHarmonic(
+            self.vl, self.ftpl)
         potCG = espressopp.interaction.Harmonic(K=50.0, r0=1.4, cutoff=1.4)
         interNBcg.setPotential(type1=1, type2=1, potential=potCG)
         self.system.addInteraction(interNBcg)
@@ -134,14 +156,16 @@ class TestMTSAdResS(unittest.TestCase):
         espressopp.tools.AdressDecomp(self.system, self.integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run ten steps and compute energy
         self.integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run checks
@@ -165,15 +189,24 @@ class TestMTSAdResS(unittest.TestCase):
 
     def test_ATAT_CG_templates_FAdResS(self):
         # add atomistic interactions
-        interNBat = espressopp.interaction.VerletListAdressATLenJonesReacFieldGen(self.vl, self.ftpl)
-        potLJ  = espressopp.interaction.LennardJones(epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
-        potQQ  = espressopp.interaction.ReactionFieldGeneralized(prefactor=138.935485, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff= 1.4, shift="auto")
+        interNBat = espressopp.interaction.VerletListAdressATLenJonesReacFieldGen(
+            self.vl, self.ftpl)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
+        potQQ = espressopp.interaction.ReactionFieldGeneralized(
+            prefactor=138.935485,
+            kappa=0.0,
+            epsilon1=1.0,
+            epsilon2=80.0,
+            cutoff=1.4,
+            shift="auto")
         interNBat.setPotential1(type1=0, type2=0, potential=potLJ)
         interNBat.setPotential2(type1=0, type2=0, potential=potQQ)
         self.system.addInteraction(interNBat)
 
         # add coarse-grained interaction
-        interNBcg = espressopp.interaction.VerletListAdressCGHarmonic(self.vl, self.ftpl)
+        interNBcg = espressopp.interaction.VerletListAdressCGHarmonic(
+            self.vl, self.ftpl)
         potCG = espressopp.interaction.Harmonic(K=500.0, r0=1.4, cutoff=1.4)
         interNBcg.setPotential(type1=1, type2=1, potential=potCG)
         self.system.addInteraction(interNBcg)
@@ -182,14 +215,16 @@ class TestMTSAdResS(unittest.TestCase):
         espressopp.tools.AdressDecomp(self.system, self.integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run ten steps and compute energy
         self.integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run checks
@@ -213,13 +248,16 @@ class TestMTSAdResS(unittest.TestCase):
 
     def test_AT_CG_templates_FAdResS(self):
         # add atomistic interaction
-        interNBat = espressopp.interaction.VerletListAdressATLennardJones(self.vl, self.ftpl)
-        potLJ  = espressopp.interaction.LennardJones(epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
+        interNBat = espressopp.interaction.VerletListAdressATLennardJones(
+            self.vl, self.ftpl)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=0.650299305951, sigma=0.316549165245, shift='auto', cutoff=1.4)
         interNBat.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interNBat)
 
         # add coarse-grained interaction
-        interNBcg = espressopp.interaction.VerletListAdressCGHarmonic(self.vl, self.ftpl)
+        interNBcg = espressopp.interaction.VerletListAdressCGHarmonic(
+            self.vl, self.ftpl)
         potCG = espressopp.interaction.Harmonic(K=500.0, r0=1.4, cutoff=1.4)
         interNBcg.setPotential(type1=1, type2=1, potential=potCG)
         self.system.addInteraction(interNBcg)
@@ -228,14 +266,16 @@ class TestMTSAdResS(unittest.TestCase):
         espressopp.tools.AdressDecomp(self.system, self.integrator)
 
         # coordinates and non-bonded energy of particles before integration
-        before = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        before = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_before = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run ten steps and compute energy
         self.integrator.run(10)
 
         # coordinates and non-bonded energy of particles after integration
-        after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
+        after = [self.system.storage.getParticle(
+            i).pos[j] for i in range(1, 6) for j in range(3)]
         energy_after = interNBcg.computeEnergy() + interNBat.computeEnergy()
 
         # run checks
@@ -256,6 +296,7 @@ class TestMTSAdResS(unittest.TestCase):
         self.assertEqual(before[14], after[14])
         self.assertAlmostEqual(energy_before, 199.996600, places=5)
         self.assertAlmostEqual(energy_after, 1.382440, places=5)
+
 
 if __name__ == '__main__':
     unittest.main()

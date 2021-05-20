@@ -40,15 +40,25 @@ from espressopp import pmi
 from espressopp.analysis.ConfigsParticleDecomp import *
 from _espressopp import analysis_MeanSquareInternalDist
 
-class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquareInternalDist):
+
+class MeanSquareInternalDistLocal(
+        ConfigsParticleDecompLocal,
+        analysis_MeanSquareInternalDist):
 
     def __init__(self, system, chainlength, start_pid=0):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength, start_pid)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                analysis_MeanSquareInternalDist,
+                system,
+                chainlength,
+                start_pid)
+
 
 if pmi.isController:
     class MeanSquareInternalDist(ConfigsParticleDecomp, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
-          pmiproperty = [ 'print_progress' ]
+            cls='espressopp.analysis.MeanSquareInternalDistLocal',
+            pmiproperty=['print_progress']
         )

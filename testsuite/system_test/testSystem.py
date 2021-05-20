@@ -31,13 +31,14 @@ from espressopp.tools import timers
 
 
 system = espressopp.System()
-box=(10,10,10)
+box = (10, 10, 10)
 system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin = 0.3
 system.comm = MPI.COMM_WORLD
 nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
-system.storage = espressopp.storage.DomainDecomposition(system,nodeGrid,cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(
+    system, nodeGrid, cellGrid)
 
 vl = espressopp.VerletList(system, cutoff=1.4)
 lj1 = espressopp.interaction.VerletListLennardJones(vl)

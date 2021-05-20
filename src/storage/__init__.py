@@ -19,10 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from espressopp.storage.DomainDecompositionAdress import *
+from espressopp.storage.DomainDecompositionNonBlocking import *
+from espressopp.storage.DomainDecomposition import *
+from espressopp.storage.Storage import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.storage')
-
-from espressopp.storage.Storage import *
-from espressopp.storage.DomainDecomposition import *
-from espressopp.storage.DomainDecompositionNonBlocking import *
-from espressopp.storage.DomainDecompositionAdress import *

@@ -73,15 +73,18 @@ from espressopp import pmi
 from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_CMVelocity
 
+
 class CMVelocityLocal(AnalysisBaseLocal, analysis_CMVelocity):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_CMVelocity, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class CMVelocity(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.CMVelocityLocal',
-            pmiproperty = ["v"]
-            )
+            cls='espressopp.analysis.CMVelocityLocal',
+            pmiproperty=["v"]
+        )

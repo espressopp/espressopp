@@ -54,11 +54,12 @@ PSF file format given at http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tut
 import espressopp
 from math import sqrt
 
+
 def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
-    #if not all molecules have the same number of atoms, set molsize=0
-    file = open(filename,'w')
+    # if not all molecules have the same number of atoms, set molsize=0
+    file = open(filename, 'w')
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
-    nParticles    = int(espressopp.analysis.NPart(system).compute())
+    nParticles = int(espressopp.analysis.NPart(system).compute())
     file.write("PSF CMAP\n")
     file.write(" \n")
     file.write("       1 !NTITLE\n")
@@ -67,34 +68,35 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
     st = "\n%8d !NATOM\n" % nParticles
     file.write(st)
 
-    pid    = 0
-    addToPid = 0 # if pid begins from 0, then addToPid should be +1
-    if (molsize>0):
-        mol    = 0
+    pid = 0
+    addToPid = 0  # if pid begins from 0, then addToPid should be +1
+    if (molsize > 0):
+        mol = 0
         molcnt = 0
-    else: #not all molecules have same number of atoms
-        mol    = 1
-    name='FE' # default name, overwritten when typenames map is given
+    else:  # not all molecules have same number of atoms
+        mol = 1
+    name = 'FE'  # default name, overwritten when typenames map is given
     while pid <= maxParticleID:
         if system.storage.particleExists(pid):
             particle = system.storage.getParticle(pid)
-            if(pid==0):
+            if(pid == 0):
                 addToPid = 1
-            xpos   = particle.pos[0]
-            ypos   = particle.pos[1]
-            zpos   = particle.pos[2]
-            type   = particle.type
-            q      = particle.q
-            mass   = particle.mass
+            xpos = particle.pos[0]
+            ypos = particle.pos[1]
+            zpos = particle.pos[2]
+            type = particle.type
+            q = particle.q
+            mass = particle.mass
             if typenames:
-                name=typenames[type]
-            st = "%8d T%5d    UNX  %-4s %-4s  %9.6f%14.4f\n" % (pid+addToPid, mol, name, name, q, mass)
+                name = typenames[type]
+            st = "%8d T%5d    UNX  %-4s %-4s  %9.6f%14.4f\n" % (
+                pid + addToPid, mol, name, name, q, mass)
             file.write(st)
-            pid    += 1
-            if (molsize>0):
+            pid += 1
+            if (molsize > 0):
                 molcnt += 1
                 if molcnt == molsize:
-                    mol   += 1
+                    mol += 1
                     molcnt = 0
         else:
             pid += 1
@@ -105,13 +107,14 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
         if system.getInteraction(i).bondType() == espressopp.interaction.Pair:
             try:
 
-                FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
+                FixedPairList = system.getInteraction(
+                    i).getFixedPairList().getBonds()
                 j = 0
                 while j < len(FixedPairList):
                     fplb = FixedPairList[j]
                     k = 0
                     while k < len(fplb):
-                        if maxdist != None:
+                        if maxdist is not None:
                             pid1 = fplb[k][0]
                             pid2 = fplb[k][1]
                             p1 = system.storage.getParticle(pid1)
@@ -122,10 +125,10 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
                             x2 = p2.pos[0]
                             y2 = p2.pos[1]
                             z2 = p2.pos[2]
-                            xx = (x1-x2) * (x1-x2)
-                            yy = (y1-y2) * (y1-y2)
-                            zz = (z1-z2) * (z1-z2)
-                            d = sqrt( xx + yy + zz )
+                            xx = (x1 - x2) * (x1 - x2)
+                            yy = (y1 - y2) * (y1 - y2)
+                            zz = (z1 - z2) * (z1 - z2)
+                            d = sqrt(xx + yy + zz)
                             if (d <= maxdist):
                                 bond.append(fplb[k])
                         else:
@@ -134,7 +137,7 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
 
                     j += 1
 
-            except:
+            except BaseException:
                 pass
 
     bond.sort()
@@ -142,15 +145,18 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
     file.write("\n%8d !NBOND:\n" % (len(bond)))
     i = 0
     while i < len(bond):
-        file.write("%8d%8d" % (bond[i][0]+addToPid, bond[i][1]+addToPid) ) #pid_count_translate[bond[i][1]]
-        if ( ((i+1) % 4) == 0 and (i != 0) ) or i == len(bond)-1 :
+        file.write(
+            "%8d%8d" %
+            (bond[i][0] +
+             addToPid,
+             bond[i][1] +
+                addToPid))  # pid_count_translate[bond[i][1]]
+        if (((i + 1) % 4) == 0 and (i != 0)) or i == len(bond) - 1:
             file.write("\n")
         i += 1
 
     file.write('END\n')
     file.close()
-
-
 
     """
     NOT finished yet - working on that see lammps.write how to do this!
@@ -179,27 +185,28 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
     ndihedrals = len(dihedrals)
   """
 
+
 def psfread(filename):
 
-    pid=[]
-    segname=[]
-    resname=[]
-    resindex=[]
-    atomname=[]
-    atomtype=[]
-    mass=[]
-    charge=[]
+    pid = []
+    segname = []
+    resname = []
+    resindex = []
+    atomname = []
+    atomtype = []
+    mass = []
+    charge = []
 
-    file = open(filename,'r')
+    file = open(filename, 'r')
     line = file.readline()
     line = file.readline()
     line = file.readline()
-    nskip = int(line.split()[0]) #get NREMARKS value
+    nskip = int(line.split()[0])  # get NREMARKS value
     for i in range(nskip):
         line = file.readline()
     line = file.readline()
     line = file.readline()
-    natoms = int(line.split()[0]) #get NATOMS value
+    natoms = int(line.split()[0])  # get NATOMS value
     for i in range(natoms):
         line = file.readline()
         pid.append(int(line[3:8]))
@@ -211,4 +218,4 @@ def psfread(filename):
         charge.append(float(line[34:44]))
         mass.append(float(line[45:59]))
     file.close()
-    return pid,segname,resindex,resname,atomname,atomtype,mass,charge
+    return pid, segname, resindex, resname, atomname, atomtype, mass, charge

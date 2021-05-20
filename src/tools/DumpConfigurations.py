@@ -26,47 +26,53 @@ DumpConfigurations - read/write xyz files
 *****************************************
 """
 
+from espressopp import Real3D
+from math import sqrt
 import espressopp
 
-def writexyz(filename, system, velocities = True, unfolded = False, append = False):
+
+def writexyz(filename, system, velocities=True, unfolded=False, append=False):
     """
     """
     if append:
-        file = open(filename,'a')
+        file = open(filename, 'a')
     else:
-        file = open(filename,'w')
-    numParticles  = int(espressopp.analysis.NPart(system).compute())
+        file = open(filename, 'w')
+    numParticles = int(espressopp.analysis.NPart(system).compute())
     box_x = system.bc.boxL[0]
     box_y = system.bc.boxL[1]
     box_z = system.bc.boxL[2]
     st = "%d\n%15.10f %15.10f %15.10f\n" % (numParticles, box_x, box_y, box_z)
     file.write(st)
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
-    pid   = 0
+    pid = 0
     while pid <= maxParticleID:
         if system.storage.particleExists(pid):
             particle = system.storage.getParticle(pid)
-            if unfolded == False:
-                xpos   = particle.pos[0]
-                ypos   = particle.pos[1]
-                zpos   = particle.pos[2]
+            if not unfolded:
+                xpos = particle.pos[0]
+                ypos = particle.pos[1]
+                zpos = particle.pos[2]
             else:
-                unfoldedpos = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
-                xpos   = unfoldedpos[0]
-                ypos   = unfoldedpos[1]
-                zpos   = unfoldedpos[2]
-            xvel   = particle.v[0]
-            yvel   = particle.v[1]
-            zvel   = particle.v[2]
-            type   = particle.type
+                unfoldedpos = system.bc.getUnfoldedPosition(
+                    particle.pos, particle.imageBox)
+                xpos = unfoldedpos[0]
+                ypos = unfoldedpos[1]
+                zpos = unfoldedpos[2]
+            xvel = particle.v[0]
+            yvel = particle.v[1]
+            zvel = particle.v[2]
+            type = particle.type
             if velocities:
-                st = "%d %d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(pid, type, xpos, ypos, zpos, xvel, yvel, zvel)
+                st = "%d %d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n" % (
+                    pid, type, xpos, ypos, zpos, xvel, yvel, zvel)
             else:
-                st = "%d %d %15.10f %15.10f %15.10f\n"%(pid, type, xpos, ypos, zpos)
+                st = "%d %d %15.10f %15.10f %15.10f\n" % (
+                    pid, type, xpos, ypos, zpos)
             file.write(st)
-            pid   += 1
+            pid += 1
         else:
-            pid   += 1
+            pid += 1
 
     file.close()
 
@@ -100,6 +106,7 @@ def fastwritexyz(filename, system, append = False):
   file.close()
 """
 
+
 def readxyz(filename):
     """
     """
@@ -116,7 +123,7 @@ def readxyz(filename):
         Ly = float(line[4])
         Lz = float(line[8])
 
-    pid  = []
+    pid = []
     type = []
     xpos = []
     ypos = []
@@ -126,8 +133,8 @@ def readxyz(filename):
     zvel = []
     for i in range(num_particles):
         line = file.readline().split()
-        if len(line) == 7 or len(line)==4:
-            line.insert(1,'0')
+        if len(line) == 7 or len(line) == 4:
+            line.insert(1, '0')
         pid.append(int(line[0]))
         type.append(int(line[1]))
         xpos.append(float(line[2]))
@@ -145,7 +152,6 @@ def readxyz(filename):
     file.close()
 
 
-
 def readxyzr(filename):
     """
     """
@@ -157,7 +163,7 @@ def readxyzr(filename):
     Lx = float(line.split()[0])
     Ly = float(line.split()[1])
     Lz = float(line.split()[2])
-    pid  = []
+    pid = []
     type = []
     xpos = []
     ypos = []
@@ -169,7 +175,7 @@ def readxyzr(filename):
     for i in range(num_particles):
         line = file.readline().split()
         if len(line) == 7:
-            line.insert(1,'0')
+            line.insert(1, '0')
         pid.append(int(line[0]))
         type.append(int(line[1]))
         xpos.append(float(line[2]))
@@ -197,14 +203,21 @@ def readxyzr(filename):
 
 # Livia's modified writexyz to fastwritexyz with velocities
 
-def fastwritexyz(filename, system, velocities = True, unfolded = True, append = False, scale=1.0):
+
+def fastwritexyz(
+        filename,
+        system,
+        velocities=True,
+        unfolded=True,
+        append=False,
+        scale=1.0):
     """
     """
 
     if append:
-        file = open(filename,'a')
+        file = open(filename, 'a')
     else:
-        file = open(filename,'w')
+        file = open(filename, 'w')
 
     configurations = espressopp.analysis.ConfigurationsExt(system)
     configurations.unfolded = unfolded
@@ -216,30 +229,33 @@ def fastwritexyz(filename, system, velocities = True, unfolded = True, append = 
         velocities.gather()
         velocity = velocities[0]
 
-    numParticles  = int(espressopp.analysis.NPart(system).compute())
-    box_x = system.bc.boxL[0]*scale
-    box_y = system.bc.boxL[1]*scale
-    box_z = system.bc.boxL[2]*scale
+    numParticles = int(espressopp.analysis.NPart(system).compute())
+    box_x = system.bc.boxL[0] * scale
+    box_y = system.bc.boxL[1] * scale
+    box_z = system.bc.boxL[2] * scale
     st = "%d\n%15.10f %15.10f %15.10f\n" % (numParticles, box_x, box_y, box_z)
     file.write(st)
 
     for pid in configuration:
-        xpos   = configuration[pid][0]*scale
-        ypos   = configuration[pid][1]*scale
-        zpos   = configuration[pid][2]*scale
+        xpos = configuration[pid][0] * scale
+        ypos = configuration[pid][1] * scale
+        zpos = configuration[pid][2] * scale
         if velocities:
-            xvel   = velocity[pid][0]*scale
-            yvel   = velocity[pid][1]*scale
-            zvel   = velocity[pid][2]*scale
-            st = "%d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos, xvel, yvel, zvel)
+            xvel = velocity[pid][0] * scale
+            yvel = velocity[pid][1] * scale
+            zvel = velocity[pid][2] * scale
+            st = "%d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n" % (
+                pid, xpos, ypos, zpos, xvel, yvel, zvel)
         else:
-            st = "%d %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos)
+            st = "%d %15.10f %15.10f %15.10f\n" % (pid, xpos, ypos, zpos)
         file.write(st)
         #pid   += 1
 
     file.close()
 
 # Franziska's modified readxyz to fastreadxyz without velocities
+
+
 def fastreadxyz(filename):
     """
     """
@@ -257,15 +273,15 @@ def fastreadxyz(filename):
         Ly = float(line[4])
         Lz = float(line[8])
 
-    pid  = []
+    pid = []
     type = []
     xpos = []
     ypos = []
     zpos = []
     for i in range(num_particles):
         line = file.readline().split()
-        if len(line) == 7 or len(line)==4:
-            line.insert(1,'0')
+        if len(line) == 7 or len(line) == 4:
+            line.insert(1, '0')
         pid.append(int(line[0]))
         type.append(int(line[1]))
         xpos.append(float(line[2]))
@@ -275,7 +291,8 @@ def fastreadxyz(filename):
     return pid, type, xpos, ypos, zpos, Lx, Ly, Lz
     file.close()
 
-def fastwritexyz_standard(filename, system, unfolded = False, append = False):
+
+def fastwritexyz_standard(filename, system, unfolded=False, append=False):
     """
     Fast write standard xyz file. Generally standard xyz file is
 
@@ -296,15 +313,15 @@ def fastwritexyz_standard(filename, system, unfolded = False, append = False):
     """
 
     if append:
-        file = open(filename,'a')
+        file = open(filename, 'a')
     else:
-        file = open(filename,'w')
+        file = open(filename, 'w')
 
     conf = espressopp.analysis.ConfigurationsExt(system)
     conf.unfolded = unfolded
     conf.gather()
 
-    numParticles  = int(espressopp.analysis.NPart(system).compute())
+    numParticles = int(espressopp.analysis.NPart(system).compute())
     box_x = system.bc.boxL[0]
     box_y = system.bc.boxL[1]
     box_z = system.bc.boxL[2]
@@ -312,22 +329,27 @@ def fastwritexyz_standard(filename, system, unfolded = False, append = False):
     file.write(st)
 
     for pid in conf[0]:
-        xpos   = conf[0][pid][0]
-        ypos   = conf[0][pid][1]
-        zpos   = conf[0][pid][2]
+        xpos = conf[0][pid][0]
+        ypos = conf[0][pid][1]
+        zpos = conf[0][pid][2]
 
-        st = "%d %15.10f %15.10f %15.10f\n"%(0, xpos, ypos, zpos)
+        st = "%d %15.10f %15.10f %15.10f\n" % (0, xpos, ypos, zpos)
         file.write(st)
-        pid   += 1
+        pid += 1
 
     file.close()
 
 
-import espressopp
-from math import sqrt
-from espressopp import Real3D
-
-def xyzfilewrite(filename, system, append=False, atomtypes={0:'Fe',1:'O',2:'C'}, velocities=False, charge=False):
+def xyzfilewrite(
+        filename,
+        system,
+        append=False,
+        atomtypes={
+            0: 'Fe',
+            1: 'O',
+            2: 'C'},
+    velocities=False,
+        charge=False):
     """
 
     This method creates a xyz file with the data from a specific system:
@@ -379,12 +401,12 @@ def xyzfilewrite(filename, system, append=False, atomtypes={0:'Fe',1:'O',2:'C'},
     if append:
         file = open(filename, 'a')
     else:
-        file = open(filename,'w')
+        file = open(filename, 'w')
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
     pid = 0
     comment = "REMARK generated by ESPResSo++"
 
-    st = "%d\n%s\n"%(maxParticleID, comment)
+    st = "%d\n%s\n" % (maxParticleID, comment)
     file.write(st)
 
     while pid <= maxParticleID:
@@ -395,26 +417,30 @@ def xyzfilewrite(filename, system, append=False, atomtypes={0:'Fe',1:'O',2:'C'},
             ypos = particle.pos[1]
             zpos = particle.pos[2]
             type = particle.type
-            vx   = particle.v[0]
-            vy   = particle.v[1]
-            vz   = particle.v[2]
-            q    = particle.q
+            vx = particle.v[0]
+            vy = particle.v[1]
+            vz = particle.v[2]
+            q = particle.q
 
             if type in atomtypes:
                 atom = atomtypes[type]
             else:
                 atom = 'XX'
 
-            if velocities == True:
-                if charge == True:
-                    st = "%s %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(atom, xpos, ypos, zpos, vx, vy, vz, q)
+            if velocities:
+                if charge:
+                    st = "%s %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n" % (
+                        atom, xpos, ypos, zpos, vx, vy, vz, q)
                 else:
-                    st = "%s %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(atom, xpos, ypos, zpos, vx, vy, vz)
+                    st = "%s %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n" % (
+                        atom, xpos, ypos, zpos, vx, vy, vz)
             else:
-                if charge == True:
-                    st = "%s %15.10f %15.10f %15.10f %15.10f\n"%(atom, xpos, ypos, zpos, q)
+                if charge:
+                    st = "%s %15.10f %15.10f %15.10f %15.10f\n" % (
+                        atom, xpos, ypos, zpos, q)
                 else:
-                    st = "%s %15.10f %15.10f %15.10f\n"%(atom, xpos, ypos, zpos)
+                    st = "%s %15.10f %15.10f %15.10f\n" % (
+                        atom, xpos, ypos, zpos)
 
             file.write(st)
             pid += 1

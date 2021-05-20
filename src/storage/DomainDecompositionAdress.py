@@ -58,21 +58,31 @@ from espressopp import check
 
 from espressopp.storage.Storage import *
 
+
 class DomainDecompositionAdressLocal(StorageLocal,
-                               storage_DomainDecompositionAdress):
+                                     storage_DomainDecompositionAdress):
 
     def __init__(self, system, nodeGrid, cellGrid, halfCellInt):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, storage_DomainDecompositionAdress, system, nodeGrid, cellGrid, halfCellInt)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, storage_DomainDecompositionAdress,
+                    system, nodeGrid, cellGrid, halfCellInt)
 
 
 if pmi.isController:
     class DomainDecompositionAdress(Storage):
         pmiproxydefs = dict(
-            cls = 'espressopp.storage.DomainDecompositionAdressLocal',
-            pmicall = ['getCellGrid', 'cellAdjust']
-            )
-        def __init__(self, system, nodeGrid='auto', cellGrid='auto', halfCellInt='auto', nocheck=False):
+            cls='espressopp.storage.DomainDecompositionAdressLocal',
+            pmicall=['getCellGrid', 'cellAdjust']
+        )
+
+        def __init__(
+                self,
+                system,
+                nodeGrid='auto',
+                cellGrid='auto',
+                halfCellInt='auto',
+                nocheck=False):
             if nocheck:
                 self.next_id = 0
                 self.pmiinit(system, nodeGrid, cellGrid, halfCellInt)
@@ -83,18 +93,20 @@ if pmi.isController:
                     else:
                         nodeGrid = toInt3DFromVector(nodeGrid)
                     if cellGrid == 'auto':
-                        raise Exception('Automatic cell size calculation not yet implemented')
+                        raise Exception(
+                            'Automatic cell size calculation not yet implemented')
                     else:
                         cellGrid = toInt3DFromVector(cellGrid)
                     if halfCellInt == 'auto':
                         halfCellInt = 1
 
                     for k in range(3):
-                        if nodeGrid[k]*cellGrid[k] == 1:
+                        if nodeGrid[k] * cellGrid[k] == 1:
                             print(("Warning! cellGrid[{}] has been "
                                    "adjusted to 2 (was={})".format(k, cellGrid[k])))
                             cellGrid[k] = 2
                     self.next_id = 0
                     self.pmiinit(system, nodeGrid, cellGrid, halfCellInt)
                 else:
-                    raise Exception('Error: could not create DomainDecomposition object')
+                    raise Exception(
+                        'Error: could not create DomainDecomposition object')

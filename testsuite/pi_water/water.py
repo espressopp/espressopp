@@ -39,25 +39,27 @@ from espressopp.tools import decomp
 from espressopp.tools import timers
 import pathintegral
 
+
 def genTabPotentials(tabfilesnb):
     potentials = {}
     for fg in tabfilesnb:
-        fe = fg.split(".")[0]+".tab" # name of espressopp file
+        fe = fg.split(".")[0] + ".tab"  # name of espressopp file
         gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
         pot = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rc)
-        t1, t2 = fg[6], fg[8] # type 1, type 2
-        potentials.update({t1+"_"+t2: pot})
+        t1, t2 = fg[6], fg[8]  # type 1, type 2
+        potentials.update({t1 + "_" + t2: pot})
         print("created", t1, t2, fe)
     return potentials
 
 # This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file.
 # Output of gromacs energies and esp energies should be the same
 
+
 # simulation parameters (nvt = False is nve)
-steps = 1 #100
-check = 1 #steps/10
-rc    = 0.9  # Verlet list cutoff
-skin  = 0.14
+steps = 1  # 100
+check = 1  # steps/10
+rc = 0.9  # Verlet list cutoff
+skin = 0.14
 timestep = 0.0002
 # parameters to convert GROMACS tabulated potential file
 sigma = 1.0
@@ -72,8 +74,10 @@ topfile = "topol.top"
 
 # this calls the gromacs parser for processing the top file (and included files) and the conf file
 # The variables at the beginning defaults, types, etc... can be found by calling
-# gromacs.read(grofile,topfile) without return values. It then prints out the variables to be unpacked
-defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, resname, resid, Lx, Ly, Lz= gromacs.read(grofile,topfile)
+# gromacs.read(grofile,topfile) without return values. It then prints out
+# the variables to be unpacked
+defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, resname, resid, Lx, Ly, Lz = gromacs.read(
+    grofile, topfile)
 
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
@@ -91,13 +95,14 @@ system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
+nodeGrid = decomp.nodeGrid(comm.size, size, rc, skin)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(
+    system, nodeGrid, cellGrid)
 
 # setting up GROMACS interaction stuff
 # create a force capped Lennard-Jones interaction that uses a verlet list
-verletlist  = espressopp.VerletList(system, rc)
+verletlist = espressopp.VerletList(system, rc)
 #interaction = espressopp.interaction.VerletListLennardJonesGromacs(verletlist)
 
 # add particles to the system and then decompose
@@ -108,7 +113,7 @@ for pid in range(num_particles):
             Real3D(0, 0, 0), types[pid], masses[pid], charges[pid]]
     allParticles.append(part)
 system.storage.addParticles(allParticles, *props)
-#system.storage.decompose()
+# system.storage.decompose()
 
 # set up LJ interaction according to the parameters read from the .top file
 #ljinteraction=gromacs.setLennardJonesInteractions(system, defaults, atomtypeparameters, verletlist,rc)
@@ -123,27 +128,39 @@ tabulatedinteraction.setPotential(1, 1, potentials["H_H"])
 system.addInteraction(tabulatedinteraction)
 
 # set up angle interactions according to the parameters read from the .top file
-angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams)
+angleinteractions = gromacs.setAngleInteractions(
+    system, angletypes, angletypeparams)
 
-# set up bonded interactions according to the parameters read from the .top file
-bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
+# set up bonded interactions according to the parameters read from the
+# .top file
+bondedinteractions = gromacs.setBondedInteractions(
+    system, bondtypes, bondtypeparams)
 
-# exlusions, i.e. pairs of atoms not considered for the non-bonded part. Those are defined either by bonds which automatically generate an exclusion. Or by the nregxcl variable
+# exlusions, i.e. pairs of atoms not considered for the non-bonded part.
+# Those are defined either by bonds which automatically generate an
+# exclusion. Or by the nregxcl variable
 verletlist.exclude(exclusions)
 
 # langevin thermostat
 langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 10
-langevin.temperature = 2.4942 # kT in gromacs units
+langevin.temperature = 2.4942  # kT in gromacs units
 integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
 print("POT", potentials)
-pathintegral.createPathintegralSystem(allParticles, props, types, system, langevin, potentials, P=16)
+pathintegral.createPathintegralSystem(
+    allParticles,
+    props,
+    types,
+    system,
+    langevin,
+    potentials,
+    P=16)
 
 system.storage.decompose()
-num_particles  = int(espressopp.analysis.NPart(system).compute())
+num_particles = int(espressopp.analysis.NPart(system).compute())
 
 # print simulation parameters
 print('')
@@ -165,7 +182,7 @@ pressure = espressopp.analysis.Pressure(system)
 pressureTensor = espressopp.analysis.PressureTensor(system)
 
 print("i*timestep,Eb, EAng, ETab, Ek, Etotal T")
-fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
+fmt = '%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 outfile = open("esp.dat", "w")
 
 start_time = time.process_time()
@@ -182,26 +199,31 @@ for i in range(check):
     P = pressure.compute()
     Eb = 0
     EAng = 0
-    ETab=0
+    ETab = 0
     #for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
     #for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
     #ELj= ljinteraction.computeEnergy()
     #EQQ= qq_interactions.computeEnergy()
-    ETab= tabulatedinteraction.computeEnergy()
+    ETab = tabulatedinteraction.computeEnergy()
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)
-    Etotal = Ek+Eb+EAng+ETab
+    Etotal = Ek + Eb + EAng + ETab
 
-    sys.stdout.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
-    outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
+    sys.stdout.write(fmt % (i * timestep, Eb, EAng, ETab, Ek, Etotal, T))
+    outfile.write(fmt % (i * timestep, Eb, EAng, ETab, Ek, Etotal, T))
     #espressopp.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
-    integrator.run(int(steps/check)) # print out every steps/check steps
+    integrator.run(int(steps / check))  # print out every steps/check steps
     #espressopp.tools.vmd.imd_positions(system, sock)
 
 # print timings and neighbor list information
 end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
-espressopp.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
+espressopp.tools.analyse.final_info(
+    system,
+    integrator,
+    verletlist,
+    start_time,
+    end_time)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

@@ -4,56 +4,60 @@ import espressopp
 from espressopp.tools import replicate, readxyz
 from espressopp import Real3D
 
-import time, sys
+import time
+import sys
 import numpy as np
+
 
 def bench_lj(xyz_file):
 
     # read from xyz file
     print("reading from: ", xyz_file)
-    pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz = readxyz(xyz_file)
-    Npart              = len(pid)
-    box                = (Lx,Ly,Lz)
+    pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz = readxyz(
+        xyz_file)
+    Npart = len(pid)
+    box = (Lx, Ly, Lz)
 
     ################################################
     # SIMULATION PARAMETERS
     ################################################
 
     # cutoff of the short range potential
-    r_cutoff           = 2.5
+    r_cutoff = 2.5
     # VerletList skin size (also used for domain decomposition)
-    skin               = 0.4
+    skin = 0.4
     # time step for the velocity verlet integrator
-    dt                 = 0.005
+    dt = 0.005
     # Lennard Jones epsilon during equilibration phase
-    epsilon00          = 0.1
-    epsilon11          = 0.9
-    epsilon01          = (0.1*0.3)**(0.5)
+    epsilon00 = 0.1
+    epsilon11 = 0.9
+    epsilon01 = (0.1 * 0.3)**(0.5)
     # Lennard Jones sigma during warmup and equilibration
-    sigma00            = 1.0
-    sigma11            = 0.6
-    sigma01            = (sigma00+sigma11)/2.0
+    sigma00 = 1.0
+    sigma11 = 0.6
+    sigma01 = (sigma00 + sigma11) / 2.0
 
-    steps              = 100
+    steps = 100
 
     ################################################
     # SETUP SYSTEM
     ################################################
 
     # create the basic system
-    system             = espressopp.System()
-    # use the random number generator that is included within the ESPResSo++ package
-    system.rng         = espressopp.esutil.RNG()
+    system = espressopp.System()
+    # use the random number generator that is included within the ESPResSo++
+    # package
+    system.rng = espressopp.esutil.RNG()
     # use orthorhombic periodic boundary conditions
-    system.bc          = espressopp.bc.OrthorhombicBC(system.rng, box)
+    system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
     # set the skin size used for verlet lists and cell sizes
-    system.skin        = skin
+    system.skin = skin
     # get the number of CPUs to use
-    NCPUs              = espressopp.MPI.COMM_WORLD.size
+    NCPUs = espressopp.MPI.COMM_WORLD.size
     # calculate a regular 3D grid according to the number of CPUs available
-    nodeGrid           = espressopp.tools.decomp.nodeGrid(NCPUs, box, r_cutoff, skin)
+    nodeGrid = espressopp.tools.decomp.nodeGrid(NCPUs, box, r_cutoff, skin)
     # calculate a 3D subgrid to speed up verlet list builds and communication
-    cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid,  r_cutoff, skin)
+    cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, r_cutoff, skin)
 
     print("gitrevision        = ", espressopp.Version().gitrevision)
     print("NCPUs              = ", NCPUs)
@@ -65,15 +69,16 @@ def bench_lj(xyz_file):
     print("Nparticles         = ", Npart)
     print("steps              = ", steps)
 
-    # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
-    system.storage     = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+    # create a domain decomposition particle storage with the calculated
+    # nodeGrid and cellGrid
+    system.storage = espressopp.storage.DomainDecomposition(
+        system, nodeGrid, cellGrid)
 
     # use a velocity Verlet integration scheme
-    integrator         = espressopp.integrator.VelocityVerlet(system)
+    integrator = espressopp.integrator.VelocityVerlet(system)
 
     # set the integration step
-    integrator.dt  = dt
-
+    integrator.dt = dt
 
     ################################################
     # ADD PARTICLES
@@ -86,7 +91,7 @@ def bench_lj(xyz_file):
     pid = 0
     for x, y, z in zip(xpos, ypos, zpos):
         ptype = pid % 2
-        new_particles.append([pid, ptype, Real3D(x,y,z)])
+        new_particles.append([pid, ptype, Real3D(x, y, z)])
         pid += 1
     system.storage.addParticles(new_particles, *props)
     system.storage.decompose()
@@ -96,17 +101,32 @@ def bench_lj(xyz_file):
     ########################################################################
     # 7. setting up interaction potential for the equilibration            #
     ########################################################################
-    verletlist  = espressopp.VerletList(system, r_cutoff)
+    verletlist = espressopp.VerletList(system, r_cutoff)
     interaction = espressopp.interaction.VerletListLennardJones(verletlist)
-    interaction.setPotential(type1=0, type2=0,
-                    potential=espressopp.interaction.LennardJones(
-                    epsilon=epsilon00, sigma=sigma00, cutoff=r_cutoff, shift=0.0))
-    interaction.setPotential(type1=0, type2=1,
-                    potential=espressopp.interaction.LennardJones(
-                    epsilon=epsilon01, sigma=sigma01, cutoff=r_cutoff, shift=0.0))
-    interaction.setPotential(type1=1, type2=1,
-                    potential=espressopp.interaction.LennardJones(
-                    epsilon=epsilon11, sigma=sigma11, cutoff=r_cutoff, shift=0.0))
+    interaction.setPotential(
+        type1=0,
+        type2=0,
+        potential=espressopp.interaction.LennardJones(
+            epsilon=epsilon00,
+            sigma=sigma00,
+            cutoff=r_cutoff,
+            shift=0.0))
+    interaction.setPotential(
+        type1=0,
+        type2=1,
+        potential=espressopp.interaction.LennardJones(
+            epsilon=epsilon01,
+            sigma=sigma01,
+            cutoff=r_cutoff,
+            shift=0.0))
+    interaction.setPotential(
+        type1=1,
+        type2=1,
+        potential=espressopp.interaction.LennardJones(
+            epsilon=epsilon11,
+            sigma=sigma11,
+            cutoff=r_cutoff,
+            shift=0.0))
     system.addInteraction(interaction)
 
     print("running integrator...")
@@ -125,10 +145,10 @@ def bench_lj(xyz_file):
         "Resort",               # 8
         "Lost"                  # 9
     ]
-    sub_keys = [0,6,8,4,1,2,5,7]
+    sub_keys = [0, 6, 8, 4, 1, 2, 5, 7]
 
     timers = list(integrator.getTimers())
-    timers_summ = np.mean(np.array(timers),axis=0)
+    timers_summ = np.mean(np.array(timers), axis=0)
 
     # add non-interacting particles of different type
     # this forces potentialArray to resize
@@ -136,7 +156,7 @@ def bench_lj(xyz_file):
     new_particles = []
     for x, y, z in zip(xpos[:10], ypos[:10], zpos[:10]):
         ptype = 6
-        new_particles.append([pid, ptype, Real3D(x,y,z)])
+        new_particles.append([pid, ptype, Real3D(x, y, z)])
         pid += 1
     system.storage.addParticles(new_particles, *props)
     system.storage.decompose()
@@ -148,11 +168,11 @@ def bench_lj(xyz_file):
     print("running integrator... DONE")
 
     timers = list(integrator.getTimers())
-    timers_summ += np.mean(np.array(timers),axis=0)
+    timers_summ += np.mean(np.array(timers), axis=0)
 
     print("")
     for k in sub_keys:
-        print("{:18} =  {}".format(keys[k],timers_summ[k]))
+        print("{:18} =  {}".format(keys[k], timers_summ[k]))
     print("")
 
     temperature = espressopp.analysis.Temperature(system)
@@ -160,11 +180,13 @@ def bench_lj(xyz_file):
     print("temperature        =  {}".format(T))
 
     T_exp = 0.160074388303
-    assert(abs(T-T_exp)<1.0e-8)
+    assert(abs(T - T_exp) < 1.0e-8)
+
 
 def main():
     xyz_file = "lennard_jones_fluid_10000_2048.xyz"
     bench_lj(xyz_file)
+
 
 if __name__ == '__main__':
     main()

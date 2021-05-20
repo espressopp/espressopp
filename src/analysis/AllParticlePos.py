@@ -31,13 +31,15 @@ espressopp.analysis.AllParticlePos
 from espressopp import pmi
 from _espressopp import analysis_AllParticlePos
 
+
 class AllParticlePosLocal(object):
 
     def gatherAllPositions(self):
         return self.cxxclass.gatherAllPositions(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class AllParticlePos(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmicall = [ "gatherAllPositions" ]
+            pmicall=["gatherAllPositions"]
         )

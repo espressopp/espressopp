@@ -30,25 +30,27 @@ input to an ESPResSo++ simulation.
 
 import espressopp
 
+
 def read(fin):
 
     f = open(fin)
-    line = f.readline() # comment line
-    while not 'atoms' in line: #skip possible blank line
+    line = f.readline()  # comment line
+    while 'atoms' not in line:  # skip possible blank line
         line = f.readline()
     num_particles = int(line.split()[0])
     num_bonds = int(f.readline().split()[0])
     num_angles = int(f.readline().split()[0])
     num_dihedrals = int(f.readline().split()[0])
-    line = f.readline() # impropers
-    line = f.readline() # blank line
-    line = f.readline() # atom types and maybe the word "velocities"
+    line = f.readline()  # impropers
+    line = f.readline()  # blank line
+    line = f.readline()  # atom types and maybe the word "velocities"
     num_types = int(line.split()[0])
-    velocities = True if 'velocities' in line else False #TODO fix this? why should there be the velocity keyword?
+    # TODO fix this? why should there be the velocity keyword?
+    velocities = True if 'velocities' in line else False
 
     # find and store size of box
     line = ''
-    while not 'xlo' in line:
+    while 'xlo' not in line:
         line = f.readline()
     xmin, xmax = list(map(float, line.split()[0:2]))
     ymin, ymax = list(map(float, f.readline().split()[0:2]))
@@ -59,13 +61,14 @@ def read(fin):
 
     # find and store coordinates
     line = ''
-    while not 'Atoms' in line:
+    while 'Atoms' not in line:
         line = f.readline()
     line = f.readline()
 
     if(num_types == 1):
         rstart = 3
-        if(num_bonds == 0): rstart = 2
+        if(num_bonds == 0):
+            rstart = 2
 
         x = []
         y = []
@@ -92,43 +95,45 @@ def read(fin):
     if(num_bonds != 0):
         # find and store bonds
         line = ''
-        while not 'Bonds' in line:
+        while 'Bonds' not in line:
             line = f.readline()
         line = f.readline()
         bonds = []
         for i in range(num_bonds):
-            bond_id, bond_type, pid1, pid2 = list(map(int, f.readline().split()))
+            bond_id, bond_type, pid1, pid2 = list(
+                map(int, f.readline().split()))
             bonds.append((pid1, pid2))
 
     if(num_angles != 0):
         # find and store angles
         line = ''
-        while not 'Angles' in line:
+        while 'Angles' not in line:
             line = f.readline()
         line = f.readline()
         angles = []
         for i in range(num_angles):
-            angle_id, angle_type, pid1, pid2, pid3 = list(map(int, f.readline().split()))
+            angle_id, angle_type, pid1, pid2, pid3 = list(
+                map(int, f.readline().split()))
             angles.append((pid1, pid2, pid3))
-
 
     if(num_dihedrals != 0):
         # find and store angles
         line = ''
-        while not 'Dihedrals' in line:
+        while 'Dihedrals' not in line:
             line = f.readline()
         line = f.readline()
         dihedrals = []
         for i in range(num_dihedrals):
-            dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(map(int, f.readline().split()))
+            dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(
+                map(int, f.readline().split()))
             dihedrals.append((pid1, pid2, pid3, pid4))
 
     if(velocities):
         # find and store velocities
         line = ''
-        while not 'Velocities' in line:
+        while 'Velocities' not in line:
             line = f.readline()
-        line = f.readline() # blank line
+        line = f.readline()  # blank line
         vx = []
         vy = []
         vz = []
@@ -138,9 +143,7 @@ def read(fin):
             vy.append(vy_)
             vz.append(vz_)
 
-
     f.close()
-
 
     if(num_types != 1):
         return p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz
@@ -156,11 +159,12 @@ def read(fin):
     else:
         return bonds, angles, dihedrals, x, y, z, Lx, Ly, Lz
 
+
 def read_charmm(fin):
 
     f = open(fin)
-    line = f.readline() # comment line
-    while not 'atoms' in line: #skip possible blank line
+    line = f.readline()  # comment line
+    while 'atoms' not in line:  # skip possible blank line
         line = f.readline()
     num_particles = int(line.split()[0])
     num_bonds = int(f.readline().split()[0])
@@ -168,24 +172,25 @@ def read_charmm(fin):
     num_dihedrals = int(f.readline().split()[0])
     num_impropers = int(f.readline().split()[0])
 
-    line = f.readline() # blank line
+    line = f.readline()  # blank line
 
-    line = f.readline() # atom types
+    line = f.readline()  # atom types
     num_types = int(line.split()[0])
-    line = f.readline() # bond types
+    line = f.readline()  # bond types
     num_bond_types = int(line.split()[0])
-    line = f.readline() # angle types
+    line = f.readline()  # angle types
     num_angle_types = int(line.split()[0])
-    line = f.readline() # dihedral types
+    line = f.readline()  # dihedral types
     num_dihedral_types = int(line.split()[0])
-    line = f.readline() # impropers types
+    line = f.readline()  # impropers types
     num_improper_types = int(line.split()[0])
 
-    velocities = True if 'velocities' in line else False #TODO fix this? why should there be the velocity keyword?
+    # TODO fix this? why should there be the velocity keyword?
+    velocities = True if 'velocities' in line else False
 
     # find and store size of box
     line = ''
-    while not 'xlo' in line:
+    while 'xlo' not in line:
         line = f.readline()
     xmin, xmax = list(map(float, line.split()[0:2]))
     ymin, ymax = list(map(float, f.readline().split()[0:2]))
@@ -194,9 +199,9 @@ def read_charmm(fin):
     Ly = ymax - ymin
     Lz = zmax - zmin
 
-    #find and store masses
+    # find and store masses
     line = ''
-    while not 'Masses' in line:
+    while 'Masses' not in line:
         line = f.readline()
     line = f.readline()
     masses = []
@@ -206,9 +211,9 @@ def read_charmm(fin):
         rmass = float(f.readline().split()[1])
         masses.append(rmass)
 
-#find and store LJ param
+# find and store LJ param
     line = ''
-    while not 'Pair Coeffs' in line:
+    while 'Pair Coeffs' not in line:
         line = f.readline()
     line = f.readline()
     epsilon = []
@@ -221,16 +226,16 @@ def read_charmm(fin):
         epsilon.append(repsilon)
         sigma.append(rsigma)
 
-
     # find and store coordinates
     line = ''
-    while not 'Atoms' in line:
+    while 'Atoms' not in line:
         line = f.readline()
     line = f.readline()
 
     if(num_types == 1):
         rstart = 3
-        if(num_bonds == 0): rstart = 2
+        if(num_bonds == 0):
+            rstart = 2
 
         p_type = []
         q = []
@@ -238,7 +243,7 @@ def read_charmm(fin):
         y = []
         z = []
         for i in range(num_particles):
-            rx, ry, rz = list(map(float,f.readline().split()[rstart:]))
+            rx, ry, rz = list(map(float, f.readline().split()[rstart:]))
             x.append(rx)
             y.append(ry)
             z.append(rz)
@@ -259,7 +264,7 @@ def read_charmm(fin):
     if(num_bonds != 0):
         # find and store bond coeff
         line = ''
-        while not 'Bond Coeffs' in line:
+        while 'Bond Coeffs' not in line:
             line = f.readline()
         line = f.readline()
         K = []
@@ -272,25 +277,24 @@ def read_charmm(fin):
             K.append(rK)
             r0.append(rr0)
 
-
-
     if(num_bonds != 0):
         # find and store bonds
         line = ''
-        while not 'Bonds' in line:
+        while 'Bonds' not in line:
             line = f.readline()
         line = f.readline()
         bonds = []
         bonds_type_arr = []
         for i in range(num_bonds):
-            bond_id, bond_type, pid1, pid2 = list(map(int, f.readline().split()))
+            bond_id, bond_type, pid1, pid2 = list(
+                map(int, f.readline().split()))
             bonds.append((pid1, pid2))
             bonds_type_arr.append(bond_type)
 
     if(num_angles != 0):
         # find and store angle coeff
         line = ''
-        while not 'Angle Coeffs' in line:
+        while 'Angle Coeffs' not in line:
             line = f.readline()
         line = f.readline()
         Kt = []
@@ -306,20 +310,21 @@ def read_charmm(fin):
     if(num_angles != 0):
         # find and store angles
         line = ''
-        while not 'Angles' in line:
+        while 'Angles' not in line:
             line = f.readline()
         line = f.readline()
         angles = []
         angles_type_arr = []
         for i in range(num_angles):
-            angle_id, angle_type, pid1, pid2, pid3 = list(map(int, f.readline().split()))
+            angle_id, angle_type, pid1, pid2, pid3 = list(
+                map(int, f.readline().split()))
             angles.append((pid1, pid2, pid3))
             angles_type_arr.append(angle_type)
 
     if(num_dihedrals != 0):
-    # find and store dihedrals coeff
+        # find and store dihedrals coeff
         line = ''
-        while not 'Dihedral Coeffs' in line:
+        while 'Dihedral Coeffs' not in line:
             line = f.readline()
         line = f.readline()
         Kdh = []
@@ -338,22 +343,23 @@ def read_charmm(fin):
     if(num_dihedrals != 0):
         # find and store dihedrals
         line = ''
-        while not 'Dihedrals' in line:
+        while 'Dihedrals' not in line:
             line = f.readline()
         line = f.readline()
         dihedrals = []
         dihedrals_type_arr = []
         for i in range(num_dihedrals):
-            dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(map(int, f.readline().split()))
+            dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = list(
+                map(int, f.readline().split()))
             dihedrals.append((pid1, pid2, pid3, pid4))
             dihedrals_type_arr.append(dihedral_type)
 
     if(velocities):
         # find and store velocities
         line = ''
-        while not 'Velocities' in line:
+        while 'Velocities' not in line:
             line = f.readline()
-        line = f.readline() # blank line
+        line = f.readline()  # blank line
         vx = []
         vy = []
         vz = []
@@ -363,11 +369,7 @@ def read_charmm(fin):
             vy.append(vy_)
             vz.append(vz_)
 
-
     f.close()
-
-
-
 
     if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0 and not velocities):
         return p_type, masses, epsilon, sigma, q, x, y, z, Lx, Ly, Lz
@@ -386,41 +388,43 @@ def read_charmm(fin):
     if(num_bonds != 0 and num_angles != 0 and num_dihedrals != 0 and velocities):
         return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, Kt, t0, angles, angles_type_arr, Kdh, ndh, ph0, dihedrals, dihedrals_type_arr, q, x, y, z, Lx, Ly, Lz, vx, vy, vz
 
+
 def write(fout, system, writeVelocities=False):
 
     # first collect all the information that we need to write into the file
-    numParticles  = int(espressopp.analysis.NPart(system).compute())
+    numParticles = int(espressopp.analysis.NPart(system).compute())
     box_x = system.bc.boxL[0]
     box_y = system.bc.boxL[1]
     box_z = system.bc.boxL[2]
 
-    bonds          = []
-    nbondtypes     = 0
-    angles         = []
-    nangletypes    = 0
-    dihedrals      = []
+    bonds = []
+    nbondtypes = 0
+    angles = []
+    nangletypes = 0
+    dihedrals = []
     ndihedraltypes = 0
 
     nInteractions = system.getNumberOfInteractions()
     for i in range(nInteractions):
         bT = system.getInteraction(i).bondType()
-        if   bT == espressopp.interaction.Pair:
+        if bT == espressopp.interaction.Pair:
             nbondtypes += 1
-            bl  = system.getInteraction(i).getFixedPairList().getBonds()
+            bl = system.getInteraction(i).getFixedPairList().getBonds()
             bln = []
             for j in range(len(bl)):
                 bln.extend(bl[j])
             bonds.append(bln)
         elif bT == espressopp.interaction.Angular:
             nangletypes += 1
-            an  = system.getInteraction(i).getFixedTripleList().getTriples()
+            an = system.getInteraction(i).getFixedTripleList().getTriples()
             ann = []
             for j in range(len(an)):
                 ann.extend(an[j])
             angles.append(ann)
         elif bT == espressopp.interaction.Dihedral:
             ndihedraltypes += 1
-            di  = system.getInteraction(i).getFixedQuadrupleList().getQuadruples()
+            di = system.getInteraction(
+                i).getFixedQuadrupleList().getQuadruples()
             din = []
             for j in range(len(di)):
                 din.extend(di[j])
@@ -438,28 +442,28 @@ def write(fout, system, writeVelocities=False):
 
     atomtypes = []
     maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
-    pid   = 0
+    pid = 0
     while pid <= maxParticleID:
         if system.storage.particleExists(pid):
             particle = system.storage.getParticle(pid)
-            type   = particle.type
+            type = particle.type
             if type in atomtypes:
-                pid   += 1
+                pid += 1
             else:
                 atomtypes.append(type)
                 pid += 1
         else:
-            pid   += 1
+            pid += 1
     natomtypes = len(atomtypes)
 
     # now we can write the file
-    file = open(fout,'w')
+    file = open(fout, 'w')
     file.write('LAMMPS\n\n')
     file.write('%5d atoms\n' % numParticles)
     file.write('%5d bonds\n' % nbonds)
     file.write('%5d angles\n' % nangles)
     file.write('%5d dihedrals\n' % ndihedrals)
-    #impropers are not supported yet
+    # impropers are not supported yet
     file.write('%5d impropers\n\n' % 0)
 
     file.write('%5d atom types\n' % natomtypes)
@@ -472,45 +476,47 @@ def write(fout, system, writeVelocities=False):
     file.write('%.4f %.4f ylo yhi\n' % (0.0, box_y))
     file.write('%.4f %.4f zlo zhi\n' % (0.0, box_z))
 
-    file.write('\nAtoms\n\n');
-    pid   = 0
+    file.write('\nAtoms\n\n')
+    pid = 0
     while pid <= maxParticleID:
         if system.storage.particleExists(pid):
             particle = system.storage.getParticle(pid)
             p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
-            xpos   = p[0]
-            ypos   = p[1]
-            zpos   = p[2]
-            type   = particle.type
+            xpos = p[0]
+            ypos = p[1]
+            zpos = p[2]
+            type = particle.type
             # we don't support molecule tags yet
-            molecule_tag = (pid-1) / 200 + 1
-            st = "%d %d %d %.3f %.3f %.3f\n"%(pid, molecule_tag, type+1, xpos, ypos, zpos)
+            molecule_tag = (pid - 1) / 200 + 1
+            st = "%d %d %d %.3f %.3f %.3f\n" % (
+                pid, molecule_tag, type + 1, xpos, ypos, zpos)
             file.write(st)
-            pid   += 1
+            pid += 1
         else:
-            pid   += 1
+            pid += 1
 
     if writeVelocities:
-        file.write('\nVelocities\n\n');
-        pid   = 0
+        file.write('\nVelocities\n\n')
+        pid = 0
         while pid <= maxParticleID:
             if system.storage.particleExists(pid):
                 particle = system.storage.getParticle(pid)
-                xvel   = particle.v[0]
-                yvel   = particle.v[1]
-                zvel   = particle.v[2]
-                st = "%d %15.10f %15.10f %15.10f\n"%(pid, xvel, yvel, zvel)
+                xvel = particle.v[0]
+                yvel = particle.v[1]
+                zvel = particle.v[2]
+                st = "%d %15.10f %15.10f %15.10f\n" % (pid, xvel, yvel, zvel)
                 file.write(st)
-                pid   += 1
+                pid += 1
             else:
-                pid   += 1
+                pid += 1
 
     if nbonds > 0:
         file.write('\nBonds\n\n')
         bn = 1
         for i in range(len(bonds)):
             for j in range(len(bonds[i])):
-                file.write('%d %d %d %d\n' % (bn, i+1, bonds[i][j][0], bonds[i][j][1]))
+                file.write('%d %d %d %d\n' %
+                           (bn, i + 1, bonds[i][j][0], bonds[i][j][1]))
                 bn += 1
 
     if nangles > 0:
@@ -518,7 +524,9 @@ def write(fout, system, writeVelocities=False):
         an = 1
         for i in range(len(angles)):
             for j in range(len(angles[i])):
-                file.write('%d %d %d %d %d\n' % (an, i+1, angles[i][j][1], angles[i][j][0], angles[i][j][2]))
+                file.write(
+                    '%d %d %d %d %d\n' %
+                    (an, i + 1, angles[i][j][1], angles[i][j][0], angles[i][j][2]))
                 an += 1
 
     if ndihedrals > 0:
@@ -526,7 +534,15 @@ def write(fout, system, writeVelocities=False):
         dn = 1
         for i in range(len(dihedrals)):
             for j in range(len(dihedrals[i])):
-                file.write('%d %d %d %d %d %d\n' % (dn, i+1, dihedrals[i][j][0], dihedrals[i][j][1], dihedrals[i][j][2], dihedrals[i][j][3]))
+                file.write(
+                    '%d %d %d %d %d %d\n' %
+                    (dn,
+                     i +
+                     1,
+                     dihedrals[i][j][0],
+                        dihedrals[i][j][1],
+                        dihedrals[i][j][2],
+                        dihedrals[i][j][3]))
                 dn += 1
 
     file.close()

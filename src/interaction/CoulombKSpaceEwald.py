@@ -138,38 +138,56 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombKSpaceEwald, \
-                      interaction_CellListCoulombKSpaceEwald
+    interaction_CellListCoulombKSpaceEwald
+
 
 class CoulombKSpaceEwaldLocal(PotentialLocal, interaction_CoulombKSpaceEwald):
     def __init__(self, system, prefactor, alpha, kmax):
 
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_CoulombKSpaceEwald,
+                system,
+                prefactor,
+                alpha,
+                kmax)
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CoulombKSpaceEwald, system, prefactor, alpha, kmax)
 
-class CellListCoulombKSpaceEwaldLocal(InteractionLocal, interaction_CellListCoulombKSpaceEwald):
+class CellListCoulombKSpaceEwaldLocal(
+        InteractionLocal,
+        interaction_CellListCoulombKSpaceEwald):
     def __init__(self, storage, potential):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CellListCoulombKSpaceEwald, storage, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_CellListCoulombKSpaceEwald,
+                storage,
+                potential)
 
     def getFixedPairList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return []
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
+
 
 if pmi.isController:
     class CoulombKSpaceEwald(Potential):
         pmiproxydefs = dict(
-          cls = 'espressopp.interaction.CoulombKSpaceEwaldLocal',
-          pmiproperty = ['prefactor', 'alpha', 'kmax']
-          )
+            cls='espressopp.interaction.CoulombKSpaceEwaldLocal',
+            pmiproperty=['prefactor', 'alpha', 'kmax']
+        )
 
     class CellListCoulombKSpaceEwald(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.CellListCoulombKSpaceEwaldLocal',
-          pmicall = ['getFixedPairList','getPotential']
-          )
+            cls='espressopp.interaction.CellListCoulombKSpaceEwaldLocal',
+            pmicall=['getFixedPairList', 'getPotential']
+        )

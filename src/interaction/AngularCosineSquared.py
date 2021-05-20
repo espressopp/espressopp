@@ -98,38 +98,56 @@ from espressopp.esutil import *
 from espressopp.interaction.AngularPotential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_AngularCosineSquared, \
-                      interaction_FixedTripleListAngularCosineSquared
+    interaction_FixedTripleListAngularCosineSquared
 
-class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosineSquared):
+
+class AngularCosineSquaredLocal(
+        AngularPotentialLocal,
+        interaction_AngularCosineSquared):
 
     def __init__(self, K=1.0, theta0=0.0):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularCosineSquared, K, theta0)
 
-class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_FixedTripleListAngularCosineSquared):
+
+class FixedTripleListAngularCosineSquaredLocal(
+        InteractionLocal,
+        interaction_FixedTripleListAngularCosineSquared):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListAngularCosineSquared, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedTripleListAngularCosineSquared,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getFixedTripleList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedTripleList(self)
+
 
 if pmi.isController:
     class AngularCosineSquared(AngularPotential):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.AngularCosineSquaredLocal',
-            pmiproperty = ['K', 'theta0']
-            )
-
-    class FixedTripleListAngularCosineSquared(Interaction, metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedTripleListAngularCosineSquaredLocal',
-            pmicall = ['setPotential','getFixedTripleList']
+            cls='espressopp.interaction.AngularCosineSquaredLocal',
+            pmiproperty=['K', 'theta0']
         )
+
+    class FixedTripleListAngularCosineSquared(
+            Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls='espressopp.interaction.FixedTripleListAngularCosineSquaredLocal',
+            pmicall=[
+                'setPotential',
+                'getFixedTripleList'])

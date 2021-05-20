@@ -117,16 +117,20 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_BerendsenBarostatAnisotropic
 
-class BerendsenBarostatAnisotropicLocal(ExtensionLocal, integrator_BerendsenBarostatAnisotropic):
+
+class BerendsenBarostatAnisotropicLocal(
+        ExtensionLocal,
+        integrator_BerendsenBarostatAnisotropic):
     def __init__(self, system):
 
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
                 pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_BerendsenBarostatAnisotropic, system)
 
+
 if pmi.isController:
     class BerendsenBarostatAnisotropic(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.BerendsenBarostatAnisotropicLocal',
-          pmiproperty = [ 'tau', 'pressure' ]
+            cls='espressopp.integrator.BerendsenBarostatAnisotropicLocal',
+            pmiproperty=['tau', 'pressure']
         )

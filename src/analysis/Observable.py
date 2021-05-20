@@ -28,8 +28,10 @@ r"""
 from espressopp import pmi
 from _espressopp import analysis_Observable
 
+
 class result_types:
     none, real_scalar, int_scalar, real_vector, int_vector = list(range(5))
+
 
 class ObservableLocal(object):
 
@@ -48,9 +50,10 @@ class ObservableLocal(object):
         else:
             return self.cxxclass.compute(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class Observable(metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
-            pmicall = [ "compute" ]
-            )
+            pmicall=["compute"]
+        )

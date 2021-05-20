@@ -65,34 +65,41 @@ from espressopp import pmi
 from espressopp import toReal3D, toReal3DFromVector, toInt3D, toInt3DFromVector
 from _espressopp import bc_BC
 
+
 class BCLocal(object):
     def getMinimumImageVector(self, pos1, pos2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
+        if not (pmi._PMIComm and pmi._PMIComm.isActive(
+        )) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             return self.cxxclass.getMinimumImageVector(
                 self, toReal3DFromVector(pos1), toReal3DFromVector(pos2))
 
     def getFoldedPosition(self, pos, imageBox=None):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
+        if not (pmi._PMIComm and pmi._PMIComm.isActive(
+        )) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             if imageBox is None:
-                return self.cxxclass.getFoldedPosition(self, toReal3DFromVector(pos))
+                return self.cxxclass.getFoldedPosition(
+                    self, toReal3DFromVector(pos))
             else:
                 return self.cxxclass.getFoldedPosition(
                     self, toReal3DFromVector(pos), toInt3DFromVector(imageBox))
 
     def getUnfoldedPosition(self, pos, imageBox):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
+        if not (pmi._PMIComm and pmi._PMIComm.isActive(
+        )) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             return self.cxxclass.getUnfoldedPosition(
                 self, toReal3DFromVector(pos), toInt3DFromVector(imageBox))
 
     def getRandomPos(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
+        if not (pmi._PMIComm and pmi._PMIComm.isActive(
+        )) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             return self.cxxclass.getRandomPos(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class BC(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmiproperty = [ "boxL", "rng" ],
-            localcall = [ "getMinimumImageVector",
-                          "getFoldedPosition", "getUnfoldedPosition",
-                          "getRandomPos" ]
-            )
+            pmiproperty=["boxL", "rng"],
+            localcall=["getMinimumImageVector",
+                       "getFoldedPosition", "getUnfoldedPosition",
+                       "getRandomPos"]
+        )

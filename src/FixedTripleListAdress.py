@@ -54,12 +54,16 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
 
+class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
 
     def __init__(self, storage, fixedtupleList):
         if pmi.workerIsActive():
-            cxxinit(self, _espressopp.FixedTripleListAdress, storage, fixedtupleList)
+            cxxinit(
+                self,
+                _espressopp.FixedTripleListAdress,
+                storage,
+                fixedtupleList)
 
     def add(self, pid1, pid2):
         if pmi.workerIsActive():
@@ -82,10 +86,11 @@ class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
                 pid1, pid2, pid3 = triple
                 self.cxxclass.add(self, pid1, pid2, pid3)
 
+
 if pmi.isController:
     class FixedTripleListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedTripleListAdressLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addTriples" ]
-            )
+            cls='espressopp.FixedTripleListAdressLocal',
+            localcall=["add"],
+            pmicall=["addTriples"]
+        )

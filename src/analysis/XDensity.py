@@ -42,18 +42,21 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_XDensity
 
+
 class XDensityLocal(ObservableLocal, analysis_XDensity):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_XDensity, system)
 
     def compute(self, rdfN):
         return self.cxxclass.compute(self, rdfN)
 
-if pmi.isController :
+
+if pmi.isController:
     class XDensity(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          pmicall = [ "compute" ],
-          cls = 'espressopp.analysis.XDensityLocal'
+            pmicall=["compute"],
+            cls='espressopp.analysis.XDensityLocal'
         )

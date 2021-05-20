@@ -73,41 +73,49 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_VSphereSelf, interaction_SelfVSphere
 
+
 class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
 
     def __init__(self, e1=0.0, a1=1.0, a2=0.0, Nb=1,
                  cutoff=infinity, shift=0.0):
         """Initialize the local VSphere object."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_VSphereSelf, e1, a1, a2, Nb, cutoff)
             else:
-                cxxinit(self, interaction_VSphereSelf, e1, a1, a2, Nb, cutoff, shift)
+                cxxinit(self, interaction_VSphereSelf,
+                        e1, a1, a2, Nb, cutoff, shift)
+
 
 class SelfVSphereLocal(InteractionLocal, interaction_SelfVSphere):
 
     def __init__(self, system, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_SelfVSphere, system, potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
+
 
 if pmi.isController:
     class VSphereSelf(Potential):
         'The VSphereSelf potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.VSphereSelfLocal',
-            pmiproperty = ['e1', 'a1', 'a2', 'Nb']
-            )
+            cls='espressopp.interaction.VSphereSelfLocal',
+            pmiproperty=['e1', 'a1', 'a2', 'Nb']
+        )
 
     class SelfVSphere(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.SelfVSphereLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.SelfVSphereLocal',
+            pmicall=['setPotential', 'getPotential']
+        )

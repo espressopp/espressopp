@@ -36,15 +36,20 @@ from espressopp import pmi
 from espressopp.analysis.ConfigsParticleDecomp import *
 from _espressopp import analysis_VelocityAutocorrelation
 
-class VelocityAutocorrelationLocal(ConfigsParticleDecompLocal, analysis_VelocityAutocorrelation):
+
+class VelocityAutocorrelationLocal(
+        ConfigsParticleDecompLocal,
+        analysis_VelocityAutocorrelation):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_VelocityAutocorrelation, system)
+
 
 if pmi.isController:
     class VelocityAutocorrelation(ConfigsParticleDecomp, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          pmiproperty = [ 'print_progress' ],
-          cls =  'espressopp.analysis.VelocityAutocorrelationLocal'
+            pmiproperty=['print_progress'],
+            cls='espressopp.analysis.VelocityAutocorrelationLocal'
         )

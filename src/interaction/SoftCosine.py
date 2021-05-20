@@ -88,83 +88,116 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_SoftCosine, \
-                      interaction_VerletListSoftCosine, \
-                      interaction_CellListSoftCosine, \
-                      interaction_FixedPairListSoftCosine
+    interaction_VerletListSoftCosine, \
+    interaction_CellListSoftCosine, \
+    interaction_FixedPairListSoftCosine
+
 
 class SoftCosineLocal(PotentialLocal, interaction_SoftCosine):
 
     def __init__(self, A=1.0, cutoff=infinity, shift="auto"):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if shift =="auto":
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift == "auto":
                 cxxinit(self, interaction_SoftCosine, A, cutoff)
             else:
                 cxxinit(self, interaction_SoftCosine, A, cutoff, shift)
 
-class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosine):
+
+class VerletListSoftCosineLocal(
+        InteractionLocal,
+        interaction_VerletListSoftCosine):
     'The (local) SoftCosine interaction using Verlet lists.'
+
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListSoftCosine, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosine):
+
+class VerletListSoftCosineLocal(
+        InteractionLocal,
+        interaction_VerletListSoftCosine):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListSoftCosine, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class CellListSoftCosineLocal(InteractionLocal, interaction_CellListSoftCosine):
+
+class CellListSoftCosineLocal(
+        InteractionLocal,
+        interaction_CellListSoftCosine):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListSoftCosine, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListSoftCosineLocal(InteractionLocal, interaction_FixedPairListSoftCosine):
+
+class FixedPairListSoftCosineLocal(
+        InteractionLocal,
+        interaction_FixedPairListSoftCosine):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListSoftCosine, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListSoftCosine,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class SoftCosine(Potential):
         'The SoftCosine potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.SoftCosineLocal',
-            pmiproperty = ['A']
-            )
+            cls='espressopp.interaction.SoftCosineLocal',
+            pmiproperty=['A']
+        )
+
     class VerletListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListSoftCosineLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListSoftCosineLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
+
     class CellListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListSoftCosineLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.CellListSoftCosineLocal',
+            pmicall=['setPotential']
+        )
+
     class FixedPairListSoftCosine(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListSoftCosineLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListSoftCosineLocal',
+            pmicall=['setPotential']
+        )

@@ -28,18 +28,20 @@ Npart = 10
 amp = 0.5
 vecR = espressopp.Real3D(amp)
 
+
 class Test_CM(unittest.TestCase):
     def setUp(self):
 
-        system, integrator = espressopp.standard_system.LennardJones(Npart, box=(10,10,10))
+        system, integrator = espressopp.standard_system.LennardJones(
+            Npart, box=(10, 10, 10))
 
         # fill in particles' velocities with dummy numbers
-        for i in range (1,Npart + 1):
+        for i in range(1, Npart + 1):
             system.storage.modifyParticle(i, 'v', i * vecR)
             p = system.storage.getParticle(i)
 
         # set up analysis of the CMVelocity
-        tvel= espressopp.analysis.CMVelocity(system)
+        tvel = espressopp.analysis.CMVelocity(system)
 
         # set self:
         self.system = system
@@ -56,13 +58,12 @@ class Test_CM(unittest.TestCase):
         self.assertAlmostEqual(self.tvel.v[1], ap_sum / Npart, places=10)
         self.assertAlmostEqual(self.tvel.v[2], ap_sum / Npart, places=10)
 
-
     def test_CMVelocity(self):
         # attach to integrator
         ext_remove_com = espressopp.integrator.ExtAnalyze(self.tvel, 10)
         self.integrator.addExtension(ext_remove_com)
 
-        for i in range (10):
+        for i in range(10):
             self.integrator.run(10)
 
             # check resetted CM-velocity
@@ -72,6 +73,7 @@ class Test_CM(unittest.TestCase):
 
             # fill in particles' velocity again with non-zero numbers
             self.system.storage.modifyParticle(i + 1, 'v', (i + 1) * vecR)
+
 
 if __name__ == '__main__':
     unittest.main()
