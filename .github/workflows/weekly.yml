@@ -1,6 +1,7 @@
 name: WEEKLY
 
 on:
+  workflow_dispatch:
   schedule:
     - cron:  '0 0 * * SAT'
 
@@ -11,16 +12,13 @@ jobs:
         BUILD_TYPE: [Release, Debug]
         DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_devel', 'ubuntu_rolling', 'ubuntu_mpich']
         CXX: ['g++', 'clang++']
-        EXTERNAL_MPI4PY: ['On','Off']
         include:
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CXX: 'icpc'
-            EXTERNAL_MPI4PY: 'On'
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CXX: 'icpx'
-            EXTERNAL_MPI4PY: 'On'
 
     runs-on: ubuntu-latest
     container: espressopp/buildenv:${{ matrix.distro }}
@@ -37,7 +35,7 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DEXTERNAL_MPI4PY=${{ matrix.EXTERNAL_MPI4PY }} -DESPP_WERROR=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DESPP_WERROR=ON
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2

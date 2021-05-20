@@ -10,12 +10,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
 #build .env for pipenv
-#CMAKE_BINARY_DIR for espressopp, CMAKE_CURRENT_BINARY_DIR for for _espressopps.so and contrib for MPI.so
-if (EXTERNAL_MPI4PY)
-    set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
-else (EXTERNAL_MPI4PY)
-    set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
-endif (EXTERNAL_MPI4PY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
         ${CMAKE_BINARY_DIR}/.env @ONLY)
 
@@ -50,6 +44,8 @@ endif()
 get_target_property(ESPP_CFLAGS _espressopp COMPILE_OPTIONS)
 message(STATUS "_espressopp compiler flags are: ${ESPP_CFLAGS}")
 
+set_target_properties(_espressopp PROPERTIES ESP_PY_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
+
 target_include_directories(_espressopp PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>)
 
@@ -66,6 +62,12 @@ endif()
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 add_dependencies(_espressopp gitversion)
+
+if(NOT PYTHON_INSTDIR)
+    execute_process(COMMAND ${Python3_EXECUTABLE}
+            -c "import distutils.sysconfig as cg; print(cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}'))"
+            OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR} ARCHIVE DESTINATION ${PYTHON_INSTDIR})
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/espressopp
