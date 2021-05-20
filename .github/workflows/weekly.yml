@@ -35,7 +35,7 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DESPP_WERROR=ON
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DESPP_WERROR=ON
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2
