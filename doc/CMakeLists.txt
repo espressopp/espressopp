@@ -19,12 +19,14 @@ find_program(SPHINX_EXECUTABLE
         DOC "Sphinx documentation generation tool (http://www.sphinx-doc.org/)"
         )
 
+get_target_property(ESP_PY_ENV _espressopp ESP_PY_ENV)
+
 if (SPHINX_EXECUTABLE)
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/sphinx)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 
     add_custom_target(sphinx
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${TEST_ENV} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${ESP_PY_ENV} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
             DEPENDS ${SPHINX_SOURCE}/conf.py _espressopp
             )
 
