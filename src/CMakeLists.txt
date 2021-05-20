@@ -49,14 +49,11 @@ set_target_properties(_espressopp PROPERTIES ESP_PY_ENV "PYTHONPATH=${CMAKE_BINA
 target_include_directories(_espressopp PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>)
 
-#target_link_libraries( _espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl ) requires CMake 3.19 :(
-target_include_directories(_espressopp PRIVATE ${HDF5_INCLUDE_DIRS})
-target_link_libraries(_espressopp PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
-
 target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::system Boost::filesystem Boost::python${PYTHON_VERSION_NO_DOT} Boost::numpy${PYTHON_VERSION_NO_DOT})
 target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
+target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
 if(WITH_XTC)
     target_add_definitions(_espressopp PRIVATE -DHAS_GROMACS)
