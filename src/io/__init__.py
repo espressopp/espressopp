@@ -39,4 +39,7 @@ except ImportError:
     pass
 
 from espressopp.io.DumpH5MD import *
+from espressopp.io.DumpH5MDParallel import *
 from espressopp.io.DumpTopology import *
+
+from espressopp.io.RestoreH5MDParallel import *

@@ -60,6 +60,17 @@ find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(FFTW3 REQUIRED)
 
 ########################################################################
+#Find HDF5
+########################################################################
+
+set(HDF5_PREFER_PARALLEL ON)
+#set(HDF5_FIND_DEBUG ON)
+find_package(HDF5 REQUIRED COMPONENTS C HL)
+if (NOT HDF5_IS_PARALLEL)
+    message(FATAL_ERROR "HDF5 with MPI support is required! Serial version detected.")
+endif()
+
+########################################################################
 #Process GROMACS settings
 ########################################################################
 find_package(GROMACS 2021 CONFIG QUIET NAMES gromacs gromacs_d)

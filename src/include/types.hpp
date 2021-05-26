@@ -101,11 +101,67 @@ class NoDefault : public std::exception
 {
 };
 
+// convenience casting functions for unsigned ints
+template <typename T>
+unsigned int uint_c(const T& val)
+{
+    return static_cast<unsigned int>(val);
+}
+template <typename T>
+uint8_t uint8_c(const T& val)
+{
+    return static_cast<uint8_t>(val);
+}
+template <typename T>
+uint16_t uint16_c(const T& val)
+{
+    return static_cast<uint16_t>(val);
+}
+template <typename T>
+uint32_t uint32_c(const T& val)
+{
+    return static_cast<uint32_t>(val);
+}
+template <typename T>
+uint64_t uint64_c(const T& val)
+{
+    return static_cast<uint64_t>(val);
+}
+
+// convenience casting functions for signed ints
 template <typename T>
 int int_c(const T& val)
 {
-    return static_cast<T>(val);
+    return static_cast<int>(val);
 }
+template <typename T>
+int8_t int8_c(const T& val)
+{
+    return static_cast<int8_t>(val);
+}
+template <typename T>
+int16_t int16_c(const T& val)
+{
+    return static_cast<int16_t>(val);
+}
+template <typename T>
+int32_t int32_c(const T& val)
+{
+    return static_cast<int32_t>(val);
+}
+template <typename T>
+int64_t int64_c(const T& val)
+{
+    return static_cast<int64_t>(val);
+}
+
+// convenience casting functions for real
+template <typename T>
+real real_c(const T& val)
+{
+    return static_cast<real>(val);
+}
+
 }  // namespace espressopp
 
 #endif

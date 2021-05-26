@@ -36,6 +36,7 @@ Alternatively, you can download a tarball or zip file of [previous release versi
  - MPI
  - FFTW3
  - GROMACS (required when `WITH_XTC` flag is enabled)
+ - HDF5
 
 ## Python Dependencies
 ESPResSo++ requires Python 3.7 or newer. All required Python packages are listed in `requirements.txt`. You can install them via: `pip3 install -r requirements.txt`
