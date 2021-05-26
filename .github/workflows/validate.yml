@@ -26,14 +26,17 @@ jobs:
       matrix:
         BUILD_TYPE: [Release, Debug]
         DISTRO: ['fedora']
-        CXX: ['g++', 'clang++']
+        CMAKE_COMPILER: [
+            '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
+            '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+        ]
         include:
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
-            CXX: 'icpc'
+            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc'
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
-            CXX: 'icpx'
+            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 
     runs-on: ubuntu-latest
     container: espressopp/buildenv:${{ matrix.distro }}
@@ -41,8 +44,8 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.ccache
-          key: ${{ matrix.DISTRO }}-${{ matrix.CXX }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
-          restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CXX }}-${{ matrix.BUILD_TYPE }}
+          key: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
+          restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}
 
       - uses: actions/checkout@v2
 
@@ -50,7 +53,7 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2
