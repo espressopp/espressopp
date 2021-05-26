@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(espressopp LANGUAGES CXX)
+project(espressopp LANGUAGES C CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(ESPP_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
