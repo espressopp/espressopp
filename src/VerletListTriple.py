@@ -57,8 +57,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class VerletListTripleLocal(_espressopp.VerletListTriple):
 
+class VerletListTripleLocal(_espressopp.VerletListTriple):
 
     def __init__(self, system, cutoff, exclusionlist=[]):
 
@@ -72,10 +72,20 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
 
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+                cxxinit(
+                    self,
+                    _espressopp.VerletListTriple,
+                    system,
+                    cutoff,
+                    True)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
+                cxxinit(
+                    self,
+                    _espressopp.VerletListTriple,
+                    system,
+                    cutoff,
+                    False)
                 # add exclusions
                 for pid in exclusionlist:
                     self.cxxclass.exclude(self, pid)
@@ -97,7 +107,7 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
         Each processor takes the broadcasted exclusion list
         and adds it to its list.
         """
-        #if pmi.workerIsActive():
+        # if pmi.workerIsActive():
         #  print 'Warning! Exclusion list is not yet implemented to the triple verlet \
         #        list. Nothing happend'
         for pid in exclusionlist:
@@ -108,10 +118,10 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
     def getAllTriples(self):
 
         if pmi.workerIsActive():
-            triples=[]
-            ntriples=self.localSize()
+            triples = []
+            ntriples = self.localSize()
             for i in range(ntriples):
-                triple=self.cxxclass.getTriple(self, i+1)
+                triple = self.cxxclass.getTriple(self, i + 1)
                 triples.append(triple)
             return triples
 
@@ -119,8 +129,12 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
 if pmi.isController:
     class VerletListTriple(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls = 'espressopp.VerletListTripleLocal',
-          pmiproperty = [ 'builds' ],
-          pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
-          pmiinvoke = [ 'getAllTriples' ]
-        )
+            cls='espressopp.VerletListTripleLocal',
+            pmiproperty=['builds'],
+            pmicall=[
+                'totalSize',
+                'exclude',
+                'connect',
+                'disconnect',
+                'getVerletCutoff'],
+            pmiinvoke=['getAllTriples'])

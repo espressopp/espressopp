@@ -22,8 +22,9 @@
 import unittest
 from espressopp import *
 
-class Test0Real3D(unittest.TestCase) :
-    def test0Create(self) :
+
+class Test0Real3D(unittest.TestCase):
+    def test0Create(self):
         'Test the creation of Real3D instances.'
         x = Real3D()
         self.assertEqual(x[0], 0.0)
@@ -60,23 +61,23 @@ class Test0Real3D(unittest.TestCase) :
         self.assertRaises(TypeError, Real3D, (1.0, 2.0))
         self.assertRaises(TypeError, Real3D, (1.0, 2.0, 3.0, 4.0))
 
-    def test1OutOfRange(self) :
+    def test1OutOfRange(self):
         'Test out-of-range Real3D element access.'
         v = Real3D()
         self.assertRaises(IndexError, v.__getitem__, -1)
         self.assertRaises(IndexError, v.__getitem__, 3)
 
-    def test2SetItem(self) :
+    def test2SetItem(self):
         'Test setting Real3D elements.'
-        x = Real3D();
-        x[0] = 1.0;
-        x[1] = 2.0;
-        x[2] = 3.0;
+        x = Real3D()
+        x[0] = 1.0
+        x[1] = 2.0
+        x[2] = 3.0
         self.assertEqual(x[0], 1.0)
         self.assertEqual(x[1], 2.0)
         self.assertEqual(x[2], 3.0)
 
-    def test3Properties(self) :
+    def test3Properties(self):
         'Test Real3D properties.'
         v = Real3D(1.0, 2.0, 3.0)
         self.assertEqual(v.x, 1.0)
@@ -91,7 +92,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(v[1], 2.0)
         self.assertEqual(v[2], 3.0)
 
-    def test4Conversion(self) :
+    def test4Conversion(self):
         'Test conversion of Real3D to other types.'
         v = Real3D(1.0, 2.0, 3.0)
         self.assertEqual(tuple(v), (1.0, 2.0, 3.0))
@@ -99,7 +100,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(str(v), '(1.0, 2.0, 3.0)')
         self.assertEqual(repr(v), 'Real3D(1.0, 2.0, 3.0)')
 
-    def test5Comparison(self) :
+    def test5Comparison(self):
         'Test Real3D comparison operations.'
         v = Real3D(1.0, 2.0, 3.0)
         v2 = Real3D(1.0, 2.0, 3.0)
@@ -107,7 +108,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertFalse(v != v2)
         self.assertTrue(v is not v2)
 
-    def test6Numerics(self) :
+    def test6Numerics(self):
         'Test various numeric operations of Real3D.'
         v = Real3D(1.0, 2.0, 3.0)
         r = v * 2.0
@@ -118,7 +119,7 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(type(r), Real3D)
         self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
 
-        r = v*v
+        r = v * v
         self.assertEqual(r, 14.0)
 
         r = v.sqr()
@@ -131,7 +132,7 @@ class Test0Real3D(unittest.TestCase) :
         r = v.cross(v2)
         self.assertEqual(r, Real3D(-4.0, 8.0, -4.0))
 
-    def test7Pickle(self) :
+    def test7Pickle(self):
         'Test pickling Real3D.'
         import pickle
         v = Real3D(1.0, 2.0, 3.0)
@@ -141,6 +142,7 @@ class Test0Real3D(unittest.TestCase) :
         v2 = pickle.loads(s)
         self.assertTrue(v is not v2)
         self.assertEqual(v, v2)
+
 
 if __name__ == "__main__":
     unittest.main()

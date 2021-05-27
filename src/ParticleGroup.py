@@ -55,8 +55,8 @@ from . import esutil
 from . import pmi
 from espressopp.esutil import cxxinit
 
-class ParticleGroupLocal(_espressopp.ParticleGroup):
 
+class ParticleGroupLocal(_espressopp.ParticleGroup):
 
     def __init__(self, storage):
         if pmi.workerIsActive():
@@ -78,9 +78,10 @@ class ParticleGroupLocal(_espressopp.ParticleGroup):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
+
 if pmi.isController:
     class ParticleGroup(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.ParticleGroupLocal',
-            pmicall = [ "add", "show", "has", "size" ]
-            )
+            cls='espressopp.ParticleGroupLocal',
+            pmicall=["add", "show", "has", "size"]
+        )

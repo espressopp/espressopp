@@ -67,10 +67,12 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_OnTheFlyFEC
 
+
 class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
 
     def __init__(self, system, center=[]):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_OnTheFlyFEC, system)
 
             # set center of OnTheFlyFEC
@@ -78,33 +80,39 @@ class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
                 self.cxxclass.setCenter(self, center[0], center[1], center[2])
 
     def writeFEC(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.writeFEC(self)
 
     def resetCounter(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.resetCounter(self)
 
     def makeArrays(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.makeArrays(self)
 
     def getBins(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getBins(self)
 
     def getSteps(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getSteps(self)
 
     def getGap(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getIterations(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class OnTheFlyFEC(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.OnTheFlyFECLocal',
-            pmiproperty = [ 'gap', 'steps', 'bins'],
-            pmicall = ['writeFEC', 'makeArrays', 'resetCounter', 'getBins', 'getSteps', 'getGap']
-            )
+            cls='espressopp.integrator.OnTheFlyFECLocal', pmiproperty=[
+                'gap', 'steps', 'bins'], pmicall=[
+                'writeFEC', 'makeArrays', 'resetCounter', 'getBins', 'getSteps', 'getGap'])

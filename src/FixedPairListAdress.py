@@ -70,22 +70,27 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
 
+class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
 
     def __init__(self, storage, fixedtupleList):
 
         if pmi.workerIsActive():
-            cxxinit(self, _espressopp.FixedPairListAdress, storage, fixedtupleList)
+            cxxinit(
+                self,
+                _espressopp.FixedPairListAdress,
+                storage,
+                fixedtupleList)
 
     def add(self, pid1, pid2):
 
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
+
     def getBonds(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getBonds(self)
+            bonds = self.cxxclass.getBonds(self)
             return bonds
 
     def remove(self):
@@ -105,11 +110,12 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
                 pid1, pid2 = bond
                 self.cxxclass.add(self, pid1, pid2)
 
+
 if pmi.isController:
     class FixedPairListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedPairListAdressLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addBonds","remove" ],
-                        pmiinvoke = ['getBonds']
-            )
+            cls='espressopp.FixedPairListAdressLocal',
+            localcall=["add"],
+            pmicall=["addBonds", "remove"],
+            pmiinvoke=['getBonds']
+        )

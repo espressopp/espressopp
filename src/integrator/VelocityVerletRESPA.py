@@ -69,26 +69,34 @@ from espressopp import pmi
 from espressopp.integrator.MDIntegrator import *
 from _espressopp import integrator_VelocityVerletRESPA
 
-class VelocityVerletRESPALocal(MDIntegratorLocal, integrator_VelocityVerletRESPA):
+
+class VelocityVerletRESPALocal(
+        MDIntegratorLocal,
+        integrator_VelocityVerletRESPA):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_VelocityVerletRESPA, system)
 
     def setmultistep(self, multistep):
         if multistep <= 0:
-            raise ValueError('multistep must be larger than zero. Your input: {}'.format(multistep))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'multistep must be larger than zero. Your input: {}'.format(multistep))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setmultistep(self, multistep)
 
     def getmultistep(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getmultistep(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class VelocityVerletRESPA(MDIntegrator, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.VelocityVerletRESPALocal',
-          pmiproperty = ['multistep'],
-          pmicall = ['setmultistep', 'getmultistep']
+            cls='espressopp.integrator.VelocityVerletRESPALocal',
+            pmiproperty=['multistep'],
+            pmicall=['setmultistep', 'getmultistep']
         )

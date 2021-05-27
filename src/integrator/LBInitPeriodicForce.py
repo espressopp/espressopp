@@ -56,16 +56,23 @@ from espressopp import pmi
 from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_PeriodicForce
 
+
 class LBInitPeriodicForceLocal(LBInitLocal, integrator_LBInit_PeriodicForce):
     def __init__(self, system, latticeboltzmann):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_LBInit_PeriodicForce, system, latticeboltzmann)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_LBInit_PeriodicForce,
+                system,
+                latticeboltzmann)
 
-if pmi.isController :
+
+if pmi.isController:
     class LBInitPeriodicForce(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LBInitPeriodicForceLocal',
-            pmicall = [
-                       "setForce",
-                       "addForce"]
-            )
+            cls='espressopp.integrator.LBInitPeriodicForceLocal',
+            pmicall=[
+                "setForce",
+                "addForce"]
+        )

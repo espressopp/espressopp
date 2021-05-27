@@ -94,19 +94,37 @@ from espressopp import pmi
 from espressopp.ParticleAccess import *
 from _espressopp import io_DumpXTCAdress
 
+
 class DumpXTCAdressLocal(ParticleAccessLocal, io_DumpXTCAdress):
-    def __init__(self, system, ftpl, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
-        cxxinit(self, io_DumpXTCAdress, system, ftpl, integrator, filename, unfolded, length_factor, append)
+    def __init__(
+            self,
+            system,
+            ftpl,
+            integrator,
+            filename='out.xtc',
+            unfolded=False,
+            length_factor=1.0,
+            append=True):
+        cxxinit(
+            self,
+            io_DumpXTCAdress,
+            system,
+            ftpl,
+            integrator,
+            filename,
+            unfolded,
+            length_factor,
+            append)
 
     def dump(self):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
 
-if pmi.isController :
+if pmi.isController:
     class DumpXTCAdress(ParticleAccess, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.io.DumpXTCAdressLocal',
-            pmicall = ('dump',),
-            pmiproperty = ('filename', 'unfolded', 'length_factor', 'append')
+            cls='espressopp.io.DumpXTCAdressLocal',
+            pmicall=('dump',),
+            pmiproperty=('filename', 'unfolded', 'length_factor', 'append')
         )

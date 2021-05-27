@@ -30,46 +30,66 @@ expected_files = [
 ]
 
 
-
 class TestDumpXTC(unittest.TestCase):
     def setUp(self):
-        system, integrator = espressopp.standard_system.LennardJones(0,(20,20,20))
+        system, integrator = espressopp.standard_system.LennardJones(
+            0, (20, 20, 20))
         self.system = system
         self.integrator = integrator
-
 
     def test_simple_xtc(self):
 
         particle_list = [
-        ( 1 , espressopp.Real3D( 4.75575 , 5.82131 , 16.9163) ),
-        ( 2 , espressopp.Real3D( 3.04417 , 11.7107 , 3.86951) ),
-        ( 3 , espressopp.Real3D( 16.2125 , 3.47061 , 9.69966) ),
-        ( 4 , espressopp.Real3D( 3.03725 , 7.33914 , 9.83473) ),
-        ( 5 , espressopp.Real3D( 18.2019 , 5.30514 , 17.8638) ),
-        ( 6 , espressopp.Real3D( 4.40702 , 12.636 , 11.4215) ),
-        ( 7 , espressopp.Real3D( 6.64315 , 2.0891 , 10.0586) ),
-        ( 8 , espressopp.Real3D( 11.3479 , 17.0833 , 0.802817) ),
-        ( 9 , espressopp.Real3D( 2.16045 , 12.7879 , 0.26222) ) ]
+            (1, espressopp.Real3D(4.75575, 5.82131, 16.9163)),
+            (2, espressopp.Real3D(3.04417, 11.7107, 3.86951)),
+            (3, espressopp.Real3D(16.2125, 3.47061, 9.69966)),
+            (4, espressopp.Real3D(3.03725, 7.33914, 9.83473)),
+            (5, espressopp.Real3D(18.2019, 5.30514, 17.8638)),
+            (6, espressopp.Real3D(4.40702, 12.636, 11.4215)),
+            (7, espressopp.Real3D(6.64315, 2.0891, 10.0586)),
+            (8, espressopp.Real3D(11.3479, 17.0833, 0.802817)),
+            (9, espressopp.Real3D(2.16045, 12.7879, 0.26222))]
 
         self.system.storage.addParticles(particle_list, 'id', 'pos')
 
         file_xtc_9atoms = "test_without_compression.xtc"
-        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_9atoms, unfolded = False, length_factor = 1.0, append = False)
+        dump_xtc = espressopp.io.DumpXTC(
+            self.system,
+            self.integrator,
+            filename=file_xtc_9atoms,
+            unfolded=False,
+            length_factor=1.0,
+            append=False)
         dump_xtc.dump()
 
-        self.system.storage.addParticles( [( 10 , espressopp.Real3D( 14.4037 , 2.03629 , 9.6589) )] , 'id','pos')
+        self.system.storage.addParticles(
+            [(10, espressopp.Real3D(14.4037, 2.03629, 9.6589))], 'id', 'pos')
         file_xtc_10atoms = "test_with_compression.xtc"
-        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_10atoms, unfolded = False, length_factor = 1.0, append = False)
+        dump_xtc = espressopp.io.DumpXTC(
+            self.system,
+            self.integrator,
+            filename=file_xtc_10atoms,
+            unfolded=False,
+            length_factor=1.0,
+            append=False)
         dump_xtc.dump()
 
-        self.assertTrue(filecmp.cmp(file_xtc_9atoms, expected_files[0], shallow = False), "!!! Error! Files are not equal!! They should be equal!")
-        self.assertTrue(filecmp.cmp(file_xtc_10atoms, expected_files[1], shallow = False), "!!! Error! Files are not equal!! They should be equal!")
-
+        self.assertTrue(
+            filecmp.cmp(
+                file_xtc_9atoms,
+                expected_files[0],
+                shallow=False),
+            "!!! Error! Files are not equal!! They should be equal!")
+        self.assertTrue(
+            filecmp.cmp(
+                file_xtc_10atoms,
+                expected_files[1],
+                shallow=False),
+            "!!! Error! Files are not equal!! They should be equal!")
 
     def tearDown(self):
         os.remove("test_without_compression.xtc")
         os.remove("test_with_compression.xtc")
-
 
 
 if __name__ == '__main__':

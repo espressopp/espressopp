@@ -29,19 +29,23 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestCaseLangevinThermostatOnGroup(unittest.TestCase):
     def setUp(self):
         system = espressopp.System()
-        box=(10,10,10)
+        box = (10, 10, 10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.rng = espressopp.esutil.RNG(54321)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
         self.system = system
 
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.3)
-        system.storage = espressopp.storage.DomainDecomposition(system,nodeGrid,cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.3)
+        system.storage = espressopp.storage.DomainDecomposition(
+            system, nodeGrid, cellGrid)
 
         particle_lists = [
             (1, espressopp.Real3D(0, 1, 2), espressopp.Real3D(0, 0, 0)),
@@ -64,7 +68,8 @@ class TestCaseLangevinThermostatOnGroup(unittest.TestCase):
 
     def test_thermalize_only_group(self):
         """Run thermostat only on particles in ParticleGroup."""
-        langevin = espressopp.integrator.LangevinThermostatOnGroup(self.system, self.thermo_group)
+        langevin = espressopp.integrator.LangevinThermostatOnGroup(
+            self.system, self.thermo_group)
         langevin.gamma = 1.0
         langevin.temperature = 1.0
         self.integrator.addExtension(langevin)

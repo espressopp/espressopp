@@ -37,21 +37,28 @@ espressopp.vectorization.Vectorization
 AOS = 'AOS'
 SOA = 'SOA'
 
+
 class VectorizationLocal(_espressopp.Vectorization):
 
     def __init__(self, system, integrator, mode=""):
         if pmi.workerIsActive():
-            if mode=="" or mode==SOA:
+            if mode == "" or mode == SOA:
                 mode_int = _espressopp.VectorizationMode.SOA
-            elif mode==AOS:
+            elif mode == AOS:
                 mode_int = _espressopp.VectorizationMode.AOS
             else:
                 raise ValueError("Incorrect mode [{}]".format(mode))
-            cxxinit(self, _espressopp.Vectorization, system, integrator, mode_int)
+            cxxinit(
+                self,
+                _espressopp.Vectorization,
+                system,
+                integrator,
+                mode_int)
             system.storage.decompose()
+
 
 if pmi.isController:
     class Vectorization(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.vectorization.VectorizationLocal'
+            cls='espressopp.vectorization.VectorizationLocal'
         )

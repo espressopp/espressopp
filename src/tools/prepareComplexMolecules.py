@@ -115,15 +115,22 @@ various helper functions for setting up systems containing complex molecules suc
 import espressopp
 import math
 
-def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1):
+
+def findConstrainedBonds(
+        atomPids,
+        bondtypes,
+        bondtypeparams,
+        masses,
+        massCutoff=1.1):
 
     hydrogenIDs = []
     constrainedBondsDict = {}
-    constraintDistances = {} #keys: (pid heavy, pid light), values: bond length
+    # keys: (pid heavy, pid light), values: bond length
+    constraintDistances = {}
 
     # first find hydrogens
     for pid in atomPids:
-        if masses[pid-1] < massCutoff:
+        if masses[pid - 1] < massCutoff:
             hydrogenIDs.append(pid)
     # then find hydrogen-containing bonds
     for bid, bondlist in bondtypes.items():
@@ -140,34 +147,43 @@ def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff
                     constrainedBondsDict[pidHea].append(pidHyd)
                 else:
                     constrainedBondsDict[pidHea] = [pidHyd]
-                constraintDistances[(pidHea,pidHyd)] = bondtypeparams[bid].parameters['b0']
+                constraintDistances[(pidHea, pidHyd)
+                                    ] = bondtypeparams[bid].parameters['b0']
 
     constrainedBondsList = []
     for pidHea in list(constrainedBondsDict.keys()):
         for pidHyd in constrainedBondsDict[pidHea]:
-            constrainedBondsList.append([pidHea,pidHyd,constraintDistances[(pidHea,pidHyd)],masses[pidHea-1],masses[pidHyd-1]])
+            constrainedBondsList.append([pidHea, pidHyd, constraintDistances[(
+                pidHea, pidHyd)], masses[pidHea - 1], masses[pidHyd - 1]])
 
     return hydrogenIDs, constrainedBondsDict, constrainedBondsList
 
-def getInternalNonbondedInteractions(atExclusions,pidlist):
+
+def getInternalNonbondedInteractions(atExclusions, pidlist):
     nonBondPairs = []
     for pid1 in pidlist:
         for pid2 in pidlist:
-            if pid1==pid2: continue
-            if (pid1,pid2) in atExclusions: continue
-            if (pid2,pid1) in atExclusions: continue
-            if (pid1,pid2) in nonBondPairs: continue #to avoid this we'd have to assume pids in pidlist were ordered and continuous
-            if (pid2,pid1) in nonBondPairs: continue #to avoid this we'd have to assume pids in pidlist were ordered and continuous
-            nonBondPairs.append((pid1,pid2))
+            if pid1 == pid2:
+                continue
+            if (pid1, pid2) in atExclusions:
+                continue
+            if (pid2, pid1) in atExclusions:
+                continue
+            if (pid1, pid2) in nonBondPairs:
+                continue  # to avoid this we'd have to assume pids in pidlist were ordered and continuous
+            if (pid2, pid1) in nonBondPairs:
+                continue  # to avoid this we'd have to assume pids in pidlist were ordered and continuous
+            nonBondPairs.append((pid1, pid2))
     return nonBondPairs
 
-def readSimpleSystem(filename,nparticles,header=0):
-    f = open(filename,'r')
-    mass=[]
-    charge=[]
-    index=[]
-    name=[]
-    ptype=[]
+
+def readSimpleSystem(filename, nparticles, header=0):
+    f = open(filename, 'r')
+    mass = []
+    charge = []
+    index = []
+    name = []
+    ptype = []
     for i in range(header):
         f.readline()
     for i in range(nparticles):
@@ -175,60 +191,84 @@ def readSimpleSystem(filename,nparticles,header=0):
         line = line.split()
         mass.append(float(line[0]))
         charge.append(float(line[1]))
-        if len(line)>2:
+        if len(line) > 2:
             index.append(int(line[2]))
-        if len(line)>3:
+        if len(line) > 3:
             name.append(line[3])
-        if len(line)==5:
+        if len(line) == 5:
             ptype.append(line[4])
     f.close()
-    if len(line)==2:
-        return mass,charge
-    elif len(line)==3:
-        return mass,charge,index
-    elif len(line)==4:
-        return mass,charge,index,name
-    elif len(line)==5:
-        return mass,charge,index,name,ptype
+    if len(line) == 2:
+        return mass, charge
+    elif len(line) == 3:
+        return mass, charge, index
+    elif len(line) == 4:
+        return mass, charge, index, name
+    elif len(line) == 5:
+        return mass, charge, index, name, ptype
 
-def applyBoreschRestraints(system,restraintAtoms,restraintK,restraintR0):
+
+def applyBoreschRestraints(system, restraintAtoms, restraintK, restraintR0):
 
     restraintinteraction = {}
 
     restraintBond = espressopp.FixedPairList(system.storage)
-    restraintBond.addBonds([(restraintAtoms['a'],restraintAtoms['A'])])
-    potint=espressopp.interaction.FixedPairListHarmonic(system, restraintBond, potential=espressopp.interaction.Harmonic(K=0.5*restraintK['aA'],r0=restraintR0['aA'], cutoff = 5.0, shift = 0.0))
+    restraintBond.addBonds([(restraintAtoms['a'], restraintAtoms['A'])])
+    potint = espressopp.interaction.FixedPairListHarmonic(
+        system, restraintBond, potential=espressopp.interaction.Harmonic(
+            K=0.5 * restraintK['aA'], r0=restraintR0['aA'], cutoff=5.0, shift=0.0))
     system.addInteraction(potint)
-    restraintinteraction.update({0:potint})
+    restraintinteraction.update({0: potint})
 
     restraintAngle = espressopp.FixedTripleList(system.storage)
-    restraintAngle.addTriples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
-    potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['aAB'],theta0=restraintR0['aAB']*math.pi/180.0))
+    restraintAngle.addTriples(
+        [(restraintAtoms['a'], restraintAtoms['A'], restraintAtoms['B'])])
+    potint = espressopp.interaction.FixedTripleListAngularHarmonic(
+        system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(
+            K=0.5 * restraintK['aAB'], theta0=restraintR0['aAB'] * math.pi / 180.0))
     system.addInteraction(potint)
-    restraintinteraction.update({1:potint})
+    restraintinteraction.update({1: potint})
 
     restraintAngle = espressopp.FixedTripleList(system.storage)
-    restraintAngle.addTriples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
-    potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['baA'],theta0=restraintR0['baA']*math.pi/180.0))
+    restraintAngle.addTriples(
+        [(restraintAtoms['b'], restraintAtoms['a'], restraintAtoms['A'])])
+    potint = espressopp.interaction.FixedTripleListAngularHarmonic(
+        system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(
+            K=0.5 * restraintK['baA'], theta0=restraintR0['baA'] * math.pi / 180.0))
     system.addInteraction(potint)
-    restraintinteraction.update({2:potint})
+    restraintinteraction.update({2: potint})
 
     restraintDih = espressopp.FixedQuadrupleList(system.storage)
-    restraintDih.addQuadruples([(restraintAtoms['c'],restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
-    potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['cbaA'],phi0=restraintR0['cbaA']*math.pi/180.0))
+    restraintDih.addQuadruples([(restraintAtoms['c'],
+                                 restraintAtoms['b'],
+                                 restraintAtoms['a'],
+                                 restraintAtoms['A'])])
+    potint = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(
+        system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(
+            K=restraintK['cbaA'], phi0=restraintR0['cbaA'] * math.pi / 180.0))
     system.addInteraction(potint)
-    restraintinteraction.update({3:potint})
+    restraintinteraction.update({3: potint})
 
     restraintDih = espressopp.FixedQuadrupleList(system.storage)
-    restraintDih.addQuadruples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
-    potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['baAB'],phi0=restraintR0['baAB']*math.pi/180.0))
+    restraintDih.addQuadruples([(restraintAtoms['b'],
+                                 restraintAtoms['a'],
+                                 restraintAtoms['A'],
+                                 restraintAtoms['B'])])
+    potint = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(
+        system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(
+            K=restraintK['baAB'], phi0=restraintR0['baAB'] * math.pi / 180.0))
     system.addInteraction(potint)
-    restraintinteraction.update({4:potint})
+    restraintinteraction.update({4: potint})
 
     restraintDih = espressopp.FixedQuadrupleList(system.storage)
-    restraintDih.addQuadruples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'],restraintAtoms['C'])])
-    potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['aABC'],phi0=restraintR0['aABC']*math.pi/180.0))
+    restraintDih.addQuadruples([(restraintAtoms['a'],
+                                 restraintAtoms['A'],
+                                 restraintAtoms['B'],
+                                 restraintAtoms['C'])])
+    potint = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(
+        system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(
+            K=restraintK['aABC'], phi0=restraintR0['aABC'] * math.pi / 180.0))
     system.addInteraction(potint)
-    restraintinteraction.update({5:potint})
+    restraintinteraction.update({5: potint})
 
     return restraintinteraction

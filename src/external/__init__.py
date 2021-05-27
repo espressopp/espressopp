@@ -21,5 +21,5 @@
 
 try:
     from espressopp.external.transformations import *
-except:
+except BaseException:
     print('Warning: numpy module not available')

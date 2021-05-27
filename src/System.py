@@ -113,10 +113,13 @@ class SystemLocal(_espressopp.System):
 
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm().py2f())
-            else :
+                cxxinit(
+                    self,
+                    _espressopp.System,
+                    pmi._PMIComm.getMPIsubcomm().py2f())
+            else:
                 pass
-        else :
+        else:
             cxxinit(self, _espressopp.System, pmi._MPIcomm.py2f())
 
         self._integrator = None
@@ -137,7 +140,8 @@ class SystemLocal(_espressopp.System):
             ret_val = self.cxxclass.addInteraction(self, interaction)
             if name is not None:
                 if name in self._interaction2id:
-                    raise RuntimeError('Interaction with name {} already defined.'.format(name))
+                    raise RuntimeError(
+                        'Interaction with name {} already defined.'.format(name))
                 self._interaction2id[name] = self._interaction_pid
             self._interaction_pid += 1
             return ret_val
@@ -156,12 +160,14 @@ class SystemLocal(_espressopp.System):
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
                 for k, v in self._interaction2id.items()
-                }
+            }
             self._interaction_pid = max(self._interaction2id.values()) + 1
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
-            return {k: self.getInteraction(v) for k, v in self._interaction2id.items()}
+            return {
+                k: self.getInteraction(v) for k,
+                v in self._interaction2id.items()}
 
     def getNumberOfInteractions(self):
 
@@ -173,10 +179,12 @@ class SystemLocal(_espressopp.System):
         if pmi.workerIsActive():
             ni = self.getNumberOfInteractions()
             if ni > 0:
-                if number >=0 and number < ni:
+                if number >= 0 and number < ni:
                     return self.cxxclass.getInteraction(self, number)
                 else:
-                    raise Error("Interaction number %i does not exist" % number)
+                    raise Error(
+                        "Interaction number %i does not exist" %
+                        number)
             else:
                 raise Error("interaction list of system is empty")
 
@@ -190,23 +198,27 @@ class SystemLocal(_espressopp.System):
             if len(args) == 1:
                 arg0 = args[0]
                 if isinstance(arg0, Real3D):
-                    #print arg0," is a Real3D object"
-                    self.cxxclass.scaleVolume( arg0 )
+                    # print arg0," is a Real3D object"
+                    self.cxxclass.scaleVolume(arg0)
                 elif hasattr(arg0, '__iter__'):
                     if len(arg0) == 3:
-                #print args, " has iterator and length 3"
-                        self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
+                        # print args, " has iterator and length 3"
+                        self.cxxclass.scaleVolume(
+                            self, toReal3DFromVector(arg0))
                     elif len(arg0) == 1:
-                        #print args, " has iterator and length 1"
-                        self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
+                        # print args, " has iterator and length 1"
+                        self.cxxclass.scaleVolume(
+                            self, toReal3DFromVector(
+                                arg0[0], arg0[0], arg0[0]))
                     else:
                         print(args, " is invalid")
                 else:
-                    #print args, " is scalar"
-                    self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
+                    # print args, " is scalar"
+                    self.cxxclass.scaleVolume(
+                        self, toReal3DFromVector([arg0, arg0, arg0]))
             elif len(args) == 3:
-                #print args, " is 3 numbers"
-                self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
+                # print args, " is 3 numbers"
+                self.cxxclass.scaleVolume(self, toReal3DFromVector(*args))
             else:
                 print(args, " is invalid")
 
@@ -215,12 +227,25 @@ class SystemLocal(_espressopp.System):
         if pmi.workerIsActive():
             self.cxxclass.setTrace(self, switch)
 
+
 if pmi.isController:
     class System(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls = 'espressopp.SystemLocal',
-          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
-          pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
-                'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-                'getAllInteractions', 'getInteractionByName']
-        )
+            cls='espressopp.SystemLocal',
+            pmiproperty=[
+                'storage',
+                'bc',
+                'rng',
+                'skin',
+                'maxCutoff',
+                'integrator'],
+            pmicall=[
+                'addInteraction',
+                'removeInteraction',
+                'removeInteractionByName',
+                'getInteraction',
+                'getNumberOfInteractions',
+                'scaleVolume',
+                'setTrace',
+                'getAllInteractions',
+                'getInteractionByName'])

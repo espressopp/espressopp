@@ -57,8 +57,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
 
+class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
 
     def __init__(self, storage):
 
@@ -75,12 +75,12 @@ class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
             for tuple in tuplelist:
                 for pid in tuple:
                     self.cxxclass.add(self, pid)
-                self.cxxclass.addTs(self);
+                self.cxxclass.addTs(self)
 
 
 if pmi.isController:
     class FixedTupleListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedTupleListAdressLocal',
-            pmicall = [ "addTuples" ]
-            )
+            cls='espressopp.FixedTupleListAdressLocal',
+            pmicall=["addTuples"]
+        )

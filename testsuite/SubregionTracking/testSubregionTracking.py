@@ -25,6 +25,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class SubregionTracking(unittest.TestCase):
     def setUp(self):
         self.system = espressopp.System()
@@ -32,8 +33,10 @@ class SubregionTracking(unittest.TestCase):
         self.system.rng = espressopp.esutil.RNG()
         self.system.bc = espressopp.bc.OrthorhombicBC(self.system.rng, box)
         nodeGrid = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.5)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.5)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         particle_list = [
             (1, espressopp.Real3D(3.0, 5.0, 5.0)),
@@ -56,25 +59,57 @@ class SubregionTracking(unittest.TestCase):
 
         self.system.storage.addParticles(particle_list, 'id', 'pos')
         self.system.storage.decompose()
-        self.tracklist = [1,2,3,4,5,6,11,15,16]
+        self.tracklist = [1, 2, 3, 4, 5, 6, 11, 15, 16]
 
     def test_geometry_spherical(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='spherical', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+        subregiontracking = espressopp.analysis.SubregionTracking(
+            self.system,
+            span=1.5,
+            geometry='spherical',
+            pidlist=self.tracklist,
+            center=[
+                5.0,
+                5.0,
+                5.0])
         number_of_particles = subregiontracking.compute()
         self.assertEqual(number_of_particles, 3)
 
     def test_geometry_xbounded(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-x', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+        subregiontracking = espressopp.analysis.SubregionTracking(
+            self.system,
+            span=1.5,
+            geometry='bounded-x',
+            pidlist=self.tracklist,
+            center=[
+                5.0,
+                5.0,
+                5.0])
         number_of_particles = subregiontracking.compute()
         self.assertEqual(number_of_particles, 6)
 
     def test_geometry_ybounded(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-y', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+        subregiontracking = espressopp.analysis.SubregionTracking(
+            self.system,
+            span=1.5,
+            geometry='bounded-y',
+            pidlist=self.tracklist,
+            center=[
+                5.0,
+                5.0,
+                5.0])
         number_of_particles = subregiontracking.compute()
         self.assertEqual(number_of_particles, 8)
 
     def test_geometry_zbounded(self):
-        subregiontracking = espressopp.analysis.SubregionTracking(self.system, span=1.5, geometry='bounded-z', pidlist=self.tracklist, center=[5.0, 5.0, 5.0])
+        subregiontracking = espressopp.analysis.SubregionTracking(
+            self.system,
+            span=1.5,
+            geometry='bounded-z',
+            pidlist=self.tracklist,
+            center=[
+                5.0,
+                5.0,
+                5.0])
         number_of_particles = subregiontracking.compute()
         self.assertEqual(number_of_particles, 7)
 

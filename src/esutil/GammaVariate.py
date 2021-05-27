@@ -36,15 +36,18 @@ from espressopp import pmi
 
 from _espressopp import esutil_GammaVariate
 
+
 class GammaVariateLocal(esutil_GammaVariate):
     def __init__(self, alpha, beta):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, esutil_GammaVariate, alpha, beta)
+
 
 if pmi.isController:
     class GammaVariate(metaclass=pmi.Proxy):
         """A random gamma variate."""
         pmiproxydefs = dict(
-            cls = 'espressopp.esutil.GammaVariateLocal',
-            localcall = [ '__call__' ],
-            )
+            cls='espressopp.esutil.GammaVariateLocal',
+            localcall=['__call__'],
+        )

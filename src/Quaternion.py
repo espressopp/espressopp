@@ -174,7 +174,9 @@ def extend_class():
                 real_part = arg0[0]
                 unreal_part = Real3D(arg0[1], arg0[2], arg0[3])
             else:
-                raise TypeError("Cannot initialize Quaternion from %s" % (args))
+                raise TypeError(
+                    "Cannot initialize Quaternion from %s" %
+                    (args))
         elif len(args) == 2 and isinstance(args[0], (int, float)) \
                 and isinstance(args[1], Real3D):
             real_part, unreal_part = args
@@ -221,7 +223,8 @@ def toQuaternionFromVector(*args):
             return Quaternion(*args)
     elif len(args) == 4:
         return Quaternion(*args)
-    raise TypeError("Specify real_part, unreal_part[0], unreal_part[1] and unreal_part[2].")
+    raise TypeError(
+        "Specify real_part, unreal_part[0], unreal_part[1] and unreal_part[2].")
 
 
 def toQuaternion(*args):

@@ -47,21 +47,19 @@ expected_files = [
 def prewrite_expected_files(file_list_expected):
     length_unit_test = "LJ"
     header_lines = [
-        'system description, current step=0, length unit=%s\n' % (length_unit_test),
-        '    5\n'
-    ]
+        'system description, current step=0, length unit=%s\n' %
+        (length_unit_test), '    5\n']
     lines_to_be_written_standard = [
         '10000TTT    TTT    1   5.000   5.500   5.000  0.0000  0.0000  0.0000\n',
         '10000TTT    TTT    2   5.000   6.500   5.000  0.0000  0.0000  0.0000\n',
         '10000TTT    TTT    3   5.000   7.500   5.000  0.0000  0.0000  0.0000\n',
         '10000TTT    TTT    4   5.000   8.500   5.000  0.0000  0.0000  0.0000\n',
-        '10000TTT    TTT    5   5.000   9.500   5.000  0.0000  0.0000  0.0000\n'
-    ]
+        '10000TTT    TTT    5   5.000   9.500   5.000  0.0000  0.0000  0.0000\n']
 
     lines_list = [lines_to_be_written_standard]
     zipped_lists = list(zip(expected_files, lines_list))
 
-    for filename,lines in zipped_lists:
+    for filename, lines in zipped_lists:
         with open(filename, "w") as f:
             for header_line in header_lines:
                 f.write(header_line)
@@ -87,9 +85,12 @@ class TestDumpGROAdress(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
-        system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=system.skin)
+        system.storage = espressopp.storage.DomainDecompositionAdress(
+            system, nodeGrid, cellGrid)
         self.system = system
 
     def test_gromacs_adress(self):
@@ -106,38 +107,57 @@ class TestDumpGROAdress(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(5.0, 8.5, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(5.0, 9.5, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
         #tuples = [(1,2),(3,4),(5,6),(7,8),(9,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                         dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=True)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=True)
 
         # add interaction
-        interNB = espressopp.interaction.VerletListHadressLennardJones2(vl, ftpl)
-        potWCA1  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
-        potWCA2 = espressopp.interaction.LennardJones(epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
-        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1) # AT
-        interNB.setPotentialCG(type1=0, type2=0, potential=potWCA2) # CG
+        interNB = espressopp.interaction.VerletListHadressLennardJones2(
+            vl, ftpl)
+        potWCA1 = espressopp.interaction.LennardJones(
+            epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
+        potWCA2 = espressopp.interaction.LennardJones(
+            epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
+        interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1)  # AT
+        interNB.setPotentialCG(type1=0, type2=0, potential=potWCA2)  # CG
         self.system.addInteraction(interNB)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
         integrator.dt = 0.01
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         file_gro_adress = "test_standard_dumpGROAdress_type_not_hardcoded.gro"
 
-        dump_gro_adress = espressopp.io.DumpGROAdress(self.system, ftpl, integrator, filename=file_gro_adress)
+        dump_gro_adress = espressopp.io.DumpGROAdress(
+            self.system, ftpl, integrator, filename=file_gro_adress)
         dump_gro_adress.dump()
-        self.assertTrue(filecmp.cmp(file_gro_adress, expected_files[0], shallow = False), "!!! Error! Files are not equal!! They should be equal!")
+        self.assertTrue(
+            filecmp.cmp(
+                file_gro_adress,
+                expected_files[0],
+                shallow=False),
+            "!!! Error! Files are not equal!! They should be equal!")
 
     def tearDown(self):
         remove_all_gro_files()

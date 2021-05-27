@@ -42,18 +42,21 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_XTemperature
 
+
 class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_XTemperature, system)
 
     def compute(self, N):
         return self.cxxclass.compute(self, N)
 
-if pmi.isController :
+
+if pmi.isController:
     class XTemperature(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          pmicall = [ "compute" ],
-          cls = 'espressopp.analysis.XTemperatureLocal'
+            pmicall=["compute"],
+            cls='espressopp.analysis.XTemperatureLocal'
         )

@@ -52,14 +52,23 @@ from espressopp import pmi
 from espressopp.analysis.ConfigsParticleDecomp import *
 from _espressopp import analysis_MeanSquareDispl
 
-class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl):
 
-    def __init__(self, system, chainlength = None, start_pid=0):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+class MeanSquareDisplLocal(
+        ConfigsParticleDecompLocal,
+        analysis_MeanSquareDispl):
+
+    def __init__(self, system, chainlength=None, start_pid=0):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if chainlength is None:
                 cxxinit(self, analysis_MeanSquareDispl, system)
             else:
-                cxxinit(self, analysis_MeanSquareDispl, system, chainlength, start_pid)
+                cxxinit(
+                    self,
+                    analysis_MeanSquareDispl,
+                    system,
+                    chainlength,
+                    start_pid)
 
     def computeG2(self):
         return self.cxxclass.computeG2(self)
@@ -71,10 +80,11 @@ class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl)
         print(1)
         return 1
 
+
 if pmi.isController:
     class MeanSquareDispl(ConfigsParticleDecomp, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.analysis.MeanSquareDisplLocal',
-          pmiproperty = [ 'print_progress' ],
-          pmicall = ["computeG2", 'strange']
+            cls='espressopp.analysis.MeanSquareDisplLocal',
+            pmiproperty=['print_progress'],
+            pmicall=["computeG2", 'strange']
         )

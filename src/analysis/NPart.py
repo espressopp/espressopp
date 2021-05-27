@@ -36,14 +36,17 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_NPart
 
+
 class NPartLocal(ObservableLocal, analysis_NPart):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NPart, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class NPart(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.NPartLocal'
+            cls='espressopp.analysis.NPartLocal'
         )

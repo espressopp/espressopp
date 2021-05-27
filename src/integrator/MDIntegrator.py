@@ -58,12 +58,16 @@ class MDIntegratorLocal(object):
 
     def run(self, niter):
         if not isinstance(niter, int):
-            raise ValueError('The provided number of steps have to be an integer not {} with value {}'.format(type(niter), niter))
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            raise ValueError(
+                'The provided number of steps have to be an integer not {} with value {}'.format(
+                    type(niter), niter))
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.run(self, niter)
 
     def addExtension(self, extension):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 
             # set integrator and connect to it
             extension.cxxclass.setIntegrator(extension, self)
@@ -72,16 +76,24 @@ class MDIntegratorLocal(object):
             return self.cxxclass.addExtension(self, extension)
 
     def getExtension(self, k):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getExtension(self, k)
 
     def getNumberOfExtensions(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getNumberOfExtensions(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class MDIntegrator(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmiproperty = [ 'dt', 'step' ],
-            pmicall = [ 'run', 'addExtension', 'getExtension', 'getNumberOfExtensions' ]
-            )
+            pmiproperty=[
+                'dt',
+                'step'],
+            pmicall=[
+                'run',
+                'addExtension',
+                'getExtension',
+                'getNumberOfExtensions'])

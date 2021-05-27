@@ -43,6 +43,7 @@ from espressopp import pmi
 
 ResultNone = _espressopp.esutil_Collectives_ResultNone
 
+
 def locateItem(here):
     res = _espressopp.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
     if pmi.isController:

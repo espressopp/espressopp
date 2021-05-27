@@ -69,8 +69,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedPairDistListLocal(_espressopp.FixedPairDistList):
 
+class FixedPairDistListLocal(_espressopp.FixedPairDistList):
 
     def __init__(self, storage):
 
@@ -102,30 +102,31 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
     def getPairs(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getPairs(self)
+            bonds = self.cxxclass.getPairs(self)
             return bonds
 
     def getPairsDist(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getPairsDist(self)
+            bonds = self.cxxclass.getPairsDist(self)
             return bonds
 
     def getDist(self, pid1, pid2):
         if pmi.workerIsActive():
             return self.cxxclass.getDist(self, pid1, pid2)
 
+
 if pmi.isController:
     class FixedPairDistList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedPairDistListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addPairs" ],
-            pmiinvoke = ['getPairs', 'getPairsDist', 'size']
+            cls='espressopp.FixedPairDistListLocal',
+            localcall=["add"],
+            pmicall=["addPairs"],
+            pmiinvoke=['getPairs', 'getPairsDist', 'size']
         )
 
         def getDist(self, pid1, pid2):
             pairs = pmi.invoke(self.pmiobject, 'getDist', pid1, pid2)
             for i in pairs:
-                if( i != -1 ):
+                if(i != -1):
                     return i

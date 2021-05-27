@@ -68,18 +68,35 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_Adress
 
+
 class AdressLocal(ExtensionLocal, integrator_Adress):
 
-
-    def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False, regionupdates = 1, multistep = 1):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    def __init__(
+            self,
+            _system,
+            _verletlist,
+            _fixedtuplelist,
+            KTI=False,
+            regionupdates=1,
+            multistep=1):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if pmi.workerIsActive():
-                cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI, regionupdates, multistep)
+                cxxinit(
+                    self,
+                    integrator_Adress,
+                    _system,
+                    _verletlist,
+                    _fixedtuplelist,
+                    KTI,
+                    regionupdates,
+                    multistep)
+
 
 if pmi.isController:
     class Adress(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.integrator.AdressLocal' #,
+            cls='espressopp.integrator.AdressLocal'  # ,
             #pmiproperty = [ 'builds' ],
             #pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
-            )
+        )

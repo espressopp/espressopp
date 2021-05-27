@@ -49,12 +49,19 @@ class PotentialEnergyLocal(ObservableLocal, analysis_PotentialEnergy):
             if compute_method is None:
                 compute_method = 'ALL'
             if compute_method not in ['AT', 'CG', 'ALL']:
-                raise ValueError('Wrong compute_method, should be ALL, AT or CG')
+                raise ValueError(
+                    'Wrong compute_method, should be ALL, AT or CG')
 
             if compute_method == 'ALL':
                 cxxinit(self, analysis_PotentialEnergy, system, interaction)
             else:
-                cxxinit(self, analysis_PotentialEnergy, system, interaction, compute_method == 'AT')
+                cxxinit(
+                    self,
+                    analysis_PotentialEnergy,
+                    system,
+                    interaction,
+                    compute_method == 'AT')
+
 
 if pmi.isController:
     class PotentialEnergy(Observable, metaclass=pmi.Proxy):

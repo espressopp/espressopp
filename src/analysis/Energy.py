@@ -60,10 +60,11 @@ espressopp.analysis.Energy
 """
 import espressopp
 
+
 class EnergyPot():
 
     def __init__(self, system, per_atom=False):
-        self.system   = system
+        self.system = system
         self.per_atom = per_atom
 
     def compute(self):
@@ -71,37 +72,39 @@ class EnergyPot():
         for k in range(self.system.getNumberOfInteractions()):
             EPot += self.system.getInteraction(k).computeEnergy()
         if self.per_atom:
-            NPart  = espressopp.analysis.NPart(self.system).compute()
+            NPart = espressopp.analysis.NPart(self.system).compute()
             return EPot / NPart
         else:
             return EPot
 
+
 class EnergyKin():
 
     def __init__(self, system, per_atom=False):
-        self.system   = system
+        self.system = system
         self.per_atom = per_atom
 
     def compute(self):
-        NPart  = espressopp.analysis.NPart(self.system).compute()
-        T      = espressopp.analysis.Temperature(self.system).compute()
-        EKin   = (3.0/2.0) * NPart * T
+        NPart = espressopp.analysis.NPart(self.system).compute()
+        T = espressopp.analysis.Temperature(self.system).compute()
+        EKin = (3.0 / 2.0) * NPart * T
         if self.per_atom:
             return EKin / NPart
         else:
             return EKin
 
+
 class EnergyTot():
 
     def __init__(self, system, per_atom=False):
-        self.system   = system
+        self.system = system
         self.per_atom = per_atom
 
     def compute(self):
-        NPart  = espressopp.analysis.NPart(self.system).compute()
-        T      = espressopp.analysis.Temperature(self.system).compute()
-        EKin   = (3.0/2.0) * NPart * T
-        EPot   = 0.0
+        NPart = espressopp.analysis.NPart(self.system).compute()
+        T = espressopp.analysis.Temperature(self.system).compute()
+        EKin = (3.0 / 2.0) * NPart * T
+        EPot = 0.0
         for k in range(self.system.getNumberOfInteractions()):
             EPot += self.system.getInteraction(k).computeEnergy()
         if self.per_atom:

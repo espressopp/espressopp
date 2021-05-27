@@ -48,14 +48,17 @@ from espressopp import pmi
 from espressopp.analysis.LBOutput import *
 from _espressopp import analysis_LBOutput_VzOfX
 
+
 class LBOutputVzOfXLocal(LBOutputLocal, analysis_LBOutput_VzOfX):
     def __init__(self, system, latticeboltzmann):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_VzOfX, system, latticeboltzmann)
 
-if pmi.isController :
+
+if pmi.isController:
     class LBOutputVzOfX(LBOutput, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.LBOutputVzOfXLocal',
-            pmicall = ["writeOutput"]
-            )
+            cls='espressopp.analysis.LBOutputVzOfXLocal',
+            pmicall=["writeOutput"]
+        )

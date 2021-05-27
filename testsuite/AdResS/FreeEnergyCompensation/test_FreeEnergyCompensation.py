@@ -28,6 +28,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestFreeEnergyCompensation(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -36,9 +37,12 @@ class TestFreeEnergyCompensation(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
-        system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=system.skin)
+        system.storage = espressopp.storage.DomainDecompositionAdress(
+            system, nodeGrid, cellGrid)
         self.system = system
 
     def test_slab(self):
@@ -55,40 +59,54 @@ class TestFreeEnergyCompensation(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
         integrator.dt = 0.01
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # set up FEC
-        fec = espressopp.integrator.FreeEnergyCompensation(self.system, center=[5.0, 5.0, 5.0])
-        fec.addForce(itype=3,filename="table_fec.tab",type=1)
+        fec = espressopp.integrator.FreeEnergyCompensation(
+            self.system, center=[5.0, 5.0, 5.0])
+        fec.addForce(itype=3, filename="table_fec.tab", type=1)
         integrator.addExtension(fec)
 
         # x coordinates of particles before integration
-        before = [self.system.storage.getParticle(i).pos[0] for i in range(1,6)]
+        before = [self.system.storage.getParticle(
+            i).pos[0] for i in range(1, 6)]
 
         # run ten steps and compute energy
         integrator.run(10)
         energy = fec.computeCompEnergy()
 
         # x coordinates of particles after integration
-        after = [self.system.storage.getParticle(i).pos[0] for i in range(1,6)]
+        after = [self.system.storage.getParticle(
+            i).pos[0] for i in range(1, 6)]
 
-        # run checks (only one particle is in hybrid region and should feel the FEC. Also check that its FEC energy is correct)
+        # run checks (only one particle is in hybrid region and should feel the
+        # FEC. Also check that its FEC energy is correct)
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertAlmostEqual(after[2], 7.598165, places=5)
@@ -110,40 +128,55 @@ class TestFreeEnergyCompensation(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(5.0, 8.5, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(5.0, 9.5, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=True)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=True)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
         integrator.dt = 0.01
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # set up FEC
-        fec = espressopp.integrator.FreeEnergyCompensation(self.system, center=[5.0, 5.0, 5.0], sphereAdr=True)
-        fec.addForce(itype=3,filename="table_fec.tab",type=1)
+        fec = espressopp.integrator.FreeEnergyCompensation(
+            self.system, center=[5.0, 5.0, 5.0], sphereAdr=True)
+        fec.addForce(itype=3, filename="table_fec.tab", type=1)
         integrator.addExtension(fec)
 
         # y coordinates of particles before integration
-        before = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
+        before = [self.system.storage.getParticle(
+            i).pos[1] for i in range(1, 6)]
 
         # run ten steps
         integrator.run(10)
         energy = fec.computeCompEnergy()
 
         # y coordinates of particles after integration
-        after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
+        after = [self.system.storage.getParticle(
+            i).pos[1] for i in range(1, 6)]
 
-        # run checks (as for test with slab-geometry, but check y-coordinates this time. Given the now spherical setup, particles should move as before but along the y-axis).
+        # run checks (as for test with slab-geometry, but check y-coordinates
+        # this time. Given the now spherical setup, particles should move as
+        # before but along the y-axis).
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertAlmostEqual(after[2], 7.598165, places=5)

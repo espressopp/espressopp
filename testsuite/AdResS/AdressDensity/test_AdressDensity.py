@@ -27,6 +27,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestAdressDensity(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -35,9 +36,12 @@ class TestAdressDensity(unittest.TestCase):
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin = 0.3
         system.comm = MPI.COMM_WORLD
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=system.skin)
-        system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=system.skin)
+        system.storage = espressopp.storage.DomainDecompositionAdress(
+            system, nodeGrid, cellGrid)
         self.system = system
 
     def test_densitycalculation(self):
@@ -54,20 +58,30 @@ class TestAdressDensity(unittest.TestCase):
             (9, 0, 0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
             (10, 0, 0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 

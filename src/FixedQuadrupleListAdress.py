@@ -65,13 +65,17 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
 
+class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
 
     def __init__(self, storage, fixedtupleList):
 
         if pmi.workerIsActive():
-            cxxinit(self, _espressopp.FixedQuadrupleListAdress, storage, fixedtupleList)
+            cxxinit(
+                self,
+                _espressopp.FixedQuadrupleListAdress,
+                storage,
+                fixedtupleList)
 
     def add(self, pid1, pid2, pid3, pid4):
 
@@ -101,11 +105,12 @@ class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
             quadruple = self.cxxclass.getQuadruples(self)
             return quadruple
 
+
 if pmi.isController:
     class FixedQuadrupleListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedQuadrupleListAdressLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addQuadruples" ],
-            pmiinvoke = ["getQuadruples", "size"]
-            )
+            cls='espressopp.FixedQuadrupleListAdressLocal',
+            localcall=["add"],
+            pmicall=["addQuadruples"],
+            pmiinvoke=["getQuadruples", "size"]
+        )

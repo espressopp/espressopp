@@ -50,12 +50,15 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_GeneralizedLangevinThermostat
 
-class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedLangevinThermostat):
+
+class GeneralizedLangevinThermostatLocal(
+        ExtensionLocal,
+        integrator_GeneralizedLangevinThermostat):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_GeneralizedLangevinThermostat, system)
-
 
     def addCoeffs(self, itype, filename, type):
         """
@@ -64,14 +67,15 @@ class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedL
         """
         if pmi.workerIsActive():
             self.cxxclass.addCoeffs(self, itype, filename, type)
-    #def enableAdress(self):
+    # def enableAdress(self):
     #    if pmi.workerIsActive():
     #        self.cxxclass.enableAdress(self);
 
-if pmi.isController :
+
+if pmi.isController:
     class GeneralizedLangevinThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.GeneralizedLangevinThermostatLocal',
-            pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addCoeffs' ]
-            )
+            cls='espressopp.integrator.GeneralizedLangevinThermostatLocal',
+            pmiproperty=['itype', 'filename'],
+            pmicall=['addCoeffs']
+        )

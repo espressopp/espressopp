@@ -29,6 +29,7 @@ espressopp.esutil.RNG
 from espressopp import pmi
 from _espressopp import esutil_RNG
 
+
 class RNGLocal(esutil_RNG):
     pass
 
@@ -42,11 +43,12 @@ class RNGLocal(esutil_RNG):
 #            else :
 #                pass
 
+
 if pmi.isController:
     class RNG(metaclass=pmi.Proxy):
         'Random number generator.'
         pmiproxydefs = dict(
-            cls = 'espressopp.esutil.RNGLocal',
-            localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
-            pmicall = [ 'seed', 'get_seed', 'saveState', 'loadState' ]
-            )
+            cls='espressopp.esutil.RNGLocal',
+            localcall=['__call__', 'normal', 'gamma', 'uniformOnSphere'],
+            pmicall=['seed', 'get_seed', 'saveState', 'loadState']
+        )

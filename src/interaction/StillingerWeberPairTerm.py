@@ -165,119 +165,172 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_StillingerWeberPairTerm, \
-                      interaction_VerletListStillingerWeberPairTerm, \
-                      interaction_VerletListAdressStillingerWeberPairTerm, \
-                      interaction_VerletListHadressStillingerWeberPairTerm, \
-                      interaction_CellListStillingerWeberPairTerm, \
-                      interaction_FixedPairListStillingerWeberPairTerm
+    interaction_VerletListStillingerWeberPairTerm, \
+    interaction_VerletListAdressStillingerWeberPairTerm, \
+    interaction_VerletListHadressStillingerWeberPairTerm, \
+    interaction_CellListStillingerWeberPairTerm, \
+    interaction_FixedPairListStillingerWeberPairTerm
 
-class StillingerWeberPairTermLocal(PotentialLocal, interaction_StillingerWeberPairTerm):
+
+class StillingerWeberPairTermLocal(
+        PotentialLocal,
+        interaction_StillingerWeberPairTerm):
 
     def __init__(self, A, B, p, q, epsilon=1.0, sigma=1.0, cutoff=infinity):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_StillingerWeberPairTerm, A, B, p, q, epsilon, sigma, cutoff)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_StillingerWeberPairTerm,
+                    A, B, p, q, epsilon, sigma, cutoff)
 
-class VerletListStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListStillingerWeberPairTerm):
+
+class VerletListStillingerWeberPairTermLocal(
+        InteractionLocal,
+        interaction_VerletListStillingerWeberPairTerm):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListStillingerWeberPairTerm, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletListLocal(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
-class VerletListAdressStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListAdressStillingerWeberPairTerm):
+
+class VerletListAdressStillingerWeberPairTermLocal(
+        InteractionLocal,
+        interaction_VerletListAdressStillingerWeberPairTerm):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressStillingerWeberPairTerm, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressStillingerWeberPairTerm,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-class VerletListHadressStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListHadressStillingerWeberPairTerm):
+
+class VerletListHadressStillingerWeberPairTermLocal(
+        InteractionLocal, interaction_VerletListHadressStillingerWeberPairTerm):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressStillingerWeberPairTerm, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressStillingerWeberPairTerm,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-class CellListStillingerWeberPairTermLocal(InteractionLocal, interaction_CellListStillingerWeberPairTerm):
+
+class CellListStillingerWeberPairTermLocal(
+        InteractionLocal,
+        interaction_CellListStillingerWeberPairTerm):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListStillingerWeberPairTerm, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListStillingerWeberPairTermLocal(InteractionLocal, interaction_FixedPairListStillingerWeberPairTerm):
+
+class FixedPairListStillingerWeberPairTermLocal(
+        InteractionLocal,
+        interaction_FixedPairListStillingerWeberPairTerm):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListStillingerWeberPairTerm, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListStillingerWeberPairTerm,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class StillingerWeberPairTerm(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-          cls = 'espressopp.interaction.StillingerWeberPairTermLocal',
-          pmiproperty = ['A', 'B', 'p', 'q', 'epsilon', 'sigma']
+            cls='espressopp.interaction.StillingerWeberPairTermLocal',
+            pmiproperty=['A', 'B', 'p', 'q', 'epsilon', 'sigma']
         )
 
     class VerletListStillingerWeberPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.VerletListStillingerWeberPairTermLocal',
-          pmicall = ['setPotential', 'getPotential', 'getVerletList']
-        )
+            cls='espressopp.interaction.VerletListStillingerWeberPairTermLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'getVerletList'])
 
-    class VerletListAdressStillingerWeberPairTerm(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressStillingerWeberPairTerm(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.VerletListAdressStillingerWeberPairTermLocal',
-          pmicall = ['setPotentialAT', 'setPotentialCG']
-        )
+            cls='espressopp.interaction.VerletListAdressStillingerWeberPairTermLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
-    class VerletListHadressStillingerWeberPairTerm(Interaction, metaclass=pmi.Proxy):
+    class VerletListHadressStillingerWeberPairTerm(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.VerletListHadressStillingerWeberPairTermLocal',
-          pmicall = ['setPotentialAT', 'setPotentialCG']
-        )
+            cls='espressopp.interaction.VerletListHadressStillingerWeberPairTermLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
     class CellListStillingerWeberPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.CellListStillingerWeberPairTermLocal',
-          pmicall = ['setPotential']
+            cls='espressopp.interaction.CellListStillingerWeberPairTermLocal',
+            pmicall=['setPotential']
         )
 
-    class FixedPairListStillingerWeberPairTerm(Interaction, metaclass=pmi.Proxy):
+    class FixedPairListStillingerWeberPairTerm(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.FixedPairListStillingerWeberPairTermLocal',
-          pmicall = ['setPotential']
-        )
+            cls='espressopp.interaction.FixedPairListStillingerWeberPairTermLocal',
+            pmicall=['setPotential'])

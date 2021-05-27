@@ -39,12 +39,14 @@ Then the molecules will be put together properly afterwards when calling AdressD
 
 import espressopp
 
+
 def AdressSetCG(apm, pidCG, allParticlesAT):
-    cmp = [0,0,0]
-    pos = (allParticlesAT[pidCG*apm])[1]
+    cmp = [0, 0, 0]
+    pos = (allParticlesAT[pidCG * apm])[1]
     for i in range(3):
         cmp[i] += pos[i]
     return cmp
+
 
 def AdressDecomp(system, integrator):
     system.storage.decompose()

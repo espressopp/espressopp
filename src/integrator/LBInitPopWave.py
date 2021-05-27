@@ -55,15 +55,18 @@ from espressopp import pmi
 from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_PopWave
 
+
 class LBInitPopWaveLocal(LBInitLocal, integrator_LBInit_PopWave):
     def __init__(self, system, latticeboltzmann):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_PopWave, system, latticeboltzmann)
 
-if pmi.isController :
+
+if pmi.isController:
     class LBInitPopWave(LBInit, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LBInitPopWaveLocal',
-            pmicall = [
-                       "createDenVel"]
-            )
+            cls='espressopp.integrator.LBInitPopWaveLocal',
+            pmicall=[
+                "createDenVel"]
+        )

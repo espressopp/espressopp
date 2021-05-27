@@ -24,6 +24,7 @@ from espressopp import pmi
 from espressopp.esutil import Collectives as collectives
 import mpi4py.MPI as MPI
 
+
 class TestCollectives(unittest.TestCase):
     def testLocate(self):
         for owner in range(MPI.COMM_WORLD.size - 1):
@@ -46,7 +47,8 @@ class TestCollectives(unittest.TestCase):
             else:
                 collectives.locateItem(True)
 
+
 if __name__ == "__main__":
-    if pmi.isController :
+    if pmi.isController:
         pmi.stopWorkerLoop()
     unittest.main()

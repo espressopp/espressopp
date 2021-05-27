@@ -57,34 +57,46 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_HarmonicTrap, interaction_SingleParticleHarmonicTrap
 
 
-class HarmonicTrapLocal(SingleParticlePotentialLocal, interaction_HarmonicTrap):
+class HarmonicTrapLocal(
+        SingleParticlePotentialLocal,
+        interaction_HarmonicTrap):
 
     def __init__(self):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_HarmonicTrap)
 
 
-class SingleParticleHarmonicTrapLocal(InteractionLocal, interaction_SingleParticleHarmonicTrap):
+class SingleParticleHarmonicTrapLocal(
+        InteractionLocal,
+        interaction_SingleParticleHarmonicTrap):
 
     def __init__(self, system, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_SingleParticleHarmonicTrap, system, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_SingleParticleHarmonicTrap,
+                system,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class HarmonicTrap(SingleParticlePotential):
         'The HarmonicTrap potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.HarmonicTrapLocal',
-            pmiproperty = ['k', 'center']
-            )
+            cls='espressopp.interaction.HarmonicTrapLocal',
+            pmiproperty=['k', 'center']
+        )
 
     class SingleParticleHarmonicTrap(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.SingleParticleHarmonicTrapLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.SingleParticleHarmonicTrapLocal',
+            pmicall=['setPotential']
+        )

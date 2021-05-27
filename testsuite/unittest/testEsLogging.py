@@ -28,8 +28,9 @@ from espressopp.interaction import LennardJones
 
 filename = "log.out"
 
-class Test0Logging(unittest.TestCase) :
-    def test0Create(self) :
+
+class Test0Logging(unittest.TestCase):
+    def test0Create(self):
 
         lj = LennardJones(1.0, 2.0, 3.0)
         self.assertEqual(lj.epsilon, 1.0)
@@ -54,12 +55,13 @@ if __name__ == "__main__":
     log = logging.getLogger("LennardJones")
     log.setLevel(logging.TRACE)
     # deactivate propagation of log messages up the hierarchy
-    log.propagate=0
+    log.propagate = 0
     # create handler
     handler = logging.FileHandler(filename)
     handler.setLevel(logging.TRACE)
     # create formatter
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     # add formatter to handler
     handler.setFormatter(formatter)
     # add handler to logger

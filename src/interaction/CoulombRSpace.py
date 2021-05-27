@@ -148,43 +148,59 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombRSpace, \
-                      interaction_VerletListCoulombRSpace
+    interaction_VerletListCoulombRSpace
+
 
 class CoulombRSpaceLocal(PotentialLocal, interaction_CoulombRSpace):
 
     def __init__(self, prefactor=1.0, alpha=1.0, cutoff=infinity):
 
-
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CoulombRSpace, prefactor, alpha, cutoff)
 
-class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulombRSpace):
+
+class VerletListCoulombRSpaceLocal(
+        InteractionLocal,
+        interaction_VerletListCoulombRSpace):
 
     def __init__(self, vl):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombRSpace, vl)
 
     def setPotential(self, type1, type2, potential):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletListLocal(self):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
 
 if pmi.isController:
 
     class CoulombRSpace(Potential):
-        pmiproxydefs = dict( cls = 'espressopp.interaction.CoulombRSpaceLocal', pmiproperty = [ 'prefactor', 'alpha'] )
+        pmiproxydefs = dict(
+            cls='espressopp.interaction.CoulombRSpaceLocal',
+            pmiproperty=[
+                'prefactor',
+                'alpha'])
 
     class VerletListCoulombRSpace(Interaction, metaclass=pmi.Proxy):
-        pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListCoulombRSpaceLocal',
-        pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )
+        pmiproxydefs = dict(
+            cls='espressopp.interaction.VerletListCoulombRSpaceLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'getVerletList'])

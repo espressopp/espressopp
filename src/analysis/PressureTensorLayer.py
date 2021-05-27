@@ -83,15 +83,20 @@ from espressopp import pmi
 from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_PressureTensorLayer
 
-class PressureTensorLayerLocal(AnalysisBaseLocal, analysis_PressureTensorLayer):
+
+class PressureTensorLayerLocal(
+        AnalysisBaseLocal,
+        analysis_PressureTensorLayer):
 
     def __init__(self, system, h0, dh):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensorLayer, system, h0, dh)
+
 
 if pmi.isController:
     class PressureTensorLayer(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.PressureTensorLayerLocal',
-            pmiproperty = [ 'h0', 'dh' ]
+            cls='espressopp.analysis.PressureTensorLayerLocal',
+            pmiproperty=['h0', 'dh']
         )

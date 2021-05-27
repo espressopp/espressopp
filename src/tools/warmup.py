@@ -22,7 +22,8 @@
 import espressopp
 from espressopp import Real3D
 
-def warmup(system, integrator, number = 80):
+
+def warmup(system, integrator, number=80):
     """
     Warm up for a system with a density of 0.85.
 
@@ -42,7 +43,7 @@ def warmup(system, integrator, number = 80):
     print("starting warmup")
 
     org_dt = integrator.dt
-    pot = system.getInteraction(0).clonePotential(0,0)
+    pot = system.getInteraction(0).clonePotential(0, 0)
     final_sigma = pot.sigma
     final_epsilon = pot.epsilon
     N = 50
@@ -51,11 +52,11 @@ def warmup(system, integrator, number = 80):
     force_capping = espressopp.integrator.CapForce(system, 0.0)
     integrator.addExtension(force_capping)
 
-    for k in range(11,number):
-        force_capping.setAbsCapForce(1000000.0/number*k)
-        pot.sigma = final_sigma/number*k
-        pot.epsilon = final_epsilon/number*k
-        system.getInteraction(0).setPotential(0,0,pot)
+    for k in range(11, number):
+        force_capping.setAbsCapForce(1000000.0 / number * k)
+        pot.sigma = final_sigma / number * k
+        pot.epsilon = final_epsilon / number * k
+        system.getInteraction(0).setPotential(0, 0, pot)
         espressopp.tools.analyse.info(system, integrator)
         integrator.run(N)
 

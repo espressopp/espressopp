@@ -46,11 +46,12 @@ rc = 1.12
 skin = 0.3                                 # skin for Verlet lists
 nvt = True
 timestep = 0.01
-spline  = 2                                # spline interpolation type (1, 2, 3)
+spline = 2                                # spline interpolation type (1, 2, 3)
 halfCellInt = int(sys.argv[1])
-useBuffers = False                         # too few number of particles/cell to benefit from buffers
+# too few number of particles/cell to benefit from buffers
+useBuffers = False
 
-conffile = 'polymer_melt.start' # file with inital configuration
+conffile = 'polymer_melt.start'  # file with inital configuration
 tabfileLJ = "pot-lj_%s.txt" % halfCellInt
 tabfileFENE = "pot-fene_%s.txt" % halfCellInt
 tabfileCosine = "pot-cosine_%s.txt" % halfCellInt
@@ -83,13 +84,16 @@ print('halfCellInt = ', halfCellInt)
 
 comm = MPI.COMM_WORLD
 
-nodeGrid = decomp.nodeGrid(comm.size,size,rc,skin)
+nodeGrid = decomp.nodeGrid(comm.size, size, rc, skin)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin, halfCellInt)
 print("nodeGrid =", nodeGrid)
 print("cellGrid =", cellGrid)
-print("particles/cell =", 1.0*num_particles/(cellGrid[0]*cellGrid[1]*cellGrid[2]))
+print("particles/cell =", 1.0 * num_particles /
+      (cellGrid[0] * cellGrid[1] * cellGrid[2]))
 
 # writes the tabulated file
+
+
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
@@ -97,15 +101,17 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     for i in range(N):
         r = low + i * delta
         energy = pot.computeEnergy(r)
-        if body == 2:# this is for 2-body potentials
+        if body == 2:  # this is for 2-body potentials
             force = pot.computeForce(Real3D(r, 0.0, 0.0))[0]
-        else: # this is for 3- and 4-body potentials
+        else:  # this is for 3- and 4-body potentials
             force = pot.computeForce(r)
-        outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
+        outfile.write("%15.8g %15.8g %15.8g\n" % (r, energy, force))
 
     outfile.close()
 
 # compute the number of cells on each node
+
+
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
@@ -114,23 +120,30 @@ def calcNumberCells(size, nodes, cutoff):
 
 
 # write the tabulated potential files
-potLJ  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
+potLJ = espressopp.interaction.LennardJones(
+    epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
 potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
 
-print('Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine))
+print('Generating potential files ... (%2s, %2s, %2s)\n' %
+      (tabfileLJ, tabfileFENE, tabfileCosine))
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=potLJ.cutoff)
 writeTabFile(potFENE, tabfileFENE, N=257, low=0.0001, high=1.49)
 writeTabFile(potCosine, tabfileCosine, N=257, low=0.0001, high=3.14, body=3)
 
-potTabLJ = espressopp.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc)
-potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)
-potTabCosine = espressopp.interaction.TabulatedAngular(itype=spline, filename = tabfileCosine)
+potTabLJ = espressopp.interaction.Tabulated(
+    itype=spline, filename=tabfileLJ, cutoff=rc)
+potTabFENE = espressopp.interaction.Tabulated(
+    itype=spline, filename=tabfileFENE)
+potTabCosine = espressopp.interaction.TabulatedAngular(
+    itype=spline, filename=tabfileCosine)
 
 # repeat simulation twice, with and without tabulated potential
 for tabulation in [True, False]:
-    if tabulation: w = ''
-    else: w = 'out'
+    if tabulation:
+        w = ''
+    else:
+        w = 'out'
     print('Running simulation with%0s tabulated potentials' % w)
 
     print('Setting up ...')
@@ -139,22 +152,24 @@ for tabulation in [True, False]:
     system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
     system.skin = skin
 
-
     #nodeGrid = Int3D(1, 1, comm.size)
-    #cellGrid = Int3D(
-        #calcNumberCells(size[0], nodeGrid[0], rc),
-        #calcNumberCells(size[1], nodeGrid[1], rc),
-        #calcNumberCells(size[2], nodeGrid[2], rc)
-        #)
-    system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, halfCellInt)
+    # cellGrid = Int3D(
+    #calcNumberCells(size[0], nodeGrid[0], rc),
+    #calcNumberCells(size[1], nodeGrid[1], rc),
+    #calcNumberCells(size[2], nodeGrid[2], rc)
+    # )
+    system.storage = espressopp.storage.DomainDecomposition(
+        system, nodeGrid, cellGrid, halfCellInt)
 
     # add particles to the system and then decompose
     system.storage.addParticles(new_particles, *props)
     system.storage.decompose()
 
-
     # Lennard-Jones with Verlet list
-    vl = espressopp.VerletList(system, cutoff = rc + system.skin, useBuffers=useBuffers)
+    vl = espressopp.VerletList(
+        system,
+        cutoff=rc + system.skin,
+        useBuffers=useBuffers)
     if tabulation:
         interLJ = espressopp.interaction.VerletListTabulated(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potTabLJ)
@@ -163,31 +178,32 @@ for tabulation in [True, False]:
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
 
-
     # FENE bonds with Fixed Pair List
     fpl = espressopp.FixedPairList(system.storage)
     fpl.addBonds(bonds)
     if tabulation:
-        interFENE = espressopp.interaction.FixedPairListTabulated(system, fpl, potTabFENE)
-        #interFENE.setPotential(type1=0, type2=0, potential=potTabFENE) # no longer needed
+        interFENE = espressopp.interaction.FixedPairListTabulated(
+            system, fpl, potTabFENE)
+        # interFENE.setPotential(type1=0, type2=0, potential=potTabFENE) # no
+        # longer needed
     else:
-        interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
+        interFENE = espressopp.interaction.FixedPairListFENE(
+            system, fpl, potFENE)
         #interFENE.setPotential(type1=0, type2=0, potential=potFENE)
     system.addInteraction(interFENE)
-
 
     # Cosine with Fixed Triple List
     ftl = espressopp.FixedTripleList(system.storage)
     ftl.addTriples(angles)
     if tabulation:
-        interCosine = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTabCosine)
+        interCosine = espressopp.interaction.FixedTripleListTabulatedAngular(
+            system, ftl, potTabCosine)
         #interCosine.setPotential(type1=0, type2=0, potential=potTabCosine)
     else:
-        interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
+        interCosine = espressopp.interaction.FixedTripleListCosine(
+            system, ftl, potCosine)
         #interCosine.setPotential(type1=0, type2=0, potential=potCosine)
     system.addInteraction(interCosine)
-
-
 
     # integrator
     integrator = espressopp.integrator.VelocityVerlet(system)
@@ -198,7 +214,6 @@ for tabulation in [True, False]:
         langevin.gamma = 1.0
         langevin.temperature = 1.0
         integrator.addExtension(langevin)
-
 
     # analysis
     configurations = espressopp.analysis.Configurations(system)
@@ -217,7 +232,8 @@ for tabulation in [True, False]:
     Eb = interFENE.computeEnergy()
     Ea = interCosine.computeEnergy()
     Etotal = Ek + Ep + Eb + Ea
-    sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
+    sys.stdout.write(
+        ' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
     sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
     start_time = time.process_time()
@@ -237,7 +253,8 @@ for tabulation in [True, False]:
     end_time = time.process_time()
     timers.show(integrator.getTimers(), precision=2)
 
-    espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
+    espressopp.tools.analyse.final_info(
+        system, integrator, vl, start_time, end_time)
 
 #os.system('rm '+tabfileLJ+' '+tabfileFENE+' '+tabfileCosine)
 print('\nDone.')

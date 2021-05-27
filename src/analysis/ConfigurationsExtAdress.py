@@ -96,27 +96,41 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_ConfigurationsExtAdress
 
-class ConfigurationsExtAdressLocal(ObservableLocal, analysis_ConfigurationsExtAdress):
+
+class ConfigurationsExtAdressLocal(
+        ObservableLocal,
+        analysis_ConfigurationsExtAdress):
 
     def __init__(self, system, fixedtuplelist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_ConfigurationsExtAdress, system, fixedtuplelist)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                analysis_ConfigurationsExtAdress,
+                system,
+                fixedtuplelist)
+
     def gather(self):
         return self.cxxclass.gather(self)
+
     def clear(self):
         return self.cxxclass.clear(self)
+
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+
     def __next__(self):
         return self.cxxclass.all(self).next()
+
     def back(self):
         return self.cxxclass.back(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class ConfigurationsExtAdress(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.ConfigurationsExtAdressLocal',
-            pmicall = [ "gather", "clear", "back" ],
-            localcall = ["__getitem__", "__iter__", "__next__"],
-            pmiproperty = ["capacity", "size", 'unfolded']
-            )
+            cls='espressopp.analysis.ConfigurationsExtAdressLocal',
+            pmicall=["gather", "clear", "back"],
+            localcall=["__getitem__", "__iter__", "__next__"],
+            pmiproperty=["capacity", "size", 'unfolded']
+        )

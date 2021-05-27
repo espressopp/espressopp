@@ -36,19 +36,24 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinThermostat1D
 
-class LangevinThermostat1DLocal(ExtensionLocal, integrator_LangevinThermostat1D):
+
+class LangevinThermostat1DLocal(
+        ExtensionLocal,
+        integrator_LangevinThermostat1D):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LangevinThermostat1D, system)
 
-    #def enableAdress(self):
+    # def enableAdress(self):
     #    if pmi.workerIsActive():
     #        self.cxxclass.enableAdress(self);
 
-if pmi.isController :
+
+if pmi.isController:
     class LangevinThermostat1D(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LangevinThermostat1DLocal',
-            pmiproperty = [ 'gamma', 'temperature', 'adress', 'direction' ]
-            )
+            cls='espressopp.integrator.LangevinThermostat1DLocal',
+            pmiproperty=['gamma', 'temperature', 'adress', 'direction']
+        )

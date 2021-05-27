@@ -68,42 +68,56 @@ from espressopp import pmi
 from _espressopp import interaction_Interaction
 
 
-unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = list(range(7))
+unused, Nonbonded, Single, Pair, Angular, Dihedral, NonbondedSlow = list(
+    range(7))
+
 
 class InteractionLocal(object):
 
     def computeEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeEnergy(self)
 
-    def computeEnergyAA(self, atomtype = None):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    def computeEnergyAA(self, atomtype=None):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if atomtype is None:
                 return self.cxxclass.computeEnergyAA(self)
             else:
                 return self.cxxclass.computeEnergyAA(self, atomtype)
 
-    def computeEnergyCG(self, atomtype = None):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    def computeEnergyCG(self, atomtype=None):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if atomtype is None:
                 return self.cxxclass.computeEnergyCG(self)
             else:
                 return self.cxxclass.computeEnergyCG(self, atomtype)
 
     def computeEnergyDeriv(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeEnergyDeriv(self)
 
     def computeVirial(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeVirial(self)
 
     def bondType(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return int(self.cxxclass.bondType(self))
 
-if pmi.isController :
+
+if pmi.isController:
     class Interaction(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
-            )
+            pmicall=[
+                "computeEnergy",
+                "computeEnergyDeriv",
+                "computeEnergyAA",
+                "computeEnergyCG",
+                "computeVirial",
+                "bondType"])

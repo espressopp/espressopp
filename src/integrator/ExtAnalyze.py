@@ -53,14 +53,17 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_ExtAnalyze
 
+
 class ExtAnalyzeLocal(ExtensionLocal, integrator_ExtAnalyze):
 
     def __init__(self, action_obj, interval=1):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_ExtAnalyze, action_obj, interval)
 
-if pmi.isController :
+
+if pmi.isController:
     class ExtAnalyze(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.ExtAnalyzeLocal',
+            cls='espressopp.integrator.ExtAnalyzeLocal',
         )

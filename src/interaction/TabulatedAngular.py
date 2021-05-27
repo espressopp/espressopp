@@ -166,31 +166,50 @@ from espressopp.esutil import *
 from espressopp.interaction.AngularPotential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TabulatedAngular, \
-                        interaction_FixedTripleListTabulatedAngular, \
-                        interaction_FixedTripleListTypesTabulatedAngular, \
-                        interaction_FixedTripleListPIadressTabulatedAngular
+    interaction_FixedTripleListTabulatedAngular, \
+    interaction_FixedTripleListTypesTabulatedAngular, \
+    interaction_FixedTripleListPIadressTabulatedAngular
 
 
-class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
+class TabulatedAngularLocal(
+        AngularPotentialLocal,
+        interaction_TabulatedAngular):
     def __init__(self, itype, filename):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedAngular, itype, filename)
 
-class FixedTripleListTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedAngular):
+
+class FixedTripleListTabulatedAngularLocal(
+        InteractionLocal,
+        interaction_FixedTripleListTabulatedAngular):
 
     def __init__(self, system, ftl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListTabulatedAngular, system, ftl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedTripleListTabulatedAngular,
+                system,
+                ftl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
 
-class FixedTripleListTypesTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTypesTabulatedAngular):
+class FixedTripleListTypesTabulatedAngularLocal(
+        InteractionLocal,
+        interaction_FixedTripleListTypesTabulatedAngular):
     def __init__(self, system, ftl):
         if pmi.workerIsActive():
-            cxxinit(self, interaction_FixedTripleListTypesTabulatedAngular, system, ftl)
+            cxxinit(
+                self,
+                interaction_FixedTripleListTypesTabulatedAngular,
+                system,
+                ftl)
 
     def setPotential(self, type1, type2, type3, potential):
         if pmi.workerIsActive():
@@ -209,14 +228,34 @@ class FixedTripleListTypesTabulatedAngularLocal(InteractionLocal, interaction_Fi
             return self.cxxclass.getFixedTripleList(self)
 
 
-class FixedTripleListPIadressTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListPIadressTabulatedAngular):
+class FixedTripleListPIadressTabulatedAngularLocal(
+        InteractionLocal,
+        interaction_FixedTripleListPIadressTabulatedAngular):
     'The (local) tanulated angular interaction using FixedTriple lists.'
-    def __init__(self, system, ftl, fixedtupleList, potential, ntrotter, speedup):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListPIadressTabulatedAngular, system, ftl, fixedtupleList, potential, ntrotter, speedup)
+
+    def __init__(
+            self,
+            system,
+            ftl,
+            fixedtupleList,
+            potential,
+            ntrotter,
+            speedup):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedTripleListPIadressTabulatedAngular,
+                system,
+                ftl,
+                fixedtupleList,
+                potential,
+                ntrotter,
+                speedup)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
@@ -260,24 +299,38 @@ if pmi.isController:
     class TabulatedAngular(AngularPotential):
         'The TabulatedAngular potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.TabulatedAngularLocal',
-            pmiproperty = ['itype', 'filename']
-            )
+            cls='espressopp.interaction.TabulatedAngularLocal',
+            pmiproperty=['itype', 'filename']
+        )
 
     class FixedTripleListTabulatedAngular(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedTripleListTabulatedAngularLocal',
-            pmicall = ['setPotential', 'getFixedTripleList']
-            )
-
-    class FixedTripleListTypesTabulatedAngular(Interaction, metaclass=pmi.Proxy):
-        pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedTripleListTypesTabulatedAngularLocal',
-            pmicall = ['setPotential','getPotential', 'setFixedTripleList', 'getFixedTripleList']
+            cls='espressopp.interaction.FixedTripleListTabulatedAngularLocal',
+            pmicall=['setPotential', 'getFixedTripleList']
         )
 
-    class FixedTripleListPIadressTabulatedAngular(Interaction, metaclass=pmi.Proxy):
+    class FixedTripleListTypesTabulatedAngular(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedTripleListPIadressTabulatedAngularLocal',
-            pmicall = ['setPotential', 'getPotential', 'setFixedTripleList', 'getFixedTripleList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
-            )
+            cls='espressopp.interaction.FixedTripleListTypesTabulatedAngularLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedTripleList',
+                'getFixedTripleList'])
+
+    class FixedTripleListPIadressTabulatedAngular(
+            Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls='espressopp.interaction.FixedTripleListPIadressTabulatedAngularLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedTripleList',
+                'getFixedTripleList',
+                'setFixedTupleList',
+                'getFixedTupleList',
+                'setNTrotter',
+                'getNTrotter',
+                'setSpeedup',
+                'getSpeedup'])

@@ -24,6 +24,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestCaseCapForce(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -42,16 +43,27 @@ class TestCaseCapForce(unittest.TestCase):
 
     def test_cap_force(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, 1.5, 0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 0, 0, espressopp.Real3D(4.95, 5.0, 5.0), 1.0, 0, 1.),
             (2, 0, 0, espressopp.Real3D(5.05, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -59,15 +71,16 @@ class TestCaseCapForce(unittest.TestCase):
         integrator.dt = 0.005
 
         # Lennard-Jones with Verlet list
-        rc_lj   = pow(2.0, 1.0/6.0)
-        vl      = espressopp.VerletList(self.system, cutoff = rc_lj)
-        potLJ   = espressopp.interaction.LennardJones(epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
+        rc_lj = pow(2.0, 1.0 / 6.0)
+        vl = espressopp.VerletList(self.system, cutoff=rc_lj)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
         interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interLJ)
 
         # create a CapForce instance
-        capforce       = espressopp.integrator.CapForce(self.system, 1.0)
+        capforce = espressopp.integrator.CapForce(self.system, 1.0)
         integrator.addExtension(capforce)
 
         # run 1 step
@@ -78,21 +91,38 @@ class TestCaseCapForce(unittest.TestCase):
         print(particle1.f, particle2.f)
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 2 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 1 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 2 is not capped.")
 
     def test_cap_force_array(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, 1.5, 0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 0, 0, espressopp.Real3D(4.95, 5.0, 5.0), 1.0, 0, 1.),
             (2, 0, 0, espressopp.Real3D(5.05, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -100,15 +130,17 @@ class TestCaseCapForce(unittest.TestCase):
         integrator.dt = 0.005
 
         # Lennard-Jones with Verlet list
-        rc_lj   = pow(2.0, 1.0/6.0)
-        vl      = espressopp.VerletList(self.system, cutoff = rc_lj)
-        potLJ   = espressopp.interaction.LennardJones(epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
+        rc_lj = pow(2.0, 1.0 / 6.0)
+        vl = espressopp.VerletList(self.system, cutoff=rc_lj)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
         interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interLJ)
 
         # create a CapForce instance
-        capforce       = espressopp.integrator.CapForce(self.system, espressopp.Real3D(1.0, 1.0, 1.0))
+        capforce = espressopp.integrator.CapForce(
+            self.system, espressopp.Real3D(1.0, 1.0, 1.0))
         integrator.addExtension(capforce)
 
         # run 1 step
@@ -119,21 +151,38 @@ class TestCaseCapForce(unittest.TestCase):
         print(particle1.f, particle2.f)
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 2 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 1 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 2 is not capped.")
 
     def test_cap_force_group(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, 1.5, 0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 0, 0, espressopp.Real3D(4.95, 5.0, 5.0), 1.0, 0, 1.),
             (2, 0, 0, espressopp.Real3D(5.05, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -141,9 +190,10 @@ class TestCaseCapForce(unittest.TestCase):
         integrator.dt = 0.005
 
         # Lennard-Jones with Verlet list
-        rc_lj   = pow(2.0, 1.0/6.0)
-        vl      = espressopp.VerletList(self.system, cutoff = rc_lj)
-        potLJ   = espressopp.interaction.LennardJones(epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
+        rc_lj = pow(2.0, 1.0 / 6.0)
+        vl = espressopp.VerletList(self.system, cutoff=rc_lj)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
         interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interLJ)
@@ -153,7 +203,8 @@ class TestCaseCapForce(unittest.TestCase):
         particle_group.add(1)
 
         # create a CapForce instance
-        capforce       = espressopp.integrator.CapForce(self.system, 1.0, particle_group)
+        capforce = espressopp.integrator.CapForce(
+            self.system, 1.0, particle_group)
         integrator.addExtension(capforce)
 
         # run 1 step
@@ -164,21 +215,38 @@ class TestCaseCapForce(unittest.TestCase):
         print(particle1.f, particle2.f)
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
-        self.assertTrue(math.fabs(particle2.f[0]) > 1.0, "The force of particle 2 is capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 1 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle2.f[0]) > 1.0,
+            "The force of particle 2 is capped.")
 
     def test_cap_force_array_group(self):
         # set up normal domain decomposition
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(self.box, nodeGrid, 1.5, 0.3)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            self.box, nodeGrid, 1.5, 0.3)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 0, 0, espressopp.Real3D(4.95, 5.0, 5.0), 1.0, 0, 1.),
             (2, 0, 0, espressopp.Real3D(5.05, 5.0, 5.0), 1.0, 0, 1.),
         ]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
+        self.system.storage.addParticles(
+            particle_list,
+            'id',
+            'type',
+            'q',
+            'pos',
+            'mass',
+            'adrat',
+            'radius')
         self.system.storage.decompose()
 
         # integrator
@@ -186,9 +254,10 @@ class TestCaseCapForce(unittest.TestCase):
         integrator.dt = 0.005
 
         # Lennard-Jones with Verlet list
-        rc_lj   = pow(2.0, 1.0/6.0)
-        vl      = espressopp.VerletList(self.system, cutoff = rc_lj)
-        potLJ   = espressopp.interaction.LennardJones(epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
+        rc_lj = pow(2.0, 1.0 / 6.0)
+        vl = espressopp.VerletList(self.system, cutoff=rc_lj)
+        potLJ = espressopp.interaction.LennardJones(
+            epsilon=1., sigma=1., cutoff=rc_lj, shift=0)
         interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
         self.system.addInteraction(interLJ)
@@ -198,7 +267,9 @@ class TestCaseCapForce(unittest.TestCase):
         particle_group.add(1)
 
         # create a CapForce instance
-        capforce       = espressopp.integrator.CapForce(self.system, espressopp.Real3D(1.0, 1.0, 1.0), particle_group)
+        capforce = espressopp.integrator.CapForce(
+            self.system, espressopp.Real3D(
+                1.0, 1.0, 1.0), particle_group)
         integrator.addExtension(capforce)
 
         # run 1 step
@@ -209,8 +280,15 @@ class TestCaseCapForce(unittest.TestCase):
         print(particle1.f, particle2.f)
 
         # run checks
-        self.assertTrue(math.fabs(particle1.f[0]) == 1.0, "The force of particle 1 is not capped.")
-        self.assertTrue(math.fabs(particle2.f[0]) > 1.0, "The force of particle 2 is capped.")
+        self.assertTrue(
+            math.fabs(
+                particle1.f[0]) == 1.0,
+            "The force of particle 1 is not capped.")
+        self.assertTrue(
+            math.fabs(
+                particle2.f[0]) > 1.0,
+            "The force of particle 2 is capped.")
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -100,20 +100,43 @@ from espressopp import pmi
 from espressopp.ParticleAccess import *
 from _espressopp import io_DumpGRO
 
+
 class DumpGROLocal(ParticleAccessLocal, io_DumpGRO):
 
-    def __init__(self, system, integrator, filename='out.gro', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
-        cxxinit(self, io_DumpGRO, system, integrator, filename, unfolded, length_factor, length_unit, append)
+    def __init__(
+            self,
+            system,
+            integrator,
+            filename='out.gro',
+            unfolded=False,
+            length_factor=1.0,
+            length_unit='LJ',
+            append=True):
+        cxxinit(
+            self,
+            io_DumpGRO,
+            system,
+            integrator,
+            filename,
+            unfolded,
+            length_factor,
+            length_unit,
+            append)
 
     def dump(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.dump(self)
 
 
-if pmi.isController :
+if pmi.isController:
     class DumpGRO(ParticleAccess, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.io.DumpGROLocal',
-          pmicall = [ 'dump' ],
-          pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'append']
-        )
+            cls='espressopp.io.DumpGROLocal',
+            pmicall=['dump'],
+            pmiproperty=[
+                'filename',
+                'unfolded',
+                'length_factor',
+                'length_unit',
+                'append'])

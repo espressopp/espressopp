@@ -65,8 +65,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
 
+class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
 
     def __init__(self, storage):
 
@@ -105,11 +105,12 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
             quadruple = self.cxxclass.getQuadruples(self)
             return quadruple
 
+
 if pmi.isController:
     class FixedQuadrupleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedQuadrupleListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addQuadruples","remove" ],
-            pmiinvoke = ["getQuadruples", "size"]
-            )
+            cls='espressopp.FixedQuadrupleListLocal',
+            localcall=["add"],
+            pmicall=["addQuadruples", "remove"],
+            pmiinvoke=["getQuadruples", "size"]
+        )

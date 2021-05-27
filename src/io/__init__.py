@@ -25,18 +25,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from espressopp.io.DumpTopology import *
+from espressopp.io.DumpH5MD import *
+from espressopp.io.DumpXYZ import *
+from espressopp.io.DumpGROAdress import *
+from espressopp.io.DumpGRO import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.io')
 
-from espressopp.io.DumpGRO import *
-from espressopp.io.DumpGROAdress import *
-from espressopp.io.DumpXYZ import *
 
 try:
     from espressopp.io.DumpXTC import *
     from espressopp.io.DumpXTCAdress import *
 except ImportError:
     pass
-
-from espressopp.io.DumpH5MD import *
-from espressopp.io.DumpTopology import *

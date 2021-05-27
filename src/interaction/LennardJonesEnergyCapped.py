@@ -200,145 +200,204 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJonesEnergyCapped, \
-                      interaction_VerletListLennardJonesEnergyCapped, \
-                      interaction_VerletListAdressLennardJonesEnergyCapped, \
-                      interaction_VerletListHadressLennardJonesEnergyCapped, \
-                      interaction_CellListLennardJonesEnergyCapped, \
-                      interaction_FixedPairListLennardJonesEnergyCapped
+    interaction_VerletListLennardJonesEnergyCapped, \
+    interaction_VerletListAdressLennardJonesEnergyCapped, \
+    interaction_VerletListHadressLennardJonesEnergyCapped, \
+    interaction_CellListLennardJonesEnergyCapped, \
+    interaction_FixedPairListLennardJonesEnergyCapped
 
-class LennardJonesEnergyCappedLocal(PotentialLocal, interaction_LennardJonesEnergyCapped):
+
+class LennardJonesEnergyCappedLocal(
+        PotentialLocal,
+        interaction_LennardJonesEnergyCapped):
 
     def __init__(self, epsilon=1.0, sigma=1.0,
-                 cutoff=infinity, caprad=0.0 ,shift="auto"):
+                 cutoff=infinity, caprad=0.0, shift="auto"):
         """Initialize the local Lennard Jones object."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if shift =="auto":
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift == "auto":
                 cxxinit(self, interaction_LennardJonesEnergyCapped,
                         epsilon, sigma, cutoff, caprad)
             else:
                 cxxinit(self, interaction_LennardJonesEnergyCapped,
                         epsilon, sigma, cutoff, caprad, shift)
 
-class VerletListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListLennardJonesEnergyCapped):
+
+class VerletListLennardJonesEnergyCappedLocal(
+        InteractionLocal,
+        interaction_VerletListLennardJonesEnergyCapped):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesEnergyCapped, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListAdressLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesEnergyCapped):
+
+class VerletListAdressLennardJonesEnergyCappedLocal(
+        InteractionLocal, interaction_VerletListAdressLennardJonesEnergyCapped):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressLennardJonesEnergyCapped, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressLennardJonesEnergyCapped,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
     def getPotentialAT(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialAT(self, type1, type2)
 
     def getPotentialCG(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialCG(self, type1, type2)
 
-class VerletListHadressLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListHadressLennardJonesEnergyCapped):
+
+class VerletListHadressLennardJonesEnergyCappedLocal(
+        InteractionLocal, interaction_VerletListHadressLennardJonesEnergyCapped):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressLennardJonesEnergyCapped, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressLennardJonesEnergyCapped,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
     def getPotentialAT(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialAT(self, type1, type2)
 
     def getPotentialCG(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialCG(self, type1, type2)
 
-class CellListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_CellListLennardJonesEnergyCapped):
+
+class CellListLennardJonesEnergyCappedLocal(
+        InteractionLocal,
+        interaction_CellListLennardJonesEnergyCapped):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesEnergyCapped, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class FixedPairListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesEnergyCapped):
+
+class FixedPairListLennardJonesEnergyCappedLocal(
+        InteractionLocal,
+        interaction_FixedPairListLennardJonesEnergyCapped):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListLennardJonesEnergyCapped, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListLennardJonesEnergyCapped,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
+
 
 if pmi.isController:
     class LennardJonesEnergyCapped(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.LennardJonesEnergyCappedLocal',
-            pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
-            )
+            cls='espressopp.interaction.LennardJonesEnergyCappedLocal',
+            pmiproperty=['epsilon', 'sigma', 'cutoff', 'caprad']
+        )
 
     class VerletListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListLennardJonesEnergyCappedLocal',
-            pmicall = ['setPotential', 'getPotential']
-            )
+            cls='espressopp.interaction.VerletListLennardJonesEnergyCappedLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential'])
 
-    class VerletListAdressLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressLennardJonesEnergyCapped(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG',
+                'getPotentialAT',
+                'getPotentialCG'])
 
-    class VerletListHadressLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
+    class VerletListHadressLennardJonesEnergyCapped(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressLennardJonesEnergyCappedLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListHadressLennardJonesEnergyCappedLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG',
+                'getPotentialAT',
+                'getPotentialCG'])
 
     class CellListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListLennardJonesEnergyCappedLocal',
-            pmicall = ['setPotential', 'getPotential']
-            )
+            cls='espressopp.interaction.CellListLennardJonesEnergyCappedLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
 
-    class FixedPairListLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
+    class FixedPairListLennardJonesEnergyCapped(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListLennardJonesEnergyCappedLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListLennardJonesEnergyCappedLocal',
+            pmicall=['setPotential'])

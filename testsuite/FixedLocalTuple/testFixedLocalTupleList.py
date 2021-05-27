@@ -31,17 +31,18 @@ import math
 
 from espressopp import Real3D
 
-class TestFixedLocalTupleList(unittest.TestCase) :
 
-    def setUp(self) :
+class TestFixedLocalTupleList(unittest.TestCase):
+
+    def setUp(self):
         system = espressopp.System()
 
-        rng  = espressopp.esutil.RNG()
+        rng = espressopp.esutil.RNG()
 
-        N    = 4
+        N = 4
         SIZE = float(N)
-        box  = Real3D(SIZE)
-        bc   = espressopp.bc.OrthorhombicBC(None, box)
+        box = Real3D(SIZE)
+        bc = espressopp.bc.OrthorhombicBC(None, box)
 
         system.bc = bc
 
@@ -49,17 +50,20 @@ class TestFixedLocalTupleList(unittest.TestCase) :
 
         system.skin = 0.001
 
-        cutoff = SIZE/2. - system.skin
+        cutoff = SIZE / 2. - system.skin
 
         comm = espressopp.MPI.COMM_WORLD
 
-        nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,cutoff,system.skin)
-        cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, system.skin)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, cutoff, system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, cutoff, system.skin)
 
-        print('NodeGrid = %s'%(nodeGrid,))
-        print('CellGrid = %s'%(cellGrid,))
+        print('NodeGrid = %s' % (nodeGrid,))
+        print('CellGrid = %s' % (cellGrid,))
 
-        system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+        system.storage = espressopp.storage.DomainDecomposition(
+            system, nodeGrid, cellGrid)
         pid = 0
 
         for i in range(N):
@@ -98,7 +102,7 @@ class TestFixedLocalTupleList(unittest.TestCase) :
         self.tuplelist = tuplelist
 
     # This function checks the size of empty FixedLocalTupleList.
-    def test_create_fixedtuplelist(self) :
+    def test_create_fixedtuplelist(self):
         self.assertEqual(sum(self.tuplelist.size(), 0), 0)
 
     # This function checks the python interface of FixedLocalTupleList.
@@ -106,41 +110,44 @@ class TestFixedLocalTupleList(unittest.TestCase) :
     # whether the added tuple number equals the return value of size().
     # For getTuples(), this function test
     # whether a tuplelist obtained by getTuples equals added tuplelist
-    def test_add_get_fixedtuplelist(self) :
+    def test_add_get_fixedtuplelist(self):
         system = self.system
         N = self.N
         tuplelist = self.tuplelist
 
         # FixedLocalTupleList contain particles
-        num_constrain = N*N
+        num_constrain = N * N
         stored = []
-        for i in range(int(N*N*N/num_constrain)):
+        for i in range(int(N * N * N / num_constrain)):
             pairs = []
             for j in range(num_constrain):
-                pairs.append(int(num_constrain*i + j))
+                pairs.append(int(num_constrain * i + j))
             tuplelist.addTuple(pairs)
             stored.append(pairs)
 
-        num_constrain = N*N/2
-        for i in range(int(N*N*N/num_constrain), int(2*N*N*N/num_constrain)):
+        num_constrain = N * N / 2
+        for i in range(int(N * N * N / num_constrain),
+                       int(2 * N * N * N / num_constrain)):
             pairs = []
             for j in range(int(num_constrain)):
-                pairs.append(int(num_constrain*i + j))
+                pairs.append(int(num_constrain * i + j))
             tuplelist.addTuple(pairs)
             stored.append(pairs)
 
         # check the size of FixedLocalTupleList
-        self.assertEqual(sum(tuplelist.size(), 0), 1.5*N*N*N/num_constrain)
+        self.assertEqual(sum(tuplelist.size(), 0),
+                         1.5 * N * N * N / num_constrain)
 
         # check the contained particles id
         g_tuplelist = tuplelist.getTuples()
         s_id = 0
-        for i in range(int(3*N*N*N/num_constrain/2)):
+        for i in range(int(3 * N * N * N / num_constrain / 2)):
             for j in range(espressopp.MPI.COMM_WORLD.size):
                 if stored[s_id] in g_tuplelist[j]:
                     break
             self.assertEqual(stored[s_id] in g_tuplelist[j], True)
             s_id += 1
+
 
 if __name__ == "__main__":
     unittest.main()

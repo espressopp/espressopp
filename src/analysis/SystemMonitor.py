@@ -78,7 +78,7 @@ Example
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
-from espressopp.analysis.AnalysisBase import *  #NOQA
+from espressopp.analysis.AnalysisBase import *  # NOQA
 from _espressopp import analysis_SystemMonitor
 from _espressopp import analysis_SystemMonitorOutputCSV
 
@@ -86,7 +86,11 @@ from _espressopp import analysis_SystemMonitorOutputCSV
 class SystemMonitorOutputCSVLocal(analysis_SystemMonitorOutputCSV):
     def __init__(self, file_name, delimiter='\t'):
         if pmi.workerIsActive():
-            cxxinit(self, analysis_SystemMonitorOutputCSV, file_name, delimiter)
+            cxxinit(
+                self,
+                analysis_SystemMonitorOutputCSV,
+                file_name,
+                delimiter)
 
 
 class SystemMonitorLocal(analysis_SystemMonitor):
@@ -106,12 +110,14 @@ class SystemMonitorLocal(analysis_SystemMonitor):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
+
 if pmi.isController:
     class SystemMonitorOutputCSV(metaclass=pmi.Proxy):
-        pmiproxydefs = dict(cls='espressopp.analysis.SystemMonitorOutputCSVLocal')
+        pmiproxydefs = dict(
+            cls='espressopp.analysis.SystemMonitorOutputCSVLocal')
 
     class SystemMonitor(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.analysis.SystemMonitorLocal',
             pmicall=['add_observable', 'info', 'dump']
-            )
+        )

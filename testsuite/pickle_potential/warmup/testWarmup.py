@@ -28,19 +28,20 @@ Nchains = 10
 
 Mmonomers = 10
 N = Nchains * Mmonomers
-L = pow(N/d, 1.0/3)
+L = pow(N / d, 1.0 / 3)
 
-system, integrator = espressopp.standard_system.PolymerMelt(Nchains, Mmonomers,(10,10,10), dt = 0.005, temperature=1.0)
+system, integrator = espressopp.standard_system.PolymerMelt(
+    Nchains, Mmonomers, (10, 10, 10), dt=0.005, temperature=1.0)
 
 
 print("starting warmup")
 org_dt = integrator.dt
-pot = system.getInteraction(0).getPotential(0,0)
+pot = system.getInteraction(0).getPotential(0, 0)
 print(pot)
 print("Nint = ", system.getNumberOfInteractions())
 final_sigma = pot.sigma
 final_epsilon = pot.epsilon
-print("sigma=",pot.sigma, "epsilon=",pot.epsilon)
+print("sigma=", pot.sigma, "epsilon=", pot.epsilon)
 maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
 N = 1
 number = 50
@@ -49,11 +50,12 @@ for k in range(number):
     if k < 10:
         continue
 
-    force_capping = espressopp.integrator.CapForce(system, 1000000.0/number*k)
+    force_capping = espressopp.integrator.CapForce(
+        system, 1000000.0 / number * k)
     integrator.addExtension(force_capping)
 
-    pot.sigma = final_sigma/number*k
-    pot.epsilon = final_epsilon/number*k
+    pot.sigma = final_sigma / number * k
+    pot.epsilon = final_epsilon / number * k
 
     integrator.dt = 0.0001
     espressopp.tools.analyse.info(system, integrator)

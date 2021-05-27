@@ -79,34 +79,43 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_VSpherePair, interaction_VerletListVSpherePair
 
+
 class VSpherePairLocal(PotentialLocal, interaction_VSpherePair):
 
     def __init__(self, epsilon=1.0, cutoff=infinity, shift="auto"):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if shift =="auto":
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift == "auto":
                 cxxinit(self, interaction_VSpherePair,
                         epsilon, cutoff)
             else:
                 cxxinit(self, interaction_VSpherePair,
                         epsilon, cutoff, shift)
 
-class VerletListVSpherePairLocal(InteractionLocal, interaction_VerletListVSpherePair):
+
+class VerletListVSpherePairLocal(
+        InteractionLocal,
+        interaction_VerletListVSpherePair):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListVSpherePair, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
 
@@ -114,12 +123,12 @@ if pmi.isController:
     class VSpherePair(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.VSpherePairLocal',
-            pmiproperty = ['epsilon']
-            )
+            cls='espressopp.interaction.VSpherePairLocal',
+            pmiproperty=['epsilon']
+        )
 
     class VerletListVSpherePair(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListVSpherePairLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
-            )
+            cls='espressopp.interaction.VerletListVSpherePairLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )

@@ -124,77 +124,109 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TersoffPairTerm, \
-                      interaction_VerletListTersoffPairTerm, \
-                      interaction_CellListTersoffPairTerm, \
-                      interaction_FixedPairListTersoffPairTerm
+    interaction_VerletListTersoffPairTerm, \
+    interaction_CellListTersoffPairTerm, \
+    interaction_FixedPairListTersoffPairTerm
+
 
 class TersoffPairTermLocal(PotentialLocal, interaction_TersoffPairTerm):
 
     def __init__(self, A, lambda1, R, D, cutoff=infinity):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TersoffPairTerm, A, lambda1, R, D, cutoff)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_TersoffPairTerm,
+                A,
+                lambda1,
+                R,
+                D,
+                cutoff)
 
-class VerletListTersoffPairTermLocal(InteractionLocal, interaction_VerletListTersoffPairTerm):
+
+class VerletListTersoffPairTermLocal(
+        InteractionLocal,
+        interaction_VerletListTersoffPairTerm):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListTersoffPairTerm, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletListLocal(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
-class CellListTersoffPairTermLocal(InteractionLocal, interaction_CellListTersoffPairTerm):
+
+class CellListTersoffPairTermLocal(
+        InteractionLocal,
+        interaction_CellListTersoffPairTerm):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListTersoffPairTerm, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListTersoffPairTermLocal(InteractionLocal, interaction_FixedPairListTersoffPairTerm):
+
+class FixedPairListTersoffPairTermLocal(
+        InteractionLocal,
+        interaction_FixedPairListTersoffPairTerm):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListTersoffPairTerm, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListTersoffPairTerm,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class TersoffPairTerm(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-          cls = 'espressopp.interaction.TersoffPairTermLocal',
-          pmiproperty = ['A', 'lambda1', 'R', 'D']
+            cls='espressopp.interaction.TersoffPairTermLocal',
+            pmiproperty=['A', 'lambda1', 'R', 'D']
         )
 
     class VerletListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.VerletListTersoffPairTermLocal',
-          pmicall = ['setPotential', 'getPotential', 'getVerletList']
+            cls='espressopp.interaction.VerletListTersoffPairTermLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
         )
 
     class CellListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.CellListTersoffPairTermLocal',
-          pmicall = ['setPotential']
+            cls='espressopp.interaction.CellListTersoffPairTermLocal',
+            pmicall=['setPotential']
         )
 
     class FixedPairListTersoffPairTerm(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.interaction.FixedPairListTersoffPairTermLocal',
-          pmicall = ['setPotential']
+            cls='espressopp.interaction.FixedPairListTersoffPairTermLocal',
+            pmicall=['setPotential']
         )

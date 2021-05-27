@@ -73,25 +73,36 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class VerletListLocal(_espressopp.vectorization_VerletList):
 
+class VerletListLocal(_espressopp.vectorization_VerletList):
 
     def __init__(self, system, vec, cutoff, exclusionlist=[]):
 
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, True)
+                cxxinit(
+                    self,
+                    _espressopp.vectorization_VerletList,
+                    system,
+                    vec,
+                    cutoff,
+                    True)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espressopp.vectorization_VerletList, system, vec, cutoff, False)
+                cxxinit(
+                    self,
+                    _espressopp.vectorization_VerletList,
+                    system,
+                    vec,
+                    cutoff,
+                    False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair
                     self.cxxclass.exclude(self, pid1, pid2)
                 # now rebuild list with exclusions
                 self.cxxclass.rebuild(self)
-
 
     def totalSize(self):
 
@@ -118,10 +129,10 @@ class VerletListLocal(_espressopp.vectorization_VerletList):
     def getAllPairs(self):
 
         if pmi.workerIsActive():
-            pairs=[]
-            npairs=self.localSize()
+            pairs = []
+            npairs = self.localSize()
             for i in range(npairs):
-                pair=self.cxxclass.getPair(self, i+1)
+                pair = self.cxxclass.getPair(self, i + 1)
                 pairs.append(pair)
             return pairs
 
@@ -129,8 +140,16 @@ class VerletListLocal(_espressopp.vectorization_VerletList):
 if pmi.isController:
     class VerletList(object, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls = 'espressopp.vectorization.VerletListLocal',
-          pmiproperty = [ 'builds' ],
-          pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'resetTimers','rebuildPairs'],
-          pmiinvoke = [ 'getAllPairs','getTimers' ]
-        )
+            cls='espressopp.vectorization.VerletListLocal',
+            pmiproperty=['builds'],
+            pmicall=[
+                'totalSize',
+                'exclude',
+                'connect',
+                'disconnect',
+                'getVerletCutoff',
+                'resetTimers',
+                'rebuildPairs'],
+            pmiinvoke=[
+                'getAllPairs',
+                'getTimers'])

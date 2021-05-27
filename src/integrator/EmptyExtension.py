@@ -35,14 +35,17 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_EmptyExtension
 
+
 class EmptyExtensionLocal(ExtensionLocal, integrator_EmptyExtension):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_EmptyExtension, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class EmptyExtension(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.EmptyExtensionLocal'
-            )
+            cls='espressopp.integrator.EmptyExtensionLocal'
+        )

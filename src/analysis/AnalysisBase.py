@@ -64,6 +64,7 @@ from espressopp import pmi
 from espressopp.ParticleAccess import *
 from _espressopp import analysis_AnalysisBase
 
+
 class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
 
     def performMeasurement(self):
@@ -90,9 +91,14 @@ class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getNumberOfMeasurements(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class AnalysisBase(ParticleAccess, metaclass=pmi.Proxy):
 
         pmiproxydefs = dict(
-            pmicall = [ "performMeasurement", "reset", "compute", "getAverageValue", "getNumberOfMeasurements" ]
-            )
+            pmicall=[
+                "performMeasurement",
+                "reset",
+                "compute",
+                "getAverageValue",
+                "getNumberOfMeasurements"])

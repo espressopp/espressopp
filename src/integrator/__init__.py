@@ -19,49 +19,48 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from espressopp.integrator.MinimizeEnergy import *
+from espressopp.integrator.EmptyExtension import *
+from espressopp.integrator.AssociationReaction import *
+from espressopp.integrator.VelocityVerletOnRadius import *
+from espressopp.integrator.Rattle import *
+from espressopp.integrator.Settle import *
+from espressopp.integrator.ExtAnalyze import *
+from espressopp.integrator.CapForce import *
+from espressopp.integrator.ExtForce import *
+from espressopp.integrator.LBInitPopWave import *
+from espressopp.integrator.LBInitPopUniform import *
+from espressopp.integrator.LBInitPeriodicForce import *
+from espressopp.integrator.LBInitConstForce import *
+from espressopp.integrator.LBInit import *
+from espressopp.integrator.LatticeBoltzmann import *
+from espressopp.integrator.FixPositions import *
+from espressopp.integrator.LangevinBarostat import *
+from espressopp.integrator.DPDThermostat import *
+from espressopp.integrator.LangevinThermostatOnRadius import *
+from espressopp.integrator.LangevinThermostatOnGroup import *
+from espressopp.integrator.GeneralizedLangevinThermostat import *
+from espressopp.integrator.LangevinThermostat1D import *
+from espressopp.integrator.LangevinThermostatHybrid import *
+from espressopp.integrator.LangevinThermostat import *
+from espressopp.integrator.BerendsenThermostat import *
+from espressopp.integrator.BerendsenBarostatAnisotropic import *
+from espressopp.integrator.BerendsenBarostat import *
+from espressopp.integrator.Adress import *
+from espressopp.integrator.Extension import *
+from espressopp.integrator.OnTheFlyFEC import *
+from espressopp.integrator.FreeEnergyCompensation import *
+from espressopp.integrator.TDforce import *
+from espressopp.integrator.StochasticVelocityRescaling import *
+from espressopp.integrator.Isokinetic import *
+from espressopp.integrator.VelocityVerletRESPA import *
+from espressopp.integrator.VelocityVerletOnGroup import *
+from espressopp.integrator.VelocityVerlet import *
+from espressopp.integrator.MDIntegrator import *
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.integrator')
 
-from espressopp.integrator.MDIntegrator import *
-from espressopp.integrator.VelocityVerlet import *
 try:
     from espressopp.integrator.PIAdressIntegrator import *
-except:
+except BaseException:
     print('Warning: numpy module not available. Therefore, espressopp.integrator.PIAdressIntegrator unavailable.')
-from espressopp.integrator.VelocityVerletOnGroup import *
-from espressopp.integrator.VelocityVerletRESPA import *
-from espressopp.integrator.Isokinetic import *
-from espressopp.integrator.StochasticVelocityRescaling import *
-from espressopp.integrator.TDforce import *
-from espressopp.integrator.FreeEnergyCompensation import *
-from espressopp.integrator.OnTheFlyFEC import *
-
-from espressopp.integrator.Extension import *
-from espressopp.integrator.Adress import *
-from espressopp.integrator.BerendsenBarostat import *
-from espressopp.integrator.BerendsenBarostatAnisotropic import *
-from espressopp.integrator.BerendsenThermostat import *
-from espressopp.integrator.LangevinThermostat import *
-from espressopp.integrator.LangevinThermostatHybrid import *
-from espressopp.integrator.LangevinThermostat1D import *
-from espressopp.integrator.GeneralizedLangevinThermostat import *
-from espressopp.integrator.LangevinThermostatOnGroup import *
-from espressopp.integrator.LangevinThermostatOnRadius import *
-from espressopp.integrator.DPDThermostat import *
-from espressopp.integrator.LangevinBarostat import *
-from espressopp.integrator.FixPositions import *
-from espressopp.integrator.LatticeBoltzmann import *
-from espressopp.integrator.LBInit import *
-from espressopp.integrator.LBInitConstForce import *
-from espressopp.integrator.LBInitPeriodicForce import *
-from espressopp.integrator.LBInitPopUniform import *
-from espressopp.integrator.LBInitPopWave import *
-from espressopp.integrator.ExtForce import *
-from espressopp.integrator.CapForce import *
-from espressopp.integrator.ExtAnalyze import *
-from espressopp.integrator.Settle import *
-from espressopp.integrator.Rattle import *
-from espressopp.integrator.VelocityVerletOnRadius import *
-from espressopp.integrator.AssociationReaction import *
-from espressopp.integrator.EmptyExtension import *
-from espressopp.integrator.MinimizeEnergy import *

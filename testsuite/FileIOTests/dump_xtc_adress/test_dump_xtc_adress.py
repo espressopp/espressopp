@@ -28,7 +28,8 @@ expected_files = ['expected.xtc']
 
 class TestDumpXTCAdress(unittest.TestCase):
     def setUp(self):
-        system, integrator = espressopp.standard_system.LennardJones(0, (20,20,20))
+        system, integrator = espressopp.standard_system.LennardJones(
+            0, (20, 20, 20))
         self.system = system
         self.integrator = integrator
         self.ftpl = espressopp.FixedTupleListAdress(self.system.storage)
@@ -61,7 +62,7 @@ class TestDumpXTCAdress(unittest.TestCase):
             append=False)
         dump_xtc.dump()
         self.assertTrue(
-            filecmp.cmp(file_xtc_9atoms, expected_files[0], shallow = False),
+            filecmp.cmp(file_xtc_9atoms, expected_files[0], shallow=False),
             "!!! Error! Files are not equal!! They should be equal!")
 
     def tearDown(self):

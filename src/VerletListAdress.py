@@ -117,13 +117,31 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
+
 class VerletListAdressLocal(_espressopp.VerletListAdress):
 
-
-    def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[], sphereAdr=False):
+    def __init__(
+            self,
+            system,
+            cutoff,
+            adrcut,
+            dEx,
+            dHy,
+            adrCenter=[],
+            pids=[],
+            exclusionlist=[],
+            sphereAdr=False):
 
         if pmi.workerIsActive():
-            cxxinit(self, _espressopp.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
+            cxxinit(
+                self,
+                _espressopp.VerletListAdress,
+                system,
+                cutoff,
+                adrcut,
+                False,
+                dEx,
+                dHy)
             #self.cxxclass.setAtType(self, atType)
             # check for exclusions
             if (exclusionlist != []):
@@ -137,19 +155,18 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
                     self.cxxclass.addAdrParticle(self, pid)
             # set adress center
             if (adrCenter != []):
-                self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
+                self.cxxclass.setAdrCenter(
+                    self, adrCenter[0], adrCenter[1], adrCenter[2])
             # set adress region type (slab or spherical)
-            self.cxxclass.setAdrRegionType(self,sphereAdr)
+            self.cxxclass.setAdrRegionType(self, sphereAdr)
 
             # rebuild list now
             self.cxxclass.rebuild(self)
-
 
     def totalSize(self):
 
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
-
 
     def exclude(self, exclusionlist):
         """
@@ -162,7 +179,6 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
                 self.cxxclass.exclude(self, pid1, pid2)
             # rebuild list with exclusions
             self.cxxclass.rebuild(self)
-
 
     def addAdrParticles(self, pids, rebuild=True):
         """
@@ -180,10 +196,11 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
         if pmi.workerIsActive():
             self.cxxclass.rebuild(self)
 
+
 if pmi.isController:
     class VerletListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.VerletListAdressLocal',
-            pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
-            )
+            cls='espressopp.VerletListAdressLocal',
+            pmiproperty=['builds'],
+            pmicall=['totalSize', 'exclude', 'addAdrParticles', 'rebuild']
+        )

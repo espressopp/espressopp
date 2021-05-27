@@ -73,7 +73,8 @@ def extend_class():
     Tensor.xx = property(*_get_getter_setter(0))
     Tensor.yy = property(*_get_getter_setter(1))
     Tensor.zz = property(*_get_getter_setter(2))
-    Tensor.__str__ = lambda self: str((self[0], self[1], self[2], self[3], self[4], self[5]))
+    Tensor.__str__ = lambda self: str(
+        (self[0], self[1], self[2], self[3], self[4], self[5]))
     Tensor.__repr__ = lambda self: 'Tensor' + str(self)
 
 

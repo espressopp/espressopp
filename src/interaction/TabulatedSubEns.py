@@ -157,103 +157,156 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TabulatedSubEns, \
-                      interaction_VerletListTabulatedSubEns, \
-                      interaction_VerletListAdressTabulatedSubEns, \
-                      interaction_VerletListHadressTabulatedSubEns, \
-                      interaction_CellListTabulatedSubEns, \
-                      interaction_FixedPairListTabulatedSubEns, \
-                      interaction_FixedPairListTypesTabulatedSubEns
+    interaction_VerletListTabulatedSubEns, \
+    interaction_VerletListAdressTabulatedSubEns, \
+    interaction_VerletListHadressTabulatedSubEns, \
+    interaction_CellListTabulatedSubEns, \
+    interaction_FixedPairListTabulatedSubEns, \
+    interaction_FixedPairListTypesTabulatedSubEns
+
 
 class TabulatedSubEnsLocal(PotentialLocal, interaction_TabulatedSubEns):
 
     def __init__(self):
 
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedSubEns)
 
-class VerletListAdressTabulatedSubEnsLocal(InteractionLocal, interaction_VerletListAdressTabulatedSubEns):
+
+class VerletListAdressTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_VerletListAdressTabulatedSubEns):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressTabulatedSubEns, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressTabulatedSubEns,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-class VerletListHadressTabulatedSubEnsLocal(InteractionLocal, interaction_VerletListHadressTabulatedSubEns):
+
+class VerletListHadressTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_VerletListHadressTabulatedSubEns):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressTabulatedSubEns, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressTabulatedSubEns,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-class VerletListTabulatedSubEnsLocal(InteractionLocal, interaction_VerletListTabulatedSubEns):
+
+class VerletListTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_VerletListTabulatedSubEns):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListTabulatedSubEns, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class CellListTabulatedSubEnsLocal(InteractionLocal, interaction_CellListTabulatedSubEns):
+
+class CellListTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_CellListTabulatedSubEns):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListTabulatedSubEns, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 
-class FixedPairListTabulatedSubEnsLocal(InteractionLocal, interaction_FixedPairListTabulatedSubEns):
+class FixedPairListTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_FixedPairListTabulatedSubEns):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListTabulatedSubEns, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListTabulatedSubEns,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
 
-class FixedPairListTypesTabulatedSubEnsLocal(InteractionLocal, interaction_FixedPairListTypesTabulatedSubEns):
+class FixedPairListTypesTabulatedSubEnsLocal(
+        InteractionLocal,
+        interaction_FixedPairListTypesTabulatedSubEns):
     def __init__(self, system, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListTypesTabulatedSubEns, system, vl)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListTypesTabulatedSubEns,
+                system,
+                vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def setFixedPairList(self, fixedpairlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
     def getFixedPairList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
 
 
@@ -261,47 +314,59 @@ if pmi.isController:
     class TabulatedSubEns(Potential):
         'The TabulatedSubEns potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.TabulatedSubEnsLocal',
-            pmicall = ['weight_get', 'weight_set',
-                       'alpha_get', 'alpha_set', 'targetProb_get', 'targetProb_set',
-                                       'colVarSd_get', 'colVarSd_set',
-                                       'dimension_get', 'filenames_get', 'filename_get',
-                                       'filename_set', 'addInteraction', 'colVarRefs_get',
-                                       'colVarRef_get']
-            )
+            cls='espressopp.interaction.TabulatedSubEnsLocal',
+            pmicall=[
+                'weight_get',
+                'weight_set',
+                'alpha_get',
+                'alpha_set',
+                'targetProb_get',
+                'targetProb_set',
+                'colVarSd_get',
+                'colVarSd_set',
+                'dimension_get',
+                'filenames_get',
+                'filename_get',
+                'filename_set',
+                'addInteraction',
+                'colVarRefs_get',
+                'colVarRef_get'])
 
     class VerletListAdressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressTabulatedSubEnsLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListAdressTabulatedSubEnsLocal',
+            pmicall=['setPotentialAT', 'setPotentialCG']
+        )
 
     class VerletListHadressTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressTabulatedSubEnsLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListHadressTabulatedSubEnsLocal',
+            pmicall=['setPotentialAT', 'setPotentialCG']
+        )
 
     class VerletListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListTabulatedSubEnsLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListTabulatedSubEnsLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
 
     class CellListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListTabulatedSubEnsLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.CellListTabulatedSubEnsLocal',
+            pmicall=['setPotential']
+        )
 
     class FixedPairListTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListTabulatedSubEnsLocal',
-            pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListTabulatedSubEnsLocal',
+            pmicall=['setPotential', 'setFixedPairList', 'getFixedPairList']
+        )
 
     class FixedPairListTypesTabulatedSubEns(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListTypesTabulatedSubEnsLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
-        )
+            cls='espressopp.interaction.FixedPairListTypesTabulatedSubEnsLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedPairList',
+                'getFixedPairList'])

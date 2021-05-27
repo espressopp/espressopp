@@ -54,21 +54,31 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinThermostatOnRadius
 
-class LangevinThermostatOnRadiusLocal(ExtensionLocal, integrator_LangevinThermostatOnRadius):
+
+class LangevinThermostatOnRadiusLocal(
+        ExtensionLocal,
+        integrator_LangevinThermostatOnRadius):
 
     def __init__(self, system, dampingmass):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_LangevinThermostatOnRadius, system, dampingmass)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_LangevinThermostatOnRadius,
+                system,
+                dampingmass)
 
     def addExclusions(self, pidlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             for pid in pidlist:
                 self.cxxclass.addExclpid(self, pid)
 
-if pmi.isController :
+
+if pmi.isController:
     class LangevinThermostatOnRadius(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.LangevinThermostatOnRadiusLocal',
-            pmiproperty = [ 'gamma', 'temperature'],
-            pmicall = [ 'addExclusions' ]
-            )
+            cls='espressopp.integrator.LangevinThermostatOnRadiusLocal',
+            pmiproperty=['gamma', 'temperature'],
+            pmicall=['addExclusions']
+        )

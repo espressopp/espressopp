@@ -39,16 +39,24 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_FixPositions
 
+
 class FixPositionsLocal(ExtensionLocal, integrator_FixPositions):
 
     def __init__(self, system, particleGroup, fixMask):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_FixPositions, system, particleGroup, fixMask)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_FixPositions,
+                system,
+                particleGroup,
+                fixMask)
 
-if pmi.isController :
+
+if pmi.isController:
     class FixPositions(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.FixPositionsLocal',
-            pmicall = ['setFixMask', 'getFixMask'],
-            pmiproperty = [ 'particleGroup' ]
-            )
+            cls='espressopp.integrator.FixPositionsLocal',
+            pmicall=['setFixMask', 'getFixMask'],
+            pmiproperty=['particleGroup']
+        )

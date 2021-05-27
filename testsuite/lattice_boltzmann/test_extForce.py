@@ -33,12 +33,15 @@ Ni = 5
 initDen = 1.
 initVel = 0.
 
+
 class TestExtForceLB(unittest.TestCase):
     def setUp(self):
         # set up system
         global Ni, temperature
-        system, integrator = espressopp.standard_system.LennardJones(0, box=(Ni, Ni, Ni), temperature=temperature)
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+        system, integrator = espressopp.standard_system.LennardJones(
+            0, box=(Ni, Ni, Ni), temperature=temperature)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size)
 
         # set up LB fluid
         lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
@@ -47,15 +50,15 @@ class TestExtForceLB(unittest.TestCase):
 
         # set initial populations
         global initDen, initVel
-        initPop = espressopp.integrator.LBInitPopUniform(system,lb)
+        initPop = espressopp.integrator.LBInitPopUniform(system, lb)
         initPop.createDenVel(initDen, Real3D(initVel))
 
         # set external constant (gravity-like) force
-        lbforce = espressopp.integrator.LBInitConstForce(system,lb)
-        lbforce.setForce(Real3D(0.,0.,0.00001))
+        lbforce = espressopp.integrator.LBInitConstForce(system, lb)
+        lbforce.setForce(Real3D(0., 0., 0.00001))
 
         # set external sin-like force
-        lbforceSin = espressopp.integrator.LBInitPeriodicForce(system,lb)
+        lbforceSin = espressopp.integrator.LBInitPeriodicForce(system, lb)
 
         self.lb = lb
         self.integrator = integrator
@@ -70,16 +73,17 @@ class TestExtForceLB(unittest.TestCase):
         # lattice variables. halo is hard coded
         halo = 1
         myNi = self.lb.getMyNi
-        volume_xyz = (myNi[0] - 2 * halo) * (myNi[1] - 2 * halo) * (myNi[2] - 2 * halo)
+        volume_xyz = (myNi[0] - 2 * halo) * \
+            (myNi[1] - 2 * halo) * (myNi[2] - 2 * halo)
 
-        for i in range (halo, myNi[0]-halo):
-            for j in range (halo, myNi[1]-halo):
-                for k in range (halo, myNi[2]-halo):
-                    av_den += self.lb.getLBMom(Int3D(i,j,k), 0)
+        for i in range(halo, myNi[0] - halo):
+            for j in range(halo, myNi[1] - halo):
+                for k in range(halo, myNi[2] - halo):
+                    av_den += self.lb.getLBMom(Int3D(i, j, k), 0)
 
-                    jx = self.lb.getLBMom(Int3D(i,j,k), 1)
-                    jy = self.lb.getLBMom(Int3D(i,j,k), 2)
-                    jz = self.lb.getLBMom(Int3D(i,j,k), 3)
+                    jx = self.lb.getLBMom(Int3D(i, j, k), 1)
+                    jy = self.lb.getLBMom(Int3D(i, j, k), 2)
+                    jz = self.lb.getLBMom(Int3D(i, j, k), 3)
                     av_j += Real3D(jx, jy, jz)
         av_den /= volume_xyz
         av_j /= volume_xyz
@@ -99,7 +103,7 @@ class TestExtForceLB(unittest.TestCase):
         self.run_average(vz_check)
 
         # add external constant (gravity-like) force to the existing one
-        self.lbforce.addForce(Real3D(0.,0.,0.00002))
+        self.lbforce.addForce(Real3D(0., 0., 0.00002))
 
         vz_check = 0.02
         self.integrator.run(runSteps)
@@ -109,17 +113,18 @@ class TestExtForceLB(unittest.TestCase):
         global runSteps
         self.lbforce.addForce(Real3D(0.))
 
-        self.lbforceSin.setForce(Real3D(0.,0.,0.00001))
+        self.lbforceSin.setForce(Real3D(0., 0., 0.00001))
 
         vz_check = 0.   # average vz always gives 0 with sin-line force fz(x)
         self.integrator.run(runSteps)
         self.run_average(vz_check)
 
         # add external constant (gravity-like) force to the existing one
-        self.lbforceSin.addForce(Real3D(0.,0.,0.00002))
+        self.lbforceSin.addForce(Real3D(0., 0., 0.00002))
 
         self.integrator.run(runSteps)
         self.run_average(vz_check)
+
 
 if __name__ == '__main__':
     unittest.main()

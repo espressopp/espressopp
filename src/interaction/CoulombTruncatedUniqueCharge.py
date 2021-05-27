@@ -97,77 +97,111 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombTruncatedUniqueCharge, \
-                      interaction_VerletListCoulombTruncatedUniqueCharge, \
-                      interaction_CellListCoulombTruncatedUniqueCharge, \
-                      interaction_FixedPairListCoulombTruncatedUniqueCharge
+    interaction_VerletListCoulombTruncatedUniqueCharge, \
+    interaction_CellListCoulombTruncatedUniqueCharge, \
+    interaction_FixedPairListCoulombTruncatedUniqueCharge
 
-class CoulombTruncatedUniqueChargeLocal(PotentialLocal, interaction_CoulombTruncatedUniqueCharge):
+
+class CoulombTruncatedUniqueChargeLocal(
+        PotentialLocal,
+        interaction_CoulombTruncatedUniqueCharge):
 
     def __init__(self, qq=1.0,
                  cutoff=infinity, shift="auto"):
         """Initialize the local CoulombTruncatedUniqueCharge object."""
-        if shift =="auto":
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if shift == "auto":
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                    ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_CoulombTruncatedUniqueCharge,
                         qq, cutoff)
         else:
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                    ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_CoulombTruncatedUniqueCharge,
                         qq, cutoff, shift)
 
-class VerletListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_VerletListCoulombTruncatedUniqueCharge):
+
+class VerletListCoulombTruncatedUniqueChargeLocal(
+        InteractionLocal,
+        interaction_VerletListCoulombTruncatedUniqueCharge):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombTruncatedUniqueCharge, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class CellListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_CellListCoulombTruncatedUniqueCharge):
+
+class CellListCoulombTruncatedUniqueChargeLocal(
+        InteractionLocal,
+        interaction_CellListCoulombTruncatedUniqueCharge):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CellListCoulombTruncatedUniqueCharge, stor)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_CellListCoulombTruncatedUniqueCharge,
+                stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_FixedPairListCoulombTruncatedUniqueCharge):
+
+class FixedPairListCoulombTruncatedUniqueChargeLocal(
+        InteractionLocal, interaction_FixedPairListCoulombTruncatedUniqueCharge):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListCoulombTruncatedUniqueCharge, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListCoulombTruncatedUniqueCharge,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class CoulombTruncatedUniqueCharge(Potential):
         'The CoulombTruncatedUniqueCharge potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.CoulombTruncatedUniqueChargeLocal',
-            pmiproperty = ['qq']
-            )
-    class VerletListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
+            cls='espressopp.interaction.CoulombTruncatedUniqueChargeLocal',
+            pmiproperty=['qq']
+        )
+
+    class VerletListCoulombTruncatedUniqueCharge(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListCoulombTruncatedUniqueChargeLocal',
-            pmicall = ['setPotential','getPotential']
-            )
-    class CellListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
+            cls='espressopp.interaction.VerletListCoulombTruncatedUniqueChargeLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential'])
+
+    class CellListCoulombTruncatedUniqueCharge(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListCoulombTruncatedUniqueChargeLocal',
-            pmicall = ['setPotential']
-            )
-    class FixedPairListCoulombTruncatedUniqueCharge(Interaction, metaclass=pmi.Proxy):
+            cls='espressopp.interaction.CellListCoulombTruncatedUniqueChargeLocal',
+            pmicall=['setPotential'])
+
+    class FixedPairListCoulombTruncatedUniqueCharge(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListCoulombTruncatedUniqueChargeLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListCoulombTruncatedUniqueChargeLocal',
+            pmicall=['setPotential'])

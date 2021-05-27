@@ -103,77 +103,103 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJonesExpand, \
-                      interaction_VerletListLennardJonesExpand, \
-                      interaction_CellListLennardJonesExpand, \
-                      interaction_FixedPairListLennardJonesExpand
+    interaction_VerletListLennardJonesExpand, \
+    interaction_CellListLennardJonesExpand, \
+    interaction_FixedPairListLennardJonesExpand
+
 
 class LennardJonesExpandLocal(PotentialLocal, interaction_LennardJonesExpand):
 
     def __init__(self, epsilon=1.0, sigma=1.0, delta=0.0,
                  cutoff=infinity, shift="auto"):
         """Initialize the local LennardJonesExpand object."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if shift =="auto":
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift == "auto":
                 cxxinit(self, interaction_LennardJonesExpand,
                         epsilon, sigma, delta, cutoff)
             else:
                 cxxinit(self, interaction_LennardJonesExpand,
                         epsilon, sigma, delta, cutoff, shift)
 
-class VerletListLennardJonesExpandLocal(InteractionLocal, interaction_VerletListLennardJonesExpand):
+
+class VerletListLennardJonesExpandLocal(
+        InteractionLocal,
+        interaction_VerletListLennardJonesExpand):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesExpand, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class CellListLennardJonesExpandLocal(InteractionLocal, interaction_CellListLennardJonesExpand):
+
+class CellListLennardJonesExpandLocal(
+        InteractionLocal,
+        interaction_CellListLennardJonesExpand):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesExpand, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListLennardJonesExpandLocal(InteractionLocal, interaction_FixedPairListLennardJonesExpand):
+
+class FixedPairListLennardJonesExpandLocal(
+        InteractionLocal,
+        interaction_FixedPairListLennardJonesExpand):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListLennardJonesExpand, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListLennardJonesExpand,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class LennardJonesExpand(Potential):
         'The LennardJonesExpand potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.LennardJonesExpandLocal',
-            pmiproperty = ['epsilon', 'sigma', 'delta']
-            )
+            cls='espressopp.interaction.LennardJonesExpandLocal',
+            pmiproperty=['epsilon', 'sigma', 'delta']
+        )
 
     class VerletListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListLennardJonesExpandLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListLennardJonesExpandLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
+
     class CellListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListLennardJonesExpandLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.CellListLennardJonesExpandLocal',
+            pmicall=['setPotential']
+        )
+
     class FixedPairListLennardJonesExpand(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListLennardJonesExpandLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListLennardJonesExpandLocal',
+            pmicall=['setPotential']
+        )

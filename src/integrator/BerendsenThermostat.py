@@ -108,6 +108,7 @@ from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_BerendsenThermostat
 
+
 class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
     def __init__(self, system):
 
@@ -115,9 +116,10 @@ class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
                 pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_BerendsenThermostat, system)
 
+
 if pmi.isController:
     class BerendsenThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.BerendsenThermostatLocal',
-          pmiproperty = [ 'tau', 'temperature' ]
+            cls='espressopp.integrator.BerendsenThermostatLocal',
+            pmiproperty=['tau', 'temperature']
         )

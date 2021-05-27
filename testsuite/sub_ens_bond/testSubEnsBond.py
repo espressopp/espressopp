@@ -36,13 +36,13 @@ from espressopp import Real3D, Int3D
 
 # Input values for system
 N = 10                                    # box size
-size  = (float(N), float(N), float(N))
+size = (float(N), float(N), float(N))
 numParticles = 2                          # number of particles
 nsnapshots = 20
-nsteps  = 100                             # number of steps
-skin    = 0.03                             # skin for Verlet lists
-cutoff  = 0.2
-splinetypes = ['Linear','Akima','Cubic']  # implemented spline types
+nsteps = 100                             # number of steps
+skin = 0.03                             # skin for Verlet lists
+cutoff = 0.2
+splinetypes = ['Linear', 'Akima', 'Cubic']  # implemented spline types
 tgt_probs = [0.55, 0.45]
 
 ######################################################################
@@ -59,6 +59,8 @@ spline = 2
 tabBonds = ["table_bi0.txt", "table_bi1.txt"]
 
 # compute the number of cells on each node
+
+
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
@@ -66,23 +68,26 @@ def calcNumberCells(size, nodes, cutoff):
     return ncells - 1
 
 # writes the tabulated file
+
+
 def writeTabFile(name, k, x0, N, low=0.0, high=2.5):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
     for i in range(N):
         r = low + i * delta
-        energy = 0.5*k*(r-x0)**2
-        force  = -k*(r-x0)
-        outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
+        energy = 0.5 * k * (r - x0)**2
+        force = -k * (r - x0)
+        outfile.write("%15.8g %15.8g %15.8g\n" % (r, energy, force))
 
     outfile.close()
+
 
 class makeConf(unittest.TestCase):
     def setUp(self):
         # set up system
         system = espressopp.System()
-        system.rng  = espressopp.esutil.RNG()
+        system.rng = espressopp.esutil.RNG()
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
         system.skin = skin
 
@@ -93,8 +98,9 @@ class makeConf(unittest.TestCase):
             calcNumberCells(size[0], nodeGrid[0], cutoff),
             calcNumberCells(size[1], nodeGrid[1], cutoff),
             calcNumberCells(size[2], nodeGrid[2], cutoff)
-            )
-        system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+        )
+        system.storage = espressopp.storage.DomainDecomposition(
+            system, nodeGrid, cellGrid)
 
         pid = 0
 
@@ -110,23 +116,23 @@ class makeConf(unittest.TestCase):
         # now build Verlet List
         # ATTENTION: you must not add the skin explicitly here
         logging.getLogger("Interpolation").setLevel(logging.INFO)
-        vl = espressopp.VerletList(system, cutoff = cutoff)
+        vl = espressopp.VerletList(system, cutoff=cutoff)
 
         scaling_cv = 1.5
-        alpha      = 0.1
+        alpha = 0.1
 
         # ATTENTION: auto shift was enabled
         # bonds
         writeTabFile(tabBonds[0], k=100000, x0=0.26, N=500, low=0.01, high=0.6)
-        writeTabFile(tabBonds[1], k= 50000, x0=0.24, N=500, low=0.01, high=0.6)
+        writeTabFile(tabBonds[1], k=50000, x0=0.24, N=500, low=0.01, high=0.6)
 
         fpl = espressopp.FixedPairList(system.storage)
-        fpl.addBonds([(0,1)])
+        fpl.addBonds([(0, 1)])
         potBond = espressopp.interaction.TabulatedSubEns()
-        potBond.addInteraction(1, tabBonds[0],
-            espressopp.RealND([0.262, 0., 0., scaling_cv*0.424, 0., 0.]))
+        potBond.addInteraction(1, tabBonds[0], espressopp.RealND(
+            [0.262, 0., 0., scaling_cv * 0.424, 0., 0.]))
         potBond.addInteraction(1, tabBonds[1],
-            espressopp.RealND([0., 0., 0., 0., 0., 0.]))
+                               espressopp.RealND([0., 0., 0., 0., 0., 0.]))
         potBond.alpha_set(alpha)
         cv_bl = espressopp.FixedPairList(system.storage)
         cv_bl.addBonds([])
@@ -136,13 +142,14 @@ class makeConf(unittest.TestCase):
         potBond.colVarAngleList = cv_al
 
         # Renormalize the CVs
-        potBond.colVarSd_set(0,   0.0119)
+        potBond.colVarSd_set(0, 0.0119)
 
         # Target probabilities
         potBond.targetProb_set(0, tgt_probs[0])
         potBond.targetProb_set(1, tgt_probs[1])
 
-        interBond = espressopp.interaction.FixedPairListTabulatedSubEns(system, fpl, potBond)
+        interBond = espressopp.interaction.FixedPairListTabulatedSubEns(
+            system, fpl, potBond)
         system.addInteraction(interBond)
 
         temp = espressopp.analysis.Temperature(system)
@@ -155,7 +162,7 @@ class makeConf(unittest.TestCase):
         langevin = espressopp.integrator.LangevinThermostat(system)
         integrator.addExtension(langevin)
         langevin.gamma = 1.0
-        langevin.temperature = 2.479 # in kJ/mol
+        langevin.temperature = 2.479  # in kJ/mol
 
         # sock = espressopp.tools.vmd.connect(system)
 
@@ -179,14 +186,15 @@ class TestSubEnsBond(makeConf):
             Eb = self.interBond.computeEnergy()
             wts = self.potBond.weight_get()
             cv = self.potBond.colVar
-            weights.append([wts[0],wts[1]])
+            weights.append([wts[0], wts[1]])
             if k % 10 == 0:
-                print('Step %6d:' % ((k+10)*nsteps), end=' ')
+                print('Step %6d:' % ((k + 10) * nsteps), end=' ')
                 print("Weights: (%3f, %3f)" % (wts[0], wts[1]), end=' ')
                 print("avg: %3f" % np.mean([w[0] for w in weights]), end=' ')
                 print("ColVar: (%3f)" % (cv[0]))
         self.assertNotEqual(np.mean([w[0] for w in weights]), 0)
         self.assertNotEqual(np.mean([w[1] for w in weights]), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

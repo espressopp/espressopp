@@ -91,48 +91,75 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECapped
 
+
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
     def __init__(self, K=30.0, r0=0.0, rMax=1.5,
                  cutoff=infinity, r_cap=1.0, shift=0.0):
         """Initialize the local FENE object."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap)
+                cxxinit(
+                    self,
+                    interaction_FENECapped,
+                    K,
+                    r0,
+                    rMax,
+                    cutoff,
+                    r_cap)
             else:
-                cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, r_cap, shift)
+                cxxinit(self, interaction_FENECapped, K,
+                        r0, rMax, cutoff, r_cap, shift)
 
-class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFENECapped):
+
+class FixedPairListFENECappedLocal(
+        InteractionLocal,
+        interaction_FixedPairListFENECapped):
 
     def __init__(self, system, bondlist, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENECapped, system, bondlist, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListFENECapped,
+                system,
+                bondlist,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
     def setFixedPairList(self, fixedpairlist):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
     def getFixedPairList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
+
 
 if pmi.isController:
     class FENECapped(Potential):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.FENECappedLocal',
-            pmiproperty = ['K', 'r0', 'rMax', 'r_cap']
-            )
+            cls='espressopp.interaction.FENECappedLocal',
+            pmiproperty=['K', 'r0', 'rMax', 'r_cap']
+        )
 
     class FixedPairListFENECapped(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListFENECappedLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListFENECappedLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedPairList',
+                'getFixedPairList'])

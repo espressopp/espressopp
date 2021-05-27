@@ -73,40 +73,54 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_ConstrainCOM, interaction_FixedLocalTupleListConstrainCOM
 
+
 class ConstrainCOMLocal(PotentialLocal, interaction_ConstrainCOM):
 
     def __init__(self, k_com=100.):
         """Initialize the local ConstrainCOM."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_ConstrainCOM, k_com)
 
-class FixedLocalTupleListConstrainCOMLocal(InteractionLocal, interaction_FixedLocalTupleListConstrainCOM):
+
+class FixedLocalTupleListConstrainCOMLocal(
+        InteractionLocal,
+        interaction_FixedLocalTupleListConstrainCOM):
 
     def __init__(self, system, fixedtuplelist, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedLocalTupleListConstrainCOM, system, fixedtuplelist, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedLocalTupleListConstrainCOM,
+                system,
+                fixedtuplelist,
+                potential)
 
     def getPotential(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
     def setCom(self, particleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             id = 0
             for particle in particleList:
                 pos = particle[0]
                 self.cxxclass.setCom(self, id, pos)
                 id = id + 1
 
+
 if pmi.isController:
     class ConstrainCOM(Potential):
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.ConstrainCOMLocal',
-            pmiproperty = ['k_com'],
-            )
+            cls='espressopp.interaction.ConstrainCOMLocal',
+            pmiproperty=['k_com'],
+        )
 
     class FixedLocalTupleListConstrainCOM(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedLocalTupleListConstrainCOMLocal',
-            pmicall = ['getPotential', 'setCom']
-            )
+            cls='espressopp.interaction.FixedLocalTupleListConstrainCOMLocal',
+            pmicall=['getPotential', 'setCom']
+        )

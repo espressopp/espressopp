@@ -140,114 +140,170 @@ from espressopp.Exceptions import MissingFixedPairList
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJonesAutoBonds, \
-                      interaction_VerletListLennardJonesAutoBonds, \
-                      interaction_VerletListAdressLennardJonesAutoBonds, \
-                      interaction_VerletListHadressLennardJonesAutoBonds, \
-                      interaction_CellListLennardJonesAutoBonds, \
-                      interaction_FixedPairListLennardJonesAutoBonds
+    interaction_VerletListLennardJonesAutoBonds, \
+    interaction_VerletListAdressLennardJonesAutoBonds, \
+    interaction_VerletListHadressLennardJonesAutoBonds, \
+    interaction_CellListLennardJonesAutoBonds, \
+    interaction_FixedPairListLennardJonesAutoBonds
 
-class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBonds):
+
+class LennardJonesAutoBondsLocal(
+        PotentialLocal,
+        interaction_LennardJonesAutoBonds):
 
     def __init__(self, epsilon=1.0, sigma=1.0,
                  cutoff=infinity, bondlist=None, maxcrosslinks=2):
         """Initialize the local Lennard Jones auto bonds object."""
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if bondlist == None:
-                raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')
-            cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist, maxcrosslinks)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if bondlist is None:
+                raise MissingFixedPairList(
+                    'LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')
+            cxxinit(
+                self,
+                interaction_LennardJonesAutoBonds,
+                epsilon,
+                sigma,
+                cutoff,
+                bondlist,
+                maxcrosslinks)
 
-class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListLennardJonesAutoBonds):
+
+class VerletListLennardJonesAutoBondsLocal(
+        InteractionLocal,
+        interaction_VerletListLennardJonesAutoBonds):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesAutoBonds, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
     def getVerletListLocal(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 
-class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListAdressLennardJonesAutoBonds):
+
+class VerletListAdressLennardJonesAutoBondsLocal(
+        InteractionLocal,
+        interaction_VerletListAdressLennardJonesAutoBonds):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressLennardJonesAutoBonds, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressLennardJonesAutoBonds,
+                vl,
+                fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListHadressLennardJonesAutoBonds):
+
+class VerletListHadressLennardJonesAutoBondsLocal(
+        InteractionLocal,
+        interaction_VerletListHadressLennardJonesAutoBonds):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressLennardJonesAutoBonds, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressLennardJonesAutoBonds,
+                vl,
+                fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class CellListLennardJonesAutoBondsLocal(InteractionLocal, interaction_CellListLennardJonesAutoBonds):
+
+class CellListLennardJonesAutoBondsLocal(
+        InteractionLocal,
+        interaction_CellListLennardJonesAutoBonds):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesAutoBonds, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListLennardJonesAutoBondsLocal(InteractionLocal, interaction_FixedPairListLennardJonesAutoBonds):
+
+class FixedPairListLennardJonesAutoBondsLocal(
+        InteractionLocal,
+        interaction_FixedPairListLennardJonesAutoBonds):
 
     def __init__(self, system, vl, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListLennardJonesAutoBonds, system, vl, potential)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_FixedPairListLennardJonesAutoBonds,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class LennardJonesAutoBonds(Potential):
         'The Lennard-Jones auto bonds potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.LennardJonesAutoBondsLocal',
-            pmiproperty = ['epsilon', 'sigma']
-            )
+            cls='espressopp.interaction.LennardJonesAutoBondsLocal',
+            pmiproperty=['epsilon', 'sigma']
+        )
 
     class VerletListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListLennardJonesAutoBondsLocal',
-            pmicall = ['setPotential','getPotential','getVerletList']
-            )
+            cls='espressopp.interaction.VerletListLennardJonesAutoBondsLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )
 
-    class VerletListAdressLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressLennardJonesAutoBonds(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressLennardJonesAutoBondsLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListAdressLennardJonesAutoBondsLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
-    class VerletListHadressLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
+    class VerletListHadressLennardJonesAutoBonds(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressLennardJonesAutoBondsLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListHadressLennardJonesAutoBondsLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
     class CellListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListLennardJonesAutoBondsLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.CellListLennardJonesAutoBondsLocal',
+            pmicall=['setPotential']
+        )
 
     class FixedPairListLennardJonesAutoBonds(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListLennardJonesAutoBondsLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.FixedPairListLennardJonesAutoBondsLocal',
+            pmicall=['setPotential'])

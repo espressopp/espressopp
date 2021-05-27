@@ -44,26 +44,33 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_Velocities
 
+
 class VelocitiesLocal(ObservableLocal, analysis_Velocities):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Velocities, system)
+
     def gather(self):
         return self.cxxclass.gather(self)
+
     def clear(self):
         return self.cxxclass.clear(self)
+
     def __iter__(self):
         return self.cxxclass.all(self).__iter__()
+
     def __next__(self):
         return self.cxxclass.all(self).next()
 
-if pmi.isController :
+
+if pmi.isController:
     class Velocities(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.VelocitiesLocal',
-            pmicall = [ "gather", "clear" ],
-            localcall = ["getNParticles", "getCoordinates",
-                         "__getitem__", "__iter__", "all", "__next__"],
-            pmiproperty = ["capacity", "size"]
-            )
+            cls='espressopp.analysis.VelocitiesLocal',
+            pmicall=["gather", "clear"],
+            localcall=["getNParticles", "getCoordinates",
+                       "__getitem__", "__iter__", "all", "__next__"],
+            pmiproperty=["capacity", "size"]
+        )

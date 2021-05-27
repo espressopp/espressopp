@@ -76,8 +76,8 @@ import espressopp
 from espressopp.esutil import cxxinit
 from math import sqrt
 
-class FixedPairListLocal(_espressopp.FixedPairList):
 
+class FixedPairListLocal(_espressopp.FixedPairList):
 
     def __init__(self, storage):
 
@@ -113,7 +113,7 @@ class FixedPairListLocal(_espressopp.FixedPairList):
     def getBonds(self):
 
         if pmi.workerIsActive():
-            bonds=self.cxxclass.getBonds(self)
+            bonds = self.cxxclass.getBonds(self)
             return bonds
 
     def remove(self):
@@ -135,13 +135,23 @@ class FixedPairListLocal(_espressopp.FixedPairList):
             mxsqr = self.cxxclass.getLongtimeMaxBondSqr(self)
             return sqrt(mxsqr)
 
+
 if pmi.isController:
     class FixedPairList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedPairListLocal',
+            cls='espressopp.FixedPairListLocal',
             #localcall = [ 'add' ],
-            pmicall = [ 'add', 'addBonds', 'remove', 'resetLongtimeMaxBond', 'totalSize' ],
-            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal', 'getAllBonds' ]
+            pmicall=[
+                'add',
+                'addBonds',
+                'remove',
+                'resetLongtimeMaxBond',
+                'totalSize'],
+            pmiinvoke=[
+                'getBonds',
+                'size',
+                'getLongtimeMaxBondLocal',
+                'getAllBonds']
         )
 
         def getLongtimeMaxBond(self):

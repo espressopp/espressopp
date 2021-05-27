@@ -77,8 +77,8 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
 
+class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
 
     def __init__(self, storage):
 
@@ -114,6 +114,7 @@ class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
             return quadruple
 
     'returns the list of (pid1, pid2, pid3, pid4, angle(123))'
+
     def getQuadruplesAngles(self):
 
         if pmi.workerIsActive():
@@ -124,17 +125,24 @@ class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
         if pmi.workerIsActive():
             return self.cxxclass.getAngle(self, pid1, pid2, pid3, pid4)
 
+
 if pmi.isController:
     class FixedQuadrupleAngleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedQuadrupleAngleListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addQuadruples" ],
-            pmiinvoke = ["getQuadruples", "getQuadruplesAngles", "size"]
+            cls='espressopp.FixedQuadrupleAngleListLocal',
+            localcall=["add"],
+            pmicall=["addQuadruples"],
+            pmiinvoke=["getQuadruples", "getQuadruplesAngles", "size"]
         )
 
-        def getAngle(self, pid1, pid2, pid3, pid4 ):
-            angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3, pid4 )
+        def getAngle(self, pid1, pid2, pid3, pid4):
+            angles = pmi.invoke(
+                self.pmiobject,
+                'getAngle',
+                pid1,
+                pid2,
+                pid3,
+                pid4)
             for i in angles:
-                if( i != -1 ):
+                if(i != -1):
                     return i

@@ -229,108 +229,175 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_ReactionFieldGeneralized, \
-                      interaction_VerletListReactionFieldGeneralized, \
-                      interaction_VerletListAdressReactionFieldGeneralized, \
-                      interaction_VerletListAdressATReactionFieldGeneralized, \
-                      interaction_VerletListHadressReactionFieldGeneralized, \
-                      interaction_VerletListHadressATReactionFieldGeneralized, \
-                      interaction_CellListReactionFieldGeneralized
-                      #interaction_FixedPairListReactionFieldGeneralized
+    interaction_VerletListReactionFieldGeneralized, \
+    interaction_VerletListAdressReactionFieldGeneralized, \
+    interaction_VerletListAdressATReactionFieldGeneralized, \
+    interaction_VerletListHadressReactionFieldGeneralized, \
+    interaction_VerletListHadressATReactionFieldGeneralized, \
+    interaction_CellListReactionFieldGeneralized
+# interaction_FixedPairListReactionFieldGeneralized
 
-class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
 
-    def __init__(self, prefactor=1.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, shift="auto"):
+class ReactionFieldGeneralizedLocal(
+        PotentialLocal,
+        interaction_ReactionFieldGeneralized):
 
-        if shift =="auto":
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff)
+    def __init__(
+            self,
+            prefactor=1.0,
+            kappa=0.0,
+            epsilon1=1.0,
+            epsilon2=80.0,
+            cutoff=infinity,
+            shift="auto"):
+
+        if shift == "auto":
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                    ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+                cxxinit(self, interaction_ReactionFieldGeneralized,
+                        prefactor, kappa, epsilon1, epsilon2, cutoff)
         else:
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff, shift)
+            if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                    ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+                cxxinit(
+                    self,
+                    interaction_ReactionFieldGeneralized,
+                    prefactor,
+                    kappa,
+                    epsilon1,
+                    epsilon2,
+                    cutoff,
+                    shift)
 
-class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListReactionFieldGeneralized):
+
+class VerletListReactionFieldGeneralizedLocal(
+        InteractionLocal,
+        interaction_VerletListReactionFieldGeneralized):
 
     def __init__(self, vl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListReactionFieldGeneralized, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListAdressATReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListAdressATReactionFieldGeneralized):
+
+class VerletListAdressATReactionFieldGeneralizedLocal(
+        InteractionLocal, interaction_VerletListAdressATReactionFieldGeneralized):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressATReactionFieldGeneralized, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressATReactionFieldGeneralized,
+                vl,
+                fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralized):
+
+class VerletListAdressReactionFieldGeneralizedLocal(
+        InteractionLocal, interaction_VerletListAdressReactionFieldGeneralized):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressReactionFieldGeneralized, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListAdressReactionFieldGeneralized,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
-class VerletListHadressATReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHadressATReactionFieldGeneralized):
+
+class VerletListHadressATReactionFieldGeneralizedLocal(
+        InteractionLocal, interaction_VerletListHadressATReactionFieldGeneralized):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressATReactionFieldGeneralized, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressATReactionFieldGeneralized,
+                vl,
+                fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListHadressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHadressReactionFieldGeneralized):
+
+class VerletListHadressReactionFieldGeneralizedLocal(
+        InteractionLocal, interaction_VerletListHadressReactionFieldGeneralized):
 
     def __init__(self, vl, fixedtupleList):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressReactionFieldGeneralized, vl, fixedtupleList)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                interaction_VerletListHadressReactionFieldGeneralized,
+                vl,
+                fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
     def setPotentialCG(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
 
-class CellListReactionFieldGeneralizedLocal(InteractionLocal, interaction_CellListReactionFieldGeneralized):
+class CellListReactionFieldGeneralizedLocal(
+        InteractionLocal,
+        interaction_CellListReactionFieldGeneralized):
 
     def __init__(self, stor):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListReactionFieldGeneralized, stor)
 
     def setPotential(self, type1, type2, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 
-#class FixedPairListReactionFieldGeneralizedLocal(InteractionLocal, interaction_FixedPairListReactionFieldGeneralized):
+# class FixedPairListReactionFieldGeneralizedLocal(InteractionLocal, interaction_FixedPairListReactionFieldGeneralized):
 #    'The (local) ReactionFieldGeneralized interaction using FixedPair lists.'
 #    def __init__(self, system, vl, potential):
 #        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -344,47 +411,56 @@ if pmi.isController:
     class ReactionFieldGeneralized(Potential):
         'The ReactionFieldGeneralized potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.ReactionFieldGeneralizedLocal',
-            pmiproperty = ['prefactor']#['qq']
-            )
+            cls='espressopp.interaction.ReactionFieldGeneralizedLocal',
+            pmiproperty=['prefactor']  # ['qq']
+        )
 
     class VerletListReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListReactionFieldGeneralizedLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListReactionFieldGeneralizedLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential'])
 
-    class VerletListAdressATReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressATReactionFieldGeneralized(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressATReactionFieldGeneralizedLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListAdressATReactionFieldGeneralizedLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential'])
 
-    class VerletListAdressReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
+    class VerletListAdressReactionFieldGeneralized(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressReactionFieldGeneralizedLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListAdressReactionFieldGeneralizedLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
-    class VerletListHadressATReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
+    class VerletListHadressATReactionFieldGeneralized(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressATReactionFieldGeneralizedLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espressopp.interaction.VerletListHadressATReactionFieldGeneralizedLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential'])
 
-    class VerletListHadressReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
+    class VerletListHadressReactionFieldGeneralized(
+            Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressReactionFieldGeneralizedLocal',
-            pmicall = ['setPotentialAT', 'setPotentialCG']
-            )
+            cls='espressopp.interaction.VerletListHadressReactionFieldGeneralizedLocal',
+            pmicall=[
+                'setPotentialAT',
+                'setPotentialCG'])
 
     class CellListReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListReactionFieldGeneralizedLocal',
-            pmicall = ['setPotential']
-            )
+            cls='espressopp.interaction.CellListReactionFieldGeneralizedLocal',
+            pmicall=['setPotential']
+        )
 
-    #class FixedPairListReactionFieldGeneralized(Interaction):
+    # class FixedPairListReactionFieldGeneralized(Interaction):
     #    __metaclass__ = pmi.Proxy
     #    pmiproxydefs = dict(
     #        cls =  'espressopp.interaction.FixedPairListReactionFieldGeneralizedLocal',

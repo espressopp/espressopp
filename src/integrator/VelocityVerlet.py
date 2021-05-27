@@ -36,16 +36,19 @@ from espressopp import pmi
 from espressopp.integrator.MDIntegrator import *
 from _espressopp import integrator_VelocityVerlet
 
+
 class VelocityVerletLocal(MDIntegratorLocal, integrator_VelocityVerlet):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_VelocityVerlet, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class VelocityVerlet(MDIntegrator):
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.VelocityVerletLocal',
-          pmicall = ['resetTimers','getNumResorts'],
-          pmiinvoke = ['getTimers']
+            cls='espressopp.integrator.VelocityVerletLocal',
+            pmicall=['resetTimers', 'getNumResorts'],
+            pmiinvoke=['getTimers']
         )

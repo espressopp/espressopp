@@ -25,6 +25,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestRDFatomistic(unittest.TestCase):
     def setUp(self):
         # set up system
@@ -33,9 +34,12 @@ class TestRDFatomistic(unittest.TestCase):
         self.system.bc = espressopp.bc.OrthorhombicBC(self.system.rng, box)
         self.system.rng = espressopp.esutil.RNG()
         self.system.skin = 0.5
-        nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size,box,rc=1.5,skin=self.system.skin)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=self.system.skin)
-        self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
+        nodeGrid = espressopp.tools.decomp.nodeGrid(
+            espressopp.MPI.COMM_WORLD.size, box, rc=1.5, skin=self.system.skin)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=self.system.skin)
+        self.system.storage = espressopp.storage.DomainDecompositionAdress(
+            self.system, nodeGrid, cellGrid)
 
     def test_span_true(self):
         # add some particles
@@ -49,25 +53,36 @@ class TestRDFatomistic(unittest.TestCase):
             (7, 0, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 1),
             (8, 0, 0, espressopp.Real3D(6.5, 5.5, 5.0), 1.0, 1),
         ]
-        tuples = [(1,5),(2,6),(3,7),(4,8)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 5), (2, 6), (3, 7), (4, 8)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # calculate rdfs
-        rdf_span = espressopp.analysis.RDFatomistic(system=self.system, type1=0, type2=0, span=1.0, spanbased=True)
+        rdf_span = espressopp.analysis.RDFatomistic(
+            system=self.system, type1=0, type2=0, span=1.0, spanbased=True)
         rdf_span_array = rdf_span.compute(10)
 
         # run checks
@@ -86,25 +101,36 @@ class TestRDFatomistic(unittest.TestCase):
             (7, 0, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 1),
             (8, 0, 0, espressopp.Real3D(6.5, 5.5, 5.0), 1.0, 1),
         ]
-        tuples = [(1,5),(2,6),(3,7),(4,8)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
+        tuples = [(1, 5), (2, 6), (3, 7), (4, 8)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'q', 'pos', 'mass', 'adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
         self.system.storage.decompose()
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
-                                dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # initialize lambda values
         integrator = espressopp.integrator.VelocityVerlet(self.system)
-        adress = espressopp.integrator.Adress(self.system,vl,ftpl)
+        adress = espressopp.integrator.Adress(self.system, vl, ftpl)
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # calculate rdfs
-        rdf_nospan = espressopp.analysis.RDFatomistic(system=self.system, type1=0, type2=0, span=1.0, spanbased=False)
+        rdf_nospan = espressopp.analysis.RDFatomistic(
+            system=self.system, type1=0, type2=0, span=1.0, spanbased=False)
         rdf_nospan_array = rdf_nospan.compute(10)
 
         # run checks
@@ -145,21 +171,35 @@ class TestRDFatomistic(unittest.TestCase):
             (29, 1, espressopp.Real3D(5.5, 5.5, 5.0), 1, 4),
             (30, 1, espressopp.Real3D(5.5, 5.0, 5.5), 1, 1)
         ]
-        tuples = [(1,2,3,4,5),(6,7,8,9,10),(11,12,13,14,15),(16,17,18,19,20),(21,22,23,24,25),(26,27,28,29,30)]
-        self.system.storage.addParticles(particle_list, 'id', 'type', 'pos', 'adrat', 'pib')
+        tuples = [(1, 2, 3, 4, 5), (6, 7, 8, 9, 10), (11, 12, 13, 14, 15),
+                  (16, 17, 18, 19, 20), (21, 22, 23, 24, 25), (26, 27, 28, 29, 30)]
+        self.system.storage.addParticles(
+            particle_list, 'id', 'type', 'pos', 'adrat', 'pib')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
         self.system.storage.setFixedTuplesAdress(ftpl)
 
         # generate a verlet list
-        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5, dEx=2.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        vl = espressopp.VerletListAdress(
+            self.system,
+            cutoff=1.5,
+            adrcut=1.5,
+            dEx=2.0,
+            dHy=1.0,
+            adrCenter=[
+                5.0,
+                5.0,
+                5.0],
+            sphereAdr=False)
 
         # initialize lambda values
-        integrator = espressopp.integrator.PIAdressIntegrator(system=self.system, verletlist=vl, nTrotter=4)
+        integrator = espressopp.integrator.PIAdressIntegrator(
+            system=self.system, verletlist=vl, nTrotter=4)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
         # calculate rdfs
-        rdf_pi = espressopp.analysis.RDFatomistic(system=self.system, type1=1, type2=1, span=2.5)
+        rdf_pi = espressopp.analysis.RDFatomistic(
+            system=self.system, type1=1, type2=1, span=2.5)
         rdf_pi_array = rdf_pi.computePathIntegral(10)
 
         # run checks
@@ -167,6 +207,7 @@ class TestRDFatomistic(unittest.TestCase):
         self.assertAlmostEqual(rdf_pi_array[2], 26.525824, places=5)
         self.assertAlmostEqual(rdf_pi_array[3], 15.898631, places=5)
         self.assertAlmostEqual(rdf_pi_array[4], 0.0, places=5)
+
 
 if __name__ == '__main__':
     unittest.main()

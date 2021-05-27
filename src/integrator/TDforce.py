@@ -79,11 +79,28 @@ from espressopp import pmi
 
 from _espressopp import integrator_TDforce
 
+
 class TDforceLocal(integrator_TDforce):
 
-    def __init__(self, system, verletlist, startdist=0.0, enddist=0.0, edgeweightmultiplier=20, slow=False):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier, slow)
+    def __init__(
+            self,
+            system,
+            verletlist,
+            startdist=0.0,
+            enddist=0.0,
+            edgeweightmultiplier=20,
+            slow=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(
+                self,
+                integrator_TDforce,
+                system,
+                verletlist,
+                startdist,
+                enddist,
+                edgeweightmultiplier,
+                slow)
 
     def addForce(self, itype, filename, type):
         """
@@ -94,13 +111,15 @@ class TDforceLocal(integrator_TDforce):
             self.cxxclass.addForce(self, itype, filename, type)
 
     def computeTDEnergy(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeTDEnergy(self)
 
-if pmi.isController :
+
+if pmi.isController:
     class TDforce(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.TDforceLocal',
-            pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addForce', 'getForce', 'computeTDEnergy']
-            )
+            cls='espressopp.integrator.TDforceLocal',
+            pmiproperty=['itype', 'filename'],
+            pmicall=['addForce', 'getForce', 'computeTDEnergy']
+        )

@@ -25,6 +25,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestRadGyrXProfilePI(unittest.TestCase):
     def setUp(self):
         self.system = espressopp.System()
@@ -32,8 +33,10 @@ class TestRadGyrXProfilePI(unittest.TestCase):
         self.system.rng = espressopp.esutil.RNG()
         self.system.bc = espressopp.bc.OrthorhombicBC(self.system.rng, box)
         nodeGrid = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
-        cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc=1.5, skin=0.5)
-        self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
+        cellGrid = espressopp.tools.decomp.cellGrid(
+            box, nodeGrid, rc=1.5, skin=0.5)
+        self.system.storage = espressopp.storage.DomainDecomposition(
+            self.system, nodeGrid, cellGrid)
 
         particle_list = [
             (1, 1, espressopp.Real3D(3.0, 5.0, 5.0)),
@@ -58,22 +61,26 @@ class TestRadGyrXProfilePI(unittest.TestCase):
         self.system.storage.decompose()
 
     def test_geometry_spherical(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='spherical', center=[5.0, 5.0, 5.0])
+        npartsubregion = espressopp.analysis.NPartSubregion(
+            self.system, parttype=1, span=1.5, geometry='spherical', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
         self.assertEqual(number_of_particles, 6)
 
     def test_geometry_xbounded(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-x', center=[5.0, 5.0, 5.0])
+        npartsubregion = espressopp.analysis.NPartSubregion(
+            self.system, parttype=1, span=1.5, geometry='bounded-x', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
         self.assertEqual(number_of_particles, 9)
 
     def test_geometry_ybounded(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-y', center=[5.0, 5.0, 5.0])
+        npartsubregion = espressopp.analysis.NPartSubregion(
+            self.system, parttype=1, span=1.5, geometry='bounded-y', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
         self.assertEqual(number_of_particles, 8)
 
     def test_geometry_zbounded(self):
-        npartsubregion = espressopp.analysis.NPartSubregion(self.system, parttype=1, span=1.5, geometry='bounded-z', center=[5.0, 5.0, 5.0])
+        npartsubregion = espressopp.analysis.NPartSubregion(
+            self.system, parttype=1, span=1.5, geometry='bounded-z', center=[5.0, 5.0, 5.0])
         number_of_particles = npartsubregion.compute()
         self.assertEqual(number_of_particles, 11)
 

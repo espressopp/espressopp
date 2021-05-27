@@ -35,14 +35,17 @@ from espressopp import pmi
 from espressopp.analysis.Observable import *
 from _espressopp import analysis_Pressure
 
+
 class PressureLocal(ObservableLocal, analysis_Pressure):
 
     def __init__(self, system):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()
+                ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Pressure, system)
 
-if pmi.isController :
+
+if pmi.isController:
     class Pressure(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.PressureLocal'
-            )
+            cls='espressopp.analysis.PressureLocal'
+        )

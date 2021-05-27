@@ -26,6 +26,7 @@ import math
 
 from espressopp import Real3D
 
+
 def calcNumberCells(size, nodes, cutoff):
 
     ncells = 1
@@ -35,17 +36,18 @@ def calcNumberCells(size, nodes, cutoff):
 
     return ncells - 1
 
-class TestVerletList(unittest.TestCase) :
 
-    def test0Lattice(self) :
+class TestVerletList(unittest.TestCase):
+
+    def test0Lattice(self):
         system = espressopp.System()
 
-        rng  = espressopp.esutil.RNG()
+        rng = espressopp.esutil.RNG()
 
-        N    = 6
+        N = 6
         SIZE = float(N)
-        box  = Real3D(SIZE)
-        bc   = espressopp.bc.OrthorhombicBC(None, box)
+        box = Real3D(SIZE)
+        bc = espressopp.bc.OrthorhombicBC(None, box)
 
         system.bc = bc
 
@@ -63,10 +65,11 @@ class TestVerletList(unittest.TestCase) :
         for i in range(3):
             cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-        print('NodeGrid = %s'%(nodeGrid,))
-        print('CellGrid = %s'%cellGrid)
+        print('NodeGrid = %s' % (nodeGrid,))
+        print('CellGrid = %s' % cellGrid)
 
-        system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+        system.storage = espressopp.storage.DomainDecomposition(
+            system, nodeGrid, cellGrid)
         pid = 0
 
         for i in range(N):
@@ -100,14 +103,13 @@ class TestVerletList(unittest.TestCase) :
 
         vl = espressopp.VerletList(system, math.sqrt(2.0))
 
-        self.assertEqual(vl.totalSize(), N * N * N * 9);
+        self.assertEqual(vl.totalSize(), N * N * N * 9)
 
         vl = espressopp.VerletList(system, math.sqrt(3.0))
 
         # there are N * N * N * 26 / 2 pairs in cutoff
 
         self.assertEqual(vl.totalSize(), N * N * N * 13)
-
 
 
 if __name__ == "__main__":

@@ -56,8 +56,8 @@ import espressopp
 from espressopp.esutil import cxxinit
 from math import sqrt
 
-class FixedSingleListLocal(_espressopp.FixedSingleList):
 
+class FixedSingleListLocal(_espressopp.FixedSingleList):
 
     def __init__(self, storage):
 
@@ -87,14 +87,15 @@ class FixedSingleListLocal(_espressopp.FixedSingleList):
     def getSingles(self):
 
         if pmi.workerIsActive():
-            singles=self.cxxclass.getSingles(self)
+            singles = self.cxxclass.getSingles(self)
             return singles
+
 
 if pmi.isController:
     class FixedSingleList(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.FixedSingleListLocal',
+            cls='espressopp.FixedSingleListLocal',
             #localcall = [ 'add' ],
-            pmicall = [ 'add', 'addSingles' ],
-            pmiinvoke = ['getSingles', 'size']
+            pmicall=['add', 'addSingles'],
+            pmiinvoke=['getSingles', 'size']
         )

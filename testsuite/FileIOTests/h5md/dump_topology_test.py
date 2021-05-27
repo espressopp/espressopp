@@ -23,21 +23,24 @@ import sys
 import time
 import unittest as ut
 
+
 def remove_file(file_name):
     if os.path.exists(file_name):
         os.unlink(file_name)
+
 
 class TestDumpTopology(ut.TestCase):
     def setUp(self):
         self.h5md_file = 'topo_output.h5'
         remove_file(self.h5md_file)
-        self.system, self.integrator = espressopp.standard_system.Default((10., 10., 10.), dt=0.1)
+        self.system, self.integrator = espressopp.standard_system.Default(
+            (10., 10., 10.), dt=0.1)
 
         self.particles = [
-            (1, espressopp.Real3D(1,2,3), 1),
-            (2, espressopp.Real3D(2,3,4), 2),
-            (3, espressopp.Real3D(3,4,5), 3),
-            (4, espressopp.Real3D(4,5,6), 4)]
+            (1, espressopp.Real3D(1, 2, 3), 1),
+            (2, espressopp.Real3D(2, 3, 4), 2),
+            (3, espressopp.Real3D(3, 4, 5), 3),
+            (4, espressopp.Real3D(4, 5, 6), 4)]
 
         self.system.storage.addParticles(self.particles, 'id', 'pos', 'type')
 
@@ -58,7 +61,8 @@ class TestDumpTopology(ut.TestCase):
             store_velocity=True,
             store_state=True)
 
-        self.dump_topology = espressopp.io.DumpTopology(self.system, self.integrator, self.dump_h5md)
+        self.dump_topology = espressopp.io.DumpTopology(
+            self.system, self.integrator, self.dump_h5md)
         self.dump_topology.observe_tuple(self.fpl, 'bonds_0')
         self.dump_topology.observe_triple(self.ftl, 'angles_0')
         self.dump_topology.observe_quadruple(self.fql, 'dihs_0')
@@ -74,7 +78,9 @@ class TestDumpTopology(ut.TestCase):
         self.dump_h5md.close()
         h5 = h5py.File(self.h5md_file, 'r')
 
-        self.assertEqual(list(h5['/connectivity'].keys()), ['angles_0', 'bonds_0', 'dihs_0'])
+        self.assertEqual(list(h5['/connectivity'].keys()),
+                         ['angles_0', 'bonds_0', 'dihs_0'])
+
 
 class TestDumpFPL(TestDumpTopology):
     def test_check_dynamic_list(self):
@@ -89,7 +95,8 @@ class TestDumpFPL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for bond_list in h5['/connectivity/bonds_0/value']:
-            self.assertListEqual(sorted(map(tuple, [x for x in bond_list if -1 not in x])), [(1, 2), (2, 3)])
+            self.assertListEqual(
+                sorted(map(tuple, [x for x in bond_list if -1 not in x])), [(1, 2), (2, 3)])
 
     def test_check_dynamic_list_update(self):
         self.integrator.run(5)
@@ -102,7 +109,11 @@ class TestDumpFPL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/bonds_0/step']), list(range(11)))
+        self.assertEqual(
+            list(
+                h5['/connectivity/bonds_0/step']),
+            list(
+                range(11)))
 
         for bond_list in h5['/connectivity/bonds_0/value'][:6]:
             self.assertListEqual(
@@ -129,8 +140,8 @@ class TestDumpFTL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for bond_list in h5['/connectivity/angles_0/value']:
-            self.assertListEqual(sorted(map(tuple, [x for x in bond_list if -1 not in x])),
-            [(1, 2, 3)])
+            self.assertListEqual(
+                sorted(map(tuple, [x for x in bond_list if -1 not in x])), [(1, 2, 3)])
 
     def test_check_dynamic_list_update(self):
         self.integrator.run(5)
@@ -143,7 +154,11 @@ class TestDumpFTL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/angles_0/step']), list(range(11)))
+        self.assertEqual(
+            list(
+                h5['/connectivity/angles_0/step']),
+            list(
+                range(11)))
 
         for angle_list in h5['/connectivity/angles_0/value'][:6]:
             self.assertListEqual(
@@ -170,8 +185,8 @@ class TestDumpFQL(TestDumpTopology):
 
         h5 = h5py.File(self.h5md_file, 'r')
         for plist in h5['/connectivity/dihs_0/value']:
-            self.assertListEqual(sorted(map(tuple, [x for x in plist if -1 not in x])),
-            [(2, 1, 3, 4)])
+            self.assertListEqual(
+                sorted(map(tuple, [x for x in plist if -1 not in x])), [(2, 1, 3, 4)])
 
     def test_check_dynamic_list_update(self):
         self.integrator.run(5)
@@ -184,7 +199,11 @@ class TestDumpFQL(TestDumpTopology):
         self.dump_h5md.close()
 
         h5 = h5py.File(self.h5md_file, 'r')
-        self.assertEqual(list(h5['/connectivity/dihs_0/step']), list(range(11)))
+        self.assertEqual(
+            list(
+                h5['/connectivity/dihs_0/step']),
+            list(
+                range(11)))
 
         for plist in h5['/connectivity/dihs_0/value'][:6]:
             self.assertListEqual(
@@ -196,7 +215,6 @@ class TestDumpFQL(TestDumpTopology):
             self.assertListEqual(
                 sorted(map(tuple, [x for x in plist if -1 not in x])),
                 [(2, 1, 3, 4), (4, 1, 3, 2)])
-
 
 
 if __name__ == '__main__':

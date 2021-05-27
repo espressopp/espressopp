@@ -92,22 +92,38 @@ from _espressopp import interaction_FixedQuadrupleListTypesDihedralRB
 
 class DihedralRBLocal(DihedralPotentialLocal, interaction_DihedralRB):
 
-    def __init__(self, K0=0.0, K1=0.0, K2=0.0, K3=0.0, K4=0.0, K5=0.0, iupac=True):
+    def __init__(
+            self,
+            K0=0.0,
+            K1=0.0,
+            K2=0.0,
+            K3=0.0,
+            K4=0.0,
+            K5=0.0,
+            iupac=True):
 
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             if iupac:
-                cxxinit(self, interaction_DihedralRB, K0, -1*K1, K2, -1*K3, K4, -1*K5)
+                cxxinit(self, interaction_DihedralRB, K0, -
+                        1 * K1, K2, -1 * K3, K4, -1 * K5)
             else:
                 cxxinit(self, interaction_DihedralRB, K0, K1, K2, K3, K4, K5)
 
 
-class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadrupleListDihedralRB):
+class FixedQuadrupleListDihedralRBLocal(
+        InteractionLocal,
+        interaction_FixedQuadrupleListDihedralRB):
 
     def __init__(self, system, vl, potential):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
-            cxxinit(self, interaction_FixedQuadrupleListDihedralRB, system, vl, potential)
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListDihedralRB,
+                system,
+                vl,
+                potential)
 
     def setPotential(self, type1, type2, potential):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
@@ -119,14 +135,22 @@ class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadr
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             return self.cxxclass.getFixedQuadrupleList(self)
 
-class FixedQuadrupleListTypesDihedralRBLocal(InteractionLocal, interaction_FixedQuadrupleListTypesDihedralRB):
+
+class FixedQuadrupleListTypesDihedralRBLocal(
+        InteractionLocal,
+        interaction_FixedQuadrupleListTypesDihedralRB):
     def __init__(self, system, fql):
         if pmi.workerIsActive():
-            cxxinit(self, interaction_FixedQuadrupleListTypesDihedralRB, system, fql)
+            cxxinit(
+                self,
+                interaction_FixedQuadrupleListTypesDihedralRB,
+                system,
+                fql)
 
     def setPotential(self, type1, type2, type3, type4, potential):
         if pmi.workerIsActive():
-            self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+            self.cxxclass.setPotential(
+                self, type1, type2, type3, type4, potential)
 
     def getPotential(self, type1, type2, type3, type4):
         if pmi.workerIsActive():
@@ -151,16 +175,19 @@ if pmi.isController:
         """
         pmiproxydefs = dict(
             cls='espressopp.interaction.DihedralRBLocal'
-            )
+        )
 
     class FixedQuadrupleListDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.interaction.FixedQuadrupleListDihedralRBLocal',
             pmicall=['setPotential', 'getFixedQuadrupleList']
-            )
+        )
 
     class FixedQuadrupleListTypesDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralRBLocal',
-            pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
-        )
+            cls='espressopp.interaction.FixedQuadrupleListTypesDihedralRBLocal',
+            pmicall=[
+                'setPotential',
+                'getPotential',
+                'setFixedQuadrupleList',
+                'getFixedQuadrupleList'])

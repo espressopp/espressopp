@@ -60,15 +60,23 @@ class VersionLocal(_espressopp.Version):
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, _espressopp.Version)
-            else :
+            else:
                 pass
-        else :
+        else:
             cxxinit(self, _espressopp.Version)
+
 
 if pmi.isController:
     class Version(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.VersionLocal',
-            pmiproperty = ['major', 'minor', 'gitrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],
-            pmicall = ['info']
-            )
+            cls='espressopp.VersionLocal',
+            pmiproperty=[
+                'major',
+                'minor',
+                'gitrevision',
+                'boostversion',
+                'patchlevel',
+                'date',
+                'time',
+                'name'],
+            pmicall=['info'])
