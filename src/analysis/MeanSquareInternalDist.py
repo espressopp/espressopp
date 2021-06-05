@@ -24,16 +24,15 @@ r"""
 espressopp.analysis.MeanSquareInternalDist
 ******************************************
 
-.. function:: espressopp.analysis.MeanSquareInternalDist(system, chainlength)
+.. function:: espressopp.analysis.MeanSquareInternalDist(system, chainlength, start_pid)
 
-		:param system:
-		:param chainlength:
-		:type system:
-		:type chainlength:
+                :param system:
+                :param chainlength:
+                :param start_pid:
+                :type system:
+                :type chainlength:
+                :type start_pid:
 
-.. function:: espressopp.analysis.MeanSquareInternalDist.strange()
-
-		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -43,19 +42,13 @@ from _espressopp import analysis_MeanSquareInternalDist
 
 class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquareInternalDist):
 
-    def __init__(self, system, chainlength):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)
-
-    def strange(self):
-      print 1
-      return 1
+    def __init__(self, system, chainlength, start_pid=0):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength, start_pid)
 
 if pmi.isController:
-  class MeanSquareInternalDist(ConfigsParticleDecomp):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-      cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
-      pmiproperty = [ 'print_progress' ],
-      pmicall = ['strange']
-    )
+    class MeanSquareInternalDist(ConfigsParticleDecomp, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          cls =  'espressopp.analysis.MeanSquareInternalDistLocal',
+          pmiproperty = [ 'print_progress' ]
+        )

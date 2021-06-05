@@ -39,7 +39,7 @@ class TestDumpXTC(unittest.TestCase):
 
 
     def test_simple_xtc(self):
-        
+
         particle_list = [
         ( 1 , espressopp.Real3D( 4.75575 , 5.82131 , 16.9163) ),
         ( 2 , espressopp.Real3D( 3.04417 , 11.7107 , 3.86951) ),

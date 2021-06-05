@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -25,57 +25,61 @@ espressopp.Real3D
 *****************
 
 
-.. function:: espressopp.__Real3D(\*args)
+.. function:: espressopp.Real3D(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 
-.. function:: espressopp.__Real3D.x(v, [0)
+.. function:: espressopp.Real3D.x(v, [0)
 
-		:param v: 
-		:param [0: 
-		:type v: 
-		:type [0: 
-		:rtype: 
+                :param v:
+                :param [0:
+                :type v:
+                :type [0:
+                :rtype:
 
-.. function:: espressopp.__Real3D.y(v, [1)
+.. function:: espressopp.Real3D.y(v, [1)
 
-		:param v: 
-		:param [1: 
-		:type v: 
-		:type [1: 
-		:rtype: 
+                :param v:
+                :param [1:
+                :type v:
+                :type [1:
+                :rtype:
 
-.. function:: espressopp.__Real3D.z(v, [2)
+.. function:: espressopp.Real3D.z(v, [2)
 
-		:param v: 
-		:param [2: 
-		:type v: 
-		:type [2: 
-		:rtype: 
+                :param v:
+                :param [2:
+                :type v:
+                :type [2:
+                :rtype:
 
 .. function:: espressopp.toReal3DFromVector(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 
 .. function:: espressopp.toReal3D(\*args)
 
-		:param \*args: 
-		:type \*args: 
+                :param \*args:
+                :type \*args:
 """
+
+# List of exported methods from the module.
+import numbers
+
 from _espressopp import Real3D
-from espressopp import esutil
+
+__all__ = ['Real3D', 'toReal3DFromVector', 'toReal3D']
+
 
 # This injects additional methods into the Real3D class and pulls it
-# into this module 
-class __Real3D(Real3D) :
+# into this module. Now, this hacky method is required because other places
+# of the code uses _espressopp.Real3D type.
+def extend_class():
+    origin_init = Real3D.__init__
 
-
-    __metaclass__ = esutil.ExtendBaseClass
-
-    __originit = Real3D.__init__
-    def __init__(self, *args):
+    def new_init(self, *args):
         if len(args) == 0:
             x = y = z = 0.0
         elif len(args) == 1:
@@ -89,40 +93,51 @@ class __Real3D(Real3D) :
                 x, y, z = arg0
             elif isinstance(arg0, float) or isinstance(arg0, int):
                 x = y = z = arg0
-            else :
+            else:
                 raise TypeError("Cannot initialize Real3D from %s" % (args))
-        elif len(args) == 3 :
+        elif len(args) == 3:
             x, y, z = args
-        else :
+        else:
             raise TypeError("Cannot initialize Real3D from %s" % (args))
-        
-        return self.__originit(x, y, z)
 
-    # create setters and getters
-    @property
-    def x(self): return self[0]
+        origin_init(self, x, y, z)
 
-    @x.setter
-    def x(self, v): self[0] = v
+    def _eq(self, other):
+        if other is None:
+            return False
+        if isinstance(other, numbers.Number):
+            return all([self[i] == other for i in range(3)])
 
-    @property
-    def y(self) : return self[1]
+        return all([self[i] == other[i] for i in range(3)])
 
-    @y.setter
-    def y(self, v) : self[1] = v
+    def _lt(self, other):
+        if other is None:
+            return True
 
-    @property
-    def z(self) : return self[2]
+        return id(self) < id(other)
 
-    @z.setter
-    def z(self, v) : self[2] = v
+    def _get_getter_setter(idx):
+        def _get(self):
+            return self[idx]
 
-    # string conversion
-    def __str__(self) :
-        return str((self[0], self[1], self[2]))
+        def _set(self, v):
+            self[idx] = v
 
-    def __repr__(self) :
-        return 'Real3D' + str(self)
+        return _get, _set
+
+    Real3D.__init__ = new_init
+    Real3D.x = property(*_get_getter_setter(0))
+    Real3D.y = property(*_get_getter_setter(1))
+    Real3D.z = property(*_get_getter_setter(2))
+    Real3D.__str__ = lambda self: str((self[0], self[1], self[2]))
+    Real3D.__repr__ = lambda self: 'Real3D' + str(self)
+    Real3D.__eq__ = _eq
+    Real3D.__lt__ = _lt
+    Real3D.__gt__ = _lt
+
+
+extend_class()
+
 
 def toReal3DFromVector(*args):
     """Try to convert the arguments to a Real3D.
@@ -139,6 +154,7 @@ def toReal3DFromVector(*args):
         return Real3D(*args)
 
     raise TypeError("Specify x, y and z.")
+
 
 def toReal3D(*args):
     """Try to convert the arguments to a Real3D, returns the argument,

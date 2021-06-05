@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -17,9 +17,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-###########################################################################			
+###########################################################################
 #                                                                         #
-#  ESPResSo++ Python script for an methanol simulation 			  #
+#  ESPResSo++ Python script for an methanol simulation                    #
 #                                                                         #
 ###########################################################################
 
@@ -59,7 +59,7 @@ nSoluteAtoms = len(atSoluteIndices)
 nSoluteCgparticles = 1
 # indices of atoms in water molecules with adaptive resolution
 atWaterIndices = [x for x in range(7,2086)] #water atoms, 7 to 2085 inclusive
-nWaterAtoms = len(atWaterIndices) 
+nWaterAtoms = len(atWaterIndices)
 nWaterAtomsPerMol = 3 #number of atoms per cg water bead
 nWaterMols = nWaterAtoms/nWaterAtomsPerMol
 adresRegionCentreAtIndex = 1 #index of atom at centre of AdResS region
@@ -94,7 +94,7 @@ nStepsPerTrjoutput = 500
 nOutput            = nSteps/nStepsPerOutput
 
 # Parameters for size of AdResS dimensions
-ex_size = 20.00 
+ex_size = 20.00
 hy_size = 1.00
 
 # Parameters for Thermodynamic Integration
@@ -109,20 +109,20 @@ powerSC = 1.0
 sigmaSC = 0.3
 dhdlFile = "dhdl.xvg"
 dhdlF = open(dhdlFile,'a')
-dhdlF.write("#(coul-lambda, vdw-lambda) = ("+str(lambdaTICoul)+", "+str(lambdaTIVdwl)+"\n") 
+dhdlF.write("#(coul-lambda, vdw-lambda) = ("+str(lambdaTICoul)+", "+str(lambdaTIVdwl)+"\n")
 
-print '# radius of atomistic region = ',ex_size
-print '# thickness of hybrid region = ',hy_size
+print('# radius of atomistic region = ',ex_size)
+print('# thickness of hybrid region = ',hy_size)
 
 # print ESPResSo++ version and compile info
-print '# ',espressopp.Version().info()
+print('# ',espressopp.Version().info())
 # print simulation parameters (useful to have them in a log file)
-print "# nbCutoff           = ", nbCutoff
-print "# skin               = ", skin
-print "# dt                 = ", dt
-print "# nSteps             = ", nSteps
-print "# output every ",nStepsPerOutput," steps"
-print "# trajectory output every ",nStepsPerTrjoutput," steps"
+print("# nbCutoff           = ", nbCutoff)
+print("# skin               = ", skin)
+print("# dt                 = ", dt)
+print("# nSteps             = ", nSteps)
+print("# output every ",nStepsPerOutput," steps")
+print("# trajectory output every ",nStepsPerTrjoutput," steps")
 
 
 ########################################################################
@@ -131,31 +131,31 @@ print "# trajectory output every ",nStepsPerTrjoutput," steps"
 
 ## get info on (complete) atomistic system ##
 
-print '# Reading gromacs top and gro files...'
+print('# Reading gromacs top and gro files...')
 # call gromacs parser for processing the top file (and included files) and the gro file
 defaults, atTypes, atomtypesDict, atMasses, atCharges, atomtypeparameters, atBondtypes, bondtypeparams, atAngletypes, angletypeparams, atDihedraltypes, dihedraltypeparams, impropertypeparams, atExclusions, atOnefourpairslist, atX, atY, atZ, atVX, atVY, atVZ, atResnames, atResid, Lx, Ly, Lz = gromacs.read(inputcrdfile,aatopfile)
 
-reverseAtomtypesDict = dict([(v, k) for k, v in atomtypesDict.iteritems()])
+reverseAtomtypesDict = dict([(v, k) for k, v in atomtypesDict.items()])
 
 # system box size
 box                = (Lx, Ly, Lz)
-print "# Box size          = ", box
+print("# Box size          = ", box)
 
 nParticlesRead = len(atX)
-print "# total number of particles read from atomistic config file = ",nParticlesRead
+print("# total number of particles read from atomistic config file = ",nParticlesRead)
 
-print "# number of atomistic particles in solute = ",nSoluteAtoms
-print "# number of coarse-grained particles in solute = ",nSoluteCgparticles
-print "# number of atomistic particles in solvent = ",nWaterAtoms
-print "# number of coarse-grained particles in solvent = ",nWaterMols
+print("# number of atomistic particles in solute = ",nSoluteAtoms)
+print("# number of coarse-grained particles in solute = ",nSoluteCgparticles)
+print("# number of atomistic particles in solvent = ",nWaterAtoms)
+print("# number of coarse-grained particles in solvent = ",nWaterMols)
 
 nParticlesTotal = nSoluteAtoms + nSoluteCgparticles + nWaterAtoms + nWaterMols
-print "# total number of particles after setup = ",nParticlesTotal 
+print("# total number of particles after setup = ",nParticlesTotal)
 
 if (nParticlesRead != (nSoluteAtoms+nWaterAtoms)):
-  print "problem: no. particles in crd file != np. of atomistic particles specified"
-  print "values: ",nParticlesRead,nSoluteAtoms+nWaterAtoms
-  quit()
+    print("problem: no. particles in crd file != np. of atomistic particles specified")
+    print("values: ",nParticlesRead,nSoluteAtoms+nWaterAtoms)
+    quit()
 
 particleX = []
 particleY = []
@@ -173,29 +173,29 @@ particleVZ = []
 
 #atomistic particles (solute and water)
 for i in range(nSoluteAtoms+nWaterAtoms):
-  particlePID.append(i+1)
-  particleMasses.append(atMasses[i])
-  particleCharges.append(atCharges[i])
-  particleTypes.append(atTypes[i])
-  particleTypestring.append('atomistic__')
-  particleX.append(atX[i])
-  particleY.append(atY[i])
-  particleZ.append(atZ[i])
-  particleVX.append(atVX[i])
-  particleVY.append(atVY[i])
-  particleVZ.append(atVZ[i])
+    particlePID.append(i+1)
+    particleMasses.append(atMasses[i])
+    particleCharges.append(atCharges[i])
+    particleTypes.append(atTypes[i])
+    particleTypestring.append('atomistic__')
+    particleX.append(atX[i])
+    particleY.append(atY[i])
+    particleZ.append(atZ[i])
+    particleVX.append(atVX[i])
+    particleVY.append(atVY[i])
+    particleVZ.append(atVZ[i])
 
 #cg solute particle
 typeCGSolute = max(reverseAtomtypesDict.keys())+2
 reverseAtomtypesDict[typeCGSolute] = 'PCG'
-cgPid = nSoluteAtoms + nWaterAtoms + 1 
+cgPid = nSoluteAtoms + nWaterAtoms + 1
 cgSoluteParticlesDict = {} #map particlePID of cg particle to original atomistic indices
-cgSoluteParticlesDict[cgPid] = [] 
+cgSoluteParticlesDict[cgPid] = []
 charge = 0.0 #not needed on CG particles
 mass = 0.0
-for j in xrange(nSoluteAtoms):
-  mass += atMasses[j]
-  cgSoluteParticlesDict[cgPid].append(j+1)
+for j in range(int(nSoluteAtoms)):
+    mass += atMasses[j]
+    cgSoluteParticlesDict[cgPid].append(j+1)
 particlePID.append(cgPid)
 particleMasses.append(mass)
 particleCharges.append(charge)
@@ -212,21 +212,21 @@ particleVZ.append(atVZ[index])
 #cg water particles
 typeCG=max(reverseAtomtypesDict.keys())+2
 reverseAtomtypesDict[typeCG]='WCG'
-for i in range(nWaterMols):
-  particlePID.append(i+1+nSoluteAtoms+nSoluteCgparticles+nWaterAtoms)
-  indexO=atWaterIndices[3*i]-1
-  particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
-  particleCharges.append(0.0)
-  particleTypes.append(typeCG)
-  particleTypestring.append('adres_cg___')
-  particleX.append(atX[indexO]) # put CG particle on O for the moment, later CG particle will be positioned in centre
-  particleY.append(atY[indexO])
-  particleZ.append(atZ[indexO])
-  particleVX.append(atVX[indexO]) # give CG particle velocity of O for the moment
-  particleVY.append(atVY[indexO])
-  particleVZ.append(atVZ[indexO])
+for i in range(int(nWaterMols)):
+    particlePID.append(i+1+nSoluteAtoms+nSoluteCgparticles+nWaterAtoms)
+    indexO=atWaterIndices[3*i]-1
+    particleMasses.append(atMasses[indexO]+atMasses[indexO+1]+atMasses[indexO+2])
+    particleCharges.append(0.0)
+    particleTypes.append(typeCG)
+    particleTypestring.append('adres_cg___')
+    particleX.append(atX[indexO]) # put CG particle on O for the moment, later CG particle will be positioned in centre
+    particleY.append(atY[indexO])
+    particleZ.append(atZ[indexO])
+    particleVX.append(atVX[indexO]) # give CG particle velocity of O for the moment
+    particleVY.append(atVY[indexO])
+    particleVZ.append(atVZ[indexO])
 
-print '# system total charge = ',sum(particleCharges)
+print('# system total charge = ',sum(particleCharges))
 
 ########################################################################
 # 2. setup of the system, random number geneartor and parallelisation  #
@@ -237,11 +237,11 @@ system             = espressopp.System()
 # use the random number generator that is included within the ESPResSo++ package
 xs = time.time()
 seed = int(xs % int(xs) * 10000000000)
-print "RNG Seed:", seed
+print("RNG Seed:", seed)
 rng = espressopp.esutil.RNG()
 rng.seed(seed)
 system.rng = rng
-# use orthorhombic periodic boundary conditions 
+# use orthorhombic periodic boundary conditions
 system.bc          = espressopp.bc.OrthorhombicBC(system.rng, box)
 # set the skin size used for verlet lists and cell sizes
 system.skin        = skin
@@ -254,9 +254,9 @@ cellGrid           = espressopp.tools.decomp.cellGrid(box, nodeGrid, nbCutoff, s
 # create a domain decomposition particle storage with the calculated nodeGrid and cellGrid
 system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
-print "# NCPUs              = ", NCPUs
-print "# nodeGrid           = ", nodeGrid
-print "# cellGrid           = ", cellGrid
+print("# NCPUs              = ", NCPUs)
+print("# nodeGrid           = ", nodeGrid)
+print("# cellGrid           = ", cellGrid)
 
 
 
@@ -273,49 +273,49 @@ tuples = []
 
 mapAtToCgIndex = {}
 #first adres particles
-for i in range(nWaterMols):
-  cgindex = i + nSoluteAtoms + nSoluteCgparticles + nWaterAtoms
-  tmptuple = [particlePID[cgindex]]
-  # first CG particle
-  allParticles.append([particlePID[cgindex],
-                      particleTypes[cgindex],
-                      Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
-                      Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
-                      particleMasses[cgindex],particleCharges[cgindex],0])
-  # then AA particles
-  for j in range(nWaterAtomsPerMol):
-    aaindex = i*nWaterAtomsPerMol + j + nSoluteAtoms
-    tmptuple.append(particlePID[aaindex])
-    allParticles.append([particlePID[aaindex],
-                      particleTypes[aaindex],
-                      Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
-                      Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
-                      particleMasses[aaindex],particleCharges[aaindex],1])
-    mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
-  tuples.append(tmptuple)
+for i in range(int(nWaterMols)):
+    cgindex = i + nSoluteAtoms + nSoluteCgparticles + nWaterAtoms
+    tmptuple = [particlePID[cgindex]]
+    # first CG particle
+    allParticles.append([particlePID[cgindex],
+                        particleTypes[cgindex],
+                        Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
+                        Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
+                        particleMasses[cgindex],particleCharges[cgindex],0])
+    # then AA particles
+    for j in range(int(nWaterAtomsPerMol)):
+        aaindex = i*nWaterAtomsPerMol + j + nSoluteAtoms
+        tmptuple.append(particlePID[aaindex])
+        allParticles.append([particlePID[aaindex],
+                          particleTypes[aaindex],
+                          Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
+                          Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
+                          particleMasses[aaindex],particleCharges[aaindex],1])
+        mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
+    tuples.append(tmptuple)
 
 # then solute
 aaindex = 0
-for i in range(nSoluteCgparticles):
-  cgindex = i + nSoluteAtoms + nWaterAtoms
-  tmptuple = [particlePID[cgindex]]
-  allParticles.append([particlePID[cgindex],particleTypes[cgindex],
-                      Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
-                      Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
-                      particleMasses[cgindex],particleCharges[cgindex],0])
-  soluteAtomsInCgParticle = cgSoluteParticlesDict[particlePID[cgindex]]
-  for j in soluteAtomsInCgParticle:
-    aaindex = j - 1
-    tmptuple.append(particlePID[aaindex])
-    allParticles.append([particlePID[aaindex],particleTypes[aaindex],
-                        Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
-                        Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
-                        particleMasses[aaindex],particleCharges[aaindex],1])
-    mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
-  tuples.append(tmptuple)
+for i in range(int(nSoluteCgparticles)):
+    cgindex = i + nSoluteAtoms + nWaterAtoms
+    tmptuple = [particlePID[cgindex]]
+    allParticles.append([particlePID[cgindex],particleTypes[cgindex],
+                        Real3D(particleX[cgindex],particleY[cgindex],particleZ[cgindex]),
+                        Real3D(particleVX[cgindex],particleVY[cgindex],particleVZ[cgindex]),
+                        particleMasses[cgindex],particleCharges[cgindex],0])
+    soluteAtomsInCgParticle = cgSoluteParticlesDict[particlePID[cgindex]]
+    for j in soluteAtomsInCgParticle:
+        aaindex = j - 1
+        tmptuple.append(particlePID[aaindex])
+        allParticles.append([particlePID[aaindex],particleTypes[aaindex],
+                            Real3D(particleX[aaindex],particleY[aaindex],particleZ[aaindex]),
+                            Real3D(particleVX[aaindex],particleVY[aaindex],particleVZ[aaindex]),
+                            particleMasses[aaindex],particleCharges[aaindex],1])
+        mapAtToCgIndex[particlePID[aaindex]]=particlePID[cgindex]
+    tuples.append(tmptuple)
 
 
-print '# adding ',len(allParticles),' particles'
+print('# adding ',len(allParticles),' particles')
 system.storage.addParticles(allParticles, *properties)
 
 # create FixedTupleList object
@@ -327,17 +327,17 @@ system.storage.decompose()
 
 # print file to check if all particles were correctly added
 if (0):
-  file=open('system.out','w')
-  for i in range(1,nParticlesTotal+1):
-    if i <= nSoluteAtoms + nWaterAtoms:
-      vp = mapAtToCgIndex[i]
-    else:
-      vp = 0
-    part = system.storage.getParticle(i)
-    ptype = part.type
-    st="%7d %d %7.3f %7.3f %7.3f %3d %5s %7.3f %7.3f %8s\n"%(i,vp,part.pos[0],part.pos[1],part.pos[2],ptype,reverseAtomtypesDict[ptype],part.mass,part.q,particleTypestring[i-1])
-    file.write(st)
-  file.close()
+    file=open('system.out','w')
+    for i in range(1,nParticlesTotal+1):
+        if i <= nSoluteAtoms + nWaterAtoms:
+            vp = mapAtToCgIndex[i]
+        else:
+            vp = 0
+        part = system.storage.getParticle(i)
+        ptype = part.type
+        st="%7d %d %7.3f %7.3f %7.3f %3d %5s %7.3f %7.3f %8s\n"%(i,vp,part.pos[0],part.pos[1],part.pos[2],ptype,reverseAtomtypesDict[ptype],part.mass,part.q,particleTypestring[i-1])
+        file.write(st)
+    file.close()
 
 ########################################################################
 # 3. setup of the integrator and simulation ensemble                   #
@@ -345,24 +345,24 @@ if (0):
 
 # use a velocity Verlet integration scheme
 integrator     = espressopp.integrator.VelocityVerlet(system)
-# set the integration step  
+# set the integration step
 integrator.dt  = dt
 # use a thermostat if the temperature is set
 if (temperature != None):
-  # create Langevin thermostat
-  thermostat             = espressopp.integrator.LangevinThermostat(system)
-  # set Langevin friction constant
-  thermostat.gamma       = 10.0 # units ps-1
-  print "# gamma for langevin thermostat = ",thermostat.gamma
-  # set temperature
-  thermostat.temperature = temperature
-  # switch on for adres
-  thermostat.adress = True
-  print "# thermostat temperature        = ", temperature*temperatureConvFactor
-  # tell the integrator to use this thermostat
-  integrator.addExtension(thermostat)
+    # create Langevin thermostat
+    thermostat             = espressopp.integrator.LangevinThermostat(system)
+    # set Langevin friction constant
+    thermostat.gamma       = 10.0 # units ps-1
+    print("# gamma for langevin thermostat = ",thermostat.gamma)
+    # set temperature
+    thermostat.temperature = temperature
+    # switch on for adres
+    thermostat.adress = True
+    print("# thermostat temperature        = ", temperature*temperatureConvFactor)
+    # tell the integrator to use this thermostat
+    integrator.addExtension(thermostat)
 else:
-  print "#No thermostat"
+    print("#No thermostat")
 
 ########################################################################
 # 6. define atomistic and adres interactions
@@ -371,9 +371,9 @@ else:
 ## adres interactions ##
 
 cm = adresRegionCentreAtIndex
-print '# spherical moving atomistic region for adres centred on atom ',cm,' i.e. cg particle ',mapAtToCgIndex[cm]
-verletlist = espressopp.VerletListAdress(system, cutoff=nbCutoff, adrcut=nbCutoff, 
-                                dEx=ex_size, dHy=hy_size, 
+print('# spherical moving atomistic region for adres centred on atom ',cm,' i.e. cg particle ',mapAtToCgIndex[cm])
+verletlist = espressopp.VerletListAdress(system, cutoff=nbCutoff, adrcut=nbCutoff,
+                                dEx=ex_size, dHy=hy_size,
                                 pids=[mapAtToCgIndex[cm]], sphereAdr=True)
 
 # set up LJ interaction according to the parameters read from the .top file
@@ -389,7 +389,7 @@ qq_adres_interaction = gromacs.setCoulombInteractionsTI(system, verletlist, nbCu
 # set up LJ 1-4 interactions
 onefourlist = espressopp.FixedPairListAdress(system.storage,ftpl)
 onefourlist.addBonds(atOnefourpairslist)
-lj14interaction=gromacs.setLennardJones14Interactions(system, defaults, atomtypeparameters, onefourlist, nbCutoff) 
+lj14interaction=gromacs.setLennardJones14Interactions(system, defaults, atomtypeparameters, onefourlist, nbCutoff)
 
 # set up coulomb 1-4 interactions
 qq14_interactions=gromacs.setCoulomb14Interactions(system, defaults, onefourlist, nbCutoff, atTypes)
@@ -408,39 +408,39 @@ dihedralinteractions=gromacs.setDihedralInteractionsAdress(system, atDihedraltyp
 #improperinteractions=gromacs.setImproperInteractionsAdress(system, atImpropertypes, impropertypeparams,ftpl)
 
 # create an exclusions list and uncomment the next line if necessary (methanol does not need this line)
-#verletlist.exclude(cgExclusions) 
+#verletlist.exclude(cgExclusions)
 #print '# ',len(cgExclusions),' exclusions'
 
 count = system.getNumberOfInteractions()
-print '# ',count,' interactions defined'
+print('# ',count,' interactions defined')
 
 # settle water
 molidlist=[]
-for wm in range(nWaterMols): 
-  molidlist.append(tuples[wm][0]) #assuming water is listed first
-print '#Warning: settle set-up assumes water was listed first when tuples were constructed'
+for wm in range(int(nWaterMols)):
+    molidlist.append(tuples[wm][0]) #assuming water is listed first
+print('#Warning: settle set-up assumes water was listed first when tuples were constructed')
 
 settlewaters = espressopp.integrator.Settle(system, ftpl, mO=15.9994, mH=1.008, distHH=0.15136, distOH=0.09572)
 settlewaters.addMolecules(molidlist)
 integrator.addExtension(settlewaters)
 
-print '# Settling ',len(molidlist), ' waters'
+print('# Settling ',len(molidlist), ' waters')
 
-# for settle water 
+# for settle water
 nconstr = nWaterAtoms
 nAtoms = nWaterAtoms + nSoluteAtoms
 ndof_unconstr = nAtoms*3-3
 ndof_constr = ndof_unconstr-nconstr
 temp_correction_factor = float(ndof_unconstr)/float(ndof_constr)
-print "# Correcting temperature for constraints, using factor: ",temp_correction_factor
-print "# calculated using nAtoms = ",nAtoms, "nconstraints = ",nconstr," and ndof_constr = ",ndof_constr," of which ",3*nWaterMols," are from SETTLE"
+print("# Correcting temperature for constraints, using factor: ",temp_correction_factor)
+print("# calculated using nAtoms = ",nAtoms, "nconstraints = ",nconstr," and ndof_constr = ",ndof_constr," of which ",3*nWaterMols," are from SETTLE")
 
 # add AdResS
 adress = espressopp.integrator.Adress(system,verletlist,ftpl)
 integrator.addExtension(adress)
 
-# distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass 
-print '# Decomposing...'
+# distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass
+print('# Decomposing...')
 espressopp.tools.AdressDecomp(system, integrator)
 
 ########################################################################
@@ -448,48 +448,47 @@ espressopp.tools.AdressDecomp(system, integrator)
 ########################################################################
 
 temperature = espressopp.analysis.Temperature(system)
-print "# starting run..."
+print("# starting run...")
 
 dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename=trjfile, unfolded=False)
 
-print 'Start time: ', str(datetime.now())
-print "i*dt,Eb, EAng, Edih, EImp, ELj, Elj14, EQQ, EQQ14, Epot, T"
+print('Start time: ', str(datetime.now()))
+print("i*dt,Eb, EAng, Edih, EImp, ELj, Elj14, EQQ, EQQ14, Epot, T")
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
 
 integrator.run(0)
 
-for k in range(nOutput):
-  i=k*nStepsPerOutput
-  EQQ = 0.0
-  EQQ14 = 0.0
-  ELj = 0.0
-  ELj14 = 0.0
-  Eb = 0.0
-  EAng = 0.0
-  EDih = 0.0
-  EImp = 0.0
-  for bd in bondedinteractions.values(): Eb+=bd.computeEnergy()
-  for ang in angleinteractions.values(): EAng+=ang.computeEnergy()
-  for dih in dihedralinteractions.values(): EDih+=dih.computeEnergy()
-  #for imp in improperinteractions.values(): EImp+=imp.computeEnergy()
-  ELj= lj_adres_interaction.computeEnergy()
-  ELj14 = lj14interaction.computeEnergy()
-  EQQ = qq_adres_interaction.computeEnergy()
-  EQQ14 = qq14_interactions.computeEnergy()
-  dhdlCoul = qq_adres_interaction.computeEnergyDeriv() 
-  dhdlVdwl = lj_adres_interaction.computeEnergyDeriv() 
-  dhdlF.write(str(i*dt)+" "+str(dhdlCoul)+" "+str(dhdlVdwl)+"\n")
-  T = temperature.compute()
-  Epot = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-  print (fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)),"output"
-  sys.stdout.flush()
-  dhdlF.flush()
-  integrator.run(nStepsPerOutput)
-  particle = system.storage.getParticle(1)
-  if math.isnan(particle.pos[0]):
-    quit()
-  if (i > 0) and (i % nStepsPerTrjoutput == 0):
-    dump_conf_gro.dump()
+for k in range(int(nOutput)):
+    i=k*nStepsPerOutput
+    EQQ = 0.0
+    EQQ14 = 0.0
+    ELj = 0.0
+    ELj14 = 0.0
+    Eb = 0.0
+    EAng = 0.0
+    EDih = 0.0
+    EImp = 0.0
+    for bd in list(bondedinteractions.values()): Eb+=bd.computeEnergy()
+    for ang in list(angleinteractions.values()): EAng+=ang.computeEnergy()
+    for dih in list(dihedralinteractions.values()): EDih+=dih.computeEnergy()
+    #for imp in improperinteractions.values(): EImp+=imp.computeEnergy()
+    ELj= lj_adres_interaction.computeEnergy()
+    ELj14 = lj14interaction.computeEnergy()
+    EQQ = qq_adres_interaction.computeEnergy()
+    EQQ14 = qq14_interactions.computeEnergy()
+    dhdlCoul = qq_adres_interaction.computeEnergyDeriv()
+    dhdlVdwl = lj_adres_interaction.computeEnergyDeriv()
+    dhdlF.write(str(i*dt)+" "+str(dhdlCoul)+" "+str(dhdlVdwl)+"\n")
+    T = temperature.compute()
+    Epot = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
+    print((fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Epot, T*temperatureConvFactor*temp_correction_factor)), end='')
+    sys.stdout.flush()
+    dhdlF.flush()
+    integrator.run(nStepsPerOutput)
+    particle = system.storage.getParticle(1)
+    if math.isnan(particle.pos[0]):
+        quit()
+    if (i > 0) and (i % nStepsPerTrjoutput == 0):
+        dump_conf_gro.dump()
 
-print 'End time: ', str(datetime.now())
-
+print('End time: ', str(datetime.now()))

@@ -59,7 +59,7 @@ def prewrite_expected_files(file_list_expected):
     ]
 
     lines_list = [lines_to_be_written_standard, lines_to_be_written_true_pid_false_velo, lines_to_be_written_true_pid_true_velo]
-    zipped_lists = zip(expected_files, lines_list)
+    zipped_lists = list(zip(expected_files, lines_list))
 
     for filename,lines in zipped_lists:
         with open(filename, "w") as f:

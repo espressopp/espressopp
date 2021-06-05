@@ -44,19 +44,19 @@ The potential may depend on any of the particle properties (type, mass, etc.).
 
 .. function:: espressopp.interaction.SingleParticlePotential.computeEnergy(position, bc)
 
-		:param position: 
-		:param bc: 
-		:type position: 
-		:type bc: 
-		:rtype: 
+                :param position:
+                :param bc:
+                :type position:
+                :type bc:
+                :rtype:
 
 .. function:: espressopp.interaction.SingleParticlePotential.computeForce(position, bc)
 
-		:param position: 
-		:param bc: 
-		:type position: 
-		:type bc: 
-		:rtype: 
+                :param position:
+                :param bc:
+                :type position:
+                :type bc:
+                :rtype:
 """
 
 from espressopp import pmi
@@ -75,8 +75,7 @@ class SingleParticlePotentialLocal(object):
             return self.cxxclass.computeForce(self, toReal3DFromVector(position), bc)
 
 if pmi.isController:
-    class SingleParticlePotential(object):
-        __metaclass__ = pmi.Proxy
+    class SingleParticlePotential(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             localcall = ['computeForce', 'computeEnergy'],
             )

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2012-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -39,8 +39,8 @@ temperature = 1.0
 ######################################################################
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
-print espressopp.Version().info()
-print 'Setting up simulation ...'
+print(espressopp.Version().info())
+print('Setting up simulation ...')
 bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.lammps.read('polymer_melt.lammps')
 bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
 num_particles = len(x)
@@ -53,12 +53,12 @@ system, integrator = espressopp.standard_system.Default(box=box, rc=rc, skin=ski
 props = ['id', 'type', 'mass', 'pos']
 new_particles = []
 for i in range(num_particles):
-  part = [i + 1, 0, 1.0, espressopp.Real3D(x[i], y[i], z[i])]
-  new_particles.append(part)
-  if i % 1000 == 0:
-    system.storage.addParticles(new_particles, *props)
-    system.storage.decompose()
-    new_particles = []
+    part = [i + 1, 0, 1.0, espressopp.Real3D(x[i], y[i], z[i])]
+    new_particles.append(part)
+    if i % 1000 == 0:
+        system.storage.addParticles(new_particles, *props)
+        system.storage.decompose()
+        new_particles = []
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
@@ -84,27 +84,26 @@ interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosin
 system.addInteraction(interCosine)
 
 # print simulation parameters
-print ''
-print 'number of particles = ', num_particles
-print 'density             = ', density
-print 'rc                  = ', rc
-print 'dt                  = ', integrator.dt
-print 'skin                = ', system.skin
-print 'temperature         = ', temperature
-print 'nsteps              = ', nsteps
-print 'isteps              = ', isteps
-print 'NodeGrid            = ', system.storage.getNodeGrid()
-print 'CellGrid            = ', system.storage.getCellGrid()
-print ''
+print('')
+print('number of particles = ', num_particles)
+print('density             = ', density)
+print('rc                  = ', rc)
+print('dt                  = ', integrator.dt)
+print('skin                = ', system.skin)
+print('temperature         = ', temperature)
+print('nsteps              = ', nsteps)
+print('isteps              = ', isteps)
+print('NodeGrid            = ', system.storage.getNodeGrid())
+print('CellGrid            = ', system.storage.getCellGrid())
+print('')
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
 
 espressopp.tools.analyse.info(system, integrator)
-start_time = time.clock()
-for k in range(nsteps):
-  integrator.run(isteps)
-  espressopp.tools.analyse.info(system, integrator)
-end_time = time.clock()
+start_time = time.process_time()
+for k in range(int(nsteps)):
+    integrator.run(isteps)
+    espressopp.tools.analyse.info(system, integrator)
+end_time = time.process_time()
 espressopp.tools.analyse.info(system, integrator)
 espressopp.tools.analyse.final_info(system, integrator, vl, start_time, end_time)
-

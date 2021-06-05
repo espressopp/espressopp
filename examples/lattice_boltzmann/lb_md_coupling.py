@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -18,7 +18,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###########################################################################
-# DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION			  #	
+# DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION                       #
 ###########################################################################
 
 import espressopp

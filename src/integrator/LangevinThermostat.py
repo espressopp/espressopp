@@ -42,7 +42,7 @@ Example:
 .. function:: espressopp.integrator.LangevinThermostat(system)
 
         :param system: system object
-        :type system: shared_ptr<System>
+        :type system: std::shared_ptr<System>
 
 .. function:: espressopp.integrator.LangevinThermostat.addExclusions(pidlist)
 
@@ -68,8 +68,7 @@ class LangevinThermostatLocal(ExtensionLocal, integrator_LangevinThermostat):
                 self.cxxclass.addExclpid(self, pid)
 
 if pmi.isController :
-    class LangevinThermostat(Extension):
-        __metaclass__ = pmi.Proxy
+    class LangevinThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostatLocal',
             pmiproperty = [ 'gamma', 'temperature', 'adress' ],

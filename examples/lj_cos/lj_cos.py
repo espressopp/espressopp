@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -19,7 +19,7 @@
 
 ###########################################################################
 # DEMONSTRATION OF THE LJ-COS POTENTIAL CONTROLLING SOLVENT QUALITY       #
-# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)            #  
+# BY PARAMETER PHI (see M. Steinhauser PhD thesis for details)            #
 ###########################################################################
 
 import espressopp
@@ -57,9 +57,9 @@ thermostat.gamma  = 1.0
 thermostat.temperature = temperature
 integrator.addExtension(thermostat)
 
-print 'timestep is ', integrator.dt
-print 'gamma of the thermostat is ', thermostat.gamma
-print 'temperature of the thermostat is ', thermostat.temperature
+print('timestep is ', integrator.dt)
+print('gamma of the thermostat is ', thermostat.gamma)
+print('temperature of the thermostat is ', thermostat.temperature)
 
 props    = ['id', 'type', 'mass', 'pos', 'v']
 vel_zero = espressopp.Real3D(0.0, 0.0, 0.0)
@@ -77,14 +77,14 @@ for i in range(num_chains):
     for k in range(mon_per_chain):
         part = [pid + k, ptype, mass, positions[k], vel_zero]
         chain.append(part)
-        if (k < mon_per_chain - 1): 
+        if (k < mon_per_chain - 1):
             exclusionlist.append(bonds[k])
     pid += mon_per_chain
     system.storage.addParticles(chain, *props)
     system.storage.decompose()
     chain = []
     bondlist.addBonds(bonds)
-    
+
 system.storage.decompose()
 
 # initial set-up of the Lennard-Jones cosine
@@ -112,10 +112,10 @@ def main ():
     warmUpFirst()
     warmUpSecond()
 
-    print "Starting simulation" 
+    print("Starting simulation")
     for k in range(100):
         integrator.run(1000)
-    
+
         findTemperature()
         findRee()
 
@@ -128,36 +128,36 @@ def warmUpFirst():
     force_capping = espressopp.integrator.CapForce(system, max_force)
     integrator.addExtension(force_capping)
 
-    print "First phase of the warm up. Sigma will be increased from 0. to 1.0 and timestep to 0.001"
+    print("First phase of the warm up. Sigma will be increased from 0. to 1.0 and timestep to 0.001")
     new_sigma = 0.
     for l in range(4):
-        print "start increasing sigma from ", new_sigma
+        print("start increasing sigma from ", new_sigma)
         for k in range(5):
             new_sigma += 0.05
             nbLJcos.sigma = new_sigma
             nbLJcosInter.setPotential(type1=0, type2=0, potential=nbLJcos)
             integrator.run(1000)
             espressopp.tools.analyse.info(system, integrator)
-        print "increased sigma to ", new_sigma
-        print "increasing timestep from ", integrator.dt
+        print("increased sigma to ", new_sigma)
+        print("increasing timestep from ", integrator.dt)
         dt_step = .20 * integrator.dt
         for k in range(10):
             integrator.dt += dt_step
             integrator.run(1000)
             espressopp.tools.analyse.info(system, integrator)
-        print "increased timestep to ", integrator.dt
+        print("increased timestep to ", integrator.dt)
 
     force_capping.disconnect()
-    print "switching off force capping"
+    print("switching off force capping")
 
-    print "new_sigma is ", new_sigma
+    print("new_sigma is ", new_sigma)
     # FINISHED THE FIRST PHASE OF THE WARM UP
 
 def warmUpSecond():
     # SECOND PHASE OF THE WARM UP
     integrator.step = 0
     integrator.dt = 0.005
-    print "Second phase of the warm up with a production timestep of", integrator.dt, ". Force capping is turned off."
+    print("Second phase of the warm up with a production timestep of", integrator.dt, ". Force capping is turned off.")
     for k in range(100):
         integrator.run(10000)
         espressopp.tools.analyse.info(system, integrator)
@@ -201,7 +201,7 @@ def findRee():
         c2 = system.bc.getUnfoldedPosition(p2.pos, p2.imageBox)
         dr = c1 - c2
         d2r = dr.sqr()
-        R2ee += d2r 
+        R2ee += d2r
 
         r_av = Real3D(0.,0.,0.)
         for k in range(mon_per_chain):

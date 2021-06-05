@@ -3,141 +3,140 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef PyLogger_HPP
 #define PyLogger_HPP
 
 /** \file PyLogger.hpp    Python implementation for logging.
-*/
+ */
 
 #include "python.hpp"
 #include <esutil/Logger.hpp>
 
-namespace log4espp {
+#include <iostream>
 
-  /**************************************************************************
-  *                                                                         *
-  *                                                                         *
-  *                                                                         *
-  **************************************************************************/
+namespace log4espp
+{
+/**************************************************************************
+ *                                                                         *
+ *                                                                         *
+ *                                                                         *
+ **************************************************************************/
 
-  /** PyLogger is an implementaton of the abstract class Logger that uses 
-      corresponding Python Logger objects for the output of the logging 
-      statements.
+/** PyLogger is an implementaton of the abstract class Logger that uses
+    corresponding Python Logger objects for the output of the logging
+    statements.
 
-      One major efficiency aspect is that an object of this class will not
-      ask for the logging level of its Python equivalent; therefore it has 
-      to be ensured that changing the logging level of a Python logger
-      will notity an object of this C++ class.
+    One major efficiency aspect is that an object of this class will not
+    ask for the logging level of its Python equivalent; therefore it has
+    to be ensured that changing the logging level of a Python logger
+    will notity an object of this C++ class.
 
-  */
+*/
 
-  class PyLogger : public Logger {
+class PyLogger : public Logger
+{
+private:
+    boost::python::object pyLogger;  //!< Pointer to the Python instance of this logger.
 
-  private:
+    /** This routine updates the logging level by the given level of the Python logger
 
-   boost::python::object pyLogger;   //!< Pointer to the Python instance of this logger.
+        \param pyLevel is the Python coding of the level
 
-   /** This routine updates the logging level by the given level of the Python logger
+        The Python coding of the level will be translated to Logger::Level.
+    */
 
-       \param pyLevel is the Python coding of the level
+    void setPythonLevel(int pyLevel);
 
-       The Python coding of the level will be translated to Logger::Level.
-   */
+    /** Commonly used routine for logging output that can be used for all levels
 
-   void setPythonLevel(int pyLevel);
+        \param level is the string representation of the level
+        \param loc is the file location of the logging statement
+        \param msg is the message output of the logging statement
 
-   /** Commonly used routine for logging output that can be used for all levels
+        The logging output will be printed via the Python Logger object.
+    */
 
-       \param level is the string representation of the level
-       \param loc is the file location of the logging statement
-       \param msg is the message output of the logging statement
+    void log(int level, Location& loc, const std::string& msg);
 
-       The logging output will be printed via the Python Logger object. 
-   */
+public:
+    typedef boost::python::object object;
 
-   void log(int level, Location& loc, const std::string& msg);
+    /** Initialization routine to be called with initialization */
 
-  public:
+    static void initLogging();
 
-   typedef boost::python::object object;
+    static void registerPython();
 
-   /** Initialization routine to be called with initialization */
+    /** Constructor for a Logger that will use a corresponding Python instance
+        for the configuration and for the output of the logging messages
+    */
 
-   static void initLogging();
+    PyLogger(std::string, class Logger* parent);
 
-   static void registerPython();
+    ~PyLogger() { std::cout << "~PyLogger" << std::endl; }
 
-   /** Constructor for a Logger that will use a corresponding Python instance
-       for the configuration and for the output of the logging messages  
-   */
+    /** This routine sets the Python instance of the logger and/or
+        updates the logging level of the C++ class.
 
-   PyLogger(std::string, class Logger* parent);
+        \param pyLogger is the Python Logger object.
 
-   ~PyLogger() {}
+        This routine must also be called to update the logging level
+        of this object.
+    */
 
-   /** This routine sets the Python instance of the logger and/or 
-       updates the logging level of the C++ class.
+    void setPythonLogger(boost::python::object pyLogger);
 
-       \param pyLogger is the Python Logger object.
+    /** This routine sets the Python loggers for this logger and the
+        descendants.
 
-       This routine must also be called to update the logging level
-       of this object.
-   */
+        \param ParentName is the name of the parent of this logger.
 
-   void setPythonLogger(boost::python::object pyLogger);
+    */
 
-   /** This routine sets the Python loggers for this logger and the
-       descendants.
+    void setPythonLoggers(std::string& parentName);
 
-       \param ParentName is the name of the parent of this logger.
+    /** Implementation of Logger::trace */
 
-   */
+    virtual void trace(Location loc, const std::string& msg);
 
-   void setPythonLoggers(std::string& parentName);
+    /** Implementation of Logger::debug */
 
-   /** Implementation of Logger::trace */
+    virtual void debug(Location loc, const std::string& msg);
 
-   virtual void trace(Location loc, const std::string& msg);
+    /** Implementation of Logger::info */
 
-   /** Implementation of Logger::debug */
+    virtual void info(Location loc, const std::string& msg);
 
-   virtual void debug(Location loc, const std::string& msg);
+    /** Implementation of Logger::warn */
 
-   /** Implementation of Logger::info */
+    virtual void warn(Location loc, const std::string& msg);
 
-   virtual void info (Location loc, const std::string& msg);
+    /** Implementation of Logger::error */
 
-   /** Implementation of Logger::warn */
+    virtual void error(Location loc, const std::string& msg);
 
-   virtual void warn (Location loc, const std::string& msg);
+    /** Implementation of Logger::fatal */
 
-   /** Implementation of Logger::error */
+    virtual void fatal(Location loc, const std::string& msg);
+};
 
-   virtual void error(Location loc, const std::string& msg);
-
-   /** Implementation of Logger::fatal */
-
-   virtual void fatal(Location loc, const std::string& msg);
-
-  };
-
-}
+}  // namespace log4espp
 
 #endif

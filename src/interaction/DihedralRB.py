@@ -42,42 +42,42 @@ Reference: http://www.gromacs.org/Documentation/Manual
 
 .. function:: espressopp.interaction.DihedralRB(K0, K1, K2, K3, K4, K5, iupac)
 
-		:param K0: (default: 0.0)
-		:param K1: (default: 0.0)
-		:param K2: (default: 0.0)
-		:param K3: (default: 0.0)
-		:param K4: (default: 0.0)
-		:param K5: (default: 0.0)
-		:param iupac: (default: True)
-		:type K0: real
-		:type K1: real
-		:type K2: real
-		:type K3: real
-		:type K4: real
-		:type K5: real
-		:type iupac: 
+                :param K0: (default: 0.0)
+                :param K1: (default: 0.0)
+                :param K2: (default: 0.0)
+                :param K3: (default: 0.0)
+                :param K4: (default: 0.0)
+                :param K5: (default: 0.0)
+                :param iupac: (default: True)
+                :type K0: real
+                :type K1: real
+                :type K2: real
+                :type K3: real
+                :type K4: real
+                :type K5: real
+                :type iupac:
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.getFixedQuadrupleList()
 
-		:rtype: A Python list of lists.
+                :rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 """
 
 from espressopp import pmi
@@ -153,15 +153,13 @@ if pmi.isController:
             cls='espressopp.interaction.DihedralRBLocal'
             )
 
-    class FixedQuadrupleListDihedralRB(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.interaction.FixedQuadrupleListDihedralRBLocal',
             pmicall=['setPotential', 'getFixedQuadrupleList']
             )
 
-    class FixedQuadrupleListTypesDihedralRB(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTypesDihedralRB(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralRBLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

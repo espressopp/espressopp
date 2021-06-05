@@ -69,8 +69,8 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensor(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 
 from espressopp.esutil import cxxinit
@@ -82,12 +82,11 @@ from _espressopp import analysis_PressureTensor
 class PressureTensorLocal(AnalysisBaseLocal, analysis_PressureTensor):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensor, system)
 
 if pmi.isController:
-    class PressureTensor(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class PressureTensor(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.PressureTensorLocal',
             )

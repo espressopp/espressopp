@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #  Copyright (C) 2015-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -17,14 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-###################################################################################			
+###################################################################################
 #                                                                                 #
 #  ESPResSo++ Python script for a simulation using the Stillinger-Weber potential #
 #                                                                                 #
 ###################################################################################
 
 '''
-  This is an example of using Stillinger-Weber nonbonded 
+  This is an example of using Stillinger-Weber nonbonded
   3-body potential (Si melt).
   The initial configuration is a diamond structure.
   A result is radial distribution function 'rdf.dat' (units - [nm])
@@ -77,16 +77,16 @@ coord = []
 vel = []
 count = 0
 for line in lines:
-  if count==0:
-    num_particles = int(line.split()[0])
-    count=1
-  elif count==1:
-    Lx, Ly, Lz = map(float, line.split()[0:3])
-    count=2
-  elif(count==2):
-    id1, type1, x, y, z, vx, vy, vz = map(float, line.split()[0:8])
-    coord.append( Real3D(x,y,z) )
-    vel.append( Real3D(vx,vy,vz) )
+    if count==0:
+        num_particles = int(line.split()[0])
+        count=1
+    elif count==1:
+        Lx, Ly, Lz = list(map(float, line.split()[0:3]))
+        count=2
+    elif(count==2):
+        id1, type1, x, y, z, vx, vy, vz = list(map(float, line.split()[0:8]))
+        coord.append( Real3D(x,y,z) )
+        vel.append( Real3D(vx,vy,vz) )
 
 density = num_particles / (Lx * Ly * Lz)
 box     = (Lx, Ly, Lz)
@@ -111,21 +111,21 @@ new_particles = []
 type = 0
 mass = 1.0
 for pid in range(num_particles):
-  part = [pid, type, coord[pid], vel[pid], mass]
-  new_particles.append(part)
-  
+    part = [pid, type, coord[pid], vel[pid], mass]
+    new_particles.append(part)
+
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
-print ''
-print 'number of particles =', num_particles
-print 'timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep)
-print 'box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
-        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz)
-print 'density = %.4f' % (density)
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep))
+print('box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
+        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz))
+print('density = %.4f' % (density))
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # Stillinger Weber pair potential (similar to other short range pair nonbonded interactions)
 vl = espressopp.VerletList(system, cutoff=rc)
@@ -190,12 +190,12 @@ lT.gamma       = 1.0
 lT.temperature = desiredT
 integrator.addExtension(lT)
 
-print 'Equilibration.'
+print('Equilibration.')
 in_time = time.time()
 espressopp.tools.analyse.info(system, integrator)
 for i in range (10):
-  integrator.run(1000)
-  espressopp.tools.analyse.info(system, integrator)
+    integrator.run(1000)
+    espressopp.tools.analyse.info(system, integrator)
 
 ##############################################
 # calculate the radial distribution function #
@@ -205,29 +205,29 @@ nprints = 5
 ncycles = 2
 nruns = 100
 
-print '\n Measurements!'
+print('\n Measurements!')
 
 rdf_array_total = []
 
 for i in range (nprints):
-  for j in range(ncycles):
-    integrator.run(nruns)
-    
-    # calculate radial distribution function
-    distance_step = 800
-    rdf = espressopp.analysis.RadialDistrF(system)
-    rdf_array = rdf.compute(distance_step);
-    
-    for i in range( len(rdf_array) ):
-      if(i>=len(rdf_array_total)):
-        rdf_array_total.append(rdf_array[i])
-      else:
-        rdf_array_total[i] += rdf_array[i]
-    
-  espressopp.tools.analyse.info(system, integrator)
+    for j in range(int(ncycles)):
+        integrator.run(nruns)
+
+        # calculate radial distribution function
+        distance_step = 800
+        rdf = espressopp.analysis.RadialDistrF(system)
+        rdf_array = rdf.compute(distance_step);
+
+        for i in range( len(rdf_array) ):
+            if(i>=len(rdf_array_total)):
+                rdf_array_total.append(rdf_array[i])
+            else:
+                rdf_array_total[i] += rdf_array[i]
+
+    espressopp.tools.analyse.info(system, integrator)
 
 fin_time = time.time()
-print '\ngeneral running time: ', (fin_time-in_time)
+print('\ngeneral running time: ', (fin_time-in_time))
 
 # printing radial distribution function
 nameFile = 'rdf.dat'
@@ -237,5 +237,5 @@ fmt = ' %12.6f %12.6f\n'
 dr = Lx / 2. / float(distance_step) * sigma_real;
 
 for i in range( len(rdf_array_total) ):
-  resFile.write(fmt % ( (i+0.5)*dr, rdf_array_total[i] / float(ncycles*nprints) ))
+    resFile.write(fmt % ( (i+0.5)*dr, rdf_array_total[i] / float(ncycles*nprints) ))
 resFile.close()

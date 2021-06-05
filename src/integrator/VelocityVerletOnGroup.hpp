@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -29,78 +29,77 @@
 #include "esutil/Timer.hpp"
 #include "../ParticleGroup.hpp"
 
-namespace espressopp {
+namespace espressopp
+{
+namespace integrator
+{
+/** Velocity Verlet Integrator */
 
-  namespace integrator {
+class VelocityVerletOnGroup : public MDIntegrator
+{
+public:
+    VelocityVerletOnGroup(std::shared_ptr<class espressopp::System> system,
+                          std::shared_ptr<class espressopp::ParticleGroup> group_);
 
-    /** Velocity Verlet Integrator */
+    virtual ~VelocityVerletOnGroup();
 
-    class VelocityVerletOnGroup : public MDIntegrator {
+    void setLangevin(std::shared_ptr<class LangevinThermostat> langevin);
 
-      public:
+    std::shared_ptr<class LangevinThermostat> getLangevin() { return langevin; }
 
-        VelocityVerletOnGroup(shared_ptr<class espressopp::System> system, shared_ptr<class espressopp::ParticleGroup> group_);
+    void run(int nsteps);
 
-        virtual ~VelocityVerletOnGroup();
+    /** Register this class so it can be used from Python. */
 
-        void setLangevin(shared_ptr<class LangevinThermostat> langevin);
+    static void registerPython();
 
-        shared_ptr<class LangevinThermostat> getLangevin() { return langevin; }
+private:
+    bool resortFlag;  //!< true implies need for resort of particles
+    real maxDist;
 
-        void run(int nsteps);
+    real maxCut;
 
-        /** Register this class so it can be used from Python. */
+    std::shared_ptr<class LangevinThermostat> langevin;  //!< Langevin thermostat if available
+    std::shared_ptr<class espressopp::ParticleGroup> group;
 
-        static void registerPython();
+    /** Method updates particle positions and velocities.
 
-      private:
+        \return maximal square distance a particle has moved.
+    */
 
-        bool resortFlag;  //!< true implies need for resort of particles
-        real maxDist;
+    real integrate1();
 
-        real maxCut;
+    void integrate2();
 
-        shared_ptr< class LangevinThermostat > langevin;  //!< Langevin thermostat if available
-        shared_ptr<class espressopp::ParticleGroup> group;
+    void initForces();
 
-        /** Method updates particle positions and velocities.
+    void updateForces();
 
-            \return maximal square distance a particle has moved.
-        */
+    void calcForces();
 
-        real integrate1();
+    void printPositions(bool withGhost);
 
-        void integrate2();
+    void printForces(bool withGhost);
 
-        void initForces();
+    void setUp();  //<! set up for a new run
 
-        void updateForces();
+    void resetTimers();
 
-        void calcForces();
+    void printTimers();
 
-        void printPositions(bool withGhost);
+    esutil::WallTimer timeIntegrate;  //!< used for timing
 
-        void printForces(bool withGhost);
+    // variables that keep time information about different phases
 
-        void setUp();   //<! set up for a new run
-
-        void resetTimers();
-
-        void printTimers();
-
-        esutil::WallTimer timeIntegrate;  //!< used for timing
-
-        // variables that keep time information about different phases
-
-        real timeResort;
-        real timeForce;
-        real timeForceComp[100];
-        real timeComm1;
-        real timeComm2;
-        real timeInt1;
-        real timeInt2;
-    };
-  }
-}
+    real timeResort;
+    real timeForce;
+    real timeForceComp[100];
+    real timeComm1;
+    real timeComm2;
+    real timeInt1;
+    real timeInt2;
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

@@ -70,46 +70,46 @@ Example - creating the VerletListAdress for a adress region based on the overlap
 
 .. function:: espressopp.VerletListAdress(system, cutoff, adrcut, dEx, dHy, adrCenter, pids, exclusionlist, sphereAdr)
 
-		:param system:
-		:param cutoff:
-		:param adrcut:
-		:param dEx:
-		:param dHy:
-		:param adrCenter: (default: [])
-		:param pids: (default: [])
-		:param exclusionlist: (default: [])
-		:param sphereAdr: (default: False)
-		:type system:
-		:type cutoff:
-		:type adrcut:
-		:type dEx:
-		:type dHy:
-		:type adrCenter:
-		:type pids:
-		:type exclusionlist:
-		:type sphereAdr:
+                :param system:
+                :param cutoff:
+                :param adrcut:
+                :param dEx:
+                :param dHy:
+                :param adrCenter: (default: [])
+                :param pids: (default: [])
+                :param exclusionlist: (default: [])
+                :param sphereAdr: (default: False)
+                :type system:
+                :type cutoff:
+                :type adrcut:
+                :type dEx:
+                :type dHy:
+                :type adrCenter:
+                :type pids:
+                :type exclusionlist:
+                :type sphereAdr:
 
 .. function:: espressopp.VerletListAdress.addAdrParticles(pids, rebuild)
 
-		:param pids:
-		:param rebuild: (default: True)
-		:type pids:
-		:type rebuild:
-		:rtype:
+                :param pids:
+                :param rebuild: (default: True)
+                :type pids:
+                :type rebuild:
+                :rtype:
 
 .. function:: espressopp.VerletListAdress.exclude(exclusionlist)
 
-		:param exclusionlist:
-		:type exclusionlist:
-		:rtype:
+                :param exclusionlist:
+                :type exclusionlist:
+                :rtype:
 
 .. function:: espressopp.VerletListAdress.rebuild()
 
-		:rtype:
+                :rtype:
 
 .. function:: espressopp.VerletListAdress.totalSize()
 
-		:rtype:
+                :rtype:
 """
 
 from espressopp import pmi
@@ -181,8 +181,7 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
             self.cxxclass.rebuild(self)
 
 if pmi.isController:
-    class VerletListAdress(object):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdress(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls = 'espressopp.VerletListAdressLocal',
             pmiproperty = [ 'builds' ],

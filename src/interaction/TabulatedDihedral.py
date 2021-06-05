@@ -1,24 +1,26 @@
+#  Copyright (C) 2018
+#      Max Planck Institute for Polymer Research
 #  Copyright (C) 2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -37,23 +39,23 @@ potentials.
 .. function:: espressopp.interaction.TabulatedDihedral(itype, filename)
 
         :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
-		:param filename: The tabulated potential filename.
-		:type itype: int
-		:type filename: str
+                :param filename: The tabulated potential filename.
+                :type itype: int
+                :type filename: str
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potential)
 
-		:param system: The Espresso++ system object.
-		:param fql: The FixedQuadrupleList.
-		:param potential: The potential.
-		:type system: espressopp.System
-		:type fql: espressopp.FixedQuadrupleList
-		:type potential: espressopp.interaction.Potential
+                :param system: The Espresso++ system object.
+                :param fql: The FixedQuadrupleList.
+                :param potential: The potential.
+                :type system: espressopp.System
+                :type fql: espressopp.FixedQuadrupleList
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral.setPotential(potential)
 
-		:param potential: The potential object.
-		:type potential: espressopp.interaction.Potential
+                :param potential: The potential object.
+                :type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedQuadrupleListTypesTabulatedDihedral(system, fql)
 
@@ -141,15 +143,13 @@ if pmi.isController:
             pmiproperty = ['itype', 'filename']
             )
 
-    class FixedQuadrupleListTabulatedDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTabulatedDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTabulatedDihedralLocal',
             pmicall = ['setPotential', 'getFixedQuadrupleList']
             )
 
-    class FixedQuadrupleListTypesTabulatedDihedral(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListTypesTabulatedDihedral(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListTypesTabulatedDihedralLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']

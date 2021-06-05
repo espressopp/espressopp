@@ -25,22 +25,26 @@
 
 #include "LBInit.hpp"
 
-namespace espressopp {
-  namespace integrator {
-    class LBInitPopWave : public LBInit {
-      public:
-      LBInitPopWave(shared_ptr<System> _system,
-                    shared_ptr< LatticeBoltzmann > _latticeboltzmann);
+namespace espressopp
+{
+namespace integrator
+{
+class LBInitPopWave : public LBInit
+{
+public:
+    LBInitPopWave(std::shared_ptr<System> _system,
+                  std::shared_ptr<LatticeBoltzmann> _latticeboltzmann);
 
-      void createDenVel (real _rho0, Real3D _u0);
+    void createDenVel(real _rho0, Real3D _u0);
 
-      void setForce (Real3D _force);
-      void addForce (Real3D _force);
+    void setForce(Real3D _force);
+    void addForce(Real3D _force);
 
-      static void registerPython();
-      private:
-    };
-  }
-}
+    static void registerPython();
+
+private:
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

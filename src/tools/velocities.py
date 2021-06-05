@@ -23,6 +23,7 @@
 
 import random
 
+
 def gaussian(T, N, particle_mass=None, zero_momentum=True, seed=7654321, kb=1.0):
     """Generates velocities with temperature T according to a Maxwell-Boltzmann distribution.
 

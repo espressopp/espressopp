@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -29,8 +29,8 @@ a generic Lennard Jones potential with arbitrary integers a and b.
 
 .. math::
 
-	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{a} -
-	\left( \frac{\sigma}{r} \right)^{b} \right]
+        V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{a} -
+        \left( \frac{\sigma}{r} \right)^{b} \right]
 
 
 
@@ -39,187 +39,187 @@ a generic Lennard Jones potential with arbitrary integers a and b.
 
 .. function:: espressopp.interaction.LennardJonesGeneric(epsilon, sigma, a, b, cutoff, shift)
 
-		:param epsilon: (default: 1.0)
-		:param sigma: (default: 1.0)
-		:param a: (default: 12)
-		:param b: (default: 6)
-		:param cutoff: (default: infinity)
-		:param shift: (default: "auto")
-		:type epsilon: real
-		:type sigma: real
-		:type a: int
-		:type b: int
-		:type cutoff: 
-		:type shift: 
+                :param epsilon: (default: 1.0)
+                :param sigma: (default: 1.0)
+                :param a: (default: 12)
+                :param b: (default: 6)
+                :param cutoff: (default: infinity)
+                :param shift: (default: "auto")
+                :type epsilon: real
+                :type sigma: real
+                :type a: int
+                :type b: int
+                :type cutoff:
+                :type shift:
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric(vl)
 
-		:param vl: 
-		:type vl: 
+                :param vl:
+                :type vl:
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric.getPotential(type1, type2)
 
-		:param type1: 
-		:param type2: 
-		:type type1: 
-		:type type2: 
-		:rtype: 
+                :param type1:
+                :param type2:
+                :type type1:
+                :type type2:
+                :rtype:
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric.getVerletList()
 
-		:rtype: A Python list of lists.
+                :rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric(vl, fixedtupleList)
 
-		:param vl: 
-		:param fixedtupleList: 
-		:type vl: 
-		:type fixedtupleList: 
+                :param vl:
+                :param fixedtupleList:
+                :type vl:
+                :type fixedtupleList:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric.setPotentialAT(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric.setPotentialCG(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric2(vl, fixedtupleList)
 
-		:param vl: 
-		:param fixedtupleList: 
-		:type vl: 
-		:type fixedtupleList: 
+                :param vl:
+                :param fixedtupleList:
+                :type vl:
+                :type fixedtupleList:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric2.setPotentialAT(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListAdressLennardJonesGeneric2.setPotentialCG(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric(vl, fixedtupleList)
 
-		:param vl: 
-		:param fixedtupleList: 
-		:type vl: 
-		:type fixedtupleList: 
+                :param vl:
+                :param fixedtupleList:
+                :type vl:
+                :type fixedtupleList:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric.setPotentialAT(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric.setPotentialCG(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric2(vl, fixedtupleList, KTI)
 
-		:param vl: 
-		:param fixedtupleList: 
-		:param KTI: (default: False)
-		:type vl: 
-		:type fixedtupleList: 
-		:type KTI: 
+                :param vl:
+                :param fixedtupleList:
+                :param KTI: (default: False)
+                :type vl:
+                :type fixedtupleList:
+                :type KTI:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric2.setPotentialAT(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.VerletListHadressLennardJonesGeneric2.setPotentialCG(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.CellListLennardJonesGeneric(stor)
 
-		:param stor: 
-		:type stor: 
+                :param stor:
+                :type stor:
 
 .. function:: espressopp.interaction.CellListLennardJonesGeneric.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.getFixedPairList()
 
-		:rtype: A Python list of lists.
+                :rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.getPotential()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.setFixedPairList(fixedpairlist)
 
-		:param fixedpairlist: 
-		:type fixedpairlist: 
+                :param fixedpairlist:
+                :type fixedpairlist:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.setPotential(potential)
 
-		:param potential: 
-		:type potential: 
+                :param potential:
+                :type potential:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -242,12 +242,12 @@ class LennardJonesGenericLocal(PotentialLocal, interaction_LennardJonesGeneric):
         """Initialize the local generic Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
-                print "here without shift"
-                cxxinit(self, interaction_LennardJonesGeneric, 
+                print("here without shift")
+                cxxinit(self, interaction_LennardJonesGeneric,
                         epsilon, sigma, a, b, cutoff)
             else:
-                print "here with shift"
-                cxxinit(self, interaction_LennardJonesGeneric, 
+                print("here with shift")
+                cxxinit(self, interaction_LennardJonesGeneric,
                         epsilon, sigma, a, b, cutoff, shift)
 
 class VerletListLennardJonesGenericLocal(InteractionLocal, interaction_VerletListLennardJonesGeneric):
@@ -281,7 +281,7 @@ class VerletListAdressLennardJonesGenericLocal(InteractionLocal, interaction_Ver
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 class VerletListAdressLennardJonesGeneric2Local(InteractionLocal, interaction_VerletListAdressLennardJonesGeneric2):
 
     def __init__(self, vl, fixedtupleList):
@@ -295,7 +295,7 @@ class VerletListAdressLennardJonesGeneric2Local(InteractionLocal, interaction_Ve
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-                  
+
 class VerletListHadressLennardJonesGenericLocal(InteractionLocal, interaction_VerletListHadressLennardJonesGeneric):
 
     def __init__(self, vl, fixedtupleList):
@@ -309,7 +309,7 @@ class VerletListHadressLennardJonesGenericLocal(InteractionLocal, interaction_Ve
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
-            
+
 class VerletListHadressLennardJonesGeneric2Local(InteractionLocal, interaction_VerletListHadressLennardJonesGeneric2):
 
     def __init__(self, vl, fixedtupleList, KTI = False):
@@ -329,7 +329,7 @@ class CellListLennardJonesGenericLocal(InteractionLocal, interaction_CellListLen
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesGeneric, stor)
-        
+
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
@@ -339,7 +339,7 @@ class FixedPairListLennardJonesGenericLocal(InteractionLocal, interaction_FixedP
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesGeneric, system, vl, potential)
-        
+
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
@@ -352,7 +352,7 @@ class FixedPairListLennardJonesGenericLocal(InteractionLocal, interaction_FixedP
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
-    
+
     def getFixedPairList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
@@ -365,50 +365,43 @@ if pmi.isController:
             pmiproperty = ['epsilon', 'sigma', 'a', 'b']
             )
 
-    class VerletListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListLennardJonesGenericLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
-    class VerletListAdressLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class VerletListAdressLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesGenericLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
-    class VerletListAdressLennardJonesGeneric2(Interaction):
-        __metaclass__ = pmi.Proxy
+
+    class VerletListAdressLennardJonesGeneric2(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListAdressLennardJonesGeneric2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
-    class VerletListHadressLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+
+    class VerletListHadressLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesGenericLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
-            
-    class VerletListHadressLennardJonesGeneric2(Interaction):
-        __metaclass__ = pmi.Proxy
+
+    class VerletListHadressLennardJonesGeneric2(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressLennardJonesGeneric2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
-    class CellListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+    class CellListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListLennardJonesGenericLocal',
             pmicall = ['setPotential']
             )
-        
-    class FixedPairListLennardJonesGeneric(Interaction):
-        __metaclass__ = pmi.Proxy
+
+    class FixedPairListLennardJonesGeneric(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesGenericLocal',
             pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ]

@@ -27,27 +27,33 @@
 #include "VerletListAdress.hpp"
 #include "python.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    // Class to compute the density profile along slabs in the x-direction of the system.
-    class AdressDensity : public Observable {
-    public:
-      AdressDensity(shared_ptr< System > system, shared_ptr<VerletListAdress> _verletList) : Observable(system), verletList(_verletList) {}
-      ~AdressDensity() {}
-      shared_ptr<VerletListAdress> verletList;
-      virtual real compute() const;
-      virtual python::list computeArray(int) const;
+namespace espressopp
+{
+namespace analysis
+{
+// Class to compute the density profile along slabs in the x-direction of the system.
+class AdressDensity : public Observable
+{
+public:
+    AdressDensity(std::shared_ptr<System> system, std::shared_ptr<VerletListAdress> _verletList)
+        : Observable(system), verletList(_verletList)
+    {
+    }
+    ~AdressDensity() {}
+    std::shared_ptr<VerletListAdress> verletList;
+    virtual real compute() const;
+    virtual python::list computeArray(int) const;
 
-      /** Add pid to exclusionlist */
-      void addExclpid(int pid) { exclusions.insert(pid); }
+    /** Add pid to exclusionlist */
+    void addExclpid(int pid) { exclusions.insert(pid); }
 
-      static void registerPython();
+    static void registerPython();
 
-    private:
-      /** pid exclusion list */
-      std::set<longint> exclusions;
-    };
-  }
-}
+private:
+    /** pid exclusion list */
+    std::set<longint> exclusions;
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

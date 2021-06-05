@@ -56,8 +56,7 @@ class LangevinThermostatOnGroupLocal(ExtensionLocal, integrator_LangevinThermost
             cxxinit(self, integrator_LangevinThermostatOnGroup, system, particle_group)
 
 if pmi.isController :
-    class LangevinThermostatOnGroup(Extension):
-        __metaclass__ = pmi.Proxy
+    class LangevinThermostatOnGroup(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostatOnGroupLocal',
             pmiproperty = [ 'gamma', 'temperature']

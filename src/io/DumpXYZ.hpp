@@ -38,119 +38,119 @@
 #include "iterator/CellListIterator.hpp"
 #include <string>
 
-namespace espressopp {
-  namespace io{
+namespace espressopp
+{
+namespace io
+{
+class DumpXYZ : public ParticleAccess
+{
+public:
+    DumpXYZ(std::shared_ptr<System> system,
+            std::shared_ptr<integrator::MDIntegrator> _integrator,
+            std::string _file_name,
+            bool _unfolded,
+            real _length_factor,
+            std::string _length_unit,
+            bool _store_pids,
+            bool _store_velocities,
+            bool _append)
+        : ParticleAccess(system),
+          integrator(_integrator),
+          file_name(_file_name),
+          unfolded(_unfolded),
+          length_factor(_length_factor),
+          store_pids(_store_pids),
+          store_velocities(_store_velocities),
+          append(_append)
+    {
+        setLengthUnit(_length_unit);
 
-    class DumpXYZ : public ParticleAccess {
+        // get local particle ID map
+        std::map<long, short> myParticleIDToTypeMap;
+        CellList realCells = system->storage->getRealCells();
+        for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit)
+        {
+            long id = cit->id();
+            short type = cit->type();
+            myParticleIDToTypeMap[id] = type;
+        }
 
-    public:
+        // gather all particle ID maps
+        std::vector<std::map<long, short> > allParticleIDMaps;
+        boost::mpi::all_gather(*getSystem()->comm, myParticleIDToTypeMap, allParticleIDMaps);
 
-      DumpXYZ(shared_ptr<System> system,
-              shared_ptr<integrator::MDIntegrator> _integrator,
-              std::string _file_name,
-              bool _unfolded,
-              real _length_factor,
-              std::string _length_unit,
-              bool _store_pids,
-              bool _store_velocities,
-              bool _append) :
-                        ParticleAccess(system),
-                        integrator(_integrator),
-                        file_name( _file_name ),
-                        unfolded(_unfolded),
-                        length_factor(_length_factor),
-                        store_pids(_store_pids),
-                        store_velocities(_store_velocities),
-                        append(_append){
-          setLengthUnit(_length_unit);
+        if (allParticleIDMaps.size() == 0)
+            throw std::runtime_error(
+                "Dumper: No particles found in the system - make sure particles are added first "
+                "before Dumper is initialized");
 
-          //get local particle ID map
-          std::map<long, short> myParticleIDToTypeMap;
-          CellList realCells = system->storage->getRealCells();
-          for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-              long id = cit->id();
-              short type = cit->type();
-              myParticleIDToTypeMap[id] = type;
-          }
-          if (myParticleIDToTypeMap.size() ==0 )
-              throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
+        // merge all particle ID maps
+        for (std::vector<std::map<long, short> >::iterator it = allParticleIDMaps.begin();
+             it != allParticleIDMaps.end(); ++it)
+        {
+            particleIDToType.insert(it->begin(), it->end());
+        }
+        // std::cout << "particleIDToType.size(): " << particleIDToType.size() << std::endl;
 
-          //gather all particle ID maps
-          std::vector< std::map<long, short> > allParticleIDMaps;
-          boost::mpi::all_gather(
-                  *getSystem()->comm,
-                  myParticleIDToTypeMap,
-                  allParticleIDMaps);
+        if (system->comm->rank() == 0 && !append) FileBackup backup(file_name);
+    }
+    ~DumpXYZ() {}
 
-          //merge all particle ID maps
-          for (std::vector< std::map<long, short> >::iterator it=allParticleIDMaps.begin(); it!=allParticleIDMaps.end(); ++it)
-          {
-              particleIDToType.insert(it->begin(), it->end());
-          }
-          //std::cout << "particleIDToType.size(): " << particleIDToType.size() << std::endl;
+    void perform_action() { dump(); }
 
+    void dump();
 
-        if (system->comm->rank() == 0  && !append)
-          FileBackup backup(file_name);
-      }
-      ~DumpXYZ() {}
+    std::string getFilename() { return file_name; }
+    void setFilename(std::string v) { file_name = v; }
+    bool getUnfolded() { return unfolded; }
+    void setUnfolded(bool v) { unfolded = v; }
+    bool getStorePids() { return store_pids; }
+    void setStorePids(bool v) { store_pids = v; }
+    bool getStoreVelocities() { return store_velocities; }
+    void setStoreVelocities(bool v) { store_velocities = v; }
+    bool getAppend() { return append; }
+    void setAppend(bool v) { append = v; }
 
-      void perform_action(){
-        dump();
-      }
-
-      void dump();
-
-      std::string getFilename(){return file_name;}
-      void setFilename(std::string v){file_name = v;}
-      bool getUnfolded(){return unfolded;}
-      void setUnfolded(bool v){unfolded = v;}
-      bool getStorePids(){return store_pids;}
-      void setStorePids(bool v){store_pids = v;}
-      bool getStoreVelocities(){return store_velocities;}
-      void setStoreVelocities(bool v){store_velocities = v;}
-      bool getAppend(){return append;}
-      void setAppend(bool v){append = v;}
-
-      std::string getLengthUnit(){return length_unit;}
-      void setLengthUnit(std::string v){
-        esutil::Error err( getSystem()->comm );
-        if( v != "LJ" && v != "nm" && v != "A" ){
-          std::stringstream msg;
-          msg<<"Wrong unit length: "<< v << "  It should be string: LJ, nm or A" <<"\n";
-          err.setException( msg.str() );
-          err.checkException();
+    std::string getLengthUnit() { return length_unit; }
+    void setLengthUnit(std::string v)
+    {
+        esutil::Error err(getSystem()->comm);
+        if (v != "LJ" && v != "nm" && v != "A")
+        {
+            std::stringstream msg;
+            msg << "Wrong unit length: " << v << "  It should be string: LJ, nm or A"
+                << "\n";
+            err.setException(msg.str());
+            err.checkException();
         }
 
         length_unit = v;
-      }
-      real getLengthFactor(){return length_factor;}
-      void setLengthFactor(real v){length_factor = v;}
+    }
+    real getLengthFactor() { return length_factor; }
+    void setLengthFactor(real v) { length_factor = v; }
 
-      static void registerPython();
+    static void registerPython();
 
-    protected:
+protected:
+    // static LOG4ESPP_DECL_LOGGER(logger);
 
-      //static LOG4ESPP_DECL_LOGGER(logger);
+private:
+    // integrator we need to know an integration step
+    std::shared_ptr<integrator::MDIntegrator> integrator;
 
-    private:
+    std::string file_name;
 
-      // integrator we need to know an integration step
-      shared_ptr<integrator::MDIntegrator> integrator;
-
-      std::string file_name;
-
-      //an array or an map where key: particle id and value: particle type
-      //we assume, that the type of a particle does not change over time
-      std::map<long, short> particleIDToType;
-      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
-      bool append; //append to existing trajectory file or create a new one
-      bool store_pids;
-      bool store_velocities;
-      real length_factor;
-      std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
-    };
-  }
-}
+    // an array or an map where key: particle id and value: particle type
+    // we assume, that the type of a particle does not change over time
+    std::map<long, short> particleIDToType;
+    bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
+    real length_factor;
+    bool store_pids;
+    bool store_velocities;
+    bool append;              // append to existing trajectory file or create a new one
+    std::string length_unit;  // length unit: {could be LJ, nm, A} it is just for user info
+};
+}  // namespace io
+}  // namespace espressopp
 
 #endif

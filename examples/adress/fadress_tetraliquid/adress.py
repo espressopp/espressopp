@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python3
 #  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -53,7 +53,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
 
-    for i in range(N):
+    for i in range(int(N)):
         r = low + i * delta
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
@@ -152,10 +152,10 @@ fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..."
+print("Added tuples and bonds, decomposing now ...")
 system.storage.decompose()
 
-print "done decomposing"
+print("done decomposing")
 
 # AdResS Verlet list
 vl = espressopp.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
@@ -196,17 +196,17 @@ langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
 
 
-print ''
-print 'number of AT particles =', num_particles
-print 'number of CG particles =', num_particlesCG
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of AT particles =', num_particles)
+print('number of CG particles =', num_particlesCG)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)
@@ -224,25 +224,24 @@ Eb = interFENE.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential      ebonded     ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
-start_time = time.clock()
-nsteps = steps / intervals
+start_time = time.process_time()
+nsteps = steps // intervals
 for s in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * s
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interFENE.computeEnergy()
-  sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
-  system.storage.decompose()
+    integrator.run(nsteps)
+    step = nsteps * s
+    T = temperature.compute()
+    P = pressure.compute()
+    Pij = pressureTensor.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interFENE.computeEnergy()
+    sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
+    system.storage.decompose()
 
-end_time = time.clock()
+end_time = time.process_time()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-

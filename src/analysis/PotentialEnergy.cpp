@@ -22,28 +22,30 @@
 #include "PotentialEnergy.hpp"
 #include "interaction/Interaction.hpp"
 
-using namespace espressopp;  //NOLINT
+using namespace espressopp;  // NOLINT
 
-namespace espressopp {
-namespace analysis {
-
-real PotentialEnergy::compute_real() const {
-  if (compute_global_)
-    return interaction_->computeEnergy();
-  else if (compute_at_)
-    return interaction_->computeEnergyAA();
-  else
-    return interaction_->computeEnergyCG();
+namespace espressopp
+{
+namespace analysis
+{
+real PotentialEnergy::compute_real() const
+{
+    if (compute_global_)
+        return interaction_->computeEnergy();
+    else if (compute_at_)
+        return interaction_->computeEnergyAA();
+    else
+        return interaction_->computeEnergyCG();
 }
 
-
-void PotentialEnergy::registerPython() {
-  using namespace espressopp::python;  //NOLINT
-  class_<PotentialEnergy, bases<Observable> >
-    ("analysis_PotentialEnergy",
-        init< shared_ptr<System>, shared_ptr<interaction::Interaction> >())
-    .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>, bool>())
-    .add_property("value", &PotentialEnergy::compute_real);
+void PotentialEnergy::registerPython()
+{
+    using namespace espressopp::python;  // NOLINT
+    class_<PotentialEnergy, bases<Observable> >(
+        "analysis_PotentialEnergy",
+        init<std::shared_ptr<System>, std::shared_ptr<interaction::Interaction> >())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<interaction::Interaction>, bool>())
+        .add_property("value", &PotentialEnergy::compute_real);
 }
 }  // end namespace analysis
 }  // end namespace espressopp

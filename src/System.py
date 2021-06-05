@@ -1,24 +1,24 @@
-#  Copyright (C) 2015,2017
+#  Copyright (C) 2015,2017,2021
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -57,47 +57,47 @@ Example (not complete):
 
 .. function:: espressopp.System.addInteraction(interaction, name)
 
-		:param interaction: 
-		:type interaction: 
-		:param name: The optional name of the interaction.
-		:type name: string
-		:rtype: bool
+                :param interaction:
+                :type interaction:
+                :param name: The optional name of the interaction.
+                :type name: string
+                :rtype: bool
 
 .. function:: espressopp.System.getInteraction(number)
 
-		:param number: 
-		:type number: 
-		:rtype: 
+                :param number:
+                :type number:
+                :rtype:
 
 .. function:: espressopp.System.getNumberOfInteractions()
 
-		:rtype: 
+                :rtype:
 
 .. function:: espressopp.System.removeInteraction(number)
 
-		:param number: 
-		:type number: 
-		:rtype: 
+                :param number:
+                :type number:
+                :rtype:
 
 .. function:: espressopp.System.removeInteractionByName(self, name)
 
-		:param name: The name of the interaction to remove.
-		:type name: str
+                :param name: The name of the interaction to remove.
+                :type name: str
 
 .. function:: espressopp.System.getAllInteractions()
 
-		:rtype: The dictionary with name as a key and Interaction object.
+                :rtype: The dictionary with name as a key and Interaction object.
 
 .. function:: espressopp.System.scaleVolume(\*args)
 
-		:param \*args: 
-		:type \*args: 
-		:rtype: 
+                :param \*args:
+                :type \*args:
+                :rtype:
 
 .. function:: espressopp.System.setTrace(switch)
 
-		:param switch: 
-		:type switch: 
+                :param switch:
+                :type switch:
 """
 
 from espressopp import pmi, Real3D, toReal3DFromVector
@@ -113,11 +113,11 @@ class SystemLocal(_espressopp.System):
 
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm())
+                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm().py2f())
             else :
                 pass
         else :
-            cxxinit(self, _espressopp.System, pmi._MPIcomm)
+            cxxinit(self, _espressopp.System, pmi._MPIcomm.py2f())
 
         self._integrator = None
         self._interaction2id = {}
@@ -155,7 +155,7 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.removeInteraction(self, interaction_id)
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
-                for k, v in self._interaction2id.iteritems()
+                for k, v in self._interaction2id.items()
                 if v != interaction_id
                 }
             self._interaction_pid = max(self._interaction2id.values()) + 1
@@ -174,7 +174,7 @@ class SystemLocal(_espressopp.System):
         if pmi.workerIsActive():
             ni = self.getNumberOfInteractions()
             if ni > 0:
-                if number >=0 and number < ni: 
+                if number >=0 and number < ni:
                     return self.cxxclass.getInteraction(self, number)
                 else:
                     raise Error("Interaction number %i does not exist" % number)
@@ -201,18 +201,14 @@ class SystemLocal(_espressopp.System):
               self.cxxclass.scaleVolume( arg0 )
             elif hasattr(arg0, '__iter__'):
               if len(arg0) == 3:
-                #print args, " has iterator and length 3"
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
               elif len(arg0) == 1:
-                #print args, " has iterator and length 1"
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
               else:
-                print args, " is invalid"
+                print(args, " is invalid")
             else:
-              #print args, " is scalar"
               self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
-          elif len(args) == 3:          
-            #print args, " is 3 numbers"
+          elif len(args) == 3:
             self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
             print args, " is invalid"
@@ -223,12 +219,11 @@ class SystemLocal(_espressopp.System):
             self.cxxclass.setTrace(self, switch)
 
 if pmi.isController:
-  class System(object):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-      cls = 'espressopp.SystemLocal',
-      pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
-      pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
-            'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-            'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']
-    )
+    class System(metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          cls = 'espressopp.SystemLocal',
+          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
+          pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
+                'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
+                'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']
+        )

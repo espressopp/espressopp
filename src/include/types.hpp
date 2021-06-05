@@ -23,70 +23,89 @@
 #ifndef _TYPES_HPP
 #define _TYPES_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpi.hpp>
 #include <exception>
 #include <limits>
+#include <memory>
 #include "esconfig.hpp"
 
-namespace espressopp {
-  using boost::shared_ptr;
-  using boost::weak_ptr;
-  using boost::make_shared;
-  using boost::enable_shared_from_this;
-  using boost::const_pointer_cast;
-  using boost::static_pointer_cast;
-  using boost::dynamic_pointer_cast;
-  namespace mpi {
-    using namespace boost::mpi;
-  }
-
-  /* Forward declarations and typedefs. */
-  namespace esutil {
-    class RNG;
-  }
-
-  class Real3D;
-  class Int3D;
-  class Tensor;
-
-  class Particle;
-  class ParticleList;
-  class ParticlePair;
-  class PairList;
-
-  class ParticleTriple;
-  class TripleList;
-  class ParticleQuadruple;
-  class QuadrupleList;
-
-  class Cell;
-  class CellList;
-  class NeighborCellList;
-  class LocalCellList;
-
-  class VerletList;
-
-  class System;
-
-  namespace storage {
-    class Storage;
-    class DomainDecomposition;
-    class DomainDecompositionNonBlocking;
-  }
-
-  namespace bc {
-    class BC;
-  }
-
-  namespace interaction {
-    class Interaction;
-    class InteractionList;
-  }
-
-  class NoDefault: public std::exception {};
+namespace espressopp
+{
+using std::const_pointer_cast;
+using std::dynamic_pointer_cast;
+using std::enable_shared_from_this;
+using std::make_shared;
+using std::shared_ptr;
+using std::static_pointer_cast;
+using std::weak_ptr;
+namespace mpi
+{
+using namespace boost::mpi;
 }
+
+/* Forward declarations and typedefs. */
+namespace esutil
+{
+class RNG;
+}
+
+class Real3D;
+class Int3D;
+class Tensor;
+
+struct Particle;
+struct ParticleList;
+class ParticlePair;
+struct PairList;
+
+class ParticleTriple;
+struct TripleList;
+class ParticleQuadruple;
+struct QuadrupleList;
+
+struct Cell;
+struct CellList;
+struct NeighborCellList;
+struct LocalCellList;
+
+class VerletList;
+
+class System;
+
+namespace storage
+{
+class Storage;
+class DomainDecomposition;
+class DomainDecompositionNonBlocking;
+}  // namespace storage
+
+namespace bc
+{
+class BC;
+}
+
+namespace interaction
+{
+class Interaction;
+struct InteractionList;
+}  // namespace interaction
+
+namespace vectorization
+{
+class ParticleArray;
+class Vectorization;
+class VerletList;
+}  // namespace vectorization
+
+class NoDefault : public std::exception
+{
+};
+
+template <typename T>
+int int_c(const T& val)
+{
+    return static_cast<T>(val);
+}
+}  // namespace espressopp
 
 #endif

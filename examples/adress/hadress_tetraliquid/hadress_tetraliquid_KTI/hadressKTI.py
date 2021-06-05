@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python3
 #  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
@@ -59,7 +59,7 @@ pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("equilibra
 tabCG = "table_potential.dat"
 
 # number of CG particles
-num_particlesCG = len(x)/4
+num_particlesCG = len(x)//4
 
 # number of AT particles
 num_particles = len(x)
@@ -136,9 +136,9 @@ bonds = Tetracryst.makebonds(len(x))
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..."
+print("Added tuples and bonds, decomposing now ...")
 system.storage.decompose()
-print "done decomposing"
+print("done decomposing")
 
 # AdResS Verlet list
 vl = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc,
@@ -179,40 +179,40 @@ integrator.addExtension(langevin)
 espressopp.tools.AdressDecomp(system, integrator)
 
 # system information
-print ''
-print 'number of AT particles =', num_particles
-print 'number of CG particles =', num_particlesCG
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
+print('')
+print('number of AT particles =', num_particles)
+print('number of CG particles =', num_particlesCG)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('NodeGrid = %s' % (nodeGrid,))
+print('CellGrid = %s' % (cellGrid,))
+print('')
 
 # analysis
 temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 
 # timer
-start_time = time.clock()
+start_time = time.process_time()
 
 # set lambdas and derivates to zero
 for i in range(num_particles + num_particlesCG):
- system.storage.modifyParticle(i, 'lambda_adrd', 0.0)
- system.storage.modifyParticle(i, 'lambda_adr', 0.0)
+    system.storage.modifyParticle(i, 'lambda_adrd', 0.0)
+    system.storage.modifyParticle(i, 'lambda_adr', 0.0)
 system.storage.decompose()
 
 ### EQUILIBRATION ###
 # equilibration parameters
 EQsteps = 1000
 EQintervals = 100
-EQnsteps = EQsteps/EQintervals
+EQnsteps = EQsteps//EQintervals
 
-print ''
-print 'Short equilibration'
-print 'Equilibration steps =', EQsteps
-print ''
+print('')
+print('Short equilibration')
+print('Equilibration steps =', EQsteps)
+print('')
 
 # print the data of the intial configuration
 fmt = '%5d %8.4f %10.5f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
@@ -228,20 +228,20 @@ sys.stdout.write(fmt % (0, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
 
 # do equilibration
 for s in range(1, EQintervals + 1):
-  integrator.run(EQnsteps)
-  EQstep = EQnsteps * s
-  T = temperature.compute()
-  P = pressure.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interNB.computeEnergy()
-  Eb = interQuartic.computeEnergy()
-  Eaa = interNB.computeEnergyAA()
-  Ecg = interNB.computeEnergyCG()
-  sys.stdout.write(fmt % (EQstep, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
+    integrator.run(EQnsteps)
+    EQstep = EQnsteps * s
+    T = temperature.compute()
+    P = pressure.compute()
+    Ek = 0.5 * T * (3 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interQuartic.computeEnergy()
+    Eaa = interNB.computeEnergyAA()
+    Ecg = interNB.computeEnergyCG()
+    sys.stdout.write(fmt % (EQstep, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
 
-print ''
-print 'Equilibration Done'
-print ''
+print('')
+print('Equilibration Done')
+print('')
 
 ### KIRKWOOD TI ###
 # TI parameters
@@ -250,21 +250,21 @@ steps = 100
 stepsequi = 50
 intervals = 10
 
-nstepsTI = steps/intervals
+nstepsTI = steps//intervals
 lambdastep = 1.0/bins
 
 # specify output filename
 namerawFile = 'KirkwoodTI_rawdata.dat'
 
-print ''
-print 'Starting Kirkwood TI'
-print ''
-print 'Kirkwood TI steps =', bins
-print 'Kirkwood TI stepwidth =', lambdastep
-print 'Integration steps for each lambda =', steps
-print 'Equilibration steps after each lamda switch =', stepsequi
-print 'Intervals for taking data and printing information to screen =', intervals
-print ''
+print('')
+print('Starting Kirkwood TI')
+print('')
+print('Kirkwood TI steps =', bins)
+print('Kirkwood TI stepwidth =', lambdastep)
+print('Integration steps for each lambda =', steps)
+print('Equilibration steps after each lamda switch =', stepsequi)
+print('Intervals for taking data and printing information to screen =', intervals)
+print('')
 
 # print the data of the starting configuration
 fmt = '%5d %8.4f %10.5f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
@@ -277,7 +277,7 @@ Eaa = interNB.computeEnergyAA()
 Ecg = interNB.computeEnergyCG()
 sys.stdout.write(' step      T         P         etotal     enonbonded    ebonded      ekinetic     eallatom        ecg \n')
 sys.stdout.write(fmt % (0, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
-print ''
+print('')
 
 # output arrays
 Energydiff = []
@@ -286,64 +286,63 @@ Pressurediff = []
 # Kirkwood steps
 for i in range(bins+1):
 
- # change Lambda
- print 'Kirkwood step: %d' %i
- print 'Lambda: %f' %(lambdastep*i)
- for p in range(num_particles + num_particlesCG):
-   system.storage.modifyParticle(p, 'lambda_adr', lambdastep*i)
- system.storage.decompose()
- # equilibration
- integrator.run(stepsequi)
- step = i * (steps+stepsequi) + stepsequi
- T = temperature.compute()
- P = pressure.compute()
- Ek = 0.5 * T * (3.0 * num_particles)
- Ep = interNB.computeEnergy()
- Eb = interQuartic.computeEnergy()
- Eaa = interNB.computeEnergyAA()
- Ecg = interNB.computeEnergyCG()
- sys.stdout.write(fmt % (step, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
+    # change Lambda
+    print('Kirkwood step: %d' %i)
+    print('Lambda: %f' %(lambdastep*i))
+    for p in range(num_particles + num_particlesCG):
+        system.storage.modifyParticle(p, 'lambda_adr', lambdastep*i)
+    system.storage.decompose()
+    # equilibration
+    integrator.run(stepsequi)
+    step = i * (steps+stepsequi) + stepsequi
+    T = temperature.compute()
+    P = pressure.compute()
+    Ek = 0.5 * T * (3.0 * num_particles)
+    Ep = interNB.computeEnergy()
+    Eb = interQuartic.computeEnergy()
+    Eaa = interNB.computeEnergyAA()
+    Ecg = interNB.computeEnergyCG()
+    sys.stdout.write(fmt % (step, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
 
- # Kirkwood integration
- runningEdiff = 0.0
- runningP = 0.0
- for s in range(1,intervals+1):
-   integrator.run(nstepsTI)
-   step = i * (steps+stepsequi) + s * nstepsTI + stepsequi
-   T = temperature.compute()
-   P = pressure.compute()
-   Ek = 0.5 * T * (3.0 * num_particles)
-   Ep = interNB.computeEnergy()
-   Eb = interQuartic.computeEnergy()
-   Eaa = interNB.computeEnergyAA()
-   Ecg = interNB.computeEnergyCG()
-   sys.stdout.write(fmt % (step, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
+    # Kirkwood integration
+    runningEdiff = 0.0
+    runningP = 0.0
+    for s in range(1,intervals+1):
+        integrator.run(nstepsTI)
+        step = i * (steps+stepsequi) + s * nstepsTI + stepsequi
+        T = temperature.compute()
+        P = pressure.compute()
+        Ek = 0.5 * T * (3.0 * num_particles)
+        Ep = interNB.computeEnergy()
+        Eb = interQuartic.computeEnergy()
+        Eaa = interNB.computeEnergyAA()
+        Ecg = interNB.computeEnergyCG()
+        sys.stdout.write(fmt % (step, T, P, Ek + Ep + Eb, Ep, Eb, Ek, Eaa, Ecg))
 
-   # get the relevant energy and pressure differences
-   runningEdiff += Ecg - Eaa
-   runningP += P
+        # get the relevant energy and pressure differences
+        runningEdiff += Ecg - Eaa
+        runningP += P
 
- # get the averages
- runningEdiff/=intervals
- runningP/=intervals
+    # get the averages
+    runningEdiff/=intervals
+    runningP/=intervals
 
- # append to output arrays
- Energydiff.append(runningEdiff)
- Pressurediff.append(runningP)
+    # append to output arrays
+    Energydiff.append(runningEdiff)
+    Pressurediff.append(runningP)
 
 # print the raw output to file
-print ''
-print "Kirkwood TI done, printing raw data to %s\n" %namerawFile
+print('')
+print("Kirkwood TI done, printing raw data to %s\n" %namerawFile)
 form = '%12.8f %12.8f %12.8f\n'
 rawFile = open (namerawFile, 'w')
 rawFile.write('lambda  V_CG-V_AA  P(lambda)\n')
 for i in range( bins+1 ):
- rawFile.write(form % ( lambdastep*i, Energydiff[i], Pressurediff[i] ))
+    rawFile.write(form % ( lambdastep*i, Energydiff[i], Pressurediff[i] ))
 rawFile.close()
 
 # simulation information
-end_time = time.clock()
+end_time = time.process_time()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-

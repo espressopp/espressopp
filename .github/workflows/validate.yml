@@ -1,0 +1,192 @@
+name: VALIDATE
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '0 0 * * SUN'
+
+jobs:
+  cancel-duplicate-workflow-runs:
+    name: "Cancel duplicate workflow runs"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: potiuk/cancel-workflow-runs@master
+        name: "Cancel duplicate workflow runs"
+        with:
+          cancelMode: duplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceRunId: ${{ github.event.workflow_run.id }}
+          notifyPRCancel: true
+          skipEventTypes: '["schedule"]'
+
+  build:
+    strategy:
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+        DISTRO: ['fedora']
+        CMAKE_COMPILER: [
+            '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
+            '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+        ]
+        include:
+          - BUILD_TYPE: 'Debug'
+            DISTRO: 'fedora_intel'
+            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc'
+          - BUILD_TYPE: 'Debug'
+            DISTRO: 'fedora_intel'
+            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
+
+    runs-on: ubuntu-latest
+    container: espressopp/buildenv:${{ matrix.distro }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
+          restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}
+
+      - uses: actions/checkout@v2
+
+      - name: Install Python Dependencies
+        run: pip3 install -r requirements.txt
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
+
+      - name: Build
+        run: cmake --build build --verbose --target all -j 2
+
+      - name: Install
+        run: cmake --install build
+
+      - name: Test
+        working-directory: build
+        run: ctest --rerun-failed --output-on-failure -j 2
+
+  documentation:
+    runs-on: ubuntu-latest
+    environment: CI
+    container: espressopp/buildenv:fedora
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: 'espressopp'
+
+      - name: Install Python Dependencies
+        run: pip3 install -r espressopp/requirements.txt
+
+      - name: build espressopp
+        run: |
+          cmake -S espressopp -B espressopp-build
+          cmake --build espressopp-build -j 2
+
+      - name: build doxygen
+        run: |
+          cmake --build espressopp-build --target doxygen -j 2
+
+      - name: build sphinx
+        run: |
+          cmake --build espressopp-build --target sphinx -j 2
+
+      - name: build sphinx-pdf
+        run: |
+          cmake --build espressopp-build --target sphinx-pdf -j 2
+
+      - uses: actions/checkout@v2
+        with:
+          repository: 'espressopp/espressopp.github.io.git'
+          ref: 'master'
+          path: 'html'
+
+      - name: update docu repo
+        working-directory: html
+        run: |
+          rm -rf *
+          mv ../espressopp-build/doc/sphinx/html/* .
+          mv ../espressopp-build/doc/sphinx/pdf/ESPResSo++.pdf .
+
+      - name: commit
+        working-directory: html
+        run: |
+          git config --global user.name "Automatic Deployment (GitHub Action)";
+          git config --global user.email "espp-devel@listserv.mpip-mainz.mpg.de";
+          git add --all && git commit -m "Documentation Update";
+
+      - name: register deploy key
+        env:
+          PAGES_KEY: ${{ secrets.PAGES_KEY }}
+        if: env.PAGES_KEY != null
+        run: |
+          export HOME=/home/$(whoami)
+          mkdir ~/.ssh && echo "${PAGES_KEY}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          ssh git@github.com || true
+
+      - name: deploy documentation
+        working-directory: html
+        run: |
+          if [[ "${GITHUB_REF}" == 'refs/heads/master' ]]; then
+            git push git@github.com:espressopp/espressopp.github.io.git master;
+          else
+            git push --dry-run git@github.com:espressopp/espressopp.github.io.git master || true;
+          fi
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: espressopp
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: github.ref == 'refs/heads/master'
+
+      - name: Build and Push Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{github.workspace}}
+          file: espressopp/.github/workflows/Dockerfile
+          push: ${{ github.ref == 'refs/heads/master' }}
+          tags: espressopp/espressopp:latest
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  coverage:
+    runs-on: ubuntu-latest
+    container: espressopp/buildenv:fedora
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python Dependencies
+        run: pip3 install -r requirements.txt
+
+      - name: Coverage build
+        run: |
+          cmake -B builddir -DUSE_GCOV=on -DCMAKE_BUILD_TYPE=Debug
+          cmake --build builddir --verbose -j 2
+
+      - name: Run tests
+        run: ctest --output-on-failure -j 2
+        working-directory: builddir
+
+      - name: Upload Report to codecov.io
+        uses: codecov/codecov-action@v1
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: run formatter
+        run: ./format.sh
+
+      - name: check formatting
+        run: git diff --exit-code

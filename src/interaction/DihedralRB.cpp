@@ -24,33 +24,36 @@
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
-namespace espressopp {
-namespace interaction {
-void DihedralRB::registerPython() {
-  using namespace espressopp::python;  //NOLINT
+namespace espressopp
+{
+namespace interaction
+{
+void DihedralRB::registerPython()
+{
+    using namespace espressopp::python;  // NOLINT
 
-  class_<DihedralRB, bases<DihedralPotential> >(
-      "interaction_DihedralRB", init< real, real, real, real, real, real >());
+    class_<DihedralRB, bases<DihedralPotential> >("interaction_DihedralRB",
+                                                  init<real, real, real, real, real, real>());
 
-  typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
-  class_ <FixedQuadrupleListDihedralRB, bases <Interaction> >
-      ("interaction_FixedQuadrupleListDihedralRB",
-          init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralRB> >())
-      .def(init<shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
-                shared_ptr<DihedralRB> >())
-      .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
-      .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
+    typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
+    class_<FixedQuadrupleListDihedralRB, bases<Interaction> >(
+        "interaction_FixedQuadrupleListDihedralRB",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<DihedralRB> >())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleListAdress>,
+                  std::shared_ptr<DihedralRB> >())
+        .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
+        .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
 
-  typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralRB>
-    FixedQuadrupleListTypesDihedralRB;
-  class_< FixedQuadrupleListTypesDihedralRB, bases< Interaction > >
-    ("interaction_FixedQuadrupleListTypesDihedralRB",
-       init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
-      .def("setPotential", &FixedQuadrupleListTypesDihedralRB::setPotential)
-      .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
-      .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
-      .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
-
+    typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralRB>
+        FixedQuadrupleListTypesDihedralRB;
+    class_<FixedQuadrupleListTypesDihedralRB, bases<Interaction> >(
+        "interaction_FixedQuadrupleListTypesDihedralRB",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
+        .def("setPotential", &FixedQuadrupleListTypesDihedralRB::setPotential)
+        .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
+        .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
+        .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
 }
 
 }  // end namespace interaction

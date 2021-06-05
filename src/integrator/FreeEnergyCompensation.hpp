@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012-2018
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
@@ -29,52 +29,55 @@
 #include "Real3D.hpp"
 #include "SystemAccess.hpp"
 #include "interaction/Interpolation.hpp"
-#include <map>
-
+#include <unordered_map>
 
 #include "Extension.hpp"
 #include "VelocityVerlet.hpp"
 
 #include "boost/signals2.hpp"
 
+namespace espressopp
+{
+namespace integrator
+{
+class FreeEnergyCompensation : public Extension
+{
+public:
+    bool sphereAdr;
+    int ntrotter;
+    bool slow;
+    FreeEnergyCompensation(std::shared_ptr<System> system,
+                           bool _sphereAdr = false,
+                           int _ntrotter = 1,
+                           bool _slow = false);
+    virtual ~FreeEnergyCompensation();
 
-namespace espressopp {
-  namespace integrator {
+    /** Setter for the filename, will read in the table. */
+    void addForce(int itype, const char* _filename, int type);
+    const char* getFilename() const { return filename.c_str(); }
 
-    class FreeEnergyCompensation : public Extension {
+    void applyForce();
 
-      public:
-        bool sphereAdr;
-        FreeEnergyCompensation(shared_ptr<System> system, bool _sphereAdr = false);
-        virtual ~FreeEnergyCompensation();
+    real computeCompEnergy();
 
-        /** Setter for the filename, will read in the table. */
-        void addForce(int itype, const char* _filename, int type);
-        const char* getFilename() const { return filename.c_str(); }
+    void setCenter(real x, real y, real z);
 
-        void applyForce();
+    static void registerPython();
 
-        real computeCompEnergy();
+private:
+    boost::signals2::connection _applyForce;
 
-        void setCenter(real x, real y, real z);
+    void connect();
+    void disconnect();
 
-        static void registerPython();
+    Real3D center;
+    std::string filename;
+    typedef std::shared_ptr<interaction::Interpolation> Table;
+    std::unordered_map<int, Table> forces;  // map type to force
 
-      private:
-
-        boost::signals2::connection _applyForce;
-
-        void connect();
-        void disconnect();
-
-        Real3D center;
-        std::string filename;
-        typedef shared_ptr <interaction::Interpolation> Table;
-        std::map<int, Table> forces; // map type to force
-
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

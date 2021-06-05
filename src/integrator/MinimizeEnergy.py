@@ -62,16 +62,16 @@ Example
 
 .. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement, variable_step_flag)
 
-		:param system: The espressopp system object.
-		:type system: espressopp.System
-		:param gamma: The gamma value.
-		:type gamma: float
-		:param ftol: The force tolerance
-		:type ftol: float
-		:param max_displacement: The maximum displacement.
-		:type max_displacement: float
+                :param system: The espressopp system object.
+                :type system: espressopp.System
+                :param gamma: The gamma value.
+                :type gamma: float
+                :param ftol: The force tolerance
+                :type ftol: float
+                :param max_displacement: The maximum displacement.
+                :type max_displacement: float
                 :param variable_step_flag: The flag of adjusting gamma to the force strength.
-		:type variable_step_flag: bool
+                :type variable_step_flag: bool
 
 .. function:: espressopp.integrator.MinimizeEnergy.run(max_steps, verbose)
 
@@ -110,8 +110,7 @@ class MinimizeEnergyLocal(integrator_MinimizeEnergy):
             return self.cxxclass.run(self, niter, verbose)
 
 if pmi.isController:
-    class MinimizeEnergy:
-        __metaclass__ = pmi.Proxy
+    class MinimizeEnergy(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.MinimizeEnergyLocal',
             pmiproperty = ('f_max', 'displacement', 'step'),

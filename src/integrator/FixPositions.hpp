@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -32,45 +32,47 @@
 #include "Real3D.hpp"
 #include "Particle.hpp"
 
-namespace espressopp {
-  namespace integrator {
+namespace espressopp
+{
+namespace integrator
+{
+/** Langevin */
 
-    /** Langevin */
+class FixPositions : public Extension
+{
+public:
+    FixPositions(std::shared_ptr<System> _system,
+                 std::shared_ptr<ParticleGroup> _particleGroup,
+                 const Int3D& _fixMask);
 
-    class FixPositions : public Extension {
+    void setParticleGroup(std::shared_ptr<ParticleGroup> _particleGroup);
 
-      public:
+    std::shared_ptr<ParticleGroup> getParticleGroup();
 
-        FixPositions(shared_ptr< System > _system, shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask);
+    void setFixMask(Int3D& _fixMask);
 
-        void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
+    Int3D& getFixMask();
 
-        shared_ptr< ParticleGroup > getParticleGroup();
+    virtual ~FixPositions(){};
 
-        void setFixMask(Int3D& _fixMask);
+    void savePositions();
+    void restorePositions();
 
-        Int3D& getFixMask();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        virtual ~FixPositions() {};
+private:
+    boost::signals2::connection _befIntP, _aftIntP;
+    std::shared_ptr<ParticleGroup> particleGroup;
+    Int3D fixMask;
+    std::list<std::pair<Particle*, Real3D> > savePos;
+    void connect();
+    void disconnect();
 
-        void savePositions();
-        void restorePositions();
-
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
-
-      private:
-        boost::signals2::connection _befIntP, _aftIntP;
-        shared_ptr< ParticleGroup > particleGroup;
-        Int3D fixMask;
-        std::list< std::pair<Particle *, Real3D> > savePos;
-        void connect();
-        void disconnect();
-
-        /** Logger */
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}
+    /** Logger */
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

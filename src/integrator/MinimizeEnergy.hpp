@@ -33,55 +33,53 @@
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
 
-namespace espressopp {
-namespace integrator {
-
+namespace espressopp
+{
+namespace integrator
+{
 // Adopted from espressomd: src/core/minimize_energy.cpp
 
-class MinimizeEnergy : public SystemAccess {
- public:
-  MinimizeEnergy(shared_ptr<class espressopp::System> system,
-                 real gamma,
-                 real ftol,
-                 real max_displacement,
-		 bool variable_step_flag);
-  virtual ~MinimizeEnergy();
+class MinimizeEnergy : public SystemAccess
+{
+public:
+    MinimizeEnergy(std::shared_ptr<class espressopp::System> system,
+                   real gamma,
+                   real ftol,
+                   real max_displacement,
+                   bool variable_step_flag);
+    virtual ~MinimizeEnergy();
 
-  bool run(int max_steps, bool verbose);
+    bool run(int max_steps, bool verbose);
 
-  /** Register this class so it can be used from Python. */
-  static void registerPython();
- private:
-  void steepestDescentStep();
-  void updateForces();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-  // Getters
-  real getFMax() {
-    return sqrt(f_max_sqr_);
-  }
+private:
+    void steepestDescentStep();
+    void updateForces();
 
-  real getDpMax() {
-    return sqrt(dp_sqr_max_);
-  }
+    // Getters
+    real getFMax() { return sqrt(f_max_sqr_); }
 
-  // Params
-  real gamma_;
-  real max_displacement_;  // Maximum displacement on particle.
-  real ftol_sqr_;  // Force limit, when maximum force is lower then stop.
+    real getDpMax() { return sqrt(dp_sqr_max_); }
 
-  real f_max_sqr_;  // Maximum force on particles.
-  real dp_sqr_max_;   // Maximum particle displacement.
-  real dp_MAX; // Summation of maximum particle displacement.
+    // Params
+    real gamma_;
+    real max_displacement_;  // Maximum displacement on particle.
+    real ftol_sqr_;          // Force limit, when maximum force is lower then stop.
 
-  bool variable_step_flag_;  //!< true implies that gamma is adjusted to the force strength. 
+    real f_max_sqr_;   // Maximum force on particles.
+    real dp_sqr_max_;  // Maximum particle displacement.
+    real dp_MAX;       // Summation of maximum particle displacement.
 
-  bool resort_flag_;  //!< true implies need for resort of particles
+    bool variable_step_flag_;  //!< true implies that gamma is adjusted to the force strength.
 
-  longint nstep_;
+    bool resort_flag_;  //!< true implies need for resort of particles
 
-  static LOG4ESPP_DECL_LOGGER(theLogger);
+    longint nstep_;
+
+    static LOG4ESPP_DECL_LOGGER(theLogger);
 };
-
 
 }  // end namespace integrator
 }  // end namespace espressopp

@@ -10,14 +10,14 @@ import mpi4py.MPI as MPI
 import unittest
 
 def vec_pbc(u,v,cell):
-   #vector u-v
-   dx = u[0] - v[0]
-   dy = u[1] - v[1]
-   dz = u[2] - v[2]
-   dx = dx - round(dx/cell[0])*cell[0]
-   dy = dy - round(dy/cell[1])*cell[1] 
-   dz = dz - round(dz/cell[2])*cell[2] 
-   return dx,dy,dz
+    #vector u-v
+    dx = u[0] - v[0]
+    dy = u[1] - v[1]
+    dz = u[2] - v[2]
+    dx = dx - round(dx/cell[0])*cell[0]
+    dy = dy - round(dy/cell[1])*cell[1]
+    dz = dz - round(dz/cell[2])*cell[2]
+    return dx,dy,dz
 
 def abslen(u):
     return math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2])
@@ -39,19 +39,19 @@ def calc_dihedral(self,quadrupleslist):
 
     positions = []
     for pid in quadrupleslist:
-      positions.append(self.system.storage.getParticle(pid).pos)
-    
-    rij = vec_pbc(positions[1],positions[0],self.box) 
-    rjk = vec_pbc(positions[2],positions[1],self.box) 
-    rkn = vec_pbc(positions[3],positions[2],self.box) 
+        positions.append(self.system.storage.getParticle(pid).pos)
+
+    rij = vec_pbc(positions[1],positions[0],self.box)
+    rjk = vec_pbc(positions[2],positions[1],self.box)
+    rkn = vec_pbc(positions[3],positions[2],self.box)
     rijjk = cross(rij,rjk)
     rjkkn = cross(rjk,rkn)
 
     cos_phi = dot(rijjk,rjkkn)/(abslen(rijjk)*abslen(rjkkn))
-    
+
     phi = math.acos(cos_phi)
 
-    rcross = cross(rijjk,rjkkn) 
+    rcross = cross(rijjk,rjkkn)
     signcheck = dot(rcross,rjk)
     if signcheck < 0.0: phi *= -1.0
 
@@ -72,10 +72,10 @@ class TestDihedralHarmonic(unittest.TestCase):
         cellGrid = espressopp.tools.decomp.cellGrid(box, nodeGrid, cutoff, skin)
         system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         self.system = system
- 
+
     def test_phi0(self):
         #create system with three torsions, and for each one set a potential with a different phi0 values, to check that the interaction potential works for all combinations of positive and negative phi and phi0
-       
+
         phi0 = [10.0,-170.0,170.0]
 
         particle_list = [
@@ -104,12 +104,12 @@ class TestDihedralHarmonic(unittest.TestCase):
 
         #add torsions
         interactions = []
-        for i in xrange(3):
-          fql = espressopp.FixedQuadrupleList(self.system.storage)
-          fql.addQuadruples([torsiontuples[i]])
-          interaction = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(self.system,fql,potential=espressopp.interaction.DihedralHarmonic(K=1.0,phi0=phi0[i]*math.pi/180.0))
-          self.system.addInteraction(interaction)
-          interactions.append(interaction)
+        for i in range(3):
+            fql = espressopp.FixedQuadrupleList(self.system.storage)
+            fql.addQuadruples([torsiontuples[i]])
+            interaction = espressopp.interaction.FixedQuadrupleListDihedralHarmonic(self.system,fql,potential=espressopp.interaction.DihedralHarmonic(K=1.0,phi0=phi0[i]*math.pi/180.0))
+            self.system.addInteraction(interaction)
+            interactions.append(interaction)
 
         #add bonds so that atoms in the torsions don't drift too far apart
         fpl = espressopp.FixedPairList(self.system.storage)

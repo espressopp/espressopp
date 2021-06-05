@@ -26,34 +26,37 @@
 
 #include "LatticeBoltzmann.hpp"
 
-namespace espressopp {
-  namespace integrator {
-    /** Abstract base class for arbitrary Init for LB simulations. */
-    class LBInit {
-    public:
-      /* Constructor for the class */
-      LBInit(shared_ptr< System > _system,
-                         shared_ptr< LatticeBoltzmann > _latticeboltzmann) {
-                            latticeboltzmann = _latticeboltzmann;
-      }
-      /* Destructor for the class */
-      virtual ~LBInit () {}
+namespace espressopp
+{
+namespace integrator
+{
+/** Abstract base class for arbitrary Init for LB simulations. */
+class LBInit
+{
+public:
+    /* Constructor for the class */
+    LBInit(std::shared_ptr<System> _system, std::shared_ptr<LatticeBoltzmann> _latticeboltzmann)
+    {
+        latticeboltzmann = _latticeboltzmann;
+    }
+    /* Destructor for the class */
+    virtual ~LBInit() {}
 
-      /* HANDLING INITIAL DENSITIES AND VELOCITIES */
-      virtual void createDenVel (real _rho0, Real3D _u0) = 0;
+    /* HANDLING INITIAL DENSITIES AND VELOCITIES */
+    virtual void createDenVel(real _rho0, Real3D _u0) = 0;
 
-      /* HANDLING EXTERNAL FORCES */
-      virtual void setForce (Real3D _force) = 0;
-      virtual void addForce (Real3D _force) = 0;
+    /* HANDLING EXTERNAL FORCES */
+    virtual void setForce(Real3D _force) = 0;
+    virtual void addForce(Real3D _force) = 0;
 
-      static void registerPython();
+    static void registerPython();
 
-    protected:
-      shared_ptr<LatticeBoltzmann> latticeboltzmann;
-      real rho0;
-      Real3D u0;
-    };
-  }
-}
+protected:
+    std::shared_ptr<LatticeBoltzmann> latticeboltzmann;
+    real rho0;
+    Real3D u0;
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

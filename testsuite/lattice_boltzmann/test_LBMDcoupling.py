@@ -1,23 +1,23 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -*- coding: utf-8 -*-
 
 import espressopp
@@ -74,7 +74,7 @@ class makeConf(unittest.TestCase):
         potLJ          = espressopp.interaction.LennardJones(epsilon, sigma, rc)
         interaction.setPotential(type1=0, type2=0, potential=potLJ)
         system.addInteraction(interaction)
-        
+
         # integrator
         integrator     = espressopp.integrator.VelocityVerlet(system)
         integrator.dt  = timestep
@@ -107,7 +107,7 @@ class makeConf(unittest.TestCase):
             system.storage.addParticles(particle_list, 'id', 'type', 'mass', 'pos', 'v')
             system.storage.decompose()
 
-            print "Warm up. Sigma will be increased from 0. to 1."
+            print("Warm up. Sigma will be increased from 0. to 1.")
             new_sigma = sigma
             for k in range(50):
                 integrator.run(100)
@@ -120,7 +120,7 @@ class makeConf(unittest.TestCase):
             espressopp.tools.fastwritexyz(mdoutput, system)
 
         # LB will control thermostatting now
-        thermostat.disconnect()        
+        thermostat.disconnect()
 
         integrator.step = 0
 
@@ -139,7 +139,7 @@ class makeConf(unittest.TestCase):
         lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
         ext_lboutputScreen=espressopp.integrator.ExtAnalyze(lboutputScreen,lb.profStep)
         integrator.addExtension(ext_lboutputScreen)
-        
+
         # lb parameters: viscosities, temperature, time contrast b/w MD and LB
         lb.visc_b = 3.
         lb.visc_s = 3.
@@ -154,13 +154,13 @@ class makeConf(unittest.TestCase):
 
     def tearDown(self):
         if (self.integrator.step == 0):
-            print "continue to restarting test:"
+            print("continue to restarting test:")
         else:
             shutil.rmtree('./dump/')
 
 class TestLBMDCoupling(makeConf):
     def test_lbmdcoupling(self):
-        print "Checking total momentum of LB-MD system:"
+        print("Checking total momentum of LB-MD system:")
 
         global runSteps
 
@@ -171,12 +171,12 @@ class TestLBMDCoupling(makeConf):
         restartmdoutput = 'dump/restart' + s + '.xyz'
         espressopp.tools.fastwritexyz(restartmdoutput, self.system)
         self.restartmdoutput = restartmdoutput
-    
+
         self.integrator.step = 0
         # output formatting
-        print "-" * 73
+        print("-" * 73)
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)
@@ -184,7 +184,7 @@ class TestLBMDCoupling(makeConf):
         self.assertAlmostEqual(tot_mom[2], 0., places=10)
 
     def test_restartlbmd(self):
-        print "Checking total momentum of restarted LB-MD system:"
+        print("Checking total momentum of restarted LB-MD system:")
 
         global runSteps
         self.integrator.step = runSteps
@@ -204,9 +204,9 @@ class TestLBMDCoupling(makeConf):
         self.integrator.run(runSteps)
 
         # output formatting
-        print "-" * 73
+        print("-" * 73)
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+        print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
 
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)

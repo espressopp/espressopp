@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
@@ -28,12 +28,12 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools import lammps, gromacs
-from espresso.tools import decomp, timers, replicate
+from espressopp import Real3D, Int3D
+from espressopp.tools import lammps, gromacs
+from espressopp.tools import decomp, timers, replicate
 
 # simulation parameters (nvt = False is nve)
 steps = 1000
@@ -52,14 +52,14 @@ bonds, angles, x, y, z, Lx, Ly, Lz = replicate(bonds, angles, x, y, z, Lx, Ly, L
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-nodeGrid = espresso.tools.decomp.nodeGrid(comm.size,size,rc,skin)
-cellGrid = espresso.tools.decomp.cellGrid(size,nodeGrid,rc,skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+nodeGrid = espressopp.tools.decomp.nodeGrid(comm.size,size,rc,skin)
+cellGrid = espressopp.tools.decomp.cellGrid(size,nodeGrid,rc,skin)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
 # do this in chunks of 1000 particles to speed it up
@@ -76,57 +76,57 @@ system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
 # Lennard-Jones with Verlet list
-vl = espresso.VerletList(system, cutoff = rc + system.skin)
-potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = rc, shift = False)
-interLJ = espresso.interaction.VerletListLennardJones(vl)
+vl = espressopp.VerletList(system, cutoff = rc + system.skin)
+potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = rc, shift = False)
+interLJ = espressopp.interaction.VerletListLennardJones(vl)
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 system.addInteraction(interLJ)
 
 # FENE bonds
-fpl = espresso.FixedPairList(system.storage)
+fpl = espressopp.FixedPairList(system.storage)
 fpl.addBonds(bonds)
-potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
+potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
 system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
-ftl = espresso.FixedTripleList(system.storage)
+ftl = espressopp.FixedTripleList(system.storage)
 ftl.addTriples(angles)
-potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
-interCosine = espresso.interaction.FixedTripleListCosine(system, ftl, potCosine)
+potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
+interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
 #interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
 system.addInteraction(interCosine)
 
 
 # integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 if(nvt):
-  langevin = espresso.integrator.LangevinThermostat(system)
+  langevin = espressopp.integrator.LangevinThermostat(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
   integrator.addExtension(langevin)
 
 # print simulation parameters
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'nvt =', nvt
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid)
-print 'CellGrid = %s' % (cellGrid)
-print ''
+print('')
+print('number of particles =', num_particles)
+print('density = %.4f' % (density))
+print('rc =', rc)
+print('dt =', integrator.dt)
+print('skin =', system.skin)
+print('nvt =', nvt)
+print('steps =', steps)
+print('NodeGrid = %s' % (nodeGrid))
+print('CellGrid = %s' % (cellGrid))
+print('')
 
 # analysis
-# configurations = espresso.analysis.Configurations(system)
+# configurations = espressopp.analysis.Configurations(system)
 # configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
 
@@ -141,9 +141,9 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-start_time = time.clock()
+start_time = time.process_time()
 integrator.run(steps)
-end_time = time.clock()
+end_time = time.process_time()
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()

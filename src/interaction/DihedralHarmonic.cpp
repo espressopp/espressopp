@@ -27,40 +27,41 @@
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
-namespace espressopp {
-  namespace interaction {
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    DihedralHarmonic::registerPython() {
-      using namespace espressopp::python;
+namespace espressopp
+{
+namespace interaction
+{
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void DihedralHarmonic::registerPython()
+{
+    using namespace espressopp::python;
 
-      class_ <DihedralHarmonic, bases <DihedralPotential> >
-      ("interaction_DihedralHarmonic", init< real, real >())
+    class_<DihedralHarmonic, bases<DihedralPotential> >("interaction_DihedralHarmonic",
+                                                        init<real, real>())
         .add_property("K", &DihedralHarmonic::getK, &DihedralHarmonic::setK)
-        .add_property("phi0", &DihedralHarmonic::getPhi0, &DihedralHarmonic::setPhi0)
-      ;
+        .add_property("phi0", &DihedralHarmonic::getPhi0, &DihedralHarmonic::setPhi0);
 
-      typedef class FixedQuadrupleListInteractionTemplate <DihedralHarmonic>
-      FixedQuadrupleListDihedralHarmonic;
-      class_ <FixedQuadrupleListDihedralHarmonic, bases <Interaction> >
-        ("interaction_FixedQuadrupleListDihedralHarmonic",
-                  init< shared_ptr<System>,
-                        shared_ptr<FixedQuadrupleList>,
-                        shared_ptr<DihedralHarmonic> >())
+    typedef class FixedQuadrupleListInteractionTemplate<DihedralHarmonic>
+        FixedQuadrupleListDihedralHarmonic;
+    class_<FixedQuadrupleListDihedralHarmonic, bases<Interaction> >(
+        "interaction_FixedQuadrupleListDihedralHarmonic",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<DihedralHarmonic> >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonic::setPotential)
-        .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList)
-        ;
-      typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonic>
+        .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList);
+    typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonic>
         FixedQuadrupleListTypesDihedralHarmonic;
-      class_< FixedQuadrupleListTypesDihedralHarmonic, bases< Interaction > >
-        ("interaction_FixedQuadrupleListTypesDihedralHarmonic",
-         init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+    class_<FixedQuadrupleListTypesDihedralHarmonic, bases<Interaction> >(
+        "interaction_FixedQuadrupleListTypesDihedralHarmonic",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
         .def("setPotential", &FixedQuadrupleListTypesDihedralHarmonic::setPotential)
         .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonic::getPotentialPtr)
-        .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)
-        .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::getFixedQuadrupleList);
-    }
-  }
+        .def("setFixedQuadrupleList",
+             &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)
+        .def("getFixedQuadrupleList",
+             &FixedQuadrupleListTypesDihedralHarmonic::getFixedQuadrupleList);
 }
+}  // namespace interaction
+}  // namespace espressopp

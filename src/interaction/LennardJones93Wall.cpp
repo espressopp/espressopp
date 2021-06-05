@@ -26,30 +26,30 @@
 #include "LennardJones93Wall.hpp"
 #include "Real3D.hpp"
 
-namespace espressopp {
-  namespace interaction {
-
-    typedef class SingleParticleInteractionTemplate <LennardJones93Wall>
+namespace espressopp
+{
+namespace interaction
+{
+typedef class SingleParticleInteractionTemplate<LennardJones93Wall>
     SingleParticleLennardJones93Wall;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    LennardJones93Wall::registerPython() {
-      using namespace espressopp::python;
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void LennardJones93Wall::registerPython()
+{
+    using namespace espressopp::python;
 
-      class_< LennardJones93Wall, bases< SingleParticlePotential > >
-        ("interaction_LennardJones93Wall", init<>())
+    class_<LennardJones93Wall, bases<SingleParticlePotential> >("interaction_LennardJones93Wall",
+                                                                init<>())
         .def("setParams", &LennardJones93Wall::setParams)
-        .def("getParams", &LennardJones93Wall::getParams)
-        ;
+        .def("getParams", &LennardJones93Wall::getParams);
 
-      class_< SingleParticleLennardJones93Wall, bases< Interaction > >
-        ("interaction_SingleParticleLennardJones93Wall", init< shared_ptr<System>, shared_ptr<LennardJones93Wall> >())
+    class_<SingleParticleLennardJones93Wall, bases<Interaction> >(
+        "interaction_SingleParticleLennardJones93Wall",
+        init<std::shared_ptr<System>, std::shared_ptr<LennardJones93Wall> >())
         .def("setPotential", &SingleParticleLennardJones93Wall::setPotential)
-        .def("getPotential", &SingleParticleLennardJones93Wall::getPotential)
-       ;
-    }
-  }
+        .def("getPotential", &SingleParticleLennardJones93Wall::getPotential);
 }
+}  // namespace interaction
+}  // namespace espressopp

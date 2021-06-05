@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017,2018
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -36,6 +36,8 @@
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
+#include "NPartSubregion.hpp"
+#include "SubregionTracking.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
 #include "CMVelocity.hpp"
@@ -53,6 +55,7 @@
 #include "XTemperature.hpp"
 #include "XPressure.hpp"
 #include "AdressDensity.hpp"
+#include "RadGyrXProfilePI.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
 
@@ -68,31 +71,37 @@
 
 #include "SystemMonitor.hpp"
 #include "PotentialEnergy.hpp"
+#include "KineticEnergy.hpp"
 
-namespace espressopp {
-  namespace analysis {
-    void registerPython() {
-      Observable::registerPython();
-      AnalysisBase::registerPython();
-      Temperature::registerPython();
-      Pressure::registerPython();
-      PressureTensor::registerPython();
-      PressureTensorLayer::registerPython();
-      PressureTensorMultiLayer::registerPython();
-      Configuration::registerPython();
-      Configurations::registerPython();
-      ConfigurationExt::registerPython();
-      ConfigurationsExt::registerPython();
-      ConfigurationsExtAdress::registerPython();
-      Velocities::registerPython();
-      CenterOfMass::registerPython();
-      NPart::registerPython();
-      MaxPID::registerPython();
-      AllParticlePos::registerPython();
-      IntraChainDistSq::registerPython();
-      NeighborFluctuation::registerPython();
-      OrderParameter::registerPython();
-      CMVelocity::registerPython();
+namespace espressopp
+{
+namespace analysis
+{
+void registerPython()
+{
+    Observable::registerPython();
+    AnalysisBase::registerPython();
+    Temperature::registerPython();
+    Pressure::registerPython();
+    PressureTensor::registerPython();
+    PressureTensorLayer::registerPython();
+    PressureTensorMultiLayer::registerPython();
+    Configuration::registerPython();
+    Configurations::registerPython();
+    ConfigurationExt::registerPython();
+    ConfigurationsExt::registerPython();
+    ConfigurationsExtAdress::registerPython();
+    Velocities::registerPython();
+    CenterOfMass::registerPython();
+    NPart::registerPython();
+    NPartSubregion::registerPython();
+    SubregionTracking::registerPython();
+    MaxPID::registerPython();
+    AllParticlePos::registerPython();
+    IntraChainDistSq::registerPython();
+    NeighborFluctuation::registerPython();
+    OrderParameter::registerPython();
+    CMVelocity::registerPython();
 
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();

@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -30,7 +30,7 @@ the OPLS dihedral potential. To create a new dihedral potential.
 
 .. math::
 
-	U = \sum^4_{j=1} K_j  (1 + cos(j \phi))
+        U = \sum^4_{j=1} K_j  (1 + cos(j \phi))
 
 
 
@@ -39,32 +39,32 @@ the OPLS dihedral potential. To create a new dihedral potential.
 
 .. function:: espressopp.interaction.OPLS(K1, K2, K3, K4)
 
-		:param K1: (default: 1.0)
-		:param K2: (default: 0.0)
-		:param K3: (default: 0.0)
-		:param K4: (default: 0.0)
-		:type K1: real
-		:type K2: real
-		:type K3: real
-		:type K4: real
+                :param K1: (default: 1.0)
+                :param K2: (default: 0.0)
+                :param K3: (default: 0.0)
+                :param K4: (default: 0.0)
+                :type K1: real
+                :type K2: real
+                :type K3: real
+                :type K4: real
 
 .. function:: espressopp.interaction.FixedQuadrupleListOPLS(system, vl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param system:
+                :param vl:
+                :param potential:
+                :type system:
+                :type vl:
+                :type potential:
 
 .. function:: espressopp.interaction.FixedQuadrupleListOPLS.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+                :param type1:
+                :param type2:
+                :param potential:
+                :type type1:
+                :type type2:
+                :type potential:
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -98,8 +98,7 @@ if pmi.isController:
             pmiproperty = ['K1', 'K2', 'K3', 'K4']
             )
 
-    class FixedQuadrupleListOPLS(Interaction):
-        __metaclass__ = pmi.Proxy
+    class FixedQuadrupleListOPLS(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListOPLSLocal',
             pmicall = ['setPotential']

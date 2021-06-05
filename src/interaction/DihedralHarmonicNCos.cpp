@@ -27,45 +27,47 @@
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
-namespace espressopp {
-  namespace interaction {
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    DihedralHarmonicNCos::registerPython() {
-      using namespace espressopp::python;
+namespace espressopp
+{
+namespace interaction
+{
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void DihedralHarmonicNCos::registerPython()
+{
+    using namespace espressopp::python;
 
-      class_ <DihedralHarmonicNCos, bases <DihedralPotential> >
-      ("interaction_DihedralHarmonicNCos", init< real, real, int >())
+    class_<DihedralHarmonicNCos, bases<DihedralPotential> >("interaction_DihedralHarmonicNCos",
+                                                            init<real, real, int>())
         .add_property("K", &DihedralHarmonicNCos::getK, &DihedralHarmonicNCos::setK)
         .add_property("phi0", &DihedralHarmonicNCos::getPhi0, &DihedralHarmonicNCos::setPhi0)
-        .add_property("multiplicity", &DihedralHarmonicNCos::getMultiplicity, &DihedralHarmonicNCos::setMultiplicity)
-      ;
+        .add_property("multiplicity", &DihedralHarmonicNCos::getMultiplicity,
+                      &DihedralHarmonicNCos::setMultiplicity);
 
-      typedef class FixedQuadrupleListInteractionTemplate <DihedralHarmonicNCos>
-      FixedQuadrupleListDihedralHarmonicNCos;
-      class_ <FixedQuadrupleListDihedralHarmonicNCos, bases <Interaction> >
-        ("interaction_FixedQuadrupleListDihedralHarmonicNCos",
-                  init< shared_ptr<System>,
-                        shared_ptr<FixedQuadrupleList>,
-                        shared_ptr<DihedralHarmonicNCos> >())
-        .def(init< shared_ptr<System>,
-                   shared_ptr<FixedQuadrupleListAdress>,
-                   shared_ptr<DihedralHarmonicNCos> >())
+    typedef class FixedQuadrupleListInteractionTemplate<DihedralHarmonicNCos>
+        FixedQuadrupleListDihedralHarmonicNCos;
+    class_<FixedQuadrupleListDihedralHarmonicNCos, bases<Interaction> >(
+        "interaction_FixedQuadrupleListDihedralHarmonicNCos",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<DihedralHarmonicNCos> >())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleListAdress>,
+                  std::shared_ptr<DihedralHarmonicNCos> >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonicNCos::setPotential)
-        .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonicNCos::getFixedQuadrupleList)
-        ;
+        .def("getFixedQuadrupleList",
+             &FixedQuadrupleListDihedralHarmonicNCos::getFixedQuadrupleList);
 
-      typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonicNCos>
-          FixedQuadrupleListTypesDihedralHarmonicNCos;
-      class_< FixedQuadrupleListTypesDihedralHarmonicNCos, bases< Interaction > >
-          ("interaction_FixedQuadrupleListTypesDihedralHarmonicNCos",
-           init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
-          .def("setPotential", &FixedQuadrupleListTypesDihedralHarmonicNCos::setPotential)
-          .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonicNCos::getPotentialPtr)
-          .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonicNCos::setFixedQuadrupleList)
-          .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonicNCos::getFixedQuadrupleList);
-    }
-  }
+    typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonicNCos>
+        FixedQuadrupleListTypesDihedralHarmonicNCos;
+    class_<FixedQuadrupleListTypesDihedralHarmonicNCos, bases<Interaction> >(
+        "interaction_FixedQuadrupleListTypesDihedralHarmonicNCos",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList> >())
+        .def("setPotential", &FixedQuadrupleListTypesDihedralHarmonicNCos::setPotential)
+        .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonicNCos::getPotentialPtr)
+        .def("setFixedQuadrupleList",
+             &FixedQuadrupleListTypesDihedralHarmonicNCos::setFixedQuadrupleList)
+        .def("getFixedQuadrupleList",
+             &FixedQuadrupleListTypesDihedralHarmonicNCos::getFixedQuadrupleList);
 }
+}  // namespace interaction
+}  // namespace espressopp

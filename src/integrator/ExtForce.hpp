@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -32,47 +32,49 @@
 #include "Real3D.hpp"
 #include "Particle.hpp"
 
-namespace espressopp {
-  namespace integrator {
+namespace espressopp
+{
+namespace integrator
+{
+/** ExtForce */
 
-    /** ExtForce */
+class ExtForce : public Extension
+{
+public:
+    ExtForce(std::shared_ptr<System> _system, const Real3D& _extForce);
 
-    class ExtForce : public Extension {
+    ExtForce(std::shared_ptr<System> _system,
+             const Real3D& _extForce,
+             std::shared_ptr<ParticleGroup> _particleGroup);
 
-      public:
+    void setExtForce(Real3D& _extForce);
 
-        ExtForce(shared_ptr< System > _system, const Real3D& _extForce);
+    Real3D& getExtForce();
 
-        ExtForce(shared_ptr< System > _system, const Real3D& _extForce, shared_ptr< ParticleGroup > _particleGroup);
+    void setParticleGroup(std::shared_ptr<ParticleGroup> _particleGroup);
 
-        void setExtForce(Real3D& _extForce);
+    std::shared_ptr<ParticleGroup> getParticleGroup();
 
-        Real3D& getExtForce();
+    void applyForceToGroup();
+    void applyForceToAll();
 
-        void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
+    virtual ~ExtForce(){};
 
-        shared_ptr< ParticleGroup > getParticleGroup();
+    /** Register this class so it can be used from Python. */
+    static void registerPython();
 
-        void applyForceToGroup();
-        void applyForceToAll();
+private:
+    boost::signals2::connection _aftInitF;
+    std::shared_ptr<ParticleGroup> particleGroup;
+    bool allParticles;
+    Real3D extForce;
+    void connect();
+    void disconnect();
 
-        virtual ~ExtForce() {};
-
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
-
-      private:
-        boost::signals2::connection _aftInitF;
-        shared_ptr< ParticleGroup > particleGroup;
-        bool allParticles;
-        Real3D extForce;
-        void connect();
-        void disconnect();
-
-        /** Logger */
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
-}
+    /** Logger */
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+}  // namespace integrator
+}  // namespace espressopp
 
 #endif

@@ -26,40 +26,43 @@
 #include "LBOutput.hpp"
 #include "esutil/Timer.hpp"
 
-namespace espressopp {
-   namespace analysis {
-      class LBOutputScreen : public LBOutput {
-      public:
-         LBOutputScreen(shared_ptr<System> _system,
-                        shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
+namespace espressopp
+{
+namespace analysis
+{
+class LBOutputScreen : public LBOutput
+{
+public:
+    LBOutputScreen(std::shared_ptr<System> _system,
+                   std::shared_ptr<integrator::LatticeBoltzmann> _latticeboltzmann);
 
-         void writeOutput();
-         void findLBMom(int _mode);
+    void writeOutput();
+    void findLBMom(int _mode);
 
-         void setMDMom(Real3D _mdMom);
-         Real3D getMDMom();
+    void setMDMom(Real3D _mdMom);
+    Real3D getMDMom();
 
-         void setLBMom(Real3D _lbMom);
-         Real3D getLBMom();
+    void setLBMom(Real3D _lbMom);
+    Real3D getLBMom();
 
-         void setLBTimerOld(real _lbTimerOld);
-         real getLBTimerOld();
+    void setLBTimerOld(real _lbTimerOld);
+    real getLBTimerOld();
 
-         void setLBTimerNew(real _lbTimerNew);
-         real getLBTimerNew();
+    void setLBTimerNew(real _lbTimerNew);
+    real getLBTimerNew();
 
-         void setOldStepNum(long int _oldStepNum);
-         long int getOldStepNum();
+    void setOldStepNum(long int _oldStepNum);
+    long int getOldStepNum();
 
-         static void registerPython();
+    static void registerPython();
 
-      private:
-         int oldStepNum;
-         real lbTimerOld, lbTimerNew;
-         Real3D lbMom, mdMom;
-         esutil::WallTimer timeLBtoMD;  //!< used for timing
-      };
-   }
-}
+private:
+    int oldStepNum;
+    real lbTimerOld, lbTimerNew;
+    Real3D lbMom, mdMom;
+    esutil::WallTimer timeLBtoMD;  //!< used for timing
+};
+}  // namespace analysis
+}  // namespace espressopp
 
 #endif

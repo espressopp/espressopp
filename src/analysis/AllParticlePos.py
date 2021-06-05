@@ -26,7 +26,7 @@ espressopp.analysis.AllParticlePos
 
 .. function:: espressopp.analysis.AllParticlePos.gatherAllPositions()
 
-		:rtype:
+                :rtype:
 """
 from espressopp import pmi
 from _espressopp import analysis_AllParticlePos
@@ -34,11 +34,10 @@ from _espressopp import analysis_AllParticlePos
 class AllParticlePosLocal(object):
 
     def gatherAllPositions(self):
-      return self.cxxclass.gatherAllPositions(self)
+        return self.cxxclass.gatherAllPositions(self)
 
 if pmi.isController :
-    class AllParticlePos(object):
-        __metaclass__ = pmi.Proxy
+    class AllParticlePos(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             pmicall = [ "gatherAllPositions" ]
         )

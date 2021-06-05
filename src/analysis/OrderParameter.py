@@ -26,20 +26,20 @@ espressopp.analysis.OrderParameter
 
 .. function:: espressopp.analysis.OrderParameter(system, cutoff, angular_momentum, do_cluster_analysis, include_surface_particles, ql_low, ql_high)
 
-		:param system:
-		:param cutoff:
-		:param angular_momentum: (default: 6)
-		:param do_cluster_analysis: (default: False)
-		:param include_surface_particles: (default: False)
-		:param ql_low: (default: -1.0)
-		:param ql_high: (default: 1.0)
-		:type system:
-		:type cutoff:
-		:type angular_momentum: int
-		:type do_cluster_analysis:
-		:type include_surface_particles:
-		:type ql_low:
-		:type ql_high: real
+                :param system:
+                :param cutoff:
+                :param angular_momentum: (default: 6)
+                :param do_cluster_analysis: (default: False)
+                :param include_surface_particles: (default: False)
+                :param ql_low: (default: -1.0)
+                :param ql_high: (default: 1.0)
+                :type system:
+                :type cutoff:
+                :type angular_momentum: int
+                :type do_cluster_analysis:
+                :type include_surface_particles:
+                :type ql_low:
+                :type ql_high: real
 """
 
 from espressopp.esutil import cxxinit
@@ -53,15 +53,14 @@ class OrderParameterLocal(AnalysisBaseLocal, analysis_OrderParameter):
     def __init__(self, system, cutoff, angular_momentum=6,
                       do_cluster_analysis=False, include_surface_particles=False,
                       ql_low=-1.0, ql_high=1.0):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             #print "coupled cluster analysis is currently broken"
             cxxinit(self, analysis_OrderParameter, system, cutoff, angular_momentum,
                       do_cluster_analysis, include_surface_particles,
                       ql_low, ql_high)
 
 if pmi.isController :
-    class OrderParameter(AnalysisBase):
-        __metaclass__ = pmi.Proxy
+    class OrderParameter(AnalysisBase, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-          cls =  'espressopp.analysis.OrderParameterLocal'
+            cls =  'espressopp.analysis.OrderParameterLocal'
         )

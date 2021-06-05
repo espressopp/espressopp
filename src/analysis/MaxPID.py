@@ -27,8 +27,8 @@ espressopp.analysis.MaxPID
 
 .. function:: espressopp.analysis.MaxPID(system)
 
-		:param system:
-		:type system:
+                :param system:
+                :type system:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -39,12 +39,11 @@ from _espressopp import analysis_MaxPID
 class MaxPIDLocal(ObservableLocal, analysis_MaxPID):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_MaxPID, system)
 
 if pmi.isController :
-    class MaxPID(Observable):
-        __metaclass__ = pmi.Proxy
+    class MaxPID(Observable, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.MaxPIDLocal'
             )

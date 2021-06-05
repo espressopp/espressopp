@@ -91,24 +91,24 @@ will produce trj.xyz with in nanometers
                                     length_factor=1.0, length_unit='LJ', store_pids=False,\
                                     store_velocities=False, append=True)
 
-	:param system:
-	:param integrator:
-	:param filename:
-	:param bool unfolded:
-	:param real length_factor:
-	:param length_unit:
-	:param bool store_pids:
-	:param bool store_velocities:
-	:param bool append:
-	:type system:
-	:type integrator:
-	:type filename:
-	:type length_unit:
+        :param system:
+        :param integrator:
+        :param filename:
+        :param bool unfolded:
+        :param real length_factor:
+        :param length_unit:
+        :param bool store_pids:
+        :param bool store_velocities:
+        :param bool append:
+        :type system:
+        :type integrator:
+        :type filename:
+        :type length_unit:
 
 .. function:: espressopp.io.DumpXYZ.dump()
 
-		:rtype:
-        
+                :rtype:
+
 """
 
 from espressopp.esutil import cxxinit
@@ -119,19 +119,18 @@ from _espressopp import io_DumpXYZ
 
 class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
 
-  def __init__(self, system, integrator, filename='out.xyz', unfolded=False, length_factor=1.0, length_unit='LJ', store_pids=False, store_velocities=False, append=True):
-    cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, store_pids, store_velocities, append)
+    def __init__(self, system, integrator, filename='out.xyz', unfolded=False, length_factor=1.0, length_unit='LJ', store_pids=False, store_velocities=False, append=True):
+        cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, store_pids, store_velocities, append)
 
-  def dump(self):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.dump(self)
+    def dump(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.dump(self)
 
 
 if pmi.isController :
-  class DumpXYZ(ParticleAccess):
-    __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict(
-      cls =  'espressopp.io.DumpXYZLocal',
-      pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'store_pids', 'store_velocities', 'append']
-    )
+    class DumpXYZ(ParticleAccess, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+          cls =  'espressopp.io.DumpXYZLocal',
+          pmicall = [ 'dump' ],
+          pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'store_pids', 'store_velocities', 'append']
+        )
