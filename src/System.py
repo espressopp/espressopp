@@ -211,7 +211,7 @@ class SystemLocal(_espressopp.System):
           elif len(args) == 3:
             self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
-            print args, " is invalid"
+            print(args, " is invalid")
           
     def setTrace(self, switch):
 
