@@ -69,7 +69,7 @@ public:
     /** returns observable of type int, used for Python and on C++ level*/
     virtual int compute_int() const { return 0; };
     /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
-    virtual void compute_real_vector() { return; };
+    virtual std::vector<real> compute_real_vector() { return std::vector<real>(); };
     /** computes vector of integer values, used on C++ level only */
     virtual void compute_int_vector() { return; };
 
