@@ -37,31 +37,28 @@
 #include "iterator/CellListIterator.hpp"
 #include <boost/mpi/timer.hpp>
 
-namespace espressopp {
-namespace analysis {
-
+namespace espressopp
+{
+namespace analysis
+{
 /**
  * Base class for SystemMonitor output formats.
  */
-class SystemMonitorOutput {
-  friend class SystemMonitor;
-  public:
+class SystemMonitorOutput
+{
+    friend class SystemMonitor;
+
+public:
     virtual void write() = 0;
-    void setSystem(shared_ptr<System> system) {
-      system_ = system;
-    }
+    void setSystem(shared_ptr<System> system) { system_ = system; }
 
-    void setKeys(shared_ptr<std::vector<std::string> > keys) {
-      keys_ = keys;
-    }
+    void setKeys(shared_ptr<std::vector<std::string> > keys) { keys_ = keys; }
 
-    void setValues(shared_ptr<std::vector<real> > val) {
-      values_ = val;
-    }
+    void setValues(shared_ptr<std::vector<real> > val) { values_ = val; }
 
     static void registerPython();
 
-  protected:
+protected:
     shared_ptr<std::vector<std::string> > keys_;
     shared_ptr<std::vector<real> > values_;
     shared_ptr<System> system_;
@@ -74,84 +71,86 @@ class SystemMonitorOutput {
  * @param file_name The output file name.
  * @param delimiter The separator of fields.
  */
-class SystemMonitorOutputCSV : public SystemMonitorOutput {
- public:
-  SystemMonitorOutputCSV(std::string file_name, std::string delimiter) :
-      file_name_(file_name), delimiter_(delimiter) {
-    header_written_ = false;
-  }
-  void write();
-
-  static void registerPython();
-
- private:
-  std::string file_name_;
-  std::string delimiter_;
-  bool header_written_;
-};
-
-class SystemMonitorOutputDummy : public SystemMonitorOutput {
- public:
-  void write() { }
-  static void registerPython();
-};
-
-
-class SystemMonitor : public ParticleAccess {
- public:
-  typedef std::vector<std::pair<std::string, shared_ptr<Observable> > > ObservableList;
-  SystemMonitor(shared_ptr< System > system,
-                shared_ptr<integrator::MDIntegrator> integrator,
-                shared_ptr<SystemMonitorOutput> output):
-        ParticleAccess(system),
-        system_(system),
-        integrator_(integrator),
-        output_(output) {
-    header_ = make_shared<std::vector<std::string> >();
-    values_ = make_shared<std::vector<real> >();
-
-    output_->setKeys(header_);
-    output_->setValues(values_);
-    output_->setSystem(system);
-
-    header_shown_ = false;
-    if (system->comm->rank() == 0) {
-      header_->push_back("step");
-      header_->push_back("time");
-      visible_observables_.push_back(1);
-      visible_observables_.push_back(1);
+class SystemMonitorOutputCSV : public SystemMonitorOutput
+{
+public:
+    SystemMonitorOutputCSV(std::string file_name, std::string delimiter)
+        : file_name_(file_name), delimiter_(delimiter)
+    {
+        header_written_ = false;
     }
-    elapsed_time_ = true;
-  }
+    void write();
 
-  ~SystemMonitor() { }
+    static void registerPython();
 
-  void perform_action();
-  void info();
+private:
+    std::string file_name_;
+    std::string delimiter_;
+    bool header_written_;
+};
 
-  static void registerPython();
+class SystemMonitorOutputDummy : public SystemMonitorOutput
+{
+public:
+    void write() {}
+    static void registerPython();
+};
 
- private:
-  void computeObservables();
+class SystemMonitor : public ParticleAccess
+{
+public:
+    typedef std::vector<std::pair<std::string, shared_ptr<Observable> > > ObservableList;
+    SystemMonitor(shared_ptr<System> system,
+                  shared_ptr<integrator::MDIntegrator> integrator,
+                  shared_ptr<SystemMonitorOutput> output)
+        : ParticleAccess(system), system_(system), integrator_(integrator), output_(output)
+    {
+        header_ = make_shared<std::vector<std::string> >();
+        values_ = make_shared<std::vector<real> >();
 
-  void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
+        output_->setKeys(header_);
+        output_->setValues(values_);
+        output_->setSystem(system);
 
-  int current_step_;
-  bool header_shown_;
-  bool elapsed_time_;
-  boost::mpi::timer timer_;
+        header_shown_ = false;
+        if (system->comm->rank() == 0)
+        {
+            header_->push_back("step");
+            header_->push_back("time");
+            visible_observables_.push_back(1);
+            visible_observables_.push_back(1);
+        }
+        elapsed_time_ = true;
+    }
 
-  shared_ptr<std::vector<real> > values_;
-  shared_ptr<std::vector<std::string> > header_;
-  std::vector<int> visible_observables_;
-  shared_ptr<System> system_;
-  shared_ptr<integrator::MDIntegrator> integrator_;
+    ~SystemMonitor() {}
 
-  shared_ptr<SystemMonitorOutput> output_;
-  ObservableList observables_;
+    void perform_action();
+    void info();
 
-  real total_energy_;
-  real potential_energy_;
+    static void registerPython();
+
+private:
+    void computeObservables();
+
+    void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
+
+    int current_step_;
+    bool header_shown_;
+    bool elapsed_time_;
+    boost::mpi::timer timer_;
+
+    shared_ptr<std::vector<real> > values_;
+    shared_ptr<std::vector<std::string> > header_;
+    std::vector<int> visible_observables_;
+    shared_ptr<System> system_;
+    shared_ptr<integrator::MDIntegrator> integrator_;
+
+    shared_ptr<SystemMonitorOutput> output_;
+    ObservableList observables_;
+
+    real total_energy_;
+    real potential_energy_;
 };
 
 }  // end namespace analysis

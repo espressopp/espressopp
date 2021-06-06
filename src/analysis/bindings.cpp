@@ -103,33 +103,33 @@ void registerPython()
     OrderParameter::registerPython();
     CMVelocity::registerPython();
 
-      ConfigsParticleDecomp::registerPython();
-      VelocityAutocorrelation::registerPython();
-      MeanSquareDispl::registerPython();
-      MeanSquareInternalDist::registerPython();
-      RadialDistrF::registerPython();
-      StaticStructF::registerPython();
-      RDFatomistic::registerPython();
-      XDensity::registerPython();
-      XTemperature::registerPython();
-      XPressure::registerPython();
-      AdressDensity::registerPython();
-      Test::registerPython();
-      ParticleRadiusDistribution::registerPython();
+    ConfigsParticleDecomp::registerPython();
+    VelocityAutocorrelation::registerPython();
+    MeanSquareDispl::registerPython();
+    MeanSquareInternalDist::registerPython();
+    RadialDistrF::registerPython();
+    StaticStructF::registerPython();
+    RDFatomistic::registerPython();
+    XDensity::registerPython();
+    XTemperature::registerPython();
+    XPressure::registerPython();
+    AdressDensity::registerPython();
+    Test::registerPython();
+    ParticleRadiusDistribution::registerPython();
 
-      Autocorrelation::registerPython();
-      Viscosity::registerPython();
+    Autocorrelation::registerPython();
+    Viscosity::registerPython();
 
-      LBOutput::registerPython();
-      LBOutputScreen::registerPython();
-      LBOutputVzInTime::registerPython();
-      LBOutputVzOfX::registerPython();
+    LBOutput::registerPython();
+    LBOutputScreen::registerPython();
+    LBOutputVzInTime::registerPython();
+    LBOutputVzOfX::registerPython();
 
-      SystemMonitorOutput::registerPython();
-      SystemMonitorOutputDummy::registerPython();
-      SystemMonitorOutputCSV::registerPython();
-      SystemMonitor::registerPython();
-      PotentialEnergy::registerPython();
-    }
-  }
+    SystemMonitorOutput::registerPython();
+    SystemMonitorOutputDummy::registerPython();
+    SystemMonitorOutputCSV::registerPython();
+    SystemMonitor::registerPython();
+    PotentialEnergy::registerPython();
 }
+}  // namespace analysis
+}  // namespace espressopp

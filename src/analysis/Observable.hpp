@@ -61,39 +61,39 @@ public:
     };
     virtual ~Observable(){};
 
-    public:
-      /** for compatibilty with old compute function only, will be deleted soon */
-      virtual real compute() const { return 0.0; };
-      /** returns observable of type real, used for Python and on C++ level*/
-      virtual real compute_real() const { return 0.0;};
-      /** returns observable of type int, used for Python and on C++ level*/
-      virtual int compute_int() const { return 0; };
-      /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
-      virtual void compute_real_vector(){ return; };
-      /** computes vector of integer values, used on C++ level only */
-      virtual void compute_int_vector(){ return; };
+public:
+    /** for compatibilty with old compute function only, will be deleted soon */
+    virtual real compute() const { return 0.0; };
+    /** returns observable of type real, used for Python and on C++ level*/
+    virtual real compute_real() const { return 0.0; };
+    /** returns observable of type int, used for Python and on C++ level*/
+    virtual int compute_int() const { return 0; };
+    /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
+    virtual void compute_real_vector() { return; };
+    /** computes vector of integer values, used on C++ level only */
+    virtual void compute_int_vector() { return; };
 
-      /** returns python list of real values (e.g. pressure tensor, ...), used on Python level*/
-      virtual python::list compute_real_vector_python();
-      /** returns python list of integer values, used on Python level*/
-      virtual python::list compute_int_vector_python();
+    /** returns python list of real values (e.g. pressure tensor, ...), used on Python level*/
+    virtual python::list compute_real_vector_python();
+    /** returns python list of integer values, used on Python level*/
+    virtual python::list compute_int_vector_python();
 
-      /** returns the result type of the observable */
-      // TODO at the moment it returns int instead, because it was causing an error
-      // trying to convert result_types to python
-      //result_types getResultType() { return result_type; };
-      int getResultType() { return result_type; };
-      longint getResultVectorSize() { return result_vector_size; }
-      ObservableTypes getObservableType() { return observable_type; }
+    /** returns the result type of the observable */
+    // TODO at the moment it returns int instead, because it was causing an error
+    // trying to convert result_types to python
+    // result_types getResultType() { return result_type; };
+    int getResultType() { return result_type; };
+    longint getResultVectorSize() { return result_vector_size; }
+    ObservableTypes getObservableType() { return observable_type; }
 
-      static void registerPython();
+    static void registerPython();
 
-     protected:
-      result_types result_type;
-      ObservableTypes observable_type;
-      std::vector< real > result_real_vector;
-      std::vector< int > result_int_vector;
-      longint result_vector_size;
+protected:
+    result_types result_type;
+    ObservableTypes observable_type;
+    std::vector<real> result_real_vector;
+    std::vector<int> result_int_vector;
+    longint result_vector_size;
 
     static LOG4ESPP_DECL_LOGGER(logger);
 };
