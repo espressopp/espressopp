@@ -130,6 +130,9 @@ void registerPython()
     SystemMonitorOutputCSV::registerPython();
     SystemMonitor::registerPython();
     PotentialEnergy::registerPython();
+    KineticEnergy::registerPython();
+
+    RadGyrXProfilePI::registerPython();
 }
 }  // namespace analysis
 }  // namespace espressopp
