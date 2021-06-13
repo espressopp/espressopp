@@ -53,19 +53,16 @@ void ExtAnalyze::connect()
 {
     // connection to end of integrator
     _aftIntV = integrator->aftIntV.connect(std::bind(&ExtAnalyze::perform_action, this));
-    counter = 0;
 }
 
 // void ExtAnalyze::performMeasurement() {
 void ExtAnalyze::perform_action()
 {
     LOG4ESPP_INFO(theLogger, "performing measurement in integrator");
-    //if (integrator->getStep() % interval == 0)
-    if (counter % interval == 0)
+    if ((integrator->getStep() - 1) % interval == 0)
     {
         particle_access->perform_action();
     }
-    counter++;
 }
 
 /****************************************************
