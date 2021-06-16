@@ -177,7 +177,7 @@ class TestLBMDCoupling(makeConf):
         print("-" * 73)
         tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
         print("total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n")
-    
+
         # momentum checks
         self.assertAlmostEqual(tot_mom[0], 0., places=10)
         self.assertAlmostEqual(tot_mom[1], 0., places=10)
