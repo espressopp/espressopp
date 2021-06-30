@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017,2021
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -55,7 +57,6 @@ private:
 
     std::shared_ptr<ParticleAccess> particle_access;
     int interval;
-    int counter;
 
     /** Logger */
     static LOG4ESPP_DECL_LOGGER(theLogger);
