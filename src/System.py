@@ -225,7 +225,7 @@ if pmi.isController:
     class System(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls = 'espressopp.SystemLocal',
-          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
+          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator', 'vectorization'],
           pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
                 'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
                 'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']

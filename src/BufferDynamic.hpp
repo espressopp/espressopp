@@ -128,9 +128,11 @@ public:
         val = *tbuf;
     }
 
-    void read(int& val) { readAll<int>(val); }
-
-    void read(real& val) { readAll<real>(val); }
+    template <class T>
+    void read(T& v)
+    {
+        readAll<T>(v);
+    }
 
     void read(Particle& p, int extradata)
     {
@@ -150,33 +152,16 @@ public:
         }
     }
 
-    void read(Particle& p) { readAll<Particle>(p); }
-
-    void read(ParticleForce& f) { readAll<ParticleForce>(f); }
-
-    void read(std::vector<longint>& v)
+    template <class T>
+    void read(std::vector<T>& v)
     {
-        int nvals;
+        size_t nvals;
         read(nvals);
         v.clear();
         v.reserve(nvals);
-        for (int i = 0; i < nvals; i++)
+        for (size_t i = 0; i < nvals; i++)
         {
-            int val;
-            read(val);
-            v.push_back(val);
-        }
-    }
-
-    void read(std::vector<real>& v)
-    {
-        int nvals;
-        read(nvals);
-        v.clear();
-        v.reserve(nvals);
-        for (int i = 0; i < nvals; i++)
-        {
-            real val;
+            T val;
             read(val);
             v.push_back(val);
         }
@@ -237,7 +222,7 @@ public:
     OutBuffer(const mpi::communicator& comm) : Buffer(comm) {}
 
     template <class T>
-    void writeAll(T& val)
+    void writeAll(T const& val)
     {
         int size = sizeof(T);  // needed size to write the data
         extend(pos + size);    // make sure that buffer will be sufficient
@@ -248,9 +233,11 @@ public:
         // std::cout << comm.rank() << ": write usedSize: " << usedSize << "\n";
     }
 
-    void write(int& val) { writeAll<int>(val); }
-
-    void write(real& val) { writeAll<real>(val); }
+    template <class T>
+    void write(T const& v)
+    {
+        writeAll<T>(v);
+    }
 
     void write(Particle& p, int extradata, const Real3D& shift)
     {
@@ -274,17 +261,14 @@ public:
         }
     }
 
-    void write(ParticleForce& f) { writeAll<ParticleForce>(f); }
-
-    void write(Particle& p) { writeAll<Particle>(p); }
-
-    void write(std::vector<longint>& v)
+    template <class T>
+    void write(std::vector<T> const& v)
     {
-        int size = v.size();
+        size_t size = v.size();
         write(size);
-        for (longint i = 0; i < size; i++)
+        for (size_t i = 0; i < size; i++)
         {
-            int val = v[i];
+            T val = v[i];
             write(val);
         }
     }
