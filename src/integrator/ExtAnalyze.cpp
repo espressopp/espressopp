@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017,2021
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -51,18 +53,16 @@ void ExtAnalyze::connect()
 {
     // connection to end of integrator
     _aftIntV = integrator->aftIntV.connect(std::bind(&ExtAnalyze::perform_action, this));
-    counter = 0;
 }
 
 // void ExtAnalyze::performMeasurement() {
 void ExtAnalyze::perform_action()
 {
     LOG4ESPP_INFO(theLogger, "performing measurement in integrator");
-    if (counter % interval == 0)
+    if ((integrator->getStep() - 1) % interval == 0)
     {
         particle_access->perform_action();
     }
-    counter++;
 }
 
 /****************************************************

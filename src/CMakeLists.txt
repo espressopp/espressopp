@@ -55,7 +55,7 @@ target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 
 if(WITH_XTC)
-    target_add_definitions(_espressopp PRIVATE -DHAS_GROMACS)
+    target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)
     target_link_libraries(_espressopp PRIVATE Gromacs::libgromacs)
     target_sources(_espressopp PRIVATE ${DUMP_XTC_SOURCE})
 endif()
