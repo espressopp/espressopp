@@ -190,11 +190,7 @@ inline void VerletListLennardJonesCapped::addForces_impl(
             const int in_min = prange[ip].first;
             const int in_max = prange[ip].second;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+            ESPP_VEC_PRAGMAS
             for (int in = in_min; in < in_max; in++)
             {
                 auto np_ii = nplist[in];

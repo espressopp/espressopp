@@ -32,6 +32,13 @@
 #endif
 #endif
 
+#ifdef __INTEL_COMPILER
+#define ESPP_VEC_PRAGMAS _Pragma("vector always") _Pragma("vector aligned") _Pragma("ivdep")
+#define ESPP_VEC_PRAGMAS
+#else
+#define ESPP_VEC_PRAGMAS
+#endif
+
 // NOTE: Padding to 64-byte boundaries
 constexpr size_t ESPP_VECTOR_ALIGNMENT = 64;
 constexpr size_t ESPP_VECTOR_WIDTH = ESPP_VECTOR_ALIGNMENT / sizeof(espressopp::real);

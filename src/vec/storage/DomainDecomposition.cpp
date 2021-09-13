@@ -289,11 +289,7 @@ void DomainDecomposition::copyRealsToGhostsIntra(size_t dir, Real3D const& shift
 
                 if (DO_SHIFT)
                 {
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (size_t ip = 0; ip < numPart; ip++)
                     {
                         pos_g[ip] = pos_r[ip] + shift_v;
@@ -301,11 +297,7 @@ void DomainDecomposition::copyRealsToGhostsIntra(size_t dir, Real3D const& shift
                 }
                 else
                 {
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (size_t ip = 0; ip < numPart; ip++)
                     {
                         pos_g[ip] = pos_r[ip];
@@ -348,11 +340,7 @@ void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir)
                 const real* __restrict f_g = f + cellRange[icg];
 
                 {
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (size_t ip = 0; ip < numPart; ip++)
                     {
                         f_r[ip] += f_g[ip];
@@ -389,11 +377,7 @@ void DomainDecomposition::packCells(AlignedVector<real>& sendBuf,
                 const real* __restrict p_ptr_c = p_ptr + cr[ic];
                 const size_t npart = cr[ic + 1] - cr[ic];
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                ESPP_VEC_PRAGMAS
                 for (size_t ip = 0; ip < npart; ip++)
                 {
                     if (DO_SHIFT == ADD_SHIFT)
@@ -454,11 +438,7 @@ void DomainDecomposition::unpackCells(AlignedVector<real> const& recvBuf, bool c
                 real* __restrict p_ptr_c = p_ptr + cr[ic];
                 const size_t npart = cr[ic + 1] - cr[ic];
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                ESPP_VEC_PRAGMAS
                 for (size_t ip = 0; ip < npart; ip++)
                 {
                     if (DATA_MODE == DATA_ADD)

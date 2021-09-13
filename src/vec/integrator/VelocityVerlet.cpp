@@ -353,11 +353,7 @@ real VelocityVerlet::integrate1(ParticleArray& particles, const real dt)
         const real* __restrict f_z = &(particles.f_z[start]);
         const real* __restrict mass = &(particles.mass[start]);
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+        ESPP_VEC_PRAGMAS
         for (size_t ip = 0; ip < size; ip++)
         {
             const real dtfm = 0.5 * dt / mass[ip];
@@ -402,11 +398,7 @@ void VelocityVerlet::integrate2(ParticleArray& particles, const real dt)
         const real* __restrict f_z = &(particles.f_z[start]);
         const real* __restrict mass = &(particles.mass[start]);
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+        ESPP_VEC_PRAGMAS
         for (size_t ip = 0; ip < size; ip++)
         {
             const real dtfm = 0.5 * dt / mass[ip];

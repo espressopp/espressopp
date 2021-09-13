@@ -187,11 +187,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
 
                     int* __restrict c_j_ctr = c_j_ptr + nc_ctr;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (int ll = 0; ll < ncell_size; ll++)
                     {
                         c_j_ctr[ll] = ncell_start + ll;
@@ -207,11 +203,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     const int num_pad = pad_end - nc_ctr;
                     int* __restrict c_j_ctr = c_j_ptr + nc_ctr;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (int ll = 0; ll < num_pad; ll++)
                     {
                         c_j_ctr[ll] = padding;
@@ -221,11 +213,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 const int& c_end = nc_ctr;
 
                 /// fill values
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                ESPP_VEC_PRAGMAS
                 for (int ii = 0; ii < c_end; ii++)
                 {
                     int p = c_j_ptr[ii];
@@ -282,11 +270,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     {
                         int ll = 0;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                        ESPP_VEC_PRAGMAS
                         for (size_t np = ncell_start; np < ncell_data_end; np++)
                         {
                             {
@@ -321,11 +305,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     int* __restrict npptr = &(nplist[c_np_start + c_nplist_size]);
                     int ll = 0;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                    ESPP_VEC_PRAGMAS
                     for (int ii = 0; ii < c_j_size; ii++)
                     {
                         const real dist_x = p_x - c_x_ptr[ii];
@@ -355,11 +335,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                         {
                             int ll = 0;
 
-#ifdef __INTEL_COMPILER
-#pragma vector always
-#pragma vector aligned
-#pragma ivdep
-#endif
+                            ESPP_VEC_PRAGMAS
                             for (size_t np = ncell_start; np < ncell_data_end; np++)
                             {
                                 {
