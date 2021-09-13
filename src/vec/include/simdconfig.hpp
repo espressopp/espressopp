@@ -33,11 +33,11 @@
 #endif
 
 #ifdef __INTEL_COMPILER
-#define ESPP_VEC_PRAGMAS _Pragma("vector always") _Pragma("vector aligned") _Pragma("ivdep")
-#define ESPP_VEC_PRAGMAS
+#define ESPP_VEC_PRAGMAS _Pragma("ivdep")
 #else
-#define ESPP_VEC_PRAGMAS
+#define ESPP_VEC_PRAGMAS _Pragma("GCC ivdep")
 #endif
+// TODO: Test and define for more compilers
 
 // NOTE: Padding to 64-byte boundaries
 constexpr size_t ESPP_VECTOR_ALIGNMENT = 64;
