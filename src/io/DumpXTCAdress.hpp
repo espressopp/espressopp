@@ -53,13 +53,13 @@ public:
                   std::shared_ptr<integrator::MDIntegrator> _integrator,
                   std::string _file_name,
                   bool _unfolded,
-                  real _length_factor,
-                  bool _append)
+                  bool _append,
+                  real _length_factor)
         : ParticleAccess(system),
-          ftpl(_ftpl),
           fio(NULL),
           xtcprec(1000),
           integrator(_integrator),
+          ftpl(_ftpl),
           file_name(_file_name),
           unfolded(_unfolded),
           length_factor(_length_factor),
@@ -97,8 +97,8 @@ private:
     std::string file_name;
 
     bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
-    bool append;    // append to existing trajectory file or create a new one
     real length_factor;
+    bool append;    // append to existing trajectory file or create a new one
 
     bool open(const char *mode);
     void close();
