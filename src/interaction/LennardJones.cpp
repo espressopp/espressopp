@@ -26,6 +26,7 @@
 #include "Harmonic.hpp"
 #include "ReactionFieldGeneralized.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListAdressATInteractionTemplate.hpp"
 #include "VerletListAdressCGInteractionTemplate.hpp"
@@ -39,12 +40,14 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
 namespace interaction
 {
 typedef class VerletListInteractionTemplate<LennardJones> VerletListLennardJones;
+typedef class VerletListHybridInteractionTemplate<LennardJones> VerletListHybridLennardJones;
 typedef class VerletListAdressInteractionTemplate<LennardJones, Tabulated>
     VerletListAdressLennardJones;
 typedef class VerletListAdressATInteractionTemplate<LennardJones> VerletListAdressATLennardJones;
@@ -84,8 +87,8 @@ typedef class VerletListHadressInteractionTemplate<LennardJones, Harmonic>
 typedef class CellListAllPairsInteractionTemplate<LennardJones> CellListLennardJones;
 typedef class FixedPairListInteractionTemplate<LennardJones> FixedPairListLennardJones;
 typedef class FixedPairListTypesInteractionTemplate<LennardJones> FixedPairListTypesLennardJones;
+typedef class FixedPairListAdressInteractionTemplate<LennardJones> FixedPairListAdressLennardJones;
 LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
-// LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -224,6 +227,17 @@ void LennardJones::registerPython()
         .def("setPotentialCG", &VerletListHadressLennardJonesHarmonic::setPotentialCG);
     ;
 
+    class_<VerletListHybridLennardJones, bases<Interaction> >(
+        "interaction_VerletListHybridLennardJones",
+        init<std::shared_ptr<VerletList>, bool>())
+        .def("getVerletList", &VerletListHybridLennardJones::getVerletList)
+        .def("setPotential", &VerletListHybridLennardJones::setPotential)
+        .def("getPotential", &VerletListHybridLennardJones::getPotentialPtr)
+        .add_property("scale_factor", &VerletListHybridLennardJones::scaleFactor,
+                      &VerletListHybridLennardJones::setScaleFactor)
+        .add_property("max_force", &VerletListHybridLennardJones::maxForce,
+                      &VerletListHybridLennardJones::setMaxForce);
+
     class_<CellListLennardJones, bases<Interaction> >("interaction_CellListLennardJones",
                                                       init<std::shared_ptr<storage::Storage> >())
         .def("setPotential", &CellListLennardJones::setPotential);
@@ -248,6 +262,17 @@ void LennardJones::registerPython()
         .def("getFixedPairList", &FixedPairListTypesLennardJones::getFixedPairList)
         .def("setPotential", &FixedPairListTypesLennardJones::setPotential)
         .def("getPotential", &FixedPairListTypesLennardJones::getPotentialPtr);
+
+    class_<FixedPairListAdressLennardJones, bases<Interaction> >(
+        "interaction_FixedPairListAdressLennardJones",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJones>, bool>())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<LennardJones>,
+             bool>())
+        .def("setPotential", &FixedPairListAdressLennardJones::setPotential)
+        .def("getPotential", &FixedPairListAdressLennardJones::getPotential)
+        .def("setFixedPairList", &FixedPairListAdressLennardJones::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListAdressLennardJones::getFixedPairList)
+        ;
 }
 
 }  // namespace interaction

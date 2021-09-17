@@ -31,6 +31,7 @@
 #include "InterpolationAkima.hpp"
 #include "InterpolationCubic.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListAdressCGInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
@@ -41,6 +42,7 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
 #include "FixedPairListPIadressInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -71,6 +73,7 @@ void Tabulated::setFilename(int itype, const char* _filename)
 }
 
 typedef class VerletListInteractionTemplate<Tabulated> VerletListTabulated;
+typedef class VerletListHybridInteractionTemplate<Tabulated> VerletListHybridTabulated;
 typedef class VerletListAdressInteractionTemplate<Tabulated, Tabulated> VerletListAdressTabulated;
 typedef class VerletListAdressCGInteractionTemplate<Tabulated> VerletListAdressCGTabulated;
 typedef class VerletListHadressInteractionTemplate<Tabulated, Tabulated> VerletListHadressTabulated;
@@ -85,6 +88,8 @@ typedef class CellListAllPairsInteractionTemplate<Tabulated> CellListTabulated;
 typedef class FixedPairListInteractionTemplate<Tabulated> FixedPairListTabulated;
 typedef class FixedPairListTypesInteractionTemplate<Tabulated> FixedPairListTypesTabulated;
 typedef class FixedPairListPIadressInteractionTemplate<Tabulated> FixedPairListPIadressTabulated;
+typedef class FixedPairListAdressInteractionTemplate<Tabulated> FixedPairListAdressTabulated;
+LOG4ESPP_LOGGER(Tabulated::theLogger, "Tabulated");
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -172,6 +177,18 @@ void Tabulated::registerPython()
         .def("getNTrotter", &VerletListPIadressNoDriftTabulated::getNTrotter)
         .def("setSpeedup", &VerletListPIadressNoDriftTabulated::setSpeedup)
         .def("getSpeedup", &VerletListPIadressNoDriftTabulated::getSpeedup);
+    ;
+
+    class_<VerletListHybridTabulated, bases<Interaction> >(
+        "interaction_VerletListHybridTabulated",
+        init<std::shared_ptr<VerletList>, bool>())
+        .def("getVerletList", &VerletListHybridTabulated::getVerletList)
+        .def("setPotential", &VerletListHybridTabulated::setPotential)
+        .def("getPotential", &VerletListHybridTabulated::getPotentialPtr)
+        .add_property("scale_factor", &VerletListHybridTabulated::scaleFactor,
+                      &VerletListHybridTabulated::setScaleFactor)
+        .add_property("max_force", &VerletListHybridTabulated::maxForce,
+                      &VerletListHybridTabulated::setMaxForce);
     ;
 
     class_<CellListTabulated, bases<Interaction> >("interaction_CellListTabulated",

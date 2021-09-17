@@ -698,6 +698,7 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJones, \
                       interaction_VerletListLennardJones, \
+                      interaction_VerletListHybridLennardJones, \
                       interaction_VerletListAdressLennardJones, \
                       interaction_VerletListAdressATLennardJones, \
                       interaction_VerletListAdressATLenJonesReacFieldGen, \
@@ -716,7 +717,8 @@ from _espressopp import interaction_LennardJones, \
                       interaction_VerletListHadressLennardJonesHarmonic, \
                       interaction_CellListLennardJones, \
                       interaction_FixedPairListLennardJones, \
-                      interaction_FixedPairListTypesLennardJones
+                      interaction_FixedPairListTypesLennardJones, \
+                      interaction_FixedPairListAdressLennardJones
 
 class LennardJonesLocal(PotentialLocal, interaction_LennardJones):
 
@@ -736,6 +738,23 @@ class VerletListLennardJonesLocal(InteractionLocal, interaction_VerletListLennar
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJones, vl)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def getVerletListLocal(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getVerletList(self)
+
+class VerletListHybridLennardJonesLocal(InteractionLocal, interaction_VerletListHybridLennardJones):
+    def __init__(self, vl, cg_potential=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListLennardJones, vl, cg_potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -1059,6 +1078,29 @@ class FixedPairListTypesLennardJonesLocal(InteractionLocal, interaction_FixedPai
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
+class FixedPairListAdressLennardJonesLocal(InteractionLocal, interaction_FixedPairListAdressLennardJones):
+    'The (local) Lennard-Jones interaction using FixedPair lists.'
+    def __init__(self, system, vl, potential, cg_potential=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListAdressLennardJones, system, vl, potential, cg_potential)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self)
+
+    def setFixedPairList(self, fixedpairlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
+
+    def getFixedPairList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedPairList(self)
+
 if pmi.isController:
     class LennardJones(Potential):
         'The Lennard-Jones potential.'
@@ -1072,6 +1114,12 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListLennardJonesLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
+
+    class VerletListHybridLennardJones(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridLennardJonesLocal',
+            pmicall = ['setPotential', 'getPotential', 'getVerletList']
+        )
 
     class VerletListAdressATLennardJones(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
@@ -1186,3 +1234,9 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListTypesLennardJonesLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList','getFixedPairList' ]
             )
+
+    class FixedPairListAdressLennardJones(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressLennardJonesLocal',
+            pmicall = ['setPotential', 'getPotential', 'setFixedPairList','getFixedPairList' ]
+        )

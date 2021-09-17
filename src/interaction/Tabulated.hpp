@@ -27,6 +27,7 @@
 //#include <stdexcept>
 #include "Potential.hpp"
 #include "Interpolation.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -48,6 +49,8 @@ private:
     int interpolationType;
 
 public:
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+
     static void registerPython();
 
     Tabulated()

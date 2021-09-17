@@ -51,6 +51,7 @@
 #include <Version.hpp>
 #include <ParticleAccess.hpp>
 #include <RealND.hpp>
+#include <FixedVSList.hpp>
 
 #include <esutil/PyLogger.hpp>
 #include <esutil/bindings.hpp>
@@ -92,6 +93,7 @@ void espressopp::registerPython()
     espressopp::Version::registerPython();
     espressopp::ParticleAccess::registerPython();
     espressopp::RealNDs::registerPython();
+    espressopp::FixedVSList::registerPython();
 
     espressopp::esutil::registerPython();
     espressopp::bc::registerPython();

@@ -262,6 +262,11 @@ class ParticleLocal(object):
     def isGhost(self, val): self.__getTmp().isGhost = val
 
     @property
+    def isVP(self): return self.__getTmp().isVP
+    @isVP.setter
+    def isVP(self, val): self.__getTmp().isVP = val
+    
+    @property
     def lambda_adr(self): return self.__getTmp().lambda_adr
     @lambda_adr.setter
     def lambda_adr(self, val): self.__getTmp().lambda_adr = val
@@ -301,6 +306,7 @@ class ParticleLocal(object):
     def locateParticle(self):
         tmp = self.storage.lookupRealParticle(self.pid)
         return (tmp is not None)
+
 
 if pmi.isController:
     class Particle(metaclass=pmi.Proxy):

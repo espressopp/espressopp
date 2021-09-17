@@ -40,6 +40,9 @@ typedef double real;
 static const real infinity = std::numeric_limits<real>::infinity();
 static const real ROUND_ERROR_PREC = std::numeric_limits<real>::epsilon();
 
+static const real ALMOST_ZERO = std::numeric_limits<real>::epsilon();
+static const real ALMOST_ONE = 1.0 - std::numeric_limits<real>::epsilon();
+
 // define this to "long long" if you need longer integers
 typedef int longint;
 
@@ -47,6 +50,9 @@ typedef int longint;
 typedef boost::lagged_fibonacci607 RNGType;
 // If you REALLY need speed use the line below instead
 // typedef boost::rand48 RNGType;
+
+inline bool isAlmostZero(real value1) { return (std::abs(value1 - ALMOST_ZERO) < 10e-16); }
+
 }  // namespace espressopp
 
 #endif
