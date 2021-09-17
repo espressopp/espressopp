@@ -98,7 +98,7 @@ private:
 
     bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
     real length_factor;
-    bool append;    // append to existing trajectory file or create a new one
+    bool append;  // append to existing trajectory file or create a new one
 
     bool open(const char *mode);
     void close();
