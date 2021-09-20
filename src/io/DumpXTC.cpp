@@ -81,7 +81,6 @@ void DumpXTC::dump()
         {
             ConfigurationExtIterator cei = conf_real->getIterator();
             // Real3D *box = new Real3D [dim];
-            matrix box;
             rvec *coord = new rvec[num_of_particles];
             RealND props;
             props.setDimension(cei.currentProperties().getDimension());

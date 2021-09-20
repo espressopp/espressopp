@@ -69,7 +69,6 @@ void DumpXTCAdress::dump()
         if (this->open("a"))
         {
             analysis::ConfigurationExtIterator cei = conf_real->getIterator();
-            matrix box;
             rvec *coord = new rvec[num_of_particles];
             RealND props;
             props.setDimension(cei.currentProperties().getDimension());
