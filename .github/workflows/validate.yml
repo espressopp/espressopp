@@ -64,7 +64,7 @@ jobs:
         run: cmake --install build
 
       - name: Test
-        if: matrix.DISTRO != 'fedora_intel'
+        if: ${{ matrix.DISTRO != 'fedora_intel' }}
         working-directory: build
         run: ctest --rerun-failed --output-on-failure -j 2
 
