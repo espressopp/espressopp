@@ -31,6 +31,7 @@
 #include <VerletList.hpp>
 #include <VerletListAdress.hpp>
 #include <VerletListTriple.hpp>
+#include <VerletListHybrid.hpp>
 #include <FixedSingleList.hpp>
 #include <FixedPairList.hpp>
 #include <FixedPairDistList.hpp>
@@ -72,6 +73,8 @@ void espressopp::registerPython()
     espressopp::VerletList::registerPython();
     espressopp::VerletListAdress::registerPython();
     espressopp::VerletListTriple::registerPython();
+    espressopp::VerletListHybridAT::registerPython();
+    espressopp::VerletListHybridCG::registerPython();
     espressopp::FixedSingleList::registerPython();
     espressopp::FixedPairList::registerPython();
     espressopp::FixedPairDistList::registerPython();

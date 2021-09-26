@@ -168,7 +168,8 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TabulatedAngular, \
                         interaction_FixedTripleListTabulatedAngular, \
                         interaction_FixedTripleListTypesTabulatedAngular, \
-                        interaction_FixedTripleListPIadressTabulatedAngular
+                        interaction_FixedTripleListPIadressTabulatedAngular, \
+                        interaction_FixedTripleListAdressTabulatedAngular
 
 
 class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
@@ -255,6 +256,16 @@ class FixedTripleListPIadressTabulatedAngularLocal(InteractionLocal, interaction
         if pmi.workerIsActive():
             self.cxxclass.getSpeedup(self)
 
+class FixedTripleListAdressTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListAdressTabulatedAngular):
+    'The (local) tabulated angular interaction using FixedTriple lists.'
+    def __init__(self, system, vl, potential, cg_potential=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedTripleListAdressTabulatedAngular, system, vl, potential, cg_potential)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
 
 if pmi.isController:
     class TabulatedAngular(AngularPotential):
@@ -280,4 +291,10 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListPIadressTabulatedAngularLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedTripleList', 'getFixedTripleList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
+            )
+
+    class FixedTripleListAdressTabulatedAngular(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedTripleListAdressTabulatedAngularLocal',
+            pmicall = ['setPotential', 'getFixedTripleList', 'getPotential']
             )

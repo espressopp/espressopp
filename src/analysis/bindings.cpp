@@ -73,6 +73,7 @@
 #include "PotentialEnergy.hpp"
 #include "KineticEnergy.hpp"
 #include "Resolution.hpp"
+#include "TemperatureOnGroup.hpp"
 
 namespace espressopp
 {
@@ -133,6 +134,7 @@ void registerPython()
     PotentialEnergy::registerPython();
     KineticEnergy::registerPython();
     Resolution::registerPython();
+    TemperatureOnGroup::registerPython();
 
     RadGyrXProfilePI::registerPython();
 }

@@ -754,7 +754,7 @@ class VerletListLennardJonesLocal(InteractionLocal, interaction_VerletListLennar
 class VerletListHybridLennardJonesLocal(InteractionLocal, interaction_VerletListHybridLennardJones):
     def __init__(self, vl, cg_potential=False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListLennardJones, vl, cg_potential)
+            cxxinit(self, interaction_VerletListHybridLennardJones, vl, cg_potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -1118,7 +1118,8 @@ if pmi.isController:
     class VerletListHybridLennardJones(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridLennardJonesLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
+            pmicall = ['setPotential', 'getPotential', 'getVerletList'],
+            pmiproprty = ['scale_factor', 'max_force']
         )
 
     class VerletListAdressATLennardJones(Interaction, metaclass=pmi.Proxy):

@@ -115,15 +115,13 @@ class SystemMonitorLocal(analysis_SystemMonitor):
             self.cxxclass.dump(self)
 
 if pmi.isController:
-    class SystemMonitorDummy:
-        __metaclass__ = pmi.Proxy
+    class SystemMonitorDummy(metaclass=pmi.Proxy):
         pmiproxydefs = dict(cls='espressopp.analysis.SystemMonitorOutputDummyLocal')
-    class SystemMonitorOutputCSV:
-        __metaclass__ = pmi.Proxy
+
+    class SystemMonitorOutputCSV(metaclass=pmi.Proxy):
         pmiproxydefs = dict(cls='espressopp.analysis.SystemMonitorOutputCSVLocal')
 
-    class SystemMonitor:
-        __metaclass__ = pmi.Proxy
+    class SystemMonitor(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.analysis.SystemMonitorLocal',
             pmicall=['add_observable', 'info', 'dump'],

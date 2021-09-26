@@ -595,6 +595,7 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_Tabulated, \
                       interaction_VerletListTabulated, \
+                      interaction_VerletListHybridTabulated, \
                       interaction_VerletListAdressTabulated, \
                       interaction_VerletListAdressCGTabulated, \
                       interaction_VerletListHadressTabulated, \
@@ -605,7 +606,8 @@ from _espressopp import interaction_Tabulated, \
                       interaction_CellListTabulated, \
                       interaction_FixedPairListTabulated, \
                       interaction_FixedPairListTypesTabulated, \
-                      interaction_FixedPairListPIadressTabulated
+                      interaction_FixedPairListPIadressTabulated, \
+                      interaction_FixedPairListAdressTabulated
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
 
@@ -677,6 +679,33 @@ class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHa
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
+
+class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
+
+    def __init__(self, vl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListTabulated, vl)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+class VerletListHybridTabulatedLocal(InteractionLocal, interaction_VerletListHybridTabulated):
+    def __init__(self, vl, cg_potential=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHybridTabulated, vl, cg_potential)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
 
 
 class VerletListPIadressTabulatedLocal(InteractionLocal, interaction_VerletListPIadressTabulated):
@@ -917,6 +946,16 @@ class FixedPairListPIadressTabulatedLocal(InteractionLocal, interaction_FixedPai
             self.cxxclass.getSpeedup(self)
 
 
+class FixedPairListAdressTabulatedLocal(InteractionLocal, interaction_FixedPairListAdressTabulated):
+    'The (local) tabulated interaction using FixedPair lists.'
+    def __init__(self, system, vl, potential, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListAdressTabulated, system, vl, potential, is_cg)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
 if pmi.isController:
     class Tabulated(Potential):
         'The Tabulated potential.'
@@ -973,6 +1012,13 @@ if pmi.isController:
             pmicall = ['setPotential','getPotential']
             )
 
+    class VerletListHybridTabulated(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridTabulatedLocal',
+            pmicall = ['setPotential','getPotential'],
+            pmiproperty = ('scale_factor', 'max_force')
+        )
+
     class CellListTabulated(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.CellListTabulatedLocal',
@@ -995,4 +1041,10 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListPIadressTabulatedLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedPairList', 'getFixedPairList', 'setFixedTupleList', 'getFixedTupleList', 'setNTrotter', 'getNTrotter', 'setSpeedup', 'getSpeedup']
+            )
+
+    class FixedPairListAdressTabulated(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressTabulatedLocal',
+            pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )

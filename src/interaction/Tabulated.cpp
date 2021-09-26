@@ -232,6 +232,19 @@ void Tabulated::registerPython()
         .def("setSpeedup", &FixedPairListPIadressTabulated::setSpeedup)
         .def("getSpeedup", &FixedPairListPIadressTabulated::getSpeedup);
     ;
+
+    class_<FixedPairListAdressTabulated, bases<Interaction> >(
+        "interaction_FixedPairListAdressTabulated",
+        init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Tabulated>, bool>())
+        .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Tabulated>,
+                  bool>())
+        .def("setPotential", &FixedPairListAdressTabulated::setPotential)
+        .def("getPotential", &FixedPairListAdressTabulated::getPotential)
+        .def("setFixedPairList", &FixedPairListAdressTabulated::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListAdressTabulated::getFixedPairList)
+        .add_property("scale_factor", &FixedPairListAdressTabulated::scaleFactor,
+                      &FixedPairListAdressTabulated::setScaleFactor);
+    ;
 }
 
 }  // namespace interaction

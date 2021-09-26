@@ -60,6 +60,19 @@ This module provides a writer for H5MD_ file format.
 
     :rtype: The DumpH5MD writer.
 
+Flags
+++++++++++++++++++
+
+- store_position: saves position of particles.
+- store_species: saves the type of particles.
+- store_state: saves chemical state of particles.
+- store_velocity: saves velocity
+- store_force: saves force
+- store_charge: saves charge
+- store_lambda: saves the value of lambda parameter (useful in AdResS simulations)
+- store_res_id: saves residue id
+- do_sort: sort the file (see :ref:`sorting-file-label`)
+
 Example
 +++++++
 
@@ -196,7 +209,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 author_email=email,
                 driver='mpio',
                 comm=MPI.COMM_WORLD)
-        except (NameError, AttributeError):
+        except (NameError, AttributeError, ValueError):
             # h5py in serial mode.
             self.file = pyh5md.File(
                 filename, 'w',
@@ -257,6 +270,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         if self.store_res_id:
             self.res_id = pyh5md.element(part, 'res_id', store='time', time=True, maxshape=(None, ),
                                          shape=(self.chunk_size, ), dtype=self.int_type,  fillvalue=-1)
+        self._system_data()
 
         self.commTimer = 0.0
         self.updateTimer = 0.0
@@ -440,7 +454,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         # Store species.
         if self.store_species:
-            species = np.asarray(self.getSpecies())
+            species = np.asarray(self.getSpecies(), dtype=self.int_type)
             if total_size > self.species.value.shape[1]:
                 isResized = True
                 self.species.value.resize(total_size, axis=1)
@@ -448,7 +462,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         # Store state.
         if self.store_state:
-            state = np.asarray(self.getState())
+            state = np.asarray(self.getState(), dtype=self.int_type)
             if total_size > self.state.value.shape[1]:
                 isResized = True
                 self.state.value.resize(total_size, axis=1)
@@ -456,7 +470,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         # Store lambda_adr
         if self.store_lambda:
-            lambda_adr = np.asarray(self.getLambda())
+            lambda_adr = np.asarray(self.getLambda(), dtype=self.float_type)
             if total_size > self.lambda_adr.value.shape[1]:
                 isResized = True
                 self.lambda_adr.value.resize(total_size, axis=1)
@@ -464,7 +478,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         # Store res_id
         if self.store_res_id:
-            res_id = np.asarray(self.getResId())
+            res_id = np.asarray(self.getResId(), dtype=self.int_type)
             if total_size > self.res_id.value.shape[1]:
                 isResized = True
                 self.res_id.value.resize(total_size, axis=1)

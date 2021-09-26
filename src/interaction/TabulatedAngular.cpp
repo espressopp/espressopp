@@ -32,6 +32,7 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedTripleListTypesInteractionTemplate.hpp"
 #include "FixedTripleListPIadressInteractionTemplate.hpp"
+#include "FixedTripleListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -66,6 +67,9 @@ typedef class FixedTripleListTypesInteractionTemplate<TabulatedAngular>
     FixedTripleListTypesTabulatedAngular;
 typedef class FixedTripleListPIadressInteractionTemplate<TabulatedAngular>
     FixedTripleListPIadressTabulatedAngular;
+
+typedef class FixedTripleListAdressInteractionTemplate<TabulatedAngular>
+    FixedTripleListAdressTabulatedAngular;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -108,6 +112,13 @@ void TabulatedAngular::registerPython()
         .def("getNTrotter", &FixedTripleListPIadressTabulatedAngular::getNTrotter)
         .def("setSpeedup", &FixedTripleListPIadressTabulatedAngular::setSpeedup)
         .def("getSpeedup", &FixedTripleListPIadressTabulatedAngular::getSpeedup);
+
+    class_<FixedTripleListAdressTabulatedAngular, bases<Interaction> >(
+        "interaction_FixedTripleListAdressTabulatedAngular",
+        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<TabulatedAngular>, bool>())
+        .def("setPotential", &FixedTripleListAdressTabulatedAngular::setPotential)
+        .def("getPotential", &FixedTripleListAdressTabulatedAngular::getPotential)
+        .def("getFixedTripleList", &FixedTripleListAdressTabulatedAngular::getFixedTripleList);
 }
 
 }  // namespace interaction

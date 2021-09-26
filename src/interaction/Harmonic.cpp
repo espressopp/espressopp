@@ -29,6 +29,7 @@
 #include "VerletListAdressCGInteractionTemplate.hpp"
 #include "VerletListHadressATInteractionTemplate.hpp"
 #include "VerletListHadressCGInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -53,6 +54,7 @@ void Harmonic::registerPython()
     typedef class VerletListAdressATInteractionTemplate<Harmonic> VerletListAdressATHarmonic;
     typedef class VerletListAdressCGInteractionTemplate<Harmonic> VerletListAdressCGHarmonic;
     typedef class VerletListInteractionTemplate<Harmonic> VerletListHarmonic;
+    typedef class FixedPairListAdressInteractionTemplate<Harmonic> FixedPairListAdressHarmonic;
 
     class_<FixedPairListHarmonic, bases<Interaction> >(
         "interaction_FixedPairListHarmonic",
@@ -106,6 +108,18 @@ void Harmonic::registerPython()
         .def("getVerletList", &VerletListHadressCGHarmonic::getVerletList)
         .def("setPotential", &VerletListHadressCGHarmonic::setPotential)
         .def("getPotential", &VerletListHadressCGHarmonic::getPotentialPtr);
+
+    class_<FixedPairListAdressHarmonic, bases<Interaction> >(
+        "interaction_FixedPairListAdressHarmonic",
+        init<shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Harmonic>, bool>())
+        .def(
+            init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Harmonic>, bool>())
+        .def("setPotential", &FixedPairListAdressHarmonic::setPotential)
+        .def("getPotential", &FixedPairListAdressHarmonic::getPotential)
+        .def("setFixedPairList", &FixedPairListAdressHarmonic::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListAdressHarmonic::getFixedPairList)
+        .add_property("scale_factor", &FixedPairListAdressHarmonic::scaleFactor,
+                      &FixedPairListAdressHarmonic::setScaleFactor);
 }
 
 }  // namespace interaction

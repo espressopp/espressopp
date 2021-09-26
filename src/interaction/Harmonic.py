@@ -297,7 +297,8 @@ from _espressopp import interaction_Harmonic, interaction_FixedPairListHarmonic,
                       interaction_VerletListAdressCGHarmonic, \
                       interaction_VerletListHadressATHarmonic, \
                       interaction_VerletListHadressCGHarmonic, \
-                      interaction_VerletListHarmonic
+                      interaction_VerletListHarmonic, \
+                      interaction_FixedPairListAdressHarmonic
 
 class HarmonicLocal(PotentialLocal, interaction_Harmonic):
 
@@ -435,6 +436,20 @@ class VerletListHarmonicLocal(InteractionLocal, interaction_VerletListHarmonic):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
+class FixedPairListAdressHarmonicLocal(InteractionLocal, interaction_FixedPairListAdressHarmonic):
+    'The (local) Harmonic interaction using FixedPair lists.'
+    def __init__(self, system, vl, potential, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListAdressHarmonic, system, vl, potential, is_cg)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+    def setFixedPairList(self, fixedpairlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
 if pmi.isController:
     class Harmonic(Potential):
         'The Harmonic potential.'
@@ -483,4 +498,11 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListHarmonicLocal',
             pmicall = ['setPotential','getPotential']
+            )
+
+    class FixedPairListAdressHarmonic(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressHarmonicLocal',
+            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList'],
+            pmiproperty = ['scale_factor']
             )

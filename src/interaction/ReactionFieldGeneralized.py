@@ -234,7 +234,8 @@ from _espressopp import interaction_ReactionFieldGeneralized, \
                       interaction_VerletListAdressATReactionFieldGeneralized, \
                       interaction_VerletListHadressReactionFieldGeneralized, \
                       interaction_VerletListHadressATReactionFieldGeneralized, \
-                      interaction_CellListReactionFieldGeneralized
+                      interaction_CellListReactionFieldGeneralized, \
+                      interaction_VerletListHybridReactionFieldGeneralized
                       #interaction_FixedPairListReactionFieldGeneralized
 
 class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
@@ -267,6 +268,20 @@ class VerletListAdressATReactionFieldGeneralizedLocal(InteractionLocal, interact
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressATReactionFieldGeneralized, vl, fixedtupleList)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+class VerletListHybridReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHybridReactionFieldGeneralized):
+
+    def __init__(self, vl, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHybridReactionFieldGeneralized, vl, is_cg)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -383,6 +398,13 @@ if pmi.isController:
             cls =  'espressopp.interaction.CellListReactionFieldGeneralizedLocal',
             pmicall = ['setPotential']
             )
+
+    class VerletListHybridReactionFieldGeneralized(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridReactionFieldGeneralizedLocal',
+            pmicall = ['setPotential','getPotential'],
+            pmiproperty = ['scale_factor', 'max_force']
+        )
 
     #class FixedPairListReactionFieldGeneralized(Interaction):
     #    __metaclass__ = pmi.Proxy

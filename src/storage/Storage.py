@@ -252,6 +252,8 @@ class StorageLocal(object):
             index_lambda_adrd = -1
             index_state       = -1
             index_pib         = -1
+            index_res_id      = -1
+            index_vp          = -1
 
             last_pos = toReal3DFromVector([-99,-99,-99])
 
@@ -282,6 +284,8 @@ class StorageLocal(object):
                     elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
                     elif val.lower() == "state": index_state = nindex
                     elif val.lower() == "pib": index_pib = nindex
+                    elif val.lower() == "res_id": index_res_id = nindex
+                    elif val.lower() == "vp": index_vp = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
@@ -371,6 +375,12 @@ class StorageLocal(object):
 
                     if index_state >= 0:
                         storedParticle.state = particle[index_state]
+
+                    if index_res_id >= 0:
+                        storedParticle.res_id = particle[index_res_id]
+
+                    if index_vp >= 0:
+                        storedParticle.vp = particle[index_vp]
 
     def modifyParticle(self, pid, property, value):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -464,6 +474,8 @@ class StorageLocal(object):
             index_lambda_adrd = -1
             index_state       = -1
             index_pib         = -1
+            index_res_id      = -1
+            index_vp          = -1
 
             last_pos = toReal3DFromVector([-99,-99,-99])
 
@@ -507,6 +519,8 @@ class StorageLocal(object):
                     elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
                     elif val.lower() == "state": index_state = nindex
                     elif val.lower() == "pib": index_pib = nindex
+                    elif val.lower() == "res_id": index_res_id = nindex
+                    elif val.lower() == "vp": index_vp = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
 
             assert index_id >= 0, "particle property id is mandatory"
@@ -530,7 +544,8 @@ class StorageLocal(object):
                 index_vx, index_vy, index_vz, index_modemomx, index_modemomy, index_modemomz,
                 index_fx, index_fy, index_fz, index_fmx, index_fmy, index_fmz,
                 index_q, index_radius, index_fradius, index_vradius, index_type, index_mass,
-                index_varmass, index_adrAT, index_lambda_adr, index_lambda_adrd, index_state, index_pib
+                index_varmass, index_adrAT, index_lambda_adr, index_lambda_adrd, index_state, index_pib, index_res_id,
+                index_vp
                 ], dtype=np.int32)
             self.cxxclass.addParticlesFromArray(self, particleList, indices)
 

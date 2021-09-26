@@ -39,6 +39,7 @@ from espressopp.System import *
 from espressopp.VerletList import *
 from espressopp.VerletListTriple import *
 from espressopp.VerletListAdress import *
+from espressopp.VerletListHybrid import *
 from espressopp.FixedSingleList import *
 from espressopp.FixedPairList import *
 from espressopp.FixedPairDistList import *

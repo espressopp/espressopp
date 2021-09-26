@@ -201,6 +201,7 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_LennardJonesEnergyCapped, \
                       interaction_VerletListLennardJonesEnergyCapped, \
+                      interaction_VerletListHybridLennardJonesEnergyCapped, \
                       interaction_VerletListAdressLennardJonesEnergyCapped, \
                       interaction_VerletListHadressLennardJonesEnergyCapped, \
                       interaction_CellListLennardJonesEnergyCapped, \
@@ -305,6 +306,24 @@ class FixedPairListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_F
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
+class VerletListHybridLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListHybridLennardJonesEnergyCapped):
+    def __init__(self, vl, cg_potential=False):
+        if pmi.workerIsActive():
+            cxxinit(self, interaction_VerletListHybridLennardJonesEnergyCapped, vl, cg_potential)
+
+    def setPotential(self, type1, type2, potential):
+        if pmi.workerIsActive():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def getVerletListLocal(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getVerletList(self)
+
+
 if pmi.isController:
     class LennardJonesEnergyCapped(Potential):
         'The Lennard-Jones potential.'
@@ -342,3 +361,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential']
             )
+
+    class VerletListHybridLennardJonesEnergyCapped(Interaction, metaclass=pmi.Proxy):
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridLennardJonesEnergyCappedLocal',
+            pmicall = ['setPotential', 'getPotential', 'getVerletList'],
+            pmiproperty = ['scale_factor', 'max_force']
+        )
