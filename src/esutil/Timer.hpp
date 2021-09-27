@@ -51,13 +51,12 @@ public:
     void reset() { currentTime = getCurrentTime(); }
     /// get the time that elapsed since the last reset
     float getElapsedTime() const { return getCurrentTime() - currentTime; }
-    void startMeasure() {
-      time0 = getElapsedTime();
-    }
-    float stopMeasure() {
-      float result = getElapsedTime() - time0;
-      time0 = 0.0;
-      return result;
+    void startMeasure() { time0 = getElapsedTime(); }
+    float stopMeasure()
+    {
+        float result = getElapsedTime() - time0;
+        time0 = 0.0;
+        return result;
     }
 };
 

@@ -54,6 +54,6 @@ void Particle::registerPython()
         .add_property("res_id", &Particle::getResId, &Particle::setResId)
         .add_property("extVar", &Particle::getExtVar, &Particle::setExtVar)
         .add_property("drift_f", &Particle::getDrift, &Particle::setDrift)
-	.add_property("isVP", &Particle::getVP, &Particle::setVP);
+        .add_property("isVP", &Particle::getVP, &Particle::setVP);
 }
 }  // namespace espressopp

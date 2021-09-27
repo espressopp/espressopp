@@ -75,8 +75,8 @@ void DihedralHarmonicNCos::registerPython()
 
     class_<FixedQuadrupleListAdressDihedralHarmonicNCos, bases<Interaction> >(
         "interaction_FixedQuadrupleListAdressDihedralHarmonicNCos",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>, std::shared_ptr<DihedralHarmonicNCos>,
-             bool>())
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<DihedralHarmonicNCos>, bool>())
         .def(init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleListAdress>,
                   std::shared_ptr<DihedralHarmonicNCos>, bool>())
         .def("setPotential", &FixedQuadrupleListAdressDihedralHarmonicNCos::setPotential)

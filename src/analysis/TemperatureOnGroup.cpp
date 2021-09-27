@@ -29,7 +29,8 @@ void TemperatureOnGroup::registerPython()
 {
     using namespace espressopp::python;
     class_<TemperatureOnGroup, bases<Observable> >(
-        "analysis_TemperatureOnGroup", init<std::shared_ptr<System>, std::shared_ptr<ParticleGroup> >());
+        "analysis_TemperatureOnGroup",
+        init<std::shared_ptr<System>, std::shared_ptr<ParticleGroup> >());
 }
 
 }  // end namespace analysis

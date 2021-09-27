@@ -49,10 +49,11 @@ protected:
     typedef _DihedralPotential Potential;
 
 public:
-    FixedQuadrupleListAdressInteractionTemplate(std::shared_ptr<System> _system,
-                                                std::shared_ptr<FixedQuadrupleList> _fixedquadrupleList,
-                                                std::shared_ptr<Potential> _potential,
-                                                bool _cgPotential)
+    FixedQuadrupleListAdressInteractionTemplate(
+        std::shared_ptr<System> _system,
+        std::shared_ptr<FixedQuadrupleList> _fixedquadrupleList,
+        std::shared_ptr<Potential> _potential,
+        bool _cgPotential)
         : SystemAccess(_system),
           fixedquadrupleList(_fixedquadrupleList),
           potential(_potential),

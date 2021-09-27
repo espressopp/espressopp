@@ -115,7 +115,8 @@ void TabulatedAngular::registerPython()
 
     class_<FixedTripleListAdressTabulatedAngular, bases<Interaction> >(
         "interaction_FixedTripleListAdressTabulatedAngular",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<TabulatedAngular>, bool>())
+        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>,
+             std::shared_ptr<TabulatedAngular>, bool>())
         .def("setPotential", &FixedTripleListAdressTabulatedAngular::setPotential)
         .def("getPotential", &FixedTripleListAdressTabulatedAngular::getPotential)
         .def("getFixedTripleList", &FixedTripleListAdressTabulatedAngular::getFixedTripleList);

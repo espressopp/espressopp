@@ -101,8 +101,8 @@ void TabulatedDihedral::registerPython()
 
     class_<FixedQuadrupleListAdressTabulatedDihedral, bases<Interaction> >(
         "interaction_FixedQuadrupleListAdressTabulatedDihedral",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>, std::shared_ptr<TabulatedDihedral>,
-             bool>())
+        init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleList>,
+             std::shared_ptr<TabulatedDihedral>, bool>())
         .def(init<std::shared_ptr<System>, std::shared_ptr<FixedQuadrupleListAdress>,
                   std::shared_ptr<TabulatedDihedral>, bool>())
         .def("setPotential", &FixedQuadrupleListAdressTabulatedDihedral::setPotential)

@@ -59,7 +59,8 @@ void AngularHarmonic::registerPython()
 
     class_<FixedTripleListAdressAngularHarmonic, bases<Interaction> >(
         "interaction_FixedTripleListAdressAngularHarmonic",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>, std::shared_ptr<AngularHarmonic>, bool>())
+        init<std::shared_ptr<System>, std::shared_ptr<FixedTripleList>,
+             std::shared_ptr<AngularHarmonic>, bool>())
         .def(init<std::shared_ptr<System>, std::shared_ptr<FixedTripleListAdress>,
                   std::shared_ptr<AngularHarmonic>, bool>())
         .def("setPotential", &FixedTripleListAdressAngularHarmonic::setPotential)

@@ -180,8 +180,7 @@ void Tabulated::registerPython()
     ;
 
     class_<VerletListHybridTabulated, bases<Interaction> >(
-        "interaction_VerletListHybridTabulated",
-        init<std::shared_ptr<VerletList>, bool>())
+        "interaction_VerletListHybridTabulated", init<std::shared_ptr<VerletList>, bool>())
         .def("getVerletList", &VerletListHybridTabulated::getVerletList)
         .def("setPotential", &VerletListHybridTabulated::setPotential)
         .def("getPotential", &VerletListHybridTabulated::getPotentialPtr)

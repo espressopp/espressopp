@@ -228,8 +228,7 @@ void LennardJones::registerPython()
     ;
 
     class_<VerletListHybridLennardJones, bases<Interaction> >(
-        "interaction_VerletListHybridLennardJones",
-        init<std::shared_ptr<VerletList>, bool>())
+        "interaction_VerletListHybridLennardJones", init<std::shared_ptr<VerletList>, bool>())
         .def("getVerletList", &VerletListHybridLennardJones::getVerletList)
         .def("setPotential", &VerletListHybridLennardJones::setPotential)
         .def("getPotential", &VerletListHybridLennardJones::getPotentialPtr)
@@ -265,14 +264,14 @@ void LennardJones::registerPython()
 
     class_<FixedPairListAdressLennardJones, bases<Interaction> >(
         "interaction_FixedPairListAdressLennardJones",
-        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJones>, bool>())
-        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>, std::shared_ptr<LennardJones>,
+        init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>, std::shared_ptr<LennardJones>,
              bool>())
+        .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>,
+                  std::shared_ptr<LennardJones>, bool>())
         .def("setPotential", &FixedPairListAdressLennardJones::setPotential)
         .def("getPotential", &FixedPairListAdressLennardJones::getPotential)
         .def("setFixedPairList", &FixedPairListAdressLennardJones::setFixedPairList)
-        .def("getFixedPairList", &FixedPairListAdressLennardJones::getFixedPairList)
-        ;
+        .def("getFixedPairList", &FixedPairListAdressLennardJones::getFixedPairList);
 }
 
 }  // namespace interaction
