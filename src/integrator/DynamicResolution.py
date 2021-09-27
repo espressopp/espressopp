@@ -77,16 +77,18 @@ class DynamicResolutionLocal(ExtensionLocal, integrator_DynamicResolution):
     def __init__(self, _system, _vs_list, _rate):
         'Local construction of a verlet list for AdResS'
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_DynamicResolution, _system, _vs_list, _rate)
+            cxxinit(self, integrator_DynamicResolution,
+                    _system, _vs_list, _rate)
 
     def update_weights(self):
         if pmi.workerIsActive():
             self.cxxclass.update_weights(self)
 
+
 if pmi.isController:
     class DynamicResolution(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.integrator.DynamicResolutionLocal',
-            pmiproperty = ['rate', 'active'],
-            pmicall = ['update_weights']
-            )
+            cls='espressopp.integrator.DynamicResolutionLocal',
+            pmiproperty=['rate', 'active'],
+            pmicall=['update_weights']
+        )

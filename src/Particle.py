@@ -165,6 +165,7 @@ class ParticleLocal(object):
     * when a ghost particle is to be written
     * when data is to be read from a ghost that is not available
     """
+
     def __init__(self, pid, storage):
         self.pid = pid
         self.storage = storage
@@ -265,7 +266,7 @@ class ParticleLocal(object):
     def isVP(self): return self.__getTmp().isVP
     @isVP.setter
     def isVP(self, val): self.__getTmp().isVP = val
-    
+
     @property
     def lambda_adr(self): return self.__getTmp().lambda_adr
     @lambda_adr.setter
@@ -311,9 +312,9 @@ class ParticleLocal(object):
 if pmi.isController:
     class Particle(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls = 'espressopp.ParticleLocal',
-            pmiproperty = ["id", "storage"]
-            )
+            cls='espressopp.ParticleLocal',
+            pmiproperty=["id", "storage"]
+        )
 
         @property
         def node(self):
@@ -321,9 +322,11 @@ if pmi.isController:
             return node
 
         def __getattr__(self, key):
-            value = list(filter(lambda v: v is not None, pmi.invoke(self, 'getLocalData', key)))
+            value = list(filter(lambda v: v is not None,
+                         pmi.invoke(self, 'getLocalData', key)))
             if len(value) == 0:
                 return None
             if len(value) > 1:
-                raise RuntimeError('The requested particle is on more than one CPU - should not happen')
+                raise RuntimeError(
+                    'The requested particle is on more than one CPU - should not happen')
             return value[0]

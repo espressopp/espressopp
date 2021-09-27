@@ -292,13 +292,14 @@ from espressopp.esutil import *
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_Harmonic, interaction_FixedPairListHarmonic, \
-                      interaction_FixedPairListTypesHarmonic, \
-                      interaction_VerletListAdressATHarmonic, \
-                      interaction_VerletListAdressCGHarmonic, \
-                      interaction_VerletListHadressATHarmonic, \
-                      interaction_VerletListHadressCGHarmonic, \
-                      interaction_VerletListHarmonic, \
-                      interaction_FixedPairListAdressHarmonic
+    interaction_FixedPairListTypesHarmonic, \
+    interaction_VerletListAdressATHarmonic, \
+    interaction_VerletListAdressCGHarmonic, \
+    interaction_VerletListHadressATHarmonic, \
+    interaction_VerletListHadressCGHarmonic, \
+    interaction_VerletListHarmonic, \
+    interaction_FixedPairListAdressHarmonic
+
 
 class HarmonicLocal(PotentialLocal, interaction_Harmonic):
 
@@ -311,11 +312,13 @@ class HarmonicLocal(PotentialLocal, interaction_Harmonic):
             else:
                 cxxinit(self, interaction_Harmonic, K, r0, cutoff, shift)
 
+
 class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarmonic):
 
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListHarmonic, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListHarmonic,
+                    system, vl, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -325,10 +328,10 @@ class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarm
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
-
     def getFixedPairList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
+
 
 class FixedPairListTypesHarmonicLocal(InteractionLocal, interaction_FixedPairListTypesHarmonic):
     def __init__(self, system, vl):
@@ -351,11 +354,13 @@ class FixedPairListTypesHarmonicLocal(InteractionLocal, interaction_FixedPairLis
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
 
+
 class VerletListAdressATHarmonicLocal(InteractionLocal, interaction_VerletListAdressATHarmonic):
 
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressATHarmonic, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListAdressATHarmonic,
+                    vl, fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -368,12 +373,14 @@ class VerletListAdressATHarmonicLocal(InteractionLocal, interaction_VerletListAd
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
+
 
 class VerletListAdressCGHarmonicLocal(InteractionLocal, interaction_VerletListAdressCGHarmonic):
 
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressCGHarmonic, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListAdressCGHarmonic,
+                    vl, fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -386,12 +393,14 @@ class VerletListAdressCGHarmonicLocal(InteractionLocal, interaction_VerletListAd
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
+
 
 class VerletListHadressATHarmonicLocal(InteractionLocal, interaction_VerletListHadressATHarmonic):
 
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressATHarmonic, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListHadressATHarmonic,
+                    vl, fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -404,12 +413,14 @@ class VerletListHadressATHarmonicLocal(InteractionLocal, interaction_VerletListH
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
+
 
 class VerletListHadressCGHarmonicLocal(InteractionLocal, interaction_VerletListHadressCGHarmonic):
 
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressCGHarmonic, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListHadressCGHarmonic,
+                    vl, fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -422,6 +433,7 @@ class VerletListHadressCGHarmonicLocal(InteractionLocal, interaction_VerletListH
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
+
 
 class VerletListHarmonicLocal(InteractionLocal, interaction_VerletListHarmonic):
     def __init__(self, vl):
@@ -436,11 +448,14 @@ class VerletListHarmonicLocal(InteractionLocal, interaction_VerletListHarmonic):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
+
 class FixedPairListAdressHarmonicLocal(InteractionLocal, interaction_FixedPairListAdressHarmonic):
     'The (local) Harmonic interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential, is_cg=False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListAdressHarmonic, system, vl, potential, is_cg)
+            cxxinit(self, interaction_FixedPairListAdressHarmonic,
+                    system, vl, potential, is_cg)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -450,59 +465,63 @@ class FixedPairListAdressHarmonicLocal(InteractionLocal, interaction_FixedPairLi
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
 
+
 if pmi.isController:
     class Harmonic(Potential):
         'The Harmonic potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.HarmonicLocal',
-            pmiproperty = ['K', 'r0']
-            )
+            cls='espressopp.interaction.HarmonicLocal',
+            pmiproperty=['K', 'r0']
+        )
 
     class FixedPairListHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListHarmonicLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListHarmonicLocal',
+            pmicall=['setPotential', 'getPotential',
+                     'setFixedPairList', 'getFixedPairList']
+        )
 
     class FixedPairListTypesHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListTypesHarmonicLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
-            )
+            cls='espressopp.interaction.FixedPairListTypesHarmonicLocal',
+            pmicall=['setPotential', 'getPotential',
+                     'setFixedPairList', 'getFixedPairList']
+        )
 
     class VerletListAdressATHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressATHarmonicLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
-            )
+            cls='espressopp.interaction.VerletListAdressATHarmonicLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )
 
     class VerletListAdressCGHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListAdressCGHarmonicLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
-            )
+            cls='espressopp.interaction.VerletListAdressCGHarmonicLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )
 
     class VerletListHadressATHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressATHarmonicLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
-            )
+            cls='espressopp.interaction.VerletListHadressATHarmonicLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )
 
     class VerletListHadressCGHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListHadressCGHarmonicLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
-            )
+            cls='espressopp.interaction.VerletListHadressCGHarmonicLocal',
+            pmicall=['setPotential', 'getPotential', 'getVerletList']
+        )
 
     class VerletListHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHarmonicLocal',
-            pmicall = ['setPotential','getPotential']
-            )
+            cls='espresso.interaction.VerletListHarmonicLocal',
+            pmicall=['setPotential', 'getPotential']
+        )
 
     class FixedPairListAdressHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListAdressHarmonicLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList'],
-            pmiproperty = ['scale_factor']
-            )
+            cls='espressopp.interaction.FixedPairListAdressHarmonicLocal',
+            pmicall=['setPotential', 'getPotential',
+                     'setFixedPairList', 'getFixedPairList'],
+            pmiproperty=['scale_factor']
+        )

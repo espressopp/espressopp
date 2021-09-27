@@ -78,7 +78,7 @@ Example
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
-from espressopp.analysis.AnalysisBase import *  #NOQA
+from espressopp.analysis.AnalysisBase import *  # NOQA
 from _espressopp import analysis_SystemMonitor
 from _espressopp import analysis_SystemMonitorOutput
 from _espressopp import analysis_SystemMonitorOutputCSV
@@ -114,16 +114,19 @@ class SystemMonitorLocal(analysis_SystemMonitor):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
+
 if pmi.isController:
     class SystemMonitorDummy(metaclass=pmi.Proxy):
-        pmiproxydefs = dict(cls='espressopp.analysis.SystemMonitorOutputDummyLocal')
+        pmiproxydefs = dict(
+            cls='espressopp.analysis.SystemMonitorOutputDummyLocal')
 
     class SystemMonitorOutputCSV(metaclass=pmi.Proxy):
-        pmiproxydefs = dict(cls='espressopp.analysis.SystemMonitorOutputCSVLocal')
+        pmiproxydefs = dict(
+            cls='espressopp.analysis.SystemMonitorOutputCSVLocal')
 
     class SystemMonitor(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls='espressopp.analysis.SystemMonitorLocal',
             pmicall=['add_observable', 'info', 'dump'],
             pmiproperty=('total_energy', 'potential_energy')
-            )
+        )
