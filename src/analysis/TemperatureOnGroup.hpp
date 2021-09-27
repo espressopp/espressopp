@@ -38,7 +38,7 @@ public:
     static void registerPython();
 
     TemperatureOnGroup(std::shared_ptr<System> system, std::shared_ptr<ParticleGroup> pg)
-        : Observable(system), eKin_(0.0), particle_group_(pg)
+        : Observable(system), particle_group_(pg), eKin_(0.0)
     {
         result_type = real_scalar;
     }
