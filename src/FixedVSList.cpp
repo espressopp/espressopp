@@ -46,8 +46,8 @@ bool FixedVSList::addT(tuple pids)
     bool returnVal = true;
 
     tuple::iterator it = pids.begin();
-    longint pid_cg = *it;
-    std::vector<longint> pidstmp;
+    size_t pid_cg = *it;
+    std::vector<size_t> pidstmp;
 
     for (++it; it != pids.end(); ++it)
     {
@@ -65,7 +65,7 @@ void FixedVSList::registerPython()
 {
     using namespace espressopp::python;
 
-    void (FixedVSList::*pyAdd)(longint pid) = &FixedVSList::add;
+    void (FixedVSList::*pyAdd)(size_t pid) = &FixedVSList::add;
 
     class_<FixedVSList, shared_ptr<FixedVSList>, boost::noncopyable>(
         "FixedVSList", init<shared_ptr<storage::Storage> >())

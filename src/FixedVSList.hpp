@@ -37,21 +37,21 @@ protected:
     shared_ptr<storage::Storage> storage;
 
 public:
-    typedef std::vector<longint> tuple;
-    typedef boost::unordered_map<longint, tuple> GlobalTuples;
+    typedef std::vector<size_t> tuple;
+    typedef boost::unordered_map<size_t, tuple> GlobalTuples;
     GlobalTuples globalTuples;
 
     FixedVSList(shared_ptr<storage::Storage> _storage);
     ~FixedVSList();
 
-    void add(longint pid) { tmppids.push_back(pid); }
+    void add(size_t pid) { tmppids.push_back(pid); }
     void addTs()
     {
         addT(tmppids);
         tmppids.clear();
     }
 
-    tuple& getATParticleIds(longint pidK) { return globalTuples[pidK]; }
+    tuple& getATParticleIds(size_t pidK) { return globalTuples[pidK]; }
 
     static void registerPython();
 

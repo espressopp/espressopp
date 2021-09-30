@@ -44,7 +44,7 @@ LOG4ESPP_LOGGER(DynamicResolution::theLogger, "DynamicResolution");
 DynamicResolution::DynamicResolution(shared_ptr<System> _system,
                                      shared_ptr<FixedVSList> _vslist,
                                      real _rate)
-    : Extension(_system), vs_list(_vslist), rate_(_rate)
+    : Extension(_system), rate_(_rate), vs_list(_vslist)
 {
     LOG4ESPP_INFO(theLogger, "construct DynamicResolution");
     type = Extension::Adress;

@@ -73,14 +73,13 @@ real VelocityVerletHybrid::updateVS()
             if (vp->id() != it->first) throw std::runtime_error("something is really wrong!");
             Real3D cmp(0.0, 0.0, 0.0);
             // Real3D cmv(0.0, 0.0, 0.0);
-            for (FixedVSList::tuple::iterator itp = it->second.begin(); itp != it->second.end();
-                 ++itp)
+            for (auto & itp : it->second)
             {
                 Particle *atp =
-                    storage.lookupLocalParticle(*itp);  // based on real or ghost position.
+                    storage.lookupLocalParticle(itp);  // based on real or ghost position.
                 if (atp)
                 {
-                    if (atp->id() != *itp) throw std::runtime_error("something is really wrong!");
+                    if (atp->id() != itp) throw std::runtime_error("something is really wrong!");
                     const Real3D &pos = atp->position();
                     real m = atp->mass();
                     LOG4ESPP_DEBUG(theLogger, "vp-" << vp->id() << " atp:" << atp->id() << " "
@@ -93,7 +92,7 @@ real VelocityVerletHybrid::updateVS()
                 }
                 else
                 {
-                    std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
+                    std::cout << " AT particle (" << itp << ") of VP " << vp->id() << "-"
                               << vp->ghost() << " not found in tuples ";
                     std::cout << " (" << vp->position() << ")" << std::endl;
                     exit(1);
@@ -303,7 +302,7 @@ void VelocityVerletHybrid::loadTimers(std::vector<real> &return_vector,
 {
     return_vector.push_back(timeRun);
     return_labels.push_back("timeRun");
-    for (int i = 0; i < timeForceComp.size(); i++)
+    for (size_t i = 0; i < timeForceComp.size(); i++)
     {
         return_vector.push_back(timeForceComp[i]);
         std::stringstream ss;
@@ -558,7 +557,7 @@ static boost::python::object wrapGetTimers(class VelocityVerletHybrid *obj)
     obj->loadTimers(timers, labels);
 
     boost::python::list return_list;
-    for (int i = 0; i < timers.size(); i++)
+    for (size_t i = 0; i < timers.size(); i++)
     {
         return_list.append(boost::python::make_tuple(labels[i], timers[i]));
     }
