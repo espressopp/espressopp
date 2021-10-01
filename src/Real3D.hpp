@@ -66,8 +66,6 @@ public:
 
     // error checking
     bool isNaN() const;
-    bool isInf() const;
-    bool isNaNInf() const;
 
     // unary operators
     Real3D& operator+=(const Real3D& v);
@@ -168,13 +166,6 @@ inline bool Real3D::isNaN() const
 {
     return (data[0] != data[0] || data[1] != data[1] || data[2] != data[2]);
 }
-
-inline bool Real3D::isInf() const
-{
-    return (std::isinf(data[0]) || std::isinf(data[1]) || std::isinf(data[2]));
-}
-
-inline bool Real3D::isNaNInf() const { return (this->isNaN() || this->isInf()); }
 
 // unary operators
 inline Real3D& Real3D::operator+=(const Real3D& v)
