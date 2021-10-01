@@ -61,8 +61,8 @@ public:
           integrator(_integrator),
           file_name(_file_name),
           unfolded(_unfolded),
-          length_factor(_length_factor),
-          append(_append)
+          append(_append),
+          length_factor(_length_factor)
     {
         if (system->comm->rank() == 0 && !append)
         {
