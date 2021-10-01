@@ -169,11 +169,11 @@ inline void VerletListHybridInteractionTemplate<_Potential>::addForces()
             {
                 if (hasMaxForce_)
                 {
-                        real abs_force = force.abs();
-                        if (abs_force > maxForce_)
-                        {
-                            force = (force / abs_force) * maxForce_;
-                        }
+                    real abs_force = force.abs();
+                    if (abs_force > maxForce_)
+                    {
+                        force = (force / abs_force) * maxForce_;
+                    }
                 }
                 p1.force() += forcescale12 * force;
                 p2.force() -= forcescale12 * force;

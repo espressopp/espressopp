@@ -73,7 +73,7 @@ real VelocityVerletHybrid::updateVS()
             if (vp->id() != it->first) throw std::runtime_error("something is really wrong!");
             Real3D cmp(0.0, 0.0, 0.0);
             // Real3D cmv(0.0, 0.0, 0.0);
-            for (auto & itp : it->second)
+            for (auto &itp : it->second)
             {
                 Particle *atp =
                     storage.lookupLocalParticle(itp);  // based on real or ghost position.
