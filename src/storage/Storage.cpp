@@ -807,10 +807,11 @@ void addParticlesCheck(python::numpy::ndarray const &part_arr,
         throw std::runtime_error("Invalid dtype of idx_arr");
     if (!(part_arr.get_flags() & numpy::ndarray::C_CONTIGUOUS))
         throw std::runtime_error("part_arr must have C_CONTIGUOUS flag");
-    if (idx_arr.shape(0) != 33) {
-        throw std::runtime_error(boost::str(boost::format(
-                            "Invalid idx_arr shape. axis=0 must have shape=31 but have: %d") %
-                        idx_arr.shape(0)));
+    if (idx_arr.shape(0) != 33)
+    {
+        throw std::runtime_error(boost::str(
+            boost::format("Invalid idx_arr shape. axis=0 must have shape=31 but have: %d") %
+            idx_arr.shape(0)));
     }
 }
 
