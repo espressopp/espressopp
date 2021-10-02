@@ -16,7 +16,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
 add_library(_espressopp ${ESPRESSO_SOURCES})
 
 if(ESPP_WERROR)
-    target_compile_options(_espressopp PRIVATE "-Werror")
+    target_compile_options(_espressopp PRIVATE "-Werror;-Wtautological-compare")
 endif()
 # compiler specific configurations
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)

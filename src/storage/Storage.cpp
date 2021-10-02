@@ -39,6 +39,7 @@
 #include "esutil/Error.hpp"
 
 #include <iostream>
+#include <boost/format.hpp>
 #include <boost/unordered/unordered_map.hpp>
 #include <boost/python/numpy.hpp>
 
@@ -806,8 +807,11 @@ void addParticlesCheck(python::numpy::ndarray const &part_arr,
         throw std::runtime_error("Invalid dtype of idx_arr");
     if (!(part_arr.get_flags() & numpy::ndarray::C_CONTIGUOUS))
         throw std::runtime_error("part_arr must have C_CONTIGUOUS flag");
-    if (idx_arr.shape(0) != 31)
-        throw std::runtime_error("Invalid idx_arr shape. axis=0 must have shape=31");
+    if (idx_arr.shape(0) != 33) {
+        throw std::runtime_error(boost::str(boost::format(
+                            "Invalid idx_arr shape. axis=0 must have shape=31 but have: %d") %
+                        idx_arr.shape(0)));
+    }
 }
 
 void addParticlesFromArray(class Storage *obj,
@@ -831,7 +835,7 @@ void Storage::addParticlesFromArrayImpl(const real *part,
 {
     boost::mpi::communicator &comm = *(getSystem()->comm);
     int nidx_ = 0;
-    for (int i = 0; i < 31; i++) nidx_ += (idx[i] >= 0);
+    for (int i = 0; i < 33; i++) nidx_ += (idx[i] >= 0);
     if (nidx_ != nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
 
     const int index_id = idx[0];
