@@ -39,7 +39,9 @@ jobs:
             CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 
     runs-on: ubuntu-latest
-    container: espressopp/buildenv:${{ matrix.distro }}
+    container:
+      image: espressopp/buildenv:${{ matrix.distro }}
+      options: --security-opt seccomp=unconfined
     steps:
       - uses: actions/cache@v2
         with:

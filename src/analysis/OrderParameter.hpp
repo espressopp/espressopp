@@ -46,6 +46,7 @@
 // #include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 using namespace boost;
@@ -665,7 +666,7 @@ public:
 
         vector<int> wl, cl;  // wrong and correct labels
 
-        for (unordered_map<int, int>::iterator it = wrong_label_local.begin();
+        for (std::unordered_map<int, int>::iterator it = wrong_label_local.begin();
              it != wrong_label_local.end(); ++it)
         {
             wl.push_back((*it).first);
@@ -704,7 +705,7 @@ public:
                 }
             }
 
-            for (unordered_map<int, int>::iterator it = wrong_label_local0.begin();
+            for (std::unordered_map<int, int>::iterator it = wrong_label_local0.begin();
                  it != wrong_label_local0.end(); ++it)
             {
                 wl0.push_back((*it).first);
@@ -736,7 +737,7 @@ public:
         relabel_particles();
     }
 
-    unordered_map<int, int> wrong_label_local0;
+    std::unordered_map<int, int> wrong_label_local0;
 
     void relab22(int new_lab, int old_lab)
     {
@@ -802,7 +803,7 @@ public:
 
     vector<communicate_label> outside_id;
 
-    unordered_map<int, int> wrong_label_local;
+    std::unordered_map<int, int> wrong_label_local;
 
     // ***************************************************************************************
 
