@@ -37,17 +37,16 @@ namespace vec
 /// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
 class CellNeighborList
 {
-private:
-    std::vector<size_t> cells;
-    std::vector<size_t> ncells_range;
-    std::vector<size_t> ncells;
-
 public:
     typedef size_t T;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
     typedef size_t size_type;
+
+    std::vector<size_t> cells;
+    std::vector<size_t> ncells_range;
+    std::vector<size_t> ncells;
 
     CellNeighborList() {}
     CellNeighborList(Cell* const cell0,
@@ -79,6 +78,8 @@ public:
     {
         return ncells_range[row + 1] - ncells_range[row];
     }
+
+    void validate() const;
 
     void print();
 
