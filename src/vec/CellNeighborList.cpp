@@ -65,6 +65,7 @@ void CellNeighborList::init(Cell* const cell0,
         }
     }
     endRange();
+    validate();
 }
 
 CellNeighborList::CellNeighborList(std::vector<size_t> const& cells_in,
