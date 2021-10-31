@@ -37,18 +37,14 @@ namespace vec
 /// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
 class CellNeighborList
 {
-public:
-    typedef size_t T;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-    typedef size_t size_type;
-
+protected:
     std::vector<size_t> cells;
     std::vector<size_t> ncells_range;
     std::vector<size_t> ncells;
 
+public:
     CellNeighborList() {}
+
     CellNeighborList(Cell* const cell0,
                      CellList const& localCells,
                      std::vector<size_t> const& realCellIdx);
@@ -68,15 +64,35 @@ public:
         ncells_range.clear();
         ncells.clear();
     }
-    inline const_reference& at(size_type row, size_type nbr) const
+
+    inline const size_t& at(size_t row, size_t nbr) const
     {
         return ncells[ncells_range[row] + nbr];
     }
-    inline size_type numCells() const { return cells.size(); }
-    inline const_reference& cellId(size_type row) const { return cells[row]; }
-    inline value_type numNeighbors(size_type row) const
+
+    inline size_t numCells() const { return cells.size(); }
+
+    inline const size_t& cellId(size_t row) const { return cells[row]; }
+
+    inline size_t numNeighbors(size_t row) const
     {
         return ncells_range[row + 1] - ncells_range[row];
+    }
+
+    inline void insertCell(size_t const& lcell)
+    {
+        cells.push_back(lcell);
+        endRange();
+    }
+
+    inline void insertNeighbor(size_t const& index)
+    {
+        ncells.push_back(index);
+    }
+
+    inline void endRange()
+    {
+        ncells_range.push_back(ncells.size());
     }
 
     void validate() const;

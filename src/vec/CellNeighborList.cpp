@@ -48,27 +48,23 @@ void CellNeighborList::init(Cell* const cell0,
                             std::vector<size_t> const& realCellIdx,
                             std::map<int, int> const& cellMap)
 {
-    const size_t numCells = realCellIdx.size();
-
     clear();
 
     // copy neighbor information, consider only real cells
-    for (size_t irow = 0; irow < numCells; irow++)
+    for (const auto lcell: realCellIdx)
     {
-        const auto lcell = realCellIdx.at(irow);
-        cells.push_back(lcell);
-        ncells_range.push_back(ncells.size());
+        insertCell(lcell);
         for (NeighborCellInfo& nc : localCells[lcell]->neighborCells)
         {
             if (!nc.useForAllPairs)
             {
                 auto vidx = (nc.cell - cell0);  /// map global cell idx to virtual cell idx
                 if (USE_CELL_MAP) vidx = cellMap.at(vidx);
-                ncells.push_back(vidx);
+                insertNeighbor(vidx);
             }
         }
     }
-    ncells_range.push_back(ncells.size());
+    endRange();
 }
 
 CellNeighborList::CellNeighborList(std::vector<size_t> const& cells_in,
