@@ -19,6 +19,7 @@
 */
 
 #include "CellNeighborList.hpp"
+#include <algorithm>
 
 namespace espressopp
 {
@@ -68,6 +69,22 @@ void CellNeighborList::init(Cell* const cell0,
         }
     }
     ncells_range.push_back(ncells.size());
+}
+
+CellNeighborList::CellNeighborList(std::vector<size_t> const& cells_in,
+                                   std::vector<size_t> const& ncells_range_in,
+                                   std::vector<size_t> const& ncells_in)
+    : cells(cells_in), ncells_range(ncells_range_in), ncells(ncells_in)
+{
+    std::string err("Invalid input to CellNeighborList::CellNeighborList: ");
+    if (cells.size() + 1 != ncells_range.size())
+        throw std::runtime_error(err + "cells and ncells_range size mismatch");
+
+    if (!std::is_sorted(ncells_range.begin(), ncells_range.end()))
+        throw std::runtime_error(err + "ncells_range not sorted");
+
+    if (ncells_in.size() != ncells_range.back())
+        throw std::runtime_error(err + "ncells_range.back() and ncells size mismatch");
 }
 
 void CellNeighborList::print()

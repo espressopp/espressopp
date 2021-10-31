@@ -59,6 +59,10 @@ public:
                      std::vector<size_t> const& realCellIdx,
                      std::map<int, int> const& cellMap);
 
+    CellNeighborList(std::vector<size_t> const& cells_in,
+                     std::vector<size_t> const& ncells_range_in,
+                     std::vector<size_t> const& ncells_in);
+
     inline void clear()
     {
         cells.clear();
