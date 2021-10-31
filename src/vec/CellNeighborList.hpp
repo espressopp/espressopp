@@ -35,18 +35,19 @@ namespace vec
 /// first index corresponds to neighbor cells
 /// zeroth column contains the index in localcells
 /// first column (first index) contains size N, so columns [1,N+1) represent the neighbors
-class CellNeighborList : private espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge>
+class CellNeighborList
 {
 private:
-    typedef espressopp::esutil::Array2D<size_t, espressopp::esutil::enlarge> Super;
-    size_t startCell = 0;
+    std::vector<size_t> cells;
+    std::vector<size_t> ncells_range;
+    std::vector<size_t> ncells;
 
 public:
     typedef size_t T;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
-    typedef typename Super::size_type size_type;
+    typedef size_t size_type;
 
     CellNeighborList() {}
     CellNeighborList(Cell* const cell0,
@@ -58,25 +59,23 @@ public:
                      std::vector<size_t> const& realCellIdx,
                      std::map<int, int> const& cellMap);
 
-    inline void clear() { Super::clear(); }
-    // inline reference at(size_type row, size_type nbr) { return Super::at(nbr+2,row); }
+    inline void clear()
+    {
+        cells.clear();
+        ncells_range.clear();
+        ncells.clear();
+    }
     inline const_reference& at(size_type row, size_type nbr) const
     {
-        return Super::operator()(nbr + 2, row);
+        return ncells[ ncells_range[row] + nbr ];
     }
-    inline size_type numCells() const { return Super::size_m(); }
-    inline size_type maxNumNeighbors() const { return Super::size_n() - 2; }
-    // inline reference& cellId(size_type row) { return Super::at(0,row); }
-    inline const_reference& cellId(size_type row) const { return Super::operator()(0, row); }
-    // inline reference& numNeighbors(size_type row) { return Super::at(1,row); }
-    inline const_reference& numNeighbors(size_type row) const { return Super::operator()(1, row); }
+    inline size_type numCells() const { return cells.size(); }
+    inline const_reference& cellId(size_type row) const { return cells[row]; }
+    inline value_type numNeighbors(size_type row) const { return ncells_range[row+1]-ncells_range[row]; }
 
     void print();
 
 protected:
-    inline reference& at(size_type row, size_type nbr) { return Super::at(nbr + 2, row); }
-    inline reference& cellId(size_type row) { return Super::at(0, row); }
-    inline reference& numNeighbors(size_type row) { return Super::at(1, row); }
 
     template <bool USE_CELL_MAP>
     void init(Cell* const cell0,

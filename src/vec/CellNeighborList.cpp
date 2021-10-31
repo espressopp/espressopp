@@ -47,51 +47,37 @@ void CellNeighborList::init(Cell* const cell0,
                             std::vector<size_t> const& realCellIdx,
                             std::map<int, int> const& cellMap)
 {
-    // const size_t numCells = localCells.size();
     const size_t numCells = realCellIdx.size();
 
-    size_t max_nnbrs = 0;
-    for (size_t icell = 0; icell < numCells; icell++)
-    {
-        size_t nnbrs = 0;
-        const auto lcell = realCellIdx.at(icell);
-        for (NeighborCellInfo& nc : localCells[lcell]->neighborCells)
-            if (!nc.useForAllPairs) nnbrs++;
-        max_nnbrs = std::max(max_nnbrs, nnbrs);
-    }
-
-    // Reserve the maximum number of cells
-    Super::resize(max_nnbrs + 2, numCells);
+    clear();
 
     // copy neighbor information, consider only real cells
     for (size_t irow = 0; irow < numCells; irow++)
     {
-        size_t jnbr = 0;
         const auto lcell = realCellIdx.at(irow);
+        cells.push_back(lcell);
+        ncells_range.push_back(ncells.size());
         for (NeighborCellInfo& nc : localCells[lcell]->neighborCells)
         {
             if (!nc.useForAllPairs)
             {
                 auto vidx = (nc.cell - cell0);  /// map global cell idx to virtual cell idx
                 if (USE_CELL_MAP) vidx = cellMap.at(vidx);
-                this->at(irow, jnbr++) = vidx;
+                ncells.push_back(vidx);
             }
         }
-        this->cellId(irow) = lcell;
-        this->numNeighbors(irow) = jnbr;
     }
+    ncells_range.push_back(ncells.size());
 
-    // // truncate empty rows
-    // if(irow<numCells) Super::resize(Super::size_n(), irow);
 }
 
 void CellNeighborList::print()
 {
     std::ostringstream ss;
-    for (size_t irow = 0; irow < Super::size_m(); irow++)
+    for (size_t irow = 0; irow < numCells(); irow++)
     {
-        for (size_t icol = 0; icol < Super::size_n(); icol++)
-            ss << "\t" << Super::operator()(icol, irow);
+        for (size_t icol = 0; icol < numNeighbors(irow); icol++)
+            ss << "\t" << at(icol, irow);
         ss << "\n";
     }
     std::cout << ss.str();

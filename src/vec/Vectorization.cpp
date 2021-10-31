@@ -93,8 +93,7 @@ void Vectorization::resetCellsStorage(Storage* storage)
     const auto realCellIdx = CellListToIdx(realCells, cell0);
     particles.markRealCells(realCellIdx, localCells.size());
     neighborList = CellNeighborList(cell0, localCells, realCellIdx);
-    LOG4ESPP_TRACE(logger, "neighborList, ncells: " << neighborList.numCells() << " nnbrs: "
-                                                    << neighborList.maxNumNeighbors());
+    LOG4ESPP_TRACE(logger, "neighborList, ncells: " << neighborList.numCells());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
