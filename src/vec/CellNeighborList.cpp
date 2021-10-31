@@ -68,7 +68,6 @@ void CellNeighborList::init(Cell* const cell0,
         }
     }
     ncells_range.push_back(ncells.size());
-
 }
 
 void CellNeighborList::print()
@@ -76,8 +75,7 @@ void CellNeighborList::print()
     std::ostringstream ss;
     for (size_t irow = 0; irow < numCells(); irow++)
     {
-        for (size_t icol = 0; icol < numNeighbors(irow); icol++)
-            ss << "\t" << at(icol, irow);
+        for (size_t icol = 0; icol < numNeighbors(irow); icol++) ss << "\t" << at(icol, irow);
         ss << "\n";
     }
     std::cout << ss.str();

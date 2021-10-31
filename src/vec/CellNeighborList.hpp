@@ -67,16 +67,18 @@ public:
     }
     inline const_reference& at(size_type row, size_type nbr) const
     {
-        return ncells[ ncells_range[row] + nbr ];
+        return ncells[ncells_range[row] + nbr];
     }
     inline size_type numCells() const { return cells.size(); }
     inline const_reference& cellId(size_type row) const { return cells[row]; }
-    inline value_type numNeighbors(size_type row) const { return ncells_range[row+1]-ncells_range[row]; }
+    inline value_type numNeighbors(size_type row) const
+    {
+        return ncells_range[row + 1] - ncells_range[row];
+    }
 
     void print();
 
 protected:
-
     template <bool USE_CELL_MAP>
     void init(Cell* const cell0,
               CellList const& localCells,
