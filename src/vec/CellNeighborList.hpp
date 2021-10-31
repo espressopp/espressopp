@@ -61,8 +61,9 @@ public:
     inline void clear()
     {
         cells.clear();
-        ncells_range.clear();
         ncells.clear();
+        ncells_range.clear();
+        ncells_range.push_back(0);
     }
 
     inline const size_t& at(size_t row, size_t nbr) const
@@ -79,20 +80,20 @@ public:
         return ncells_range[row + 1] - ncells_range[row];
     }
 
-    inline void insertCell(size_t const& lcell)
+    inline void beginCell(size_t const& lcell)
     {
         cells.push_back(lcell);
-        endRange();
     }
+
+    inline void endCell()
+    {
+        ncells_range.push_back(ncells.size());
+    }
+
 
     inline void insertNeighbor(size_t const& index)
     {
         ncells.push_back(index);
-    }
-
-    inline void endRange()
-    {
-        ncells_range.push_back(ncells.size());
     }
 
     void validate() const;

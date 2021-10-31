@@ -53,7 +53,7 @@ void CellNeighborList::init(Cell* const cell0,
     // copy neighbor information, consider only real cells
     for (const auto lcell: realCellIdx)
     {
-        insertCell(lcell);
+        beginCell(lcell);
         for (NeighborCellInfo& nc : localCells[lcell]->neighborCells)
         {
             if (!nc.useForAllPairs)
@@ -63,8 +63,8 @@ void CellNeighborList::init(Cell* const cell0,
                 insertNeighbor(vidx);
             }
         }
+        endCell();
     }
-    endRange();
     validate();
 }
 
