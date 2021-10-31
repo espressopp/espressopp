@@ -43,7 +43,10 @@ protected:
     std::vector<size_t> ncells;
 
 public:
-    CellNeighborList() {}
+    CellNeighborList()
+    {
+        ncells_range.push_back(0);
+    }
 
     CellNeighborList(Cell* const cell0,
                      CellList const& localCells,
