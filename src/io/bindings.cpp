@@ -29,8 +29,10 @@
 #include "DumpGRO.hpp"
 #include "DumpGROAdress.hpp"
 #include "DumpH5MD.hpp"
+#include "DumpH5MDParallel.hpp"
 #include "DumpTopology.hpp"
 #include "FileBackup.hpp"
+#include "RestoreH5MDParallel.hpp"
 
 #ifdef HAS_GROMACS
 #include "DumpXTC.hpp"
@@ -47,11 +49,13 @@ void registerPython()
     DumpGRO::registerPython();
     DumpGROAdress::registerPython();
     DumpH5MD::registerPython();
+    DumpH5MDParallel::registerPython();
     DumpTopology::registerPython();
 #ifdef HAS_GROMACS
     DumpXTC::registerPython();
     DumpXTCAdress::registerPython();
 #endif
+    RestoreH5MDParallel::registerPython();
 }
 }  // namespace io
 }  // namespace espressopp
