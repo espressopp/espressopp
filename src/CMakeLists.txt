@@ -58,6 +58,7 @@ target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::
 target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
+target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
 if(WITH_XTC)
     target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)
