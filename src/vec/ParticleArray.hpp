@@ -58,7 +58,10 @@ public:
     void markRealCells(CellList const& realcells, const Cell* cell0, size_t numLocalCells);
     void markRealCells(std::vector<size_t> const& realcells, size_t numLocalCells);
 
+    void markOwnCells(CellList const& srcCells, std::vector<size_t> const& ownCellsIdx);
+
     void copyFrom(CellList const& srcCells);
+    void copyFromCellOwn(CellList const& srcCells);
 
     void updateFromPositionVelocity(CellList const& srcCells, bool realOnly);
     void updateToPositionVelocity(CellList& srcCells, bool realOnly) const;
@@ -108,6 +111,9 @@ protected:
     std::vector<size_t> realCells_;
     /// indices of ghost cells
     std::vector<size_t> ghostCells_;
+    /// whether cell is an own cell
+    std::vector<unsigned char> cellOwn_;
+    bool setCellOwn = false;
     /// number of local cells in source storage
     std::size_t numLocalCells_ = 0;
     std::size_t size_ = 0;

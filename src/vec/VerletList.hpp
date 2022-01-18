@@ -76,6 +76,12 @@ public:
         void rebuild(real const cutsq,
                      CellNeighborList const& cellNborList,
                      ParticleArray const& particleArray);
+
+        template <bool PACK_NEIGHBORS, bool ARRAY_SELF>
+        void rebuildMulti(real const cutsq,
+                          CellNeighborList const& cellNborList,
+                          ParticleArray const& particleArray1,
+                          ParticleArray const& particleArray2);
     };
 
     /// Build a verlet list of all particle pairs stored in Vectorization

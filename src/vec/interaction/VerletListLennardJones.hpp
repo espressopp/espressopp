@@ -85,8 +85,9 @@ public:
     }
     virtual void addForces();
 
-    template <bool ONETYPE>
+    template <bool ONETYPE, bool N3L>
     static void addForces_impl(ParticleArray& particles,
+                               ParticleArray& particlesNbr,
                                VerletList::NeighborList const& neighborList,
                                AlignedVector<LJCoefficients> const& ffs,
                                AlignedVector<real> const& cutoffSqr,
@@ -118,16 +119,17 @@ inline void VerletListLennardJones::addForces()
 
     if (np_types == 1 && p_types == 1)
     {
-        addForces_impl<true>(pa, nl, ffs, cutoffSqr, np_types);
+        addForces_impl<true, true>(pa, pa, nl, ffs, cutoffSqr, np_types);
     }
     else
     {
-        addForces_impl<false>(pa, nl, ffs, cutoffSqr, np_types);
+        addForces_impl<false, true>(pa, pa, nl, ffs, cutoffSqr, np_types);
     }
 }
 
-template <bool ONETYPE>
+template <bool ONETYPE, bool N3L>
 inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
+                                                   ParticleArray& particlesNbr,
                                                    VerletList::NeighborList const& neighborList,
                                                    AlignedVector<LJCoefficients> const& ffs,
                                                    AlignedVector<real> const& cutoffSqr,
@@ -149,6 +151,14 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
         real* __restrict pa_f_x = particles.f_x.data();
         real* __restrict pa_f_y = particles.f_y.data();
         real* __restrict pa_f_z = particles.f_z.data();
+
+        const size_t* __restrict pa_type_nbr = particlesNbr.type.data();
+        const real* __restrict pa_p_x_nbr = particlesNbr.p_x.data();
+        const real* __restrict pa_p_y_nbr = particlesNbr.p_y.data();
+        const real* __restrict pa_p_z_nbr = particlesNbr.p_z.data();
+        real* __restrict pa_f_x_nbr = particlesNbr.f_x.data();
+        real* __restrict pa_f_y_nbr = particlesNbr.f_y.data();
+        real* __restrict pa_f_z_nbr = particlesNbr.f_z.data();
 
         const auto* __restrict plist = neighborList.plist.data();
         const auto* __restrict prange = neighborList.prange.data();
@@ -182,10 +192,10 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
                     int np_lookup;
                     real dist_x, dist_y, dist_z;
                     {
-                        dist_x = p_x - pa_p_x[np_ii];
-                        dist_y = p_y - pa_p_y[np_ii];
-                        dist_z = p_z - pa_p_z[np_ii];
-                        if (!ONETYPE) np_lookup = pa_type[np_ii] + p_lookup;
+                        dist_x = p_x - pa_p_x_nbr[np_ii];
+                        dist_y = p_y - pa_p_y_nbr[np_ii];
+                        dist_z = p_z - pa_p_z_nbr[np_ii];
+                        if (!ONETYPE) np_lookup = pa_type_nbr[np_ii] + p_lookup;
                     }
 
                     real distSqr = dist_x * dist_x + dist_y * dist_y + dist_z * dist_z;
@@ -217,10 +227,11 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
                         f_y += dist_y * ffactor;
                         f_z += dist_z * ffactor;
 
+                        if (N3L)
                         {
-                            pa_f_x[np_ii] -= dist_x * ffactor;
-                            pa_f_y[np_ii] -= dist_y * ffactor;
-                            pa_f_z[np_ii] -= dist_z * ffactor;
+                            pa_f_x_nbr[np_ii] -= dist_x * ffactor;
+                            pa_f_y_nbr[np_ii] -= dist_y * ffactor;
+                            pa_f_z_nbr[np_ii] -= dist_z * ffactor;
                         }
                     }
                 }

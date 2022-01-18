@@ -118,9 +118,39 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                                        CellNeighborList const& cellNborList,
                                        ParticleArray const& particleArray)
 {
+    rebuildMulti<PACK_NEIGHBORS, 1>(cutsq, cellNborList, particleArray, particleArray);
+}
+
+template void VerletList::NeighborList::rebuild<0>(real const cutsq,
+                                                   CellNeighborList const& cellNborList,
+                                                   ParticleArray const& particleArray);
+
+template void VerletList::NeighborList::rebuild<1>(real const cutsq,
+                                                   CellNeighborList const& cellNborList,
+                                                   ParticleArray const& particleArray);
+
+template <bool PACK_NEIGHBORS, bool ARRAY_SELF>
+void VerletList::NeighborList::rebuildMulti(real const cutsq,
+                                            CellNeighborList const& cellNborList,
+                                            ParticleArray const& particleArray,
+                                            ParticleArray const& particleArrayNbr)
+{
+    if (ARRAY_SELF && ((&particleArray) != (&particleArrayNbr)))
+    {
+        throw std::runtime_error("ARRAY_SELF=true but particleArray!=particleArrayNbr");
+    }
+
+    if (!ARRAY_SELF && ((&particleArray) == (&particleArrayNbr)))
+    {
+        throw std::runtime_error("ARRAY_SELF=false but particleArray==particleArrayNbr");
+    }
+
     {
         const size_t* __restrict cellRange = particleArray.cellRange().data();
         const size_t* __restrict sizes = particleArray.sizes().data();
+
+        const size_t* __restrict cellRangeNbr = particleArrayNbr.cellRange().data();
+        const size_t* __restrict sizesNbr = particleArrayNbr.sizes().data();
 
         // number of cells with neighbors
         const size_t numRealCells = cellNborList.numCells();
@@ -137,7 +167,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     const size_t cell_id = cellNborList.at(irow, inbr);
-                    c_reserve += sizes[cell_id];
+                    c_reserve += sizesNbr[cell_id];
                 }
                 c_reserve = ESPP_FIT_TO_VECTOR_WIDTH(c_reserve);
                 max_reserve = std::max(max_reserve, c_reserve);
@@ -161,6 +191,11 @@ void VerletList::NeighborList::rebuild(real const cutsq,
         const auto* __restrict pa_p_z = particleArray.p_z.data();
         const auto* __restrict pa_p_type = particleArray.type.data();
 
+        const auto* __restrict pa_p_x_nbr = particleArrayNbr.p_x.data();
+        const auto* __restrict pa_p_y_nbr = particleArrayNbr.p_y.data();
+        const auto* __restrict pa_p_z_nbr = particleArrayNbr.p_z.data();
+        const auto* __restrict pa_p_type_nbr = particleArrayNbr.type.data();
+
         auto* __restrict c_x_ptr = c_x.data();
         auto* __restrict c_y_ptr = c_y.data();
         auto* __restrict c_z_ptr = c_z.data();
@@ -182,8 +217,8 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     const int ncell_id = cellNborList.at(irow, inbr);
-                    const int ncell_start = cellRange[ncell_id];
-                    const int ncell_size = sizes[ncell_id];
+                    const int ncell_start = cellRangeNbr[ncell_id];
+                    const int ncell_size = sizesNbr[ncell_id];
 
                     int* __restrict c_j_ctr = c_j_ptr + nc_ctr;
 
@@ -198,7 +233,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 /// padding
                 {
                     const int last_nbr = cellNborList.at(irow, cell_nnbrs - 1);
-                    const int padding = cellRange[last_nbr] + sizes[last_nbr];
+                    const int padding = cellRangeNbr[last_nbr] + sizesNbr[last_nbr];
                     const int pad_end = ESPP_FIT_TO_VECTOR_WIDTH(nc_ctr);
                     const int num_pad = pad_end - nc_ctr;
                     int* __restrict c_j_ctr = c_j_ptr + nc_ctr;
@@ -217,9 +252,9 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 for (int ii = 0; ii < c_end; ii++)
                 {
                     int p = c_j_ptr[ii];
-                    c_x_ptr[ii] = pa_p_x[p];
-                    c_y_ptr[ii] = pa_p_y[p];
-                    c_z_ptr[ii] = pa_p_z[p];
+                    c_x_ptr[ii] = pa_p_x_nbr[p];
+                    c_y_ptr[ii] = pa_p_y_nbr[p];
+                    c_z_ptr[ii] = pa_p_z_nbr[p];
                 }
             }
             else
@@ -228,8 +263,8 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 for (int inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     auto ncell_id = cellNborList.at(irow, inbr);
-                    auto ncell_start = cellRange[ncell_id];
-                    auto ncell_end = ncell_start + sizes[ncell_id];
+                    auto ncell_start = cellRangeNbr[ncell_id];
+                    auto ncell_end = ncell_start + sizesNbr[ncell_id];
                     c_j_size += ncell_end - ncell_start;
                 }
             }
@@ -260,6 +295,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                 const int prev_c_nplist_size = c_nplist_size;
 
                 // self-loop
+                if (ARRAY_SELF)
                 {
                     size_t ncell_id = cell_id;
 
@@ -291,7 +327,9 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     }
                 }
 
-                size_t last_ncell = cell_id;
+                /// use last neighbor cell as default
+                size_t last_ncell = cellNborList.at(irow, cell_nnbrs - 1);
+                ;
                 size_t prev_nplist_size_nbrloop = c_nplist_size;
 
                 /// neighbor-loop
@@ -328,8 +366,8 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                     {
                         size_t ncell_id = cellNborList.at(irow, inbr);
-                        size_t ncell_start = cellRange[ncell_id];
-                        size_t ncell_data_end = cellRange[ncell_id + 1];
+                        size_t ncell_start = cellRangeNbr[ncell_id];
+                        size_t ncell_data_end = cellRangeNbr[ncell_id + 1];
                         int* __restrict npptr = &(nplist[c_np_start + c_nplist_size]);
 
                         {
@@ -340,9 +378,9 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                             {
                                 {
                                     real dist_x, dist_y, dist_z;
-                                    dist_x = p_x - pa_p_x[np];
-                                    dist_y = p_y - pa_p_y[np];
-                                    dist_z = p_z - pa_p_z[np];
+                                    dist_x = p_x - pa_p_x_nbr[np];
+                                    dist_y = p_y - pa_p_y_nbr[np];
+                                    dist_z = p_z - pa_p_z_nbr[np];
                                     const real distSqr =
                                         dist_x * dist_x + dist_y * dist_y + dist_z * dist_z;
 
@@ -369,7 +407,7 @@ void VerletList::NeighborList::rebuild(real const cutsq,
                     // pad remaining part of list with stray neighbor particle
                     size_t num_rem = new_pairs % ESPP_VECTOR_WIDTH;
                     size_t num_pad = (num_rem > 0) * (ESPP_VECTOR_WIDTH - num_rem);
-                    size_t padding = cellRange[last_ncell] + sizes[last_ncell];
+                    size_t padding = cellRangeNbr[last_ncell] + sizesNbr[last_ncell];
                     for (size_t pad = 0; pad < num_pad; pad++)
                         nplist[c_np_start + (c_nplist_size++)] = padding;
                     plist.push_back(p);
@@ -396,6 +434,26 @@ void VerletList::NeighborList::rebuild(real const cutsq,
     // LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
     //              << " local size = " << vlPairs.size());
 }
+
+template void VerletList::NeighborList::rebuildMulti<1, 1>(real const cutsq,
+                                                           CellNeighborList const& cellNborList,
+                                                           ParticleArray const& particleArray,
+                                                           ParticleArray const& particleArrayNbr);
+
+template void VerletList::NeighborList::rebuildMulti<0, 1>(real const cutsq,
+                                                           CellNeighborList const& cellNborList,
+                                                           ParticleArray const& particleArray,
+                                                           ParticleArray const& particleArrayNbr);
+
+template void VerletList::NeighborList::rebuildMulti<1, 0>(real const cutsq,
+                                                           CellNeighborList const& cellNborList,
+                                                           ParticleArray const& particleArray,
+                                                           ParticleArray const& particleArrayNbr);
+
+template void VerletList::NeighborList::rebuildMulti<0, 0>(real const cutsq,
+                                                           CellNeighborList const& cellNborList,
+                                                           ParticleArray const& particleArray,
+                                                           ParticleArray const& particleArrayNbr);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 

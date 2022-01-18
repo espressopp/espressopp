@@ -77,6 +77,38 @@ void ParticleArray::markRealCells(std::vector<size_t> const& realcellsIn, size_t
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+void ParticleArray::markOwnCells(CellList const& srcCells, std::vector<size_t> const& ownCellsIdx)
+{
+    size_t const numCells = srcCells.size();
+    if (numCells != numLocalCells_)
+    {
+        std::string msg =
+            "ParticleArray::markOwnCells Mismatch number of cells with call to markRealCells";
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
+    }
+
+    cellOwn_.clear();
+    cellOwn_.resize(numCells, 0);
+
+    for (const size_t ic : ownCellsIdx)
+    {
+        cellOwn_.at(ic) = 1;
+    }
+    setCellOwn = true;
+
+    for (const size_t ic : realCells_)
+    {
+        if (!cellOwn_[ic])
+        {
+            std::string const msg = "ParticleArray::markOwnCells realCell not in ownCell";
+            std::cerr << msg << std::endl;
+            throw std::runtime_error(msg);
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 void ParticleArray::markGhostCells()
 {
     std::vector<int> cells(numLocalCells_, 0);
@@ -164,6 +196,89 @@ void ParticleArray::copyFrom(CellList const& srcCells)
     }
 }
 
+void ParticleArray::copyFromCellOwn(CellList const& srcCells)
+{
+    size_t const numCells = srcCells.size();
+    if (numCells != numLocalCells_)
+        throw std::runtime_error("ParticleArray::copyFrom Incorrect number of cells");
+
+    if (!setCellOwn)
+    {
+        std::string const msg = "ParticleArray::copyFromCellOwn owned cells not set";
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
+    }
+
+    cellRange_.clear();
+    cellRange_.reserve(numCells + 1);
+    sizes_.clear();
+    sizes_.reserve(numCells);
+
+    // preallocate
+    size_t total_size = 0, total_data_size = 0;
+
+    for (size_t ic = 0; ic < numCells; ic++)
+    {
+        Cell* cell = srcCells[ic];
+        cellRange_.push_back(total_data_size);
+        size_t size = 0, data_size = 0;
+
+        if (cellOwn_[ic])
+        {
+            size = cell->particles.size();
+            // // require only at least one particle for padding
+            // data_size = (size+1);
+            // require only at least one particle for padding but fill one full row
+            data_size = calc_data_size(size + 1);
+        }
+        sizes_.push_back(size);
+
+        total_size += size;
+        total_data_size += data_size;
+    }
+    cellRange_.push_back(total_data_size);
+
+    reserve_size_ = total_data_size;
+    ESPP_PARTICLEARRAY_SOA_APPLY(resize(reserve_size_));
+
+    size_ = total_size;
+    data_size_ = total_data_size;
+
+    // fill values
+    auto updateCell = [this, &srcCells](size_t ic) {
+        if (!cellOwn_[ic]) return;
+        size_t start = cellRange_[ic];
+        ParticleList const& particlelist = srcCells[ic]->particles;
+        updateFrom(particlelist, start);
+    };
+    for (size_t ic = 0; ic < numCells; ic++) updateCell(ic);
+
+    {
+        auto fillCell = [this, &srcCells](size_t ic) {
+            ParticleList const& particlelist = srcCells[ic]->particles;
+            const size_t end = cellRange_[ic] + sizes_[ic];
+            const size_t data_end = cellRange_[ic + 1];
+            for (size_t ip = end; ip < data_end; ip++) p_x[ip] = large_pos;
+            for (size_t ip = end; ip < data_end; ip++) p_y[ip] = large_pos;
+            for (size_t ip = end; ip < data_end; ip++) p_z[ip] = large_pos;
+            for (size_t ip = end; ip < data_end; ip++) type[ip] = 0;
+        };
+        for (size_t ic = 0; ic < numCells; ic++) fillCell(ic);
+    }
+
+    {
+        auto fillCell = [this, &srcCells](size_t ic) {
+            ParticleList const& particlelist = srcCells[ic]->particles;
+            size_t end = cellRange_[ic] + sizes_[ic];
+            size_t data_end = cellRange_[ic + 1];
+            for (size_t ip = end; ip < data_end; ip++) id[ip] = -1;
+            for (size_t ip = end; ip < data_end; ip++) mass[ip] = 1.0;
+            for (size_t ip = end; ip < data_end; ip++) q[ip] = 0.0;
+        };
+        for (size_t ic = 0; ic < numCells; ic++) fillCell(ic);
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void ParticleArray::updateFromPositionVelocity(CellList const& srcCells, bool realOnly)
 {
@@ -241,6 +356,15 @@ void ParticleArray::updateToPositionVelocity(CellList& srcCells, bool realOnly) 
     {
         const size_t numCells = srcCells.size();
         for (size_t ic = 0; ic < numCells; ic++) updateCell(ic);
+
+        if (setCellOwn)
+        {
+            std::string const msg =
+                "updateToPositionVelocity: Not implemented for realOnly=false "
+                "and setCellOwn=true";
+            std::cerr << msg << std::endl;
+            throw std::runtime_error(msg);
+        }
     }
 }
 
