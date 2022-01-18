@@ -43,10 +43,7 @@ protected:
     std::vector<size_t> ncells;
 
 public:
-    CellNeighborList()
-    {
-        ncells_range.push_back(0);
-    }
+    CellNeighborList() { ncells_range.push_back(0); }
 
     CellNeighborList(Cell* const cell0,
                      CellList const& localCells,
@@ -83,21 +80,11 @@ public:
         return ncells_range[row + 1] - ncells_range[row];
     }
 
-    inline void beginCell(size_t const& lcell)
-    {
-        cells.push_back(lcell);
-    }
+    inline void beginCell(size_t const& lcell) { cells.push_back(lcell); }
 
-    inline void endCell()
-    {
-        ncells_range.push_back(ncells.size());
-    }
+    inline void endCell() { ncells_range.push_back(ncells.size()); }
 
-
-    inline void insertNeighbor(size_t const& index)
-    {
-        ncells.push_back(index);
-    }
+    inline void insertNeighbor(size_t const& index) { ncells.push_back(index); }
 
     void validate() const;
 

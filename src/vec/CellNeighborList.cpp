@@ -51,7 +51,7 @@ void CellNeighborList::init(Cell* const cell0,
     clear();
 
     // copy neighbor information, consider only real cells
-    for (const auto lcell: realCellIdx)
+    for (const auto lcell : realCellIdx)
     {
         beginCell(lcell);
         for (NeighborCellInfo& nc : localCells[lcell]->neighborCells)
