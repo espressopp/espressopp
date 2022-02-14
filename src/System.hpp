@@ -56,12 +56,13 @@ public:
     interaction::InteractionList shortRangeInteractions;
 
     real maxCutoff;  // maximal cutoff over all of the interactions
-    
-    real shearOffset;     // offset of x-position for image particles over the boundary (only with Lees-Edwards)
-    
-    Int3D NGridSize;   // NodeGridSize fetched by Storage and LEBC integrator
-    
-    int ghostShift; // Cell shift for the ghost layer over the boundary (only with Lees-Edwards)
+
+    real shearOffset;  // offset of x-position for image particles over the boundary (only with
+                       // Lees-Edwards)
+
+    Int3D NGridSize;  // NodeGridSize fetched by Storage and LEBC integrator
+
+    int ghostShift;  // Cell shift for the ghost layer over the boundary (only with Lees-Edwards)
     int lebcMode;
     real shearRate;
     int irank;

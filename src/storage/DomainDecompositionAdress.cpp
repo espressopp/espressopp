@@ -293,12 +293,10 @@ void DomainDecompositionAdress::initCellInteractions()
     }
 
     LOG4ESPP_DEBUG(logger, "done");
-}  
-
-//dummy function, only used for shear flow simulation (see in DomainDecomposition.cpp)
-void DomainDecompositionAdress::remapNeighbourCells(int cell_shift) {
-;
 }
+
+// dummy function, only used for shear flow simulation (see in DomainDecomposition.cpp)
+void DomainDecompositionAdress::remapNeighbourCells(int cell_shift) { ; }
 
 Cell *DomainDecompositionAdress::mapPositionToCell(const Real3D &pos)
 {

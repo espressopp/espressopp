@@ -142,7 +142,7 @@ void registerPython()
 
     CoulombKSpaceEwald::registerPython();
     CoulombMultiSiteCorrectionEwald::registerPython();
-    //CoulombScafacos::registerPython();
+    // CoulombScafacos::registerPython();
     CoulombRSpace::registerPython();
     StillingerWeberPairTerm::registerPython();
     StillingerWeberTripleTerm::registerPython();

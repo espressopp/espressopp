@@ -114,11 +114,12 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
     real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
     real offs = getSystemRef().shearOffset;
 
-    if (offs!=.0){
-        real Lx=bc.getBoxL()[0];
-        real Lz=bc.getBoxL()[2];
+    if (offs != .0)
+    {
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
         int xtmp;
-        real sqrlz_4=Lz*Lz/4.0,dpos;
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
             Particle &p1 = *it->first;
@@ -126,15 +127,18 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
 
             Real3D dist;
             Real3D dist_tmp(.0);
-            dpos=p1.position()[2]-p2.position()[2];
-            if (dpos*dpos>sqrlz_4){
-                dist_tmp[0]=(dpos > .0 ? -offs : offs);
-                xtmp=static_cast<int>(floor((p1.position()[0]+dist_tmp[0]-p2.position()[0])/Lx+0.5));
-                dist_tmp[0]-=(xtmp+.0)*Lx;
-                bc.getMinimumImageVectorBox(dist, p1.position()+dist_tmp, p2.position());
-            }else
+            dpos = p1.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist, p1.position() + dist_tmp, p2.position());
+            }
+            else
                 bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-            
+
             Real3D force;
             real d = dist.sqr();
             if (d > ltMaxBondSqr)
@@ -155,38 +159,48 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
                                    << "dist=" << sqrt(dist * dist) << " "
                                    << "force=(" << force[0] << "," << force[1] << "," << force[2]
                                    << ")");
-                //Analysis to get stress tensors
-                if (getSystemRef().ifViscosity){
-                  getSystemRef().dyadicP_xz+=dist[0]*force[2];
-                  getSystemRef().dyadicP_zx+=dist[2]*force[0];
+                // Analysis to get stress tensors
+                if (getSystemRef().ifViscosity)
+                {
+                    getSystemRef().dyadicP_xz += dist[0] * force[2];
+                    getSystemRef().dyadicP_zx += dist[2] * force[0];
                 }
             }
         }
-      }else{
-        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
-          Particle &p1 = *it->first;
-          Particle &p2 = *it->second;
-          Real3D dist;
-          
-          bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-            
-          Real3D force;
-          real d = dist.sqr();
-          if (d > ltMaxBondSqr) {
-        	  fixedpairList->setLongtimeMaxBondSqr(d);
-        	  ltMaxBondSqr = d;
-          }
-          potential->computeColVarWeights(dist, bc);
-          if(potential->_computeForce(force, dist)) {
-            p1.force() += force;
-            p2.force() -= force;
-            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1] << "," << p1.position()[2] << ") "
-        		                               << "p" << p2.id() << "(" << p2.position()[0] << "," << p2.position()[1] << "," << p2.position()[2] << ") "
-        		                               << "dist=" << sqrt(dist*dist) << " "
-        		                               << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
-          }
+    }
+    else
+    {
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            Particle &p1 = *it->first;
+            Particle &p2 = *it->second;
+            Real3D dist;
+
+            bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+
+            Real3D force;
+            real d = dist.sqr();
+            if (d > ltMaxBondSqr)
+            {
+                fixedpairList->setLongtimeMaxBondSqr(d);
+                ltMaxBondSqr = d;
+            }
+            potential->computeColVarWeights(dist, bc);
+            if (potential->_computeForce(force, dist))
+            {
+                p1.force() += force;
+                p2.force() -= force;
+                LOG4ESPP_DEBUG(_Potential::theLogger,
+                               "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1]
+                                   << "," << p1.position()[2] << ") "
+                                   << "p" << p2.id() << "(" << p2.position()[0] << ","
+                                   << p2.position()[1] << "," << p2.position()[2] << ") "
+                                   << "dist=" << sqrt(dist * dist) << " "
+                                   << "force=(" << force[0] << "," << force[1] << "," << force[2]
+                                   << ")");
+            }
         }
-      }
+    }
 }
 
 template <typename _Potential>
@@ -198,32 +212,38 @@ inline real FixedPairListInteractionTemplate<_Potential>::computeEnergy()
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
 
-    if (offs!=.0){
-        real Lx=bc.getBoxL()[0];
-        real Lz=bc.getBoxL()[2];
+    if (offs != .0)
+    {
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
         int xtmp;
-        real sqrlz_4=Lz*Lz/4.0,dpos;
-        for (FixedPairList::PairList::Iterator it(*fixedpairList);
-	     it.isValid(); ++it) {
-          const Particle &p1 = *it->first;
-          const Particle &p2 = *it->second;
-          Real3D r21;
-          
-          Real3D dist_tmp(.0);
-          dpos=p1.position()[2]-p2.position()[2];
-          if (dpos*dpos>sqrlz_4){
-            dist_tmp[0]=(dpos > .0 ? -offs : offs);
-            xtmp=static_cast<int>(floor((p1.position()[0]+dist_tmp[0]-p2.position()[0])/Lx+0.5));
-            dist_tmp[0]-=(xtmp+.0)*Lx;
-            bc.getMinimumImageVectorBox(r21, p1.position()+dist_tmp, p2.position());
-          }else
-            bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-            
-          potential->computeColVarWeights(r21, bc);
-          
-          e += potential->_computeEnergy(r21);
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            const Particle &p1 = *it->first;
+            const Particle &p2 = *it->second;
+            Real3D r21;
+
+            Real3D dist_tmp(.0);
+            dpos = p1.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(r21, p1.position() + dist_tmp, p2.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+
+            potential->computeColVarWeights(r21, bc);
+
+            e += potential->_computeEnergy(r21);
         }
-      }else{
+    }
+    else
+    {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
             const Particle &p1 = *it->first;
@@ -233,7 +253,7 @@ inline real FixedPairListInteractionTemplate<_Potential>::computeEnergy()
             potential->computeColVarWeights(r21, bc);
             e += potential->_computeEnergy(r21);
         }
-      }
+    }
     real esum;
     boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
     return esum;
@@ -383,35 +403,42 @@ inline real FixedPairListInteractionTemplate<_Potential>::computeVirial()
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
 
-    if (offs!=.0){
-        real Lx=bc.getBoxL()[0];
-        real Lz=bc.getBoxL()[2];
+    if (offs != .0)
+    {
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
         int xtmp;
-        real sqrlz_4=Lz*Lz/4.0,dpos;
-        for (FixedPairList::PairList::Iterator it(*fixedpairList);
-             it.isValid(); ++it) {
-          const Particle &p1 = *it->first;
-          const Particle &p2 = *it->second;
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            const Particle &p1 = *it->first;
+            const Particle &p2 = *it->second;
 
-          Real3D r21;
-          
-          Real3D dist_tmp(.0);
-          dpos=p1.position()[2]-p2.position()[2];
-          if (dpos*dpos>sqrlz_4){
-            dist_tmp[0]=(dpos > .0 ? -offs : offs);
-            xtmp=static_cast<int>(floor((p1.position()[0]+dist_tmp[0]-p2.position()[0])/Lx+0.5));
-            dist_tmp[0]-=(xtmp+.0)*Lx;
-            bc.getMinimumImageVectorBox(r21, p1.position()+dist_tmp, p2.position());
-          }else
-            bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-            
-          Real3D force;
-          potential->computeColVarWeights(r21, bc);
-          if(potential->_computeForce(force, r21)) {
-            w += r21 * force;
-          }
+            Real3D r21;
+
+            Real3D dist_tmp(.0);
+            dpos = p1.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(r21, p1.position() + dist_tmp, p2.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+
+            Real3D force;
+            potential->computeColVarWeights(r21, bc);
+            if (potential->_computeForce(force, r21))
+            {
+                w += r21 * force;
+            }
         }
-    }else{
+    }
+    else
+    {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
             const Particle &p1 = *it->first;
@@ -441,35 +468,42 @@ inline void FixedPairListInteractionTemplate<_Potential>::computeVirialTensor(Te
     Tensor wlocal(0.0);
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
-      
-    if (offs!=.0){
-        real Lx=bc.getBoxL()[0];
-        real Lz=bc.getBoxL()[2];
+
+    if (offs != .0)
+    {
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
         int xtmp;
-        real sqrlz_4=Lz*Lz/4.0,dpos;
-        for (FixedPairList::PairList::Iterator it(*fixedpairList);
-             it.isValid(); ++it) {
-          const Particle &p1 = *it->first;
-          const Particle &p2 = *it->second;
-          Real3D r21;
-          
-          Real3D dist_tmp(.0);
-          dpos=p1.position()[2]-p2.position()[2];
-          if (dpos*dpos>sqrlz_4){
-            dist_tmp[0]=(dpos > .0 ? -offs : offs);
-            xtmp=static_cast<int>(floor((p1.position()[0]+dist_tmp[0]-p2.position()[0])/Lx+0.5));
-            dist_tmp[0]-=(xtmp+.0)*Lx;
-            bc.getMinimumImageVectorBox(r21, p1.position()+dist_tmp, p2.position());
-          }else
-            bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-            
-          Real3D force;
-          potential->computeColVarWeights(r21, bc);
-          if(potential->_computeForce(force, r21)) {
-            wlocal += Tensor(r21, force);
-          }
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            const Particle &p1 = *it->first;
+            const Particle &p2 = *it->second;
+            Real3D r21;
+
+            Real3D dist_tmp(.0);
+            dpos = p1.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(r21, p1.position() + dist_tmp, p2.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+
+            Real3D force;
+            potential->computeColVarWeights(r21, bc);
+            if (potential->_computeForce(force, r21))
+            {
+                wlocal += Tensor(r21, force);
+            }
         }
-    }else{
+    }
+    else
+    {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
             const Particle &p1 = *it->first;
