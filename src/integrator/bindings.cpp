@@ -24,6 +24,7 @@
 #include "MDIntegrator.hpp"
 #include "VelocityVerlet.hpp"
 #include "PIAdressIntegrator.hpp"
+#include "VelocityVerletLE.hpp"
 #include "VelocityVerletOnGroup.hpp"
 #include "VelocityVerletRESPA.hpp"
 
@@ -73,6 +74,7 @@ void registerPython()
     MDIntegrator::registerPython();
     VelocityVerlet::registerPython();
     PIAdressIntegrator::registerPython();
+    VelocityVerletLE::registerPython();
     VelocityVerletOnGroup::registerPython();
     VelocityVerletRESPA::registerPython();
     Extension::registerPython();

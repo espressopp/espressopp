@@ -618,6 +618,29 @@ void Storage::packPositionsEtc(OutBuffer &buf, Cell &_reals, int extradata, cons
     }
 }
 
+void Storage::packPositionsEtc_LEBC(OutBuffer &buf,
+			   Cell &_reals, int extradata, const Real3D& shift, real offset) {
+  ParticleList &reals  = _reals.particles; 
+  real cpy_tmp;
+
+  LOG4ESPP_DEBUG(logger, "pack data from reals in "
+	     << (&_reals - getFirstCell()));
+  LOG4ESPP_DEBUG(logger, "also packing "
+	     << ((extradata & DATA_PROPERTIES) ? "properties " : "")
+	     << ((extradata & DATA_MOMENTUM) ? "momentum " : "")
+	     << ((extradata & DATA_LOCAL) ? "local " : ""));
+  LOG4ESPP_DEBUG(logger, "positions are shifted by "
+	     << shift[0] << "," << shift[1] << "," << shift[2]);
+
+
+  for(ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src) {
+      cpy_tmp=src->position()[0];
+      src->position()[0]+=offset;
+      buf.write(*src, extradata, shift);
+      src->position()[0]=cpy_tmp;
+  }
+}
+
 void Storage::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata)
 {
     ParticleList &ghosts = _ghosts.particles;
@@ -661,6 +684,48 @@ void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts, int extradata, cons
     {
         dst->copyAsGhost(*src, extradata, shift);
     }
+}
+
+void Storage::copyRealsToGhosts_LEBC(Cell &_reals, Cell &_ghosts,
+			    int extradata,
+			    const Real3D& shift)
+{
+  ParticleList &reals  = _reals.particles;
+  ParticleList &ghosts = _ghosts.particles;
+  real cpy_tmp;
+  real Lx=getSystem()->bc->getBoxL()[0];
+  real Lz=getSystem()->bc->getBoxL()[2];
+  int xgrid=getInt3DCellGrid()[0]*getSystem()->NGridSize[0];//getInt3DNodeGrid()[0];
+  real offs=getSystem()->shearOffset;
+  
+  LOG4ESPP_DEBUG(logger, "copy data from reals in "
+	     << (&_reals - getFirstCell()) << " to ghosts in "
+	     << (&_ghosts - getFirstCell()));
+  LOG4ESPP_DEBUG(logger, "also copying "
+	     << ((extradata & DATA_PROPERTIES) ? "properties " : "")
+	     << ((extradata & DATA_MOMENTUM) ? "momentum " : "")
+	     << ((extradata & DATA_LOCAL) ? "local " : ""));
+  LOG4ESPP_DEBUG(logger, "positions are shifted by "
+	     << shift[0] << "," << shift[1] << "," << shift[2]);
+  ghosts.resize(reals.size());
+
+  for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
+          src != end; ++src, ++dst) {
+    if (shift[2]!=0.0){
+      cpy_tmp=src->position()[0];
+      real xref_cell=((&_ghosts - getFirstCell())%(xgrid+2)-0.5)/(xgrid+.0)*Lx;
+      src->position()[0]=src->position()[0]+offs*shift[2]/Lz;
+      if (src->position()[0]<xref_cell-Lx/2.0){
+        while (src->position()[0]<xref_cell-Lx/2.0) src->position()[0]+=Lx;
+      }else if (src->position()[0]>xref_cell+Lx/2.0){
+        while (src->position()[0]>xref_cell+Lx/2.0) src->position()[0]-=Lx;//mcutoff
+      }
+      dst->copyAsGhost(*src, extradata, shift);
+      src->position()[0]=cpy_tmp;
+    }else{
+      dst->copyAsGhost(*src, extradata, shift);
+    }
+  }
 }
 
 void Storage::packForces(OutBuffer &buf, Cell &_ghosts)

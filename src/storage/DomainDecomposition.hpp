@@ -98,6 +98,8 @@ protected:
     /// init global Verlet list
     void initCellInteractions();
     /// set the grids and allocate space accordingly
+    void remapNeighbourCells(int cell_shift);
+    /// set the grids and allocate space accordingly
     void createCellGrid(const Int3D& nodeGrid, const Int3D& cellGrid);
     /// sort cells into local/ghost cell arrays
     void markCells();
@@ -132,6 +134,7 @@ protected:
         For the order, see NodeGrid.
     */
     CommCells commCells[6];
+    CommCells commCells_bkp[2];
 
     static LOG4ESPP_DECL_LOGGER(logger);
 };

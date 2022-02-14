@@ -223,6 +223,7 @@ public:
      * Needed for DPD thermostat for example.
      */
     virtual void updateGhostsV() = 0;
+    virtual void remapNeighbourCells(int cshift) = 0;
 
     /** read back forces from ghost particles by two-sided
         communication.
@@ -313,6 +314,8 @@ protected:
                                   int extradata,
                                   const Real3D& shift);
 
+    virtual void packPositionsEtc_LEBC(class OutBuffer& buf,
+			    Cell &reals, int extradata, const Real3D& shift, real offset);
     /** unpack received data for ghosts. */
     virtual void unpackPositionsEtc(Cell& ghosts, class InBuffer& buf, int extradata);
 
@@ -322,6 +325,7 @@ protected:
     */
     virtual void copyRealsToGhosts(Cell& reals, Cell& ghosts, int extradata, const Real3D& shift);
 
+    virtual void copyRealsToGhosts_LEBC(Cell &reals, Cell &ghosts, int extradata, const Real3D& shift);
     // void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
 
     /** pack ghost forces for sending. */

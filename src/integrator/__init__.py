@@ -28,6 +28,7 @@ try:
     from espressopp.integrator.PIAdressIntegrator import *
 except:
     print('Warning: numpy module not available. Therefore, espressopp.integrator.PIAdressIntegrator unavailable.')
+from espressopp.integrator.VelocityVerletLE import *
 from espressopp.integrator.VelocityVerletOnGroup import *
 from espressopp.integrator.VelocityVerletRESPA import *
 from espressopp.integrator.Isokinetic import *

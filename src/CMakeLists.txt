@@ -1,5 +1,13 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
-file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
+if (NOT (SCAFACOS_ROOT_DIR AND SCAFACOS_LIBS))
+    file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
+	    esutil/GenLogger.cpp
+	    interaction/CoulombScafacos.cpp)
+else()
+    file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
+	    esutil/GenLogger.cpp)
+endif()
+# file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
 file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
@@ -59,6 +67,13 @@ target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
+
+if (SCAFACOS_ROOT_DIR AND SCAFACOS_LIBS)
+#  set(SCAFACOS_ROOT_DIR "/home/zhexu/Program/scafacos/local")
+  file(GLOB_RECURSE SCAFACOS_LIBS ${SCAFACOS_ROOT_DIR}/lib/libfcs*.so)
+  message("SCAFACOS_LIBS: ${SCAFACOS_LIBS}")
+  target_link_libraries(_espressopp PUBLIC ${SCAFACOS_LIBS})
+endif()
 
 if(WITH_XTC)
     target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)

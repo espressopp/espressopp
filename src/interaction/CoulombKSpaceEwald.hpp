@@ -84,6 +84,8 @@ private:
     int nParticles;   // local variable for the number of particles
     real rclx, rcly, rclz;
     real force_prefac[3];  // real array for force prefactors [0]: x,[1]: y,[2]: z
+    real cottheta; // necessary components for cell basis matrix for a parallelepiped periodic box
+    bool ifshear;
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -129,6 +131,14 @@ public:
         Lx = Li[0];
         Ly = Li[1];
         Lz = Li[2];
+
+        ifshear=false;
+        cottheta=.0;
+        if (system -> shearOffset != .0){
+          cottheta=system->shearOffset/Lz;
+          if (cottheta!=.0)
+            ifshear=true;
+        }
 
         real skmax = kmax / min(Lx, min(Ly, Lz));
         real skmaxsq = skmax * skmax;  // we choose the biggest cutoff
@@ -179,7 +189,11 @@ public:
                 for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
-                    rkz2 = kz2 * rLz2;
+                    if (ifshear){
+                        rkz2 = (kz+.0)/Lz-cottheta*(kx+.0)/Lx;
+                        rkz2 = rkz2*rkz2;
+                    }else
+                        rkz2 = kz2 * rLz2;
                     rk2PIz = kz * rclz;
 
                     ksq = kx2 + ky2 + kz2;
@@ -282,22 +296,46 @@ public:
         /* Calculation of k space sums */
         // -1, 0, 1
         int j = 0;  // auxiliary variable, particle counter
-        for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
-        {
-            Particle& p = *it;
-
-            eikx[0][j] = dcomplex(1.0, 0.0);
-            eiky[kmax + 0][j] = dcomplex(1.0, 0.0);
-            eikz[kmax + 0][j] = dcomplex(1.0, 0.0);
-
-            eikx[1][j] = dcomplex(cos(rclx * p.position()[0]), sin(rclx * p.position()[0]));
-            eiky[kmax + 1][j] = dcomplex(cos(rcly * p.position()[1]), sin(rcly * p.position()[1]));
-            eikz[kmax + 1][j] = dcomplex(cos(rclz * p.position()[2]), sin(rclz * p.position()[2]));
-
-            eiky[kmax - 1][j] = conj(eiky[kmax + 1][j]);
-            eikz[kmax - 1][j] = conj(eikz[kmax + 1][j]);
-
+        if (ifshear){
+          // calculate ksum for ewald under shear flow
+          for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
+            Particle &p = *it;
+            
+            real intc=Lx/cottheta;
+            real zshift=-p.position()[0]/cottheta;
+            int nshift=static_cast<int>(floor((p.position()[2]+zshift)/intc)+1.0);
+            real px=p.position()[0]+(nshift+.0)*Lx;
+            
+            eikx[     0][j] = dcomplex(1.0, 0.0);
+            eiky[kmax+0][j] = dcomplex(1.0, 0.0);
+            eikz[kmax+0][j] = dcomplex(1.0, 0.0);
+  
+            eikx[     1][j] = dcomplex( cos( rclx * (px-cottheta*p.position()[2]) ), sin( rclx * (px-cottheta*p.position()[2]) ));
+            eiky[kmax+1][j] = dcomplex( cos( rcly * p.position()[1] ), sin( rcly * p.position()[1] ) );
+            eikz[kmax+1][j] = dcomplex( cos( rclz * p.position()[2] ), sin( rclz * p.position()[2] ) );
+  
+            eiky[kmax-1][j] = conj( eiky[kmax+1][j] );
+            eikz[kmax-1][j] = conj( eikz[kmax+1][j] );
+           
             j++;
+          }
+        }else{
+          for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
+            Particle &p = *it;
+            
+            eikx[     0][j] = dcomplex(1.0, 0.0);
+            eiky[kmax+0][j] = dcomplex(1.0, 0.0);
+            eikz[kmax+0][j] = dcomplex(1.0, 0.0);
+  
+            eikx[     1][j] = dcomplex( cos( rclx * p.position()[0] ), sin( rclx * p.position()[0] ) );
+            eiky[kmax+1][j] = dcomplex( cos( rcly * p.position()[1] ), sin( rcly * p.position()[1] ) );
+            eikz[kmax+1][j] = dcomplex( cos( rclz * p.position()[2] ), sin( rclz * p.position()[2] ) );
+  
+            eiky[kmax-1][j] = conj( eiky[kmax+1][j] );
+            eikz[kmax-1][j] = conj( eikz[kmax+1][j] );
+           
+            j++;
+          }
         }
 
         // calculation of the rest terms
@@ -394,14 +432,27 @@ public:
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
             int j = 0;
-            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
-            {
-                Particle& p = *it;
-
-                real tf = 0.0;
-                if (p.q() != 0)
-                {
-                    tf = imag(tff * conj(eik[k][j]));
+          if (ifshear)
+            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
+              Particle& p = *it;
+              
+              real tf = 0.0;
+              if( p.q()!=0 ){
+                tf= imag( tff  *  conj( eik[k][j] ) );
+              
+                p.force()[0] += force_prefac[0] * tf * kxfield[k];
+                p.force()[1] += force_prefac[1] * tf * kyfield[k];
+                p.force()[2] += force_prefac[2] * tf * kzfield[k] - force_prefac[0]*cottheta * tf * kxfield[k];
+              }
+              j++;
+            }
+          else
+            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
+              Particle& p = *it;
+              
+              real tf = 0.0;
+              if( p.q()!=0 ){
+                tf= imag( tff  *  conj( eik[k][j] ) );
 
                     p.force()[0] += force_prefac[0] * tf * kxfield[k];
                     p.force()[1] += force_prefac[1] * tf * kyfield[k];
@@ -409,6 +460,7 @@ public:
                 }
                 j++;
             }
+          
         }
 
         return true;

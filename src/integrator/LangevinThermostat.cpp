@@ -25,6 +25,7 @@
 
 #include "types.hpp"
 #include "System.hpp"
+#include "bc/BC.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
@@ -137,12 +138,27 @@ void LangevinThermostat::thermalizeAdr()
 
 void LangevinThermostat::frictionThermo(Particle& p)
 {
+    System& system = getSystemRef();
     real massf = sqrt(p.mass());
 
     // get a random value for each vector component
     Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
+    int mode=system.lebcMode;
 
-    p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
+    if (mode==0){
+        p.force() += pref1 * p.velocity() * p.mass() +
+                     pref2 * ranval * massf;
+    }else if (mode==1){
+        real halfL= system.bc->getBoxL()[2]/2.0;
+        Real3D vtmp={system.shearRate*(p.position()[2]-halfL),.0,.0};
+        p.force() += pref1 * (p.velocity()+vtmp) * p.mass() +
+                     pref2 * ranval * massf;
+    }else if (mode==2){
+        Real3D vtmp={.0,p.velocity()[1],.0};
+        Real3D rtmp={.0,ranval[1],.0};
+        p.force() += pref1 * vtmp * p.mass() +
+                     pref2 * rtmp * massf;
+    }
 
     LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
 }

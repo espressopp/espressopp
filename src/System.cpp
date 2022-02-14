@@ -57,6 +57,19 @@ System::System(int fComm)
 {
     comm = std::make_shared<mpi::communicator>(MPI_Comm_f2c(fComm), mpi::comm_attach);
     maxCutoff = 0.0;
+    shearOffset = 0.0;
+    NGridSize={1,1,1};
+    ghostShift=0;
+    lebcMode = 0;
+    shearRate = 0.0;
+    irank=0;
+    dyadicP_xz=.0;
+    dyadicP_zx=.0;
+    if (rename("FLAG_VIS","FLAG_VIS")==0){
+      std::cout<<"The calculation of the shear viscosity only supports non-bonded and two-body bonding interactions \n";
+      ifViscosity=true;
+    }else
+      ifViscosity=false;
 }
 
 void System::setSkin(real _skin)

@@ -68,6 +68,8 @@
 #include "DihedralHarmonic.hpp"
 #include "DihedralRB.hpp"
 #include "CoulombKSpaceEwald.hpp"
+#include "CoulombMultiSiteCorrectionEwald.hpp"
+//#include "CoulombScafacos.hpp"
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
@@ -139,6 +141,8 @@ void registerPython()
     DihedralHarmonic::registerPython();
 
     CoulombKSpaceEwald::registerPython();
+    CoulombMultiSiteCorrectionEwald::registerPython();
+    //CoulombScafacos::registerPython();
     CoulombRSpace::registerPython();
     StillingerWeberPairTerm::registerPython();
     StillingerWeberTripleTerm::registerPython();

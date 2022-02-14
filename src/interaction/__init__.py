@@ -73,6 +73,8 @@ from espressopp.interaction.DihedralHarmonic import *
 from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *
+from espressopp.interaction.CoulombMultiSiteCorrectionEwald import *
+#from espressopp.interaction.CoulombScafacos import *
 from espressopp.interaction.CoulombRSpace import *
 from espressopp.interaction.StillingerWeberPairTerm import *
 from espressopp.interaction.StillingerWeberTripleTerm import *
