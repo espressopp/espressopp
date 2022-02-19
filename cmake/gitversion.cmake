@@ -23,7 +23,7 @@ set (NEW_GIT_HEADER "new_gitversion.hpp")
 file(WRITE ${NEW_GIT_HEADER} "static const std::string gitversion = \"${ESPP_GIT_ID}\";\n")
 file(APPEND ${NEW_GIT_HEADER} "constexpr int majorversion = ${PROJECT_VERSION_MAJOR};\n")
 file(APPEND ${NEW_GIT_HEADER} "constexpr int minorversion = ${PROJECT_VERSION_MINOR};\n")
-file(APPEND ${NEW_GIT_HEADER} "constexpr int patchlevel = ${PROJECT_VERSION_PATCH};\n")
+file(APPEND ${NEW_GIT_HEADER} "constexpr int patchversion = ${PROJECT_VERSION_PATCH};\n")
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${NEW_GIT_HEADER} ${GIT_HEADER})
 execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${NEW_GIT_HEADER})
 
