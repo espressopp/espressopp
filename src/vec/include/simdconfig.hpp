@@ -26,12 +26,6 @@
 #include <boost/align/aligned_allocator.hpp>
 #include "include/esconfig.hpp"
 
-#if defined(__AVX512F__)
-#if __AVX512F__
-#define ESPP_VECTOR_MASK
-#endif
-#endif
-
 #ifdef __INTEL_COMPILER
 #define ESPP_VEC_PRAGMAS _Pragma("ivdep")
 #else
