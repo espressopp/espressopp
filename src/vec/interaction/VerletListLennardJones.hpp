@@ -204,9 +204,7 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
                         cutoffSqr_ = cutoffSqr[np_lookup];
                     }
 
-#if defined(ESPP_VECTOR_MASK)
                     if (distSqr <= cutoffSqr_)
-#endif
                     {
                         real frac2 = 1.0 / distSqr;
                         real frac6 = frac2 * frac2 * frac2;
@@ -216,10 +214,6 @@ inline void VerletListLennardJones::addForces_impl(ParticleArray& particles,
                             ffactor = ff1_ * frac6 - ff2_;
                         else
                             ffactor = ffs[np_lookup].ff1 * frac6 - ffs[np_lookup].ff2;
-
-#if !defined(ESPP_VECTOR_MASK)
-                        if (distSqr > cutoffSqr_) ffactor = 0.0;
-#endif
 
                         ffactor = frac6 * ffactor * frac2;
 
