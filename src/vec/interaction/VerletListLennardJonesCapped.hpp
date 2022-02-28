@@ -211,9 +211,7 @@ inline void VerletListLennardJonesCapped::addForces_impl(
                         cutoffSqr_ = cutoffSqr[np_lookup];
                     }
 
-#if defined(ESPP_VECTOR_MASK)
                     if (distSqr <= cutoffSqr_)
-#endif
                     {
                         bool NO_CAP;
                         if (ONETYPE)
@@ -246,10 +244,6 @@ inline void VerletListLennardJonesCapped::addForces_impl(
                                           (ffs[np_lookup].cfrac6 - 0.5) /
                                           (ffs[np_lookup].caprad * sqrt(distSqr));
                         }
-
-#if !defined(ESPP_VECTOR_MASK)
-                        if (distSqr > cutoffSqr_) ffactor = 0.0;
-#endif
 
                         f_x += dist_x * ffactor;
                         f_y += dist_y * ffactor;
