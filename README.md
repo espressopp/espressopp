@@ -76,6 +76,13 @@ $ cmake . -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3
 $ make
 ```
 
+You can also include ScaFaCoS Library (pre-installation required, see in http://www.scafacos.de/) into E++ compilation
+
+```sh
+$ cmake . -DCMAKE_INSTALL_PREFIX=[installation directory]
+$ make
+```
+
 ## How to install E++ in some Linux distributions
 
 ### Ubuntu

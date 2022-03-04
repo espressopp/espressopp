@@ -40,11 +40,11 @@
 #include "System.hpp"
 
 #include "iostream"
-#include <config.h>
+#include <fcs_config.h>
 #include <cstdlib>
 #include <cstring>
 #include "fcs.h"
-#include "common/near/near.h"
+//#include "common/near/near.h"
 
 #include "boost/serialization/vector.hpp"
 #include "boost/serialization/complex.hpp"

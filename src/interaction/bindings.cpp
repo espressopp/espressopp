@@ -69,7 +69,9 @@
 #include "DihedralRB.hpp"
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombMultiSiteCorrectionEwald.hpp"
-//#include "CoulombScafacos.hpp"
+#ifdef FCS_EXIST
+ #include "CoulombScafacos.hpp"
+#endif
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
@@ -142,7 +144,9 @@ void registerPython()
 
     CoulombKSpaceEwald::registerPython();
     CoulombMultiSiteCorrectionEwald::registerPython();
-    // CoulombScafacos::registerPython();
+#ifdef FCS_EXIST
+    CoulombScafacos::registerPython();
+#endif
     CoulombRSpace::registerPython();
     StillingerWeberPairTerm::registerPython();
     StillingerWeberTripleTerm::registerPython();

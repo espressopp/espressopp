@@ -111,24 +111,16 @@ if (USE_CCACHE)
     endif()
 endif()
 
-########################################################################
-#Scafacos Add
-########################################################################
+#################################
+# Scafacos Package (optional)   #
+#################################
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SCAFACOS IMPORTED_TARGET scafacos)
 
-if ( SCAFACOS_BUILD AND SCAFACOS_SOURCE AND SCAFACOS_ROOT_DIR)
-#set(SCAFACOS_BUILD "/home/zhexu/Program/scafacos/build/")
-#set(SCAFACOS_SOURCE "/home/zhexu/Program/scafacos/")
-#set(SCAFACOS_ROOT_DIR "/home/zhexu/Program/scafacos/local")
-  include_directories(${SCAFACOS_BUILD})
-  include_directories("${SCAFACOS_BUILD}/../../")
-  include_directories("${SCAFACOS_SOURCE}/src/")
-  include_directories("${SCAFACOS_SOURCE}/lib/")
-  include_directories("${SCAFACOS_SOURCE}/lib/common/fcs-common/")
-  include_directories("${SCAFACOS_ROOT_DIR}/include")
+if ( SCAFACOS_FOUND )
+  include_directories("${SCAFACOS_INCLUDEDIR}")
   add_definitions( -DHAVE_CONFIG_H )
-#
-
 endif()
 
 ######################################

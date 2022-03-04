@@ -1,16 +1,9 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
-if (NOT (SCAFACOS_ROOT_DIR AND SCAFACOS_LIBS))
-    file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-	    esutil/GenLogger.cpp
-	    interaction/CoulombScafacos.cpp)
-else()
-    file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-	    esutil/GenLogger.cpp)
-endif()
-# file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
+file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
 file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
+file(GLOB_RECURSE FCS_SOURCE interaction/CoulombScafacos.cpp)
 
-list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
+list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE} ${FCS_SOURCE})
 
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
 
@@ -68,11 +61,10 @@ target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
-if (SCAFACOS_ROOT_DIR AND SCAFACOS_LIBS)
-#  set(SCAFACOS_ROOT_DIR "/home/zhexu/Program/scafacos/local")
-  file(GLOB_RECURSE SCAFACOS_LIBS ${SCAFACOS_ROOT_DIR}/lib/libfcs*.so)
-  message("SCAFACOS_LIBS: ${SCAFACOS_LIBS}")
-  target_link_libraries(_espressopp PUBLIC ${SCAFACOS_LIBS})
+if (SCAFACOS_FOUND)
+    target_compile_definitions(_espressopp PRIVATE -DFCS_EXIST)
+    target_link_libraries(_espressopp PRIVATE PkgConfig::SCAFACOS)
+    target_sources(_espressopp PRIVATE ${FCS_SOURCE})
 endif()
 
 if(WITH_XTC)

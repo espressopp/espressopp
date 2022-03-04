@@ -74,7 +74,12 @@ from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *
 from espressopp.interaction.CoulombMultiSiteCorrectionEwald import *
-#from espressopp.interaction.CoulombScafacos import *
+
+try:
+    from espressopp.interaction.CoulombScafacos import *
+except ImportError:
+    pass
+
 from espressopp.interaction.CoulombRSpace import *
 from espressopp.interaction.StillingerWeberPairTerm import *
 from espressopp.interaction.StillingerWeberTripleTerm import *
