@@ -39,7 +39,9 @@ jobs:
             CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 
     runs-on: ubuntu-latest
-    container: espressopp/buildenv:${{ matrix.distro }}
+    container:
+      image: espressopp/buildenv:${{ matrix.distro }}
+      options: --security-opt seccomp=unconfined
     steps:
       - uses: actions/cache@v2
         with:
@@ -51,6 +53,13 @@ jobs:
 
       - name: Install Python Dependencies
         run: pip3 install -r requirements.txt
+
+      - name: version numbers
+        run: |
+          python3 --version
+          pip3 list
+          cmake --version
+          git --version
 
       - name: Configure
         run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON

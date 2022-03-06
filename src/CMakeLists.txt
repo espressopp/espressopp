@@ -4,7 +4,11 @@ file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
 
-add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
+add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+                                                      -DPROJECT_VERSION_MAJOR="${PROJECT_VERSION_MAJOR}"
+                                                      -DPROJECT_VERSION_MINOR="${PROJECT_VERSION_MINOR}"
+                                                      -DPROJECT_VERSION_PATCH="${PROJECT_VERSION_PATCH}"
+                                                      -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
@@ -33,7 +37,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     endif()
 endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES Intel)
-    target_compile_options(_espressopp PRIVATE "-restrict")
+    message("CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES IntelLLVM)
+      target_compile_options(_espressopp PRIVATE "-restrict")
+    elseif(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 2021.4.0)
+      target_compile_options(_espressopp PRIVATE "-fp-model=strict")
+    endif()
     if(ESPP_LOCAL_ARCHITECTURE)
         target_compile_options(_espressopp PRIVATE "-xHost")
     endif()
@@ -53,6 +62,7 @@ target_link_libraries(_espressopp PUBLIC Boost::mpi Boost::serialization Boost::
 target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
+target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
 if(WITH_XTC)
     target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)

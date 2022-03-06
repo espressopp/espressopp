@@ -36,9 +36,9 @@ namespace espressopp
 Version::Version()
 {
     name = "ESPResSo++";
-    major = MAJORVERSION;
-    minor = MINORVERSION;
-    patchlevel = PATCHLEVEL;
+    major = majorversion;
+    minor = minorversion;
+    patchlevel = patchversion;
     gitrevision = gitversion;
     boostversion = BOOST_LIB_VERSION;
     date = __DATE__;
