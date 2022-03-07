@@ -5,6 +5,8 @@
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   Copyright (C) 2019
       Max Planck Computing and Data Facility
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
