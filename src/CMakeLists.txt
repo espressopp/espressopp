@@ -5,7 +5,11 @@ file(GLOB_RECURSE FCS_SOURCE interaction/CoulombScafacos.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE} ${FCS_SOURCE})
 
-add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
+add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+                                                      -DPROJECT_VERSION_MAJOR="${PROJECT_VERSION_MAJOR}"
+                                                      -DPROJECT_VERSION_MINOR="${PROJECT_VERSION_MINOR}"
+                                                      -DPROJECT_VERSION_PATCH="${PROJECT_VERSION_PATCH}"
+                                                      -P ${ESPP_CMAKE_DIR}/gitversion.cmake)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
         ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
