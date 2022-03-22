@@ -34,13 +34,15 @@
 
 namespace espressopp
 {
-///////////////////////////////////////////////////////////////////////////////////////////////
-/// Namespace re-implementing espressopp classes with SOA-layout and vectorization
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Namespace re-implementing espressopp classes with SOA-layout and vectorization.
+///
+/// This allows vectorized versions of classes to be called with prefixes `espressopp::vec` in C++
+/// and `espressopp.vec` in python.
 namespace vec
 {
-///////////////////////////////////////////////////////////////////////////////////////////////
-/// Facilitates offloading of particle data to vectorization-friendly form
-///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Facilitates offloading of particle data to vectorization-friendly form.
 /// Two levels of vectorization are currently supported:
 /// * Level 1 - Connects to standard MDIntegrator class so particle data are offloaded at every
 ///             time step. This allows non-vectorized forces to be used at the expense of speed.
@@ -83,7 +85,6 @@ public:
     static void registerPython();
 
 protected:
-
     /// Stores a pointer to the standard MDIntegrator in case of vecLevel=1
     std::shared_ptr<MDIntegrator> mdintegrator;
 
