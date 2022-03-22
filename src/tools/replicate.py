@@ -19,9 +19,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from espressopp import pmi
-from mpi4py import MPI
 from espressopp import Real3D
-from pprint import pprint
 
 class ReplicateParallelLocal:
     """ Usage:
