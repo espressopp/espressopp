@@ -32,7 +32,7 @@ namespace vec
 LOG4ESPP_LOGGER(Vectorization::logger, "Vectorization");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// constructor
+/// Constructor for vecLevel=1
 Vectorization::Vectorization(std::shared_ptr<System> _system,
                              std::shared_ptr<MDIntegrator> _mdintegrator)
     : SystemAccess(_system), mdintegrator(_mdintegrator), vecLevel(1)
@@ -41,12 +41,14 @@ Vectorization::Vectorization(std::shared_ptr<System> _system,
     resetCells();  // immediately retrieve cell information
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor for vecLevel=2
 Vectorization::Vectorization(std::shared_ptr<System> _system) : SystemAccess(_system), vecLevel(2)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// destructor
+/// Destructor
 Vectorization::~Vectorization() { disconnect(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,7 @@ void Vectorization::disconnect()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// reset and update cell mapping and neighbor lists from current storage
+/// Reset and update cell mapping and neighbor lists from current storage
 void Vectorization::resetCells()
 {
     if (!getSystem()->storage)
@@ -85,6 +87,8 @@ void Vectorization::resetCells()
     resetCellsStorage(getSystem()->storage.get());
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// Reset and update cell mapping and neighbor lists from given storage class pointer
 void Vectorization::resetCellsStorage(Storage* storage)
 {
     CellList const& localCells = storage->getLocalCells();
@@ -97,15 +101,15 @@ void Vectorization::resetCellsStorage(Storage* storage)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// set force array/s to zero
+/// Set force array/s to zero
 void Vectorization::zeroForces() { particles.zeroForces(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// reset and update particles from current storage
+/// Reset and update particles from current storage
 void Vectorization::resetParticles() { particles.copyFrom(getSystem()->storage->getLocalCells()); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// set force array/s to zero and overwrite particles position data
+/// Set force array/s to zero and overwrite particles position data
 void Vectorization::befCalcForces()
 {
     zeroForces();
@@ -113,14 +117,14 @@ void Vectorization::befCalcForces()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// add forces back to storage
+/// Add forces back to storage
 void Vectorization::updateForces()
 {
     particles.addToForceOnly(getSystem()->storage->getLocalCells());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// registration with python
+/// Registration with python
 void Vectorization::registerPython()
 {
     using namespace espressopp::python;

@@ -34,10 +34,18 @@
 
 namespace espressopp
 {
+///////////////////////////////////////////////////////////////////////////////////////////////
+/// Namespace re-implementing espressopp classes with SOA-layout and vectorization
 namespace vec
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////
-/// facilitates offloading of particle data to vectorization-friendly form
+/// Facilitates offloading of particle data to vectorization-friendly form
+///
+/// Two levels of vectorization are currently supported:
+/// * Level 1 - Connects to standard MDIntegrator class so particle data are offloaded at every
+///             time step. This allows non-vectorized forces to be used at the expense of speed.
+/// * Level 2 - Offloading occurs only at the beginning and end of the integrator run and before
+///             and after every resort. This allows only vectorized forces to be used.
 class Vectorization : public SystemAccess
 {
     typedef espressopp::storage::Storage Storage;
@@ -60,6 +68,7 @@ public:
     CellNeighborList neighborList;
     std::shared_ptr<StorageVec> storageVec;
 
+    /// Obtain vectorization level
     inline int getVecLevel() { return vecLevel; }
 
     void resetCells();
@@ -69,13 +78,16 @@ public:
 
     void resetParticles();
     void befCalcForces();
-    void updatePositions();
     void updateForces();
 
     static void registerPython();
 
 protected:
+
+    /// Stores a pointer to the standard MDIntegrator in case of vecLevel=1
     std::shared_ptr<MDIntegrator> mdintegrator;
+
+    /// Determines the vectorization level
     const int vecLevel;
 
     // signals that connect to integrator
@@ -89,7 +101,7 @@ protected:
     static LOG4ESPP_DECL_LOGGER(logger);
 };
 
-/// converts cell list to list of indices
+/// Converts cell list to list of indices
 template <typename T = size_t>
 std::vector<T> CellListToIdx(std::vector<Cell*> const& cellList, Cell* const refCell)
 {
