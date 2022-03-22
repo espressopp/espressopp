@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2022
+#      Max-Planck-Institute for Polymer Research & JGU Mainz
 #
 #  This file is part of ESPResSo++.
 #
