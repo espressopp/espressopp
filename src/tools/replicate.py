@@ -98,7 +98,7 @@ class ReplicateParallelLocal:
     def addParticlesWorker(self, storage, start_pid, seed_particles, properties):
         assert len(seed_particles) == len(self.x), "Length mismatch in seed_particles"
 
-        properties = ['id', 'pos', *properties]
+        properties = ['id', 'pos'] + list(properties)
         pid = start_pid
         for i in range(self.xdim):
             for j in range(self.ydim):
@@ -106,7 +106,7 @@ class ReplicateParallelLocal:
                     new_particles = []
                     for x_, y_, z_, seed in zip(self.x, self.y, self.z, seed_particles):
                         pos = Real3D((x_ + i * self.Lx), (y_ + j * self.Ly), (z_ + k * self.Lz))
-                        new_particles.append([pid, pos, *seed])
+                        new_particles.append([pid, pos] + seed)
                         pid += 1
                     storage.addParticles(new_particles, *properties)
 
