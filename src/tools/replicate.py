@@ -83,62 +83,68 @@ class ReplicateParallelLocal:
         pass
 
     def replicateWorker(self, bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
-        self.bonds = bonds
-        self.angles = angles
-        self.x = x
-        self.y = y
-        self.z = z
-        self.Lx = Lx
-        self.Ly = Ly
-        self.Lz = Lz
-        self.xdim = xdim
-        self.ydim = ydim
-        self.zdim = zdim
+        if pmi.workerIsActive():
+            self.bonds = bonds
+            self.angles = angles
+            self.x = x
+            self.y = y
+            self.z = z
+            self.Lx = Lx
+            self.Ly = Ly
+            self.Lz = Lz
+            self.xdim = xdim
+            self.ydim = ydim
+            self.zdim = zdim
 
     def addParticlesWorker(self, storage, start_pid, seed_particles, properties):
-        assert len(seed_particles) == len(self.x), "Length mismatch in seed_particles"
+        if pmi.workerIsActive():
+            assert len(seed_particles) == len(self.x), "Length mismatch in seed_particles"
 
-        properties = ['id', 'pos'] + list(properties)
-        pid = start_pid
-        for i in range(self.xdim):
-            for j in range(self.ydim):
-                for k in range(self.zdim):
-                    new_particles = []
-                    for x_, y_, z_, seed in zip(self.x, self.y, self.z, seed_particles):
-                        pos = Real3D((x_ + i * self.Lx), (y_ + j * self.Ly), (z_ + k * self.Lz))
-                        new_particles.append([pid, pos] + seed)
-                        pid += 1
-                    storage.addParticles(new_particles, *properties)
+            properties = ['id', 'pos'] + list(properties)
+            pid = start_pid
+            for i in range(self.xdim):
+                for j in range(self.ydim):
+                    for k in range(self.zdim):
+                        new_particles = []
+                        for x_, y_, z_, seed in zip(self.x, self.y, self.z, seed_particles):
+                            pos = Real3D((x_ + i * self.Lx), (y_ + j * self.Ly), (z_ + k * self.Lz))
+                            new_particles.append([pid, pos] + seed)
+                            pid += 1
+                        storage.addParticles(new_particles, *properties)
+                        storage.decompose()
 
     def addBonds(self, fpl):
-        ct = 0
-        num_particles_original = len(self.x)
-        fpl.addBonds(self.bonds)
-        for i in range(self.xdim):
-            for j in range(self.ydim):
-                for k in range(self.zdim):
-                    if(i + j + k != 0):
-                        bonds_replicated = []
-                        ct = ct + 1
-                        for p1, p2 in self.bonds:
-                            bonds_replicated.append((p1 + ct * num_particles_original, \
-                                                    p2 + ct * num_particles_original))
-                        fpl.addBonds(bonds_replicated)
+        if pmi.workerIsActive():
+            ct = 0
+            num_particles_original = len(self.x)
+            fpl.addBonds(self.bonds)
+            for i in range(self.xdim):
+                for j in range(self.ydim):
+                    for k in range(self.zdim):
+                        if(i + j + k != 0):
+                            bonds_replicated = []
+                            ct = ct + 1
+                            for p1, p2 in self.bonds:
+                                bonds_replicated.append((p1 + ct * num_particles_original, \
+                                                        p2 + ct * num_particles_original))
+                            fpl.addBonds(bonds_replicated)
 
     def addTriples(self, ftl):
-        ct = 0
-        num_particles_original = len(self.x)
-        ftl.addTriples(self.angles)
-        for i in range(self.xdim):
-            for j in range(self.ydim):
-                for k in range(self.zdim):
-                    if(i + j + k != 0):
-                        angles_replicated = []
-                        for p1, p2, p3 in self.angles:
-                            angles_replicated.append((p1 + ct * num_particles_original, \
-                                                    p2 + ct * num_particles_original, \
-                                                    p3 + ct * num_particles_original))
-                        ftl.addTriples(angles_replicated)
+        if pmi.workerIsActive():
+            ct = 0
+            num_particles_original = len(self.x)
+            ftl.addTriples(self.angles)
+            for i in range(self.xdim):
+                for j in range(self.ydim):
+                    for k in range(self.zdim):
+                        if(i + j + k != 0):
+                            angles_replicated = []
+                            ct = ct + 1
+                            for p1, p2, p3 in self.angles:
+                                angles_replicated.append((p1 + ct * num_particles_original, \
+                                                        p2 + ct * num_particles_original, \
+                                                        p3 + ct * num_particles_original))
+                            ftl.addTriples(angles_replicated)
 
 if pmi.isController:
     class ReplicateParallel(metaclass=pmi.Proxy):
@@ -171,6 +177,8 @@ if pmi.isController:
             ...
             ftl = espressopp.FixedTripleList(system.storage)
             rp.addTriples(ftl)
+
+        For a full working example see testsuite/ReplicateParallel/polymer_melt.py
         """
 
         pmiproxydefs = dict(
