@@ -318,10 +318,9 @@ void ParticleArray::updateFromPositionVelocity(CellList const& srcCells, bool re
 void ParticleArray::updateToPositionVelocity(CellList& srcCells, bool realOnly) const
 {
 /// copy particle info (position and velocity ) back to srcCells
+
 /// TODO: track which properties were modified using flags and possibly implement templates to
 /// offload each modified property
-
-/// TODO: enable option to update only real cells since ghost cells will be cleared during rebuild
 
 /// NOTE: Currently the only properties that needs to update back is the position and velocity;
 /// forces are modified but are not used after the update, while type, id, mass and q are

@@ -87,18 +87,23 @@ public:
     /// Build a verlet list of all particle pairs stored in Vectorization
     /// whose distance is less than a given cutoff.
     /// \param system is the system for which the verlet list is built
-    /// \param cut is the cutoff value for the
+    /// \param cut is the cutoff value without skin
+    /// \param rebuildVL determines whether to call rebuild in the constructor (not called if
+    ///     exclusions are provided)
     VerletList(std::shared_ptr<System>, real cut, bool rebuildVL);
 
     ~VerletList();
 
     // PairList& getPairs() { return vlPairs; }
 
+    /// Returns a const reference to the NeighborList object
     inline const auto& getNeighborList() { return neighborList; }
 
+    /// Returns the stored pointer of the Vectorization class
     inline auto getVectorization() { return vectorization; }
 
-    real getVerletCutoff();  // returns cutoff + skin
+    /// returns cutoff + skin
+    real getVerletCutoff();
 
     void connect();
 

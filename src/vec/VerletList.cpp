@@ -45,8 +45,6 @@ using namespace espressopp::iterator;
 LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-/// cut is a cutoff (without skin)
 VerletList::VerletList(std::shared_ptr<System> system, real _cut, bool rebuildVL)
     : SystemAccess(system)
 {
@@ -69,26 +67,28 @@ VerletList::VerletList(std::shared_ptr<System> system, real _cut, bool rebuildVL
     builds = 0;
 
     resetTimers();
-    if (rebuildVL) rebuild();  // not called if exclutions are provided
+    if (rebuildVL) rebuild();  // not called if exclusions are provided
 
     connect();
 }
 
 real VerletList::getVerletCutoff() { return cutVerlet; }
 
+/// Make a connection to vectorization to invoke rebuild on loadCells
 void VerletList::connect()
 {
-    // make a connection to vectorization to invoke rebuild on loadCells
     connectionResort =
         getSystem()->storage->onParticlesChanged.connect(std::bind(&VerletList::rebuild, this));
 }
 
+/// Disconnect from System to avoid rebuild on resort
 void VerletList::disconnect()
 {
-    // disconnect from System to avoid rebuild on resort
     connectionResort.disconnect();
 }
 
+/// Rebuild the neighborLists based on the contents of Vectorization::particles and
+/// Vectorization::neighborList using the cutoff + skin as effective cutoff distance
 void VerletList::rebuild()
 {
     timer.reset();
@@ -489,9 +489,10 @@ VerletList::~VerletList()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
+/// Reset timeRebuild to zero
 void VerletList::resetTimers() { timeRebuild = 0.0; }
 
+/// Get the value of timers into t
 void VerletList::loadTimers(real* t)
 {
     t[0] = timeRebuild;

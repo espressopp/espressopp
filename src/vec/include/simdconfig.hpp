@@ -33,8 +33,14 @@
 #endif
 // TODO: Test and define for more compilers
 
-// NOTE: Padding to 64-byte boundaries
+namespace espressopp
+{
+namespace vec
+{
+/// Padding and alignment to 64-byte boundaries
 constexpr size_t ESPP_VECTOR_ALIGNMENT = 64;
+
+/// Number of espressopp::real elements in the SIMD width
 constexpr size_t ESPP_VECTOR_WIDTH = ESPP_VECTOR_ALIGNMENT / sizeof(espressopp::real);
 
 constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
@@ -42,17 +48,13 @@ constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
     return ((((SIZE) + ESPP_VECTOR_WIDTH - 1) / ESPP_VECTOR_WIDTH) * ESPP_VECTOR_WIDTH);
 }
 
-namespace espressopp
-{
-namespace vec
-{
-// aligned
+/// Vector allocated aligned to given Alignment (64 bytes by default)
 template <typename T, std::size_t Alignment = ESPP_VECTOR_ALIGNMENT>
 using AlignedVector = std::vector<T, boost::alignment::aligned_allocator<T, Alignment>>;
 
-// represents a very large number for padding positions of "fake" particles = sqrt(max/3)
-// compatible only with real = double
-static const real large_pos = 7.74099e150;
+/// Represents a very large number for padding positions of "fake" particles = sqrt(max/3).
+/// NOTE: compatible only if real = double
+constexpr real large_pos = 7.74099e150;
 
 }  // namespace vec
 }  // namespace espressopp

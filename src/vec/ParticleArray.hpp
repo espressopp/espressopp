@@ -42,14 +42,13 @@ enum ParticleElements
     PARTICLE_VELOCITY_ONLY = 64,
     PARTICLE_FORCE_ONLY = 128
 };
-
-/*
-    Optimizations:
-      - store particle data separately as arrays of individual attributes (SOA)
-      - use aligned vector everywhere
-      - pad ends of vector w/ pseudo particles to keep cell length a multiple of the cpu vector
-   width
- */
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Re-implements `std::vector<espressopp::Particle>` as structure-of-arrays layout
+///
+/// Optimizations:
+/// * store particle data separately as arrays of individual attributes (SOA)
+/// * use AlignedVector everywhere
+/// * pad ends of vector w/ pseudo particles to keep cell length a multiple of the cpu vector width
 class ParticleArray
 {
 public:
