@@ -100,6 +100,7 @@ class ReplicateParallelLocal:
         if pmi.workerIsActive():
             assert len(seed_particles) == len(self.x), "Length mismatch in seed_particles"
 
+            # add replicated particles
             properties = ['id', 'pos'] + list(properties)
             pid = start_pid
             for i in range(self.xdim):
@@ -115,6 +116,7 @@ class ReplicateParallelLocal:
 
     def addBonds(self, fpl):
         if pmi.workerIsActive():
+            # add replicated bonds
             ct = 0
             num_particles_original = len(self.x)
             fpl.addBonds(self.bonds)
@@ -131,6 +133,7 @@ class ReplicateParallelLocal:
 
     def addTriples(self, ftl):
         if pmi.workerIsActive():
+            # add replicated angles
             ct = 0
             num_particles_original = len(self.x)
             ftl.addTriples(self.angles)
@@ -188,7 +191,11 @@ if pmi.isController:
 
         def replicate(self, bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
             self.replicateWorker(bonds, angles, x, y, z, Lx, Ly, Lz, xdim, ydim, zdim)
+
+            # expected number of particles after replication
             num_particles = len(x) * xdim * ydim * zdim
+
+            # modify the box size
             Lx = Lx * xdim
             Ly = Ly * ydim
             Lz = Lz * zdim
@@ -200,3 +207,4 @@ if pmi.isController:
             if 'id' in properties:
                 raise ValueError("properties should not include 'id'")
             self.addParticlesWorker(storage, start_pid, seed_particles, properties)
+
