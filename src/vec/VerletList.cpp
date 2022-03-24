@@ -259,7 +259,7 @@ void VerletList::NeighborList::rebuildMulti(real const cutsq,
             else
             {
                 /// just count the total number of neighbors
-                for (int inbr = 0; inbr < cell_nnbrs; inbr++)
+                for (size_t inbr = 0; inbr < cell_nnbrs; inbr++)
                 {
                     auto ncell_id = cellNborList.at(irow, inbr);
                     auto ncell_start = cellRangeNbr[ncell_id];
