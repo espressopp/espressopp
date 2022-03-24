@@ -82,10 +82,7 @@ void VerletList::connect()
 }
 
 /// Disconnect from System to avoid rebuild on resort
-void VerletList::disconnect()
-{
-    connectionResort.disconnect();
-}
+void VerletList::disconnect() { connectionResort.disconnect(); }
 
 /// Rebuild the neighborLists based on the contents of Vectorization::particles and
 /// Vectorization::neighborList using the cutoff + skin as effective cutoff distance
