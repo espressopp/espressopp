@@ -255,7 +255,6 @@ void ParticleArray::copyFromCellOwn(CellList const& srcCells)
 
     {
         auto fillCell = [this, &srcCells](size_t ic) {
-            ParticleList const& particlelist = srcCells[ic]->particles;
             const size_t end = cellRange_[ic] + sizes_[ic];
             const size_t data_end = cellRange_[ic + 1];
             for (size_t ip = end; ip < data_end; ip++) p_x[ip] = large_pos;
@@ -268,7 +267,6 @@ void ParticleArray::copyFromCellOwn(CellList const& srcCells)
 
     {
         auto fillCell = [this, &srcCells](size_t ic) {
-            ParticleList const& particlelist = srcCells[ic]->particles;
             size_t end = cellRange_[ic] + sizes_[ic];
             size_t data_end = cellRange_[ic + 1];
             for (size_t ip = end; ip < data_end; ip++) id[ip] = -1;

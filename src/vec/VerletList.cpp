@@ -194,7 +194,6 @@ void VerletList::NeighborList::rebuildMulti(real const cutsq,
         const auto* __restrict pa_p_x_nbr = particleArrayNbr.p_x.data();
         const auto* __restrict pa_p_y_nbr = particleArrayNbr.p_y.data();
         const auto* __restrict pa_p_z_nbr = particleArrayNbr.p_z.data();
-        const auto* __restrict pa_p_type_nbr = particleArrayNbr.type.data();
 
         auto* __restrict c_x_ptr = c_x.data();
         auto* __restrict c_y_ptr = c_y.data();
