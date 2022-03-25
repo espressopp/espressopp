@@ -24,6 +24,18 @@ import time
 
 def generate_md(use_vec=True):
     print('{}USING VECTORIZATION'.format('NOT ' if not use_vec else ''))
+
+    if use_vec:
+        Default = espressopp.vec.standard_system.Default
+        VerletList = espressopp.vec.VerletList
+        VerletListLennardJones = espressopp.vec.interaction.VerletListLennardJones
+        LennardJones = espressopp.vec.interaction.LennardJones
+    else:
+        Default = espressopp.standard_system.Default
+        VerletList = espressopp.VerletList
+        VerletListLennardJones = espressopp.interaction.VerletListLennardJones
+        LennardJones = espressopp.interaction.LennardJones
+
     nsteps      = 1
     isteps      = 10
     #
@@ -43,10 +55,7 @@ def generate_md(use_vec=True):
     box = (Lx, Ly, Lz)
     num_particles = len(pid)
 
-    if use_vec:
-        system, integrator = espressopp.vec.standard_system.Default(box=box, rc=rc, skin=skin, dt=timestep, temperature=temperature)
-    else:
-        system, integrator = espressopp.standard_system.Default(box=box, rc=rc, skin=skin, dt=timestep, temperature=temperature)
+    system, integrator = Default(box=box, rc=rc, skin=skin, dt=timestep, temperature=temperature)
 
     props = ['id', 'type', 'mass', 'pos', 'v']
     new_particles = []
@@ -57,14 +66,9 @@ def generate_md(use_vec=True):
     system.storage.decompose()
 
     # Lennard-Jones with Verlet list
-    if use_vec:
-        vl      = espressopp.vec.VerletList(system, cutoff = rc)
-        interLJ = espressopp.vec.interaction.VerletListLennardJones(vl)
-        potLJ   = espressopp.vec.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
-    else:
-        vl      = espressopp.VerletList(system, cutoff = rc)
-        interLJ = espressopp.interaction.VerletListLennardJones(vl)
-        potLJ   = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
+    vl      = VerletList(system, cutoff = rc)
+    interLJ = VerletListLennardJones(vl)
+    potLJ   = LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
 
     interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
