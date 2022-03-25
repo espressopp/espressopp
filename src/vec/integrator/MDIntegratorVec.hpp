@@ -56,10 +56,6 @@ public:
 
     int getNumberOfExtensions();
 
-    // Boost signals for extensions
-    // TODO: These extensions should take futures as arguments as they will be used in
-    // continuation-style programming of integration steps. e.g.
-
     // signals to extend the integrator
     boost::signals2::signal<void()> runInit;  // initialization of run()
     boost::signals2::signal<void()> recalc1;  // inside recalc, before updateForces()

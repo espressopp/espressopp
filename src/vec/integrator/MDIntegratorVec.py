@@ -22,9 +22,9 @@ from espressopp.esutil import cxxinit
 from _espressopp import vec_integrator_MDIntegratorVec
 
 r"""
-**********************************************
+*****************************************
 espressopp.vec.integrator.MDIntegratorVec
-**********************************************
+*****************************************
 """
 
 class MDIntegratorVecLocal(object):

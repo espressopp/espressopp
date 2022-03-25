@@ -210,7 +210,7 @@ void VelocityVerletBase::calcForces()
 {
     initForcesParray();
     {
-        // TODO: Might need to place interaction list in VecRuntime
+        // TODO: Might need to place separate interaction list for vecLevel=1
         System& sys = getSystemRef();
         const espressopp::interaction::InteractionList& srIL = sys.shortRangeInteractions;
 
