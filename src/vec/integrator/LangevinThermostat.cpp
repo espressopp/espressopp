@@ -112,11 +112,21 @@ void LangevinThermostat::thermalize()
     LOG4ESPP_DEBUG(theLogger, "thermalize");
 
     if (!exclusions.empty())
-        throw std::runtime_error("LangevinThermostat::thermalize exclusions not implemented");
+        thermalize_impl<1>();
+    else
+        thermalize_impl<0>();
+}
 
+template <bool CHECK_EXCLUSIONS>
+void LangevinThermostat::thermalize_impl()
+{
     auto& particles = getSystem()->vectorization->particles;
     for (iterator::ParticleArrayIterator pit(particles, true); pit.isValid(); ++pit)
     {
+        if (CHECK_EXCLUSIONS)
+        {
+            if (exclusions.count(pit.id()) > 0) continue;
+        }
         const real mass = pit.mass();
         const real massf = sqrt(mass);
 
@@ -129,6 +139,10 @@ void LangevinThermostat::thermalize()
         pit.f_z() += pref1 * pit.v_z() * mass + pref2 * ranval_z * massf;
     }
 }
+
+template void LangevinThermostat::thermalize_impl<0>();
+
+template void LangevinThermostat::thermalize_impl<1>();
 
 // for AdResS
 void LangevinThermostat::thermalizeAdr()

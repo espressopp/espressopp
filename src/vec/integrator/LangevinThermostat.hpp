@@ -85,6 +85,9 @@ public:
 private:
     boost::signals2::connection _initialize, _heatUp, _coolDown, _thermalize, _thermalizeAdr;
 
+    template <bool CHECK_EXCLUSIONS>
+    void thermalize_impl();
+
     void frictionThermo(class Particle&);
 
     // this connects thermalizeAdr
