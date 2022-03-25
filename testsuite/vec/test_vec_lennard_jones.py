@@ -22,19 +22,24 @@ import espressopp
 from espressopp.tools import readxyz
 import time
 
-def generate_md(use_vec=True):
+def generate_md(use_vec=True, lj_capped=False):
     print('{}USING VECTORIZATION'.format('NOT ' if not use_vec else ''))
+    print('USING LennardJones{} Potential'.format('Capped' if lj_capped else ''))
 
     if use_vec:
-        Default = espressopp.vec.standard_system.Default
-        VerletList = espressopp.vec.VerletList
-        VerletListLennardJones = espressopp.vec.interaction.VerletListLennardJones
-        LennardJones = espressopp.vec.interaction.LennardJones
+        Default                      = espressopp.vec.standard_system.Default
+        VerletList                   = espressopp.vec.VerletList
+        VerletListLennardJones       = espressopp.vec.interaction.VerletListLennardJones
+        LennardJones                 = espressopp.vec.interaction.LennardJones
+        VerletListLennardJonesCapped = espressopp.vec.interaction.VerletListLennardJonesCapped
+        LennardJonesCapped           = espressopp.vec.interaction.LennardJonesCapped
     else:
-        Default = espressopp.standard_system.Default
-        VerletList = espressopp.VerletList
-        VerletListLennardJones = espressopp.interaction.VerletListLennardJones
-        LennardJones = espressopp.interaction.LennardJones
+        Default                      = espressopp.standard_system.Default
+        VerletList                   = espressopp.VerletList
+        VerletListLennardJones       = espressopp.interaction.VerletListLennardJones
+        LennardJones                 = espressopp.interaction.LennardJones
+        VerletListLennardJonesCapped = espressopp.interaction.VerletListLennardJonesCapped
+        LennardJonesCapped           = espressopp.interaction.LennardJonesCapped
 
     nsteps      = 1
     isteps      = 10
@@ -67,8 +72,12 @@ def generate_md(use_vec=True):
 
     # Lennard-Jones with Verlet list
     vl      = VerletList(system, cutoff = rc)
-    interLJ = VerletListLennardJones(vl)
-    potLJ   = LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
+    if lj_capped:
+        interLJ = VerletListLennardJonesCapped(vl)
+        potLJ   = LennardJonesCapped(epsilon=1.0, sigma=1.0, cutoff=pow(2.0, 1.0/6.0), caprad=0.6, shift='auto')
+    else:
+        interLJ = VerletListLennardJones(vl)
+        potLJ   = LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=0)
 
     interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
@@ -102,15 +111,17 @@ class TestVectorization(unittest.TestCase):
     def test1(self):
         ''' Ensure that positions after integration are the same for both vec and non-vec versions '''
         print('-'*70)
-        pos0 = generate_md(True)
-        print('-'*70)
-        pos1 = generate_md(False)
-        print('-'*70)
 
-        self.assertEqual(len(pos0), len(pos1))
-        diff = [(pos0[i]-pos1[i]).sqr() for i in range(len(pos1))]
-        for d in diff:
-            self.assertAlmostEqual(d,0.0,8)
+        for lj_capped in [False, True]:
+            pos0 = generate_md(True, lj_capped)
+            print('-'*70)
+            pos1 = generate_md(False, lj_capped)
+            print('-'*70)
+
+            self.assertEqual(len(pos0), len(pos1))
+            diff = [(pos0[i]-pos1[i]).sqr() for i in range(len(pos1))]
+            for d in diff:
+                self.assertAlmostEqual(d,0.0,8)
 
 if __name__ == "__main__":
     unittest.main()
