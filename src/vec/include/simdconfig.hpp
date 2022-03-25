@@ -52,9 +52,12 @@ constexpr size_t ESPP_FIT_TO_VECTOR_WIDTH(size_t SIZE)
 template <typename T, std::size_t Alignment = ESPP_VECTOR_ALIGNMENT>
 using AlignedVector = std::vector<T, boost::alignment::aligned_allocator<T, Alignment>>;
 
+static_assert(std::is_same<real, double>::value || std::is_same<real, float>::value,
+              "Only float and double are allowed for espressopp::real. Otherwise, manually choose "
+              "a value for large_pos.");
+
 /// Represents a very large number for padding positions of "fake" particles = sqrt(max/3).
-/// NOTE: compatible only if real = double
-constexpr real large_pos = 7.74099e150;
+constexpr real large_pos = std::is_same<real, double>::value ? 7.74099e150 : 7.74099e15;
 
 }  // namespace vec
 }  // namespace espressopp
