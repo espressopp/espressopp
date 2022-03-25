@@ -50,6 +50,7 @@ Example:
 
         :param pidlist: list of particle ids to be excluded from thermostating. In adaptive (AdResS) simulations, add ids of atomistic particles to be excluded (thermostats acts in this case on atomistic level). For normal simulations, add normal or coarse-grained particle ids.
         :type pidlist: list of ints
+        :NOTE: Handling of exclusions not yet implemented.
 
 """
 from espressopp.esutil import cxxinit

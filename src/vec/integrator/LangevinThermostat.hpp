@@ -91,7 +91,7 @@ private:
     void enableAdress();
     bool adress;
 
-    /** pid eclusion list */
+    /** pid exclusion list */
     std::set<longint> exclusions;
 
     void connect();
