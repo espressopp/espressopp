@@ -39,6 +39,16 @@
 #include "Int3D.hpp"
 #include <map>
 
+/// fwd declarations
+namespace espressopp
+{
+namespace hpx4espp
+{
+class InBufferView;
+class OutBufferView;
+}  // namespace hpx4espp
+}  // namespace espressopp
+
 namespace espressopp
 {
 struct ParticleProperties
@@ -193,6 +203,8 @@ struct Particle
 {
     friend class InBuffer;
     friend class OutBuffer;
+    friend class hpx4espp::InBufferView;
+    friend class hpx4espp::OutBufferView;
 
     /** bitmask: which extra data elements to in- or exclude from
         ghost sending

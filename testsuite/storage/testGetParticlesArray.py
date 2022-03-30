@@ -18,44 +18,23 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from particles_array_utils import add_particles, add_missing_props, get_particles_config
+from particles_array_utils import add_particles, add_missing_props, \
+    get_particles_config, get_particles_array
 
+class TestGetParticlesArray(unittest.TestCase):
 
-class MyTestBase(unittest.TestCase):
-
-    def compare(self, prop0, prop1, places=None):
+    def compare(self, prop0, prop1):
         self.assertEqual(len(prop0), len(prop1))
         for i in range(len(prop0)):
             for j in range(3):
-                if places is None:
-                    self.assertEqual(prop0[i][j], prop1[i][j])
-                else:
-                    self.assertAlmostEqual(prop0[i][j], prop1[i][j], places)
-
-
-class TestAddParticlesArray(MyTestBase):
+                self.assertEqual(prop0[i][j],prop1[i][j], msg=f"Error in i={i} j={j}")
 
     def test1(self):
-        pos0, vel0 = get_particles_config(add_particles(False))
-        pos1, vel1 = get_particles_config(add_particles(True))
+        system = add_particles(False)
+        pos0, vel0 = get_particles_config(system)
+        pos1, vel1 = get_particles_array(system)
 
         self.compare(pos0, pos1)
-        self.compare(vel0, vel1)
-
-    def test2(self):
-        with self.assertRaises(AssertionError):
-            add_missing_props()
-
-
-class TestAddParticlesArrayReplicate(MyTestBase):
-
-    def test3(self):
-        repl = (2, 3, 4)
-        pos0, vel0 = get_particles_config(add_particles(False, repl))
-        pos1, vel1 = get_particles_config(add_particles(True, repl))
-
-        # use assertAlmostEqual due to coordinate multiplication
-        self.compare(pos0, pos1, places=12)
         self.compare(vel0, vel1)
 
 

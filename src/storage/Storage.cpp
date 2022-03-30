@@ -42,10 +42,13 @@
 #include <boost/unordered/unordered_map.hpp>
 #include <boost/python/numpy.hpp>
 
+#include "checks.hpp"
+
 using namespace std;
 
 using namespace boost;
 using namespace espressopp::iterator;
+namespace np = boost::python::numpy;
 
 namespace espressopp
 {
@@ -796,23 +799,33 @@ void Storage::restorePositions()
 
 ///////////////////////////////////////////////////////////////////////////
 /// Faster adding of particles by storing data in numpy arrays
-void addParticlesCheck(python::numpy::ndarray const &part_arr,
-                       python::numpy::ndarray const &idx_arr)
+void partArrayCheck(np::ndarray const &part_arr)
 {
     using namespace espressopp::python;
     if (!(part_arr.get_dtype() == numpy::dtype::get_builtin<real>()))
         throw std::runtime_error("Invalid dtype of part_arr");
-    if (!(idx_arr.get_dtype() == numpy::dtype::get_builtin<int>()))
-        throw std::runtime_error("Invalid dtype of idx_arr");
     if (!(part_arr.get_flags() & numpy::ndarray::C_CONTIGUOUS))
         throw std::runtime_error("part_arr must have C_CONTIGUOUS flag");
+}
+
+void idxArrayCheck(np::ndarray const &idx_arr)
+{
+    using namespace espressopp::python;
+    if (!(idx_arr.get_dtype() == numpy::dtype::get_builtin<int>()))
+        throw std::runtime_error("Invalid dtype of idx_arr");
     if (idx_arr.shape(0) != 31)
         throw std::runtime_error("Invalid idx_arr shape. axis=0 must have shape=31");
 }
 
+void addParticlesCheck(np::ndarray const &part_arr, np::ndarray const &idx_arr)
+{
+    partArrayCheck(part_arr);
+    idxArrayCheck(idx_arr);
+}
+
 void addParticlesFromArray(class Storage *obj,
-                           python::numpy::ndarray const &part_arr,
-                           python::numpy::ndarray const &idx_arr)
+                           np::ndarray const &part_arr,
+                           np::ndarray const &idx_arr)
 {
     addParticlesCheck(part_arr, idx_arr);
 
@@ -824,6 +837,40 @@ void addParticlesFromArray(class Storage *obj,
     obj->addParticlesFromArrayImpl(part, idx, npart, nidx);
 }
 
+#define DEFINE_INDEX_VARS(PRE, IDX)        \
+    const int PRE##_id = IDX[0];           \
+    const int PRE##_posx = IDX[1];         \
+    const int PRE##_posy = IDX[2];         \
+    const int PRE##_posz = IDX[3];         \
+    const int PRE##_modeposx = IDX[4];     \
+    const int PRE##_modeposy = IDX[5];     \
+    const int PRE##_modeposz = IDX[6];     \
+    const int PRE##_vx = IDX[7];           \
+    const int PRE##_vy = IDX[8];           \
+    const int PRE##_vz = IDX[9];           \
+    const int PRE##_modemomx = IDX[10];    \
+    const int PRE##_modemomy = IDX[11];    \
+    const int PRE##_modemomz = IDX[12];    \
+    const int PRE##_fx = IDX[13];          \
+    const int PRE##_fy = IDX[14];          \
+    const int PRE##_fz = IDX[15];          \
+    const int PRE##_fmx = IDX[16];         \
+    const int PRE##_fmy = IDX[17];         \
+    const int PRE##_fmz = IDX[18];         \
+    const int PRE##_q = IDX[19];           \
+    const int PRE##_radius = IDX[20];      \
+    const int PRE##_fradius = IDX[21];     \
+    const int PRE##_vradius = IDX[22];     \
+    const int PRE##_type = IDX[23];        \
+    const int PRE##_mass = IDX[24];        \
+    const int PRE##_varmass = IDX[25];     \
+    const int PRE##_adrAT = IDX[26];       \
+    const int PRE##_lambda_adr = IDX[27];  \
+    const int PRE##_lambda_adrd = IDX[28]; \
+    const int PRE##_state = IDX[29];       \
+    const int PRE##_pib = IDX[30];         \
+    /*  */
+
 void Storage::addParticlesFromArrayImpl(const real *part,
                                         const int *idx,
                                         const int npart,
@@ -834,37 +881,7 @@ void Storage::addParticlesFromArrayImpl(const real *part,
     for (int i = 0; i < 31; i++) nidx_ += (idx[i] >= 0);
     if (nidx_ != nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
 
-    const int index_id = idx[0];
-    const int index_posx = idx[1];
-    const int index_posy = idx[2];
-    const int index_posz = idx[3];
-    const int index_modeposx = idx[4];
-    const int index_modeposy = idx[5];
-    const int index_modeposz = idx[6];
-    const int index_vx = idx[7];
-    const int index_vy = idx[8];
-    const int index_vz = idx[9];
-    const int index_modemomx = idx[10];
-    const int index_modemomy = idx[11];
-    const int index_modemomz = idx[12];
-    const int index_fx = idx[13];
-    const int index_fy = idx[14];
-    const int index_fz = idx[15];
-    const int index_fmx = idx[16];
-    const int index_fmy = idx[17];
-    const int index_fmz = idx[18];
-    const int index_q = idx[19];
-    const int index_radius = idx[20];
-    const int index_fradius = idx[21];
-    const int index_vradius = idx[22];
-    const int index_type = idx[23];
-    const int index_mass = idx[24];
-    const int index_varmass = idx[25];
-    const int index_adrAT = idx[26];
-    const int index_lambda_adr = idx[27];
-    const int index_lambda_adrd = idx[28];
-    const int index_state = idx[29];
-    const int index_pib = idx[30];
+    DEFINE_INDEX_VARS(index, idx);
 
     {
         bool particleExists = false;
@@ -948,6 +965,185 @@ void Storage::addParticlesFromArrayImpl(const real *part,
         if (index_state >= 0) sp->state() = int(part[offset + index_state]);
     }
 }
+
+void addParticlesFromArrayReplicate(class Storage *obj,
+                                    python::numpy::ndarray const &part_arr,
+                                    python::numpy::ndarray const &idx_arr,
+                                    const real Lx,
+                                    const real Ly,
+                                    const real Lz,
+                                    const int xdim,
+                                    const int ydim,
+                                    const int zdim,
+                                    const int pid_start)
+{
+    addParticlesCheck(part_arr, idx_arr);
+
+    const real *part = (real *)(part_arr.get_data());
+    const int *idx = (int *)(idx_arr.get_data());
+    const int npart = part_arr.shape(0);
+    const int nidx = part_arr.shape(1);
+
+    obj->addParticlesFromArrayReplImpl(part, idx, npart, nidx, Lx, Ly, Lz, xdim, ydim, zdim,
+                                       pid_start);
+}
+
+void Storage::addParticlesFromArrayReplImpl(const real *part,
+                                            const int *idx,
+                                            const int npart,
+                                            const int nidx,
+                                            const real Lx,
+                                            const real Ly,
+                                            const real Lz,
+                                            const int xdim,
+                                            const int ydim,
+                                            const int zdim,
+                                            const int pid_start)
+{
+    int nidx_ = 0;
+    for (int i = 0; i < 31; i++) nidx_ += (idx[i] >= 0);
+    if (nidx_ != nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
+
+    const int index_id = idx[0];
+    const int index_posx = idx[1];
+    const int index_posy = idx[2];
+    const int index_posz = idx[3];
+
+    if (pid_start < 0) throw std::runtime_error("Assertion failed: pid_start>=0");
+    if (xdim < 1) throw std::runtime_error("Assertion failed: xdim>=1");
+    if (ydim < 1) throw std::runtime_error("Assertion failed: ydim>=1");
+    if (zdim < 1) throw std::runtime_error("Assertion failed: zdim>=1");
+
+    typedef std::tuple<size_t, size_t, Real3D> repl_t;
+    std::vector<repl_t> replicated;
+    size_t newId = 0;
+    for (int i = 0; i < xdim; i++)
+    {
+        for (int j = 0; j < ydim; j++)
+        {
+            for (int k = 0; k < zdim; k++)
+            {
+                for (int p = 0; p < npart; p++)
+                {
+                    const int offset = p * nidx;
+                    const Real3D newPos(part[offset + index_posx] + i * Lx,
+                                        part[offset + index_posy] + j * Ly,
+                                        part[offset + index_posz] + k * Lz);
+                    if (checkIsRealParticle(0, newPos))
+                    {
+                        const size_t oldId = p;
+                        replicated.push_back({newId, oldId, newPos});
+                    }
+                    newId++;
+                }
+            }
+        }
+    }
+
+    std::vector<real> partRepl(replicated.size() * nidx);
+    for (size_t p = 0; p < replicated.size(); p++)
+    {
+        /// copy all entries
+        const auto &r = replicated[p];
+        const auto newId = std::get<0>(r);
+        const auto oldId = std::get<1>(r);
+        const auto &newPos = std::get<2>(r);
+
+        /// copy all entries for this row
+        const size_t newOffset = p * nidx;
+        const size_t oldOffset = oldId * nidx;
+        for (int ii = 0; ii < nidx; ii++)
+        {
+            partRepl[newOffset + ii] = part[oldOffset + ii];
+        }
+
+        /// replace id
+        partRepl[newOffset + index_id] = newId;
+
+        /// replace position
+        partRepl[newOffset + index_posx] = newPos[0];
+        partRepl[newOffset + index_posy] = newPos[1];
+        partRepl[newOffset + index_posz] = newPos[2];
+    }
+
+    /// call:
+    this->addParticlesFromArrayImpl(partRepl.data(), idx, replicated.size(), nidx);
+}
+
+np::ndarray getParticlesArrayImpl(class Storage *obj, np::ndarray const &idx_arr)
+{
+    idxArrayCheck(idx_arr);
+    const int *idx = (int *)(idx_arr.get_data());
+    int nidx = 0;
+    for (int i = 0; i < 31; i++)
+    {
+        nidx += (idx[i] >= 0);
+    }
+
+    for (int i = 0; i < 31; i++)
+    {
+        ASSERT_LESS(idx[i], nidx)
+    }
+
+    DEFINE_INDEX_VARS(index, idx);
+
+    int npart = 0;
+    for (auto const &rc : obj->getRealCells())
+    {
+        npart += rc->particles.size();
+    }
+
+    auto part_arr = np::zeros(python::make_tuple(npart, nidx), np::dtype::get_builtin<real>());
+    partArrayCheck(part_arr);
+    real *part = (real *)(part_arr.get_data());
+
+    if (index_adrAT >= 0)
+    {
+        std::cerr << "getParticlesArray not implemented for adress" << std::endl;
+    }
+
+    {
+        int p = 0;
+        for (CellListIterator cit(obj->getRealCells()); !cit.isDone(); ++cit, ++p)
+        {
+            const int offset = p * nidx;
+            if (index_id >= 0) part[offset + index_id] = cit->id();
+            if (index_posx >= 0) part[offset + index_posx] = cit->position()[0];
+            if (index_posy >= 0) part[offset + index_posy] = cit->position()[1];
+            if (index_posz >= 0) part[offset + index_posz] = cit->position()[2];
+            if (index_modeposx >= 0) part[offset + index_modeposx] = cit->modepos()[0];
+            if (index_modeposy >= 0) part[offset + index_modeposy] = cit->modepos()[1];
+            if (index_modeposz >= 0) part[offset + index_modeposz] = cit->modepos()[2];
+            if (index_vx >= 0) part[offset + index_vx] = cit->velocity()[0];
+            if (index_vy >= 0) part[offset + index_vy] = cit->velocity()[1];
+            if (index_vz >= 0) part[offset + index_vz] = cit->velocity()[2];
+            if (index_modemomx >= 0) part[offset + index_modemomx] = cit->modemom()[0];
+            if (index_modemomy >= 0) part[offset + index_modemomy] = cit->modemom()[1];
+            if (index_modemomz >= 0) part[offset + index_modemomz] = cit->modemom()[2];
+            if (index_fx >= 0) part[offset + index_fx] = cit->force()[0];
+            if (index_fy >= 0) part[offset + index_fy] = cit->force()[1];
+            if (index_fz >= 0) part[offset + index_fz] = cit->force()[2];
+            if (index_fmx >= 0) part[offset + index_fmx] = cit->forcem()[0];
+            if (index_fmy >= 0) part[offset + index_fmy] = cit->forcem()[1];
+            if (index_fmz >= 0) part[offset + index_fmz] = cit->forcem()[2];
+            if (index_q >= 0) part[offset + index_q] = cit->q();
+            if (index_radius >= 0) part[offset + index_radius] = cit->radius();
+            if (index_fradius >= 0) part[offset + index_fradius] = cit->fradius();
+            if (index_vradius >= 0) part[offset + index_vradius] = cit->vradius();
+            if (index_type >= 0) part[offset + index_type] = cit->type();
+            if (index_mass >= 0) part[offset + index_mass] = cit->mass();
+            if (index_varmass >= 0) part[offset + index_varmass] = cit->varmass();
+            if (index_lambda_adr >= 0) part[offset + index_lambda_adr] = cit->lambda();
+            if (index_lambda_adrd >= 0) part[offset + index_lambda_adrd] = cit->lambdaDeriv();
+            if (index_state >= 0) part[offset + index_state] = cit->state();
+            if (index_pib >= 0) part[offset + index_pib] = cit->pib();
+        }
+        CHECK_EQUAL(p, npart);
+    }
+
+    return part_arr;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -975,7 +1171,9 @@ void Storage::registerPython()
         .def("decompose", &Storage::decompose)
         .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
-        .def("addParticlesFromArray", &addParticlesFromArray);
+        .def("addParticlesFromArray", &addParticlesFromArray)
+        .def("addParticlesFromArrayReplicate", &addParticlesFromArrayReplicate)
+        .def("getParticlesArrayImpl", &getParticlesArrayImpl);
 }
 }  // namespace storage
 }  // namespace espressopp

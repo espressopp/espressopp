@@ -112,6 +112,14 @@ if (USE_CCACHE)
 endif()
 
 ######################################
+# HPX                                #
+######################################
+option(HPX4ESPP_ENABLED "Enable HPX4ESPP package" OFF)
+if(HPX4ESPP_ENABLED)
+    find_package(HPX REQUIRED)
+endif()
+
+######################################
 # Include the following subdirectory #
 ######################################
 add_subdirectory(src)
