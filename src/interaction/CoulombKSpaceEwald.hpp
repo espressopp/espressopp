@@ -86,8 +86,8 @@ private:
     int nParticles;   // local variable for the number of particles
     real rclx, rcly, rclz;
     real force_prefac[3];  // real array for force prefactors [0]: x,[1]: y,[2]: z
-    real cottheta;  // necessary components for cell basis matrix for a parallelepiped periodic box
-    bool ifshear;
+    real cottheta=.0;  // necessary components for cell basis matrix for a parallelepiped periodic box
+    bool ifshear=false;
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -103,6 +103,7 @@ private:
 
     // precalculated factors for the virial and virial tensor
     vector<real> virialPref;
+    vector<real> virialDyadicXZ;
     vector<Tensor> virialTensorPref;
     Tensor I;
 
@@ -134,13 +135,11 @@ public:
         Ly = Li[1];
         Lz = Li[2];
 
-        ifshear = false;
-        cottheta = .0;
-        if (system->shearOffset != .0)
-        {
-            cottheta = system->shearOffset / Lz;
-            if (cottheta != .0) ifshear = true;
-        }
+        /*if (getenv("CTHETAX10")!=NULL){
+          cottheta=(atoi(getenv("CTHETAX10"))+.0)/10.0;
+          ifshear=true;
+          std::cout<<"COTTHETA> "<<cottheta<<" \n";
+        }*/
 
         real skmax = kmax / min(Lx, min(Ly, Lz));
         real skmaxsq = skmax * skmax;  // we choose the biggest cutoff
@@ -177,17 +176,24 @@ public:
         ky_ind.clear();
         kz_ind.clear();
         virialPref.clear();
+        virialDyadicXZ.clear();
         virialTensorPref.clear();
+        
+        int min_ky=0;
+        int min_kz=1;
+
         for (int kx = 0; kx <= kmax; kx++)
         {
             kx2 = kx * kx;
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
+            //for (int ky = min_ky; ky <= kmax; ky++)
             for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
+                //for (int kz = min_kz; kz <= kmax; kz++)
                 for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
@@ -223,11 +229,14 @@ public:
 
                         virialPref.push_back(1 - h2 * inv2alpha2);
                         virialTensorPref.push_back(I - 2 * hh / h2 - hh * inv2alpha2);
+                        virialDyadicXZ.push_back(-prefactor*M_2PI*M_2PI*(4.0/h2+invAlpha2)/Lx/Lz);
 
                         kVectorLength++;
                     }
                 }
+                min_kz=-kmax;
             }
+            min_ky=-kmax;
         }
 
         // cout <<"node:  "<< system->comm->rank() <<  " kVectorLength: "<< kVectorLength<< " kmax:
@@ -297,11 +306,17 @@ public:
     // compute force and energy
     void exponentPrecalculation(CellList realcells)
     {
+        if (system->shearOffset != .0)
+        {
+            cottheta = (system->shearOffset-Lx) / Lz;
+            if (cottheta != .0) ifshear = true;
+        }
         /* Calculation of k space sums */
         // -1, 0, 1
         int j = 0;  // auxiliary variable, particle counter
         if (ifshear)
         {
+            preset();
             // calculate ksum for ewald under shear flow
             for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
             {
@@ -426,7 +441,7 @@ public:
         energy -= sum_q2 * alpha * M_1_SQRTPI;
 
         energy *= prefactor;
-
+//std::cout<<"EwaldK> "<<energy<<" \n";
         return energy;
     }
 
@@ -442,7 +457,12 @@ public:
             if (kxfield[k] == 0)
                 fact = 1.0;
             else
+            {
                 fact = 2.0;
+                if (system->ifViscosity && kzfield[k]!=0){
+                    system->dyadicP_xz+=kvector[k]*virialDyadicXZ[k]*norm( totsum[k] )*kxfield[k]*kzfield[k];
+                }
+            }
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
             int j = 0;

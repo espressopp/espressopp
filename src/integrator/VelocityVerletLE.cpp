@@ -406,29 +406,41 @@ void VelocityVerletLE::integrate2()
     // loop over all particles of the local cells
     real half_dt = 0.5 * dt;
 
-    real mv2 = .0;
-    for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
-    {
-        real dtfm = half_dt / cit->mass();
-        /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        cit->velocity() += dtfm * cit->force();
-        // Need to add propagation of shear speed if necessary
-        // Collect xz-&zx- components from stress Tensor
-        if (system.ifViscosity) mv2 += cit->mass() * cit->velocity()[0] * cit->velocity()[2];
-    }
-
-    // print the off-diagonal (XZ) component of stress Tensor
     if (system.ifViscosity)
     {
+        real mv2 = .0;
+        for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+        {
+            real dtfm = half_dt / cit->mass();
+            /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+            cit->velocity() += dtfm * cit->force();
+            // Need to add propagation of shear speed if necessary
+            // Collect xz-&zx- components from stress Tensor
+            mv2 += cit->mass() * cit->velocity()[0] * cit->velocity()[2];
+        }
+    
+        real allDyadicP_xz=.0;
+        real P_xz=system.dyadicP_xz;
+        //mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, boost::mpi::maximum<real>());
+        boost::mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, std::plus<real>());
+        // print the off-diagonal (XZ) component of stress Tensor
         real vol = system.bc->getBoxL()[2] * system.bc->getBoxL()[1] * system.bc->getBoxL()[0];
-        std::cout << "SIGXZ> " << getStep() + 1 << " "
-                  << -1.0 / vol * (mv2 + system.dyadicP_xz) / shearRate
+        if (system.comm->rank()==0) std::cout << "SIGXZ> " << getStep() + 1 << " "
+                  << -1.0 / vol * (mv2 + allDyadicP_xz) / shearRate
                   //<<" "<<-1.0/vol*(mv2)/shearRate
                   << " \n";
-        // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<"
-        // \n";
         system.dyadicP_xz = .0;
-        system.dyadicP_zx = .0;
+        // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<" \n";
+        //system.dyadicP_zx = .0;
+    }
+    else
+    {
+        for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
+        {
+            real dtfm = half_dt / cit->mass();
+            /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+            cit->velocity() += dtfm * cit->force();
+        }
     }
 
     step++;
