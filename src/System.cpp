@@ -61,6 +61,7 @@ System::System(int fComm)
     NGridSize = {1, 1, 1};
     ghostShift = 0;
     lebcMode = 0;
+    ifShear = false;
     shearRate = 0.0;
     irank = 0;
     dyadicP_xz = .0;

@@ -86,8 +86,8 @@ private:
     int nParticles;   // local variable for the number of particles
     real rclx, rcly, rclz;
     real force_prefac[3];  // real array for force prefactors [0]: x,[1]: y,[2]: z
-    real cottheta=.0;  // necessary components for cell basis matrix for a parallelepiped periodic box
-    bool ifshear=false;
+    real cottheta = .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
+    bool shear_flag = false;
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -134,10 +134,11 @@ public:
         Lx = Li[0];
         Ly = Li[1];
         Lz = Li[2];
+        shear_flag = system->ifShear;
 
         /*if (getenv("CTHETAX10")!=NULL){
           cottheta=(atoi(getenv("CTHETAX10"))+.0)/10.0;
-          ifshear=true;
+          shear_flag=true;
           std::cout<<"COTTHETA> "<<cottheta<<" \n";
         }*/
 
@@ -197,7 +198,7 @@ public:
                 for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
-                    if (ifshear)
+                    if (shear_flag)
                     {
                         rkz2 = (kz + .0) / Lz - cottheta * (kx + .0) / Lx;
                         rkz2 = rkz2 * rkz2;
@@ -227,8 +228,8 @@ public:
                         real h2 = h * h;
                         Tensor hh(h, h);  // it is tensor: hi*hj
 
-                        virialPref.push_back(1 - h2 * inv2alpha2);
-                        virialTensorPref.push_back(I - 2 * hh / h2 - hh * inv2alpha2);
+                        virialPref.push_back(prefactor*(1 - h2 * inv2alpha2));
+                        virialTensorPref.push_back(prefactor*(I - 2 * hh / h2 - hh * inv2alpha2));
                         virialDyadicXZ.push_back(-prefactor*M_2PI*M_2PI*(4.0/h2+invAlpha2)/Lx/Lz);
 
                         kVectorLength++;
@@ -306,15 +307,15 @@ public:
     // compute force and energy
     void exponentPrecalculation(CellList realcells)
     {
-        if (system->shearOffset != .0)
+        if (shear_flag)
         {
-            cottheta = (system->shearOffset-Lx) / Lz;
-            if (cottheta != .0) ifshear = true;
+			real offs = system->shearOffset;
+            cottheta = ((offs > Lx/2.0 ? offs-Lx : offs)) / Lz;
         }
         /* Calculation of k space sums */
         // -1, 0, 1
         int j = 0;  // auxiliary variable, particle counter
-        if (ifshear)
+        if (shear_flag && cottheta != .0)
         {
             preset();
             // calculate ksum for ewald under shear flow
@@ -441,7 +442,7 @@ public:
         energy -= sum_q2 * alpha * M_1_SQRTPI;
 
         energy *= prefactor;
-//std::cout<<"EwaldK> "<<energy<<" \n";
+
         return energy;
     }
 
@@ -466,7 +467,7 @@ public:
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
             int j = 0;
-            if (ifshear)
+            if (shear_flag)
                 for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
                 {
                     Particle& p = *it;

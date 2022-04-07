@@ -83,7 +83,16 @@ void VelocityVerletLE::run(int nsteps)
     real Lz = system.bc->getBoxL()[2];
     int ngrid =
         storage.getInt3DCellGrid()[0] * system.NGridSize[0];  // storage.getInt3DNodeGrid()[2];
-    system.shearRate = shearRate;
+    if (shearRate != .0)
+    {
+        system.shearRate = shearRate;
+        system.ifShear = true;
+	}
+	else
+	{
+		throw std::runtime_error("VelocityVerletLE error: LE integrator is called \
+		but the shear rate is set to zero \n");
+	}
 
     // signal
     runInit();
@@ -181,7 +190,7 @@ void VelocityVerletLE::run(int nsteps)
         if (ctmp > shift_count)
         {
             std::cout << " ERR> SHIFT: " << ctmp << " / " << shift_count << " \n";
-            throw std::runtime_error("cellShift error: numeric error leading to no cell shifts \n");
+            throw std::runtime_error("VelocityVerletLE error: numeric error leading to no cell shifts \n");
         }
 
         if (maxDist > skinHalf) resortFlag = true;
@@ -368,7 +377,7 @@ real VelocityVerletLE::integrate1()
                       << cit->position()[1] << "," << cit->position()[2] << "] (" << deltaP[0]
                       << "," << deltaP[1] << "," << deltaP[2] << ") \n"
                       << cit->velocity()[2] << " | " << cit->force()[2] << " \n";
-            throw std::runtime_error("VelocityVerlet LE error: particle crosses over two images");
+            throw std::runtime_error("VelocityVerletLE error: particle crosses over two images");
         }
 
         count++;

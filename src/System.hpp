@@ -64,6 +64,7 @@ public:
 
     int ghostShift;  // Cell shift for the ghost layer over the boundary (only with Lees-Edwards)
     int lebcMode;
+    bool ifShear;
     real shearRate;
     int irank;
     bool ifViscosity;
