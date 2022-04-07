@@ -79,7 +79,7 @@ $ make
 You can also include ScaFaCoS Library (pre-installation required, see in http://www.scafacos.de/) into E++ compilation
 
 ```sh
-$ cmake . -DCMAKE_INSTALL_PREFIX=[installation directory]
+$ cmake . -DCMAKE_PREFIX_PATH=[installation directory]
 $ make
 ```
 

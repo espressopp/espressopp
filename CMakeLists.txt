@@ -119,7 +119,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(SCAFACOS IMPORTED_TARGET scafacos)
 
 if ( SCAFACOS_FOUND )
-  include_directories("${SCAFACOS_INCLUDEDIR}")
+#  include_directories("${SCAFACOS_INCLUDEDIR}")
   add_definitions( -DHAVE_CONFIG_H )
 endif()
 
