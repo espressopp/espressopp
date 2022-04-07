@@ -115,12 +115,12 @@ endif()
 # Scafacos Package (optional)   #
 #################################
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SCAFACOS IMPORTED_TARGET scafacos)
-
-if ( SCAFACOS_FOUND )
-#  include_directories("${SCAFACOS_INCLUDEDIR}")
-  add_definitions( -DHAVE_CONFIG_H )
+find_package(PkgConfig)
+if(PkgConfig_FOUND)
+    pkg_check_modules(SCAFACOS IMPORTED_TARGET scafacos)
+    if ( SCAFACOS_FOUND )
+        add_definitions( -DHAVE_CONFIG_H )
+    endif()
 endif()
 
 ######################################
