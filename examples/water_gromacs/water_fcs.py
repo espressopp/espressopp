@@ -122,10 +122,8 @@ if EMODE==0:  #truncated coulomb
 else:
     #  Ewald summation parameters
     coulomb_prefactor = 138.935485
-    #alphaEwald     = 1.112583061 #  alpha - Ewald parameter
-    #alphaEwald     = 0.660557
-    rspacecutoff   = 3.0*pow(1/density,1.0/3.0) #4.9 #  rspacecutoff - the cutoff in real space
-    alphaEwald     = np.exp(1.4548-1.0867*np.log(rspacecutoff))
+    rspacecutoff   = 0.9 #  rspacecutoff - the cutoff in real space
+    alphaEwald     = 2.45399
     kspacecutoff   = 30 #  kspacecutoff - the cutoff in reciprocal space
 
     if EMODE==1: #GO with Ewald in ESPR++
