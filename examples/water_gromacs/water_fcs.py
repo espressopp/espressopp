@@ -140,6 +140,7 @@ else:
         coulombR_intEwald = espressopp.interaction.VerletListCoulombRSpace(verletlist)
         coulombR_intEwald.setPotential(type1=0, type2=0, potential = coulombR_potEwald)
         coulombR_intEwald.setPotential(type1=0, type2=1, potential = coulombR_potEwald)
+        coulombR_intEwald.setPotential(type1=1, type2=1, potential = coulombR_potEwald)
         system.addInteraction(coulombR_intEwald)
       
         ewaldK_pot = espressopp.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alphaEwald, kspacecutoff)
