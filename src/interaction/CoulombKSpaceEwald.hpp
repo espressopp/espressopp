@@ -188,14 +188,14 @@ public:
             kx2 = kx * kx;
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
-            //for (int ky = min_ky; ky <= kmax; ky++)
-            for (int ky = -kmax; ky <= kmax; ky++)
+            for (int ky = min_ky; ky <= kmax; ky++)
+            //for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
-                //for (int kz = min_kz; kz <= kmax; kz++)
-                for (int kz = -kmax; kz <= kmax; kz++)
+                for (int kz = min_kz; kz <= kmax; kz++)
+                //for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
                     if (shear_flag)
@@ -460,14 +460,13 @@ public:
             else
             {
                 fact = 2.0;
-                if (system->ifViscosity && kzfield[k]!=0){
+                if (shear_flag && system->ifViscosity && kzfield[k]!=0)
                     system->dyadicP_xz+=kvector[k]*virialDyadicXZ[k]*norm( totsum[k] )*kxfield[k]*kzfield[k];
-                }
             }
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
             int j = 0;
-            if (shear_flag)
+            if (shear_flag && cottheta != .0)
                 for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
                 {
                     Particle& p = *it;
@@ -501,7 +500,7 @@ public:
                     j++;
                 }
         }
-
+        
         return true;
     }
 

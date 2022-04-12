@@ -121,7 +121,7 @@ inline void VerletListInteractionTemplate<_Potential>::addForces()
     Potential max_pot = potentialArray.at(vlmaxtype, vlmaxtype);  // force a resize
 
     // Uncomment below for analyzing shear simulations
-    if (verletList->getSystemRef().shearOffset != .0 && verletList->getSystemRef().ifViscosity)
+    if (verletList->getSystemRef().ifViscosity && verletList->getSystemRef().shearOffset != .0)
     {
         System &system = verletList->getSystemRef();
         real Lx = system.bc->getBoxL()[0];

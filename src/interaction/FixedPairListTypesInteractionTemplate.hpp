@@ -131,8 +131,9 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
     LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
     const bc::BC &bc = *getSystemRef().bc;
     real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
 
-    if (offs != .0)
+    if (shear_flag)
     {
         real Lx = bc.getBoxL()[0];
         real Lz = bc.getBoxL()[2];
@@ -178,6 +179,11 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
             {
                 p1.force() += force;
                 p2.force() -= force;
+                //Analysis to get stress tensors
+                if (getSystemRef().ifViscosity){
+                  getSystemRef().dyadicP_xz+=dist[0]*force[2];
+                  //getSystemRef().dyadicP_zx+=dist[2]*force[0];
+                }
             }
         }
     }
@@ -221,8 +227,9 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
     real es = 0.0;
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
 
-    if (offs != .0)
+    if (shear_flag)
     {
         real Lx = bc.getBoxL()[0];
         real Lz = bc.getBoxL()[2];
@@ -362,8 +369,9 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
     real w = 0.0;
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
 
-    if (offs != .0)
+    if (shear_flag)
     {
         real Lx = bc.getBoxL()[0];
         real Lz = bc.getBoxL()[2];
