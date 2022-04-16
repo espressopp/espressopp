@@ -86,7 +86,8 @@ private:
     int nParticles;   // local variable for the number of particles
     real rclx, rcly, rclz;
     real force_prefac[3];  // real array for force prefactors [0]: x,[1]: y,[2]: z
-    real cottheta = .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
+    real cottheta =
+        .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
     bool shear_flag = false;
 
     vector<real> kvector;  // precalculated k-vector
@@ -179,9 +180,9 @@ public:
         virialPref.clear();
         virialDyadicXZ.clear();
         virialTensorPref.clear();
-        
-        int min_ky=0;
-        int min_kz=1;
+
+        int min_ky = 0;
+        int min_kz = 1;
 
         for (int kx = 0; kx <= kmax; kx++)
         {
@@ -189,13 +190,13 @@ public:
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
             for (int ky = min_ky; ky <= kmax; ky++)
-            //for (int ky = -kmax; ky <= kmax; ky++)
+            // for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
                 for (int kz = min_kz; kz <= kmax; kz++)
-                //for (int kz = -kmax; kz <= kmax; kz++)
+                // for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
                     if (shear_flag)
@@ -228,16 +229,17 @@ public:
                         real h2 = h * h;
                         Tensor hh(h, h);  // it is tensor: hi*hj
 
-                        virialPref.push_back(prefactor*(1 - h2 * inv2alpha2));
-                        virialTensorPref.push_back(prefactor*(I - 2 * hh / h2 - hh * inv2alpha2));
-                        virialDyadicXZ.push_back(-prefactor*M_2PI*M_2PI*(4.0/h2+invAlpha2)/Lx/Lz);
+                        virialPref.push_back(prefactor * (1 - h2 * inv2alpha2));
+                        virialTensorPref.push_back(prefactor * (I - 2 * hh / h2 - hh * inv2alpha2));
+                        virialDyadicXZ.push_back(-prefactor * M_2PI * M_2PI *
+                                                 (4.0 / h2 + invAlpha2) / Lx / Lz);
 
                         kVectorLength++;
                     }
                 }
-                min_kz=-kmax;
+                min_kz = -kmax;
             }
-            min_ky=-kmax;
+            min_ky = -kmax;
         }
 
         // cout <<"node:  "<< system->comm->rank() <<  " kVectorLength: "<< kVectorLength<< " kmax:
@@ -309,8 +311,8 @@ public:
     {
         if (shear_flag)
         {
-			real offs = system->shearOffset;
-            cottheta = ((offs > Lx/2.0 ? offs-Lx : offs)) / Lz;
+            real offs = system->shearOffset;
+            cottheta = ((offs > Lx / 2.0 ? offs - Lx : offs)) / Lz;
         }
         /* Calculation of k space sums */
         // -1, 0, 1
@@ -460,8 +462,9 @@ public:
             else
             {
                 fact = 2.0;
-                if (shear_flag && system->ifViscosity && kzfield[k]!=0)
-                    system->dyadicP_xz+=kvector[k]*virialDyadicXZ[k]*norm( totsum[k] )*kxfield[k]*kzfield[k];
+                if (shear_flag && system->ifViscosity && kzfield[k] != 0)
+                    system->dyadicP_xz +=
+                        kvector[k] * virialDyadicXZ[k] * norm(totsum[k]) * kxfield[k] * kzfield[k];
             }
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
@@ -500,7 +503,7 @@ public:
                     j++;
                 }
         }
-        
+
         return true;
     }
 

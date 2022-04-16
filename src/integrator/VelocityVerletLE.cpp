@@ -87,12 +87,13 @@ void VelocityVerletLE::run(int nsteps)
     {
         system.shearRate = shearRate;
         system.ifShear = true;
-	}
-	else
-	{
-		throw std::runtime_error("VelocityVerletLE error: LE integrator is called \
+    }
+    else
+    {
+        throw std::runtime_error(
+            "VelocityVerletLE error: LE integrator is called \
 		but the shear rate is set to zero \n");
-	}
+    }
 
     // signal
     runInit();
@@ -190,7 +191,8 @@ void VelocityVerletLE::run(int nsteps)
         if (ctmp > shift_count)
         {
             std::cout << " ERR> SHIFT: " << ctmp << " / " << shift_count << " \n";
-            throw std::runtime_error("VelocityVerletLE error: numeric error leading to no cell shifts \n");
+            throw std::runtime_error(
+                "VelocityVerletLE error: numeric error leading to no cell shifts \n");
         }
 
         if (maxDist > skinHalf) resortFlag = true;
@@ -316,7 +318,8 @@ real VelocityVerletLE::integrate1()
     System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     // if (rename("FLAG_P","FLAG_P")==0 && getenv("VAR1")!=NULL &&
-    // system.comm->rank()==system.irank){ std:cout<<"===========\nRUN01> TimeStep= "<<getStep()<<" /
+    // system.comm->rank()==system.irank){ std:cout<<"===========\nRUN01> TimeStep= "<<getStep()<<"
+    // /
     // "<<system.shearOffset<<"\n------\n";}
 
     // loop over all particles of the local cells
@@ -427,20 +430,22 @@ void VelocityVerletLE::integrate2()
             // Collect xz-&zx- components from stress Tensor
             mv2 += cit->mass() * cit->velocity()[0] * cit->velocity()[2];
         }
-    
-        real allDyadicP_xz=.0;
-        real P_xz=system.dyadicP_xz;
-        //mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, boost::mpi::maximum<real>());
+
+        real allDyadicP_xz = .0;
+        real P_xz = system.dyadicP_xz;
+        // mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, boost::mpi::maximum<real>());
         boost::mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, std::plus<real>());
         // print the off-diagonal (XZ) component of stress Tensor
         real vol = system.bc->getBoxL()[2] * system.bc->getBoxL()[1] * system.bc->getBoxL()[0];
-        if (system.comm->rank()==0) std::cout << "SIGXZ> " << getStep() + 1 << " "
-                  << -1.0 / vol * (mv2 + allDyadicP_xz) / shearRate
-                  //<<" "<<-1.0/vol*(mv2)/shearRate
-                  << " \n";
+        if (system.comm->rank() == 0)
+            std::cout << "SIGXZ> " << getStep() + 1 << " "
+                      << -1.0 / vol * (mv2 + allDyadicP_xz) / shearRate
+                      //<<" "<<-1.0/vol*(mv2)/shearRate
+                      << " \n";
         system.dyadicP_xz = .0;
-        // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<" \n";
-        //system.dyadicP_zx = .0;
+        // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<"
+        // \n";
+        // system.dyadicP_zx = .0;
     }
     else
     {

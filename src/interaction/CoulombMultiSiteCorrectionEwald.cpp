@@ -26,8 +26,8 @@
 // For a Coulombic FixedPairList interaction, it's necessary to use
 // FixedPairListTypesInteractionTemplate.hpp instead of FixedPairListInteractionTemplate.hpp so that
 // we can use _computeForce and _computeEnergy which take both particles and distance vector as
-// arguments because the Coulomb interaction needs access to both the charges (via the particles) and
-// the minimum image distance (via the boundary conditions in the interaction template)
+// arguments because the Coulomb interaction needs access to both the charges (via the particles)
+// and the minimum image distance (via the boundary conditions in the interaction template)
 
 namespace espressopp
 {

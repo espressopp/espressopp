@@ -121,8 +121,8 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
     Real3D r = p1.position() - p2.position();
     real dist2 = r.sqr();
     System& system = getSystemRef();
-    
-    bool shear_flag=system.ifShear;
+
+    bool shear_flag = system.ifShear;
     if (!shear_flag)
     {
         if (dist2 < current_cutoff_sqr)
@@ -175,7 +175,7 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
     real dist2 = r.sqr();
     System& system = getSystemRef();
 
-    bool shear_flag=system.ifShear;
+    bool shear_flag = system.ifShear;
     if (!shear_flag)
     {
         if (dist2 < current_cutoff_sqr)

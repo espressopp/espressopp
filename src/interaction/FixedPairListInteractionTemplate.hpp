@@ -115,7 +115,7 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
     real offs = getSystemRef().shearOffset;
-    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
     if (shear_flag)
     {
@@ -214,7 +214,7 @@ inline real FixedPairListInteractionTemplate<_Potential>::computeEnergy()
     real e = 0.0;
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
-    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
     if (shear_flag)
     {
@@ -406,7 +406,7 @@ inline real FixedPairListInteractionTemplate<_Potential>::computeVirial()
     real w = 0.0;
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
-    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
     if (shear_flag)
     {
@@ -473,7 +473,7 @@ inline void FixedPairListInteractionTemplate<_Potential>::computeVirialTensor(Te
     Tensor wlocal(0.0);
     const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
-    bool shear_flag = (getSystemRef().ifShear && offs!=.0);
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
     if (shear_flag)
     {

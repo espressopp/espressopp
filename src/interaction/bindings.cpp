@@ -72,7 +72,7 @@
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombMultiSiteCorrectionEwald.hpp"
 #ifdef FCS_EXIST
- #include "CoulombScafacos.hpp"
+#include "CoulombScafacos.hpp"
 #endif
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
