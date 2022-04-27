@@ -309,8 +309,9 @@ public:
     // compute force and energy
     void exponentPrecalculation(CellList realcells)
     {
-        if (shear_flag)
+        if (system->ifShear)
         {
+            shear_flag = system->ifShear;
             real offs = system->shearOffset;
             cottheta = ((offs > Lx / 2.0 ? offs - Lx : offs)) / Lz;
         }
@@ -320,6 +321,7 @@ public:
         if (shear_flag && cottheta != .0)
         {
             preset();
+
             // calculate ksum for ewald under shear flow
             for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
             {
