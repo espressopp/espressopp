@@ -840,7 +840,7 @@ inline void VerletListHadressInteractionTemplate<_PotentialAT, _PotentialCG>::co
         boost::mpi::all_reduce(*mpiWorld, p_xx_local.at(i), p_xx_sum.at(i), std::plus<real>());
     }
     std::transform(p_xx_sum.begin(), p_xx_sum.end(), p_xx_sum.begin(),
-                   std::bind2nd(std::divides<real>(), Volume));
+                   [=](auto &x) { return x / Volume; });
     for (i = 0; i < bins; ++i)
     {
         p_xx_total.at(i) += p_xx_sum.at(i);
