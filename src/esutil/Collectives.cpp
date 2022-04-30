@@ -35,7 +35,7 @@ DuplicateError::DuplicateError() : std::runtime_error("item was found on more th
    - Duplicate iff more than one input value is not NotHere
    - the one value that is not NotHere otherwise
  */
-struct UniqueReduce : public std::binary_function<int, int, int>
+struct UniqueReduce
 {
     static const int NotHere = -1;
     static const int Duplicate = -2;

@@ -8,4 +8,5 @@ io
    espressopp.io.DumpGROAdress.rst
    espressopp.io.DumpXYZ.rst
    espressopp.io.DumpH5MD.rst
+   espressopp.io.DumpH5MDParallel.rst
    espressopp.io.DumpTopology.rst
