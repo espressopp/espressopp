@@ -240,6 +240,8 @@ void VelocityVerletLE::run(int nsteps)
         // std::cout<<" aftIntV> "<<" \n";}
     }
 
+    if (system.ifViscosity) system.sumP_xz /= nsteps + .0;
+
     timeRun = timeIntegrate.getElapsedTime();
     timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] + timeComm1 +
                           timeComm2 + timeInt1 + timeInt2 + timeResort);
