@@ -135,6 +135,8 @@ void VelocityVerletLE::run(int nsteps)
     // system.irank=atoi(getenv("IRANK"));
     if (getenv("LMODE") != NULL) system.lebcMode = atoi(getenv("LMODE"));
 
+    if (system.ifViscosity) system.sumP_xz = .0;
+
     for (int i = 0; i < nsteps; i++)
     {
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
@@ -227,9 +229,6 @@ void VelocityVerletLE::run(int nsteps)
         befIntV();
 
         time = timeIntegrate.getElapsedTime();
-        /*if (i==nsteps-1 && rename("FLAG_V","FLAG_V")==0){
-          integrate2_extra();
-        }else*/
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
         // if (rename("FLAG_P","FLAG_P")==0 && system.comm->rank()==system.irank){
@@ -437,14 +436,10 @@ void VelocityVerletLE::integrate2()
         boost::mpi::all_reduce(*system.comm, P_xz, allDyadicP_xz, std::plus<real>());
         // print the off-diagonal (XZ) component of stress Tensor
         real vol = system.bc->getBoxL()[2] * system.bc->getBoxL()[1] * system.bc->getBoxL()[0];
-        if (system.comm->rank() == 0)
-            std::cout << "SIGXZ> " << getStep() + 1 << " "
-                      << -1.0 / vol * (mv2 + allDyadicP_xz) / shearRate
-                      //<<" "<<-1.0/vol*(mv2)/shearRate
-                      << " \n";
-        system.dyadicP_xz = .0;
+        system.sumP_xz += -1.0 / vol * (mv2 + allDyadicP_xz) / shearRate;
         // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<"
         // \n";
+        system.dyadicP_xz = .0;
         // system.dyadicP_zx = .0;
     }
     else
@@ -456,169 +451,6 @@ void VelocityVerletLE::integrate2()
             cit->velocity() += dtfm * cit->force();
         }
     }
-
-    step++;
-}
-
-void VelocityVerletLE::integrate2_extra()
-{
-    LOG4ESPP_INFO(theLogger, "updating second half step of velocities")
-    System& system = getSystemRef();
-    CellList realCells = system.storage->getRealCells();
-
-    // loop over all particles of the local cells
-    real half_dt = 0.5 * dt;
-
-    int bin_size = 50, ntot = 0, *cnt;
-    real mo[4] = {.0, .0, .0, .0};
-    real *vx, *vz, *sx, *ty, *tz;
-    Real3D* ori;
-    int nchain = 10, clength = 20;
-
-    if (getenv("NCHAIN") != NULL)
-        if (atoi(getenv("NCHAIN")) > 0) nchain = atoi(getenv("NCHAIN"));
-    if (getenv("CLENGTH") != NULL)
-        if (atoi(getenv("CLENGTH")) > 0) clength = atoi(getenv("CLENGTH"));
-
-    real mv2 = .0;
-
-    cnt = new int[bin_size];
-    vx = new real[bin_size];
-    vz = new real[bin_size];
-    sx = new real[bin_size];
-    ty = new real[bin_size];
-    tz = new real[bin_size];
-    ori = new Real3D[nchain];
-
-    // Init
-    for (int i = 0; i < bin_size; i++)
-    {
-        cnt[i] = 0;
-        vx[i] = .0;
-        vz[i] = .0;
-        sx[i] = .0;
-        ty[i] = .0;
-        tz[i] = .0;
-    }
-    real Lz = system.bc->getBoxL()[2];
-    for (int i = 0; i < nchain; i++)
-    {
-        ori[i] = {.0, .0, .0};
-    }
-
-    for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
-    {
-        real dtfm = half_dt / cit->mass();
-        /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        cit->velocity() += dtfm * cit->force();
-
-        // Need to add propagation of shear speed if necessary
-        real spdShear = shearRate * (cit->position()[2] - Lz / 2.0);
-        mo[0] += cit->velocity()[0];
-        mo[1] += cit->velocity()[1];
-        mo[2] += cit->velocity()[2];
-        mo[3] += cit->velocity()[0] + spdShear;
-
-        int itmp = static_cast<int>(floor(cit->position()[2] / Lz * (bin_size + .0)));
-        if (itmp < 0)
-            itmp = 0;
-        else if (itmp >= bin_size)
-            itmp = bin_size - 1;
-
-        ntot++;
-        cnt[itmp]++;
-        vx[itmp] += cit->velocity()[0];
-        vz[itmp] += cit->velocity()[2];
-        sx[itmp] += cit->velocity()[0] + spdShear;
-
-        // Real3D vtmp={spdShear,.0,.0};
-        // vtmp=vtmp+cit->velocity();
-        ty[itmp] += (cit->velocity()[1] * cit->velocity()[1]) * cit->mass() / 1.0;
-        tz[itmp] += (cit->velocity()[2] * cit->velocity()[2]) * cit->mass() / 1.0;
-
-        // Collect orientation info. (always first N chains if not specific)
-        int mono_idx = (cit->id() - 1) % clength;
-        int chain_idx = (cit->id() - 1 - mono_idx) / clength;
-        if (chain_idx < nchain)
-        {
-            if (mono_idx == 0)
-            {
-                ori[chain_idx] -= cit->position();
-            }
-            else if (mono_idx == clength - 1)
-            {
-                ori[chain_idx] += cit->position();
-            }
-        }
-
-        // Collect xz-&zx- components from stress Tensor
-        mv2 += cit->mass() * cit->velocity()[0] * cit->velocity()[2];
-    }
-
-    // Normalization
-    for (int i = 0; i < 4; i++) mo[i] = mo[i] / (ntot + .0);
-    for (int i = 0; i < bin_size; i++)
-    {
-        vx[i] = vx[i] / (cnt[i] + .0);
-        vz[i] = vz[i] / (cnt[i] + .0);
-        sx[i] = sx[i] / (cnt[i] + .0);
-        ty[i] = ty[i] / (cnt[i] + .0);
-        tz[i] = tz[i] / (cnt[i] + .0);
-    }
-    for (int i = 0; i < nchain; i++)
-    {
-        real val_tmp = ori[i].abs();
-        ori[i] = ori[i] / val_tmp;
-    }
-
-    // print out
-    if (rename("FLAG_VEL", "FLAG_VEL") == 0)
-    {
-        std::cout << "MOMENTUM> " << getStep() + 1 << " " << mo[0] << " " << mo[1] << " " << mo[2]
-                  << " " << mo[3] << " \n";
-        // std::cout<<"DISTR> "<<getStep()+1<<" 0.0 0.0 \n";
-        for (int i = 0; i < bin_size; i++)
-        {
-            real z = (i + 0.5) / (bin_size + .0);
-            std::cout << "DISTR> " << getStep() + 1 << " " << z << " "
-                      << (cnt[i] + .0) / (ntot + .0) * (bin_size + .0) << " \n";
-            std::cout << "VX> " << getStep() + 1 << " " << z << " " << vx[i] << " \n";
-            std::cout << "VZ> " << getStep() + 1 << " " << z << " " << vz[i] << " \n";
-            std::cout << "VSHEAR> " << getStep() + 1 << " " << z << " " << sx[i] / (shearRate)
-                      << " \n";
-            std::cout << "TP> " << getStep() + 1 << " " << z << " " << ty[i] << " \n";
-            std::cout << "TZ> " << getStep() + 1 << " " << z << " " << tz[i] << " \n";
-        }
-    }
-
-    if (rename("FLAG_OAF", "FLAG_OAF") == 0)
-    {
-        for (int i = 0; i < nchain; i++)
-        {
-            std::cout << "CHAIN-" << i + 1 << "> " << getStep() + 1 << " " << ori[i] << " \n";
-        }
-    }
-
-    if (rename("FLAG_VIS", "FLAG_VIS") == 0)
-    {
-        real vol = system.bc->getBoxL()[2] * system.bc->getBoxL()[1] * system.bc->getBoxL()[0];
-        std::cout << "SIGXZ> " << getStep() + 1 << " "
-                  << -1.0 / vol * (mv2 + system.dyadicP_xz) / shearRate
-                  //<<" "<<-1.0/vol*(mv2)/shearRate
-                  << " \n";
-        // std::cout<<"SIGZX> "<<getStep()+1<<" "<<-1.0/vol*(mv2+system.dyadicP_zx)/shearRate<<"
-        // \n";
-    }
-    system.dyadicP_xz = .0;
-    system.dyadicP_zx = .0;
-
-    delete cnt;
-    delete vx;
-    delete vz;
-    delete sx;
-    delete ty;
-    delete tz;
-    delete ori;
 
     step++;
 }

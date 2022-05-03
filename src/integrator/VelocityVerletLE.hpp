@@ -80,8 +80,6 @@ protected:
 
     void integrate2();
 
-    void integrate2_extra();
-
     void initForces();
 
     void updateForces();
