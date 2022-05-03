@@ -219,6 +219,7 @@ void System::registerPython()
         //      .def_readwrite("shortRangeInteractions",
         //		     &System::shortRangeInteractions)
         .def_readonly("maxCutoff", &System::maxCutoff)
+	.def_readonly("sumP_xz", &System::sumP_xz)
         .def("addInteraction", &System::addInteraction)
         .def("removeInteraction", &System::removeInteraction)
         .def("getInteraction", &System::getInteraction)
