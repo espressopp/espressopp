@@ -70,6 +70,7 @@ public:
     bool ifViscosity;
     real dyadicP_xz;
     real dyadicP_zx;
+    real sumP_xz;
 
     bool CommunicatorIsInitialized;
 
