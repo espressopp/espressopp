@@ -66,6 +66,8 @@ System::System(int fComm)
     irank = 0;
     dyadicP_xz = .0;
     dyadicP_zx = .0;
+    sumP_xz = .0;
+
     if (rename("FLAG_VIS", "FLAG_VIS") == 0)
     {
         std::cout << "The calculation of the shear viscosity only supports non-bonded and two-body "
