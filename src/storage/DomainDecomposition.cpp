@@ -263,8 +263,8 @@ void DomainDecomposition::cellAdjust()
     int iz = (int)(box_sizeL[2] / (rc_skin * _nodeGrid[2]));
     Int3D _newCellGrid(ix, iy, iz);
 
-    if (getSystem()->comm->rank() == 0)
-        std::cout << " Corrected DOMDEC [" << getInt3DNodeGrid() << "](" << _newCellGrid << ") \n";
+    // if (getSystem()->comm->rank() == 0)
+    //  std::cout << " Corrected DOMDEC [" << getInt3DNodeGrid() << "](" << _newCellGrid << ") \n";
 
     // save all particles to temporary vector
     std::vector<ParticleList> tmp_pl;

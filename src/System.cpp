@@ -70,8 +70,9 @@ System::System(int fComm)
 
     if (rename("FLAG_VIS", "FLAG_VIS") == 0)
     {
-        std::cout << "The calculation of the shear viscosity only supports non-bonded and two-body "
-                     "bonding interactions \n";
+        // std::cout << "The calculation of the shear viscosity only supports non-bonded and
+        // two-body "
+        //             "bonding interactions \n";
         ifViscosity = true;
     }
     else
@@ -219,7 +220,7 @@ void System::registerPython()
         //      .def_readwrite("shortRangeInteractions",
         //		     &System::shortRangeInteractions)
         .def_readonly("maxCutoff", &System::maxCutoff)
-	.def_readonly("sumP_xz", &System::sumP_xz)
+        .def_readonly("sumP_xz", &System::sumP_xz)
         .def("addInteraction", &System::addInteraction)
         .def("removeInteraction", &System::removeInteraction)
         .def("getInteraction", &System::getInteraction)
