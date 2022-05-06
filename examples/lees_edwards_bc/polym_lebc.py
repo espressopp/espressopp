@@ -210,7 +210,7 @@ integrator2.addExtension(langevin)
 
 # since the interaction cut-off changed the size of the cells that are used
 # to speed up verlet list builds should be adjusted accordingly 
-system.storage.cellAdjust()
+system.storage.cellAdjust(shear = True)
 
 print("starting production ...")
 espressopp.tools.analyse.info(system, integrator2)
