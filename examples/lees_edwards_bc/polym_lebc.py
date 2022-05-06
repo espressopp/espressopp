@@ -2,6 +2,8 @@
 #
 #  Copyright (C) 2013-2017(H)
 #      Max Planck Institute for Polymer Research
+#  Copyright (C) 2022
+#      Data Center, Johannes Gutenberg University Mainz
 #
 #  This file is part of ESPResSo++.
 #  
