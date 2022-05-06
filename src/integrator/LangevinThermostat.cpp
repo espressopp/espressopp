@@ -140,7 +140,7 @@ void LangevinThermostat::thermalizeAdr()
 
 void LangevinThermostat::frictionThermo(Particle& p)
 {
-    System& system = getSystemRef();
+    // System& system = getSystemRef();
     real massf = sqrt(p.mass());
 
     // get a random value for each vector component

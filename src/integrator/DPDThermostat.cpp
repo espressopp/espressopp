@@ -151,7 +151,6 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
             real omega = 1 - dist / current_cutoff;
             real omega2 = omega * omega;
 
-            real halfL = system.bc->getBoxL()[2] / 2.0;
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
 
             r /= dist;
@@ -227,7 +226,6 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
             real omega = 1 - dist / current_cutoff;
             real omega2 = omega * omega;
 
-            real halfL = system.bc->getBoxL()[2] / 2.0;
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
 
             r /= dist;

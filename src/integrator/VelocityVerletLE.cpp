@@ -325,12 +325,10 @@ real VelocityVerletLE::integrate1()
 
     // loop over all particles of the local cells
     int count = 0;
-    bool flag_inBoxShear = false;
     real maxSqDist = 0.0;  // maximal square distance a particle moves
     real Lx = system.bc->getBoxL()[0];
     real Lz = system.bc->getBoxL()[2];
     real halfL = Lz / 2.0;
-    real cutoff = system.maxCutoff;
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
