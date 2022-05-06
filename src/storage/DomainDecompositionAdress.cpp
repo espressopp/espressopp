@@ -175,7 +175,7 @@ void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates)
     std::cout << "Nothing happened" << std::endl;
 }
 
-void DomainDecompositionAdress::cellAdjust()
+void DomainDecompositionAdress::cellAdjust(bool withShear = false)
 {
     // create an appropriate cell grid
     Real3D box_sizeL = getSystem()->bc->getBoxL();
