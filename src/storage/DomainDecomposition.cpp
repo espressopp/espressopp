@@ -191,7 +191,7 @@ void DomainDecomposition::scaleVolume(real s, bool particleCoordinates)
         }
         else
         {
-            cellAdjust();
+            cellAdjust(false);
         }
     }
     else
@@ -226,7 +226,7 @@ void DomainDecomposition::scaleVolume(Real3D s, bool particleCoordinates)
             err.setException(msg.str());
         }
         else
-            cellAdjust();
+            cellAdjust(false);
     }
     else
     {
@@ -244,7 +244,7 @@ Int3D DomainDecomposition::getInt3DNodeGrid()
     return Int3D(nodeGrid.getGridSize(0), nodeGrid.getGridSize(1), nodeGrid.getGridSize(2));
 }
 
-void DomainDecomposition::cellAdjust()
+void DomainDecomposition::cellAdjust(bool withShear = false)
 {
     // create an appropriate cell grid
     Real3D box_sizeL = getSystem()->bc->getBoxL();
@@ -255,9 +255,12 @@ void DomainDecomposition::cellAdjust()
     Int3D _nodeGrid(nodeGrid.getGridSize());
     // new cellGrid
 
+    real rc_skin = maxCutoffL + skinL;
     // skin_mod
-    real rc_skin =
-        (maxCutoffL * 2.0 > maxCutoffL + skinL ? (maxCutoffL * 2.0 + 0.01) : (maxCutoffL + skinL));
+    if (withShear || getSystem()->ifShear)
+        rc_skin = (maxCutoffL * 2.0 > maxCutoffL + skinL ? (maxCutoffL * 2.0 + 0.01)
+                                                         : (maxCutoffL + skinL));
+
     int ix = (int)(box_sizeL[0] / (rc_skin * _nodeGrid[0]));
     int iy = (int)(box_sizeL[1] / (rc_skin * _nodeGrid[1]));
     int iz = (int)(box_sizeL[2] / (rc_skin * _nodeGrid[2]));
@@ -702,9 +705,9 @@ void DomainDecomposition::decomposeRealParticles()
     real Lz = getSystem()->bc->getBoxL()[2];
     real Lx = getSystem()->bc->getBoxL()[0];
 
-    int node1, node2, ptmp1, ptmp2;
-    int allCellGrid = getInt3DNodeGrid()[0] * getInt3DCellGrid()[0];
-    real mid_1, mid_2;
+    int node1 = -1, node2 = -1, ptmp1, ptmp2;
+    // int allCellGrid = getInt3DNodeGrid()[0] * getInt3DCellGrid()[0];
+    real mid_1 = .0, mid_2 = .0;
 
     do
     {
@@ -1389,7 +1392,7 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst, bool realToGhost
                 // exchange size information, if necessary
 
                 // This is used for cell communication in parallel computing with LEBC
-                int allCellGrid = getInt3DNodeGrid()[0] * getInt3DCellGrid()[0];
+                // int allCellGrid = getInt3DNodeGrid()[0] * getInt3DCellGrid()[0];
                 if (offs > .0 && coord == 2 &&
                     (nodeGrid.getNodePosition(2) == 0 ||
                      nodeGrid.getNodePosition(2) == getInt3DNodeGrid()[2] - 1)
@@ -1400,7 +1403,7 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst, bool realToGhost
                     {
                         commCells_bkp[dir - 4].reals.reserve(commCells[dir].reals.size());
                         commCells_bkp[dir - 4].ghosts.reserve(commCells[dir].ghosts.size());
-                        for (int i = 0; i < commCells[dir].reals.size(); i++)
+                        for (int i = 0, end = commCells[dir].reals.size(); i < end; i++)
                         {
                             commCells_bkp[dir - 4].reals.push_back(commCells[dir].reals[i]);
                             commCells_bkp[dir - 4].ghosts.push_back(commCells[dir].ghosts[i]);
@@ -1413,7 +1416,7 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst, bool realToGhost
                     int new_dir = (nodeGrid.getNodePosition(2) > 0 ? -3 : -6) + dir;
                     int sz01 =
                         (getInt3DCellGrid()[1] + 2) * (getInt3DCellGrid()[0] + 1 - incell_shift);
-                    int sz02 = (getInt3DCellGrid()[1] + 2) * (incell_shift + 1);
+                    // int sz02 = (getInt3DCellGrid()[1] + 2) * (incell_shift + 1);
                     real Lx = getSystem()->bc->getBoxL()[0];
 
                     // define node1 & node2 for sendBuffer or recvBuffer
@@ -1913,13 +1916,17 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst, bool realToGhost
 void DomainDecomposition::registerPython()
 {
     using namespace espressopp::python;
+
+    void (DomainDecomposition::*pyCellAdjust)(bool withShear) = &DomainDecomposition::cellAdjust;
+
     class_<DomainDecomposition, bases<Storage>, boost::noncopyable>(
         "storage_DomainDecomposition",
         init<std::shared_ptr<System>, const Int3D&, const Int3D&, int>())
         .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)
         .def("getCellGrid", &DomainDecomposition::getInt3DCellGrid)
         .def("getNodeGrid", &DomainDecomposition::getInt3DNodeGrid)
-        .def("cellAdjust", &DomainDecomposition::cellAdjust);
+        // .def("cellAdjust", &DomainDecomposition::cellAdjust);
+        .def("cellAdjust", pyCellAdjust);
 }
 
 }  // namespace storage

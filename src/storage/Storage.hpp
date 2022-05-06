@@ -68,7 +68,7 @@ public:
     virtual void scaleVolume(Real3D s, bool pS) = 0;
 
     /** It should be used at the place where is the possibility of cell size<cutoff+skin*/
-    virtual void cellAdjust() = 0;
+    virtual void cellAdjust(bool withShear) = 0;
 
     /** It should return cell grid as an integer vector*/
     virtual Int3D getInt3DCellGrid() = 0;

@@ -91,7 +91,7 @@ void System::setSkin(real _skin)
         real cs = maxCutoff + skin;
         if (cs > std::min(std::min(cellGr[0], cellGr[1]), cellGr[2]))
         {
-            storage->cellAdjust();
+            storage->cellAdjust(false);
         }
     }
     // storage -> decompose();  // it's not nessesary because at the end of cellAdjust()

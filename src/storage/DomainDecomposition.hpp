@@ -62,7 +62,7 @@ public:
 
     // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
     // as a consequence of the system resizing
-    virtual void cellAdjust();
+    virtual void cellAdjust(bool withShear);
 
     virtual Cell* mapPositionToCell(const Real3D& pos);
     virtual Cell* mapPositionToCellClipped(const Real3D& pos);
