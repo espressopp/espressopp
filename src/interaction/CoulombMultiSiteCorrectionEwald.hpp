@@ -54,7 +54,7 @@ public:
     static void registerPython();
 
     // empty constructor
-    CoulombMultiSiteCorrectionEwald() : prefactor(0.0), alpha(0.0)
+    CoulombMultiSiteCorrectionEwald() : alpha(0.0), prefactor(0.0)
     {
         // setShift(0.0);
         autoShift = false;
@@ -64,7 +64,7 @@ public:
 
     // constructor
     CoulombMultiSiteCorrectionEwald(real _prefactor, real _alpha, real _cutoff)
-        : prefactor(_prefactor), alpha(_alpha)
+        : alpha(_alpha), prefactor(_prefactor)
     {
         autoShift = false;
         setCutoff(_cutoff);
