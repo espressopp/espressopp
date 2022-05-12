@@ -7,11 +7,10 @@ on:
 
 jobs:
   build:
-    continue-on-error: ${{ matrix.DISTRO == 'ubuntu_devel' }}
     strategy:
       matrix:
         BUILD_TYPE: [Release, Debug]
-        DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_devel', 'ubuntu_rolling', 'ubuntu_mpich']
+        DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_rolling', 'ubuntu_mpich']
         CMAKE_COMPILER: [
             '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
             '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
