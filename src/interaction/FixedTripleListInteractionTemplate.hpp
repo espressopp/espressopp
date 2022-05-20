@@ -170,6 +170,14 @@ inline void FixedTripleListInteractionTemplate<_AngularPotential>::addForces()
             p1.force() += force12;
             p2.force() -= force12 + force32;
             p3.force() += force32;
+            // Analysis to get stress tensors
+            if (getSystemRef().ifViscosity)
+            {
+                getSystemRef().dyadicP_xz += dist12[0] * force12[2];
+                getSystemRef().dyadicP_zx += dist12[2] * force12[0];
+                getSystemRef().dyadicP_xz += dist32[0] * force32[2];
+                getSystemRef().dyadicP_zx += dist32[2] * force32[0];
+            }
         }
     }
     else
