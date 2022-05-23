@@ -287,7 +287,7 @@ public:
         real rksq, rkx2, rky2, rkz2;
         real rLx2 = 1. / (Lx * Lx);
         real rLy2 = 1. / (Ly * Ly);
-        real rLz2 = 1. / (Lz * Lz);
+        // real rLz2 = 1. / (Lz * Lz);
         // clear all vectors
         kvector.clear();
 
