@@ -64,6 +64,18 @@ VelocityVerletLE::VelocityVerletLE(shared_ptr<System> system, real _shearRate)
     resortFlag = true;
     maxDist = 0.0;
     nResorts = 0;
+    if (shearRate != .0)
+    {
+        System& system = getSystemRef();
+        system.shearRate = shearRate;
+        system.ifShear = true;
+    }
+    else
+    {
+        throw std::runtime_error(
+            "VelocityVerletLE error: LE integrator is called \
+		but the shear rate is set to zero \n");
+    }
 }
 
 VelocityVerletLE::~VelocityVerletLE() { LOG4ESPP_INFO(theLogger, "free VelocityVerletLE"); }
@@ -83,17 +95,6 @@ void VelocityVerletLE::run(int nsteps)
     real Lz = system.bc->getBoxL()[2];
     int ngrid =
         storage.getInt3DCellGrid()[0] * system.NGridSize[0];  // storage.getInt3DNodeGrid()[2];
-    if (shearRate != .0)
-    {
-        system.shearRate = shearRate;
-        system.ifShear = true;
-    }
-    else
-    {
-        throw std::runtime_error(
-            "VelocityVerletLE error: LE integrator is called \
-		but the shear rate is set to zero \n");
-    }
 
     // signal
     runInit();
