@@ -89,7 +89,7 @@ private:
     real cottheta =
         .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
     bool shear_flag = false;
-    int k_mode = -1; // "1": proceed preset_lite() every MD step; "2": collect all kvector's
+    int k_mode = -1;  // "1": proceed preset_lite() every MD step; "2": collect all kvector's
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -279,7 +279,7 @@ public:
 
         // precalculate factors
         real invAlpha2 = 1.0 / (alpha * alpha);
-        real B = M_PI2 * invAlpha2;         // PI^2 / alpha^2
+        real B = M_PI2 * invAlpha2;  // PI^2 / alpha^2
         real V = M_2PI * Lx * Ly * Lz;
 
         /* calculate the k-vector array */
@@ -324,7 +324,7 @@ public:
             min_ky = -kmax;
         }
     }
-    
+
     // here we get the current particle number on the current node
     // and set the auxiliary arrays eikx, eiky, eikz
     void getParticleNumber()
@@ -379,7 +379,7 @@ public:
             // initialize k_mode for the first sheared step
             if (k_mode < 0)
             {
-                k_mode = 1; // preset_lite() every step
+                k_mode = 1;  // preset_lite() every step
                 // k_mode = 2; // read kvectors if recorded
             }
             shear_flag = system->ifShear;
