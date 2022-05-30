@@ -74,9 +74,6 @@ void VelocityVerlet::run(int nsteps)
     // signal
     runInit();
 
-    // cancel the shear flag if turned on
-    system.ifShear = false;
-
     // Before start make sure that particles are on the right processor
     if (resortFlag)
     {
