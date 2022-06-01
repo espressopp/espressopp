@@ -150,7 +150,7 @@ void Configurations::gather()
                     system.bc->foldPosition(pos, img);
                 else
                     system.bc->unfoldPosition(pos, img);
-			}
+            }
             coordinates[i] = pos;
         }
         if (gatherVel) velocities[i] = cit->velocity();
