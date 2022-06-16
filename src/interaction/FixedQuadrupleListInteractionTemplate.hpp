@@ -173,17 +173,20 @@ inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::addForces
             potential->computeColVarWeights(dist21, dist32, dist43, bc);
             potential->_computeForce(force1, force2, force3, force4, dist21, dist32, dist43);
             p1.force() += force1;
-            p2.force() += force2;  // p2.force() -= force2;
-            p3.force() += force3;
+            p2.force() += force2;  // f2=-f1+f_jk, f_jk=f1+f2
+            p3.force() += force3;  // f3=-f4-f_jk, f_jk=-(f3+f4)
             p4.force() += force4;
-            // // Analysis to get stress tensors
-            // if (getSystemRef().ifViscosity)
-            // {
-            //     getSystemRef().dyadicP_xz += dist12[0] * force12[2];
-            //     getSystemRef().dyadicP_zx += dist12[2] * force12[0];
-            //     getSystemRef().dyadicP_xz += dist32[0] * force32[2];
-            //     getSystemRef().dyadicP_zx += dist32[2] * force32[0];
-            // }
+            // Analysis to get stress tensors
+            // f21=-f1, f32=-f_jk=f3+f4, f43=f4
+            if (getSystemRef().ifViscosity)
+            {
+                getSystemRef().dyadicP_xz -= dist21[0] * force1[2];
+                getSystemRef().dyadicP_zx -= dist21[2] * force1[0];
+                getSystemRef().dyadicP_xz += dist32[0] * (force3[2] + force4[2]);
+                getSystemRef().dyadicP_zx += dist32[2] * (force3[0] + force4[0]);
+                getSystemRef().dyadicP_xz += dist43[0] * force4[2];
+                getSystemRef().dyadicP_zx += dist43[2] * force4[0];
+            }
         }
     }
     else
