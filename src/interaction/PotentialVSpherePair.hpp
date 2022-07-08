@@ -287,7 +287,7 @@ inline python::list PotentialVSpherePairTemplate<Derived>::computeForce(const Pa
                                                                         const Particle& p2) const
 {
     Real3D fr;
-    real fsi, fsj;
+    real fsi = 0, fsj = 0;
     python::list pl;
     bool ret;
     ret = _computeForce(fr, fsi, fsj, p1, p2);
@@ -308,7 +308,7 @@ inline python::list PotentialVSpherePairTemplate<Derived>::computeForce(const Re
                                                                         const real& sigmaj) const
 {
     Real3D fr;
-    real fsi, fsj;
+    real fsi = 0, fsj = 0;
     python::list pl;
     bool ret;
     ret = _computeForce(fr, fsi, fsj, dist, sigmai, sigmaj);
