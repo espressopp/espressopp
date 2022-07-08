@@ -212,12 +212,10 @@ void PIAdressIntegrator::initializeSetup()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-
             Real3D cmp(0.0, 0.0, 0.0);
             Real3D cmv(0.0, 0.0, 0.0);
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 cmp += at.position();
@@ -320,10 +318,8 @@ void PIAdressIntegrator::integrateV1(int t, bool doubletime)
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 if ((at.pib() != 1) && (speedup == true) && (vp.lambda() < 0.000000001))
@@ -365,17 +361,14 @@ void PIAdressIntegrator::integrateV2()
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-
             if (constkinmass == false)
             {  // kinetic mass also changes - hence, second decomposition level required
 
                 // First half_dt4 loop without centroid mode
                 if ((speedup == false) || (vp.lambda() > 0.000000001))
                 {  // do not propagate the higher modes in the CL region when using speedup
-                    for (std::vector<Particle *>::iterator it2 = atList.begin();
-                         it2 != atList.end(); ++it2)
+                    for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                         it2 != it3->second.end(); ++it2)
                     {
                         Particle &at = **it2;
                         if (at.pib() == 1)
@@ -396,8 +389,8 @@ void PIAdressIntegrator::integrateV2()
                 }
 
                 // half_dt2, only centroid mode
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if (at.pib() == 1)
@@ -408,8 +401,8 @@ void PIAdressIntegrator::integrateV2()
                         {
                             // Get the inner factor
                             real xi = 0.0;
-                            for (std::vector<Particle *>::iterator it5 = atList.begin();
-                                 it5 != atList.end(); ++it5)
+                            for (std::vector<Particle *>::iterator it5 = it3->second.begin();
+                                 it5 != it3->second.end(); ++it5)
                             {
                                 Particle &at2 = **it5;
                                 if (at2.pib() != 1)
@@ -504,8 +497,8 @@ void PIAdressIntegrator::integrateV2()
                 if ((speedup == false) || (vp.lambda() > 0.000000001))
                 {  // do not propagate the higher modes in the CL region when using speedup
 
-                    for (std::vector<Particle *>::iterator it2 = atList.begin();
-                         it2 != atList.end(); ++it2)
+                    for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                         it2 != it3->second.end(); ++it2)
                     {
                         Particle &at = **it2;
 
@@ -528,8 +521,8 @@ void PIAdressIntegrator::integrateV2()
             }
             else
             {  // constant kinetic mass - hence, no second decomposition level required
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if ((at.pib() != 1) && (speedup == true) && (vp.lambda() < 0.000000001))
@@ -574,12 +567,9 @@ void PIAdressIntegrator::integrateModePos()
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList;
-                atList = it3->second;
-
                 // First half_dt4 loop with only centroid mode
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if (at.pib() == 1)
@@ -640,14 +630,14 @@ void PIAdressIntegrator::integrateModePos()
 
                 // half_dt2 loop without centroid mode
                 real half_dt = 0.5 * ntrotter * dt / (CMDparameter * vp.varmass());
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if ((at.pib() == 1) ||
                         ((speedup == true) && (vp.lambda() < 0.000000001) && (at.pib() != 1)))
                     {  // do not propagate the higher modes in the CL region when using speedup,
-                       // also exclude centroid
+                        // also exclude centroid
                         continue;
                     }
                     else
@@ -664,8 +654,8 @@ void PIAdressIntegrator::integrateModePos()
                 }
 
                 // Second half_dt4 loop with only centroid mode
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
 
@@ -741,11 +731,8 @@ void PIAdressIntegrator::integrateModePos()
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList;
-                atList = it3->second;
-
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
 
@@ -854,10 +841,8 @@ void PIAdressIntegrator::OUintegrate()
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 if (at.pib() == 1)
@@ -964,18 +949,17 @@ void PIAdressIntegrator::transPos1()
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it2->second;
             Real3D oldpos = vp.position();
 
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                 it3 != it2->second.end(); ++it3)
             {
                 Particle &at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.position() = zero;
 
-                for (std::vector<Particle *>::iterator it5 = atList.begin(); it5 != atList.end();
-                     ++it5)
+                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                     it5 != it2->second.end(); ++it5)
                 {
                     Particle &at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
@@ -1027,17 +1011,15 @@ void PIAdressIntegrator::transPos2()
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it2->second;
-
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                 it3 != it2->second.end(); ++it3)
             {
                 Particle &at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.modepos() = zero;
 
-                for (std::vector<Particle *>::iterator it5 = atList.begin(); it5 != atList.end();
-                     ++it5)
+                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                     it5 != it2->second.end(); ++it5)
                 {
                     Particle &at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
@@ -1079,16 +1061,15 @@ void PIAdressIntegrator::transMom1()
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it2->second;
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                 it3 != it2->second.end(); ++it3)
             {
                 Particle &at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.velocity() = zero;
 
-                for (std::vector<Particle *>::iterator it5 = atList.begin(); it5 != atList.end();
-                     ++it5)
+                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                     it5 != it2->second.end(); ++it5)
                 {
                     Particle &at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
@@ -1182,16 +1163,15 @@ void PIAdressIntegrator::transMom2()
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it2->second;
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                 it3 != it2->second.end(); ++it3)
             {
                 Particle &at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.modemom() = zero;
 
-                for (std::vector<Particle *>::iterator it5 = atList.begin(); it5 != atList.end();
-                     ++it5)
+                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                     it5 != it2->second.end(); ++it5)
                 {
                     Particle &at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
@@ -1269,14 +1249,13 @@ void PIAdressIntegrator::transForces()
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it2->second;
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                 it3 != it2->second.end(); ++it3)
             {
                 Particle &at = **it3;
 
-                for (std::vector<Particle *>::iterator it5 = atList.begin(); it5 != atList.end();
-                     ++it5)
+                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                     it5 != it2->second.end(); ++it5)
                 {
                     Particle &at2 = **it5;
                     if (at.pib() == 1)
@@ -1337,7 +1316,7 @@ void PIAdressIntegrator::calcForcesM()
 
 void PIAdressIntegrator::calcForcesF()
 {  // Calculate fast forces, this is, the intra-ring forces between the path integral beads (purely
-   // in mode space)
+    // in mode space)
     System &system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
@@ -1358,10 +1337,8 @@ void PIAdressIntegrator::calcForcesF()
             {
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList;
-                    atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                         it3 != it2->second.end(); ++it3)
                     {
                         Particle &at = **it3;
                         if (at.pib() > 1 && int_c(at.pib()) <= ntrotter)
@@ -1375,8 +1352,8 @@ void PIAdressIntegrator::calcForcesF()
                             if (vp.lambda() < 1.0 && vp.lambda() > 0.0)
                             {
                                 real xi = 0.0;
-                                for (std::vector<Particle *>::iterator it5 = atList.begin();
-                                     it5 != atList.end(); ++it5)
+                                for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                                     it5 != it2->second.end(); ++it5)
                                 {
                                     Particle &at2 = **it5;
                                     if (at2.pib() != 1)
@@ -1462,10 +1439,8 @@ void PIAdressIntegrator::calcForcesF()
         {
             if (it2 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList;
-                atList = it2->second;
-                for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end();
-                     ++it3)
+                for (std::vector<Particle *>::iterator it3 = it2->second.begin();
+                     it3 != it2->second.end(); ++it3)
                 {
                     Particle &at = **it3;
                     if (at.pib() > 1 && int_c(at.pib()) <= ntrotter)
@@ -1479,8 +1454,8 @@ void PIAdressIntegrator::calcForcesF()
                         if (vp.lambda() < 1.0 && vp.lambda() > 0.0)
                         {
                             real xi = 0.0;
-                            for (std::vector<Particle *>::iterator it5 = atList.begin();
-                                 it5 != atList.end(); ++it5)
+                            for (std::vector<Particle *>::iterator it5 = it2->second.begin();
+                                 it5 != it2->second.end(); ++it5)
                             {
                                 Particle &at2 = **it5;
                                 if (at2.pib() != 1)
@@ -1606,7 +1581,7 @@ void PIAdressIntegrator::updateForces(int f)
 
 void PIAdressIntegrator::distributeForces()
 {  // distribute forces from atomistic particles (path integral beads) to CG particles (physical
-   // atoms)
+    // atoms)
     System &system = getSystemRef();
     CellList localCells = system.storage->getLocalCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
@@ -1618,10 +1593,9 @@ void PIAdressIntegrator::distributeForces()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
             Real3D vpfm = vp.force();
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 at.force() += (1.0 / ntrotter) * vpfm;
@@ -1704,9 +1678,8 @@ real PIAdressIntegrator::computeKineticEnergy()
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 if (at.pib() == 1)
@@ -1783,9 +1756,8 @@ real PIAdressIntegrator::computeRingEnergy()
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 if (at.pib() == 1)
@@ -1832,11 +1804,10 @@ real PIAdressIntegrator::computeRingEnergyRaw()
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it3->second;
             Real3D pos1(0.0, 0.0, 0.0);
             Real3D posN(0.0, 0.0, 0.0);
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                 it2 != it3->second.end(); ++it2)
             {
                 Particle &at = **it2;
                 if (at.pib() == 1)
@@ -1891,10 +1862,8 @@ real PIAdressIntegrator::computeMomentumDrift(int parttype)
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList;
-                atList = it3->second;
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if (at.pib() == 1)
@@ -1954,10 +1923,8 @@ real PIAdressIntegrator::computePositionDrift(int parttype)
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList;
-                atList = it3->second;
-                for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end();
-                     ++it2)
+                for (std::vector<Particle *>::iterator it2 = it3->second.begin();
+                     it2 != it3->second.end(); ++it2)
                 {
                     Particle &at = **it2;
                     if (at.pib() == 1)

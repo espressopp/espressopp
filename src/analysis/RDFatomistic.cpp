@@ -77,11 +77,8 @@ python::list RDFatomistic::computeArray(int rdfN) const
 
                 if (it2 != fixedtupleList->end())
                 {  // Are there atomistic particles for given CG particle? If yes, use those for
-                   // calculation.
-                    std::vector<Particle *> atList;
-                    atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    // calculation.
+                    for (auto it3 = it2->second.begin(); it3 != it2->second.end(); ++it3)
                     {
                         Particle &at = **it3;
                         int id = at.id();
@@ -251,10 +248,7 @@ python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
 
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList;
-                    atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    for (auto it3 = it2->second.begin(); it3 != it2->second.end(); ++it3)
                     {
                         Particle &at = **it3;
 

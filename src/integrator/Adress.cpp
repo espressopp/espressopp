@@ -149,13 +149,10 @@ void Adress::SetPosVel()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
-
             // Compute center of mass
             Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (auto it2 = it3->second.begin(); it2 != it3->second.end(); ++it2)
             {
                 Particle& at = **it2;
                 cmp += at.mass() * at.position();
@@ -277,13 +274,10 @@ void Adress::integrate1(real& maxSqDist)
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
-
             // Compute center of mass
             Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (auto it2 = it3->second.begin(); it2 != it3->second.end(); ++it2)
             {
                 Particle& at = **it2;
                 cmp += at.mass() * at.position();
@@ -405,11 +399,8 @@ void Adress::integrate2()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
-
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (auto it2 = it3->second.begin(); it2 != it3->second.end(); ++it2)
             {
                 Particle& at = **it2;
                 cmv += at.mass() * at.velocity();
@@ -454,11 +445,8 @@ void Adress::integrateSlow()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
-
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle*>::iterator it2 = it3->second.begin(); it2 != it3->second.end(); ++it2)
             {
                 Particle& at = **it2;
                 cmv += at.mass() * at.velocity();
@@ -628,12 +616,9 @@ void Adress::aftCalcF()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
-
             // update force of AT particles belonging to a VP
             Real3D vpfm = vp.force() / vp.getMass();
-            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (auto it2 = it3->second.begin(); it2 != it3->second.end(); ++it2)
             {
                 Particle& at = **it2;
 
