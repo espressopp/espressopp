@@ -1630,7 +1630,8 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst, bool realToGhost
                         }
 
                         // prepare send and receive buffers
-                        longint receiver, sender;
+                        longint receiver = -1;
+                        longint sender = -1;
                         outBuffer.reset();
                         // inBuffer.reset();
 
