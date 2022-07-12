@@ -46,8 +46,7 @@ def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomt
             if types[pid]==k:
                 list_t.append(pid+1)
         type_end.append(len(list_t))
-    #print(list_t)
-    #print(type_end)
+    
     rdf_maxr = min(Lx,Ly,Lz)
     rdf_bin = int(0.5*rdf_maxr/rdf_dr)
     
@@ -58,7 +57,7 @@ def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomt
         del arr_tmp
 
     pos = espressopp.analysis.Configurations(system)
-    # pos.capacity=1
+    pos.capacity=1
     pos.gather()
     
     for p in range(len(rdf_pair)):
@@ -94,7 +93,6 @@ def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomt
         jdx=rdf_pair[p][1]
         itot_f=float(type_end[idx+1]-type_end[idx])
         jtot_f=float(type_end[jdx+1]-type_end[jdx])
-        # rho_i=itot_f/Lx/Ly/Lz
         rho_j=jtot_f/Lx/Ly/Lz
         
         if jdx==idx:
@@ -110,7 +108,6 @@ def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomt
             rdf_rad=(i+0.5)*rdf_dr
             rdf_fac=4.0*M_PI*rdf_rad*rdf_rad*rdf_dr*itot_f*rho_j
             out_stream.write("%.4f\t%.6f\n" %(rdf_rad, rdf_array[p][i]/rdf_fac))
-        # out_stream.write("\n")
         out_stream.close()
         print("The calculation to g(r) for %s-%s pairs is finished. See in %s" % (typeI,typeJ,filename))
     
@@ -128,8 +125,8 @@ epsilon = 1.0
 c6 = 1.0
 c12 = 1.0
 # parameters to calculate partial radial distribution functions
-rdf_pair = [[0,0],[1,0],[1,1]] # type-type [(H,H),(O,H),(O,O)]
-rdf_dr = 0.002 # width for each ridial shell
+rdf_pair = [[0,0],[1,0],[1,1]]  # type-type [(H,H),(O,H),(O,O)]
+rdf_dr = 0.002                  # width for each ridial shell
 
 # GROMACS setup files
 grofile = "conf.gro"

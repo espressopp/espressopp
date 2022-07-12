@@ -37,10 +37,9 @@ from espressopp.tools import decomp, timers, replicate
 import os
 
 # simulation parameters (nvt = False is nve)
-rc = 1.12 ##pow(2.0, 1.0/6.0)
+rc = 1.12      #pow(2.0, 1.0/6.0)
 skin = 0.3
 nvt = True
-ifbond = True  # Switch on if bonded interactions are included
 skipEqui=False # Switch on if no equilibration before a shear starts
 shear_rate = 0.1
 timestep = 0.002
@@ -49,7 +48,7 @@ Temp=1.0       # Temperature
 equi_nloops = 200
 equi_isteps = 50
 # number of prod loops
-prod_nloops       = 50 #200
+prod_nloops       = 200
 # number of integration steps performed in each production loop
 prod_isteps       = 10
 
@@ -103,30 +102,24 @@ interLJ = espressopp.interaction.VerletListLennardJones(vl)
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 system.addInteraction(interLJ)
 
-if (ifbond):
-   # FENE bonds
-   fpl = espressopp.FixedPairList(system.storage)
-   fpl.addBonds(bonds)
-   #potFENE = espressopp.interaction.Harmonic(K=30.0, r0=0.0)
-   #interFENE = espressopp.interaction.FixedPairListHarmonic(system, fpl, potFENE)
-   #system.addInteraction(interFENE)
-   potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, r_cap=1.49)
-   interFENE = espressopp.interaction.FixedPairListFENECapped(system, fpl, potFENE)
-   #potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-   #interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
-   system.addInteraction(interFENE)
+# FENE bonds
+fpl = espressopp.FixedPairList(system.storage)
+fpl.addBonds(bonds)
+## Capped FENE potential (optional)
+#potFENE = espressopp.interaction.FENECapped(K=30.0, r0=0.0, rMax=1.5, r_cap=1.49)
+#interFENE = espressopp.interaction.FixedPairListFENECapped(system, fpl, potFENE)
+potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
+system.addInteraction(interFENE)
 # Cosine with FixedTriple list
-   ftl = espressopp.FixedTripleList(system.storage)
-   ftl.addTriples(angles)
-   potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
-   interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
-   #interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
-   system.addInteraction(interCosine)
-
+ftl = espressopp.FixedTripleList(system.storage)
+ftl.addTriples(angles)
+potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
+interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
+system.addInteraction(interCosine)
 
 # integrator
 integrator = espressopp.integrator.VelocityVerlet(system)
-  
 integrator.dt = timestep
 
 if(nvt):
@@ -151,14 +144,11 @@ print('CellGrid = %s' % (cellGrid))
 print('')
 
 # analysis
-# configurations = espressopp.analysis.Configurations(system)
-# configurations.gather()
 temperature = espressopp.analysis.Temperature(system)
 pressure = espressopp.analysis.Pressure(system)
 pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
-
 
 #Equilibration
 if not skipEqui:
@@ -169,26 +159,13 @@ if not skipEqui:
      espressopp.tools.analyse.info(system, integrator)
    print("equilibration finished")
 
-
-#T = temperature.compute()
-#P = pressure.compute()
-#Pij = pressureTensor.compute()
-#Ek = 0.5 * T * (3 * num_particles)
-#Ep = interLJ.computeEnergy()
-#Eb = interFENE.computeEnergy()
-#Ea = interCosine.computeEnergy()
-#Etotal = Ek + Ep + Eb + Ea
-#sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
-#sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-
 ########################################################################
 # MD with shear flow                                                   #
 ########################################################################
 
-
 # cancelling thermostat
-#langevin.disconnect()
-# set all integrator timers to zero again (they were increased during warmup)
+langevin.disconnect()
+# set all integrator timers to zero again
 integrator.resetTimers()
 # set integrator time step to zero again
 integrator.step = 0
@@ -197,16 +174,11 @@ if (shear_rate>0.0):
   integrator2     = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate)
 else:
   integrator2     = espressopp.integrator.VelocityVerlet(system)
-# set the integration step  
+# set the integration step for integrator2
 integrator2.dt  = timestep
 integrator2.step = 0
 
 integrator2.addExtension(langevin)
-#fixpositions = espressopp.integrator.FixPositions(system, fixedWall, fixMask)
-#integrator2.addExtension(fixpositions)
-# Define a Lees-Edwards BC instead of std orthorhombic
-
-#system.bc=espressopp.bc.LeesEdwardsBC(system.rng, integrator2, size, shear=shear_rate)
 
 # since the interaction cut-off changed the size of the cells that are used
 # to speed up verlet list builds should be adjusted accordingly 
@@ -220,22 +192,22 @@ start_time = time.process_time()
 for step in range(prod_nloops):
   integrator2.run(prod_isteps)
   espressopp.tools.analyse.info(system, integrator2)
-#  espressopp.tools.xyzfilewrite(filename, system, velocities = False, charge = False, append=True, atomtypes={0:'X'})
-#  espressopp.tools.pdbwrite("prod.pdb", system, molsize=Npart,append=True)
+  #espressopp.tools.xyzfilewrite(filename, system, velocities = False, charge = False, append=True, atomtypes={0:'X'})
+  #espressopp.tools.pdbwrite("prod.pdb", system, molsize=Npart,append=True)
 end_time = time.process_time()
 print("production finished")
 
-if (ifbond):
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interLJ.computeEnergy()
-  Eb = interFENE.computeEnergy()
-  Ea = interCosine.computeEnergy()
-  Etotal = Ek + Ep + Eb + Ea
-  sys.stdout.write(fmt % (prod_nloops*prod_isteps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-  sys.stdout.write('\n')
+T = temperature.compute()
+P = pressure.compute()
+Pij = pressureTensor.compute()
+Ek = 0.5 * T * (3 * num_particles)
+Ep = interLJ.computeEnergy()
+Eb = interFENE.computeEnergy()
+Ea = interCosine.computeEnergy()
+Etotal = Ek + Ep + Eb + Ea
+sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
+sys.stdout.write(fmt % (prod_nloops*prod_isteps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+sys.stdout.write('\n')
 
 # print timings and neighbor list information
 timers.show(integrator2.getTimers(), precision=3)
