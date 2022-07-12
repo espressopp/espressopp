@@ -80,7 +80,7 @@ You can also include ScaFaCoS Library (pre-installation required, see in http://
 
 ```sh
 $ cmake . -DCMAKE_PREFIX_PATH=[installation directory]
-$ make
+$ cmake --build .
 ```
 
 ## How to install E++ in some Linux distributions
