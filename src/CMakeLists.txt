@@ -70,7 +70,7 @@ target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
 if (SCAFACOS_FOUND)
-    target_compile_definitions(_espressopp PRIVATE -DFCS_EXIST)
+    target_compile_definitions(_espressopp PRIVATE -DFCS_EXIST -DHAVE_CONFIG_H)
     target_link_libraries(_espressopp PRIVATE PkgConfig::SCAFACOS)
     target_sources(_espressopp PRIVATE ${FCS_SOURCE})
 endif()
