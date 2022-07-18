@@ -198,7 +198,7 @@ public:
         // MPI_Comm communicator = MPI_COMM_WORLD;
         // cout<<"SCATEST: 01 "<<num_glob<<"\n";
         sfcs_prefac = prefactor;  // 332.07;
-        fcs_int sfcs_pdc[3];
+        // fcs_int sfcs_pdc[3];
 #if FCS_ENABLE_DIRECT
         strcpy(DIRECT_parameters, "direct_cutoff,0.0,direct_periodic_images,1,1,1");
 #endif
@@ -458,10 +458,10 @@ public:
     {
         mpi::communicator communic = *system->comm;
 
-        int n_nodes = communic.size();
-        int this_node = communic.rank();
+        // int n_nodes = communic.size();
+        // int this_node = communic.rank();
 
-        real fact;
+        // real fact;
         real energy = 0;
 
         mpi::all_reduce(communic, en_local, energy, plus<real>());
@@ -474,7 +474,8 @@ public:
     {
         mpi::communicator communic = *system->comm;
 
-        fcs_int i, j, k, k3, idx, nlocal_map;
+        // fcs_int i, j;
+        fcs_int k, k3, idx, nlocal_map;
 
         getParticleNumber();
         num_local = nParticles;
@@ -639,8 +640,8 @@ public:
     {
         mpi::communicator communic = *system->comm;
 
-        int n_nodes = communic.size();
-        int this_node = communic.rank();
+        // int n_nodes = communic.size();
+        // int this_node = communic.rank();
 
         // cout<<"SCATEST: CompuViri - "<<communic.rank()<<"\n";
         real node_virial = 0;
@@ -656,8 +657,8 @@ public:
     {
         mpi::communicator communic = *system->comm;
 
-        int n_nodes = communic.size();
-        int this_node = communic.rank();
+        // int n_nodes = communic.size();
+        // int this_node = communic.rank();
 
         // cout<<"SCATEST: CompuViriTensor - "<<communic.rank()<<"\n";
         Tensor node_virialTensor = 0;
