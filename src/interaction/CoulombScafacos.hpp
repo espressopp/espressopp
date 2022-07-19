@@ -176,7 +176,6 @@ public:
     {
         // TODO it could be parallelized too
         mpi::communicator communic = *system->comm;
-        // cout<<"SCATEST: PRESET\n";
 
         Real3D Li = system->bc->getBoxL();  // getting the system size
         Lx = Li[0];
@@ -262,9 +261,6 @@ public:
                "vmg_cycle_type,2,vmg_max_iterations,20,vmg_max_level,6,vmg_near_field_cells,6,vmg_"
                "precision,1e-6,vmg_smoothing_steps,3");
 #endif
-
-        // cout<<"SCATEST: 02\n";
-
         // if (handle == NULL)
         //  ;
         // else{
@@ -293,22 +289,20 @@ public:
         strcat(common_parameters, ",tolerance_field,");
         strcat(common_parameters, ffcs_tol_field);
 
-        // cout<<"SCATEST: COMMON-PRM - "<<common_parameters<<"\n";
-        //        getParticleNumber();
-        //        num_local=nParticles;
-        ////cout<<"SCAFTEST: NUMLC = "<<num_local<<endl;
-        //        //MPI_Comm_size (communicator, &comm_size);
-        //        //fprintf (stderr, "comm_size: %d \n", comm_size);
-        //        //MPI_Dims_create (comm_size, 3, dims);
-        //        //fprintf (stderr, "dims: %d %d %d\n", dims[0], dims[1], dims[2]);
-        //        //MPI_Cart_create (communicator, 3, dims, pers, 0, &cart_comm);
-        //        //communicator = cart_comm;
-        //        sfcs_coor = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
-        //        sfcs_cg = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
-        //        sfcs_field = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
-        //        sfcs_pot = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
-        //        //velocities = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
-        //        //masses = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
+        // getParticleNumber();
+        // num_local=nParticles;
+        // //MPI_Comm_size (communicator, &comm_size);
+        // //fprintf (stderr, "comm_size: %d \n", comm_size);
+        // //MPI_Dims_create (comm_size, 3, dims);
+        // //fprintf (stderr, "dims: %d %d %d\n", dims[0], dims[1], dims[2]);
+        // //MPI_Cart_create (communicator, 3, dims, pers, 0, &cart_comm);
+        // //communicator = cart_comm;
+        // sfcs_coor = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
+        // sfcs_cg = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
+        // sfcs_field = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
+        // sfcs_pot = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
+        // //velocities = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
+        // //masses = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
 
         result = fcs_init(&handle, method.c_str(), communic);
         // fcs_result_print_result (result);
@@ -316,17 +310,13 @@ public:
         communic.barrier();
 
         result = fcs_set_parameters(handle, common_parameters, FCS_FALSE);
-        // cout<<"SCAFTEST: SETPRM\n";
         // fcs_result_print_result (result);
         fcs_result_destroy(result);
 
         result = fcs_set_total_particles(handle, num_glob);  // NOT LOCAL
-        // cout<<"SCAFTEST: SETTOT\n";
         // fcs_result_print_result (result);
         fcs_result_destroy(result);
         communic.barrier();
-
-        // cout<<"SCATEST: 03\n";
 
         switch (fcs_get_method(handle))
         {
@@ -398,7 +388,6 @@ public:
                 break;
         }
         communic.barrier();
-        // cout<<"SCATEST: 04\n";
 
         if (sum != NULL)
         {
@@ -559,7 +548,6 @@ public:
 
             nlocal_map = k;
         }
-        // cout<<"SCATEST: NLOC_MAP "<<nlocal_map<<endl;
         if (ifTuned)
         {
             fcs_p3m_get_alpha(handle, &p3m_alpha);
@@ -617,14 +605,12 @@ public:
             }
 
             idx++;
-            // cout<<"SCAFTEST: k,idx = "<<k<<"  "<<idx<<endl;
         }
 
         for (k = 0, en_local = .0; k < nlocal_map; k++)
         {
             en_local += sfcs_prefac * sfcs_pot[k] * sfcs_cg[k] / 2.0;
         }
-        // cout<<"SCAFTEST: CompuFc-En= "<<en_local<<" "<<communic.rank()<<"\n";
 
         free(sfcs_coor);
         free(sfcs_cg);
@@ -644,7 +630,6 @@ public:
         // int n_nodes = communic.size();
         // int this_node = communic.rank();
 
-        // cout<<"SCATEST: CompuViri - "<<communic.rank()<<"\n";
         real node_virial = 0;
         real virial = 0;
         mpi::all_reduce(communic, node_virial, virial, plus<real>());
@@ -661,7 +646,6 @@ public:
         // int n_nodes = communic.size();
         // int this_node = communic.rank();
 
-        // cout<<"SCATEST: CompuViriTensor - "<<communic.rank()<<"\n";
         Tensor node_virialTensor = 0;
 
         Tensor virialTensor(0.0);
