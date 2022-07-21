@@ -163,6 +163,13 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
             Real3D f = (noise - friction) * r;
             p1.force() += f;
             p2.force() -= f;
+            
+            // Analysis to get stress tensors
+            if (system.ifViscosity)
+            {
+                system.dyadicP_xz += r[0] * f[2];
+                system.dyadicP_zx += r[2] * f[0];
+            }
         }
     }
 }
@@ -259,8 +266,15 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
             f_damp *= pref3 * omega2;
             f_rand *= pref4 * omega;
 
-            p1.force() += f_rand - f_damp;
-            p2.force() -= f_rand - f_damp;
+            Real3D f_tmp = f_rand - f_damp;
+            p1.force() += f_tmp;
+            p2.force() -= f_tmp;
+            // Analysis to get stress tensors
+            if (system.ifViscosity)
+            {
+                system.dyadicP_xz += r[0] * f_tmp[2];
+                system.dyadicP_zx += r[2] * f_tmp[0];
+            }
         }
     }
 }
