@@ -197,8 +197,7 @@ public:
         // MPI_Comm communicator = MPI_COMM_WORLD;
         // cout<<"SCATEST: 01 "<<num_glob<<"\n";
         sfcs_prefac = prefactor;  // 332.07;
-
-        // fcs_int sfcs_pdc[3];
+                                  // fcs_int sfcs_pdc[3];
 #if FCS_ENABLE_DIRECT
         strcpy(DIRECT_parameters, "direct_cutoff,0.0,direct_periodic_images,1,1,1");
 #endif
