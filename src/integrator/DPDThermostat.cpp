@@ -163,7 +163,7 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
             Real3D f = (noise - friction) * r;
             p1.force() += f;
             p2.force() -= f;
-            
+
             // Analysis to get stress tensors
             if (system.ifViscosity)
             {
