@@ -180,7 +180,7 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         real dist = sqrt(dist2);
         real omega = 1 - dist / current_cutoff;
         real omega2 = omega * omega;
-        real veldiff = .0;
+        Real3D veldiff = .0;
 
         r /= dist;
 
