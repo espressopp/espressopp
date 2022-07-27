@@ -122,54 +122,43 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
     real dist2 = r.sqr();
     System& system = getSystemRef();
 
-    bool shear_flag = system.ifShear;
-    if (!shear_flag)
+    // Test code to switch DPD modes in shear simulation
+    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
+    // If in use, UNCOMMENT all "/* .. */"
+    /*int mode = system.lebcMode;*/
+
+    if (dist2 < current_cutoff_sqr)
     {
-        if (dist2 < current_cutoff_sqr)
+        real dist = sqrt(dist2);
+        real omega = 1 - dist / current_cutoff;
+        real omega2 = omega * omega;
+        real veldiff = .0;
+
+        r /= dist;
+        
+        /*if (system.ifShear && mode == 1)
         {
-            real dist = sqrt(dist2);
-            real omega = 1 - dist / current_cutoff;
-            real omega2 = omega * omega;
-
-            r /= dist;
-
-            real veldiff = (p1.velocity() - p2.velocity()) * r;
-            real friction = pref1 * omega2 * veldiff;
-            real r0 = ((*rng)() - 0.5);
-            real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
-
-            Real3D f = (noise - friction) * r;
-            p1.force() += f;
-            p2.force() -= f;
-        }
-    }
-    else
-    {
-        if (dist2 < current_cutoff_sqr)
-        {
-            real dist = sqrt(dist2);
-            real omega = 1 - dist / current_cutoff;
-            real omega2 = omega * omega;
-
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+            veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
+        }
+        else
+        {*/
+        veldiff = (p1.velocity() - p2.velocity()) * r;
+        /*}*/
+        
+        real friction = pref1 * omega2 * veldiff;
+        real r0 = ((*rng)() - 0.5);
+        real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
 
-            r /= dist;
+        Real3D f = (noise - friction) * r;
+        p1.force() += f;
+        p2.force() -= f;
 
-            real veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
-            real friction = pref1 * omega2 * veldiff;
-            real r0 = ((*rng)() - 0.5);
-            real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
-
-            Real3D f = (noise - friction) * r;
-            p1.force() += f;
-            p2.force() -= f;
-
-            // Analysis to get stress tensors
-            if (system.ifViscosity)
-            {
-                system.dyadicP_xz += r[0] * f[2];
-                system.dyadicP_zx += r[2] * f[0];
-            }
+        // Analysis to get stress tensors
+        if (system.ifShear && system.ifViscosity)
+        {
+            system.dyadicP_xz += r[0] * f[2];
+            system.dyadicP_zx += r[2] * f[0];
         }
     }
 }
@@ -181,100 +170,65 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
     real dist2 = r.sqr();
     System& system = getSystemRef();
 
-    bool shear_flag = system.ifShear;
-    if (!shear_flag)
+    // Test code to switch DPD modes in shear simulation
+    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
+    // If in use, UNCOMMENT all "/* .. */"
+    /*int mode = system.lebcMode;*/
+    
+    if (dist2 < current_cutoff_sqr)
     {
-        if (dist2 < current_cutoff_sqr)
+        real dist = sqrt(dist2);
+        real omega = 1 - dist / current_cutoff;
+        real omega2 = omega * omega;
+        real veldiff = .0;
+
+        r /= dist;
+        
+        Real3D noisevec(0.0);
+        noisevec[0] = (*rng)() - 0.5;
+        noisevec[1] = (*rng)() - 0.5;
+        noisevec[2] = (*rng)() - 0.5;
+        
+        /*if (system.ifShear && mode == 1)
         {
-            real dist = sqrt(dist2);
-            real omega = 1 - dist / current_cutoff;
-            real omega2 = omega * omega;
-
-            r /= dist;
-
-            Real3D noisevec(0.0);
-            noisevec[0] = (*rng)() - 0.5;
-            noisevec[1] = (*rng)() - 0.5;
-            noisevec[2] = (*rng)() - 0.5;
-
-            Real3D veldiff = p1.velocity() - p2.velocity();
-
-            Real3D f_damp, f_rand;
-
-            // Calculate matrix product of projector and veldiff vector:
-            // P dv = (I - r r_T) dv
-            f_damp[0] = (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] -
-                        r[0] * r[2] * veldiff[2];
-            f_damp[1] = (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] -
-                        r[1] * r[2] * veldiff[2];
-            f_damp[2] = (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] -
-                        r[2] * r[1] * veldiff[1];
-
-            // Same with random vector
-            f_rand[0] = (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] -
-                        r[0] * r[2] * noisevec[2];
-            f_rand[1] = (1.0 - r[1] * r[1]) * noisevec[1] - r[1] * r[0] * noisevec[0] -
-                        r[1] * r[2] * noisevec[2];
-            f_rand[2] = (1.0 - r[2] * r[2]) * noisevec[2] - r[2] * r[0] * noisevec[0] -
-                        r[2] * r[1] * noisevec[1];
-
-            f_damp *= pref3 * omega2;
-            f_rand *= pref4 * omega;
-
-            p1.force() += f_rand - f_damp;
-            p2.force() -= f_rand - f_damp;
-        }
-    }
-    else
-    {
-        if (dist2 < current_cutoff_sqr)
-        {
-            real dist = sqrt(dist2);
-            real omega = 1 - dist / current_cutoff;
-            real omega2 = omega * omega;
-
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+            veldiff = p1.velocity() - p2.velocity() + vsdiff;
+        }
+        else
+        {*/
+        veldiff = p1.velocity() - p2.velocity();
+        /*}*/
 
-            r /= dist;
+        Real3D f_damp, f_rand;
 
-            Real3D noisevec(0.0);
-            noisevec[0] = (*rng)() - 0.5;
-            noisevec[1] = (*rng)() - 0.5;
-            noisevec[2] = (*rng)() - 0.5;
+        // Calculate matrix product of projector and veldiff vector:
+        // P dv = (I - r r_T) dv
+        f_damp[0] = (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] -
+                    r[0] * r[2] * veldiff[2];
+        f_damp[1] = (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] -
+                    r[1] * r[2] * veldiff[2];
+        f_damp[2] = (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] -
+                    r[2] * r[1] * veldiff[1];
 
-            Real3D veldiff = p1.velocity() - p2.velocity() + vsdiff;
+        // Same with random vector
+        f_rand[0] = (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] -
+                    r[0] * r[2] * noisevec[2];
+        f_rand[1] = (1.0 - r[1] * r[1]) * noisevec[1] - r[1] * r[0] * noisevec[0] -
+                    r[1] * r[2] * noisevec[2];
+        f_rand[2] = (1.0 - r[2] * r[2]) * noisevec[2] - r[2] * r[0] * noisevec[0] -
+                    r[2] * r[1] * noisevec[1];
 
-            Real3D f_damp, f_rand;
+        f_damp *= pref3 * omega2;
+        f_rand *= pref4 * omega;
 
-            // Calculate matrix product of projector and veldiff vector:
-            // P dv = (I - r r_T) dv
-            f_damp[0] = (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] -
-                        r[0] * r[2] * veldiff[2];
-            f_damp[1] = (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] -
-                        r[1] * r[2] * veldiff[2];
-            f_damp[2] = (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] -
-                        r[2] * r[1] * veldiff[1];
-
-            // Same with random vector
-            f_rand[0] = (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] -
-                        r[0] * r[2] * noisevec[2];
-            f_rand[1] = (1.0 - r[1] * r[1]) * noisevec[1] - r[1] * r[0] * noisevec[0] -
-                        r[1] * r[2] * noisevec[2];
-            f_rand[2] = (1.0 - r[2] * r[2]) * noisevec[2] - r[2] * r[0] * noisevec[0] -
-                        r[2] * r[1] * noisevec[1];
-
-            f_damp *= pref3 * omega2;
-            f_rand *= pref4 * omega;
-
-            Real3D f_tmp = f_rand - f_damp;
-            p1.force() += f_tmp;
-            p2.force() -= f_tmp;
-            // Analysis to get stress tensors
-            if (system.ifViscosity)
-            {
-                system.dyadicP_xz += r[0] * f_tmp[2];
-                system.dyadicP_zx += r[2] * f_tmp[0];
-            }
+        Real3D f_tmp = f_rand - f_damp;
+        p1.force() += f_tmp;
+        p2.force() -= f_tmp;
+        // Analysis to get stress tensors
+        if (system.ifShear && system.ifViscosity)
+        {
+            system.dyadicP_xz += r[0] * f_tmp[2];
+            system.dyadicP_zx += r[2] * f_tmp[0];
         }
     }
 }
