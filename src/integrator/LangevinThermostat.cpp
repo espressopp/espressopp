@@ -149,7 +149,7 @@ void LangevinThermostat::frictionThermo(Particle& p)
     p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
 
     // Test code to switch among different types of LGV thermostats
-    // mode(0): perculiar vel; mode(1): full vel (incl. shear speed);
+    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
     // mode(2): ONLY thermalize along y-dir
     // If in use, comment the above p.force()
     /*int mode = system.lebcMode;
