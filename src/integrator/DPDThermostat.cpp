@@ -135,7 +135,7 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         real veldiff = .0;
 
         r /= dist;
-        
+
         /*if (system.ifShear && mode == 1)
         {
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
@@ -145,7 +145,7 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         {*/
         veldiff = (p1.velocity() - p2.velocity()) * r;
         /*}*/
-        
+
         real friction = pref1 * omega2 * veldiff;
         real r0 = ((*rng)() - 0.5);
         real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
@@ -174,7 +174,7 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
     // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
     // If in use, UNCOMMENT all "/* .. */"
     /*int mode = system.lebcMode;*/
-    
+
     if (dist2 < current_cutoff_sqr)
     {
         real dist = sqrt(dist2);
@@ -183,12 +183,12 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         real veldiff = .0;
 
         r /= dist;
-        
+
         Real3D noisevec(0.0);
         noisevec[0] = (*rng)() - 0.5;
         noisevec[1] = (*rng)() - 0.5;
         noisevec[2] = (*rng)() - 0.5;
-        
+
         /*if (system.ifShear && mode == 1)
         {
             Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
@@ -203,12 +203,12 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
 
         // Calculate matrix product of projector and veldiff vector:
         // P dv = (I - r r_T) dv
-        f_damp[0] = (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] -
-                    r[0] * r[2] * veldiff[2];
-        f_damp[1] = (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] -
-                    r[1] * r[2] * veldiff[2];
-        f_damp[2] = (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] -
-                    r[2] * r[1] * veldiff[1];
+        f_damp[0] =
+            (1.0 - r[0] * r[0]) * veldiff[0] - r[0] * r[1] * veldiff[1] - r[0] * r[2] * veldiff[2];
+        f_damp[1] =
+            (1.0 - r[1] * r[1]) * veldiff[1] - r[1] * r[0] * veldiff[0] - r[1] * r[2] * veldiff[2];
+        f_damp[2] =
+            (1.0 - r[2] * r[2]) * veldiff[2] - r[2] * r[0] * veldiff[0] - r[2] * r[1] * veldiff[1];
 
         // Same with random vector
         f_rand[0] = (1.0 - r[0] * r[0]) * noisevec[0] - r[0] * r[1] * noisevec[1] -
