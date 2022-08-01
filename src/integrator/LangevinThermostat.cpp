@@ -146,18 +146,16 @@ void LangevinThermostat::frictionThermo(Particle& p)
     // get a random value for each vector component
     Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
-    p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
-
     // Test code to switch among different types of LGV thermostats
     // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
     // mode(2): ONLY thermalize along y-dir
-    // If in use, comment the above p.force()
+    // To activate custom modes, UNCOMMENT all "/* .. */"
     /*int mode = system.lebcMode;
 
     if (mode == 0)
-    {
-        p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
-    }
+    {*/
+    p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
+    /*}
     else if (mode == 1)
     {
         real halfL = system.bc->getBoxL()[2] / 2.0;

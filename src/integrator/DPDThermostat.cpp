@@ -124,7 +124,7 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
 
     // Test code to switch DPD modes in shear simulation
     // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // If in use, UNCOMMENT all "/* .. */"
+    // To activate custom modes, UNCOMMENT all "/* .. */"
     /*int mode = system.lebcMode;*/
 
     if (dist2 < current_cutoff_sqr)
