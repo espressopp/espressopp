@@ -41,13 +41,17 @@ namespace integrator
 class VelocityVerletLE : public MDIntegrator
 {
 public:
-    VelocityVerletLE(shared_ptr<class espressopp::System> system, real _shearRate);
+    VelocityVerletLE(shared_ptr<class espressopp::System> system, real _shearRate, bool _viscosity);
 
     virtual ~VelocityVerletLE();
 
     void setShearRate(real _shearRate) { shearRate = _shearRate; }
 
     real getShearRate() { return shearRate; }
+
+    void setViscosity(real _viscosity) { viscosity = _viscosity; }
+
+    real getViscosity() { return viscosity; }
 
     void run(int nsteps);
 
@@ -64,7 +68,7 @@ public:
     static void registerPython();
 
 private:
-    real shearRate;
+    real shearRate, viscosity;
 
 protected:
     bool resortFlag;  //!< true implies need for resort of particles

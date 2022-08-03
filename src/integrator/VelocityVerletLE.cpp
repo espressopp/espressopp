@@ -57,8 +57,8 @@ using namespace esutil;
 
 LOG4ESPP_LOGGER(VelocityVerletLE::theLogger, "VelocityVerletLE");
 
-VelocityVerletLE::VelocityVerletLE(shared_ptr<System> system, real _shearRate)
-    : MDIntegrator(system), shearRate(_shearRate)
+VelocityVerletLE::VelocityVerletLE(shared_ptr<System> system, real _shearRate, bool _viscosity)
+    : MDIntegrator(system), shearRate(_shearRate), viscosity(_viscosity)
 {
     LOG4ESPP_INFO(theLogger, "construct VelocityVerletLE");
     resortFlag = true;
@@ -69,6 +69,7 @@ VelocityVerletLE::VelocityVerletLE(shared_ptr<System> system, real _shearRate)
         System& system = getSystemRef();
         system.shearRate = shearRate;
         system.ifShear = true;
+        system.ifViscosity = viscosity;
     }
     else
     {
@@ -134,7 +135,6 @@ void VelocityVerletLE::run(int nsteps)
 
     // if (rename("FLAG_P","FLAG_P")==0 && getenv("IRANK")!=NULL)
     // system.irank=atoi(getenv("IRANK"));
-    if (getenv("LMODE") != NULL) system.lebcMode = atoi(getenv("LMODE"));
 
     if (system.ifViscosity) system.sumP_xz = .0;
 
@@ -587,7 +587,7 @@ void VelocityVerletLE::registerPython()
 
     // Note: use noncopyable and no_init for abstract classes
     class_<VelocityVerletLE, bases<MDIntegrator>, boost::noncopyable>(
-        "integrator_VelocityVerletLE", init<shared_ptr<System>, real>())
+        "integrator_VelocityVerletLE", init<shared_ptr<System>, real, bool>())
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerletLE::resetTimers)
         .def("getNumResorts", &VelocityVerletLE::getNumResorts)

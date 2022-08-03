@@ -31,8 +31,10 @@ espressopp.integrator.VelocityVerletLE
 
 		:param system: 
 		:param shear: (default: 0.0)
+		:param viscosity: (default: False)
 		:type system: 
 		:type shear:
+		:type viscosity:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -42,16 +44,16 @@ from _espressopp import integrator_VelocityVerletLE
 
 class VelocityVerletLELocal(MDIntegratorLocal, integrator_VelocityVerletLE):
 
-    def __init__(self, system, shear=0.0):
+    def __init__(self, system, shear=0.0, viscosity=False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_VelocityVerletLE, system, shear)
+            cxxinit(self, integrator_VelocityVerletLE, system, shear, viscosity)
 
 if pmi.isController :
     class VelocityVerletLE(MDIntegrator):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
           cls =  'espressopp.integrator.VelocityVerletLELocal',
-          pmiproperty = [ 'shear' ],
+          pmiproperty = ['shear','viscosity'],
           pmicall = ['resetTimers','getNumResorts'],
           pmiinvoke = ['getTimers']
         )
