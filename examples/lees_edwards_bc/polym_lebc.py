@@ -171,7 +171,11 @@ integrator.resetTimers()
 integrator.step = 0
 
 if (shear_rate>0.0):
-  integrator2     = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate)
+  # When viscosity is to be calculated, turn on with viscosity=True and
+  # collect data by print(system.symP_xz) which will print a step-average
+  # of shear viscosity for every prod_isteps
+  integrator2     = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)
+  system.lebcMode = 0 # a mode for choosing custom thermostats (See in DPDThermostat.cpp/LangevinThermostat.cpp)
 else:
   integrator2     = espressopp.integrator.VelocityVerlet(system)
 # set the integration step for integrator2
@@ -192,6 +196,7 @@ start_time = time.process_time()
 for step in range(prod_nloops):
   integrator2.run(prod_isteps)
   espressopp.tools.analyse.info(system, integrator2)
+  #print("SIGXZ> %d %.6f" % (step*prod_isteps,system.sumP_xz))
   #espressopp.tools.xyzfilewrite(filename, system, velocities = False, charge = False, append=True, atomtypes={0:'X'})
   #espressopp.tools.pdbwrite("prod.pdb", system, molsize=Npart,append=True)
 end_time = time.process_time()

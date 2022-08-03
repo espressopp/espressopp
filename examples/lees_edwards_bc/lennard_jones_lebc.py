@@ -328,7 +328,7 @@ integrator.resetTimers()
 integrator.step = 0
 
 if (shear_rate>0.0):
-  integrator2     = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate)
+  integrator2     = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)
 else:
   integrator2     = espressopp.integrator.VelocityVerlet(system)
 # set the integration step  

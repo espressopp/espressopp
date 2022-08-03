@@ -67,16 +67,7 @@ System::System(int fComm)
     dyadicP_xz = .0;
     dyadicP_zx = .0;
     sumP_xz = .0;
-
-    if (rename("FLAG_VIS", "FLAG_VIS") == 0)
-    {
-        // std::cout << "The calculation of the shear viscosity only supports non-bonded and
-        // two-body "
-        //             "bonding interactions \n";
-        ifViscosity = true;
-    }
-    else
-        ifViscosity = false;
+    ifViscosity = false;
 }
 
 void System::setSkin(real _skin)
@@ -219,6 +210,7 @@ void System::registerPython()
         .def_readwrite("rng", &System::rng)
         //      .def_readwrite("shortRangeInteractions",
         //		     &System::shortRangeInteractions)
+        .def_readwrite("lebcMode", &System::lebcMode)
         .def_readonly("maxCutoff", &System::maxCutoff)
         .def_readonly("sumP_xz", &System::sumP_xz)
         .def_readonly("shearOffset", &System::shearOffset)
