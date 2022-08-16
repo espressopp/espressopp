@@ -230,7 +230,7 @@ public:
         // TODO check double use in common part
         g_ca = vector<Int3D>(0, Int3D(0));
 
-        q_l = vector<vector<real> >(nParticles+1, vector<real>(MMM, 0.0));
+        q_l = vector<vector<real> >(nParticles + 1, vector<real>(MMM, 0.0));
 
         // force specific
         phi = vector<vector<dcomplex> >(3, vector<dcomplex>(MMM, dcomplex(0.0)));
@@ -508,9 +508,9 @@ public:
         }
 
         g_ca.clear();
-        g_ca = vector<Int3D>(nParticles+1, Int3D(0));
+        g_ca = vector<Int3D>(nParticles + 1, Int3D(0));
         QQQ.clear();
-        QQQ = vector<dcomplex>(MMM, dcomplex(0.0)); // MMM+1?
+        QQQ = vector<dcomplex>(MMM, dcomplex(0.0));  // MMM+1?
 
         Int3D Gi, arg;
         for (iterator::CellListIterator it(realCells); it.isValid(); ++it)
@@ -553,7 +553,7 @@ public:
                 }
             }
         }
-        
+
         in_array = reinterpret_cast<fftw_complex *>(&QQQ[0]);
         set_plan_frw();
         fftw_execute(plan);
@@ -612,7 +612,7 @@ public:
                     }
                 }
             }
-            
+
             p.force() -= ff;
         }
 
