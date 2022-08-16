@@ -152,8 +152,7 @@ system             = espressopp.System()
 # use the random number generator that is included within the ESPResSo++ package
 system.rng         = espressopp.esutil.RNG()
 # use orthorhombic periodic boundary conditions 
-#system.bc          = espressopp.bc.OrthorhombicBC(system.rng, box)
-system.bc          = espressopp.bc.SlabBC(system.rng, box)
+system.bc          = espressopp.bc.OrthorhombicBC(system.rng, box)
 # set the skin size used for verlet lists and cell sizes
 system.skin        = skin
 # get the number of CPUs to use
