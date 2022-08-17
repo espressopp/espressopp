@@ -273,13 +273,10 @@ public:
         real skmax = kmax / min(Lx, min(Ly, Lz));
         real skmaxsq = skmax * skmax;  // we choose the biggest cutoff
 
-        rclx = M_2PI / Lx;
-        rcly = M_2PI / Ly;
-        rclz = M_2PI / Lz;
-
         // precalculate factors
         real invAlpha2 = 1.0 / (alpha * alpha);
         real B = M_PI2 * invAlpha2;  // PI^2 / alpha^2
+        // real inv2alpha2 = 0.5 * invAlpha2;  // 1.0 / (2*alpha^2)
         real V = M_2PI * Lx * Ly * Lz;
 
         /* calculate the k-vector array */
@@ -288,8 +285,18 @@ public:
         real rLx2 = 1. / (Lx * Lx);
         real rLy2 = 1. / (Ly * Ly);
         // real rLz2 = 1. / (Lz * Lz);
+        real rk2PIx, rk2PIy, rk2PIz;
+        kVectorLength = 0;
         // clear all vectors
         kvector.clear();
+        kxfield.clear();
+        kyfield.clear();
+        kzfield.clear();
+
+        kx_ind.clear();
+        ky_ind.clear();
+        kz_ind.clear();
+        virialDyadicXZ.clear();
 
         int min_ky = 0;
         int min_kz = 1;
@@ -298,11 +305,13 @@ public:
         {
             kx2 = kx * kx;
             rkx2 = kx2 * rLx2;
+            rk2PIx = kx * rclx;
             for (int ky = min_ky; ky <= kmax; ky++)
             // for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
+                rk2PIy = ky * rcly;
                 for (int kz = min_kz; kz <= kmax; kz++)
                 // for (int kz = -kmax; kz <= kmax; kz++)
                 {
@@ -310,6 +319,7 @@ public:
                     // shear_flag=ON
                     rkz2 = (kz + .0) / Lz - cottheta * (kx + .0) / Lx;
                     rkz2 = rkz2 * rkz2;
+                    rk2PIz = kz * rclz;
 
                     ksq = kx2 + ky2 + kz2;
                     rksq = rkx2 + rky2 + rkz2;
@@ -317,12 +327,45 @@ public:
                     if ((rksq < skmaxsq) && (ksq != 0))
                     {
                         kvector.push_back(exp(-rksq * B) / (rksq * V));
+
+                        kxfield.push_back(kx);
+                        kyfield.push_back(ky);
+                        kzfield.push_back(kz);
+
+                        kx_ind.push_back(kx);
+                        ky_ind.push_back(kmax + ky);
+                        kz_ind.push_back(kmax + kz);
+
+                        // the tensor should be: deltaKronecker(i,j) - 2*hi*hj / h^2 - hi*hj /
+                        // (2*alfa^2)
+                        Real3D h(rk2PIx, rk2PIy, rk2PIz);
+                        real h2 = h * h;
+
+                        virialDyadicXZ.push_back(-prefactor * M_2PI * M_2PI *
+                                                 (4.0 / h2 + invAlpha2) / Lx / Lz);
+
+                        kVectorLength++;
                     }
                 }
                 min_kz = -kmax;
             }
             min_ky = -kmax;
         }
+
+        if (sum != NULL)
+        {
+            delete[] sum;
+            sum = NULL;
+        }
+        if (totsum != NULL)
+        {
+            delete[] totsum;
+            totsum = NULL;
+        }
+        sum = new dcomplex[kVectorLength];
+        totsum = new dcomplex[kVectorLength];
+
+        getParticleNumber();
     }
 
     // here we get the current particle number on the current node
@@ -372,27 +415,40 @@ public:
     int getKMax() const { return kmax; }
 
     // compute force and energy
-    void exponentPrecalculation(CellList realcells)
+    void exponentPrecalculation(CellList realcells, bool ifVirial = false)
     {
-        if (system->ifShear)
+        if (k_mode < 0)
         {
             // initialize k_mode for the first sheared step
-            if (k_mode < 0)
+            if (system->ifShear)
             {
                 k_mode = 1;  // preset_lite() every step
-                // k_mode = 2; // read kvectors if recorded
+                // k_mode = 2; // interpolate kvectors, NOT done yet
+                shear_flag = system->ifShear;
             }
-            shear_flag = system->ifShear;
+        }
+
+        if (shear_flag)
+        {
             real offs = system->shearOffset;
             cottheta = ((offs > Lx / 2.0 ? offs - Lx : offs)) / Lz;
         }
         /* Calculation of k space sums */
         // -1, 0, 1
         int j = 0;  // auxiliary variable, particle counter
+
         if (shear_flag && cottheta != .0)
         {
-            if (k_mode == 1) preset_lite();
-            // preset();
+            if (!ifVirial)
+            {
+                if (k_mode == 1)
+                {
+                    preset_lite();
+                    // preset();
+                }
+                else  // interpolate kvectors, NOT done yet
+                    ;
+            }
 
             // calculate ksum for ewald under shear flow
             for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
@@ -587,7 +643,7 @@ public:
     {
         // TODO it's exactly the same part as energy has
         // exponent array
-        exponentPrecalculation(realcells);
+        exponentPrecalculation(realcells, true);
 
         mpi::communicator communic = *system->comm;
 
@@ -621,7 +677,7 @@ public:
     {
         // TODO it's exactly the same part as energy does
         // exponent array
-        exponentPrecalculation(realcells);
+        exponentPrecalculation(realcells, true);
 
         mpi::communicator communic = *system->comm;
 
