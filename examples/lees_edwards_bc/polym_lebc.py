@@ -114,7 +114,7 @@ system.addInteraction(interFENE)
 # Cosine with FixedTriple list
 ftl = espressopp.FixedTripleList(system.storage)
 ftl.addTriples(angles)
-potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
+potCosine = espressopp.interaction.Cosine(K=1.5, theta0=0.0)
 interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
 system.addInteraction(interCosine)
 
