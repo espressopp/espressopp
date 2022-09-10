@@ -75,6 +75,11 @@ if (SCAFACOS_FOUND)
     target_sources(_espressopp PRIVATE ${FCS_SOURCE})
 endif()
 
+if (RANDOM123_FOUND)
+    target_include_directories(_espressopp PRIVATE ${RANDOM123_INCLUDES})
+    target_compile_definitions(_espressopp PRIVATE -DRANDOM123_EXIST)
+endif()
+
 if(WITH_XTC)
     target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)
     target_link_libraries(_espressopp PRIVATE Gromacs::libgromacs)
