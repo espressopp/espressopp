@@ -27,7 +27,7 @@ espressopp.integrator.VelocityVerletLE
 ************************************
 
 
-.. function:: espressopp.integrator.VelocityVerletLE(system,shear)
+.. function:: espressopp.integrator.VelocityVerletLE(system,shear,viscosity)
 
 		:param system: 
 		:param shear: (default: 0.0)
