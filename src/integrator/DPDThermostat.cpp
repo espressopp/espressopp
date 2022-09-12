@@ -179,8 +179,13 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
 
     // Test code to switch DPD modes in shear simulation
     // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // To activate custom modes, UNCOMMENT all "/* .. */"
-    /*int mode = system.lebcMode;*/
+    // mode(2): y-dir exclusive
+    // To activate custom modes, UNCOMMENT all "/* UNCOMMENT TO ACTIVATE
+    // MODE1/2 .. */"
+
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int mode = system.lebcMode;
+    */
 
     if (dist2 < current_cutoff_sqr)
     {
@@ -206,15 +211,17 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
 #endif
         r /= dist;
 
-        /*if (system.ifShear && mode == 1)
-        {
-            Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
-            veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
-        }
-        else
-        {*/
+        /*  UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear)
+            if (mode == 1)
+            {
+                Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+                veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
+            }
+            else if (mode == 2)
+                veldiff = (p1.velocity()[1] - p2.velocity()[1]) * r[1];
+            else*/
         veldiff = (p1.velocity() - p2.velocity()) * r;
-        /*}*/
 
         real friction = pref1 * omega2 * veldiff;
 #ifdef RANDOM123_EXIST
@@ -249,8 +256,13 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
 
     // Test code to switch DPD modes in shear simulation
     // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // If in use, UNCOMMENT all "/* .. */"
-    /*int mode = system.lebcMode;*/
+    // mode(2): y-dir exclusive
+    // To activate custom modes, UNCOMMENT all "/* UNCOMMENT TO ACTIVATE
+    // MODE1/2 .. */"
+
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int mode = system.lebcMode;
+    */
 
     if (dist2 < current_cutoff_sqr)
     {
@@ -281,15 +293,17 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         noisevec[1] = (*rng)() - 0.5;
         noisevec[2] = (*rng)() - 0.5;
 #endif
-        /*if (system.ifShear && mode == 1)
-        {
-            Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
-            veldiff = p1.velocity() - p2.velocity() + vsdiff;
-        }
-        else
-        {*/
+        /* UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear)
+            if (mode == 1)
+            {
+                Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+                veldiff = p1.velocity() - p2.velocity() + vsdiff;
+            }
+            else if (mode == 2)
+                veldiff[1] = p1.velocity()[1] - p2.velocity()[1];
+            else*/
         veldiff = p1.velocity() - p2.velocity();
-        /*}*/
 
         Real3D f_damp, f_rand;
 
