@@ -76,10 +76,18 @@ $ cmake . -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3
 $ make
 ```
 
-You can also include ScaFaCoS Library (pre-installation required, see in http://www.scafacos.de/) into E++ compilation
+You can include ScaFaCoS Library (pre-installation required, see in http://www.scafacos.de/) into E++ compilation
 
 ```sh
 $ cmake . -DCMAKE_PREFIX_PATH=[installation directory]
+$ cmake --build .
+```
+
+You can also include Random123 Library (ONLY used for DPD thermostat, pre-download required)
+
+```sh
+$ git clone https://github.com/DEShawResearch/random123.git
+$ cmake . -DRANDOM123_ROOT_DIR=[download directory]
 $ cmake --build .
 ```
 
