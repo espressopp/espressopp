@@ -403,8 +403,7 @@ void Adress::integrate2()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
 
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
@@ -452,8 +451,7 @@ void Adress::integrateSlow()
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle*> atList;
-            atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
 
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
