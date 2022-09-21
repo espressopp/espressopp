@@ -234,7 +234,8 @@ inline real VerletListVSphereInteractionTemplate<_Potential>::computeVirial()
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
-        real fsi, fsj;
+        real fsi = 0;
+        real fsj = 0;
         if (potential._computeForce(force, fsi, fsj, p1, p2))
         {
             // if(potential->_computeForce(force, p1, p2)) {
@@ -266,7 +267,8 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
-        real fsi, fsj;
+        real fsi = 0;
+        real fsj = 0;
         if (potential._computeForce(force, fsi, fsj, p1, p2))
         {
             // if(potential->_computeForce(force, p1, p2)) {
@@ -324,7 +326,8 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
             const Potential &potential = getPotential(type1, type2);
 
             Real3D force(0.0, 0.0, 0.0);
-            real fsi, fsj;
+            real fsi = 0;
+            real fsj = 0;
             if (potential._computeForce(force, fsi, fsj, p1, p2))
             {
                 // TODO think of how to incorporate sigmaij-force into virial calculation
@@ -366,7 +369,8 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
 
         Real3D force(0.0, 0.0, 0.0);
         Tensor ww;
-        real fsi, fsj;
+        real fsi = 0;
+        real fsj = 0;
         if (potential._computeForce(force, fsi, fsj, p1, p2))
         {
             // TODO think of how to incorporate sigmaij-force into virial calculation
