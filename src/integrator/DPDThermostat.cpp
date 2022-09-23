@@ -304,7 +304,9 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
             }
             else if (mode == 2)
                 veldiff[1] = p1.velocity()[1] - p2.velocity()[1];
-            else*/
+            else
+                veldiff = p1.velocity() - p2.velocity();
+        else*/
         veldiff = p1.velocity() - p2.velocity();
 
         Real3D f_damp, f_rand;
