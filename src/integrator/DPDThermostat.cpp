@@ -220,7 +220,9 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
             }
             else if (mode == 2)
                 veldiff = (p1.velocity()[1] - p2.velocity()[1]) * r[1];
-            else*/
+            else
+                veldiff = (p1.velocity() - p2.velocity()) * r;
+        else*/
         veldiff = (p1.velocity() - p2.velocity()) * r;
 
         real friction = pref1 * omega2 * veldiff;
