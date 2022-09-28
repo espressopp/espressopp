@@ -223,8 +223,7 @@ void Adress::initForces()
 
     // AT reals
     ParticleList& adrATparticles = system.storage->getAdrATParticles();
-    for (auto it = adrATparticles.begin(); it != adrATparticles.end();
-         ++it)
+    for (auto it = adrATparticles.begin(); it != adrATparticles.end(); ++it)
     {
         it->force() = 0.0;
     }
@@ -248,8 +247,7 @@ void Adress::integrate1(real& maxSqDist)
     real dt = integrator->getTimeStep();
 
     ParticleList& adrATparticles = system.storage->getAdrATParticles();
-    for (auto it = adrATparticles.begin(); it != adrATparticles.end();
-         it++)
+    for (auto it = adrATparticles.begin(); it != adrATparticles.end(); it++)
     {
         real sqDist = 0.0;
         real dtfm = 0.5 * dt / it->mass();
@@ -383,8 +381,7 @@ void Adress::integrate2()
 
     // propagete real AT particles
     ParticleList& adrATparticles = system.storage->getAdrATParticles();
-    for (auto it = adrATparticles.begin(); it != adrATparticles.end();
-         ++it)
+    for (auto it = adrATparticles.begin(); it != adrATparticles.end(); ++it)
     {
         real dtfm = 0.5 * dt / it->mass();
 
@@ -431,8 +428,7 @@ void Adress::integrateSlow()
 
     // propagete real AT particles
     ParticleList& adrATparticles = system.storage->getAdrATParticles();
-    for (auto it = adrATparticles.begin(); it != adrATparticles.end();
-         ++it)
+    for (auto it = adrATparticles.begin(); it != adrATparticles.end(); ++it)
     {
         real dtfm = 0.5 * multistep * dt / it->mass();
 
