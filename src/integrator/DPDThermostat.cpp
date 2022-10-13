@@ -199,7 +199,9 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         uint64_t j = p2.id();
         if (i > j) std::swap(i, j);
 
-        counter.v[0] = mdStep * (ntotal * (i - 1) - i * (i + 1) / 2 + j) * ncounter_per_pair;
+        counter.v[0] =
+            (mdStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            ncounter_per_pair;
         crng = threefry2x64(counter, key);  // call rng generator
 
         real zrng = u01<double>(crng.v[0]);
@@ -222,14 +224,15 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
                 veldiff = (p1.velocity()[1] - p2.velocity()[1]) * r[1];
             else
                 veldiff = (p1.velocity() - p2.velocity()) * r;
-        else*/
+        else
+        */
         veldiff = (p1.velocity() - p2.velocity()) * r;
 
         real friction = pref1 * omega2 * veldiff;
 #ifdef RANDOM123_EXIST
         real r0 = zrng - 0.5;
         /*UNCOMMENT TO ENABLE GAUSSIAN DISTRIBUTION
-        real r0 = zrng;
+        r0 = zrng;
         */
 #else
         real r0 = ((*rng)() - 0.5);
@@ -237,6 +240,15 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
 
         Real3D f = (noise - friction) * r;
+
+        /*  UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear && mode == 2)
+        {
+            f[0]=.0;
+            f[2]=.0;
+                }
+                */
+
         p1.force() += f;
         p2.force() -= f;
 
@@ -281,11 +293,13 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         int j = p2.id();
         if (i > j) std::swap(i, j);
 
-        counter.v[0] = mdStep * (ntotal * (i - 1) - i * (i + 1) / 2 + j) * ncounter_per_pair;
+        counter.v[0] =
+            (mdStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            ncounter_per_pair;
         crng = threefry2x64(counter, key);  // call rng generator
         real zrng = u01<double>(crng.v[1]);
         noisevec[0] = zrng - 0.5;
-        counter.v[0]++;
+        counter.v[0]--;
         zrng = u01<double>(crng.v[0]);
         noisevec[1] = zrng - 0.5;
         zrng = u01<double>(crng.v[1]);
@@ -304,9 +318,7 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
             }
             else if (mode == 2)
                 veldiff[1] = p1.velocity()[1] - p2.velocity()[1];
-            else
-                veldiff = p1.velocity() - p2.velocity();
-        else*/
+            else*/
         veldiff = p1.velocity() - p2.velocity();
 
         Real3D f_damp, f_rand;
