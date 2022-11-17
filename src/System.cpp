@@ -26,6 +26,7 @@
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
+#include "vec/Vectorization.hpp"
 #include "mpi.hpp"
 #include "esutil/Error.hpp"
 
@@ -208,6 +209,7 @@ void System::registerPython()
         .def_readwrite("storage", &System::storage)
         .def_readwrite("bc", &System::bc)
         .def_readwrite("rng", &System::rng)
+        .def_readwrite("vectorization", &System::vectorization)
         //      .def_readwrite("shortRangeInteractions",
         //		     &System::shortRangeInteractions)
         .def_readwrite("lebcMode", &System::lebcMode)
