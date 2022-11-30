@@ -398,13 +398,12 @@ void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
         it = fixedtupleList->find(&(*src));
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it->second;
+            std::vector<Particle *> atList = it->second;
 
             int size = atList.size();
             buf.write(size);  // write size of vector first
 
-            for (std::vector<Particle *>::iterator itv = atList.begin(); itv != atList.end(); ++itv)
+            for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
                 Particle &at = **itv;
 
@@ -457,7 +456,7 @@ void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf,
         {
             std::vector<Particle *> atList = it->second;
 
-            for (std::vector<Particle *>::iterator itv = atList.begin(); itv != atList.end(); ++itv)
+            for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
                 Particle &atg = **itv;
                 buf.read(atg,
@@ -549,8 +548,7 @@ inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
     its = fixedtupleList->find(&src);
     if (its != fixedtupleList->end())
     {
-        std::vector<Particle *> atList;
-        atList = its->second;  // src atomistic list
+        std::vector<Particle *> atList = its->second;  // src atomistic list
 
         FixedTupleListAdress::iterator itd;
         itd = fixedtupleList->find(&dst);
@@ -561,8 +559,7 @@ inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
             tmp2.resize(atList.size());
             appendParticleListToGhosts(tmp2);  // insert into list
             ParticleList::iterator itv2 = (getAdrATParticlesG().back()).begin();
-            for (std::vector<Particle *>::iterator itv = atList.begin(); itv != atList.end();
-                 ++itv, ++itv2)
+            for (auto itv = atList.begin(); itv != atList.end(); ++itv, ++itv2)
             {
                 Particle &at = **itv;
                 Particle &atg = *itv2;
@@ -574,9 +571,8 @@ inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
         }
 
         else
-        {  // if the dst tuple already exists
-            std::vector<Particle *> atgList;
-            atgList = itd->second;  // dst atomistic ghost list
+        {                                                   // if the dst tuple already exists
+            std::vector<Particle *> atgList = itd->second;  // dst atomistic ghost list
             std::vector<Particle *>::iterator itv;
             std::vector<Particle *>::iterator itv2 = atgList.begin();
             for (itv = atList.begin(); itv != atList.end(); ++itv, ++itv2)
@@ -606,8 +602,7 @@ void DomainDecompositionAdress::foldAdrPartCoor(Particle& part, Real3D& oldpos, 
         FixedTupleList::iterator it;
         it = fixedtupleList->find(&part);
         if (it != fixedtupleList->end()) {
-            std::vector<Particle*> atList;
-            atList = it->second;
+            std::vector<Particle*> atList = it->second;
 
             for (std::vector<Particle*>::iterator itv = atList.begin();
                   itv != atList.end(); ++itv) {
@@ -650,10 +645,9 @@ void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts)
         it = fixedtupleList->find(&(*src));
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
-            atList = it->second;
+            std::vector<Particle *> atList = it->second;
 
-            for (std::vector<Particle *>::iterator itv = atList.begin(); itv != atList.end(); ++itv)
+            for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
                 Particle &at = **itv;
 
@@ -701,12 +695,10 @@ void DomainDecompositionAdress::unpackAndAddForces(Cell &_reals, InBuffer &buf)
 
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList1;
-            atList1 = it->second;
+            std::vector<Particle *> atList1 = it->second;
 
             // std::cout << "AT forces ...\n";
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
-                 ++itv)
+            for (auto itv = atList1.begin(); itv != atList1.end(); ++itv)
             {
                 Particle &p3 = **itv;
                 // std::cout << getSystem()->comm->rank() << ": buf.read(AT force)
@@ -754,13 +746,11 @@ inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle &src, P
     // std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
     if (its != fixedtupleList->end() && itd != fixedtupleList->end())
     {
-        std::vector<Particle *> atList1;
-        std::vector<Particle *> atList2;
-        atList1 = its->second;
-        atList2 = itd->second;
+        std::vector<Particle *> atList1 = its->second;
+        std::vector<Particle *> atList2 = itd->second;
 
-        for (std::vector<Particle *>::iterator itv = atList1.begin(), itv2 = atList2.begin();
-             itv != atList1.end(); ++itv, ++itv2)
+        for (auto itv = atList1.begin(), itv2 = atList2.begin(); itv != atList1.end();
+             ++itv, ++itv2)
         {
             Particle &p3 = **itv;
             Particle &p4 = **itv2;
@@ -838,8 +828,7 @@ void DomainDecompositionAdress::decomposeRealParticles()
 
             if (nodeGrid.getGridSize(coord) > 1)
             {
-                for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end();
-                     it != end; ++it)
+                for (auto it = realCells.begin(), end = realCells.end(); it != end; ++it)
                 {
                     Cell &cell = **it;
 
@@ -936,8 +925,7 @@ void DomainDecompositionAdress::decomposeRealParticles()
             {
                 /* Single node direction case (no communication)
                    Fold particles that have left the box */
-                for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end();
-                     it != end; ++it)
+                for (auto it = realCells.begin(), end = realCells.end(); it != end; ++it)
                 {
                     Cell &cell = **it;
                     // do not use an iterator here, since we have need to take out particles during

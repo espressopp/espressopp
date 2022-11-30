@@ -78,10 +78,8 @@ python::list RDFatomistic::computeArray(int rdfN) const
                 if (it2 != fixedtupleList->end())
                 {  // Are there atomistic particles for given CG particle? If yes, use those for
                    // calculation.
-                    std::vector<Particle *> atList;
-                    atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    std::vector<Particle *> atList = it2->second;
+                    for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                     {
                         Particle &at = **it3;
                         int id = at.id();
@@ -101,7 +99,7 @@ python::list RDFatomistic::computeArray(int rdfN) const
         boost::mpi::broadcast(*system.comm, conf, rank_i);
 
         // for simplicity we will number the particles from 0
-        for (map<size_t, data>::iterator itr = conf.begin(); itr != conf.end(); ++itr)
+        for (auto itr = conf.begin(); itr != conf.end(); ++itr)
         {
             data p = itr->second;
             config[num_part] = p;
@@ -127,7 +125,7 @@ python::list RDFatomistic::computeArray(int rdfN) const
         int molP1 = config[i].molecule;
         real resolutionP1 = config[i].resolution;
 
-        if (spanbased == true)
+        if (spanbased)
         {
             if ((coordP1[0] < Li_half[0] + span) && (coordP1[0] > Li_half[0] - span))
             {
@@ -251,10 +249,8 @@ python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
 
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList;
-                    atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    std::vector<Particle *> atList = it2->second;
+                    for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                     {
                         Particle &at = **it3;
 
@@ -279,7 +275,7 @@ python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
         boost::mpi::broadcast(*system.comm, conf, rank_i);
 
         // for simplicity we will number the particles from 0
-        for (map<size_t, dataPathIntegral>::iterator itr = conf.begin(); itr != conf.end(); ++itr)
+        for (auto itr = conf.begin(); itr != conf.end(); ++itr)
         {
             dataPathIntegral p = itr->second;
             config[num_part] = p;
