@@ -128,8 +128,14 @@ endif()
 #
 # The following variables are set when RANDOM123 is found:
 #  RANDOM123_FOUND      = Set to true, if all components of RANDOM123 have been found.
-#  RANDOM123_INCLUDES   = Include path for the header files of RANDOM123
-#pkg_check_modules(RANDOM123 IMPORTED_TARGET random123)
+#  RANDOM123_INCLUDES    = Include path for the header files of RANDOM123
+
+find_path(RANDOM123_INCLUDE_DIR Random123/threefry.h)
+if(RANDOM123_INCLUDE_DIR)
+    set(RANDOM123_FOUND TRUE)
+    message(STATUS "Found Random123: ${RANDOM123_INCLUDES}")
+endif()
+
 if (NOT RANDOM123_FOUND)
 
   if (NOT RANDOM123_ROOT_DIR)
@@ -153,10 +159,10 @@ if (NOT RANDOM123_FOUND)
     
     # Mark advanced variables
     mark_as_advanced (RANDOM123_ROOT_DIR RANDOM123_INCLUDES)
-  #else (RANDOM123_FOUND)
-  #  if (RANDOM123_FIND_REQUIRED)
-  #    message (FATAL_ERROR "Could not find RANDOM123!")
-  #  endif (RANDOM123_FIND_REQUIRED)
+  else (RANDOM123_FOUND)
+    if (RANDOM123_FIND_REQUIRED)
+      message (FATAL_ERROR "Required package Random123 not found")
+    endif (RANDOM123_FIND_REQUIRED)
   endif ()
 endif()
 
