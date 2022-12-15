@@ -25,13 +25,13 @@
 ###########################################################################
 
 """
-The warm-up and equilibration are prepared in zero-shear. To activate a shear
-flow, we create a second integrator
-integrator2 = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)
-parameters:
-shear: input a shear rate
-viscosity: If switched on, the shear viscosity is calulated and wirtten to system.sumP_xz
-for every prod_isteps
+Usage:
+1. The warm-up and equilibration are prepared in zero-shear
+2. To activate a shear flow, create a new integrator
+integrator2 = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)  
+  shear: shear rate
+  viscosity: If True, the shear viscosity is calulated using Irving-Kirkwood formula
+             and wirtten to system.sumP_xz (averaged for every prod_isteps)
 """
 import espressopp
 import time
@@ -174,12 +174,6 @@ if (temperature != None):
 
 print("adding ", Npart, " particles to the system ...")
 
-## fix x,y and z coord axis
-#fixMask = espressopp.Int3D(0,1,0)
-#
-## create a particel group that will contain the fixed particles
-#fixedWall  = espressopp.ParticleGroup(system.storage)
-
 for pid in range(Npart):
   # get a 3D random coordinate within the box
   pos = system.bc.getRandomPos()
@@ -188,12 +182,8 @@ for pid in range(Npart):
   # the following default values are set for each particle:
   # (type=0, mass=1.0, velocity=(0,0,0), charge=0.0)
   system.storage.addParticle(pid, pos)
-  #fixedWall.add(pid)
 # distribute the particles to parallel CPUs 
 system.storage.decompose()
-
-#fixpositions = espressopp.integrator.FixPositions(system, fixedWall, fixMask)
-#integrator.addExtension(fixpositions)
 
 ########################################################################
 # 5. setting up interaction potential for the warmup                   #
@@ -313,24 +303,12 @@ integrator2.dt  = dt
 integrator2.step = 0
 
 integrator2.addExtension(thermostat)
-#fixpositions = espressopp.integrator.FixPositions(system, fixedWall, fixMask)
-#integrator2.addExtension(fixpositions)
 
 # since the interaction cut-off changed the size of the cells that are used
 # to speed up verlet list builds should be adjusted accordingly 
 system.storage.cellAdjust(shear = True)
 
-
 print("starting production ...")
-
-# Create random seed
-#tseed = int( time.time() * 1000.0)
-#random.seed( ((tseed & 0xff000000) >> 24) +
-#             ((tseed & 0x00ff0000) >>  8) +
-#             ((tseed & 0x0000ff00) <<  8) +
-#             ((tseed & 0x000000ff) << 24))
-#irand=random.randint(1,99999)
-
 
 # print inital status information
 espressopp.tools.analyse.info(system, integrator2)
