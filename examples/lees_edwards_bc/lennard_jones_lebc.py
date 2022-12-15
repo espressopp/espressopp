@@ -20,40 +20,18 @@
 ###########################################################################
 #                                                                         #
 #  This is an example for an MD simulation of a simple Lennard-Jones      #
-#  fluid with ESPResSo++. 						  #	
+#  fluid in a shear flow. 						  #	
 #                                                                         #
 ###########################################################################
 
 """
-We will start with particles at random positions within
-the simulation box interacting via a shifted Lennard-Jones type potential
-with an interaction cutoff at 2.5.
-Newtons equations of motion are integrated with a Velocity-Verlet integrator.
-The canonical (NVT) ensemble is realized by using a Langevin thermostat.
-In order to prevent explosion due to strongly overlapping volumes of 
-random particles the system needs to be warmed up first.   
-Warm-up is accomplished by using a repelling-only LJ interaction
-(cutoff=1.12246, shift=0.25) with a force capping at radius 0.6
-and initial small LJ epsilon value of 0.1.
-During warmup epsilon is gradually increased to its final value 1.0.  
-After warm-up the system is equilibrated using the full uncapped  LJ Potential.
-
-If a system still explodes during warmup or equilibration, warmup time
-could be increased by increasing warmup_nloops and the capradius could
-be set to another value. Depending on the system (number of particles, density, ...)
-it could also be necessary to vary sigma during warmup.  
-
-The simulation consists of the following steps:
-
-  1. specification of the main simulation parameters
-  2. setup of the system, random number generator and parallelisation
-  3. setup of the integrator and simulation ensemble
-  4. adding the particles
-  5. setting up interaction potential for the warmup
-  6. running the warmup loop
-  7. setting up interaction potential for the equilibration
-  8. running the equilibration loop
-  9. writing configuration to a file
+The warm-up and equilibration are prepared in zero-shear. To activate a shear
+flow, we create a second integrator
+integrator2 = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)
+parameters:
+shear: input a shear rate
+viscosity: If switched on, the shear viscosity is calulated and wirtten to system.sumP_xz
+for every prod_isteps
 """
 import espressopp
 import time
@@ -359,25 +337,10 @@ espressopp.tools.analyse.info(system, integrator2)
 #sock = espressopp.tools.vmd.connect(system)
 filename = "prod.xyz"
 
-#conf  = espressopp.analysis.Configurations(system)
-#conf.gather()
-#dpl=(0.0,0.0,0.0)
-#dpl=dpl*Npart
-#dpl=list(dpl)
-
 tstart=time.process_time()
 for step in range(prod_nloops):
   # perform equilibration_isteps integration steps
   integrator2.run(prod_isteps)
-#  conf.gather()
-#  msd=0.0
-#  for k in range(Npart):
-#    for i in range(1,3):
-#      tmp=conf[0][k][i]-conf[1][k][i]+0.5*box[i]
-#      fl=math.floor((tmp)/box[i])
-#      dpl[k*3+i]=dpl[k*3+i]+tmp-fl*box[i]-0.5*box[i]
-#      msd=msd+dpl[k*3+i]*dpl[k*3+i]
-#  print "MSD> ",(step+1)*dt*prod_isteps,msd/Npart
   # print status information
   #espressopp.tools.vmd.imd_positions(system, sock)
   espressopp.tools.analyse.info(system, integrator2)
