@@ -143,8 +143,7 @@ void DomainDecomposition::prepareGhostBuffers()
         {
             size_t const dir = 2 * coord + lr;
 
-            auto f_countParticles = [cr](auto const& cellIdx)
-            {
+            auto f_countParticles = [cr](auto const& cellIdx) {
                 size_t total = 0;
                 for (auto const& ic : cellIdx) total += (cr[ic + 1] - cr[ic]);
                 return total;
@@ -278,8 +277,7 @@ void DomainDecomposition::copyRealsToGhostsIntra(size_t dir, Real3D const& shift
     const auto& cellRange = particles.cellRange();
 
     {
-        auto f_dim = [&](real* __restrict pos, real shift_v)
-        {
+        auto f_dim = [&](real* __restrict pos, real shift_v) {
             for (size_t ic = 0; ic < numCells; ic++)
             {
                 const size_t icr = ccr[ic];
@@ -331,8 +329,7 @@ void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir)
     const auto& cellRange = particles.cellRange();
 
     {
-        auto f_dim = [&](real* __restrict f)
-        {
+        auto f_dim = [&](real* __restrict f) {
             for (size_t ic = 0; ic < numCells; ic++)
             {
                 const size_t icr = ccr[ic];
@@ -370,8 +367,7 @@ void DomainDecomposition::packCells(AlignedVector<real>& sendBuf,
     const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
     {
-        auto f_pack_dim = [&](size_t dim, const real* __restrict p_ptr, real shift_v)
-        {
+        auto f_pack_dim = [&](size_t dim, const real* __restrict p_ptr, real shift_v) {
             real* __restrict b_ptr = sendBuf.data() + numPart * dim;
 
             size_t b_off = 0;
@@ -430,8 +426,7 @@ void DomainDecomposition::unpackCells(AlignedVector<real> const& recvBuf, bool c
     const auto& numPart = commReal ? commCellIdx[dir].numReals : commCellIdx[dir].numGhosts;
 
     {
-        auto f_unpack_dim = [&](size_t dim, real* __restrict p_ptr)
-        {
+        auto f_unpack_dim = [&](size_t dim, real* __restrict p_ptr) {
             const size_t b_start = (numPart * dim);
             const real* __restrict b_ptr = recvBuf.data() + b_start;
 

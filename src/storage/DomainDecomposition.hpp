@@ -99,7 +99,7 @@ protected:
 
     /// init global Verlet list
     void initCellInteractions();
-    /// set the grids and allocate space accordingly
+    /// reset connection of neighbour cells
     void remapNeighbourCells(int cell_shift);
     /// set the grids and allocate space accordingly
     void createCellGrid(const Int3D& nodeGrid, const Int3D& cellGrid);
@@ -136,6 +136,7 @@ protected:
         For the order, see NodeGrid.
     */
     CommCells commCells[6];
+    /// A backup commCells list (LEBC only)
     CommCells commCells_bkp[2];
 
     static LOG4ESPP_DECL_LOGGER(logger);

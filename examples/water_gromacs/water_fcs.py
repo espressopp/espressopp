@@ -19,9 +19,25 @@
 
 ###########################################################################
 #                                                                         #
-#  ESPResSo++ Python script for tabulated GROMACS simulation              #
+#  ESPResSo++ Python script for a simualtion using ScaFaCoS as a          #
+#  long-range force calculator                                            #
 #                                                                         #
 ###########################################################################
+
+"""
+Attention!
+This example ONLY gives an instruction to ScaFaCoS setup in ESPResSo++.
+Results will be INCORRECT for SPC/water. ScaFaCoS only supports monatomic 
+gas systems with charges. For simulating a molecular system with nonbonded
+exclusion rules, we suggest to add necessary compensation using using 
+FixedPairListTypes. One example is given in EMODE=1 (using Ewald)
+
+Usage:
+1. Choose EMODE=2
+2. Define parameters in ScaFaCoS
+     fcs_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor,
+     energy_tolerance, num_of_particles, method='p3m')
+"""
 
 import sys
 import time
@@ -44,7 +60,7 @@ T2Kalvin= amu*1000000/3/kB
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-EMODE=2 # switch mode - 0 = generalized reaction field; 1 = Ewald (internal); 2 = Scafacos
+EMODE=2 # 0: generalized reaction field / 1: Ewald (internal) / 2: Scafacos
 steps = 10000
 check = steps/100
 rc    = 0.9  # Verlet list cutoff
@@ -147,13 +163,6 @@ else:
         ewaldK_int = espressopp.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
         system.addInteraction(ewaldK_int)
     else: #GO with FCS
-        print("############# ATTENTION! #############")
-        print("This example ONLY provides an instruction on the ScaFaCoS setup for ESPResSo++ simulation!!!")
-        print("Results will be INCORRECT in this SPC/water example!!!")
-        print("The current ScaFaCoS module only supports simulations in charged monatomic gas systems")
-        print("..unless a full -QQ/r^2 compensation term is included (according to the given non-bond exclusion rule) using FixedPairListTypes")
-        print("..or short-range forces are completely removed from the ScaFaCoS calculator and instead handled by ESPResSo++.")
-        print("######################################")
         fcs_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor, 0.001, num_particles,'p3m')
         fcs_int = espressopp.interaction.CellListCoulombScafacos(system.storage, fcs_pot)
         system.addInteraction(fcs_int)

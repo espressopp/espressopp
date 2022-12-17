@@ -256,7 +256,8 @@ void DomainDecomposition::cellAdjust(bool withShear = false)
     // new cellGrid
 
     real rc_skin = maxCutoffL + skinL;
-    // skin_mod
+    // for shear simulation, the cell size must be larger than
+    // max(cutoff*2,cutoff+skin)
     if (withShear || getSystem()->ifShear)
         rc_skin = (maxCutoffL * 2.0 > maxCutoffL + skinL ? (maxCutoffL * 2.0 + 0.01)
                                                          : (maxCutoffL + skinL));
@@ -372,6 +373,7 @@ void DomainDecomposition::initCellInteractions()
     LOG4ESPP_DEBUG(logger, "done");
 }
 
+// change the connection of neighbour cells when ghost cell shift by +/- 1 cell size
 void DomainDecomposition::remapNeighbourCells(int cell_shift)
 {
     // if (rename("FLAG_P","FLAG_P")==0 && getSystem()->comm->rank()==getSystem()->irank)

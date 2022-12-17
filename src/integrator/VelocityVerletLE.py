@@ -26,6 +26,7 @@ r"""
 espressopp.integrator.VelocityVerletLE
 ************************************
 
+A velocity verlet integrator used for Lees-Edwards boundary condition
 
 .. function:: espressopp.integrator.VelocityVerletLE(system,shear,viscosity)
 

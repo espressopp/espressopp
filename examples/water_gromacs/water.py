@@ -33,9 +33,7 @@ from espressopp.tools import gromacs
 from espressopp.tools import decomp
 from espressopp.tools import timers
 
-# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file.
-# Output of gromacs energies and esp energies should be the same
-
+# This function assists users to calculate type-specific radial distribution function
 def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomtypes):
     list_t = []
     M_PI = 3.1415926535897932384626433832795029
@@ -112,6 +110,10 @@ def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomt
         print("The calculation to g(r) for %s-%s pairs is finished. See in %s" % (typeI,typeJ,filename))
     
     print("") 
+
+# This example reads in a gromacs water system (SPC/Fw) treated with reaction field.
+# See the corresponding gromacs grompp.mdp paramter file.
+# Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
 steps = 10000

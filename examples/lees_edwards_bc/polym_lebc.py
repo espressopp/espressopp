@@ -22,9 +22,20 @@
 #
 ###########################################################################
 #                                                                         #
-#  ESPResSo++ Benchmark Python script for a polymer melt                  #
+#  ESPResSo++ Benchmark Python script for a polymer melt under shear      #
 #                                                                         #
 ###########################################################################
+
+"""
+Usage:
+1. The equilibration is prepared in zero-shear
+2. To activate a shear flow, create a new integrator
+
+   integrator2 = espressopp.integrator.VelocityVerletLE(system,shear=shear_rate,viscosity=False)  
+       shear: shear rate
+       viscosity: If True, the shear viscosity is calulated using Irving-Kirkwood formula
+                  and wirtten to system.sumP_xz (averaged for every prod_isteps)
+"""
 
 import sys
 import time

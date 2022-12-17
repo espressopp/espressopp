@@ -22,25 +22,13 @@ r"""
 espressopp.interaction.CoulombScafacos
 *****************************************
 
-Coulomb potential and interaction Objects (`K` space part)
- 
-.. math::
-
-	\frac{1}{2\pi V} 
-	\sum_{m\in \mathbb{Z}^3 \atop 0<|m|<k_{max}} 
-	\frac{exp(-\frac{\pi^2}{\alpha^2}m^{\prime 2})}{m^{\prime 2}}
-	\left\lvert\sum_{i=1}^{N}
-	 q_{i}\cdot exp(2\pi i r_{i}\cdot m^{\prime})\right\rvert^{2}
-	
-This is the `K` space part of potential of Coulomb long range interaction according to the Ewald
-summation technique. Good explanation of Ewald summation could be found here [Allen89]_,
-[Deserno98]_.
+Coulomb solver using ScaFaCoS library
 
 Example:
 
-    >>> ewaldK_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor, alpha, kspacecutoff)
-    >>> ewaldK_int = espressopp.interaction.CellListCoulombScafacos(system.storage, ewaldK_pot)
-    >>> system.addInteraction(ewaldK_int)
+    >>> FCS_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor, tolerance, method)
+    >>> FCS_int = espressopp.interaction.CellListCoulombScafacos(system.storage, FCS_pot)
+    >>> system.addInteraction(FCS_int)
 
 **!IMPORTANT** Coulomb interaction needs `R` space part as well CoulombRSpace_.
 
@@ -57,19 +45,19 @@ Definition:
     
 .. _System: espressopp.System.html    
     
-    >>> ewaldK_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor, alpha, kspacecutoff)
+    >>> FCS_pot = espressopp.interaction.CoulombScafacos(system, coulomb_prefactor, alpha, kspacecutoff)
 
     Potential Properties:
 
-    *   *ewaldK_pot.prefactor*
+    *   *FCS_pot.prefactor*
 
         The property 'prefactor' defines the Coulomb prefactor.
 
-    *   *ewaldK_pot.alpha*
+    *   *FCS_pot.alpha*
 
         The property 'alpha' defines the Ewald parameter :math:`\\alpha`.
 
-    *   *ewaldK_pot.kmax*
+    *   *FCS_pot.kmax*
 
         The property 'kmax' defines the cutoff in `K` space.
         
@@ -78,7 +66,7 @@ Definition:
     
 .. _Storage: espressopp.storage.Storage.html    
 
-    >>> ewaldK_int = espressopp.interaction.CellListCoulombScafacos(system.storage, ewaldK_pot)
+    >>> FCS_int = espressopp.interaction.CellListCoulombScafacos(system.storage, FCS_pot)
     
     Interaction Methods:
 
@@ -88,7 +76,7 @@ Definition:
     
 Adding the interaction to the system:
     
-    >>> system.addInteraction(ewaldK_int)
+    >>> system.addInteraction(FCS_int)
     
 References:
 

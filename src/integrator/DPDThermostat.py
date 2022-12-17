@@ -29,7 +29,8 @@ espressopp.integrator.DPDThermostat
 
                 :param system:
                 :param vl:
-                :param ntotal: (default: 0)
+                :param ntotal: (default: 0, a total number of particles)
+                               (not needed if switched back to generic rng
                 :type system:
                 :type vl:
                 :type ntotal:
