@@ -148,13 +148,6 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
             // shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0);
-            // if(potential._computeForce(force, p1, p2)) {
-            ////if(potential->_computeForce(force, p1, p2)) {
-            //  p1.force() += force;
-            //  p2.force() -= force;
-            //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" <<
-            //  force);
-            //}
             Real3D dist;
             Real3D dist_tmp(.0);
             if (p1.position()[2] - p2.position()[2] > Lz / 2.0)
@@ -179,6 +172,8 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
             {
                 p1.force() += force;
                 p2.force() -= force;
+                //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force="
+                //  << force);
                 // Analysis to get stress tensors
                 if (getSystemRef().ifViscosity)
                 {
@@ -200,20 +195,16 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
             // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0);
-            // if(potential._computeForce(force, p1, p2)) {
-            ////if(potential->_computeForce(force, p1, p2)) {
-            //  p1.force() += force;
-            //  p2.force() -= force;
-            //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" <<
-            //  force);
-            //}
             Real3D dist;
             bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+
             potential.computeColVarWeights(dist, bc);
             if (potential._computeForce(force, p1, p2, dist))
             {
                 p1.force() += force;
                 p2.force() -= force;
+                //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force="
+                //  << force);
             }
         }
     }
