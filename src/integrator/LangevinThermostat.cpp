@@ -140,29 +140,33 @@ void LangevinThermostat::thermalizeAdr()
 
 void LangevinThermostat::frictionThermo(Particle& p)
 {
-    /*System& system = getSystemRef();*/
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    System& system = getSystemRef();
+    */
     real massf = sqrt(p.mass());
 
     // get a random value for each vector component
     Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
-    // Test code to switch among different types of LGV thermostats
-    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // mode(2): ONLY thermalize along y-dir
-    // To activate custom modes, UNCOMMENT all "/* .. */"
-    /*int mode = system.lebcMode;
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int modeThermal = system.lebcMode;
 
-    if (mode == 0)
+    if (modeThermal == 0)
     {*/
     p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
-    /*}
-    else if (mode == 1)
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    }
+    else if (modeThermal == 1)
     {
         real halfL = system.bc->getBoxL()[2] / 2.0;
         Real3D vtmp = {system.shearRate * (p.position()[2] - halfL), .0, .0};
         p.force() += pref1 * (p.velocity() + vtmp) * p.mass() + pref2 * ranval * massf;
     }
-    else if (mode == 2)
+    else if (modeThermal == 2)
     {
         Real3D vtmp = {.0, p.velocity()[1], .0};
         Real3D rtmp = {.0, ranval[1], .0};

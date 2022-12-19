@@ -177,14 +177,12 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
     real dist2 = r.sqr();
     System& system = getSystemRef();
 
-    // Test code to switch DPD modes in shear simulation
-    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // mode(2): y-dir exclusive
-    // To activate custom modes, UNCOMMENT all "/* UNCOMMENT TO ACTIVATE
-    // MODE1/2 .. */"
-
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
     /* UNCOMMENT TO ACTIVATE MODE1/2
-    int mode = system.lebcMode;
+    int modeThermal = system.lebcMode;
     */
 
     if (dist2 < current_cutoff_sqr)
@@ -215,12 +213,12 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
 
         /*  UNCOMMENT TO ACTIVATE MODE1/2
         if (system.ifShear)
-            if (mode == 1)
+            if (modeThermal == 1)
             {
                 Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
                 veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
             }
-            else if (mode == 2)
+            else if (modeThermal == 2)
                 veldiff = (p1.velocity()[1] - p2.velocity()[1]) * r[1];
             else
                 veldiff = (p1.velocity() - p2.velocity()) * r;
@@ -242,12 +240,12 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         Real3D f = (noise - friction) * r;
 
         /*  UNCOMMENT TO ACTIVATE MODE1/2
-        if (system.ifShear && mode == 2)
+        if (system.ifShear && modeThermal == 2)
         {
             f[0]=.0;
             f[2]=.0;
-                }
-                */
+        }
+        */
 
         p1.force() += f;
         p2.force() -= f;
@@ -268,14 +266,12 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
     real dist2 = r.sqr();
     System& system = getSystemRef();
 
-    // Test code to switch DPD modes in shear simulation
-    // mode(0): peculiar vel; mode(1): full vel (incl. shear speed);
-    // mode(2): y-dir exclusive
-    // To activate custom modes, UNCOMMENT all "/* UNCOMMENT TO ACTIVATE
-    // MODE1/2 .. */"
-
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
     /* UNCOMMENT TO ACTIVATE MODE1/2
-    int mode = system.lebcMode;
+    int modeThermal = system.lebcMode;
     */
 
     if (dist2 < current_cutoff_sqr)
@@ -311,12 +307,12 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
 #endif
         /* UNCOMMENT TO ACTIVATE MODE1/2
         if (system.ifShear)
-            if (mode == 1)
+            if (modeThermal == 1)
             {
                 Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
                 veldiff = p1.velocity() - p2.velocity() + vsdiff;
             }
-            else if (mode == 2)
+            else if (modeThermal == 2)
                 veldiff[1] = p1.velocity()[1] - p2.velocity()[1];
             else*/
         veldiff = p1.velocity() - p2.velocity();
