@@ -89,7 +89,9 @@ private:
     real cottheta =
         .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
     bool shear_flag = false;
-    int k_mode = -1;  // "1": proceed preset_lite() every MD step; "2": collect all kvector's
+    int useOtherPreset =
+        -1;  // "-1": uninitialized; "0": do nothing (only do preset at the beginning)
+             // "1": do preset_lite() every MD step; "2": kvector interpolation
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -136,8 +138,8 @@ public:
         Lx = Li[0];
         Ly = Li[1];
         Lz = Li[2];
-        // shear_flag = system->ifShear;
 
+        // test code
         /*if (getenv("CTHETAX10")!=NULL){
           cottheta=(atoi(getenv("CTHETAX10"))+.0)/10.0;
           shear_flag=true;
@@ -169,6 +171,7 @@ public:
         real rLz2 = 1. / (Lz * Lz);
         real rk2PIx, rk2PIy, rk2PIz;
         kVectorLength = 0;
+
         // clear all vectors
         kvector.clear();
         kxfield.clear();
@@ -191,21 +194,13 @@ public:
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
             for (int ky = min_ky; ky <= kmax; ky++)
-            // for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
                 for (int kz = min_kz; kz <= kmax; kz++)
-                // for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
-                    /* if (shear_flag)
-                    {
-                        rkz2 = (kz + .0) / Lz - cottheta * (kx + .0) / Lx;
-                        rkz2 = rkz2 * rkz2;
-                    }
-                    else */
                     rkz2 = kz2 * rLz2;
                     rk2PIz = kz * rclz;
 
@@ -276,7 +271,6 @@ public:
         // precalculate factors
         real invAlpha2 = 1.0 / (alpha * alpha);
         real B = M_PI2 * invAlpha2;  // PI^2 / alpha^2
-        // real inv2alpha2 = 0.5 * invAlpha2;  // 1.0 / (2*alpha^2)
         real V = M_2PI * Lx * Ly * Lz;
 
         /* calculate the k-vector array */
@@ -284,9 +278,9 @@ public:
         real rksq, rkx2, rky2, rkz2;
         real rLx2 = 1. / (Lx * Lx);
         real rLy2 = 1. / (Ly * Ly);
-        // real rLz2 = 1. / (Lz * Lz);
         real rk2PIx, rk2PIy, rk2PIz;
         kVectorLength = 0;
+
         // clear all vectors
         kvector.clear();
         kxfield.clear();
@@ -307,16 +301,13 @@ public:
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
             for (int ky = min_ky; ky <= kmax; ky++)
-            // for (int ky = -kmax; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
                 for (int kz = min_kz; kz <= kmax; kz++)
-                // for (int kz = -kmax; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
-                    // shear_flag=ON
                     rkz2 = (kz + .0) / Lz - cottheta * (kx + .0) / Lx;
                     rkz2 = rkz2 * rkz2;
                     rk2PIz = kz * rclz;
@@ -417,13 +408,13 @@ public:
     // compute force and energy
     void exponentPrecalculation(CellList realcells, bool ifVirial = false)
     {
-        if (k_mode < 0)
+        if (useOtherPreset < 0)
         {
-            // initialize k_mode for the first sheared step
+            // initialize useOtherPreset for the first sheared step
             if (system->ifShear)
             {
-                k_mode = 1;  // preset_lite() every step
-                // k_mode = 2; // interpolate kvectors, NOT done yet
+                useOtherPreset = 1;  // preset_lite() every step
+                // useOtherPreset = 2; // interpolate kvectors, NOT done yet
                 shear_flag = system->ifShear;
             }
         }
@@ -441,7 +432,7 @@ public:
         {
             if (!ifVirial)
             {
-                if (k_mode == 1)
+                if (useOtherPreset == 1)
                 {
                     preset_lite();
                     // preset();
