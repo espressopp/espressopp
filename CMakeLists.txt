@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.12)
 
 include(CMakePrintHelpers)
 
-project(espressopp VERSION 3.0.0 LANGUAGES C CXX)
+project(espressopp VERSION 3.0.0 LANGUAGES CXX)
+# C is only used for hdf5, see https://gitlab.kitware.com/cmake/cmake/-/merge_requests/8015
+if(CMAKE_VERSION VERSION_LESS 3.26)
+ enable_language(C)
+endif()
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(ESPP_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
