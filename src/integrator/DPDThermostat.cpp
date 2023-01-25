@@ -125,23 +125,31 @@ void DPDThermostat::thermalize()
 
     System& system = getSystemRef();
     system.storage->updateGhostsV();
-
+    uint64_t internal_seed = system.seed64;
+    if (system.comm->rank() == 0)
+        std::cout << "RNG-" << system.comm->rank() << " (" << internal_seed << ") " << system.seed64
+                  << " \n";
 #ifdef RANDOM123_EXIST
     if (mdStep == 0)
     {
-        if (system.comm->rank() == 0)
+        if (internal_seed == 0)
         {
-            int rng1, rng2, rng3;
-            rng1 = (*rng)(2);
-            rng2 = (*rng)(INT_MAX);
-            rng3 = (*rng)(INT_MAX);
-            seed64 = (uint64_t)rng1 * (uint64_t)rng2 * (uint64_t)UINT_MAX + (uint64_t)rng3;
+            if (system.comm->rank() == 0)
+            {
+                int rng1, rng2, rng3;
+                rng1 = (*rng)(2);
+                rng2 = (*rng)(INT_MAX);
+                rng3 = (*rng)(INT_MAX);
+                internal_seed =
+                    (uint64_t)rng1 * (uint64_t)rng2 * (uint64_t)UINT_MAX + (uint64_t)rng3;
+            }
+
+            mpi::broadcast(*system.comm, internal_seed, 0);
+            system.seed64 = internal_seed;
         }
 
-        mpi::broadcast(*system.comm, seed64, 0);
-
         counter = {{0}};
-        ukey = {{seed64}};
+        ukey = {{internal_seed}};
         key = ukey;
         // crng = threefry2x64(counter, key);
         // counter.v[0]=ULONG_MAX-1;std::cout<<"CTR> "<<counter.v[0]<<"\n";
@@ -149,7 +157,11 @@ void DPDThermostat::thermalize()
         //<<","<<key<<") /"<<uneg11<double>(crng.v[0])<<std::endl;
     }
 #endif
+    if (system.comm->rank() == 0)
+        std::cout << "Rng-" << system.comm->rank() << " (" << internal_seed << ") " << system.seed64
+                  << " \n";
     // loop over VL pairs
+    intStep = integrator->getStep();
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
         Particle& p1 = *it->first;
@@ -164,7 +176,11 @@ void DPDThermostat::thermalize()
         (uint64_t)ntotal * (uint64_t)(ntotal - 1) / (uint64_t)2 * (uint64_t)ncounter_per_pair;
 
     if (ULONG_MAX - mdStep * ncounter_per_step < ncounter_per_step)
+    {
         mdStep = 0;
+        internal_seed = 0;
+        system.seed64 = 0;
+    }
     else
         mdStep++;
 #endif
@@ -198,7 +214,7 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
         if (i > j) std::swap(i, j);
 
         counter.v[0] =
-            (mdStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            (intStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
             ncounter_per_pair;
         crng = threefry2x64(counter, key);  // call rng generator
 
@@ -290,7 +306,7 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         if (i > j) std::swap(i, j);
 
         counter.v[0] =
-            (mdStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            (intStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
             ncounter_per_pair;
         crng = threefry2x64(counter, key);  // call rng generator
         real zrng = u01<double>(crng.v[1]);

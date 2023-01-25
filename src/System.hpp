@@ -77,6 +77,7 @@ public:
     real dyadicP_xz;
     real dyadicP_zx;
     real sumP_xz;
+    uint64_t seed64;  // user-settable seed
 
     bool CommunicatorIsInitialized;
 

@@ -69,6 +69,7 @@ System::System(int fComm)
     dyadicP_zx = .0;
     sumP_xz = .0;
     ifViscosity = false;
+    seed64 = 0;
 }
 
 void System::setSkin(real _skin)
@@ -215,7 +216,8 @@ void System::registerPython()
         .def_readwrite("lebcMode", &System::lebcMode)
         .def_readonly("maxCutoff", &System::maxCutoff)
         .def_readonly("sumP_xz", &System::sumP_xz)
-        .def_readonly("shearOffset", &System::shearOffset)
+        .def_readwrite("shearOffset", &System::shearOffset)
+        .def_readwrite("seed64", &System::seed64)
         .def("addInteraction", &System::addInteraction)
         .def("removeInteraction", &System::removeInteraction)
         .def("getInteraction", &System::getInteraction)
