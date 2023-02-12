@@ -126,9 +126,7 @@ void DPDThermostat::thermalize()
     System& system = getSystemRef();
     system.storage->updateGhostsV();
     uint64_t internal_seed = system.seed64;
-    if (system.comm->rank() == 0)
-        std::cout << "RNG-" << system.comm->rank() << " (" << internal_seed << ") " << system.seed64
-                  << " \n";
+
 #ifdef RANDOM123_EXIST
     if (mdStep == 0)
     {
@@ -157,9 +155,7 @@ void DPDThermostat::thermalize()
         //<<","<<key<<") /"<<uneg11<double>(crng.v[0])<<std::endl;
     }
 #endif
-    if (system.comm->rank() == 0)
-        std::cout << "Rng-" << system.comm->rank() << " (" << internal_seed << ") " << system.seed64
-                  << " \n";
+
     // loop over VL pairs
     intStep = integrator->getStep();
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
