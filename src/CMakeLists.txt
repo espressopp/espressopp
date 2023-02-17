@@ -28,7 +28,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
         target_compile_options(_espressopp PRIVATE -Wall)
     endif()
     # There seem to be spurious warnings in gcc 12.1.[01]: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100366
-    if(ESPP_WERROR AND CMAKE_BUILD_TYPE STREQUAL "Release" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12.1.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 12.2.1 )
+    if(ESPP_WERROR AND CMAKE_BUILD_TYPE STREQUAL "Release" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12.1.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 13.0.1 )
         target_compile_options(_espressopp PRIVATE "-Wno-nonnull")
     endif()
     if(ESPP_LOCAL_ARCHITECTURE)
