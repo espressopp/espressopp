@@ -158,7 +158,7 @@ void Channels::verifyChannels()
             }
         }
 
-        std::vector<AlignedVectorChar> bufs = hpx::util::unwrap(futures);
+        std::vector<AlignedVectorChar> bufs = hpx::unwrap(futures);
         for (int coord = 0; coord < 3; ++coord)
         {
             const int nsub = numSubNodes[coord];

@@ -44,7 +44,7 @@ inline void parallelForLoop(typename std::decay<I>::type first, I last, F&& func
 {
     if (hpx::threads::get_self_ptr() != nullptr)
     {
-        hpx::parallel::for_loop(hpx::parallel::execution::par, first, last, func);
+        hpx::experimental::for_loop(hpx::execution::par, first, last, func);
     }
     else
     {

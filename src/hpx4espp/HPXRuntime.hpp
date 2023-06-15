@@ -65,8 +65,8 @@ protected:
     int hpx_main(int argc, char** argv);
 
 private:
-    hpx::lcos::local::spinlock mtx_;
-    hpx::lcos::local::condition_variable_any cond_;
+    hpx::spinlock mtx_;
+    hpx::condition_variable_any cond_;
     std::mutex startup_mtx_;
     std::condition_variable startup_cond_;
     bool running_;

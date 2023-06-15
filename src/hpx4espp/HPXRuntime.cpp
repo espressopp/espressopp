@@ -34,8 +34,6 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #endif
 
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-
 #include "python.hpp"
 
 int __argc = 0;

@@ -35,8 +35,8 @@
 
 #include <boost/python/numpy.hpp>
 
-using hpx::parallel::for_loop;
-using hpx::parallel::execution::par;
+using hpx::for_loop;
+using hpx::execution::par;
 
 #include "integrator/MDIntegrator.hpp"
 
