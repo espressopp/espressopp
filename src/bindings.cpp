@@ -31,6 +31,7 @@
 #include <VerletList.hpp>
 #include <VerletListAdress.hpp>
 #include <VerletListTriple.hpp>
+#include <VerletListHybrid.hpp>
 #include <FixedSingleList.hpp>
 #include <FixedPairList.hpp>
 #include <FixedPairDistList.hpp>
@@ -51,6 +52,7 @@
 #include <Version.hpp>
 #include <ParticleAccess.hpp>
 #include <RealND.hpp>
+#include <FixedVSList.hpp>
 
 #include <esutil/PyLogger.hpp>
 #include <esutil/bindings.hpp>
@@ -71,6 +73,8 @@ void espressopp::registerPython()
     espressopp::VerletList::registerPython();
     espressopp::VerletListAdress::registerPython();
     espressopp::VerletListTriple::registerPython();
+    espressopp::VerletListHybridAT::registerPython();
+    espressopp::VerletListHybridCG::registerPython();
     espressopp::FixedSingleList::registerPython();
     espressopp::FixedPairList::registerPython();
     espressopp::FixedPairDistList::registerPython();
@@ -92,6 +96,7 @@ void espressopp::registerPython()
     espressopp::Version::registerPython();
     espressopp::ParticleAccess::registerPython();
     espressopp::RealNDs::registerPython();
+    espressopp::FixedVSList::registerPython();
 
     espressopp::esutil::registerPython();
     espressopp::bc::registerPython();

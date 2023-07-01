@@ -28,6 +28,7 @@
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -40,6 +41,8 @@ typedef class VerletListHadressInteractionTemplate<LennardJonesCapped, Tabulated
     VerletListHadressLennardJonesCapped;
 typedef class CellListAllPairsInteractionTemplate<LennardJonesCapped> CellListLennardJonesCapped;
 typedef class FixedPairListInteractionTemplate<LennardJonesCapped> FixedPairListLennardJonesCapped;
+typedef class FixedPairListAdressInteractionTemplate<LennardJonesCapped>
+    FixedPairListAdressLennardJonesCapped;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -99,6 +102,14 @@ void LennardJonesCapped::registerPython()
         .def(init<std::shared_ptr<System>, std::shared_ptr<FixedPairListAdress>,
                   std::shared_ptr<LennardJonesCapped> >())
         .def("setPotential", &FixedPairListLennardJonesCapped::setPotential);
+    ;
+    class_<FixedPairListAdressLennardJonesCapped, bases<Interaction> >(
+        "interaction_FixedPairListAdressLennardJonesCapped",
+        init<shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesCapped>,
+             bool>())
+        .def(init<shared_ptr<System>, shared_ptr<FixedPairListAdress>,
+                  shared_ptr<LennardJonesCapped>, bool>())
+        .def("setPotential", &FixedPairListAdressLennardJonesCapped::setPotential);
     ;
 }
 
