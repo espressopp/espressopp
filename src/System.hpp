@@ -37,6 +37,11 @@ namespace esutil
 class RNG;
 }
 
+namespace vec
+{
+class Vectorization;
+}
+
 class System : public enable_shared_from_this<System>
 {
 private:
@@ -51,6 +56,7 @@ public:
     std::shared_ptr<storage::Storage> storage;
     std::shared_ptr<bc::BC> bc;
     std::shared_ptr<esutil::RNG> rng;
+    std::shared_ptr<vec::Vectorization> vectorization;
 
     interaction::InteractionList shortRangeInteractions;
 
