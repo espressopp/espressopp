@@ -201,7 +201,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                                     ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
                                     print('HeSpaDDA message: No update of dN req ...')
                             else:
-                                print('Cubicity check passed -> powered by HeSpaDDA')
+                                #Cubicity check passed
                                 fdN = [j, i, i]
             else:
                 for i in range(1, n + 1):
@@ -228,15 +228,15 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                                         ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
                                         print('HeSpaDDA message: No update of dN req ...')
                                 else:
-                                    print('Cubicity check passed -> powered by HeSpaDDA')
+                                    #Cubicity check passed
                                     fdN = [k, j, i]
             if abs(box_size[1] - box_size[2]) < (2 * (rc + skin)):
                 if fdN[2] > fdN[1]:
                     aux = fdN[2]
                     fdN[2] = fdN[1]
                     fdN[1] = aux
-                else:
-                    print('HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!')
+                #else:
+                #    print('HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!')
             else:
                 print('HeSpaDDA message: Size Lenghts are different in Y and Z!')
             return Int3D(fdN[0], fdN[1], fdN[2])
@@ -277,7 +277,7 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                                     ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
                                     print('HeSpaDDA message: No update of dN req ...')
                             else:
-                                print('Cubicity check passed -> powered by HeSpaDDA')
+                                #Cubicity check passed
                                 fdN = [j, i, i]
 
             else:
@@ -305,15 +305,15 @@ def nodeGrid(n=None, box_size=None, rc=None, skin=None, eh_size=0, ratioMS=0, id
                                         ijkmax = fdN[0] * fdN[0] + fdN[1] * fdN[1] + fdN[2] * fdN[2]
                                         print('HeSpaDDA message: No update of dN req ...')
                                 else:
-                                    print('Cubicity check passed -> powered by HeSpaDDA')
+                                    #Cubicity check passed
                                     fdN = [k, j, i]
     if abs(box_size[1] - box_size[2]) < (2 * (rc + skin)):
         if fdN[2] > fdN[1]:
             aux = fdN[2]
             fdN[2] = fdN[1]
             fdN[1] = aux
-        else:
-            print('HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!')
+        #else:
+        #    print('HeSpaDDA message: Size Lenghts are eq. while ordering axis with preference on X, Y and Z!')
     else:
         print('HeSpaDDA message: Size Lenghts are different in Y and Z!')
     return Int3D(fdN[0], fdN[1], fdN[2])
