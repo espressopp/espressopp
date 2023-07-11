@@ -82,6 +82,7 @@
 #include "ConstrainCOM.hpp"
 #include "ConstrainRG.hpp"
 #include "SmoothSquareWell.hpp"
+#include "Attractivecos30.hpp"
 
 namespace espressopp
 {
@@ -151,6 +152,7 @@ void registerPython()
     ConstrainCOM::registerPython();
     ConstrainRG::registerPython();
     SmoothSquareWell::registerPython();
+    Attractivecos30::registerPython();
 }
 }  // namespace interaction
 }  // namespace espressopp
