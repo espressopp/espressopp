@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 include(CMakePrintHelpers)
 
-project(espressopp VERSION 3.0.1 LANGUAGES C CXX)
+project(espressopp VERSION 3.1.0 LANGUAGES C CXX)
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(ESPP_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
