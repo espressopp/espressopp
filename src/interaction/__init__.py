@@ -90,3 +90,4 @@ from espressopp.interaction.ConstrainCOM import *
 from espressopp.interaction.ConstrainRG import *
 from espressopp.interaction.SmoothSquareWell import *
 from espressopp.interaction.Attractivecos30 import *
+from espressopp.interaction.Glassbending30 import *
