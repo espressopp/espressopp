@@ -91,3 +91,5 @@ from espressopp.interaction.ConstrainRG import *
 from espressopp.interaction.SmoothSquareWell import *
 from espressopp.interaction.Attractivecos30 import *
 from espressopp.interaction.Glassbending30 import *
+from espressopp.interaction.LennardJones_sphwall30 import *
+from espressopp.interaction.nLennardJones104Wall30 import *

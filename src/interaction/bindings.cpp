@@ -84,6 +84,8 @@
 #include "SmoothSquareWell.hpp"
 #include "Attractivecos30.hpp"
 #include "Glassbending30.hpp"
+#include "LennardJones_sphwall30.hpp"
+#include "nLennardJones104Wall30.hpp"
 
 namespace espressopp
 {
@@ -155,6 +157,8 @@ void registerPython()
     SmoothSquareWell::registerPython();
     Attractivecos30::registerPython();
     Glassbending30::registerPython();
+    LennardJones_sphwall30::registerPython();
+    nLennardJones104Wall30::registerPython();
 }
 }  // namespace interaction
 }  // namespace espressopp
