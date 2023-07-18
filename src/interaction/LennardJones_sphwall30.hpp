@@ -75,7 +75,7 @@ namespace espressopp {
       int bondType() { return Single; }
       real getMaxCutoff() { return 0.; }
 
-      void setParams(int type, real _epsilon, real _sigma, real _radius, real _lcutoff)
+      void setParams(unsigned type, real _epsilon, real _sigma, real _radius, real _lcutoff)
        {
           if ((params_list.size()) < (type + 1))
         {
@@ -89,12 +89,12 @@ namespace espressopp {
         setAutoShift(type);
     }
 
-      python::tuple getParams(int type) {
+      python::tuple getParams(unsigned type) {
 	LJ_sphwParams &params = params_list.at(type);
 	return python::make_tuple(params.epsilon, params.sigma, params.radius, params.lcutoff);
       }
 
-      real setAutoShift(int type) {
+      real setAutoShift(unsigned type) {
 	LJ_sphwParams &params = params_list.at(type);
 	real rc = params.lcutoff;
         real rc2 = rc*rc;

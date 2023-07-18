@@ -77,7 +77,7 @@ public:
     int bondType() { return Single; }
     real getMaxCutoff() { return 0.; }
 
-    void setParams(int type, real _epsilon, real _sigma, real _sigmaCutoff, real _r0)
+    void setParams(unsigned type, real _epsilon, real _sigma, real _sigmaCutoff, real _r0)
     {
         if (int_c(params_list.size()) < (type + 1))
         {
@@ -91,13 +91,13 @@ public:
         setAutoShift(type);
     }
 
-    python::tuple getParams(int type)
+    python::tuple getParams(unsigned type)
     {
         LJ93WParams& params = params_list.at(type);
         return python::make_tuple(params.epsilon, params.sigma, params.sigmaCutoff, params.r0);
     }
 
-    real setAutoShift(int type)
+    real setAutoShift(unsigned type)
     {
         LJ93WParams& params = params_list.at(type);
 
