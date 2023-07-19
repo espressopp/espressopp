@@ -79,7 +79,7 @@ public:
 
     void setParams(unsigned type, real _epsilon, real _sigma, real _sigmaCutoff, real _r0)
     {
-        if (int_c(params_list.size()) < (type + 1))
+        if (params_list.size() < (type + 1))
         {
             params_list.resize(type + 1);
         }
