@@ -35,7 +35,7 @@ Alternatively, you can download a tarball or zip file of [previous release versi
  - Boost ( >= 1.69.0)
  - MPI
  - FFTW3
- - GROMACS (required when `WITH_XTC` flag is enabled)
+ - GROMACS (required when `WITH_XTC` flag is enabled, GROMACS needs to be built with GMX_INSTALL_LEGACY_API)
  - HDF5
 
 ## Python Dependencies
