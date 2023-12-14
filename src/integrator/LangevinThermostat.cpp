@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -25,6 +27,7 @@
 
 #include "types.hpp"
 #include "System.hpp"
+#include "bc/BC.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
@@ -137,12 +140,38 @@ void LangevinThermostat::thermalizeAdr()
 
 void LangevinThermostat::frictionThermo(Particle& p)
 {
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    System& system = getSystemRef();
+    */
     real massf = sqrt(p.mass());
 
     // get a random value for each vector component
     Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int modeThermal = system.lebcMode;
+
+    if (modeThermal == 0)
+    {*/
     p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    }
+    else if (modeThermal == 1)
+    {
+        real halfL = system.bc->getBoxL()[2] / 2.0;
+        Real3D vtmp = {system.shearRate * (p.position()[2] - halfL), .0, .0};
+        p.force() += pref1 * (p.velocity() + vtmp) * p.mass() + pref2 * ranval * massf;
+    }
+    else if (modeThermal == 2)
+    {
+        Real3D vtmp = {.0, p.velocity()[1], .0};
+        Real3D rtmp = {.0, ranval[1], .0};
+        p.force() += pref1 * vtmp * p.mass() + pref2 * rtmp * massf;
+    }*/
 
     LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
 }
