@@ -1,5 +1,5 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
-file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
+file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp hpx4espp/*.cpp)
 file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
@@ -18,6 +18,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pipenv-env.cmakein
         ${CMAKE_BINARY_DIR}/.env @ONLY)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
+
+add_subdirectory(hpx4espp)
+target_link_libraries(_espressopp PRIVATE _hpx4espp_component)
 
 if(ESPP_WERROR)
     target_compile_options(_espressopp PRIVATE "-Werror")

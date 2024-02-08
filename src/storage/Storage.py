@@ -429,10 +429,8 @@ class StorageLocal(object):
                 p = ParticleLocal(pid,self)
                 print("CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2]))
 
-    def addParticlesArray(self, particleList, *properties):
-
+    def packArrayProperties(self, *properties, check=True):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-
             index_id          = -1
             index_posx        = -1 ### Real3D
             index_posy        = -1
@@ -509,21 +507,22 @@ class StorageLocal(object):
                     elif val.lower() == "pib": index_pib = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
 
-            assert index_id >= 0, "particle property id is mandatory"
-            assert index_posx >= 0, "particle property posx is mandatory"
-            assert index_posy >= 0, "particle property posy is mandatory"
-            assert index_posz >= 0, "particle property posz is mandatory"
+            if check:
+                assert index_id >= 0, "particle property id is mandatory"
+                assert index_posx >= 0, "particle property posx is mandatory"
+                assert index_posy >= 0, "particle property posy is mandatory"
+                assert index_posz >= 0, "particle property posz is mandatory"
 
-            def check3DProperty(prop, ix, iy, iz):
-                assert ((ix>=0)==(iy>=0) and (iy>=0)==(iz>=0)), \
-                    "Missing at least one of the 3d coordinates of property \"{}\"".format(prop)
+                def check3DProperty(prop, ix, iy, iz):
+                    assert ((ix>=0)==(iy>=0) and (iy>=0)==(iz>=0)), \
+                        "Missing at least one of the 3d coordinates of property \"{}\"".format(prop)
 
-            check3DProperty("pos", index_posx, index_posy, index_posz)
-            check3DProperty("v", index_vx, index_vy, index_vz)
-            check3DProperty("f", index_fx, index_fy, index_fz)
-            check3DProperty("fm", index_fmx, index_fmy, index_fmz)
-            check3DProperty("modepos", index_modeposx, index_modeposy, index_modeposz)
-            check3DProperty("modemom", index_modemomx, index_modemomy, index_modemomz)
+                check3DProperty("pos", index_posx, index_posy, index_posz)
+                check3DProperty("v", index_vx, index_vy, index_vz)
+                check3DProperty("f", index_fx, index_fy, index_fz)
+                check3DProperty("fm", index_fmx, index_fmy, index_fmz)
+                check3DProperty("modepos", index_modeposx, index_modeposy, index_modeposz)
+                check3DProperty("modemom", index_modemomx, index_modemomy, index_modemomz)
 
             indices = np.array([index_id,
                 index_posx, index_posy, index_posz, index_modeposx, index_modeposy, index_modeposz,
@@ -532,14 +531,32 @@ class StorageLocal(object):
                 index_q, index_radius, index_fradius, index_vradius, index_type, index_mass,
                 index_varmass, index_adrAT, index_lambda_adr, index_lambda_adrd, index_state, index_pib
                 ], dtype=np.int32)
+            return indices
+
+    def addParticlesArray(self, particleList, *properties):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            indices = self.packArrayProperties(*properties)
             self.cxxclass.addParticlesFromArray(self, particleList, indices)
+
+    def addParticlesArrayReplicate(self, particleList, *properties, size_orig=None, repl=(1,1,1), idstart=0):
+        assert size_orig is not None, "Provide size_orig parameter"
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            Lx, Ly, Lz = size_orig
+            xdim, ydim, zdim = repl
+            indices = self.packArrayProperties(*properties)
+            self.cxxclass.addParticlesFromArrayReplicate(self, particleList, indices, Lx, Ly, Lz, xdim, ydim, zdim, idstart)
+
+    def getParticlesArrayImpl(self, *properties):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            indices = self.packArrayProperties(*properties, check=False)
+            return self.cxxclass.getParticlesArrayImpl(self, indices)
 
 if pmi.isController:
     class Storage(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles", "addParticlesArray", "addParticlesArrayReplicate"],
             pmiproperty = [ "system" ],
-            pmiinvoke = ["getRealParticleIDs", "printRealParticles"]
+            pmiinvoke = ["getRealParticleIDs", "printRealParticles", "getParticlesArrayImpl"]
             )
 
         def particleExists(self, pid):
@@ -598,3 +615,15 @@ if pmi.isController:
 
         def clearSavedPositions(self):
             pmi.call(self.pmiobject, 'clearSavedPositions')
+
+        def getParticlesArray(self, *properties):
+            return np.concatenate(self.getParticlesArrayImpl(*properties), axis=0).transpose()
+
+    def preReplicate(num_particles_orig, Lx_orig, Ly_orig, Lz_orig, xdim=1, ydim=1, zdim=1):
+        tot_repl = xdim * ydim * zdim
+        num_particles = num_particles_orig * tot_repl
+        Lx = Lx_orig * xdim
+        Ly = Ly_orig * ydim
+        Lz = Lz_orig * zdim
+        return num_particles, Lx, Ly, Lz
+

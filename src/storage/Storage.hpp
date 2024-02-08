@@ -443,6 +443,18 @@ public:
                                    const int* idx,
                                    const int npart,
                                    const int nidx);
+
+    void addParticlesFromArrayReplImpl(const real* part,
+                                       const int* idx,
+                                       const int npart,
+                                       const int nidx,
+                                       const real Lx,
+                                       const real Ly,
+                                       const real Lz,
+                                       const int xdim,
+                                       const int ydim,
+                                       const int zdim,
+                                       const int pid_start);
     /////////////////////////////////////////////////////////////////////////
 };
 }  // namespace storage

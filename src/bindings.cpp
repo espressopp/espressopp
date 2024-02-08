@@ -62,6 +62,7 @@
 #include <io/bindings.hpp>
 
 #include <vec/bindings.hpp>
+#include <hpx4espp/bindings.hpp>
 
 void espressopp::registerPython()
 {
@@ -102,6 +103,7 @@ void espressopp::registerPython()
     espressopp::io::registerPython();
 
     espressopp::vec::registerPython();
+    espressopp::hpx4espp::registerPython();
 
     log4espp::PyLogger::registerPython();
 }
