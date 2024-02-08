@@ -36,7 +36,7 @@ Alternatively, you can download a tarball or zip file of [previous release versi
  - MPI
  - FFTW3
  - GROMACS (required when `WITH_XTC` flag is enabled)
- - [HPX 1.5.1](https://hpx-docs.stellar-group.org/tags/1.5.1/html/quickstart.html) (required when `HPX4ESPP_ENABLED=ON`, tested with this [patched version](https://github.com/jnvance/hpx/tree/1.5.1-patch))
+ - [HPX 1.9.1](https://hpx-docs.stellar-group.org/tags/1.9.1/html/quickstart.html) (required when `HPX4ESPP_ENABLED=ON`)
  - HDF5
 
 ## Python Dependencies
