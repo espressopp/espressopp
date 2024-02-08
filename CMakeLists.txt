@@ -116,7 +116,7 @@ endif()
 ######################################
 option(HPX4ESPP_ENABLED "Enable HPX4ESPP package" OFF)
 if(HPX4ESPP_ENABLED)
-    find_package(HPX REQUIRED)
+    find_package(HPX 1.9.1 REQUIRED)
 endif()
 
 ######################################
