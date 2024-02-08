@@ -37,7 +37,7 @@
         ss_ << "MPI rank " << _rank_ << ", file \"" << __FILE__ << "\", line " << __LINE__        \
             << ", in " << f << "\n  " << msg;                                                     \
         std::cerr << "\nHPX4ESPP_THROW_EXCEPTION: " << ss_.str() << ": HPX("                      \
-                  << hpx::error_names[errcode] << ")\n"                                           \
+                  << hpx::get_error_name(errcode) << ")\n"                                        \
                   << std::endl;                                                                   \
         HPX_THROW_EXCEPTION(errcode, f, ss_.str());                                               \
     }                                                                                             \

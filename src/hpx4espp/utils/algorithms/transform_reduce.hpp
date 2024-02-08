@@ -44,15 +44,13 @@ inline T parallelTransformReduce(
 {
     if (hpx::threads::get_self_ptr() != nullptr)
     {
-        return hpx::parallel::transform_reduce(hpx::parallel::execution::par, first, last,
-                                               std::move(init), std::forward<Reduce>(red_op),
-                                               std::forward<Convert>(conv_op));
+        return hpx::transform_reduce(hpx::execution::par, first, last, std::move(init),
+                                     std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
     }
     else
     {
-        return hpx::parallel::transform_reduce(hpx::parallel::execution::seq, first, last,
-                                               std::move(init), std::forward<Reduce>(red_op),
-                                               std::forward<Convert>(conv_op));
+        return hpx::transform_reduce(hpx::execution::seq, first, last, std::move(init),
+                                     std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
     }
 }
 
