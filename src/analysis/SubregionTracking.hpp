@@ -27,6 +27,8 @@
 #include "Real3D.hpp"
 #include "python.hpp"
 
+#include <set>
+
 namespace espressopp
 {
 namespace analysis

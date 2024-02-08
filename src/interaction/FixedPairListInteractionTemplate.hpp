@@ -292,7 +292,7 @@ inline void FixedPairListInteractionTemplate<_Potential>::computeVirialX(
     }
 
     std::transform(p_xx_sum.begin(), p_xx_sum.end(),
-    p_xx_sum.begin(),std::bind2nd(std::divides<real>(),Volume)); for (i = 0; i < bins; ++i)
+    p_xx_sum.begin(), [=](auto& x){return x / Volume;}); for (i = 0; i < bins; ++i)
     {
        p_xx_total.at(i) += p_xx_sum.at(i);         // TO EXCLUDE THEM
     }*/

@@ -35,7 +35,7 @@ Alternatively, you can download a tarball or zip file of [previous release versi
  - Boost ( >= 1.69.0)
  - MPI
  - FFTW3
- - GROMACS (required when `WITH_XTC` flag is enabled)
+ - GROMACS (required when `WITH_XTC` flag is enabled, GROMACS needs to be built with GMX_INSTALL_LEGACY_API)
  - [HPX 1.9.1](https://hpx-docs.stellar-group.org/tags/1.9.1/html/quickstart.html) (required when `HPX4ESPP_ENABLED=ON`)
  - HDF5
 
@@ -112,9 +112,9 @@ Report bugs on the [GitHub issues site](https://github.com/espressopp/espressopp
 
 ## Installation
 
-Download the following [HPX 1.5.1 patched version](https://github.com/jnvance/hpx/tree/1.5.1-patch) or the latest release [HPX 1.7.1](https://github.com/STEllAR-GROUP/hpx/releases/tag/1.7.1).
+Download the latest release [HPX 1.9.1](https://github.com/STEllAR-GROUP/hpx/releases/tag/1.9.1).
 
-Follow the installation procedure in [this documentation](https://hpx-docs.stellar-group.org/tags/1.5.1/html/quickstart.html).
+Follow the installation procedure in [this documentation](https://hpx-docs.stellar-group.org/tags/1.9.1/html/quickstart.html).
 
 Build espressopp:
 

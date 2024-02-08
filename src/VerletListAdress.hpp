@@ -32,6 +32,8 @@
 #include "boost/unordered_set.hpp"
 #include "Real3D.hpp"
 
+#include <set>
+
 namespace espressopp
 {
 /** Class that builds and stores verlet lists.

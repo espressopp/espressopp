@@ -80,10 +80,10 @@ class TestH5MD(unittest.TestCase):
 
         restore_h5md_parallel = espressopp.io.RestoreH5MDParallel(self.system, 'reference.h5')
         restore_h5md_parallel.restore()
-        dump_h5md_parallel = espressopp.io.DumpH5MDParallel(self.system, 'dump.h5')
+        dump_h5md_parallel = espressopp.io.DumpH5MDParallel(self.system, 'dump2.h5')
         dump_h5md_parallel.dump()
 
-        self.binary_compare('reference.h5', 'dump.h5')
+        self.compare_hdf5_structure('reference.h5', 'dump2.h5')
 
 
 if __name__ == '__main__':

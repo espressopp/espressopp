@@ -163,7 +163,8 @@ void ParticleArray::copyFrom(CellList const& srcCells)
     data_size_ = total_data_size;
 
     // fill values
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         size_t start = cellRange_[ic];
         ParticleList const& particlelist = srcCells[ic]->particles;
         updateFrom(particlelist, start);
@@ -171,7 +172,8 @@ void ParticleArray::copyFrom(CellList const& srcCells)
     for (size_t ic = 0; ic < numCells; ic++) updateCell(ic);
 
     {
-        auto fillCell = [this, &srcCells](size_t ic) {
+        auto fillCell = [this, &srcCells](size_t ic)
+        {
             ParticleList const& particlelist = srcCells[ic]->particles;
             const size_t end = cellRange_[ic] + particlelist.size();
             const size_t data_end = cellRange_[ic + 1];
@@ -184,7 +186,8 @@ void ParticleArray::copyFrom(CellList const& srcCells)
     }
 
     {
-        auto fillCell = [this, &srcCells](size_t ic) {
+        auto fillCell = [this, &srcCells](size_t ic)
+        {
             ParticleList const& particlelist = srcCells[ic]->particles;
             size_t end = cellRange_[ic] + particlelist.size();
             size_t data_end = cellRange_[ic + 1];
@@ -245,7 +248,8 @@ void ParticleArray::copyFromCellOwn(CellList const& srcCells)
     data_size_ = total_data_size;
 
     // fill values
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         if (!cellOwn_[ic]) return;
         size_t start = cellRange_[ic];
         ParticleList const& particlelist = srcCells[ic]->particles;
@@ -254,7 +258,8 @@ void ParticleArray::copyFromCellOwn(CellList const& srcCells)
     for (size_t ic = 0; ic < numCells; ic++) updateCell(ic);
 
     {
-        auto fillCell = [this, &srcCells](size_t ic) {
+        auto fillCell = [this, &srcCells](size_t ic)
+        {
             const size_t end = cellRange_[ic] + sizes_[ic];
             const size_t data_end = cellRange_[ic + 1];
             for (size_t ip = end; ip < data_end; ip++) p_x[ip] = large_pos;
@@ -266,7 +271,8 @@ void ParticleArray::copyFromCellOwn(CellList const& srcCells)
     }
 
     {
-        auto fillCell = [this, &srcCells](size_t ic) {
+        auto fillCell = [this, &srcCells](size_t ic)
+        {
             size_t end = cellRange_[ic] + sizes_[ic];
             size_t data_end = cellRange_[ic + 1];
             for (size_t ip = end; ip < data_end; ip++) id[ip] = -1;
@@ -282,7 +288,8 @@ void ParticleArray::updateFromPositionVelocity(CellList const& srcCells, bool re
 {
     const size_t numCells = srcCells.size();
 
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         ParticleList const& particlelist = srcCells[ic]->particles;
         const size_t start = cellRange_[ic];
         const size_t end = start + particlelist.size();
@@ -330,7 +337,8 @@ void ParticleArray::updateToPositionVelocity(CellList& srcCells, bool realOnly) 
     verify(srcCells);
 #endif
 
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         ParticleList& particlelist = srcCells[ic]->particles;
         const size_t start = cellRange_[ic];
         const size_t end = start + particlelist.size();
@@ -466,7 +474,8 @@ void ParticleArray::updateToPositionOnly(CellList& srcCells) const
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void ParticleArray::updateFromForceOnly(CellList const& srcCells, bool realOnly)
 {
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         ParticleList const& particlelist = srcCells[ic]->particles;
         const size_t start = cellRange_[ic];
         const size_t end = start + particlelist.size();
@@ -497,7 +506,8 @@ void ParticleArray::updateFromForceOnly(CellList const& srcCells, bool realOnly)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void ParticleArray::updateToForceOnly(CellList& srcCells, bool realOnly) const
 {
-    auto updateCell = [this, &srcCells](size_t ic) {
+    auto updateCell = [this, &srcCells](size_t ic)
+    {
         ParticleList& particlelist = srcCells[ic]->particles;
         const size_t start = cellRange_[ic];
         const size_t end = start + particlelist.size();
@@ -542,7 +552,8 @@ void ParticleArray::addToForceOnly(CellList& srcCells) const
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void ParticleArray::zeroForces()
 {
-    auto f_zero = [](real* __restrict f, size_t size) {
+    auto f_zero = [](real* __restrict f, size_t size)
+    {
         ESPP_VEC_PRAGMAS
         for (size_t i = 0; i < size; i++) f[i] = 0.0;
     };

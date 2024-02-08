@@ -36,6 +36,8 @@
 #include "FixedTupleListAdress.hpp"
 #include "boost/signals2.hpp"
 
+#include <set>
+
 namespace espressopp
 {
 namespace integrator

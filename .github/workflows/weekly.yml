@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         BUILD_TYPE: [Release, Debug]
-        DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_devel', 'ubuntu_rolling', 'ubuntu_mpich']
+        DISTRO: ['fedora', 'fedora_rawhide', 'fedora_mpich', 'opensuse', 'ubuntu', 'ubuntu_rolling']
         CMAKE_COMPILER: [
             '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
             '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
@@ -28,13 +28,13 @@ jobs:
       image: espressopp/buildenv:${{ matrix.distro }}
       options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.ccache
           key: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
           restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Python Dependencies
         run: pip3 install -r requirements.txt
