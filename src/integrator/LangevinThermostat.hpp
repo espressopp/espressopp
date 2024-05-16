@@ -35,6 +35,8 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
+#include <set>
+
 namespace espressopp
 {
 namespace integrator

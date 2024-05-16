@@ -28,7 +28,7 @@ install it first. It is available for all major Linux distributions and also for
 
 .. code-block:: bash
 
-   cmake .
+   cmake -B builddir .
 
 (the space and dot after *cmake* are necessary)
 
@@ -37,7 +37,7 @@ tell cmake manually, where to find them by typing:
 
 .. code-block:: bash
 
-   ccmake .
+   ccmake -B builddir .
 
 This will open an interactive page where all configuration information can be specified.
 
@@ -45,7 +45,7 @@ After successfully building all the Makefiles you should build |espp| with:
 
 .. code-block:: bash
 
-   make
+   cmake --build builddir
 
 (This will take several minutes)
 
