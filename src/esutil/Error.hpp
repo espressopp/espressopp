@@ -35,7 +35,7 @@ namespace esutil
 /** Print Stack*/
 static inline void printStackTrace(std::stringstream &msg, const unsigned int max_frames)
 {
-    void *addrlist[max_frames + 1];
+    auto addrlist = new void*[max_frames + 1];
     int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void *));
     if (addrlen == 0)
     {
@@ -49,6 +49,7 @@ static inline void printStackTrace(std::stringstream &msg, const unsigned int ma
         msg << symbollist[i] << std::endl;
     }
     free(symbollist);
+    delete[] addrlist;
 }
 
 /** This class supports exception handling for MPI processors.
