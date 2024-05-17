@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@8e02cf5c38baa3ddce3b993cef6fa49aa33e22ac
+        uses: peter-evans/slash-command-dispatch@13bc09769d122a64f75aa5037256f6f2d78be8c4
         with:
           token: ${{ secrets.BOT_PAT }}
           commands: format
