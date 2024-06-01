@@ -129,8 +129,8 @@ Move to the directory ``$ESPRESSOHOME``. Update the makefiles and compile using 
 
 .. code-block:: c
 
-   cmake .
-   make
+   cmake -B builddir .
+   cmake --build builddir
 
 .. Step 5
 .. ......
