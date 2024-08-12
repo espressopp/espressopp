@@ -48,7 +48,7 @@ jobs:
           git --version
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/espressopp -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON -DHPX4ESPP_ENABLED=ON
 
       - name: Build
         run: cmake --build build --verbose --target all -j 2
