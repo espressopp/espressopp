@@ -180,7 +180,8 @@ void VelocityVerlet::run_(int nsteps)
 real VelocityVerlet::integrate1()
 {
     auto& vs = this->storageHPX->virtualStorage;
-    auto f_integrate1_vs = [this, &vs](size_t const& ivs) {
+    auto f_integrate1_vs = [this, &vs](size_t const& ivs)
+    {
         auto& particles = vs[ivs].particles;
         return vec::integrator::VelocityVerlet::integrate1(particles, dt);
     };
@@ -201,9 +202,8 @@ real VelocityVerlet::integrate1()
 void VelocityVerlet::integrate2()
 {
     auto& vs = this->storageHPX->virtualStorage;
-    auto f_integrate2_vs = [this, &vs](size_t const& ivs) {
-        vec::integrator::VelocityVerlet::integrate2(vs[ivs].particles, dt);
-    };
+    auto f_integrate2_vs = [this, &vs](size_t const& ivs)
+    { vec::integrator::VelocityVerlet::integrate2(vs[ivs].particles, dt); };
 
     utils::parallelForLoop(size_t(0), vs.size(), f_integrate2_vs);
 }

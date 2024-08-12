@@ -45,7 +45,8 @@ void SAVE_PARTICLE_ARRAY(boost::mpi::communicator const& comm,
                          std::string label,
                          int filterLevel)
 {
-    auto getEnvStr = [](std::string const& key) {
+    auto getEnvStr = [](std::string const& key)
+    {
         char* val = std::getenv(key.c_str());
         return val == NULL ? std::string("") : std::string(val);
     };
@@ -67,7 +68,8 @@ void SAVE_PARTICLE_ARRAY(boost::mpi::communicator const& comm,
     };
     std::vector<SaveParticle> saveParticles;
 
-    auto appendCell = [&](const auto& inode, size_t ic) {
+    auto appendCell = [&](const auto& inode, size_t ic)
+    {
         const auto& vs = vss[inode];
         const auto& pa = vs.particles;
 
@@ -113,12 +115,14 @@ void SAVE_PARTICLE_ARRAY(boost::mpi::communicator const& comm,
 
     /// TODO: Gather to rank 0
 
-    auto saveToFile = [](const auto& saveParticles, const auto& outFile) {
+    auto saveToFile = [](const auto& saveParticles, const auto& outFile)
+    {
         HPX4ESPP_DEBUG_MSG("Saving " << saveParticles.size() << " particles to " << outFile);
 
         // verify that file does not yet exist
         {
-            auto fileExists = [](const std::string& filename) -> bool {
+            auto fileExists = [](const std::string& filename) -> bool
+            {
                 struct stat buf;
                 if (stat(filename.c_str(), &buf) != -1)
                 {

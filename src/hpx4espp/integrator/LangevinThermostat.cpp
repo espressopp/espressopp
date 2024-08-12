@@ -150,7 +150,8 @@ void LangevinThermostat::thermalize()
         throw std::runtime_error("Insufficient number of threads in rngThread");
     }
 
-    auto friction_thermo_vs = [this, &vss, &rngs](size_t ivs) {
+    auto friction_thermo_vs = [this, &vss, &rngs](size_t ivs)
+    {
         auto& vs = vss[ivs];
         auto& particles = vss[ivs].particles;
         const auto& realCells = particles.realCells();

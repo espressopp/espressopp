@@ -117,68 +117,71 @@ Channels::Channels(espressopp::storage::NodeGrid const& nodeGrid,
 
 void Channels::verifyChannels()
 {
-    hpx::threads::run_as_hpx_thread([this] {
-        const int rank = mpiWorld->rank();
-
-        /// send the channel's data
-        for (int coord = 0; coord < 3; ++coord)
+    hpx::threads::run_as_hpx_thread(
+        [this]
         {
-            const int nsub = numSubNodes[coord];
-            for (int lr = 0; lr < 2; ++lr)
+            const int rank = mpiWorld->rank();
+
+            /// send the channel's data
+            for (int coord = 0; coord < 3; ++coord)
             {
-                for (int isub = 0; isub < nsub; isub++)
+                const int nsub = numSubNodes[coord];
+                for (int lr = 0; lr < 2; ++lr)
                 {
-                    auto const& idx = sendIdxs[CHIDX(coord, lr, isub)];
-                    AlignedVectorChar avc(sizeof(int) * 4);
-                    int* buf = (int*)(avc.data());
-                    buf[0] = std::get<0>(idx);
-                    buf[1] = std::get<1>(idx);
-                    buf[2] = std::get<2>(idx);
-                    buf[3] = std::get<3>(idx);
-                    // sendChannels[CHIDX(coord,lr,isub)].set(hpx::launch::sync, avc);
-                    sendChannels[CHIDX(coord, lr, isub)].set(hpx::launch::apply, std::move(avc));
-                    // sendChannels[CHIDX(coord,lr,isub)].set(hpx::launch::apply, avc);
+                    for (int isub = 0; isub < nsub; isub++)
+                    {
+                        auto const& idx = sendIdxs[CHIDX(coord, lr, isub)];
+                        AlignedVectorChar avc(sizeof(int) * 4);
+                        int* buf = (int*)(avc.data());
+                        buf[0] = std::get<0>(idx);
+                        buf[1] = std::get<1>(idx);
+                        buf[2] = std::get<2>(idx);
+                        buf[3] = std::get<3>(idx);
+                        // sendChannels[CHIDX(coord,lr,isub)].set(hpx::launch::sync, avc);
+                        sendChannels[CHIDX(coord, lr, isub)].set(hpx::launch::apply,
+                                                                 std::move(avc));
+                        // sendChannels[CHIDX(coord,lr,isub)].set(hpx::launch::apply, avc);
+                    }
                 }
             }
-        }
 
-        std::vector<hpx::future<AlignedVectorChar>> futures;
-        futures.reserve(2 * (numSubNodes[0] + numSubNodes[1] + numSubNodes[2]));
-        for (int coord = 0; coord < 3; ++coord)
-        {
-            const int nsub = numSubNodes[coord];
-            for (int lr = 0; lr < 2; ++lr)
+            std::vector<hpx::future<AlignedVectorChar>> futures;
+            futures.reserve(2 * (numSubNodes[0] + numSubNodes[1] + numSubNodes[2]));
+            for (int coord = 0; coord < 3; ++coord)
             {
-                for (int isub = 0; isub < nsub; isub++)
+                const int nsub = numSubNodes[coord];
+                for (int lr = 0; lr < 2; ++lr)
                 {
-                    // std::future<AlignedVectorChar> buf =
-                    // recvChannels[CHIDX(coord,lr,isub)].get();
-                    futures.push_back(recvChannels[CHIDX(coord, lr, isub)].get());
+                    for (int isub = 0; isub < nsub; isub++)
+                    {
+                        // std::future<AlignedVectorChar> buf =
+                        // recvChannels[CHIDX(coord,lr,isub)].get();
+                        futures.push_back(recvChannels[CHIDX(coord, lr, isub)].get());
+                    }
                 }
             }
-        }
 
-        std::vector<AlignedVectorChar> bufs = hpx::unwrap(futures);
-        for (int coord = 0; coord < 3; ++coord)
-        {
-            const int nsub = numSubNodes[coord];
-            for (int lr = 0; lr < 2; ++lr)
+            std::vector<AlignedVectorChar> bufs = hpx::unwrap(futures);
+            for (int coord = 0; coord < 3; ++coord)
             {
-                for (int isub = 0; isub < nsub; isub++)
+                const int nsub = numSubNodes[coord];
+                for (int lr = 0; lr < 2; ++lr)
                 {
-                    const int chidx = CHIDX(coord, lr, isub);
-                    auto const& avc = bufs[chidx];
-                    HPX4ESPP_ASSERT_EQUAL(avc.size(), sizeof(int) * 4);
-                    auto const& idx = recvIdxs[chidx];
-                    const int* buf = (int*)(avc.data());
-                    HPX4ESPP_ASSERT_EQUAL(buf[0], std::get<0>(idx));
-                    HPX4ESPP_ASSERT_EQUAL(buf[1], std::get<1>(idx));
-                    HPX4ESPP_ASSERT_EQUAL(buf[2], std::get<2>(idx));
-                    HPX4ESPP_ASSERT_EQUAL(buf[3], std::get<3>(idx));
+                    for (int isub = 0; isub < nsub; isub++)
+                    {
+                        const int chidx = CHIDX(coord, lr, isub);
+                        auto const& avc = bufs[chidx];
+                        HPX4ESPP_ASSERT_EQUAL(avc.size(), sizeof(int) * 4);
+                        auto const& idx = recvIdxs[chidx];
+                        const int* buf = (int*)(avc.data());
+                        HPX4ESPP_ASSERT_EQUAL(buf[0], std::get<0>(idx));
+                        HPX4ESPP_ASSERT_EQUAL(buf[1], std::get<1>(idx));
+                        HPX4ESPP_ASSERT_EQUAL(buf[2], std::get<2>(idx));
+                        HPX4ESPP_ASSERT_EQUAL(buf[3], std::get<3>(idx));
+                    }
                 }
             }
-        }
-    });
+        });
 }
 
 ChannelType& Channels::sendChannel(size_t coord, size_t lr, size_t isub)
@@ -217,7 +220,8 @@ std::string Channels::getChannelName(IndexType const& p) const
 /// store channel parameters into list of tuples
 python::object Channels::getChannelIndices() const
 {
-    auto f_append_idx = [this](auto& l, auto const& idxList) {
+    auto f_append_idx = [this](auto& l, auto const& idxList)
+    {
         HPX4ESPP_ASSERT_EQUAL(idxList.size(),
                               2 * (numSubNodes[0] + numSubNodes[1] + numSubNodes[2]));
 

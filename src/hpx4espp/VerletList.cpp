@@ -127,14 +127,16 @@ void VerletList::rebuild()
     num_pairs = 0;
     const size_t nvs = getVirtualStorage().size();
 
-    auto f = [this](size_t i) {
+    auto f = [this](size_t i)
+    {
         const auto& vs = getVirtualStorage().at(i);
         auto& nls = neighborLists.at(i);
 
         int num_pairs = 0;
         size_t max_type = 0;
 
-        auto f_rebuild = [&, this](vec::VerletList::NeighborList& nl, const auto& cnl) {
+        auto f_rebuild = [&, this](vec::VerletList::NeighborList& nl, const auto& cnl)
+        {
             nl.reset();
             if (vs.particles.size()) nl.rebuild<1>(cutsq, cnl, vs.particles);
             num_pairs += 2 * nl.num_pairs;

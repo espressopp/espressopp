@@ -190,19 +190,22 @@ inline void VerletListLennardJones::addForces_impl()
 
     /// for loop over virtual subdomains
     const size_t nvs = vss.size();
-    utils::parallelForLoop(size_t(0), nvs, [this, &vss, &nls](size_t inode) {
-        auto& vs = vss[inode];
-        const auto& nl = nls[inode];
-        addForces_impl_vs<ONETYPE, 1>(vs.particles, vs.particles, nl.realNbrs);
-        addForces_impl_vs<ONETYPE, 1>(vs.particles, vs.particles, nl.externalNbrs);
-
-        for (const auto& nnode_cnl : nl.internalNbrs)
+    utils::parallelForLoop(
+        size_t(0), nvs,
+        [this, &vss, &nls](size_t inode)
         {
-            const auto nnode = nnode_cnl.first;
-            const auto& cnl = nnode_cnl.second;
-            addForces_impl_vs<ONETYPE, 0>(vs.particles, vss[nnode].particles, cnl);
-        }
-    });
+            auto& vs = vss[inode];
+            const auto& nl = nls[inode];
+            addForces_impl_vs<ONETYPE, 1>(vs.particles, vs.particles, nl.realNbrs);
+            addForces_impl_vs<ONETYPE, 1>(vs.particles, vs.particles, nl.externalNbrs);
+
+            for (const auto& nnode_cnl : nl.internalNbrs)
+            {
+                const auto nnode = nnode_cnl.first;
+                const auto& cnl = nnode_cnl.second;
+                addForces_impl_vs<ONETYPE, 0>(vs.particles, vss[nnode].particles, cnl);
+            }
+        });
 }
 
 template <bool ONETYPE, bool N3L>

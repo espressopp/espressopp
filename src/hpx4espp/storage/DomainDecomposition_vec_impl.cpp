@@ -63,9 +63,11 @@ void DomainDecomposition::ghostCommunication_impl()
                 shift[coord] = nodeGrid.getBoundary(dir) * curCoordBoxL;
             }
 
-            auto f_interNode_pack = [this, &shift, dir]() {
+            auto f_interNode_pack = [this, &shift, dir]()
+            {
                 const real time = wallTimer.getElapsedTime();
-                auto packNode = [this, dir, &shift](size_t idxCommNode) {
+                auto packNode = [this, dir, &shift](size_t idxCommNode)
+                {
                     if (REAL_TO_GHOSTS)
                     {
                         packCells<PACKED_POSITIONS, ADD_SHIFT>(buffReal, true, dir, idxCommNode,
@@ -84,7 +86,8 @@ void DomainDecomposition::ghostCommunication_impl()
                 timeUpdateGhosts_InterNode_pack += wallTimer.getElapsedTime() - time;
             };
 
-            auto f_interNode_comm = [this, &comm, coord, dir, oppDir]() {
+            auto f_interNode_comm = [this, &comm, coord, dir, oppDir]()
+            {
                 const real time = wallTimer.getElapsedTime();
                 longint recver, sender, countRecv, countSend;
                 real *buffSend, *buffRecv;
@@ -119,10 +122,12 @@ void DomainDecomposition::ghostCommunication_impl()
                 timeUpdateGhosts_InterNode_comm += wallTimer.getElapsedTime() - time;
             };
 
-            auto f_interNode_unpack = [this, dir]() {
+            auto f_interNode_unpack = [this, dir]()
+            {
                 const real time = wallTimer.getElapsedTime();
 
-                auto unpackNode = [this, dir](size_t idxCommNode) {
+                auto unpackNode = [this, dir](size_t idxCommNode)
+                {
                     if (REAL_TO_GHOSTS)
                     {
                         unpackCells<PACKED_POSITIONS, DATA_INSERT>(buffGhost, false, dir,
@@ -142,19 +147,22 @@ void DomainDecomposition::ghostCommunication_impl()
 
             /// Inter-node block
             auto f_interNode = [this, &shift, &f_interNode_pack, &f_interNode_comm,
-                                &f_interNode_unpack, coord, dir, oppDir]() {
+                                &f_interNode_unpack, coord, dir, oppDir]()
+            {
                 f_interNode_pack();
                 f_interNode_comm();
                 f_interNode_unpack();
             };
 
             /// Intra-node block (including shifted/periodic)
-            auto f_intraNode = [this, &shift, doPeriodic, dir]() {
+            auto f_intraNode = [this, &shift, doPeriodic, dir]()
+            {
                 const real time = wallTimer.getElapsedTime();
 
                 if (HPX4ESPP_OPTIMIZE_COMM)
                 {
-                    auto f_pair = [this, dir, &shift](size_t i) {
+                    auto f_pair = [this, dir, &shift](size_t i)
+                    {
                         const size_t ip = i / numCommSubs;
                         const size_t is = i % numCommSubs;
 
@@ -179,7 +187,8 @@ void DomainDecomposition::ghostCommunication_impl()
                 }
                 else
                 {
-                    auto f_pair = [this, dir, &shift](size_t i) {
+                    auto f_pair = [this, dir, &shift](size_t i)
+                    {
                         const size_t ip = i / numCommSubs;
                         const size_t is = i % numCommSubs;
 
@@ -250,7 +259,8 @@ void DomainDecomposition::copyRealsToGhostsIntra(
         const auto& crg = pg.cellRange();
 
         {
-            auto f_dim = [&](const real* __restrict ptr_r, real* __restrict ptr_g, real shift_v) {
+            auto f_dim = [&](const real* __restrict ptr_r, real* __restrict ptr_g, real shift_v)
+            {
                 for (size_t ic = 0; ic < numCells; ic++)
                 {
                     const size_t icr = ccr[ic];
@@ -301,7 +311,8 @@ void DomainDecomposition::copyRealsToGhostsIntra(
         const auto& crg = pg.cellRange();
 
         {
-            auto f_dim = [&](const real* __restrict ptr_r, real* __restrict ptr_g, real shift_v) {
+            auto f_dim = [&](const real* __restrict ptr_r, real* __restrict ptr_g, real shift_v)
+            {
                 // for (size_t ic = 0; ic < numCells; ic++)
                 for (size_t ic = c_range.first; ic < c_range.second; ic++)
                 {
@@ -362,7 +373,8 @@ void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir, size_t ir, size
         const auto& crg = pg.cellRange();
 
         {
-            auto f_dim = [&](real* __restrict ptr_r, const real* __restrict ptr_g) {
+            auto f_dim = [&](real* __restrict ptr_r, const real* __restrict ptr_g)
+            {
                 for (size_t ic = 0; ic < numCells; ic++)
                 {
                     const size_t icr = ccr[ic];
@@ -407,7 +419,8 @@ void DomainDecomposition::addGhostForcesToRealsIntra(size_t dir, size_t ir, size
         const auto& crg = pg.cellRange();
 
         {
-            auto f_dim = [&](real* __restrict ptr_r, const real* __restrict ptr_g) {
+            auto f_dim = [&](real* __restrict ptr_r, const real* __restrict ptr_g)
+            {
                 // for (size_t ic = 0; ic < numCells; ic++)
                 for (size_t ic = c_range.first; ic < c_range.second; ic++)
                 {
@@ -459,7 +472,8 @@ void DomainDecomposition::packCells(vec::AlignedVector<real>& sendBuf,
     {
         /// loop over dimensions (x,y,z)
         auto f_pack_dim = [dir, nodeStart, nodeEnd, numPart, inode, &cc, &cr, &sendBuf, &vd, this](
-                              size_t dim, const real* __restrict p_ptr, real shift_v) {
+                              size_t dim, const real* __restrict p_ptr, real shift_v)
+        {
             const size_t b_start = (nodeStart * 3) + (numPart * dim);
             real* __restrict b_ptr = sendBuf.data() + b_start;
 
@@ -546,7 +560,8 @@ void DomainDecomposition::unpackCells(vec::AlignedVector<real> const& recvBuf,
     {
         /// loop over dimensions (x,y,z)
         auto f_pack_dim = [dir, nodeStart, nodeEnd, numPart, inode, &cc, &cr, &recvBuf, &vd, this](
-                              size_t dim, real* __restrict p_ptr) {
+                              size_t dim, real* __restrict p_ptr)
+        {
             const size_t b_start = (nodeStart * 3) + (numPart * dim);
             const real* __restrict b_ptr = recvBuf.data() + b_start;
 
@@ -704,13 +719,13 @@ void DomainDecomposition::exchangeGhosts_impl()
                     }
 
                     // resize according to received information
-                    auto f_resize = [this, &recvSizes, &dir](size_t i) {
-                        commCells[dir].ghosts[i]->particles.resize(recvSizes[i]);
-                    };
+                    auto f_resize = [this, &recvSizes, &dir](size_t i)
+                    { commCells[dir].ghosts[i]->particles.resize(recvSizes[i]); };
                     size_t const numCommCells = commCells[dir].ghosts.size();
                     utils::parallelForLoop(0, numCommCells, f_resize);
 
-                    auto f_sizesToByteRanges = [&sizeTotal](std::vector<longint> const& sizes) {
+                    auto f_sizesToByteRanges = [&sizeTotal](std::vector<longint> const& sizes)
+                    {
                         const int nsize = sizes.size();
                         std::vector<longint> ranges;
                         ranges.resize(nsize + 1);
@@ -743,8 +758,8 @@ void DomainDecomposition::exchangeGhosts_impl()
                 {
                     const real time = wallTimer.getElapsedTime();
 
-                    auto f_fillBufView = [](auto& bufview, const auto& buffixed,
-                                            const auto& ranges) {
+                    auto f_fillBufView = [](auto& bufview, const auto& buffixed, const auto& ranges)
+                    {
                         const size_t size = ranges.size() - 1;
                         if (bufview.size() < size) bufview.resize(size);
                         for (size_t i = 0; i < size; i++)
@@ -761,8 +776,9 @@ void DomainDecomposition::exchangeGhosts_impl()
                     {
                         receiver = nodeGrid.getNodeNeighborIndex(dir);
                         sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
-                        auto f_pack = [](OutBufferView& buf, Cell& _reals, int extradata,
-                                         const Real3D& shift) {
+                        auto f_pack =
+                            [](OutBufferView& buf, Cell& _reals, int extradata, const Real3D& shift)
+                        {
                             ParticleList& reals = _reals.particles;
                             for (ParticleList::iterator src = reals.begin(), end = reals.end();
                                  src != end; ++src)
@@ -772,9 +788,9 @@ void DomainDecomposition::exchangeGhosts_impl()
                         };
                         const size_t size = commCells[dir].reals.size();
                         utils::parallelForLoop(
-                            0, size, [this, &f_pack, &extradata, &shift, dir](size_t i) {
-                                f_pack(outBufView[i], *commCells[dir].reals[i], extradata, shift);
-                            });
+                            0, size,
+                            [this, &f_pack, &extradata, &shift, dir](size_t i)
+                            { f_pack(outBufView[i], *commCells[dir].reals[i], extradata, shift); });
                     }
 
                     timeExcGhosts_InterNode_pack += wallTimer.getElapsedTime() - time;
@@ -802,7 +818,8 @@ void DomainDecomposition::exchangeGhosts_impl()
                     const real time = wallTimer.getElapsedTime();
 
                     {
-                        auto f_unpack = [](Cell& _ghosts, InBufferView& buf, int extradata) {
+                        auto f_unpack = [](Cell& _ghosts, InBufferView& buf, int extradata)
+                        {
                             ParticleList& ghosts = _ghosts.particles;
                             for (ParticleList::iterator dst = ghosts.begin(), end = ghosts.end();
                                  dst != end; ++dst)
@@ -817,9 +834,9 @@ void DomainDecomposition::exchangeGhosts_impl()
                         };
                         const size_t size = commCells[dir].ghosts.size();
                         utils::parallelForLoop(
-                            0, size, [this, &f_unpack, &extradata, dir](size_t i) {
-                                f_unpack(*commCells[dir].ghosts[i], inBufView[i], extradata);
-                            });
+                            0, size,
+                            [this, &f_unpack, &extradata, dir](size_t i)
+                            { f_unpack(*commCells[dir].ghosts[i], inBufView[i], extradata); });
                     }
 
                     timeExcGhosts_InterNode_unpack += wallTimer.getElapsedTime() - time;
@@ -985,7 +1002,8 @@ void DomainDecomposition::prepareGhostBuffers_channel()
             size_t const dir = 2 * coord + lr;
             size_t const oppDir = 2 * coord + (1 - lr);
 
-            auto f_resize_buf = [this](bool commReals, size_t dir) {
+            auto f_resize_buf = [this](bool commReals, size_t dir)
+            {
                 auto& buf = commReals ? sendBufReal[dir] : sendBufGhost[dir];
                 // auto& bufSizeList = commReals ? sendBufSizeReal[dir] : sendBufSizeGhost[dir];
                 std::vector<size_t> const& cn =
@@ -1035,8 +1053,9 @@ void DomainDecomposition::ghostCommunication_channel_impl()
                 shift[coord] = nodeGrid.getBoundary(dir) * curCoordBoxL;
             }
 
-            auto f_subNode_send = [this, &shift, coord, lr, dir, oppDir, rank,
-                                   doPeriodic](size_t send_node) {
+            auto f_subNode_send =
+                [this, &shift, coord, lr, dir, oppDir, rank, doPeriodic](size_t send_node)
+            {
                 /// get send mode info from nsubComm
                 auto const& ns =
                     nsubComm[send_node + numSubNodes * (REAL_TO_GHOSTS ? dir : oppDir)];
@@ -1142,7 +1161,8 @@ void DomainDecomposition::ghostCommunication_channel_impl()
                 return std::move(hpx::make_ready_future());
             };
 
-            auto f_send = [this, &f_subNode_send]() {
+            auto f_send = [this, &f_subNode_send]()
+            {
                 std::vector<hpx::future<void>> sendFutures;
                 for (size_t send_node = 0; send_node < numSubNodes; send_node++)
                 {
@@ -1151,7 +1171,8 @@ void DomainDecomposition::ghostCommunication_channel_impl()
                 return std::move(sendFutures);
             };
 
-            auto f_recv = [this, doPeriodic, coord, lr, dir, oppDir, rank]() {
+            auto f_recv = [this, doPeriodic, coord, lr, dir, oppDir, rank]()
+            {
                 std::vector<hpx::future<void>> recvFutures;
                 auto const& recvNodes = REAL_TO_GHOSTS ? commNodesGhost[dir] : commNodesReal[dir];
                 const size_t numRecvNodes = doPeriodic ? 0 : recvNodes.size();
@@ -1180,7 +1201,8 @@ void DomainDecomposition::ghostCommunication_channel_impl()
                             .then(hpx::launch::async,
                                   // hpx::launch::sync,
                                   [this, recv_node, lr_ch, dir, oppDir, coord,
-                                   lr](hpx::future<AlignedVectorChar>&& future) {
+                                   lr](hpx::future<AlignedVectorChar>&& future)
+                                  {
                                       AlignedVectorChar recvBuf = future.get();
 
                                       /// check buffer size
@@ -1274,7 +1296,8 @@ void DomainDecomposition::packCells_channel(
         /// loop over dimensions (x,y,z)
         size_t b_start = 0;
         auto f_pack_dim = [dir, &cc, &cr, &sendBuf, &b_start, expNumParts](
-                              size_t dim, const real* __restrict p_ptr, real shift_v) {
+                              size_t dim, const real* __restrict p_ptr, real shift_v)
+        {
             // const size_t b_start = (nodeStart * 3) + (numPart * dim);
             real* __restrict b_ptr = (real*)(sendBuf.data()) + b_start;
 
@@ -1359,7 +1382,8 @@ void DomainDecomposition::unpackCells_channel(vec::AlignedVector<char> const& re
         /// loop over dimensions (x,y,z)
         size_t b_start = 0;
         auto f_pack_dim = [dir, inode, &cc, &cr, &recvBuf, &b_start, expNumParts](
-                              size_t dim, real* __restrict p_ptr) {
+                              size_t dim, real* __restrict p_ptr)
+        {
             const real* __restrict b_ptr = (real*)(recvBuf.data()) + b_start;
 
             /// loop over cells

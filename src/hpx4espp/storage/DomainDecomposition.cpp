@@ -417,7 +417,8 @@ void DomainDecomposition::resetVirtualStorage()
             {
                 if (rank == irank)
                 {
-                    auto f_grid_info = [](const auto& grid) {
+                    auto f_grid_info = [](const auto& grid)
+                    {
                         std::ostringstream ss;
                         ss << "(" << grid.getGridSize(0) << ", " << grid.getGridSize(1) << ", "
                            << grid.getGridSize(2) << ") "
@@ -475,7 +476,8 @@ void DomainDecomposition::resetVirtualStorage()
             }
         }
 
-        auto isInnerCell = [](auto const& cellGrid, auto const index) {
+        auto isInnerCell = [](auto const& cellGrid, auto const index)
+        {
             int m, n, o;
             cellGrid.mapIndexToPosition(m, n, o, index);
             return cellGrid.isInnerCell(m, n, o);
@@ -642,7 +644,8 @@ void DomainDecomposition::resetVirtualStorage()
             const auto numNodes = virtualStorage.size();
             std::vector<std::set<std::pair<size_t, size_t>>> nodeCellPairs(numNodes);
 
-            auto setPairsInsertCheck = [](auto& set, std::pair<size_t, size_t> const& pair) {
+            auto setPairsInsertCheck = [](auto& set, std::pair<size_t, size_t> const& pair)
+            {
                 const auto result = set.insert(pair);
                 HPX4ESPP_ASSERT_EQUAL_MSG(
                     result.second, true,
@@ -670,7 +673,8 @@ void DomainDecomposition::resetVirtualStorage()
                 }
             }
 
-            auto print_check_ncp = [&nodeCellPairs, numNodes](bool print, bool check) {
+            auto print_check_ncp = [&nodeCellPairs, numNodes](bool print, bool check)
+            {
                 for (size_t inode = 0; inode < numNodes; inode++)
                 {
                     const auto& ncp = nodeCellPairs[inode];
@@ -691,7 +695,8 @@ void DomainDecomposition::resetVirtualStorage()
 
             // print_check_ncp(true, false);
 
-            auto search_erase = [](std::pair<size_t, size_t> const& pair, auto& ncp) {
+            auto search_erase = [](std::pair<size_t, size_t> const& pair, auto& ncp)
+            {
                 auto search = ncp.find(pair);
                 if (search != ncp.end())
                 {
@@ -704,11 +709,11 @@ void DomainDecomposition::resetVirtualStorage()
                 }
             };
 
-            auto isOwnCellGlobal = [&mapCellToSubNode](auto const inode, auto const gidx) {
-                return mapCellToSubNode.at(gidx).first == inode;
-            };
+            auto isOwnCellGlobal = [&mapCellToSubNode](auto const inode, auto const gidx)
+            { return mapCellToSubNode.at(gidx).first == inode; };
 
-            auto isOwnCell = [&mapCellToSubNode](auto const& vd, auto const lidx) {
+            auto isOwnCell = [&mapCellToSubNode](auto const& vd, auto const lidx)
+            {
                 const auto cgi = vd.cellGridInfo[lidx].cellType;
                 return (cgi == VDD::CellInfo::CELL_REAL) ||
                        (cgi == VDD::CellInfo::CELL_GHOST_EXTERNAL);
@@ -726,7 +731,8 @@ void DomainDecomposition::resetVirtualStorage()
                 /// remove pairs with real and external ghosts (i,j) and (j,i)
                 auto& ncp = nodeCellPairs[inode];
 
-                auto remove_n3l = [&ncp, &search_erase, inode, &isOwnCell, &vd](auto const& cnl) {
+                auto remove_n3l = [&ncp, &search_erase, inode, &isOwnCell, &vd](auto const& cnl)
+                {
                     for (size_t ic = 0; ic < cnl.numCells(); ic++)
                     {
                         const auto pcell = cnl.cellId(ic);
@@ -776,7 +782,8 @@ void DomainDecomposition::resetVirtualStorage()
 
                 /// remove pairs with internal ghosts (i,j) only
                 auto remove_nnode = [inode, &nodeCellPairs, &search_erase, &mapCellToSubNode,
-                                     &isOwnCell, this](const size_t nnode, auto const& cnl) {
+                                     &isOwnCell, this](const size_t nnode, auto const& cnl)
+                {
                     const auto& vd = this->vdd[inode];
                     const auto& vs = this->virtualStorage[inode];
                     const auto& cellMap = vs.getCellMap();
@@ -904,7 +911,8 @@ void DomainDecomposition::resetVirtualStorage()
                 }
             }
 
-            auto print_check_acp = [&allCellPairs](bool print, bool check) {
+            auto print_check_acp = [&allCellPairs](bool print, bool check)
+            {
                 if (print)
                     std::cout << "allCellPairs numpairs: " << allCellPairs.size() << std::endl;
                 if (check) HPX4ESPP_ASSERT_EQUAL(allCellPairs.size(), 0);
@@ -913,7 +921,8 @@ void DomainDecomposition::resetVirtualStorage()
             // print_check_acp(true, false);
 
             auto remove = [&allCellPairs, &search_erase, this](const auto& cnl, const auto& vs,
-                                                               const auto& vsNbr, const bool n3l) {
+                                                               const auto& vsNbr, const bool n3l)
+            {
                 for (size_t ic = 0; ic < cnl.numCells(); ic++)
                 {
                     const auto pcell = cnl.cellId(ic);
@@ -923,7 +932,8 @@ void DomainDecomposition::resetVirtualStorage()
                         const auto ncellNbr = cnl.at(ic, nn);
                         const auto ncell_gidx = vsNbr.localCells[ncellNbr] - this->localCells[0];
 
-                        auto genMsg = [&, this](auto pair) {
+                        auto genMsg = [&, this](auto pair)
+                        {
                             std::ostringstream ss;
                             ss << "Pair not found: {" << pair.first << "," << pair.second
                                << "}. Failed in remove inode=" << (&vs - &virtualStorage[0])
@@ -978,7 +988,8 @@ void DomainDecomposition::resetVirtualStorage()
         /// print stats about cnls
         if (false)
         {
-            auto cnlSize = [](const auto& cnl) {
+            auto cnlSize = [](const auto& cnl)
+            {
                 size_t size = 0;
                 for (size_t ic = 0; ic < cnl.numCells(); ic++)
                 {
@@ -1009,7 +1020,8 @@ void DomainDecomposition::resetVirtualStorage()
             std::set<size_t> checkNodes = {0, 1, 3, 4};
             constexpr size_t checkCell = 93;
 
-            auto checkCNL = [](const auto& cnl) {
+            auto checkCNL = [](const auto& cnl)
+            {
                 std::ostringstream oss;
                 for (size_t ic = 0; ic < cnl.numCells(); ic++)
                 {
@@ -1070,7 +1082,8 @@ void DomainDecomposition::resetVirtualStorage()
     /// prepare ghost communication
     {
         auto vFillCells = [](std::vector<size_t>& cv, const int leftBoundary[3],
-                             const int rightBoundary[3], CellGrid const& cg) {
+                             const int rightBoundary[3], CellGrid const& cg)
+        {
             longint total = 1;
             for (int i = 0; i < 3; ++i)
             {
@@ -1098,7 +1111,8 @@ void DomainDecomposition::resetVirtualStorage()
             }
         };
 
-        auto vPrepareGhostCommunication = [&vFillCells](VDD& vd) {
+        auto vPrepareGhostCommunication = [&vFillCells](VDD& vd)
+        {
             auto& vcg = vd.cellGrid;
             auto& vcc = vd.commCells;
 
@@ -1208,7 +1222,8 @@ void DomainDecomposition::resetVirtualStorage()
 
                 /// loop through the other coords, fixing this coord
                 auto fillPlane = [this, &otherCoord2, &otherCoord1, thisCoord](
-                                     size_t initCoord, std::vector<size_t>& plane) {
+                                     size_t initCoord, std::vector<size_t>& plane)
+                {
                     std::array<size_t, 3> nodeCoord;
                     nodeCoord[thisCoord] = initCoord;
                     for (size_t i2 = 0; i2 < subNodeGrid[otherCoord2]; i2++)
@@ -1240,7 +1255,8 @@ void DomainDecomposition::resetVirtualStorage()
                     std::cout << " left:        " << left << std::endl;
                     std::cout << " right:       " << right << std::endl;
 
-                    auto printList = [](auto const& list, auto const& name) {
+                    auto printList = [](auto const& list, auto const& name)
+                    {
                         std::cout << " " << name << ": ";
                         std::copy(std::begin(list), std::end(list),
                                   std::ostream_iterator<size_t>(std::cout, " "));
@@ -1262,7 +1278,8 @@ void DomainDecomposition::resetVirtualStorage()
                 }
             }
 
-            auto getPartition = [](size_t len, size_t parts) {
+            auto getPartition = [](size_t len, size_t parts)
+            {
                 const size_t q = len / parts;
                 const size_t r = len % parts;
                 std::vector<size_t> sizes(parts, q);
@@ -1270,7 +1287,8 @@ void DomainDecomposition::resetVirtualStorage()
                 return sizes;
             };
 
-            auto getRanges = [](auto const& sizes) {
+            auto getRanges = [](auto const& sizes)
+            {
                 std::vector<std::pair<size_t, size_t>> ranges;
                 size_t sum = 0;
                 for (size_t i = 0; i < sizes.size(); i++)
@@ -1350,7 +1368,8 @@ void DomainDecomposition::resetVirtualStorage()
             if (false && !rank)
             {
                 /// print commCells
-                auto printCommCells = [this](int dir, bool reals) {
+                auto printCommCells = [this](int dir, bool reals)
+                {
                     std::ostringstream ss;
                     ss << "commCells[" << dir << "]." << (reals ? "reals" : "ghosts");
                     const auto& cc = reals ? commCells[dir].reals : commCells[dir].ghosts;
@@ -1369,8 +1388,9 @@ void DomainDecomposition::resetVirtualStorage()
 
             /// verify that commCells for this direction are fully contained within these planes
             {
-                auto verifyCommNodes = [this](size_t dir, std::vector<size_t> const& plane,
-                                              bool commReal) {
+                auto verifyCommNodes =
+                    [this](size_t dir, std::vector<size_t> const& plane, bool commReal)
+                {
                     /// collect all localCells for this plane
                     std::set<Cell*> lcSet;
                     for (const auto& n : plane)
@@ -1412,8 +1432,9 @@ void DomainDecomposition::resetVirtualStorage()
             /// verify that commCells in virtual Node match the commCells of the entire
             /// subdomain
             {
-                auto verifyCommCells = [this](size_t dir, std::vector<size_t> const& plane,
-                                              bool commReal) {
+                auto verifyCommCells =
+                    [this](size_t dir, std::vector<size_t> const& plane, bool commReal)
+                {
                     auto const& ccr = commCells[dir].reals;
                     auto const& ccg = commCells[dir].ghosts;
 
@@ -1569,7 +1590,8 @@ void DomainDecomposition::resetVirtualStorage()
         if (HPX4ESPP_OPTIMIZE_COMM)
         {
             /// list down commCells in the full subdomain
-            auto const fill_occ = [lc0, this](auto& occReals, auto& occGhosts) {
+            auto const fill_occ = [lc0, this](auto& occReals, auto& occGhosts)
+            {
                 for (size_t dir = 0; dir < 6; dir++)
                 {
                     occReals[dir].clear();
@@ -1591,7 +1613,8 @@ void DomainDecomposition::resetVirtualStorage()
             std::array<std::set<size_t>, 6> occReals, occGhosts;
             fill_occ(occReals, occGhosts);
 
-            auto removeCommCell = [](auto& occ, auto const cc) {
+            auto removeCommCell = [](auto& occ, auto const cc)
+            {
                 const auto find = occ.find(cc);
                 if (find == occ.end()) return 1;
                 occ.erase(find);
@@ -1599,7 +1622,8 @@ void DomainDecomposition::resetVirtualStorage()
             };
 
             /// remove entries from inter-node updates
-            auto test1 = [&, this](bool REAL_TO_GHOSTS) {
+            auto test1 = [&, this](bool REAL_TO_GHOSTS)
+            {
                 auto occReals1 = occReals;
                 auto occGhosts1 = occGhosts;
 
@@ -1623,8 +1647,9 @@ void DomainDecomposition::resetVirtualStorage()
                         {
                             const auto& idxCommNode = ii;
 
-                            auto removeCommCells = [&, this](const bool commReal, auto& occ,
-                                                             const auto occ_label) {
+                            auto removeCommCells =
+                                [&, this](const bool commReal, auto& occ, const auto occ_label)
+                            {
                                 const size_t inode = commReal ? commNodesReal[dir][idxCommNode]
                                                               : commNodesGhost[dir][idxCommNode];
 
@@ -1668,7 +1693,8 @@ void DomainDecomposition::resetVirtualStorage()
             test1(false);
 
             /// make sure there are no intra-node updates that are not in the periodic boundaries
-            auto test2 = [&, this](bool REAL_TO_GHOSTS) {
+            auto test2 = [&, this](bool REAL_TO_GHOSTS)
+            {
                 auto occReals2 = occReals;
                 auto occGhosts2 = occGhosts;
 
@@ -1685,7 +1711,8 @@ void DomainDecomposition::resetVirtualStorage()
                         HPX4ESPP_ASSERT_NEQ(occReals2[dir].size(), 0);
                         HPX4ESPP_ASSERT_NEQ(occGhosts2[dir].size(), 0);
 
-                        auto f_pair = [&, this](size_t i) {
+                        auto f_pair = [&, this](size_t i)
+                        {
                             const size_t ip = i / numCommSubs;
                             const size_t is = i % numCommSubs;
 
@@ -2075,7 +2102,8 @@ python::object DomainDecomposition::getChannelIndices() const
 void DomainDecomposition::loadCells()
 {
     /// load new particle data (real and ghost cells)
-    auto f = [this](size_t i) {
+    auto f = [this](size_t i)
+    {
         auto& vs = this->virtualStorage[i];
         if (HPX4ESPP_OPTIMIZE_COMM)
             vs.particles.copyFromCellOwn(vs.localCells);
@@ -2102,7 +2130,8 @@ void DomainDecomposition::loadCells()
 
 void DomainDecomposition::unloadCells()
 {
-    auto f = [this](size_t i) {
+    auto f = [this](size_t i)
+    {
         auto& vs = this->virtualStorage[i];
         vs.particles.updateToPositionVelocity(vs.localCells, true);
         /// only real cells
@@ -2140,8 +2169,9 @@ void DomainDecomposition::prepareGhostBuffers()
             size_t const dir = 2 * coord + lr;
             size_t const oppDir = 2 * coord + (1 - lr);
 
-            auto f_count_particles = [this](bool commReals, size_t dir,
-                                            std::vector<size_t>& nodeRange) {
+            auto f_count_particles =
+                [this](bool commReals, size_t dir, std::vector<size_t>& nodeRange)
+            {
                 // bool commReals = true;
                 std::vector<size_t> const& cn =
                     commReals ? commNodesReal[dir] : commNodesGhost[dir];
@@ -2171,8 +2201,9 @@ void DomainDecomposition::prepareGhostBuffers()
 
             ///////////////////////////////////////////////////////////////////////////////////////
             /// determine the range of particles for subComm
-            auto f_count_particles_sub = [this](bool commReals, size_t dir,
-                                                const std::vector<size_t>& nodeRange) {
+            auto f_count_particles_sub =
+                [this](bool commReals, size_t dir, const std::vector<size_t>& nodeRange)
+            {
                 std::vector<size_t> const& cn =
                     commReals ? commNodesReal[dir] : commNodesGhost[dir];
                 size_t dirTotal = 0;
@@ -2364,7 +2395,8 @@ void DomainDecomposition::exchangeGhosts_SingleNode()
                 }
 
                 const int numCells = commCells[dir].ghosts.size();
-                auto copyParticlesRealsToGhosts = [this, dir, extradata, &shift](int i) {
+                auto copyParticlesRealsToGhosts = [this, dir, extradata, &shift](int i)
+                {
                     ParticleList& reals = commCells[dir].reals[i]->particles;
                     ParticleList& ghosts = commCells[dir].ghosts[i]->particles;
 
@@ -2400,7 +2432,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
     const size_t numLocalCells = localCells.size();
 
     {
-        auto moveIndexedParticleNonGlobal = [this](ParticleList& dl, ParticleList& sl, int i) {
+        auto moveIndexedParticleNonGlobal = [this](ParticleList& dl, ParticleList& sl, int i)
+        {
             dl.push_back(sl[i]);
             const int newSize = sl.size() - 1;
             if (i != newSize)
@@ -2413,7 +2446,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
         const real* cellSize = cellGrid.getCellSize();
         const real* invCellSize = cellGrid.getInverseCellSize();
         const int frame = cellGrid.getFrameWidth();
-        auto mapPositionToLocalCell = [this, &cellSize, &invCellSize, &frame](const Real3D& pos) {
+        auto mapPositionToLocalCell = [this, &cellSize, &invCellSize, &frame](const Real3D& pos)
+        {
             int cpos[3];
 
             for (int i = 0; i < 3; ++i)
@@ -2446,8 +2480,9 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
 
         espressopp::bc::BC const& boundary = *(getSystem()->bc);
         boost::mpi::communicator const& comm = *(getSystem()->comm);
-        auto resortRealCell = [this, &moveIndexedParticleNonGlobal, &mapPositionToLocalCell,
-                               &boundary](size_t ic) {
+        auto resortRealCell =
+            [this, &moveIndexedParticleNonGlobal, &mapPositionToLocalCell, &boundary](size_t ic)
+        {
             Cell& cell = *realCells[ic];
             // do not use an iterator here, since we have need to take out particles during the
             // loop
@@ -2502,7 +2537,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
         {
             for (auto const& wave : resortWaves)
             {
-                auto resortSubNode = [this, &wave, &resortRealCell](size_t inode) {
+                auto resortSubNode = [this, &wave, &resortRealCell](size_t inode)
+                {
                     const auto nodeIdx = wave[inode];
                     /// list of real cells in this node
                     const auto& realCellsIdx = virtualStorage[nodeIdx].realCellsIdx;
@@ -2559,7 +2595,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                 if (nodeGrid.getGridSize(coord) == 1)
                 {
                     const int numCells = commCells[dir].ghosts.size();
-                    auto moveGhostsToReals = [this, coord, dir, &boundary](int i) {
+                    auto moveGhostsToReals = [this, coord, dir, &boundary](int i)
+                    {
                         ParticleList& reals = commCells[dir].reals[i]->particles;
                         ParticleList& ghosts = commCells[dir].ghosts[i]->particles;
 
@@ -2636,7 +2673,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     recvBuf.resize(totalRecv);
                     {
                         const int numCells = commCells[dir].ghosts.size();
-                        auto f_pack = [dir, &sendRanges, &sendSizes, &sendBuf, this](int i) {
+                        auto f_pack = [dir, &sendRanges, &sendSizes, &sendBuf, this](int i)
+                        {
                             ParticleList& ghosts = commCells[dir].ghosts[i]->particles;
                             longint const& start = sendRanges[i];
                             longint const& size = sendSizes[i];
@@ -2675,8 +2713,9 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     {
                         const int numCells = commCells[dir].reals.size();
                         // int ctr = 0;
-                        auto f_unpack = [dir, coord, &recvRanges, &recvSizes, &recvBuf, &boundary,
-                                         this](int i) {
+                        auto f_unpack =
+                            [dir, coord, &recvRanges, &recvSizes, &recvBuf, &boundary, this](int i)
+                        {
                             ParticleList& reals = commCells[dir].reals[i]->particles;
                             const int start = recvRanges[i];
                             const int size = recvSizes[i];
@@ -2750,7 +2789,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
     const size_t numGhostCells = ghostCells.size();
     const size_t numLocalCells = localCells.size();
 
-    auto moveIndexedParticleNonGlobal = [](ParticleList& dl, ParticleList& sl, int i) {
+    auto moveIndexedParticleNonGlobal = [](ParticleList& dl, ParticleList& sl, int i)
+    {
         dl.push_back(sl[i]);
         const int newSize = sl.size() - 1;
         if (i != newSize)
@@ -2760,7 +2800,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
         sl.resize(newSize);
     };
 
-    auto mapPositionToLocalCell = [](VDD& vd, const Real3D& pos) {
+    auto mapPositionToLocalCell = [](VDD& vd, const Real3D& pos)
+    {
         const auto& cg = vd.cellGrid;
         const real* cellSize = cg.getCellSize();
         const real* invCellSize = cg.getInverseCellSize();
@@ -2796,8 +2837,9 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
         return vd.vLocalCells[cg.mapPositionToIndex(cpos)];
     };
 
-    auto resortRealCell = [&moveIndexedParticleNonGlobal, &mapPositionToLocalCell](VDD& vd,
-                                                                                   Cell& cell) {
+    auto resortRealCell =
+        [&moveIndexedParticleNonGlobal, &mapPositionToLocalCell](VDD& vd, Cell& cell)
+    {
         for (size_t p = 0; p < cell.particles.size(); ++p)
         {
             Particle& part = cell.particles[p];
@@ -2825,7 +2867,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
         }
     };
 
-    auto resortSubNode = [this, &resortRealCell](size_t inode) {
+    auto resortSubNode = [this, &resortRealCell](size_t inode)
+    {
         auto& vd = vdd[inode];
         auto const numRealCells = vd.vRealCells.size();
         for (Cell& c : vd.vGhostCells) c.particles.clear();
@@ -2889,8 +2932,9 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     const real* cellSize = cellGrid.getCellSize();
                     const real* invCellSize = cellGrid.getInverseCellSize();
                     const int frame = cellGrid.getFrameWidth();
-                    auto mapPositionToLocalCell = [this, &cellSize, &invCellSize,
-                                                   &frame](const Real3D& pos) {
+                    auto mapPositionToLocalCell =
+                        [this, &cellSize, &invCellSize, &frame](const Real3D& pos)
+                    {
                         int cpos[3];
 
                         for (int i = 0; i < 3; ++i)
@@ -2946,8 +2990,9 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     const real* cellSize = cellGrid.getCellSize();
                     const real* invCellSize = cellGrid.getInverseCellSize();
                     const int frame = cellGrid.getFrameWidth();
-                    auto mapPositionToLocalCell = [this, &cellSize, &invCellSize,
-                                                   &frame](const Real3D& pos) {
+                    auto mapPositionToLocalCell =
+                        [this, &cellSize, &invCellSize, &frame](const Real3D& pos)
+                    {
                         int cpos[3];
 
                         for (int i = 0; i < 3; ++i)
@@ -3020,8 +3065,10 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                 int oppositeDir = 2 * coord + (1 - lr);
 
                 /// Intra-node block (including shifted/periodic)
-                auto f_intraNode = [this, coord, dir, &boundary]() {
-                    auto f_pair = [this, coord, dir, &boundary](size_t i) {
+                auto f_intraNode = [this, coord, dir, &boundary]()
+                {
+                    auto f_pair = [this, coord, dir, &boundary](size_t i)
+                    {
                         const auto& pair = subNodePairsIntra[dir][i];
                         const size_t ir = std::get<0>(pair);
                         const size_t ig = std::get<1>(pair);
@@ -3051,7 +3098,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     utils::parallelForLoop(0, numPairs, f_pair);
                 };
 
-                auto f_interNode = [this, coord, dir, oppositeDir, rank, &boundary, &comm]() {
+                auto f_interNode = [this, coord, dir, oppositeDir, rank, &boundary, &comm]()
+                {
                     std::vector<longint> sendSizes, recvSizes;  /// number of particles per cell
                     std::vector<longint> sendRanges,
                         recvRanges;  /// starting index for each cell
@@ -3144,7 +3192,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     {
                         const int numCommNodes = commNodesGhost[dir].size();
                         auto f_packNode = [dir, &sendRanges, &sendSizes, &sendBuf, totalSend,
-                                           this](int idxCommNode) {
+                                           this](int idxCommNode)
+                        {
                             /// commCells to pack
                             const int inode = commNodesGhost[dir][idxCommNode];
                             const auto& vd = vdd[inode];
@@ -3185,7 +3234,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
 
                     if (false && rank == 1)
                     {
-                        auto str_list = [](const auto& list) {
+                        auto str_list = [](const auto& list)
+                        {
                             std::ostringstream ss;
                             for (const auto& l : list) ss << " " << l;
                             return ss.str();
@@ -3212,8 +3262,9 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                             const real* cellSize = cellGrid.getCellSize();
                             const real* invCellSize = cellGrid.getInverseCellSize();
                             const int frame = cellGrid.getFrameWidth();
-                            auto mapPositionToLocalCell = [this, &cellSize, &invCellSize,
-                                                           &frame](const Real3D& pos) {
+                            auto mapPositionToLocalCell =
+                                [this, &cellSize, &invCellSize, &frame](const Real3D& pos)
+                            {
                                 int cpos[3];
 
                                 for (int i = 0; i < 3; ++i)
@@ -3266,7 +3317,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     {
                         const int numCommNodes = commNodesReal[dir].size();
                         auto f_unpackNode = [coord, dir, totalRecv, &recvRanges, &recvSizes,
-                                             &recvBuf, &boundary, this](int idxCommNode) {
+                                             &recvBuf, &boundary, this](int idxCommNode)
+                        {
                             /// commCells to unpack
                             const int inode = commNodesReal[dir][idxCommNode];
                             const auto& vd = vdd[inode];
@@ -3302,7 +3354,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                         const int frame = cellGrid.getFrameWidth();
                                         auto mapPositionToLocalCell = [this, &cellSize,
                                                                        &invCellSize,
-                                                                       &frame](const Real3D& pos) {
+                                                                       &frame](const Real3D& pos)
+                                        {
                                             int cpos[3];
 
                                             for (int i = 0; i < 3; ++i)
@@ -3380,7 +3433,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
         const real* cellSize = cellGrid.getCellSize();
         const real* invCellSize = cellGrid.getInverseCellSize();
         const int frame = cellGrid.getFrameWidth();
-        auto mapPositionToLocalCell = [this, &cellSize, &invCellSize, &frame](const Real3D& pos) {
+        auto mapPositionToLocalCell = [this, &cellSize, &invCellSize, &frame](const Real3D& pos)
+        {
             int cpos[3];
 
             for (int i = 0; i < 3; ++i)
@@ -3458,7 +3512,8 @@ void DomainDecomposition::disconnectOffload()
 void DomainDecomposition::resetParticles()
 {
     /// load new particle data
-    auto f = [this](size_t i) {
+    auto f = [this](size_t i)
+    {
         auto& vs = this->virtualStorage[i];
         vs.particles.copyFrom(vs.localCells);
     };
@@ -3519,7 +3574,8 @@ void DomainDecomposition::resetCells()
 
 void DomainDecomposition::befCalcForces()
 {
-    auto f = [this](size_t i) {
+    auto f = [this](size_t i)
+    {
         auto& vs = this->virtualStorage[i];
         auto& particles = vs.particles;
         vs.particles.zeroForces();
