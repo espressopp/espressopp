@@ -16,14 +16,10 @@ jobs:
       matrix:
         BUILD_TYPE: [Release, Debug]
         DISTRO: ['fedora']
-        CMAKE_COMPILER: [
-            '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
-            '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
-        ]
+        CMAKE_COMPILER:
+          - '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
+          - '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
         include:
-          - BUILD_TYPE: 'Debug'
-            DISTRO: 'fedora_intel'
-            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc'
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
@@ -40,9 +36,9 @@ jobs:
           restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}
 
       - uses: actions/checkout@v3
-
+      
       - name: Install Python Dependencies
-        run: pip3 install -r requirements.txt
+        run: pip3 install -r requirements.txt --break-system-packages
 
       - name: version numbers
         run: |
@@ -74,7 +70,7 @@ jobs:
           path: 'espressopp'
 
       - name: Install Python Dependencies
-        run: pip3 install -r espressopp/requirements.txt
+        run: pip3 install -r espressopp/requirements.txt --break-system-packages
 
       - name: build espressopp
         run: |
@@ -168,7 +164,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Python Dependencies
-        run: pip3 install -r requirements.txt
+        run: pip3 install -r requirements.txt --break-system-packages
 
       - name: Coverage build
         run: |
