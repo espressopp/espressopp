@@ -22,9 +22,6 @@ jobs:
         include:
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
-            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc'
-          - BUILD_TYPE: 'Debug'
-            DISTRO: 'fedora_intel'
             CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 
     runs-on: ubuntu-latest
