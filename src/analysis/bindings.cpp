@@ -114,7 +114,6 @@ void registerPython()
     XTemperature::registerPython();
     XPressure::registerPython();
     AdressDensity::registerPython();
-    RadGyrXProfilePI::registerPython();
     Test::registerPython();
     ParticleRadiusDistribution::registerPython();
 
@@ -126,10 +125,14 @@ void registerPython()
     LBOutputVzInTime::registerPython();
     LBOutputVzOfX::registerPython();
 
+    SystemMonitorOutput::registerPython();
+    SystemMonitorOutputDummy::registerPython();
     SystemMonitorOutputCSV::registerPython();
     SystemMonitor::registerPython();
     PotentialEnergy::registerPython();
     KineticEnergy::registerPython();
+
+    RadGyrXProfilePI::registerPython();
 }
 }  // namespace analysis
 }  // namespace espressopp

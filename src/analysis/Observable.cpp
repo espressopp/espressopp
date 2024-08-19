@@ -34,8 +34,7 @@ python::list Observable::compute_real_vector_python()
 {
     python::list ret;
     compute_real_vector();
-    BOOST_FOREACH (real value, result_real_vector)
-        ret.append(value);
+    BOOST_FOREACH (real value, result_real_vector) ret.append(value);
     return ret;
 }
 
@@ -43,8 +42,7 @@ python::list Observable::compute_int_vector_python()
 {
     python::list ret;
     compute_int_vector();
-    BOOST_FOREACH (int value, result_int_vector)
-        ret.append(value);
+    BOOST_FOREACH (int value, result_int_vector) ret.append(value);
     return ret;
 }
 

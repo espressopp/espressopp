@@ -25,7 +25,8 @@
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "boost/unordered_map.hpp"
 #include "Cell.hpp"
-#include "map"
+#include <map>
+#include <set>
 
 using namespace espressopp;
 

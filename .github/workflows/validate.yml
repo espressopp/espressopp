@@ -6,51 +6,46 @@ on:
   schedule:
     - cron:  '0 0 * * SUN'
 
-jobs:
-  cancel-duplicate-workflow-runs:
-    name: "Cancel duplicate workflow runs"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: potiuk/cancel-workflow-runs@master
-        name: "Cancel duplicate workflow runs"
-        with:
-          cancelMode: duplicates
-          cancelFutureDuplicates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sourceRunId: ${{ github.event.workflow_run.id }}
-          notifyPRCancel: true
-          skipEventTypes: '["schedule"]'
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
+jobs:
   build:
     strategy:
       matrix:
         BUILD_TYPE: [Release, Debug]
         DISTRO: ['fedora']
-        CMAKE_COMPILER: [
-            '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', 
-            '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
-        ]
+        CMAKE_COMPILER:
+          - '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
+          - '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
         include:
-          - BUILD_TYPE: 'Debug'
-            DISTRO: 'fedora_intel'
-            CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc'
           - BUILD_TYPE: 'Debug'
             DISTRO: 'fedora_intel'
             CMAKE_COMPILER: '-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 
     runs-on: ubuntu-latest
-    container: espressopp/buildenv:${{ matrix.distro }}
+    container:
+      image: espressopp/buildenv:${{ matrix.distro }}
+      options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.ccache
           key: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}-${{ github.run_id }}
           restore-keys: ${{ matrix.DISTRO }}-${{ matrix.CMAKE_COMPILER }}-${{ matrix.BUILD_TYPE }}
 
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v4
+      
       - name: Install Python Dependencies
-        run: pip3 install -r requirements.txt
+        run: pip3 install -r requirements.txt --break-system-packages
+
+      - name: version numbers
+        run: |
+          python3 --version
+          pip3 list
+          cmake --version
+          git --version
 
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} ${{ matrix.CMAKE_COMPILER }} -DUSE_CCACHE=ON -DESPP_WERROR=ON
@@ -70,12 +65,12 @@ jobs:
     environment: CI
     container: espressopp/buildenv:fedora
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: 'espressopp'
 
       - name: Install Python Dependencies
-        run: pip3 install -r espressopp/requirements.txt
+        run: pip3 install -r espressopp/requirements.txt --break-system-packages
 
       - name: build espressopp
         run: |
@@ -94,7 +89,7 @@ jobs:
         run: |
           cmake --build espressopp-build --target sphinx-pdf -j 2
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           repository: 'espressopp/espressopp.github.io.git'
           ref: 'master'
@@ -136,12 +131,15 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: espressopp
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -149,7 +147,7 @@ jobs:
 
       - name: Build and Push Docker Image
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: ${{github.workspace}}
           file: espressopp/.github/workflows/Dockerfile
@@ -163,10 +161,10 @@ jobs:
     runs-on: ubuntu-latest
     container: espressopp/buildenv:fedora
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Python Dependencies
-        run: pip3 install -r requirements.txt
+        run: pip3 install -r requirements.txt --break-system-packages
 
       - name: Coverage build
         run: |
@@ -178,12 +176,12 @@ jobs:
         working-directory: builddir
 
       - name: Upload Report to codecov.io
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
 
   formatting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: run formatter
         run: ./format.sh

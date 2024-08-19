@@ -33,9 +33,9 @@ namespace espressopp
 namespace esutil
 {
 /** Print Stack*/
-static inline void printStackTrace(std::stringstream &msg, unsigned int max_frames)
+static inline void printStackTrace(std::stringstream &msg)
 {
-    void *addrlist[max_frames + 1];
+    void *addrlist[128];
     int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void *));
     if (addrlen == 0)
     {

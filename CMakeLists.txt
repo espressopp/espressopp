@@ -1,6 +1,12 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.19)
 
-project(espressopp LANGUAGES C CXX)
+include(CMakePrintHelpers)
+
+project(espressopp VERSION 3.0.0 LANGUAGES CXX)
+# C is only used for hdf5, see https://gitlab.kitware.com/cmake/cmake/-/merge_requests/8015
+if(CMAKE_VERSION VERSION_LESS 3.26)
+ enable_language(C)
+endif()
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(ESPP_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -16,7 +22,7 @@ enable_testing()
 include(CheckCXXCompilerFlag)
 
 # Check for C++14 standard
-set(CMAKE_CXX_STANDARD 14) # C++14...
+set(CMAKE_CXX_STANDARD 17) # C++14...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 
@@ -65,6 +71,17 @@ find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(FFTW3 REQUIRED)
 
 ########################################################################
+#Find HDF5
+########################################################################
+
+set(HDF5_PREFER_PARALLEL ON)
+#set(HDF5_FIND_DEBUG ON)
+find_package(HDF5 REQUIRED COMPONENTS C HL)
+if (NOT HDF5_IS_PARALLEL)
+    message(FATAL_ERROR "HDF5 with MPI support is required! Serial version detected.")
+endif()
+
+########################################################################
 #Process GROMACS settings
 ########################################################################
 find_package(GROMACS 2021 CONFIG QUIET NAMES gromacs gromacs_d)
@@ -79,18 +96,17 @@ endif()
 ########################################################################
 
 find_package(Python3 COMPONENTS Interpreter Development)
-
-execute_process(COMMAND ${Python3_EXECUTABLE}
-        -c "import sys; print(sys.version[:3].replace('.', ''))"
-        OUTPUT_VARIABLE PYTHON_VERSION_NO_DOT
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+#cmake_print_variables( Python3_INCLUDE_DIRS Python3_LINK_OPTIONS Python3_LIBRARY_DIRS Python3_RUNTIME_LIBRARY_DIRS Python3_VERSION Python3_VERSION_MAJOR Python3_VERSION_MINOR Python3_NumPy_VERSION)
+set(PYTHON_VERSION_NO_DOT "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
 
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
+#set( Boost_DEBUG ON )
 find_package(Boost 1.69.0 REQUIRED COMPONENTS mpi serialization system filesystem python${PYTHON_VERSION_NO_DOT} numpy${PYTHON_VERSION_NO_DOT} unit_test_framework)
+#cmake_print_variables( Boost_INCLUDE_DIRS Boost_LIBRARY_DIRS Boost_LIBRARIES Boost_LIB_VERSION  )
 
 ######################################
 # Automatic CCache detection         #

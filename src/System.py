@@ -1,4 +1,4 @@
-#  Copyright (C) 2015
+#  Copyright (C) 2015,2017,2021
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
@@ -156,6 +156,7 @@ class SystemLocal(_espressopp.System):
             self._interaction2id = {
                 k: v if v < interaction_id else v - 1
                 for k, v in self._interaction2id.items()
+                if v != interaction_id
                 }
             self._interaction_pid = max(self._interaction2id.values()) + 1
 
@@ -184,8 +185,13 @@ class SystemLocal(_espressopp.System):
         if pmi.workerIsActive():
             return self.getInteraction(self._interaction2id[name])
 
-    def scaleVolume(self, *args):
+    def getNameOfInteraction(self, number):
+        if pmi.workerIsActive():
+            for name, iid in self._interaction2id.items():
+                if iid == number:
+                    return name
 
+    def scaleVolume(self, *args):
         if pmi.workerIsActive():
             if len(args) == 1:
                 arg0 = args[0]
@@ -194,7 +200,7 @@ class SystemLocal(_espressopp.System):
                     self.cxxclass.scaleVolume( arg0 )
                 elif hasattr(arg0, '__iter__'):
                     if len(arg0) == 3:
-                #print args, " has iterator and length 3"
+                        #print args, " has iterator and length 3"
                         self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
                     elif len(arg0) == 1:
                         #print args, " has iterator and length 1"
@@ -209,7 +215,7 @@ class SystemLocal(_espressopp.System):
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
             else:
                 print(args, " is invalid")
-
+          
     def setTrace(self, switch):
 
         if pmi.workerIsActive():
@@ -219,8 +225,8 @@ if pmi.isController:
     class System(metaclass=pmi.Proxy):
         pmiproxydefs = dict(
           cls = 'espressopp.SystemLocal',
-          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
+          pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator', 'vectorization'],
           pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
                 'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-                'getAllInteractions', 'getInteractionByName']
+                'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']
         )

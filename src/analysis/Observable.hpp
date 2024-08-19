@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018
+  Copyright (C) 2017,2018,2021
       Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
@@ -69,7 +69,7 @@ public:
     /** returns observable of type int, used for Python and on C++ level*/
     virtual int compute_int() const { return 0; };
     /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
-    virtual void compute_real_vector() { return; };
+    virtual std::vector<real> compute_real_vector() { return std::vector<real>(); };
     /** computes vector of integer values, used on C++ level only */
     virtual void compute_int_vector() { return; };
 
@@ -83,6 +83,8 @@ public:
     // trying to convert result_types to python
     // result_types getResultType() { return result_type; };
     int getResultType() { return result_type; };
+    longint getResultVectorSize() { return result_vector_size; }
+    ObservableTypes getObservableType() { return observable_type; }
 
     static void registerPython();
 

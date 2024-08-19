@@ -196,7 +196,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 author_email=email,
                 driver='mpio',
                 comm=MPI.COMM_WORLD)
-        except (NameError, AttributeError):
+        except (NameError, AttributeError, ValueError):
             # h5py in serial mode.
             self.file = pyh5md.File(
                 filename, 'w',
@@ -208,7 +208,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self._system_data()
 
         self.float_type = np.float32 if is_single_prec else np.float64
-        self.int_type = np.int32 if is_single_prec else np.int
+        self.int_type = np.int32 if is_single_prec else np.intc
 
         part = self.file.particles_group(self.group_name)
         self.particle_group = part
