@@ -23,7 +23,7 @@ jobs:
           git push
 
       - name: Add reaction
-        uses: peter-evans/create-or-update-comment@38214a08ee61b78dc42bd8f45294668c5bfc1be0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
         with:
           token: ${{ secrets.BOT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
