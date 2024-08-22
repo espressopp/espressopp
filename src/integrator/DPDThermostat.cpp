@@ -125,9 +125,9 @@ void DPDThermostat::thermalize()
 
     System& system = getSystemRef();
     system.storage->updateGhostsV();
-    uint64_t internal_seed = system.seed64;
 
 #ifdef RANDOM123_EXIST
+    uint64_t internal_seed = system.seed64;
     if (mdStep == 0)
     {
         if (internal_seed == 0)
