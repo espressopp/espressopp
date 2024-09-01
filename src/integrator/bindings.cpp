@@ -61,6 +61,8 @@
 #include "VelocityVerletOnRadius.hpp"
 #include "AssociationReaction.hpp"
 #include "MinimizeEnergy.hpp"
+#include "VelocityVerletHybrid.hpp"
+#include "DynamicResolution.hpp"
 
 #include "EmptyExtension.hpp"
 
@@ -108,6 +110,8 @@ void registerPython()
     VelocityVerletOnRadius::registerPython();
     AssociationReaction::registerPython();
     MinimizeEnergy::registerPython();
+    VelocityVerletHybrid::registerPython();
+    DynamicResolution::registerPython();
     EmptyExtension::registerPython();
 }
 }  // namespace integrator

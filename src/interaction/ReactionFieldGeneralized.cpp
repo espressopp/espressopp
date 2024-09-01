@@ -28,8 +28,8 @@
 #include "VerletListAdressATInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "VerletListHadressATInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
-//#include "FixedPairListInteractionTemplate.hpp"
 
 namespace espressopp
 {
@@ -37,6 +37,9 @@ namespace interaction
 {
 typedef class VerletListInteractionTemplate<ReactionFieldGeneralized>
     VerletListReactionFieldGeneralized;
+
+typedef class VerletListHybridInteractionTemplate<ReactionFieldGeneralized>
+    VerletListHybridReactionFieldGeneralized;
 
 typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralized, Tabulated>
     VerletListAdressReactionFieldGeneralized;
@@ -52,9 +55,6 @@ typedef class VerletListHadressATInteractionTemplate<ReactionFieldGeneralized>
 
 typedef class CellListAllPairsInteractionTemplate<ReactionFieldGeneralized>
     CellListReactionFieldGeneralized;
-
-/*typedef class FixedPairListInteractionTemplate<ReactionFieldGeneralized>
-    FixedPairListReactionFieldGeneralized;*/
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -81,6 +81,16 @@ void ReactionFieldGeneralized::registerPython()
         .def("setPotential", &VerletListAdressATReactionFieldGeneralized::setPotential)
         .def("getPotential", &VerletListAdressATReactionFieldGeneralized::getPotentialPtr);
 
+    class_<VerletListHybridReactionFieldGeneralized, bases<Interaction> >(
+        "interaction_VerletListHybridReactionFieldGeneralized",
+        init<shared_ptr<VerletList>, bool>())
+        .def("setPotential", &VerletListHybridReactionFieldGeneralized::setPotential)
+        .def("getPotential", &VerletListHybridReactionFieldGeneralized::getPotentialPtr)
+        .add_property("scale_factor", &VerletListHybridReactionFieldGeneralized::scaleFactor,
+                      &VerletListHybridReactionFieldGeneralized::setScaleFactor)
+        .add_property("max_force", &VerletListHybridReactionFieldGeneralized::maxForce,
+                      &VerletListHybridReactionFieldGeneralized::setMaxForce);
+
     class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >(
         "interaction_VerletListAdressReactionFieldGeneralized",
         init<std::shared_ptr<VerletListAdress>, std::shared_ptr<FixedTupleListAdress> >())
@@ -105,14 +115,6 @@ void ReactionFieldGeneralized::registerPython()
         "interaction_CellListReactionFieldGeneralized", init<std::shared_ptr<storage::Storage> >())
         .def("setPotential", &CellListReactionFieldGeneralized::setPotential);
     ;
-
-    /*
-      class_<FixedPairListReactionFieldGeneralized, bases<Interaction> >
-        ("interaction_FixedPairListReactionFieldGeneralized",
-          init<std::shared_ptr<System>, std::shared_ptr<FixedPairList>,
-      std::shared_ptr<ReactionFieldGeneralized> >()) .def("setPotential",
-      &FixedPairListReactionFieldGeneralized::setPotential);
-        ;*/
 }
 }  // namespace interaction
 }  // namespace espressopp

@@ -55,6 +55,7 @@ struct ParticleProperties
     Real3D fm;
     int state;
     longint res_id;
+    bool vp;
 
 private:
     friend class boost::serialization::access;
@@ -227,6 +228,7 @@ struct Particle
         p.state = 0;
         p.pib = 0;
         p.res_id = 0;
+        p.vp = false;
     }
 
     // getter and setter used for export in Python
@@ -374,6 +376,12 @@ struct Particle
     int getResId() const { return p.res_id; }
     void setResId(const int& _res_id) { p.res_id = _res_id; }
 
+    // virtual-particle
+    bool& vp() { return p.vp; }
+    const bool& vp() const { return p.vp; }
+    bool getVP() const { return p.vp; }
+    void setVP(const bool& _vp) { p.vp = _vp; }
+
     static void registerPython();
 
     void copyAsGhost(const Particle& src, int extradata, const Real3D& shift)
@@ -392,6 +400,22 @@ struct Particle
             l = src.l;
         }
         ghost() = 1;
+        lambda() = src.lambda();
+    }
+
+    bool operator<(Particle other) const { return p.id < other.id(); }
+
+    bool operator<(const Particle& other) { return p.id < other.id(); }
+
+    bool operator<(Particle* other) { return p.id < other->id(); }
+
+    friend std::ostream& operator<<(std::ostream& output, const Particle& p)
+    {
+        output << "P.id=" << p.id() << " type=" << p.type() << " pos=" << p.position()
+               << " v=" << p.velocity() << " f=" << p.force() << " mass=" << p.mass()
+               << " img=" << p.image() << " ghost=" << p.ghost() << " lmb=" << p.lambda()
+               << " state=" << p.state() << " resid=" << p.res_id() << " vp=" << p.vp();
+        return output;
     }
 
 private:

@@ -39,6 +39,7 @@ from espressopp.System import *
 from espressopp.VerletList import *
 from espressopp.VerletListTriple import *
 from espressopp.VerletListAdress import *
+from espressopp.VerletListHybrid import *
 from espressopp.FixedSingleList import *
 from espressopp.FixedPairList import *
 from espressopp.FixedPairDistList import *
@@ -56,6 +57,7 @@ from espressopp.MultiSystem import *
 from espressopp.ParallelTempering import *
 from espressopp.Version import *
 from espressopp.PLogger import *
+from espressopp.FixedVSList import *
 
 
 infinity=float("inf")

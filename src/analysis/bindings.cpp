@@ -72,6 +72,8 @@
 #include "SystemMonitor.hpp"
 #include "PotentialEnergy.hpp"
 #include "KineticEnergy.hpp"
+#include "Resolution.hpp"
+#include "TemperatureOnGroup.hpp"
 
 namespace espressopp
 {
@@ -131,6 +133,8 @@ void registerPython()
     SystemMonitor::registerPython();
     PotentialEnergy::registerPython();
     KineticEnergy::registerPython();
+    Resolution::registerPython();
+    TemperatureOnGroup::registerPython();
 
     RadGyrXProfilePI::registerPython();
 }
