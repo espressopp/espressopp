@@ -57,7 +57,7 @@ public:
 
     // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
     // as a consequence of the system resizing
-    virtual void cellAdjust();
+    virtual void cellAdjust(bool withShear);
 
     virtual Cell *mapPositionToCell(const Real3D &pos);
     virtual Cell *mapPositionToCellClipped(const Real3D &pos);
@@ -133,6 +133,8 @@ protected:
 
     /// init global Verlet list
     void initCellInteractions();
+    /// dummy function
+    void remapNeighbourCells(int cell_shift);
     /// set the grids and allocate space accordingly
     void createCellGrid(const Int3D &nodeGrid, const Int3D &cellGrid);
     /// sort cells into local/ghost cell arrays

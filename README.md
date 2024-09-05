@@ -76,6 +76,21 @@ $ cmake -B builddir -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=
 $ cmake --build builddir
 ```
 
+You can include ScaFaCoS Library (pre-installation required, see in http://www.scafacos.de/) into E++ compilation
+
+```sh
+$ cmake . -DCMAKE_PREFIX_PATH=[installation directory]
+$ cmake --build .
+```
+
+You can also include Random123 Library (ONLY used for DPD thermostat, pre-download required)
+
+```sh
+$ git clone https://github.com/DEShawResearch/random123.git
+$ cmake . -DRANDOM123_ROOT_DIR=[download directory]
+$ cmake --build .
+```
+
 ## How to install E++ in some Linux distributions
 
 ### Ubuntu

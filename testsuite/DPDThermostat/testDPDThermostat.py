@@ -71,7 +71,7 @@ class TestDPDThermostat(unittest.TestCase):
         integrator.dt = 0.01
 
         # DPD Thermostat
-        dpd = espressopp.integrator.DPDThermostat(self.system,vl)
+        dpd = espressopp.integrator.DPDThermostat(self.system,vl,2)
         dpd.gamma = 2.0
         dpd.tgamma = 5.0
         dpd.temperature = 2.0

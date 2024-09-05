@@ -175,7 +175,7 @@ void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates)
     std::cout << "Nothing happened" << std::endl;
 }
 
-void DomainDecompositionAdress::cellAdjust()
+void DomainDecompositionAdress::cellAdjust(bool withShear = false)
 {
     // create an appropriate cell grid
     Real3D box_sizeL = getSystem()->bc->getBoxL();
@@ -294,6 +294,9 @@ void DomainDecompositionAdress::initCellInteractions()
 
     LOG4ESPP_DEBUG(logger, "done");
 }
+
+// dummy function, only used for shear flow simulation (see in DomainDecomposition.cpp)
+void DomainDecompositionAdress::remapNeighbourCells(int cell_shift) { ; }
 
 Cell *DomainDecompositionAdress::mapPositionToCell(const Real3D &pos)
 {

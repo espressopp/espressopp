@@ -25,12 +25,15 @@ espressopp.integrator.DPDThermostat
 ***********************************
 
 
-.. function:: espressopp.integrator.DPDThermostat(system, vl)
+.. function:: espressopp.integrator.DPDThermostat(system, vl, ntotal)
 
                 :param system:
                 :param vl:
+                :param ntotal: (default: 0, a total number of particles)
+                               (not needed if switched back to generic rng
                 :type system:
                 :type vl:
+                :type ntotal:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -40,9 +43,9 @@ from _espressopp import integrator_DPDThermostat
 
 class DPDThermostatLocal(ExtensionLocal, integrator_DPDThermostat):
 
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, ntotal=0):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_DPDThermostat, system, vl)
+            cxxinit(self, integrator_DPDThermostat, system, vl, ntotal)
 
     #def enableAdress(self):
     #    if pmi.workerIsActive():
@@ -52,5 +55,5 @@ if pmi.isController :
     class DPDThermostat(Extension, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.DPDThermostatLocal',
-            pmiproperty = [ 'gamma', 'tgamma', 'temperature' ]
+            pmiproperty = [ 'gamma', 'tgamma', 'temperature', 'ntotal' ]
             )
