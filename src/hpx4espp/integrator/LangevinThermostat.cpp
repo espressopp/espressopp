@@ -90,7 +90,7 @@ void LangevinThermostat::setAdress(bool _adress)
 {
     if (_adress)
     {
-        HPX4ESPP_THROW_EXCEPTION(hpx::not_implemented, "LangevinThermostat::setAdress",
+        HPX4ESPP_THROW_EXCEPTION(hpx::error::not_implemented, "LangevinThermostat::setAdress",
                                  "Not implemented for _adress=true");
     }
     adress = _adress;
@@ -139,7 +139,7 @@ void LangevinThermostat::thermalize()
     LOG4ESPP_DEBUG(theLogger, "thermalize");
 
     if (!exclusions.empty())
-        HPX4ESPP_THROW_EXCEPTION(hpx::not_implemented, "LangevinThermostat::thermalize",
+        HPX4ESPP_THROW_EXCEPTION(hpx::error::not_implemented, "LangevinThermostat::thermalize",
                                  "exclusions not implemented");
 
     auto& vss = storageHPX->virtualStorage;
@@ -197,7 +197,7 @@ void LangevinThermostat::thermalize()
 // for AdResS
 void LangevinThermostat::thermalizeAdr()
 {
-    HPX4ESPP_THROW_EXCEPTION(hpx::not_implemented, "LangevinThermostat::thermalizeAdr",
+    HPX4ESPP_THROW_EXCEPTION(hpx::error::not_implemented, "LangevinThermostat::thermalizeAdr",
                              "Function not implemented");
 #if 0
       LOG4ESPP_DEBUG(theLogger, "thermalize");

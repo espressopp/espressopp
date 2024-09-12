@@ -44,6 +44,6 @@
     /*  */
 
 #define HPX4ESPP_NOT_IMPLEMENTED(msg) \
-    HPX4ESPP_THROW_EXCEPTION(hpx::not_implemented, __FUNCTION__, msg)
+    HPX4ESPP_THROW_EXCEPTION(hpx::error::not_implemented, __FUNCTION__, msg)
 
 #endif  // HPX4ESPP_INCLUDE_ERRORS_HPP

@@ -2368,7 +2368,7 @@ void DomainDecomposition::exchangeGhosts_SingleNode()
         int coord = realToGhosts ? _coord : (2 - _coord);
 
         if (nodeGrid.getGridSize(coord) != 1)
-            HPX4ESPP_THROW_EXCEPTION(hpx::not_implemented, "exchangeGhosts_SingleNode",
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::not_implemented, "exchangeGhosts_SingleNode",
                                      "not implemented for nodeGrid>1");
 
         real curCoordBoxL = getSystem()->bc->getBoxL()[coord];
