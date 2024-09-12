@@ -26,6 +26,8 @@
 #ifndef _HPX4ESPP_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
 #define _HPX4ESPP_INTEGRATOR_LANGEVINTHERMOSTAT_HPP
 
+#include <set>
+
 #include "types.hpp"
 #include "logging.hpp"
 #include "Particle.hpp"
