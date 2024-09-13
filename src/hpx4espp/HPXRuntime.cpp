@@ -90,10 +90,10 @@ manage_hpx_runtime::manage_hpx_runtime(bool disable_tcp, size_t threads)
         cfg.push_back(cfg_threads);
     }
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
     hpx::util::function_nonser<int(int, char**)> start_function =
-        hpx::util::bind(&manage_hpx_runtime::hpx_main, this, hpx::placeholders::_1, hpx::placeholders::_2);
+        hpx::bind(&manage_hpx_runtime::hpx_main, this, hpx::placeholders::_1, hpx::placeholders::_2);
 
     hpx::init_params init_args;
     init_args.cfg = cfg;
