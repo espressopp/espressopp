@@ -117,7 +117,7 @@ manage_hpx_runtime::~manage_hpx_runtime()
 {
     // notify hpx_main to tear down the runtime
     {
-        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
+        std::lock_guard<hpx::spinlock> lk(mtx_);
         rts_ = nullptr;  // reset pointer
     }
     cond_.notify_one();  // signal exit
