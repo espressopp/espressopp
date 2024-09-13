@@ -55,7 +55,7 @@ inline typename hpx::util::invoke_result<F, Ts...>::type runAsHPXThread(F const&
     if (rtsIsRunning())
     {
         // std::cout << "NOTE: runAsHPXThread called and RTS is running" << std::endl;
-        return hpx::threads::run_as_hpx_thread(f, std::forward<Ts>(vs)...);
+        return hpx::run_as_hpx_thread(f, std::forward<Ts>(vs)...);
     }
     else
     {
