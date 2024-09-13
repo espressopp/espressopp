@@ -27,7 +27,7 @@
     {                                                                                 \
         if (!(VALUE))                                                                 \
             HPX4ESPP_THROW_EXCEPTION(                                                 \
-                hpx::assertion_failure, __FUNCTION__,                                 \
+                hpx::error::assertion_failure, __FUNCTION__,                                 \
                 "HPX4ESPP_ASSERT FAILED. " #VALUE "=" << (VALUE ? "true" : "false")); \
     }                                                                                 \
     /* */
@@ -35,7 +35,7 @@
 #define HPX4ESPP_ASSERT_EQUAL(VALUE1, VALUE2)                                                  \
     {                                                                                          \
         if (!((VALUE1) == (VALUE2)))                                                           \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                     \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                     \
                                      "HPX4ESPP_ASSERT_EQUAL FAILED."                           \
                                          << " " #VALUE1 "=" << (VALUE1) << " and " #VALUE2 "=" \
                                          << (VALUE2) << " are not equal.");                    \
@@ -45,7 +45,7 @@
 #define HPX4ESPP_ASSERT_NEQ(VALUE1, VALUE2)                                                    \
     {                                                                                          \
         if (!((VALUE1) != (VALUE2)))                                                           \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                     \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                     \
                                      "HPX4ESPP_ASSERT_NEQ FAILED."                             \
                                          << " " #VALUE1 "=" << (VALUE1) << " and " #VALUE2 "=" \
                                          << (VALUE2) << " are not unequal.");                  \
@@ -55,7 +55,7 @@
 #define HPX4ESPP_ASSERT_LT(VALUE1, VALUE2)                                                     \
     {                                                                                          \
         if (!((VALUE1) < (VALUE2)))                                                            \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                     \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                     \
                                      "HPX4ESPP_ASSERT_LT FAILED."                              \
                                          << " " #VALUE1 "=" << (VALUE1)                        \
                                          << " not less than " #VALUE2 "=" << (VALUE2) << "."); \
@@ -65,7 +65,7 @@
 #define HPX4ESPP_ASSERT_GT(VALUE1, VALUE2)                                                        \
     {                                                                                             \
         if (!((VALUE1) > (VALUE2)))                                                               \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                        \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                        \
                                      "HPX4ESPP_ASSERT_GT FAILED."                                 \
                                          << " " #VALUE1 "=" << (VALUE1)                           \
                                          << " not greater than " #VALUE2 "=" << (VALUE2) << "."); \
@@ -75,7 +75,7 @@
 #define HPX4ESPP_ASSERT_LEQ(VALUE1, VALUE2)                                                        \
     {                                                                                              \
         if (!((VALUE1) <= (VALUE2)))                                                               \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                         \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                         \
                                      "HPX4ESPP_ASSERT_LEQ FAILED."                                 \
                                          << " " #VALUE1 "=" << (VALUE1)                            \
                                          << " not less than nor equal to " #VALUE2 "=" << (VALUE2) \
@@ -86,7 +86,7 @@
 #define HPX4ESPP_ASSERT_GEQ(VALUE1, VALUE2)                                               \
     {                                                                                     \
         if (!((VALUE1) >= (VALUE2)))                                                      \
-            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,                \
+            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,                \
                                      "HPX4ESPP_ASSERT_GEQ FAILED."                        \
                                          << " " #VALUE1 "=" << (VALUE1)                   \
                                          << " not greater than nor equal to " #VALUE2 "=" \
