@@ -146,7 +146,7 @@ int manage_hpx_runtime::hpx_main(int argc, char** argv)
 
     // Now, wait for destructor to be called.
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
+        std::unique_lock<hpx::spinlock> lk(mtx_);
         if (rts_ != nullptr) cond_.wait(lk);
     }
 
