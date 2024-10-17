@@ -243,8 +243,8 @@ void DomainDecomposition::resetVirtualStorage()
                 /// owned cells
                 {
                     /// Set shift start
-                    std::array<size_t, 3> lStart = {fw, fw, fw};
-                    std::array<size_t, 3> lShiftEnd = {fw, fw, fw};
+                    std::array<size_t, 3> lStart = {static_cast<unsigned long>(fw), static_cast<unsigned long>(fw), static_cast<unsigned long>(fw)};
+                    std::array<size_t, 3> lShiftEnd = {static_cast<unsigned long>(fw), static_cast<unsigned long>(fw), static_cast<unsigned long>(fw)};
 
                     if (i2 == 0) lStart[2] = 0;
                     if (i1 == 0) lStart[1] = 0;
