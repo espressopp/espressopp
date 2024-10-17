@@ -58,7 +58,7 @@ int get_cpu_id()
         /// Adapted from
         /// https://hpcf.umbc.edu/general-productivity/checking-which-cpus-are-used-by-your-program/
         FILE* procfile = fopen("/proc/self/stat", "r");
-        long to_read = 8192;
+        constexpr long to_read = 8192;
         char buffer[to_read];
         int read = fread(buffer, sizeof(char), to_read, procfile);
         fclose(procfile);

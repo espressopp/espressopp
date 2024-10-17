@@ -78,7 +78,7 @@ void SAVE_PARTICLE_ARRAY(boost::mpi::communicator const& comm,
 
         for (size_t ip = cellStart; ip < cellEnd; ip++)
         {
-            saveParticles.push_back({rank, inode, ic, pa.id[ip], pa.p_x[ip], pa.p_y[ip], pa.p_z[ip],
+            saveParticles.push_back({static_cast<size_t>(rank), inode, ic, pa.id[ip], pa.p_x[ip], pa.p_y[ip], pa.p_z[ip],
                                      pa.v_x[ip], pa.v_y[ip], pa.v_z[ip], pa.f_x[ip], pa.f_y[ip],
                                      pa.f_z[ip]});
         }
