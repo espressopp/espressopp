@@ -117,7 +117,7 @@ Channels::Channels(espressopp::storage::NodeGrid const& nodeGrid,
 
 void Channels::verifyChannels()
 {
-    hpx::threads::run_as_hpx_thread(
+    hpx::run_as_hpx_thread(
         [this]
         {
             const int rank = mpiWorld->rank();

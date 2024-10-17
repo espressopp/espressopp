@@ -741,7 +741,7 @@ void DomainDecomposition::resetVirtualStorage()
                         if (!isOwnCell(vd, pcell))
                         {
                             HPX4ESPP_THROW_EXCEPTION(
-                                hpx::assertion_failure, __FUNCTION__,
+                                hpx::error::assertion_failure, __FUNCTION__,
                                 "ncellNbr " << pcell << " not in owned cells of inode " << inode
                                             << ". Failed in inode=" << inode << " ic=" << ic);
                         }
@@ -753,7 +753,7 @@ void DomainDecomposition::resetVirtualStorage()
                             if (!isOwnCell(vd, ncell))
                             {
                                 HPX4ESPP_THROW_EXCEPTION(
-                                    hpx::assertion_failure, __FUNCTION__,
+                                    hpx::error::assertion_failure, __FUNCTION__,
                                     "ncell " << ncell << " not in owned cells of nnode " << inode
                                              << ". Failed in inode=" << inode << " nnode=" << inode
                                              << " ic=" << ic << " nn=" << nn);
@@ -762,7 +762,7 @@ void DomainDecomposition::resetVirtualStorage()
                             if (search_erase({pcell, ncell}, ncp))
                             {
                                 HPX4ESPP_THROW_EXCEPTION(
-                                    hpx::assertion_failure, __FUNCTION__,
+                                    hpx::error::assertion_failure, __FUNCTION__,
                                     "Pair not found: {" << pcell << "," << ncell
                                                         << "}. Failed in remove_n3l inode=" << inode
                                                         << " ic=" << ic << " nn=" << nn);
@@ -770,7 +770,7 @@ void DomainDecomposition::resetVirtualStorage()
                             if (search_erase({ncell, pcell}, ncp))
                             {
                                 HPX4ESPP_THROW_EXCEPTION(
-                                    hpx::assertion_failure, __FUNCTION__,
+                                    hpx::error::assertion_failure, __FUNCTION__,
                                     "Pair not found: {" << ncell << "," << pcell
                                                         << "}. Failed in remove_n3l inode=" << inode
                                                         << " ic=" << ic << " nn=" << nn);
@@ -807,7 +807,7 @@ void DomainDecomposition::resetVirtualStorage()
                         if (!isOwnCell(vd, pcell))
                         {
                             HPX4ESPP_THROW_EXCEPTION(
-                                hpx::assertion_failure, __FUNCTION__,
+                                hpx::error::assertion_failure, __FUNCTION__,
                                 "ncellNbr " << pcell << " not in owned cells of inode " << inode
                                             << ". Failed in inode=" << inode << " ic=" << ic);
                         }
@@ -819,7 +819,7 @@ void DomainDecomposition::resetVirtualStorage()
                                 if (!isOwnCell(vdNbr, ncellNbr))
                                 {
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, __FUNCTION__,
+                                        hpx::error::assertion_failure, __FUNCTION__,
                                         "ncellNbr " << ncellNbr << " not in owned cells of nnode "
                                                     << nnode << ". Failed in inode=" << inode
                                                     << " nnode=" << nnode << " ic=" << ic
@@ -836,7 +836,7 @@ void DomainDecomposition::resetVirtualStorage()
                                 if (searchGhost == ghosts.end())
                                 {
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, __FUNCTION__,
+                                        hpx::error::assertion_failure, __FUNCTION__,
                                         "cell " << nVidx << " not in ghost cells of inode "
                                                 << inode);
                                 }
@@ -849,7 +849,7 @@ void DomainDecomposition::resetVirtualStorage()
                                     if (search_erase({pcell, ncell}, ncp))
                                     {
                                         HPX4ESPP_THROW_EXCEPTION(
-                                            hpx::assertion_failure, __FUNCTION__,
+                                            hpx::error::assertion_failure, __FUNCTION__,
                                             "Pair not found: {"
                                                 << pcell << "," << ncell
                                                 << "}. Failed in remove_n3l inode=" << inode
@@ -867,7 +867,7 @@ void DomainDecomposition::resetVirtualStorage()
                                     if (searchGhostNbr == ghostsNbr.end())
                                     {
                                         HPX4ESPP_THROW_EXCEPTION(
-                                            hpx::assertion_failure, __FUNCTION__,
+                                            hpx::error::assertion_failure, __FUNCTION__,
                                             "cell " << pVidxNbr << " not in ghost cells of nnode "
                                                     << nnode);
                                     }
@@ -876,7 +876,7 @@ void DomainDecomposition::resetVirtualStorage()
                                     if (search_erase({pcellNbr, ncellNbr}, ncpNbr))
                                     {
                                         HPX4ESPP_THROW_EXCEPTION(
-                                            hpx::assertion_failure, __FUNCTION__,
+                                            hpx::error::assertion_failure, __FUNCTION__,
                                             "Pair not found: {"
                                                 << pcellNbr << "," << ncellNbr
                                                 << "} in nnode. Failed in remove_n3l inode="
@@ -947,7 +947,7 @@ void DomainDecomposition::resetVirtualStorage()
                             const auto pair = std::make_pair(pcell_gidx, ncell_gidx);
                             if (search_erase(pair, allCellPairs))
                             {
-                                HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,
+                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,
                                                          genMsg(pair));
                             }
                         }
@@ -957,7 +957,7 @@ void DomainDecomposition::resetVirtualStorage()
                             const auto pair = std::make_pair(ncell_gidx, pcell_gidx);
                             if (search_erase(pair, allCellPairs))
                             {
-                                HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,
+                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,
                                                          genMsg(pair));
                             }
                         }
@@ -1672,7 +1672,7 @@ void DomainDecomposition::resetVirtualStorage()
                                             if (removeCommCell(occ, gidx))
                                             {
                                                 HPX4ESPP_THROW_EXCEPTION(
-                                                    hpx::assertion_failure, __FUNCTION__,
+                                                    hpx::error::assertion_failure, __FUNCTION__,
                                                     "ic not found in occ "
                                                         << occ_label << " dir=" << dir
                                                         << " ic=" << ic << " gidx=" << gidx);
@@ -1760,7 +1760,7 @@ void DomainDecomposition::resetVirtualStorage()
                                                 if (removeCommCell(occReals2[dir], icr_gidx))
                                                 {
                                                     HPX4ESPP_THROW_EXCEPTION(
-                                                        hpx::assertion_failure, __FUNCTION__,
+                                                        hpx::error::assertion_failure, __FUNCTION__,
                                                         "ic not found in occ "
                                                             << "reals"
                                                             << " dir=" << dir << " icr=" << icr
@@ -1771,7 +1771,7 @@ void DomainDecomposition::resetVirtualStorage()
                                                 if (removeCommCell(occGhosts2[dir], icg_gidx))
                                                 {
                                                     HPX4ESPP_THROW_EXCEPTION(
-                                                        hpx::assertion_failure, __FUNCTION__,
+                                                        hpx::error::assertion_failure, __FUNCTION__,
                                                         "ic not found in occ "
                                                             << "ghosts"
                                                             << " dir=" << dir << " icg=" << icg
@@ -2459,7 +2459,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     const real myLeft = cellGrid.getMyLeft(i) - cellSize[i];
                     const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                     if (pos[i] < myLeft || pos[i] >= myRight)
-                        HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, "",
+                        HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "",
                                                  "pos[i]=" << pos[i] << " allowed: [" << myLeft
                                                            << "," << myRight << ")");
                 }
@@ -2472,7 +2472,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     const int gridSize = cellGrid.getFrameGridSize(i);
                     if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                         HPX4ESPP_THROW_EXCEPTION(
-                            hpx::assertion_failure, "",
+                            hpx::error::assertion_failure, "",
                             "cpos[i]=" << cpos[i] << " allowed: [" << 0 << "," << gridSize << ")");
                 }
             }
@@ -2498,7 +2498,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     {
                         if (sortCell == 0)
                         {
-                            HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, "resortRealCell",
+                            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "resortRealCell",
                                                      "sortCell == 0 not allowed");
                         }
                         else
@@ -2526,7 +2526,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                 if (!(cell->particles.empty()))
                 {
                     HPX4ESPP_THROW_EXCEPTION(
-                        hpx::assertion_failure,
+                        hpx::error::assertion_failure,
                         "decomposeRealParticlesHPXCellTask_SingleNode_NonPeriodic",
                         "ghost cell not empty. size = " << cell->particles.size());
                 }
@@ -2568,7 +2568,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     Cell* sortCell = mapPositionToLocalCell(part.position());
                     if (sortCell != currCell)
                         HPX4ESPP_THROW_EXCEPTION(
-                            hpx::assertion_failure,
+                            hpx::error::assertion_failure,
                             "DomainDecomposition::decomposeRealParticlesHPXCellTask_SingleNode_"
                             "NonPeriodic",
                             "sortCell!=currCell");
@@ -2691,7 +2691,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
 
                         if (sendBuf.size() != totalSend)
                             HPX4ESPP_THROW_EXCEPTION(
-                                hpx::assertion_failure,
+                                hpx::error::assertion_failure,
                                 "decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodic",
                                 "size mismatch sendBuf.size()!=totalSend");
                     }
@@ -2752,7 +2752,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     Cell* sortCell = mapPositionToLocalCell(part.position());
                     if (sortCell != currCell)
                         HPX4ESPP_THROW_EXCEPTION(
-                            hpx::assertion_failure,
+                            hpx::error::assertion_failure,
                             "DomainDecomposition::decomposeRealParticlesHPXCellTask_SingleNode_"
                             "NonPeriodic",
                             "sortCell!=currCell");
@@ -2768,7 +2768,7 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                 ParticleList& ghosts = ghostCells[ig]->particles;
                 if (ghosts.size() > 0)
                     HPX4ESPP_THROW_EXCEPTION(
-                        hpx::assertion_failure,
+                        hpx::error::assertion_failure,
                         "DomainDecomposition::decomposeRealParticlesHPXCellTask_SingleNode_"
                         "NonPeriodic",
                         "ghost cell must be empty. ghosts.size()=" << ghosts.size());
@@ -2819,7 +2819,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                 const real myRight = cg.getMyRight(i) + cellSize[i];
                 if (pos[i] < myLeft || pos[i] >= myRight)
                     HPX4ESPP_THROW_EXCEPTION(
-                        hpx::assertion_failure, "",
+                        hpx::error::assertion_failure, "",
                         "pos[i]=" << pos[i] << " allowed: [" << myLeft << "," << myRight << ")");
             }
 
@@ -2831,7 +2831,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                 const int gridSize = cg.getFrameGridSize(i);
                 if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                     HPX4ESPP_THROW_EXCEPTION(
-                        hpx::assertion_failure, "",
+                        hpx::error::assertion_failure, "",
                         "cpos[i]=" << cpos[i] << " allowed: [" << 0 << "," << gridSize << ")");
             }
         }
@@ -2851,9 +2851,9 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                 {
                     if (sortCell == 0)
                     {
-                        HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, "resortRealCell",
+                        HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "resortRealCell",
                                                  "sortCell == 0 not allowed");
-                        // HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure,"resortRealCell","sortCell
+                        // HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure,"resortRealCell","sortCell
                         // == 0 not allowed"
                         //   << " particle position (" << part.position() << ") mapped to cell "
                         //   << vd.cellGrid.mapPositionToIndex(part.position()));
@@ -2947,7 +2947,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                 const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                                 if (pos[i] < myLeft || pos[i] >= myRight)
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, "mapPositionToLocalCell",
+                                        hpx::error::assertion_failure, "mapPositionToLocalCell",
                                         "pos[i]=" << pos[i] << " allowed: [" << myLeft << ","
                                                   << myRight << ")");
                             }
@@ -2960,7 +2960,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                 const int gridSize = cellGrid.getFrameGridSize(i);
                                 if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, "mapPositionToLocalCell",
+                                        hpx::error::assertion_failure, "mapPositionToLocalCell",
                                         "cpos[i]=" << cpos[i] << " allowed: [" << 0 << ","
                                                    << gridSize << ")");
                             }
@@ -3005,7 +3005,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                 const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                                 if (pos[i] < myLeft || pos[i] >= myRight)
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, "mapPositionToLocalCell",
+                                        hpx::error::assertion_failure, "mapPositionToLocalCell",
                                         "pos[i]=" << pos[i] << " allowed: [" << myLeft << ","
                                                   << myRight << ")");
                             }
@@ -3018,7 +3018,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                 const int gridSize = cellGrid.getFrameGridSize(i);
                                 if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                                     HPX4ESPP_THROW_EXCEPTION(
-                                        hpx::assertion_failure, "mapPositionToLocalCell",
+                                        hpx::error::assertion_failure, "mapPositionToLocalCell",
                                         "cpos[i]=" << cpos[i] << " allowed: [" << 0 << ","
                                                    << gridSize << ")");
                             }
@@ -3277,7 +3277,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                         const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                                         if (pos[i] < myLeft || pos[i] >= myRight)
                                             HPX4ESPP_THROW_EXCEPTION(
-                                                hpx::assertion_failure, "mapPositionToLocalCell",
+                                                hpx::error::assertion_failure, "mapPositionToLocalCell",
                                                 "pos[i]=" << pos[i] << " allowed: [" << myLeft
                                                           << "," << myRight << ")");
                                     }
@@ -3290,7 +3290,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                         const int gridSize = cellGrid.getFrameGridSize(i);
                                         if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                                             HPX4ESPP_THROW_EXCEPTION(
-                                                hpx::assertion_failure, "mapPositionToLocalCell",
+                                                hpx::error::assertion_failure, "mapPositionToLocalCell",
                                                 "cpos[i]=" << cpos[i] << " allowed: [" << 0 << ","
                                                            << gridSize << ")");
                                     }
@@ -3371,7 +3371,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                                         cellGrid.getMyRight(i) + cellSize[i];
                                                     if (pos[i] < myLeft || pos[i] >= myRight)
                                                         HPX4ESPP_THROW_EXCEPTION(
-                                                            hpx::assertion_failure,
+                                                            hpx::error::assertion_failure,
                                                             "mapPositionToLocalCell",
                                                             "pos[i]=" << pos[i] << " allowed: ["
                                                                       << myLeft << "," << myRight
@@ -3388,7 +3388,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                                         cellGrid.getFrameGridSize(i);
                                                     if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                                                         HPX4ESPP_THROW_EXCEPTION(
-                                                            hpx::assertion_failure,
+                                                            hpx::error::assertion_failure,
                                                             "mapPositionToLocalCell",
                                                             "cpos[i]=" << cpos[i] << " allowed: ["
                                                                        << 0 << "," << gridSize
@@ -3446,7 +3446,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     const real myLeft = cellGrid.getMyLeft(i) - cellSize[i];
                     const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                     if (pos[i] < myLeft || pos[i] >= myRight)
-                        HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, "mapPositionToLocalCell",
+                        HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "mapPositionToLocalCell",
                                                  "pos[i]=" << pos[i] << " allowed: [" << myLeft
                                                            << "," << myRight << ")");
                 }
@@ -3459,7 +3459,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     const int gridSize = cellGrid.getFrameGridSize(i);
                     if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                         HPX4ESPP_THROW_EXCEPTION(
-                            hpx::assertion_failure, "mapPositionToLocalCell",
+                            hpx::error::assertion_failure, "mapPositionToLocalCell",
                             "cpos[i]=" << cpos[i] << " allowed: [" << 0 << "," << gridSize << ")");
                 }
             }
@@ -3476,7 +3476,7 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
             {
                 Cell* sortCell = mapPositionToLocalCell(part.position());
                 if (sortCell != currCell)
-                    HPX4ESPP_THROW_EXCEPTION(hpx::assertion_failure, __FUNCTION__,
+                    HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,
                                              "sortCell!=currCell");
             }
         }

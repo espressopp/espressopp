@@ -73,7 +73,7 @@ inline typename hpx::util::invoke_result<F, Ts...>::type runAsHPXThread(F const&
     {                                                                                  \
         if (!espressopp::hpx4espp::utils::isInsideHPXThread())                         \
             HPX4ESPP_THROW_EXCEPTION(                                                  \
-                hpx::assertion_failure, __FUNCTION__,                                  \
+                hpx::error::assertion_failure, __FUNCTION__,                           \
                 "HPX4ESPP_CHECK_IS_INSIDE_HPX_THREAD: Not running inside HPX thread"); \
     }                                                                                  \
     /* */
