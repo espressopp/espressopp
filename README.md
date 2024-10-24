@@ -36,6 +36,7 @@ Alternatively, you can download a tarball or zip file of [previous release versi
  - MPI
  - FFTW3
  - GROMACS (required when `WITH_XTC` flag is enabled, GROMACS needs to be built with GMX_INSTALL_LEGACY_API)
+ - [HPX 1.9.1](https://hpx-docs.stellar-group.org/tags/1.9.1/html/quickstart.html) (required when `HPX4ESPP_ENABLED=ON`)
  - HDF5
 
 ## Python Dependencies
@@ -68,12 +69,14 @@ You can customize the build process by applying following CMake flags
  - `WITH_XTC` - build E++ with support of dumping trajectory to GROMACS xtc files (default: OFF).
  - `CMAKE_INSTALL_PREFIX` - where the E++ should be installed.
  - `CMAKE_CXX_FLAGS` - put specific compilation flags.
+ - `HPX4ESPP_ENABLED` - build E++ with hpx4espp module which integrates the HPX runtime (default: OFF).
+ - `HPX_DIR` - path to `.../lib64/cmake/HPX` directory which is required when `HPX4ESPP_ENABLED=ON`.
 
 Then, the flags can be used in `cmake`
 
 ```sh
-$ cmake -B builddir -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3 .
-$ cmake --build builddir
+$ cmake -B builddir -DWITH_XTC=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3 -DHPX4ESPP_ENABLED=ON -DHPX_DIR=/path/to/hpx/lib64/cmake/HPX .
+$ make
 ```
 
 ## How to install E++ in some Linux distributions
@@ -104,3 +107,37 @@ http://espressopp.github.io
 # Reporting issues
 
 Report bugs on the [GitHub issues site](https://github.com/espressopp/espressopp/issues)
+
+# Using the hpx4espp module
+
+## Installation
+
+Download the latest release [HPX 1.9.1](https://github.com/STEllAR-GROUP/hpx/releases/tag/1.9.1).
+
+Follow the installation procedure in [this documentation](https://hpx-docs.stellar-group.org/tags/1.9.1/html/quickstart.html).
+
+Build espressopp:
+
+```sh
+$ cmake . -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS=-O3 -DHPX4ESPP_ENABLED=ON -DHPX_DIR=/path/to/hpx/lib64/cmake/HPX
+$ make
+```
+
+## Examples
+
+Run the example script found in `examples/hpx4espp` using the following options:
+```sh
+[SLURM/MPI commands] python lennard_jones.py --hpx:threads=16 --hpx:print-bind [--no-hpx4espp] [--no-hpxStart]
+```
+
+For example, if you are running with SLURM on a node with 16 Skylake cores and want to compare across three versions
+```
+ORIG:
+$ srun --nodes=1 -n 16 --cpus-per-task=2 python lennard_jones.py --no-hpx4espp --no-hpxStart
+
+Vectorized kernels on hpx4espp w/o threading:
+$ srun --nodes=1 -n 16 --cpus-per-task=2 python lennard_jones.py --hpx:threads=1 --no-hpxStart
+
+HPX:
+$ srun --nodes=1 -n 1 --cpus-per-task=32 python lennard_jones.py --hpx:threads=16 --hpx:print-bind
+```
