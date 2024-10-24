@@ -243,8 +243,12 @@ void DomainDecomposition::resetVirtualStorage()
                 /// owned cells
                 {
                     /// Set shift start
-                    std::array<size_t, 3> lStart = {static_cast<unsigned long>(fw), static_cast<unsigned long>(fw), static_cast<unsigned long>(fw)};
-                    std::array<size_t, 3> lShiftEnd = {static_cast<unsigned long>(fw), static_cast<unsigned long>(fw), static_cast<unsigned long>(fw)};
+                    std::array<size_t, 3> lStart = {static_cast<unsigned long>(fw),
+                                                    static_cast<unsigned long>(fw),
+                                                    static_cast<unsigned long>(fw)};
+                    std::array<size_t, 3> lShiftEnd = {static_cast<unsigned long>(fw),
+                                                       static_cast<unsigned long>(fw),
+                                                       static_cast<unsigned long>(fw)};
 
                     if (i2 == 0) lStart[2] = 0;
                     if (i1 == 0) lStart[1] = 0;
@@ -947,8 +951,8 @@ void DomainDecomposition::resetVirtualStorage()
                             const auto pair = std::make_pair(pcell_gidx, ncell_gidx);
                             if (search_erase(pair, allCellPairs))
                             {
-                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,
-                                                         genMsg(pair));
+                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure,
+                                                         __FUNCTION__, genMsg(pair));
                             }
                         }
 
@@ -957,8 +961,8 @@ void DomainDecomposition::resetVirtualStorage()
                             const auto pair = std::make_pair(ncell_gidx, pcell_gidx);
                             if (search_erase(pair, allCellPairs))
                             {
-                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, __FUNCTION__,
-                                                         genMsg(pair));
+                                HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure,
+                                                         __FUNCTION__, genMsg(pair));
                             }
                         }
                     }
@@ -2498,8 +2502,8 @@ void DomainDecomposition::decomposeRealParticlesHPXCellTask_MultiNode_NonPeriodi
                     {
                         if (sortCell == 0)
                         {
-                            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "resortRealCell",
-                                                     "sortCell == 0 not allowed");
+                            HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure,
+                                                     "resortRealCell", "sortCell == 0 not allowed");
                         }
                         else
                         {
@@ -3277,7 +3281,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                         const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                                         if (pos[i] < myLeft || pos[i] >= myRight)
                                             HPX4ESPP_THROW_EXCEPTION(
-                                                hpx::error::assertion_failure, "mapPositionToLocalCell",
+                                                hpx::error::assertion_failure,
+                                                "mapPositionToLocalCell",
                                                 "pos[i]=" << pos[i] << " allowed: [" << myLeft
                                                           << "," << myRight << ")");
                                     }
@@ -3290,7 +3295,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                                         const int gridSize = cellGrid.getFrameGridSize(i);
                                         if ((cpos[i] < 0) || (cpos[i] >= gridSize))
                                             HPX4ESPP_THROW_EXCEPTION(
-                                                hpx::error::assertion_failure, "mapPositionToLocalCell",
+                                                hpx::error::assertion_failure,
+                                                "mapPositionToLocalCell",
                                                 "cpos[i]=" << cpos[i] << " allowed: [" << 0 << ","
                                                            << gridSize << ")");
                                     }
@@ -3446,7 +3452,8 @@ void DomainDecomposition::decomposeRealParticlesHPXParFor_MultiNode_NonPeriodic(
                     const real myLeft = cellGrid.getMyLeft(i) - cellSize[i];
                     const real myRight = cellGrid.getMyRight(i) + cellSize[i];
                     if (pos[i] < myLeft || pos[i] >= myRight)
-                        HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure, "mapPositionToLocalCell",
+                        HPX4ESPP_THROW_EXCEPTION(hpx::error::assertion_failure,
+                                                 "mapPositionToLocalCell",
                                                  "pos[i]=" << pos[i] << " allowed: [" << myLeft
                                                            << "," << myRight << ")");
                 }
