@@ -16,3 +16,4 @@ target_include_directories(_hpx4espp_component PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>)
 target_link_libraries(_hpx4espp_component PRIVATE MPI::MPI_CXX)
+target_link_libraries(_hpx4espp_component PRIVATE _espressopp)
