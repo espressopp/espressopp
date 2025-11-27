@@ -230,15 +230,65 @@ doi:10.1080/1539445X.2020.1722692
 
 # Example usage
 
-A minimal Python script to run a coarse-grained polymer melt simulation in Espresso++ looks like:
+A minimal Python script to run a simple (repulsive only) Lennard-Jones type particle simulation in ESPResSo++ looks like:
 
 ```python
 import espressopp
 
-system = espressopp.System()
-# configure box, particles, and interactions
-# run integrator
-Full examples and tutorials are available in the online documentation.
+# simulation system parameters
+num_particles = 10000      # total number of particles in the system
+box           = (20,20,20) # size of the simulationbox (all length are in sigma)
+rc            = 1.12246    # cut off for the short range non bonded potential
+skin          = 0.3        # skin used for verlet neighbor list
+dt            = 0.005      # time step for 1 md step
+epsilon       = 1.0        # energy unit
+sigma         = 1.0        # length unit
+temperature   = 1.0        # temperature of the simulation, e.g. used in Langevin Thermostat
+
+# system setup
+system         = espressopp.System()
+system.rng     = espressopp.esutil.RNG()
+system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
+system.skin    = skin
+
+# define underlying storage system for parallelisation
+nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size,box,rc,skin)
+cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+
+# interaction setup, here short range non-bonded Lennard Jones potential
+interaction    = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))
+interaction.setPotential(type1=0, type2=0, potential=espressopp.interaction.LennardJones(epsilon, sigma, rc, shift='auto'))
+system.addInteraction(interaction)
+
+# integrator setup
+integrator     = espressopp.integrator.VelocityVerlet(system)
+integrator.dt  = dt
+
+# thermostat setup
+thermostat             = espressopp.integrator.LangevinThermostat(system)
+thermostat.gamma       = 1.0
+thermostat.temperature = temperature
+integrator.addExtension(thermostat)
+
+# create random particle setup in the simulation box
+props = ['id', 'type', 'mass', 'pos', 'v']
+new_particles = []
+pid = 1
+while pid <= num_particles:
+    type = 0
+    mass = 1.0
+    pos  = system.bc.getRandomPos()
+    vel  = espressopp.Real3D(0.0, 0.0, 0.0)
+    part = [pid, type, mass, pos, vel]
+    new_particles.append(part)
+    if pid % 1000 == 0:
+        system.storage.addParticles(new_particles, *props)
+        system.storage.decompose()
+        new_particles = []
+    pid += 1
+system.storage.addParticles(new_particles, *props)
+```
 
 # Acknowledgements
 We thank the Espresso++ developer community and all contributors listed in the AUTHORS file. We acknowledge funding from Los Alamos National Laboratory, Forschungszentrum Jülich, and other collaborating institutions.
