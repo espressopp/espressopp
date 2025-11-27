@@ -95,6 +95,139 @@ Key features of Espresso++ include:
 - **Python interface**: Full simulation control and analysis scripting in Python.
 - **Extensibility**: Modular design allows easy addition of new force fields, integrators, or analysis tools.
 
+# Impact
+Espresso++ has been applied in numerous scientific studies, including investigations of:
+
+- Polymer rheology and entanglement effects
+- Lipid membranes and vesicle dynamics
+- Colloidal self-assembly
+- Active matter and microswimmers
+
+It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
+
+# Research Projects using ESPResSo++ in the last 5 years:
+
+- Grommes, Dirk and Bruch, Olaf and Imhof, Wolfgang and Reith, Dirk, 
+"Coarse-Grained Molecular Dynamics Study of the Melting Dynamics in Long Alkanes", 
+POLYMERS (2025), 
+doi:10.3390/polym17182500
+
+- Gholami, Abbas and Kloth, Sebastian and Xu, Zhen-Hao and Kremer, Kurt and Vogel, Michael and Stuehn, Torsten and Rudzinski, Joseph F., 
+"Structure and dynamics of ionic liquids under shear flow", 
+JOURNAL OF CHEMICAL PHYSICS (2025), 
+doi:10.1063/5.0279946
+
+- Grommes, Dirk and Bruch, Olaf and Reith, Dirk, 
+"Mimicking Polymer Processing Conditions on the Meso-Scale: Relaxation and Crystallization in Polyethylene Systems after Uni- and Biaxial Stretching", 
+MOLECULES (2024), 
+doi:10.3390/molecules29143391
+
+- Hsu, Hsiao-Ping and Kremer, Kurt, 
+"Entanglement-Stabilized Nanoporous Polymer Films Made by Mechanical Deformation", 
+MACROMOLECULES (2024), 
+doi:10.1021/acs.macromol.4c00187
+
+- Hsu, Hsiao-Ping and Kremer, Kurt, 
+"Glass transition temperature of (ultra-)thin polymer films", 
+JOURNAL OF CHEMICAL PHYSICS (2023), 
+doi:10.1063/5.0165902
+
+- Vance, James and Xu, Zhen-Hao and Tretyakov, Nikita and Stuehn, Torsten and Rampp, Markus and Eibl, Sebastian and Junghans, Christoph and Brinkmann, Andre, 
+"Code modernization strategies for short-range non-bonded molecular dynamics simulations", 
+COMPUTER PHYSICS COMMUNICATIONS (2023),
+doi:10.1016/j.cpc.2023.108760
+
+- Ohkuma, Takahiro and Hagita, Katsumi and Murashima, Takahiro and Deguchi, Tetsuo, 
+"Miscibility and exchange chemical potential of ring polymers in symmetric ring-ring blends", 
+SOFT MATTER (2023), 
+doi:10.1039/d3sm00108c
+
+- Grommes, Dirk and Schenk, Martin R. and Bruch, Olaf and Reith, Dirk, 
+"Initial Crystallization Effects in Coarse-Grained Polyethylene Systems after Uni- and Biaxial Stretching in Blow-Molding Cooling Scenarios", 
+POLYMERS (2022), 
+doi:10.3390/polym14235144
+
+- Grommes, Dirk and Schenk, Martin R. and Bruch, Olaf and Reith, Dirk, 
+"Investigation of Crystallization and Relaxation Effects in Coarse-Grained Polyethylene Systems after Uniaxial Stretching", 
+POLYMERS (2021), 
+doi:10.3390/polym13244466
+
+- Brunk, Aaron and Duenweg, Burkhard and Egger, Herbert and Habrich, Oliver and Lukacova-Medvid'ova, Maria and Spiller, Dominic, 
+"Analysis of a viscoelastic phase separation model", 
+JOURNAL OF PHYSICS-CONDENSED MATTER (2021), 
+doi:10.1088/1361-648X/abeb13
+
+- Zhang, Zidan and Krajniak, Jakub and Ganesan, Venkat, 
+"A Multiscale Simulation Study of Influence of Morphology on Ion Transport in Block Copolymeric Ionic Liquids", 
+MACROMOLECULES (2021), 
+doi:10.1021/acs.macromol.1c00025
+
+- Tubiana, Luca and Kobayashi, Hideki and Potestio, Raffaello and Duenweg, Burkhard and Kremer, Kurt and Virnau, Peter and Daoulas, Kostas, 
+"Comparing equilibration schemes of high-molecular-weight polymer melts with topological indicators", 
+JOURNAL OF PHYSICS-CONDENSED MATTER (2021), 
+doi:10.1088/1361-648X/abf20c
+
+- Thaler, S. and Praprotnik, M. and Zavadlav, J., 
+"Back-mapping augmented adaptive resolution simulation", 
+JOURNAL OF CHEMICAL PHYSICS (2020), 
+doi:10.1063/5.0025728
+
+- Hsu, Hsiao-Ping and Kremer, Kurt, 
+"Efficient equilibration of confined and free-standing films of highly entangled polymer melts", 
+JOURNAL OF CHEMICAL PHYSICS (2020), 
+doi:10.1063/5.0022781
+
+- Fiorentini, Raffaele and Kremer, Kurt and Potestio, Raffaello, 
+"Ligand-protein interactions in lysozyme investigated through a dual-resolution model", 
+PROTEINS-STRUCTURE FUNCTION AND BIOINFORMATICS (2020), 
+doi:10.1002/prot.25954
+
+- Papez, Petra and Merzel, Franci and Praprotnik, Matej, 
+"Rotational Dynamics of a Protein under Shear Flow Studied by the Eckart Frame Formalism", 
+JOURNAL OF PHYSICAL CHEMISTRY B (2023), 
+doi:10.1021/acs.jpcb.3c02324
+
+- Smith, Spencer and Michalski, Peter and Carette, Jacques and Keshavarz-Motamed, Zahra, 
+"State of the Practice for Lattice Boltzmann Method Software", 
+ARCHIVES OF COMPUTATIONAL METHODS IN ENGINEERING (2024), 
+doi:10.1007/s11831-023-09981-2
+
+- Bause, Marius and Bereau, Tristan, 
+"Reweighting non-equilibrium steady-state dynamics along collective variables", 
+JOURNAL OF CHEMICAL PHYSICS (2021), 
+doi:10.1063/5.0042972
+
+- Rudzinski, Joseph F. and Bereau, Tristan, 
+"Coarse-grained conformational surface hopping: Methodology and transferability", 
+JOURNAL OF CHEMICAL PHYSICS (2020), 
+doi:10.1063/5.0031249
+
+- Singh, Manjesh K. and Hu, Minghan and Cang, Yu and Hsu, Hsiao-Ping and Therien-Aubin, Heloise and Koynov, Kaloian and Fytas, George and Landfester, Katharina and Kremer, Kurt, 
+"Glass Transition of Disentangled and Entangled Polymer Melts: Single-Chain-Nanoparticles Approach", 
+MACROMOLECULES (2020), 
+doi:10.1021/acs.macromol.0c00550
+
+- Zhao, Yani and Cortes-Huerto, Robinson and Kremer, Kurt and Rudzinski, Joseph F., 
+"Investigating the Conformational Ensembles of Intrinsically Disordered Proteins with a Simple Physics-Based Model", 
+JOURNAL OF PHYSICAL CHEMISTRY B (2020), 
+doi:10.1021/acs.jpcb.0c01949
+
+- Zhao, Yani and Singh, Manjesh K. and Kremer, Kurt and Cortes-Huerto, Robinson and Mukherji, Debashish, 
+"Why Do Elastin-Like Polypeptides Possibly Have Different Solvation Behaviors in Water-Ethanol and Water-Urea Mixtures?", 
+MACROMOLECULES (2020), 
+doi:10.1021/acs.macromol.9b02123
+
+- Lee, Eunsang and Paul, Wolfgang, 
+"Additional Entanglement Effect Imposed by Small Sized Ring Aggregates in Supramolecular Polymer Melts: Molecular Dynamics Simulation Study", 
+MACROMOLECULES (2020), 
+doi:10.1021/acs.macromol.9b02209
+
+- Grommes, Dirk and Reith, Dirk, 
+"Determination of relevant mechanical properties for the production process of polyethylene by using mesoscale molecular simulation techniques", 
+SOFT MATERIALS (2020), 
+doi:10.1080/1539445X.2020.1722692
+
+
 # Example usage
 
 A minimal Python script to run a coarse-grained polymer melt simulation in Espresso++ looks like:
@@ -106,16 +239,6 @@ system = espressopp.System()
 # configure box, particles, and interactions
 # run integrator
 Full examples and tutorials are available in the online documentation.
-
-Impact
-Espresso++ has been applied in numerous scientific studies, including investigations of:
-
-- Polymer rheology and entanglement effects
-- Lipid membranes and vesicle dynamics
-- Colloidal self-assembly
-- Active matter and microswimmers
-
-It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
 
 # Acknowledgements
 We thank the Espresso++ developer community and all contributors listed in the AUTHORS file. We acknowledge funding from Los Alamos National Laboratory, Forschungszentrum Jülich, and other collaborating institutions.
