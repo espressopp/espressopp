@@ -24,7 +24,7 @@
 #ifndef _INTERACTION_TABULATED_HPP
 #define _INTERACTION_TABULATED_HPP
 
-//#include <stdexcept>
+// #include <stdexcept>
 #include "Potential.hpp"
 #include "Interpolation.hpp"
 

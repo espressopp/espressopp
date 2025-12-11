@@ -82,8 +82,8 @@ bool FixedPairListAdress::add(longint pid1, longint pid2)
         {
             std::stringstream msg;
             msg << "Atomistic bond particle p2 (id=" << pid2 << ") does not exists here "
-                << "and cannot be added. "
-                << " The pair " << pid1 << " - " << pid2 << " could not be created.";
+                << "and cannot be added. " << " The pair " << pid1 << " - " << pid2
+                << " could not be created.";
             err.setException(msg.str());
         }
     }

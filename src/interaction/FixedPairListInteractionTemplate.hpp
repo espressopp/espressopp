@@ -132,10 +132,9 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
             p2.force() -= force;
             LOG4ESPP_DEBUG(_Potential::theLogger,
                            "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1]
-                               << "," << p1.position()[2] << ") "
-                               << "p" << p2.id() << "(" << p2.position()[0] << ","
-                               << p2.position()[1] << "," << p2.position()[2] << ") "
-                               << "dist=" << sqrt(dist * dist) << " "
+                               << "," << p1.position()[2] << ") " << "p" << p2.id() << "("
+                               << p2.position()[0] << "," << p2.position()[1] << ","
+                               << p2.position()[2] << ") " << "dist=" << sqrt(dist * dist) << " "
                                << "force=(" << force[0] << "," << force[1] << "," << force[2]
                                << ")");
         }

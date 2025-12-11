@@ -30,7 +30,7 @@
 #include "logging.hpp"
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
-//#include "analysis/AnalysisBase.hpp"
+// #include "analysis/AnalysisBase.hpp"
 #include "ParticleAccess.hpp"
 
 namespace espressopp

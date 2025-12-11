@@ -24,7 +24,7 @@
 #ifndef _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "types.hpp"
 #include "Interaction.hpp"

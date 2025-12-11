@@ -22,7 +22,7 @@
 #ifndef _INTERACTION_TABULATEDSUBENS_HPP
 #define _INTERACTION_TABULATEDSUBENS_HPP
 
-//#include <stdexcept>
+// #include <stdexcept>
 #include "Potential.hpp"
 #include "Interpolation.hpp"
 #include "RealND.hpp"

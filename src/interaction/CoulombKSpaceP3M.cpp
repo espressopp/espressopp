@@ -21,7 +21,7 @@
 */
 
 #include "python.hpp"
-//#include <boost/signals2.hpp>
+// #include <boost/signals2.hpp>
 #include "CoulombKSpaceP3M.hpp"
 #include "CellListAllParticlesInteractionTemplate.hpp"
 

@@ -22,7 +22,7 @@
 #ifndef _INTERACTION_VERLETLISTADRESSATATINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTADRESSATATINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "System.hpp"
 #include "bc/BC.hpp"

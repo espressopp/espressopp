@@ -22,7 +22,7 @@
 
 #include "esutil/Array4D.hpp"
 #include <boost/test/unit_test.hpp>
-//#include "include/ut.hpp"
+// #include "include/ut.hpp"
 
 using namespace espressopp;  // NOLINT
 

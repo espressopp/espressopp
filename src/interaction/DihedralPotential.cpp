@@ -73,7 +73,7 @@ void DihedralPotential::registerPython()
     real (DihedralPotential::*computeEnergy2)(real phi) const = &DihedralPotential::computeEnergy;
 
     void (DihedralPotential::*computeForce1)(
-        Real3D & force1, Real3D & force2, Real3D & force3, Real3D & force4, const Real3D& dist21,
+        Real3D& force1, Real3D& force2, Real3D& force3, Real3D& force4, const Real3D& dist21,
         const Real3D& dist32, const Real3D& dist43) const = &DihedralPotential::computeForce;
 
     real (DihedralPotential::*computeForce2)(real phi) const = &DihedralPotential::computeForce;

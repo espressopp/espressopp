@@ -25,7 +25,7 @@
 #define _INTERACTION_REACTIONFIELDGENERALIZED_HPP
 
 #include "Potential.hpp"
-//#include "FixedPairListInteractionTemplate.hpp"
+// #include "FixedPairListInteractionTemplate.hpp"
 
 using namespace std;
 
