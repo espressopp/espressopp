@@ -100,12 +100,7 @@ Espresso++ has been applied in numerous scientific studies, including investigat
 
 It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
 
-# Research Projects using ESPResSo++ in the last 5 years:
-
-- Grommes, Dirk and Bruch, Olaf and Imhof, Wolfgang and Reith, Dirk, 
-"Coarse-Grained Molecular Dynamics Study of the Melting Dynamics in Long Alkanes", 
-POLYMERS (2025), 
-doi:10.3390/polym17182500
+# Research Projects using ESPResSo++ in the last 5 years [@Grommes:2025]
 
 - Gholami, Abbas and Kloth, Sebastian and Xu, Zhen-Hao and Kremer, Kurt and Vogel, Michael and Stuehn, Torsten and Rudzinski, Joseph F., 
 "Structure and dynamics of ionic liquids under shear flow", 
