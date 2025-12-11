@@ -7,26 +7,31 @@ tags:
   - parallel computing
   - C++/Python
 authors:
-  - name: Torsten Stuehn
-    affiliation: 1
   - name: Sebastian Eibl
     affiliation: 2
   - name: Markus Rampp
     affiliation: 2
+  - name: James Vance
+    affiliation: 3
   - name: Nikita Tretyakov
-    affiliation: 1
+    affiliation: 3
   - name: Tristan Bereau
-    affiliation: 1
+    affiliation: 5
   - name: Horacio Vargas
     affiliation: 1
   - name: Bin Song
     affiliation: 1
   - name: James Vance
     affiliation: 1
+  - name: Zhen-Hao Xu
+    affiliation: 1
   - name: Pavel Kus
     affiliation: 2
-  - name: Others
-    affiliation: 2
+  - name: Jakub Krajniak
+    orcid: 0000-0001-9372-6975
+    affiliation: 6
+  - name: Torsten Stuehn
+    affiliation: 1
   - name: Christoph Junghans
     affiliation: 3
 affiliations:
@@ -36,32 +41,13 @@ affiliations:
     index: 2
   - name: Los Alamos National Laboratory, Los Alamos, USA
     index: 3
+  - name: Johannes Gutenberg University of Mainz, Mainz, Germany
+    index: 4
+  - name: Heidelberg University, Heidelberg, Germany
+    index: 5
+  - name: Independent researcher, Poznań, Poland 
+    index: 6
 
-# $ git log --since='Thu Jul 12 22:06:00 2018 +0200' | grep ^Author: | sort | uniq -c | sort -nr
-# 201 Author: James Vance <vance@uni-mainz.de>
-# 135 Author: Christoph Junghans <junghans@votca.org>
-#  74 Author: Sebastian Eibl <XzzX@users.noreply.github.com>
-#  49 Author: Sebastian Eibl <sebastian.eibl@mpcdf.mpg.de>
-#  35 Author: niktre <niktre@gmail.com>
-#  35 Author: Christoph Junghans <christoph.junghans@gmail.com>
-#  34 Author: Jakub Krajniak <563684+jkrajniak@users.noreply.github.com>
-#  15 Author: Tristan Bereau <bereau@mpip-mainz.mpg.de>
-#  10 Author: Nikita Tretyakov <tretyakov@mpip-mainz.mpg.de>
-#  10 Author: Jakub Krajniak <jkrajniak@gmail.com>
-#   9 Author: hache <vargas@mpip-mainz.mpg.de>
-#   8 Author: Bin Song <Bin.Song@mpip-mainz.mpg.de>
-#   6 Author: Christoph Junghans <junghans@lanl.gov>
-#   5 Author: Pavel Kus <pavel.kus@mpcdf.mpg.de>
-#   5 Author: Bin Song <songbin6280@users.noreply.github.com>
-#   4 Author: Torsten Stuehn <stuehn@mpip-mainz.mpg.de>
-#   4 Author: Horacio Vargas <govarguz@users.noreply.github.com>
-#   3 Author: Tristan Bereau <tristan.bereau@gmail.com>
-#   2 Author: govarguz <horacio.v.g@gmail.com>
-#   2 Author: espressopp-bot <espressopp-bot@users.noreply.github.com>
-#   1 Author: Zhen-Hao Xu <zeh026@126.com>
-#   1 Author: Pavel Kus <pavel.kus@gmail.com>
-#   1 Author: Hache <hache@Haches-MacBook-Air.local>
-#   1 Author: Bin Song <songbin@mpip-mainz.mpg.de>
 
 date: 2025-10-02
 bibliography: paper.bib
