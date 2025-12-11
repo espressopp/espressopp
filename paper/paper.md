@@ -8,20 +8,23 @@ tags:
   - C++/Python
 authors:
   - name: Sebastian Eibl
+    orcid: 0000-0002-1069-2720
     affiliation: 2
   - name: Markus Rampp
+    orcid: 0000-0001-8177-8698
     affiliation: 2
   - name: James Vance
+    orcid: 0000-0001-7112-0382
     affiliation: 3
   - name: Nikita Tretyakov
     affiliation: 3
   - name: Tristan Bereau
+    orcid: 0000-0001-9945-1271
     affiliation: 5
-  - name: Horacio Vargas
+  - name: Horacio Vargas Guzman
+    orcid: 0000-0003-2564-3005
     affiliation: 1
   - name: Bin Song
-    affiliation: 1
-  - name: James Vance
     affiliation: 1
   - name: Zhen-Hao Xu
     affiliation: 1
@@ -31,8 +34,10 @@ authors:
     orcid: 0000-0001-9372-6975
     affiliation: 6
   - name: Torsten Stuehn
+    orcid: 0009-0006-2144-2002
     affiliation: 1
   - name: Christoph Junghans
+    orcid: 0000-0003-0925-1458
     affiliation: 3
 affiliations:
   - name: Max Planck Institute for Polymer Research, Mainz, Germany
