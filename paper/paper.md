@@ -88,7 +88,16 @@ Key features of Espresso++ include:
 
 # New Feature since last release
 
-Copy list from Markus' google doc
+Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
+
+- **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
+- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao]
+- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for \dots [@Guzman:2017]
+- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD 
+- **checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
+- **I/O**: support for parallel writing and reading of H5MD checkpoints
+- **Python 3 compatibility**
+
 
 # Impact
 Espresso++ has been applied in numerous scientific studies, including investigations of:
@@ -122,10 +131,6 @@ doi:10.1021/acs.macromol.4c00187
 JOURNAL OF CHEMICAL PHYSICS (2023), 
 doi:10.1063/5.0165902
 
-- Vance, James and Xu, Zhen-Hao and Tretyakov, Nikita and Stuehn, Torsten and Rampp, Markus and Eibl, Sebastian and Junghans, Christoph and Brinkmann, Andre, 
-"Code modernization strategies for short-range non-bonded molecular dynamics simulations", 
-COMPUTER PHYSICS COMMUNICATIONS (2023),
-doi:10.1016/j.cpc.2023.108760
 
 - Ohkuma, Takahiro and Hagita, Katsumi and Murashima, Takahiro and Deguchi, Tetsuo, 
 "Miscibility and exchange chemical potential of ring polymers in symmetric ring-ring blends", 

@@ -9,3 +9,47 @@
   url = {https://www.mdpi.com/2073-4360/17/18/2500},
   issn = {2073-4360},
 }
+
+@article{Yao:2004,
+title = {Improved neighbor list algorithm in molecular simulations using cell decomposition and data sorting method},
+journal = {Computer Physics Communications},
+volume = {161},
+number = {1},
+pages = {27-35},
+year = {2004},
+issn = {0010-4655},
+doi = {https://doi.org/10.1016/j.cpc.2004.04.004},
+url = {https://www.sciencedirect.com/science/article/pii/S0010465504002097},
+author = {Zhenhua Yao and Jian-Sheng Wang and Gui-Rong Liu and Min Cheng},
+keywords = {Molecular dynamics, Neighbor list, Verlet table, Cell linked list},
+abstract = {An improved neighbor list algorithm is proposed to reduce unnecessary interatomic distance calculations in molecular simulations. It combines the advantages of Verlet table and cell linked list algorithms by using cell decomposition approach to accelerate the neighbor list construction speed, and data sorting method to lower the CPU data cache miss rate, as well as partial updating method to minimize the unnecessary reconstruction of the neighbor list. Both serial and parallel performance of molecular dynamics simulation are evaluated using the proposed algorithm and compared with those using conventional Verlet table and cell linked list algorithms. Results show that the new algorithm outperforms the conventional algorithms by a factor of 2∼3 in cases of both small and large number of atoms.}
+}
+
+@article{Vance:2023,
+title = {Code modernization strategies for short-range non-bonded molecular dynamics simulations},
+journal = {Computer Physics Communications},
+volume = {290},
+pages = {108760},
+year = {2023},
+issn = {0010-4655},
+doi = {https://doi.org/10.1016/j.cpc.2023.108760},
+url = {https://www.sciencedirect.com/science/article/pii/S0010465523001054},
+author = {James Vance and Zhen-Hao Xu and Nikita Tretyakov and Torsten Stuehn and Markus Rampp and Sebastian Eibl and Christoph Junghans and André Brinkmann},
+keywords = {Molecular dynamics, High performance computing, HPX, MPI, ESPResSo++},
+abstract = {Modern HPC systems are increasingly relying on greater core counts and wider vector registers. Thus, applications need to be adapted to fully utilize these hardware capabilities. One class of applications that can benefit from this increase in parallelism are molecular dynamics simulations. In this paper, we describe our efforts at modernizing the ESPResSo++ simulation package for molecular dynamics by restructuring its particle data layout for efficient memory accesses and applying vectorization techniques to benefit the calculation of short-range non-bonded forces, which results in an overall three times speedup and serves as a baseline for further optimizations. We also implement fine-grained parallelism for multi-core CPUs through HPX, a C++ runtime system which uses lightweight threads and an asynchronous many-task approach to maximize concurrency. Our goal is to evaluate the performance of an HPX-based approach compared to the bulk-synchronous MPI-based implementation. This requires the introduction of an additional layer to the domain decomposition scheme that defines the task granularity. On spatially inhomogeneous systems, which impose a corresponding load-imbalance in traditional MPI-based approaches, we demonstrate that by choosing an optimal task size, the efficient work-stealing mechanisms of HPX can overcome the overhead of communication resulting in an overall 1.4 times speedup compared to the baseline MPI version.}
+}
+
+@article{Guzman:2017,
+  title = {Scalable and fast heterogeneous molecular simulation with predictive parallelization schemes},
+  author = {Guzman, Horacio V. and Junghans, Christoph and Kremer, Kurt and Stuehn, Torsten},
+  journal = {Phys. Rev. E},
+  volume = {96},
+  issue = {5},
+  pages = {053311},
+  numpages = {13},
+  year = {2017},
+  month = {Nov},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevE.96.053311},
+  url = {https://link.aps.org/doi/10.1103/PhysRevE.96.053311}
+}
