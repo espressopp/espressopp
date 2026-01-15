@@ -24,7 +24,7 @@
 #ifndef _INTERACTION_VERLETLISTADRESSINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTADRESSINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "System.hpp"
 #include "bc/BC.hpp"
@@ -959,8 +959,7 @@ inline void VerletListAdressInteractionTemplate<_PotentialAT, _PotentialCG>::com
                 std::cout << "bin1 " << bin1 << " bin2 " << bin2 << "\n";
                 std::cout << "p1.position()[0] " << p1.position()[0] << " p2.position()[0]"
                           << p2.position()[0] << "\n";
-                std::cout << "FATAL ERROR: computeVirialX error"
-                          << "\n";
+                std::cout << "FATAL ERROR: computeVirialX error" << "\n";
                 exit(0);
             }
 

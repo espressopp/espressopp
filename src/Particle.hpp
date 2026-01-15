@@ -30,7 +30,7 @@
 #include "Single.hpp"
 #include "Triple.hpp"
 #include "Quadruple.hpp"
-//#include <vector>
+// #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/mpi.hpp>
@@ -62,17 +62,17 @@ private:
     void serialize(Archive& ar, const unsigned int version)
     {
         for (int i = 0; i < 3; ++i) ar& fm[i];
-        ar& id;
-        ar& type;
-        ar& pib;
-        ar& mass;
-        ar& q;
-        ar& lambda;
-        ar& varmass;
-        ar& drift;
-        ar& lambdaDeriv;
-        ar& state;
-        ar& res_id;
+        ar & id;
+        ar & type;
+        ar & pib;
+        ar & mass;
+        ar & q;
+        ar & lambda;
+        ar & varmass;
+        ar & drift;
+        ar & lambdaDeriv;
+        ar & state;
+        ar & res_id;
     }
 };
 
@@ -104,8 +104,8 @@ private:
     {
         for (int i = 0; i < 3; ++i) ar& p[i];
         for (int i = 0; i < 3; ++i) ar& modepos[i];
-        ar& radius;
-        ar& extVar;
+        ar & radius;
+        ar & extVar;
     }
 };
 
@@ -141,7 +141,7 @@ private:
     void serialize(Archive& ar, const unsigned int version)
     {
         for (int i = 0; i < 3; ++i) ar& f[i];
-        ar& fradius;
+        ar & fradius;
     }
 };
 
@@ -166,7 +166,7 @@ private:
     {
         for (int i = 0; i < 3; ++i) ar& v[i];
         for (int i = 0; i < 3; ++i) ar& modemom[i];
-        ar& vradius;
+        ar & vradius;
     }
 };
 
@@ -185,7 +185,7 @@ private:
     void serialize(Archive& ar, const unsigned int version)
     {
         for (int ii = 0; ii < 3; ++ii) ar& i[ii];
-        ar& ghost;
+        ar & ghost;
     }
 };
 
@@ -405,7 +405,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
-        ar& p& r& m& f& l;
+        ar & p & r & m & f & l;
     }
 };
 

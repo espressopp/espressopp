@@ -27,7 +27,7 @@
 #include "Cell.hpp"
 #include "log4espp.hpp"
 #include "iterator/CellListIterator.hpp"
-//#include "iterator/NeighborCellListIterator.hpp"
+// #include "iterator/NeighborCellListIterator.hpp"
 
 namespace espressopp
 {

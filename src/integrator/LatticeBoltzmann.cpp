@@ -338,7 +338,7 @@ real LatticeBoltzmann::getLBMom(Int3D _Ni, int _l)
 /* Helpers for MD to LB (and vice versa) unit conversion */
 real LatticeBoltzmann::convMassMDtoLB() { return 1.; }
 
-//#note: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
+// #note: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
 real LatticeBoltzmann::convTimeMDtoLB() { return 1. / (integrator->getTimeStep() * getTau()); }
 real LatticeBoltzmann::convLenMDtoLB()
 {
@@ -493,8 +493,7 @@ void LatticeBoltzmann::initFluctuations()
             std::cout << fixed;  // some output tricks
             std::cout << "The fluctuations have been introduced into the system:\n";
             std::cout << "lbTemp = " << getLBTemp() << " in LJ-units or " << _lbTemp
-                      << " in lattice units"
-                      << "\n";
+                      << " in lattice units" << "\n";
         }
 
         // calculate phi coefficients
@@ -658,8 +657,8 @@ void LatticeBoltzmann::collideStream()
     ghostlat = tmp;
     time_sw += (swapping.getElapsedTime() - timer);
 
-    //#note: should one cancel this condition if pure lb is in use?
-    // or move setCouplForceLoc into the collision loop?
+    // #note: should one cancel this condition if pure lb is in use?
+    //  or move setCouplForceLoc into the collision loop?
     if (_coupling)
     {
         // set to zero coupling forces if the coupling exists
@@ -1001,8 +1000,8 @@ void LatticeBoltzmann::readLBConf(int _mode)
 
         if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false)
         {
-            std::cout << "Sorry, the restart directory is missing! "
-                      << "Something is wrong!!!" << std::endl;
+            std::cout << "Sorry, the restart directory is missing! " << "Something is wrong!!!"
+                      << std::endl;
         }
 
         // make prefix and suffix //
@@ -1122,8 +1121,8 @@ void LatticeBoltzmann::readLBConf(int _mode)
         {
             if (getStepNum() != 0)
             {
-                std::cout << "!!! Attention !!! no file with fluid moments "
-                          << "found for step " << convert.str() << std::endl;
+                std::cout << "!!! Attention !!! no file with fluid moments " << "found for step "
+                          << convert.str() << std::endl;
             }
         }
 
@@ -1160,8 +1159,8 @@ void LatticeBoltzmann::readLBConf(int _mode)
         {
             if (getStepNum() != 0)
             {
-                std::cout << "!!! Attention !!! no file with LB populations "
-                          << "found for step " << convert.str() << std::endl;
+                std::cout << "!!! Attention !!! no file with LB populations " << "found for step "
+                          << convert.str() << std::endl;
             }
         }
 

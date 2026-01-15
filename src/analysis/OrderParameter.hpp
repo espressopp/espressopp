@@ -89,16 +89,16 @@ private:
     template <class Archive>
     void serialize(Archive &ar, const unsigned int version)
     {
-        ar &d;
-        ar &qlmSumSqrt;
-        ar &nnns;
-        ar &ang_m;
-        ar &particle_id;
-        ar &nns;
-        ar &qlm;
-        ar &is_solid;
-        ar &is_surface;
-        ar &label;
+        ar & d;
+        ar & qlmSumSqrt;
+        ar & nnns;
+        ar & ang_m;
+        ar & particle_id;
+        ar & nns;
+        ar & qlm;
+        ar & is_solid;
+        ar & is_surface;
+        ar & label;
     }
 
 public:
@@ -795,9 +795,9 @@ public:
         template <typename Archive>
         void serialize(Archive &ar, const unsigned int version)
         {
-            ar &pid;
-            ar &label;
-            ar &cpu;
+            ar & pid;
+            ar & label;
+            ar & cpu;
         }
     };
 

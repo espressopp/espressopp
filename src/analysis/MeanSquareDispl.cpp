@@ -21,7 +21,7 @@
 */
 
 #include "MeanSquareDispl.hpp"
-//#include <algorithm> //for std::sort
+// #include <algorithm> //for std::sort
 using namespace std;
 // using namespace espressopp;
 

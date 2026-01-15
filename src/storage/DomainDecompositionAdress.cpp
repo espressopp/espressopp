@@ -412,9 +412,8 @@ void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
         }
         else
         {
-            std::cout << getSystem()->comm->rank() << ": packposetc "
-                      << "VP particle " << src->id() << "-" << src->ghost()
-                      << " not found in tuples!\n";
+            std::cout << getSystem()->comm->rank() << ": packposetc " << "VP particle " << src->id()
+                      << "-" << src->ghost() << " not found in tuples!\n";
             exit(1);
             return;
         }
@@ -583,8 +582,7 @@ inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
     else
     {
         std::cout << "copyGhostTuples: VP particle " << src.id() << "-" << src.ghost() << " ("
-                  << src.position() << ")"
-                  << " not found in tuples!\n";
+                  << src.position() << ")" << " not found in tuples!\n";
         exit(1);
         return;
     }
@@ -656,9 +654,8 @@ void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts)
         }
         else
         {
-            std::cout << getSystem()->comm->rank() << ": packforces "
-                      << "VP particle " << src->id() << "-" << src->ghost()
-                      << " not found in tuples!\n";
+            std::cout << getSystem()->comm->rank() << ": packforces " << "VP particle " << src->id()
+                      << "-" << src->ghost() << " not found in tuples!\n";
             exit(1);
             return;
         }
