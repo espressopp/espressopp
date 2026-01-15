@@ -286,4 +286,4 @@ system.storage.addParticles(new_particles, *props)
 ```
 
 # Acknowledgements
-We thank the Espresso++ developer community and all contributors listed in the AUTHORS file. We acknowledge funding from Los Alamos National Laboratory, Forschungszentrum Jülich, and other collaborating institutions.
+We thank the Espresso++ developer community and all contributors listed in the AUTHORS file.
