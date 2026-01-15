@@ -53,7 +53,7 @@ public:
 
     ~VerletListTriple();
 
-    TripleList &getTriples() { return vlTriples; }
+    TripleList& getTriples() { return vlTriples; }
 
     python::tuple getTriple(int i);
 
@@ -84,7 +84,7 @@ public:
     static void registerPython();
 
 protected:
-    void checkTriple(Particle &pt1, Particle &pt2, Particle &pt3);
+    void checkTriple(Particle& pt1, Particle& pt2, Particle& pt3);
     TripleList vlTriples;
 
     boost::unordered_set<longint> exList;  // exclusion list

@@ -85,7 +85,7 @@ public:
     static void registerPython();
 
 private:
-    t_trxstatus *fio;
+    t_trxstatus* fio;
     static const int dim = 3;
     real xtcprec;
 
@@ -98,9 +98,9 @@ private:
     bool append;    // append to existing trajectory file or create a new one
     real length_factor;
 
-    bool open(const char *mode);
+    bool open(const char* mode);
     void close();
-    void write(int natoms, int step, float time, Real3D *box, Real3D *x, float prec);
+    void write(int natoms, int step, float time, Real3D* box, Real3D* x, float prec);
 };
 }  // namespace io
 }  // namespace espressopp

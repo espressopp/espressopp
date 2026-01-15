@@ -78,7 +78,7 @@ public:
 
     bool getSpeedup() { return speedup; }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -90,7 +90,7 @@ public:
         }
     }
 
-    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
     virtual void addForces();
     virtual real computeEnergy();
@@ -99,11 +99,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Nonbonded; }
 
@@ -126,13 +126,13 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
     // Pairs not inside the QM/Hybrid Zone (i.e. CL region)
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         // Calculate forces in CL region
         if (speedup == true)
         {
-            const Potential &potential = getPotential(p1.type(), p2.type());
+            const Potential& potential = getPotential(p1.type(), p2.type());
             Real3D forcecl(0.0, 0.0, 0.0);
             if (potential._computeForce(forcecl, p1, p2))
             {
@@ -150,14 +150,14 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -170,8 +170,8 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -183,7 +183,7 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
                     }
 
                     // Calculate forces
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
                     Real3D forcecl(0.0, 0.0, 0.0);
                     if (potential._computeForce(forcecl, p3, p4))
                     {
@@ -211,8 +211,8 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
     // Pairs inside the QM/Hybrid Zone
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -222,14 +222,14 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -242,8 +242,8 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -255,7 +255,7 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::addForces(
                 }
 
                 // Calculate forces
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 Real3D forceqm(0.0, 0.0, 0.0);
                 if (potential._computeForce(forceqm, p3, p4))
                 {
@@ -289,14 +289,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
     real e = 0.0;
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
 
         if (speedup == true)
         {
-            const Potential &potential = getPotential(type1, type2);
+            const Potential& potential = getPotential(type1, type2);
             e += potential._computeEnergy(p1, p2);
         }
         else
@@ -309,14 +309,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -329,8 +329,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -342,7 +342,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Calculate energy
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
                     e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                     // Iterate the second iterator
@@ -364,8 +364,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
     // Pairs inside the QM/Hybrid Zone
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -375,14 +375,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -395,8 +395,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -408,7 +408,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Calculate energy
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                 // Iterate the second iterator
@@ -446,8 +446,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -457,14 +457,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -477,8 +477,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -490,7 +490,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Calculate energy
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                 // Iterate the second iterator
@@ -510,8 +510,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -521,14 +521,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -541,8 +541,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -554,7 +554,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Calculate energy
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                 // Iterate the second iterator
@@ -584,8 +584,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         if ((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype))
         {
@@ -597,14 +597,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -617,8 +617,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -630,7 +630,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Calculate energy
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
 
                     if ((int_c(p1.type()) == atomtype) && (int_c(p2.type()) == atomtype))
                     {
@@ -658,8 +658,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         if ((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype))
         {
@@ -671,14 +671,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -691,8 +691,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -704,7 +704,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Calculate energy
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
 
                     if ((int_c(p1.type()) == atomtype) && (int_c(p2.type()) == atomtype))
                     {
@@ -743,8 +743,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -754,14 +754,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -774,8 +774,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -787,7 +787,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Calculate energy
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                 // Iterate the second iterator
@@ -807,8 +807,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -818,14 +818,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -838,8 +838,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -851,7 +851,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                 }
 
                 // Calculate energy
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 e += (1.0 / ntrotter) * potential._computeEnergy(p3, p4);
 
                 // Iterate the second iterator
@@ -881,8 +881,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         if ((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype))
         {
@@ -894,14 +894,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -914,8 +914,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -927,7 +927,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Calculate energy
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
 
                     if ((int_c(p1.type()) == atomtype) && (int_c(p2.type()) == atomtype))
                     {
@@ -956,8 +956,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         if ((int_c(p1.type()) == atomtype) || (int_c(p2.type()) == atomtype))
         {
@@ -969,14 +969,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -989,8 +989,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -1002,7 +1002,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
                     }
 
                     // Calculate energy
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
 
                     if ((int_c(p1.type()) == atomtype) && (int_c(p2.type()) == atomtype))
                     {
@@ -1036,7 +1036,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeEne
 
 template <typename _Potential>
 inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in VerletListPIadressNoDrift does not work"
               << std::endl;
@@ -1052,13 +1052,13 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
         // Get particles from pairlist
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         // Calculate forces in CL region
         if (speedup == true)
         {
-            const Potential &potential = getPotential(p1.type(), p2.type());
+            const Potential& potential = getPotential(p1.type(), p2.type());
             Real3D forcecl(0.0, 0.0, 0.0);
             if (potential._computeForce(forcecl, p1, p2))
             {
@@ -1078,14 +1078,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -1098,8 +1098,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -1111,7 +1111,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
                     }
 
                     // Calculate CL forces
-                    const Potential &potential = getPotential(p3.type(), p4.type());
+                    const Potential& potential = getPotential(p3.type(), p4.type());
                     Real3D forcecl(0.0, 0.0, 0.0);
                     if (potential._computeForce(forcecl, p3, p4))
                     {
@@ -1141,8 +1141,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
     // Pairs inside the QM/Hybrid Zone
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         FixedTupleListAdress::iterator it3;
         FixedTupleListAdress::iterator it4;
@@ -1152,14 +1152,14 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
             // Get the PI bead lists (i.e. the AdResS particles)
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
             // Iterate the two iterators in a parallel fashion
-            std::vector<Particle *>::iterator itv2 = atList2.begin();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            std::vector<Particle*>::iterator itv2 = atList2.begin();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
                 if (itv2 == atList2.end())
@@ -1172,8 +1172,8 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
                 }
 
                 // Get the individual PI beads
-                Particle &p3 = **itv;
-                Particle &p4 = **itv2;
+                Particle& p3 = **itv;
+                Particle& p4 = **itv2;
 
                 if (p3.pib() != p4.pib())
                 {
@@ -1184,7 +1184,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
                     throw std::runtime_error(ss.str());
                 }
 
-                const Potential &potential = getPotential(p3.type(), p4.type());
+                const Potential& potential = getPotential(p3.type(), p4.type());
                 Real3D forceqm(0.0, 0.0, 0.0);
                 if (potential._computeForce(forceqm, p3, p4))
                 {
@@ -1217,7 +1217,7 @@ inline real VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
 }
 
 template <typename _Potential>
-inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     std::cout << "Warning! At the moment IK computeVirialTensor in VerletListPIadressNoDrift does "
                  "not work"
@@ -1226,7 +1226,7 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
 }
 
 template <typename _Potential>
-inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                           real z)
 {
     std::cout << "Warning! At the moment IK computeVirialTensor in VerletListPIadressNoDrift does "
@@ -1236,7 +1236,7 @@ inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVir
 }
 
 template <typename _Potential>
-inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w,
+inline void VerletListPIadressNoDriftInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w,
                                                                                           int n)
 {
     std::cout << "Warning! At the moment IK computeVirialTensor in VerletListPIadressNoDrift does "

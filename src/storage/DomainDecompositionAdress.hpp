@@ -37,15 +37,15 @@ namespace storage
 class NodeGridMismatch2 : public std::invalid_argument
 {
 public:
-    NodeGridMismatch2(const Int3D &gridRequested, int nodesAvailable);
+    NodeGridMismatch2(const Int3D& gridRequested, int nodesAvailable);
 };
 
 class DomainDecompositionAdress : public Storage
 {
 public:
     DomainDecompositionAdress(std::shared_ptr<System> system,
-                              const Int3D &_nodeGrid,
-                              const Int3D &_cellGrid,
+                              const Int3D& _nodeGrid,
+                              const Int3D& _cellGrid,
                               int _halfCellInt);
 
     virtual ~DomainDecompositionAdress() {}
@@ -59,14 +59,14 @@ public:
     // as a consequence of the system resizing
     virtual void cellAdjust(bool withShear);
 
-    virtual Cell *mapPositionToCell(const Real3D &pos);
-    virtual Cell *mapPositionToCellClipped(const Real3D &pos);
-    virtual Cell *mapPositionToCellChecked(const Real3D &pos);
+    virtual Cell* mapPositionToCell(const Real3D& pos);
+    virtual Cell* mapPositionToCellClipped(const Real3D& pos);
+    virtual Cell* mapPositionToCellChecked(const Real3D& pos);
 
-    longint mapPositionToNodeClipped(const Real3D &pos);
+    longint mapPositionToNodeClipped(const Real3D& pos);
 
-    const NodeGrid &getNodeGrid() const { return nodeGrid; }
-    const CellGrid &getCellGrid() const { return cellGrid; }
+    const NodeGrid& getNodeGrid() const { return nodeGrid; }
+    const CellGrid& getCellGrid() const { return cellGrid; }
 
     virtual real getLocalBoxXMin() { return nodeGrid.getMyLeft(0); }
     virtual real getLocalBoxYMin() { return nodeGrid.getMyLeft(1); }
@@ -99,31 +99,31 @@ protected:
 
         @param shift how to adjust the positions of the particles when sending
     */
-    void packPositionsEtc(class OutBuffer &buf, Cell &reals, int extradata, const Real3D &shift);
+    void packPositionsEtc(class OutBuffer& buf, Cell& reals, int extradata, const Real3D& shift);
 
     /** unpack received data for ghosts. */
-    void unpackPositionsEtc(Cell &ghosts, class InBuffer &buf, int extradata);
+    void unpackPositionsEtc(Cell& ghosts, class InBuffer& buf, int extradata);
 
     /** copy specified data elements between a real cell and one of its ghosts
 
         @param shift how to adjust the positions of the particles when sending
     */
-    void copyRealsToGhosts(Cell &reals, Cell &ghosts, int extradata, const Real3D &shift);
+    void copyRealsToGhosts(Cell& reals, Cell& ghosts, int extradata, const Real3D& shift);
 
-    void copyGhostTuples(Particle &src, Particle &dst, int extradata, const Real3D &shift);
+    void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
 
     // pack ghost forces for sending.
-    void packForces(OutBuffer &buf, Cell &ghosts);
+    void packForces(OutBuffer& buf, Cell& ghosts);
 
     // unpack received ghost forces. This one ADDS, and is most likely, what you need.
-    void unpackAndAddForces(Cell &reals, class InBuffer &buf);
+    void unpackAndAddForces(Cell& reals, class InBuffer& buf);
 
-    void addGhostForcesToReals(Cell &ghosts, Cell &reals);
+    void addGhostForcesToReals(Cell& ghosts, Cell& reals);
 
     // adds ghost forces of Adr AT particles to real Adr AT particles
-    void addAdrGhostForcesToReals(Particle &src, Particle &dst);
+    void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
-    virtual bool checkIsRealParticle(longint id, const Real3D &pos);
+    virtual bool checkIsRealParticle(longint id, const Real3D& pos);
     virtual void decomposeRealParticles();
     virtual void exchangeGhosts();
 
@@ -136,18 +136,18 @@ protected:
     /// dummy function
     void remapNeighbourCells(int cell_shift);
     /// set the grids and allocate space accordingly
-    void createCellGrid(const Int3D &nodeGrid, const Int3D &cellGrid);
+    void createCellGrid(const Int3D& nodeGrid, const Int3D& cellGrid);
     /// sort cells into local/ghost cell arrays
     void markCells();
     /// fill a list of cells with the cells from a certain region of the domain grid
-    void fillCells(std::vector<Cell *> &, const int leftBoundary[3], const int rightBoundary[3]);
+    void fillCells(std::vector<Cell*>&, const int leftBoundary[3], const int rightBoundary[3]);
 
     /** read particles from a temporary buffer into the local cell structure.
         The direction determines in which direction to fold the particles position.
         Returns true if one of the given particles did not belong to this processors
         domain.
     */
-    bool appendParticles(ParticleList &, int dir);
+    bool appendParticles(ParticleList&, int dir);
 
     /// spatial domain decomposition of nodes
     NodeGrid nodeGrid;
@@ -163,8 +163,8 @@ protected:
         are transferred to the recv-cells. */
     struct CommCells
     {
-        std::vector<Cell *> reals;
-        std::vector<Cell *> ghosts;
+        std::vector<Cell*> reals;
+        std::vector<Cell*> ghosts;
     };
     /** which cells to send left, right, up, down, ...
         For the order, see NodeGrid.

@@ -73,7 +73,7 @@ public:
 private:
     boost::signals2::connection _initialize, _heatUp, _coolDown, _thermalize;
 
-    void frictionThermo(class Particle &);
+    void frictionThermo(class Particle&);
 
     void connect();
     void disconnect();

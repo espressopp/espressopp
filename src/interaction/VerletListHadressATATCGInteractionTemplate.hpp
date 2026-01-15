@@ -78,7 +78,7 @@ public:
         fixedtupleList = _fixedtupleList;
     }
 
-    void setPotentialAT1(int type1, int type2, const PotentialAT1 &potential)
+    void setPotentialAT1(int type1, int type2, const PotentialAT1& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -90,7 +90,7 @@ public:
         }
     }
 
-    void setPotentialAT2(int type1, int type2, const PotentialAT2 &potential)
+    void setPotentialAT2(int type1, int type2, const PotentialAT2& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -102,7 +102,7 @@ public:
         }
     }
 
-    void setPotentialCG(int type1, int type2, const PotentialCG &potential)
+    void setPotentialCG(int type1, int type2, const PotentialCG& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -114,17 +114,17 @@ public:
         }
     }
 
-    PotentialAT1 &getPotentialAT1(int type1, int type2)
+    PotentialAT1& getPotentialAT1(int type1, int type2)
     {
         return potentialArrayAT1.at(type1, type2);
     }
 
-    PotentialAT2 &getPotentialAT2(int type1, int type2)
+    PotentialAT2& getPotentialAT2(int type1, int type2)
     {
         return potentialArrayAT2.at(type1, type2);
     }
 
-    PotentialCG &getPotentialCG(int type1, int type2) { return potentialArrayCG.at(type1, type2); }
+    PotentialCG& getPotentialCG(int type1, int type2) { return potentialArrayCG.at(type1, type2); }
 
     virtual void addForces();
     virtual real computeEnergy();
@@ -133,11 +133,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Nonbonded; }
 
@@ -156,11 +156,11 @@ protected:
     real dex;
     real dhy;
     real dex2;  // dex^2
-    boost::unordered_map<Particle *, real>
+    boost::unordered_map<Particle*, real>
         energydiff;  // Energydifference V_AA - V_CG map for particles in hybrid region for drift
                      // term calculation in H-AdResS
-    std::set<Particle *> adrZone;  // Virtual particles in AdResS zone (HY and AT region)
-    std::set<Particle *> cgZone;
+    std::set<Particle*> adrZone;  // Virtual particles in AdResS zone (HY and AT region)
+    std::set<Particle*> cgZone;
 };
 
 //////////////////////////////////////////////////
@@ -172,12 +172,12 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
-    std::set<Particle *> cgZone = verletList->getCGZone();
-    std::set<Particle *> adrZone = verletList->getAdrZone();
+    std::set<Particle*> cgZone = verletList->getCGZone();
+    std::set<Particle*> adrZone = verletList->getAdrZone();
 
-    for (std::set<Particle *>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
+    for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
     {
-        Particle &p = **it;
+        Particle& p = **it;
         // intitialize energy diff AA-CG
         if (p.lambda() < 0.9999999 && p.lambda() > 0.0000001)
         {
@@ -190,12 +190,12 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
     // COMMENT FOR IDEAL GAS
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
 
-        const PotentialCG &potentialCG = getPotentialCG(type1, type2);
+        const PotentialCG& potentialCG = getPotentialCG(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
 
@@ -213,8 +213,8 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
     {
         real w1, w2;
         // these are the two VP interacting
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         w1 = p1.lambda();
         w2 = p2.lambda();
@@ -225,7 +225,7 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
         // force between VP particles
         int type1 = p1.type();
         int type2 = p2.type();
-        const PotentialCG &potentialCG = getPotentialCG(type1, type2);
+        const PotentialCG& potentialCG = getPotentialCG(type1, type2);
         Real3D forcevp(0.0, 0.0, 0.0);
         if (w12 != 1.0)
         {  // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
@@ -263,24 +263,24 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
 
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
-                    Particle &p3 = **itv;
+                    Particle& p3 = **itv;
 
-                    for (std::vector<Particle *>::iterator itv2 = atList2.begin();
+                    for (std::vector<Particle*>::iterator itv2 = atList2.begin();
                          itv2 != atList2.end(); ++itv2)
                     {
-                        Particle &p4 = **itv2;
+                        Particle& p4 = **itv2;
 
                         // AT forces
                         Real3D force(0.0, 0.0, 0.0);
-                        const PotentialAT1 &potentialAT1 = getPotentialAT1(p3.type(), p4.type());
+                        const PotentialAT1& potentialAT1 = getPotentialAT1(p3.type(), p4.type());
                         if (potentialAT1._computeForce(force, p3, p4))
                         {
                             force *= w12;
@@ -305,7 +305,7 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
                                     energyat;  // subtract AT energy for virtual particle 2
                             }
                         }
-                        const PotentialAT2 &potentialAT2 = getPotentialAT2(p3.type(), p4.type());
+                        const PotentialAT2& potentialAT2 = getPotentialAT2(p3.type(), p4.type());
                         if (potentialAT2._computeForce(force, p3, p4))
                         {
                             force *= w12;
@@ -346,15 +346,15 @@ VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _Potent
 
     // H-AdResS - Drift Term part 3
     // Iterate over all particles in the hybrid region and calculate drift force
-    for (std::set<Particle *>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
+    for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
     {  // Iterate over all particles
-        Particle &vp = **it;
+        Particle& vp = **it;
         real w = vp.lambda();
 
         if (w < 0.9999999 && w > 0.0000001)
         {  //   only chose those in the hybrid region
             // calculate distance to nearest adress particle or center
-            std::vector<Real3D *>::iterator it2 = verletList->getAdrPositions().begin();
+            std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
             Real3D pa = **it2;  // position of adress particle
             Real3D mindriftforce(0.0, 0.0, 0.0);
             verletList->getSystem()->bc->getMinimumImageVector(mindriftforce, vp.position(), pa);
@@ -429,19 +429,19 @@ inline real VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
     real e = 0.0;
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const PotentialCG &potential = getPotentialCG(type1, type2);
+        const PotentialCG& potential = getPotentialCG(type1, type2);
         e += potential._computeEnergy(p1, p2);
     }
     // REMOVE FOR IDEAL GAS
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         real w1 = p1.lambda();
         real w2 = p2.lambda();
         real w12 = (w1 + w2) / 2.0;
@@ -449,7 +449,7 @@ inline real VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
         // REMOVE FOR IDEAL GAS
         int type1 = p1.type();
         int type2 = p2.type();
-        const PotentialCG &potentialCG = getPotentialCG(type1, type2);
+        const PotentialCG& potentialCG = getPotentialCG(type1, type2);
         e += (1.0 - w12) * potentialCG._computeEnergy(p1, p2);
         // REMOVE FOR IDEAL GAS
 
@@ -460,23 +460,23 @@ inline real VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
 
         if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList1;
-            std::vector<Particle *> atList2;
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
             atList1 = it3->second;
             atList2 = it4->second;
 
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
-                Particle &p3 = **itv;
-                for (std::vector<Particle *>::iterator itv2 = atList2.begin();
-                     itv2 != atList2.end(); ++itv2)
+                Particle& p3 = **itv;
+                for (std::vector<Particle*>::iterator itv2 = atList2.begin(); itv2 != atList2.end();
+                     ++itv2)
                 {
-                    Particle &p4 = **itv2;
+                    Particle& p4 = **itv2;
 
                     // AT energies
-                    const PotentialAT1 &potentialAT1 = getPotentialAT1(p3.type(), p4.type());
-                    const PotentialAT2 &potentialAT2 = getPotentialAT2(p3.type(), p4.type());
+                    const PotentialAT1& potentialAT1 = getPotentialAT1(p3.type(), p4.type());
+                    const PotentialAT2& potentialAT2 = getPotentialAT2(p3.type(), p4.type());
                     e += w12 * (potentialAT1._computeEnergy(p3, p4) +
                                 potentialAT2._computeEnergy(p3, p4));
                 }
@@ -541,7 +541,7 @@ inline real VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
 
 template <typename _PotentialAT1, typename _PotentialAT2, typename _PotentialCG>
 inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _PotentialCG>::
-    computeVirialX(std::vector<real> &p_xx_total, int bins)
+    computeVirialX(std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in "
                  "VerletListHadressATATCGInteractionTemplate does not work"
@@ -560,7 +560,7 @@ inline real VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
 
 template <typename _PotentialAT1, typename _PotentialAT2, typename _PotentialCG>
 inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _PotentialCG>::
-    computeVirialTensor(Tensor &w)
+    computeVirialTensor(Tensor& w)
 {
     std::cout << "Warning! At the moment computeVirialTensor in "
                  "VerletListHadressATATCGInteractionTemplate does not work"
@@ -569,7 +569,7 @@ inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
 
 template <typename _PotentialAT1, typename _PotentialAT2, typename _PotentialCG>
 inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _PotentialCG>::
-    computeVirialTensor(Tensor &w, real z)
+    computeVirialTensor(Tensor& w, real z)
 {
     std::cout << "Warning! At the moment computeVirialTensor in "
                  "VerletListHadressATATCGInteractionTemplate does not work"
@@ -578,7 +578,7 @@ inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _Potential
 
 template <typename _PotentialAT1, typename _PotentialAT2, typename _PotentialCG>
 inline void VerletListHadressATATCGInteractionTemplate<_PotentialAT1, _PotentialAT2, _PotentialCG>::
-    computeVirialTensor(Tensor *w, int n)
+    computeVirialTensor(Tensor* w, int n)
 {
     std::cout << "Warning! At the moment computeVirialTensor in "
                  "VerletListHadressATATCGInteractionTemplate does not work"

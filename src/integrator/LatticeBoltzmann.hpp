@@ -225,9 +225,9 @@ public:
     void galileanTransf(Real3D _specCmVel);  // galilean transform by amount of _momPerPart
 
     /* COUPLING TO MD PARTICLES */
-    void coupleLBtoMD();                   //
-    void calcRandForce(class Particle &);  // calc random force
-    void calcViscForce(class Particle &);
+    void coupleLBtoMD();                  //
+    void calcRandForce(class Particle&);  // calc random force
+    void calcViscForce(class Particle&);
     void calcDenMom();
     real convMDtoLB(int _opCode);
 
@@ -282,10 +282,10 @@ private:
     bool extForce;  // flag for an external force
 
     // LATTICES
-    lblattice *lbfluid;
-    lblattice *ghostlat;
-    lbmoments *lbmom;
-    lbforces *lbfor;
+    lblattice* lbfluid;
+    lblattice* ghostlat;
+    lbmoments* lbmom;
+    lbforces* lbfor;
 
     // COUPLING
     bool coupling;                // flag for a coupling force

@@ -26,12 +26,12 @@
 #include "types.hpp"
 
 /** the one and only instance of the MPI environment */
-static boost::mpi::environment *theEnvironment = 0;
+static boost::mpi::environment* theEnvironment = 0;
 
 std::shared_ptr<boost::mpi::communicator> mpiWorld = std::make_shared<boost::mpi::communicator>();
 
 /** Initialize MPI. */
-void initMPIEnv(int &argc, char **&argv)
+void initMPIEnv(int& argc, char**& argv)
 {
     if (theEnvironment == 0)
     {

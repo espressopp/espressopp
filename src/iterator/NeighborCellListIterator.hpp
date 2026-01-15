@@ -37,17 +37,17 @@ class NeighborCellListIterator
 {
 public:
     NeighborCellListIterator();
-    NeighborCellListIterator(NeighborCellList &cl, bool _useAllPairs);
+    NeighborCellListIterator(NeighborCellList& cl, bool _useAllPairs);
 
-    NeighborCellListIterator &operator++();
+    NeighborCellListIterator& operator++();
 
     bool isValid() const;
     bool isDone() const;
 
-    Particle &operator*() const;
-    Particle *operator->() const;
+    Particle& operator*() const;
+    Particle* operator->() const;
 
-    Cell &getCurrentCell();
+    Cell& getCurrentCell();
 
 private:
     void findNonemptyCell();
@@ -61,7 +61,7 @@ private:
 // INLINE IMPLEMENTATION
 inline NeighborCellListIterator::NeighborCellListIterator() : ncit(), pit(), useAllPairs(false) {}
 
-inline NeighborCellListIterator::NeighborCellListIterator(NeighborCellList &cl, bool _useAllPairs)
+inline NeighborCellListIterator::NeighborCellListIterator(NeighborCellList& cl, bool _useAllPairs)
     : ncit(cl), pit(), useAllPairs(_useAllPairs)
 {
     // advance to the first valid neighbor list
@@ -81,7 +81,7 @@ inline NeighborCellListIterator::NeighborCellListIterator(NeighborCellList &cl, 
     }
 }
 
-inline NeighborCellListIterator &NeighborCellListIterator::operator++()
+inline NeighborCellListIterator& NeighborCellListIterator::operator++()
 {
     ++pit;
     while (pit.isDone())
@@ -99,11 +99,11 @@ inline bool NeighborCellListIterator::isValid() const { return ncit.isValid(); }
 
 inline bool NeighborCellListIterator::isDone() const { return !isValid(); }
 
-inline Particle &NeighborCellListIterator::operator*() const { return *pit; }
+inline Particle& NeighborCellListIterator::operator*() const { return *pit; }
 
-inline Particle *NeighborCellListIterator::operator->() const { return &**this; }
+inline Particle* NeighborCellListIterator::operator->() const { return &**this; }
 
-inline Cell &NeighborCellListIterator::getCurrentCell() { return *ncit->cell; }
+inline Cell& NeighborCellListIterator::getCurrentCell() { return *ncit->cell; }
 
 }  // namespace iterator
 }  // namespace espressopp

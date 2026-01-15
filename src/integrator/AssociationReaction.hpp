@@ -96,10 +96,10 @@ public:
     /** Actual reaction step */
     void react();
 
-    void sendMultiMap(boost::unordered_multimap<longint, longint> &mm);
-    void uniqueA(boost::unordered_multimap<longint, longint> &mm);
-    void uniqueB(boost::unordered_multimap<longint, longint> &mm,
-                 boost::unordered_multimap<longint, longint> &nn);
+    void sendMultiMap(boost::unordered_multimap<longint, longint>& mm);
+    void uniqueA(boost::unordered_multimap<longint, longint>& mm);
+    void uniqueB(boost::unordered_multimap<longint, longint>& mm,
+                 boost::unordered_multimap<longint, longint>& nn);
     void applyAR();
 
     /** Register this class so it can be used from Python. */
@@ -108,7 +108,7 @@ public:
 private:
     boost::signals2::connection _initialize, _react;
 
-    void reactPair(Particle &p1, Particle &p2);
+    void reactPair(Particle& p1, Particle& p2);
 
     void connect();
     void disconnect();

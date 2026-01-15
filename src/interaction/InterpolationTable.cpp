@@ -50,7 +50,7 @@ real InterpolationTable::getEnergy(real r) const { return splineInterpolation(r,
 real InterpolationTable::getForce(real r) const { return splineInterpolation(r, force, force2); }
 
 // this is called by the created InterpolationTable object
-void InterpolationTable::read(mpi::communicator comm, const char *file)
+void InterpolationTable::read(mpi::communicator comm, const char* file)
 {
     int root = 0;  // control processor
 
@@ -124,11 +124,11 @@ void InterpolationTable::read(mpi::communicator comm, const char *file)
 
 // read file, store values in r, e, f, and return number of read lines
 // (called by read())
-int InterpolationTable::readFile(const char *file, bool dummy)
+int InterpolationTable::readFile(const char* file, bool dummy)
 {
     char line[MAXLINE];
     real r, e, f;
-    FILE *fp = fopen(file, "r");
+    FILE* fp = fopen(file, "r");
 
     if (fp == NULL)
     {
@@ -170,9 +170,9 @@ int InterpolationTable::readFile(const char *file, bool dummy)
 }  // readfile
 
 /** Spline read-in values. */
-void InterpolationTable::spline(const real *x, const real *y, int n, real yp1, real ypn, real *y2)
+void InterpolationTable::spline(const real* x, const real* y, int n, real yp1, real ypn, real* y2)
 {
-    real *u = new real[n];
+    real* u = new real[n];
 
     if (yp1 > 0.99e30)
     {
@@ -222,7 +222,7 @@ void InterpolationTable::spline(const real *x, const real *y, int n, real yp1, r
  *                                                                         *
  **************************************************************************/
 
-real InterpolationTable::splineInterpolation(real r, const real *fn, const real *fn2) const
+real InterpolationTable::splineInterpolation(real r, const real* fn, const real* fn2) const
 {
     int index = static_cast<int>((r - inner) * invdelta);
 

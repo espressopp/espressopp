@@ -129,7 +129,7 @@ python::list Storage::getRealParticleIDs()
 
 // TODO find out why python crashes if inlined
 // inline
-void Storage::removeFromLocalParticles(Particle *p, bool weak)
+void Storage::removeFromLocalParticles(Particle* p, bool weak)
 {
     /* no pointer left, can happen for ghosts when the real particle
        e has already been removed */
@@ -183,8 +183,8 @@ void Storage::removeAdrATParticle(longint id)
     }
 
     // remove from ParticleList (vector)
-    Particle *dbegin = &AdrATParticles.front();  // see whether the array was moved
-    Particle *p = lookupAdrATParticle(id);
+    Particle* dbegin = &AdrATParticles.front();  // see whether the array was moved
+    Particle* p = lookupAdrATParticle(id);
     int i = p - &AdrATParticles[0];
     int newSize = AdrATParticles.size() - 1;
     if (i != newSize)
@@ -203,14 +203,14 @@ void Storage::removeAdrATParticle(longint id)
     }
     else if (i != newSize)
     {
-        Particle *np = &(AdrATParticles[i]);
+        Particle* np = &(AdrATParticles[i]);
         updateInLocalAdrATParticles(np);
     }
 }
 
 // TODO find out why python crashes if inlined
 // inline
-void Storage::updateInLocalParticles(Particle *p, bool weak)
+void Storage::updateInLocalParticles(Particle* p, bool weak)
 {
     if (!weak || localParticles.find(p->id()) == localParticles.end())
     {
@@ -252,9 +252,9 @@ void Storage::updateInLocalParticles(Particle *p, bool weak)
     }
 }
 
-inline void Storage::updateInLocalAdrATParticles(Particle *p) { localAdrATParticles[p->id()] = p; }
+inline void Storage::updateInLocalAdrATParticles(Particle* p) { localAdrATParticles[p->id()] = p; }
 
-void Storage::updateLocalParticles(ParticleList &list, bool adress)
+void Storage::updateLocalParticles(ParticleList& list, bool adress)
 {
     if (adress)
     {
@@ -282,14 +282,14 @@ void Storage::resizeCells(longint nCells)
     }
 }
 
-Particle *Storage::addParticle(longint id, const Real3D &p, bool checkIfRealParticle)
+Particle* Storage::addParticle(longint id, const Real3D& p, bool checkIfRealParticle)
 {
     if (checkIfRealParticle && !checkIsRealParticle(id, p))
     {
         return nullptr;
     }
 
-    Cell *cell;
+    Cell* cell;
 
     Particle n;
     n.init();
@@ -314,10 +314,10 @@ Particle *Storage::addParticle(longint id, const Real3D &p, bool checkIfRealPart
 
 int Storage::removeParticle(longint id)
 {
-    Particle *p = lookupRealParticle(id);
+    Particle* p = lookupRealParticle(id);
     if (p)
     {
-        Cell *cell = mapPositionToCellChecked(p->position());
+        Cell* cell = mapPositionToCellChecked(p->position());
 
         removeFromLocalParticles(p);
 
@@ -332,7 +332,7 @@ int Storage::removeParticle(longint id)
         updateLocalParticles(cell->particles);
 
         onParticlesChanged();
-        Particle *p1 = lookupRealParticle(id);
+        Particle* p1 = lookupRealParticle(id);
         if (p1)
         {
             // it should not be printed out
@@ -357,11 +357,11 @@ void Storage::removeAllParticles()
     onParticlesChanged();
 }
 
-Particle *Storage::addAdrATParticle(longint id, const Real3D &p, const Real3D &_vpp)
+Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp)
 {
     if (!checkIsRealParticle(id, _vpp))
     {
-        return static_cast<Particle *>(0);
+        return static_cast<Particle*>(0);
     }
 
     Particle n;
@@ -392,7 +392,7 @@ Particle *Storage::addAdrATParticle(longint id, const Real3D &p, const Real3D &_
     int last_capacity = AdrATParticles.capacity();
 
     AdrATParticles.push_back(n);
-    Particle *local = &AdrATParticles.back();
+    Particle* local = &AdrATParticles.back();
 
     if (last_capacity != int_c(AdrATParticles.capacity()))
     {
@@ -407,12 +407,12 @@ Particle *Storage::addAdrATParticle(longint id, const Real3D &p, const Real3D &_
 }
 
 // this is called from fixedtuplelist only!
-Particle *Storage::addAdrATParticleFTPL(Particle n)
+Particle* Storage::addAdrATParticleFTPL(Particle n)
 {
     int last_capacity = AdrATParticles.capacity();
 
     AdrATParticles.push_back(n);
-    Particle *local = &AdrATParticles.back();
+    Particle* local = &AdrATParticles.back();
 
     if (last_capacity != int_c(AdrATParticles.capacity()))
     {
@@ -432,27 +432,27 @@ Particle *Storage::addAdrATParticleFTPL(Particle n)
     return pt;
 }*/
 
-Particle *Storage::appendUnindexedParticle(ParticleList &l, Particle &part)
+Particle* Storage::appendUnindexedParticle(ParticleList& l, Particle& part)
 {
     l.push_back(part);
     return &l.back();
 }
 
 // Particle *Storage::appendUnindexedAdrParticle(ParticleListAdr &l, Particle &part)
-Particle *Storage::appendUnindexedAdrParticle(ParticleList &l, Particle &part)
+Particle* Storage::appendUnindexedAdrParticle(ParticleList& l, Particle& part)
 {
     l.push_back(part);
     return &l.back();
 }
 
-void Storage::appendParticleListToGhosts(ParticleList &l) { AdrATParticlesG.push_back(l); }
+void Storage::appendParticleListToGhosts(ParticleList& l) { AdrATParticlesG.push_back(l); }
 
-Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
+Particle* Storage::appendIndexedParticle(ParticleList& l, Particle& part)
 {
     int last_capacity = l.capacity();
 
     l.push_back(part);
-    Particle *p = &l.back();
+    Particle* p = &l.back();
 
     if (last_capacity != int_c(l.capacity()))
     {
@@ -466,7 +466,7 @@ Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
     return p;
 }
 
-Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
+Particle* Storage::moveIndexedParticle(ParticleList& dl, ParticleList& sl, int i)
 {
     int dlast_capacity = dl.capacity();
     int slast_capacity = sl.capacity();
@@ -479,7 +479,7 @@ Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i
     }
     sl.resize(newSize);
 
-    Particle *dst = &dl.back();
+    Particle* dst = &dl.back();
 
     // fix up destination list
     if (dlast_capacity != int_c(dl.capacity()))
@@ -499,21 +499,21 @@ Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i
     }
     else if (i != newSize)
     {
-        Particle *src = &(sl[i]);
+        Particle* src = &(sl[i]);
         updateInLocalParticles(src);
     }
 
     return dst;
 }
 
-void Storage::fetchParticles(Storage &old)
+void Storage::fetchParticles(Storage& old)
 {
     LOG4ESPP_DEBUG(logger, "number of received cells = " << old.getRealCells().size());
 
     for (CellListIterator it(old.getRealCells()); it.isValid(); ++it)
     {
-        Particle &part = *it;
-        Cell *nc = mapPositionToCellClipped(part.position());
+        Particle& part = *it;
+        Cell* nc = mapPositionToCellClipped(part.position());
         appendUnindexedParticle(nc->particles, part);
     }
 
@@ -524,13 +524,13 @@ void Storage::fetchParticles(Storage &old)
     }
 }
 
-void Storage::sendParticles(ParticleList &list, longint node)
+void Storage::sendParticles(ParticleList& list, longint node)
 {
     LOG4ESPP_DEBUG(logger, "send " << list.size() << " particles to " << node);
 
     // pack for transport
 
-    OutBuffer &data = outBuffer;
+    OutBuffer& data = outBuffer;
 
     data.reset();
     int size = list.size();
@@ -551,11 +551,11 @@ void Storage::sendParticles(ParticleList &list, longint node)
     LOG4ESPP_DEBUG(logger, "done");
 }
 
-void Storage::recvParticles(ParticleList &list, longint node)
+void Storage::recvParticles(ParticleList& list, longint node)
 {
     LOG4ESPP_DEBUG(logger, "recv from " << node);
 
-    InBuffer &data = inBuffer;  // reuse storage buffer
+    InBuffer& data = inBuffer;  // reuse storage buffer
 
     data.recv(node, STORAGE_COMM_TAG);
 
@@ -571,7 +571,7 @@ void Storage::recvParticles(ParticleList &list, longint node)
 
         for (int i = 0; i < size; ++i)
         {
-            Particle *p = &list[curSize + i];
+            Particle* p = &list[curSize + i];
             data.read(*p);
             updateInLocalParticles(p);
         }
@@ -603,9 +603,9 @@ void Storage::decompose()
     onParticlesChanged();
 }
 
-void Storage::packPositionsEtc(OutBuffer &buf, Cell &_reals, int extradata, const Real3D &shift)
+void Storage::packPositionsEtc(OutBuffer& buf, Cell& _reals, int extradata, const Real3D& shift)
 {
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
 
     LOG4ESPP_DEBUG(logger, "pack data from reals in " << (&_reals - getFirstCell()));
     LOG4ESPP_DEBUG(logger, "also packing " << ((extradata & DATA_PROPERTIES) ? "properties " : "")
@@ -621,9 +621,9 @@ void Storage::packPositionsEtc(OutBuffer &buf, Cell &_reals, int extradata, cons
 }
 
 void Storage::packPositionsEtc_LEBC(
-    OutBuffer &buf, Cell &_reals, int extradata, const Real3D &shift, real offset)
+    OutBuffer& buf, Cell& _reals, int extradata, const Real3D& shift, real offset)
 {
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
     real cpy_tmp;
 
     LOG4ESPP_DEBUG(logger, "pack data from reals in " << (&_reals - getFirstCell()));
@@ -642,9 +642,9 @@ void Storage::packPositionsEtc_LEBC(
     }
 }
 
-void Storage::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata)
+void Storage::unpackPositionsEtc(Cell& _ghosts, InBuffer& buf, int extradata)
 {
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     LOG4ESPP_DEBUG(logger, "unpack data to ghosts in " << (&_ghosts - getFirstCell()));
     LOG4ESPP_DEBUG(logger, "also unpacking " << ((extradata & DATA_PROPERTIES) ? "properties " : "")
@@ -664,10 +664,10 @@ void Storage::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata)
     }
 }
 
-void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts, int extradata, const Real3D &shift)
+void Storage::copyRealsToGhosts(Cell& _reals, Cell& _ghosts, int extradata, const Real3D& shift)
 {
-    ParticleList &reals = _reals.particles;
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& reals = _reals.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     LOG4ESPP_DEBUG(logger, "copy data from reals in " << (&_reals - getFirstCell())
                                                       << " to ghosts in "
@@ -687,13 +687,13 @@ void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts, int extradata, cons
     }
 }
 
-void Storage::copyRealsToGhosts_LEBC(Cell &_reals,
-                                     Cell &_ghosts,
+void Storage::copyRealsToGhosts_LEBC(Cell& _reals,
+                                     Cell& _ghosts,
                                      int extradata,
-                                     const Real3D &shift)
+                                     const Real3D& shift)
 {
-    ParticleList &reals = _reals.particles;
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& reals = _reals.particles;
+    ParticleList& ghosts = _ghosts.particles;
     real cpy_tmp;
     real Lx = getSystem()->bc->getBoxL()[0];
     real Lz = getSystem()->bc->getBoxL()[2];
@@ -737,11 +737,11 @@ void Storage::copyRealsToGhosts_LEBC(Cell &_reals,
     }
 }
 
-void Storage::packForces(OutBuffer &buf, Cell &_ghosts)
+void Storage::packForces(OutBuffer& buf, Cell& _ghosts)
 {
     LOG4ESPP_DEBUG(logger, "pack ghost forces to buffer from cell " << (&_ghosts - getFirstCell()));
 
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     for (ParticleList::iterator src = ghosts.begin(), end = ghosts.end(); src != end; ++src)
     {
@@ -751,11 +751,11 @@ void Storage::packForces(OutBuffer &buf, Cell &_ghosts)
     }
 }
 
-void Storage::unpackForces(Cell &_reals, InBuffer &buf)
+void Storage::unpackForces(Cell& _reals, InBuffer& buf)
 {
     LOG4ESPP_DEBUG(logger, "add forces from buffer to cell " << (&_reals - getFirstCell()));
 
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
 
     for (ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst)
     {
@@ -766,11 +766,11 @@ void Storage::unpackForces(Cell &_reals, InBuffer &buf)
     }
 }
 
-void Storage::unpackAndAddForces(Cell &_reals, InBuffer &buf)
+void Storage::unpackAndAddForces(Cell& _reals, InBuffer& buf)
 {
     LOG4ESPP_DEBUG(logger, "add forces from buffer to cell " << (&_reals - getFirstCell()));
 
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
 
     for (ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst)
     {
@@ -782,14 +782,14 @@ void Storage::unpackAndAddForces(Cell &_reals, InBuffer &buf)
     }
 }
 
-void Storage::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
+void Storage::addGhostForcesToReals(Cell& _ghosts, Cell& _reals)
 {
     LOG4ESPP_DEBUG(logger, "add forces from ghosts in cell " << (&_ghosts - getFirstCell())
                                                              << " to reals in cell "
                                                              << (&_reals - getFirstCell()));
 
-    ParticleList &reals = _reals.particles;
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& reals = _reals.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     for (ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
          dst != end; ++dst, ++src)
@@ -810,7 +810,7 @@ void Storage::savePosition(size_t id)
 {
     if (getSystemRef().comm->size() == 1)
     {
-        Particle *p = lookupRealParticle(id);
+        Particle* p = lookupRealParticle(id);
         if (p)
         {
             savedRealPositions[id] = p->position();
@@ -837,7 +837,7 @@ void Storage::restorePositions()
              itr != savedRealPositions.end(); ++itr)
         {
             size_t id = itr->first;
-            Particle *p = lookupRealParticle(id);
+            Particle* p = lookupRealParticle(id);
             if (p)
             {
                 p->position() = itr->second;
@@ -847,7 +847,7 @@ void Storage::restorePositions()
              ++itr)
         {
             size_t id = itr->first;
-            Particle *p = lookupRealParticle(id);
+            Particle* p = lookupRealParticle(id);
             if (p)
             {
                 p->image() = itr->second;
@@ -870,8 +870,8 @@ void Storage::restorePositions()
 
 ///////////////////////////////////////////////////////////////////////////
 /// Faster adding of particles by storing data in numpy arrays
-void addParticlesCheck(python::numpy::ndarray const &part_arr,
-                       python::numpy::ndarray const &idx_arr)
+void addParticlesCheck(python::numpy::ndarray const& part_arr,
+                       python::numpy::ndarray const& idx_arr)
 {
     using namespace espressopp::python;
     if (!(part_arr.get_dtype() == numpy::dtype::get_builtin<real>()))
@@ -884,26 +884,26 @@ void addParticlesCheck(python::numpy::ndarray const &part_arr,
         throw std::runtime_error("Invalid idx_arr shape. axis=0 must have shape=31");
 }
 
-void addParticlesFromArray(class Storage *obj,
-                           python::numpy::ndarray const &part_arr,
-                           python::numpy::ndarray const &idx_arr)
+void addParticlesFromArray(class Storage* obj,
+                           python::numpy::ndarray const& part_arr,
+                           python::numpy::ndarray const& idx_arr)
 {
     addParticlesCheck(part_arr, idx_arr);
 
-    const real *part = (real *)(part_arr.get_data());
-    const int *idx = (int *)(idx_arr.get_data());
+    const real* part = (real*)(part_arr.get_data());
+    const int* idx = (int*)(idx_arr.get_data());
     const int npart = part_arr.shape(0);
     const int nidx = part_arr.shape(1);
 
     obj->addParticlesFromArrayImpl(part, idx, npart, nidx);
 }
 
-void Storage::addParticlesFromArrayImpl(const real *part,
-                                        const int *idx,
+void Storage::addParticlesFromArrayImpl(const real* part,
+                                        const int* idx,
                                         const int npart,
                                         const int nidx)
 {
-    boost::mpi::communicator &comm = *(getSystem()->comm);
+    boost::mpi::communicator& comm = *(getSystem()->comm);
     int nidx_ = 0;
     for (int i = 0; i < 31; i++) nidx_ += (idx[i] >= 0);
     if (nidx_ != nidx) LOG4ESPP_ERROR(logger, "size mismatch in expected number of particles");
@@ -945,7 +945,7 @@ void Storage::addParticlesFromArrayImpl(const real *part,
         for (int p = 0; p < npart; p++)
         {
             const longint id = part[p * nidx + index_id];
-            Particle *lp = this->lookupRealParticle(id);
+            Particle* lp = this->lookupRealParticle(id);
             if (lp != 0)
             {
                 particleExists = true;
@@ -975,7 +975,7 @@ void Storage::addParticlesFromArrayImpl(const real *part,
         const int offset = p * nidx;
         const longint id = part[offset + index_id];
         Real3D pos(part[offset + index_posx], part[offset + index_posy], part[offset + index_posz]);
-        Particle *sp = this->addParticle(id, pos);
+        Particle* sp = this->addParticle(id, pos);
 
         if (sp == NULL) continue;
 

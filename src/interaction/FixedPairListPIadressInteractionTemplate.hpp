@@ -113,11 +113,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Pair; }
 
@@ -136,12 +136,12 @@ protected:
 template <typename _Potential>
 inline void FixedPairListPIadressInteractionTemplate<_Potential>::addForces()
 {
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
     for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -176,14 +176,14 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::addForces()
                 if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
                     atList1 = it3->second;
                     atList2 = it4->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end())
@@ -196,8 +196,8 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::addForces()
                         }
 
                         // Get the individual PI beads
-                        Particle &p3 = **itv;
-                        Particle &p4 = **itv2;
+                        Particle& p3 = **itv;
+                        Particle& p4 = **itv2;
 
                         if (p3.pib() != p4.pib())
                         {
@@ -250,14 +250,14 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::addForces()
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -270,8 +270,8 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::addForces()
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -319,11 +319,11 @@ template <typename _Potential>
 inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergy()
 {
     real e = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -347,14 +347,14 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergy(
                 if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
                     atList1 = it3->second;
                     atList2 = it4->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end())
@@ -367,8 +367,8 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergy(
                         }
 
                         // Get the individual PI beads
-                        Particle &p3 = **itv;
-                        Particle &p4 = **itv2;
+                        Particle& p3 = **itv;
+                        Particle& p4 = **itv2;
 
                         if (p3.pib() != p4.pib())
                         {
@@ -408,14 +408,14 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergy(
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -428,8 +428,8 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergy(
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -511,7 +511,7 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeEnergyC
 
 template <typename _Potential>
 inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in "
                  "FixedPairListPIadressInteractionTemplate does not work."
@@ -524,11 +524,11 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
 {
     real w = 0.0;
 
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -556,14 +556,14 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
                 if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
                     atList1 = it3->second;
                     atList2 = it4->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end())
@@ -576,8 +576,8 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
                         }
 
                         // Get the individual PI beads
-                        Particle &p3 = **itv;
-                        Particle &p4 = **itv2;
+                        Particle& p3 = **itv;
+                        Particle& p4 = **itv2;
 
                         if (p3.pib() != p4.pib())
                         {
@@ -622,14 +622,14 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
                 atList1 = it3->second;
                 atList2 = it4->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end())
@@ -642,8 +642,8 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
                     }
 
                     // Get the individual PI beads
-                    Particle &p3 = **itv;
-                    Particle &p4 = **itv2;
+                    Particle& p3 = **itv;
+                    Particle& p4 = **itv2;
 
                     if (p3.pib() != p4.pib())
                     {
@@ -685,7 +685,7 @@ inline real FixedPairListPIadressInteractionTemplate<_Potential>::computeVirial(
 }
 
 template <typename _Potential>
-inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
                  "FixedPairListPIadressInteractionTemplate does not work."
@@ -694,7 +694,7 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialT
 }
 
 template <typename _Potential>
-inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                       real z)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
@@ -704,7 +704,7 @@ inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialT
 }
 
 template <typename _Potential>
-inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w,
+inline void FixedPairListPIadressInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w,
                                                                                       int n)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "

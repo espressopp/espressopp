@@ -118,7 +118,7 @@ private:
     real af_coef[8][7][7];  // matrix of predefined assigned function coefficients
 
     // fftw elements
-    fftw_complex *in_array;
+    fftw_complex* in_array;
     fftw_plan plan;
     int MM[3];  // auxiliary array for plan generation
 
@@ -247,7 +247,7 @@ public:
         node_sumq_2 = node_sum_q2 = 0.0;
         for (iterator::CellListIterator it(realCells); it.isValid(); ++it)
         {
-            Particle &p = *it;
+            Particle& p = *it;
             node_sumq_2 += p.q();
             node_sum_q2 += pow(p.q(), 2);
         }
@@ -335,7 +335,7 @@ public:
         }
     }
 
-    void aliasing_sum(Int3D i, Real3D *nominator, real *denominator)
+    void aliasing_sum(Int3D i, Real3D* nominator, real* denominator)
     {
         /*
          * taken from Deserno's code
@@ -437,7 +437,7 @@ public:
         return out;
     }
 
-    void set_fftw_array() { in_array = (fftw_complex *)fftw_malloc(MMM * sizeof(fftw_complex)); }
+    void set_fftw_array() { in_array = (fftw_complex*)fftw_malloc(MMM * sizeof(fftw_complex)); }
     void set_plan_frw()
     {
         plan = fftw_plan_dft(3, MM, in_array, in_array, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -515,7 +515,7 @@ public:
         Int3D Gi, arg;
         for (iterator::CellListIterator it(realCells); it.isValid(); ++it)
         {
-            Particle &p = *it;
+            Particle& p = *it;
             Real3D ppos = p.position();
             Real3D d1;
             for (int i = 0; i < 3; i++)
@@ -554,7 +554,7 @@ public:
             }
         }
 
-        in_array = reinterpret_cast<fftw_complex *>(&QQQ[0]);
+        in_array = reinterpret_cast<fftw_complex*>(&QQQ[0]);
         set_plan_frw();
         fftw_execute(plan);
     }
@@ -582,7 +582,7 @@ public:
 
         for (int l = 0; l < 3; l++)
         {
-            in_array = reinterpret_cast<fftw_complex *>(&phi[l][0]);
+            in_array = reinterpret_cast<fftw_complex*>(&phi[l][0]);
             set_plan_bcw();
             fftw_execute(plan);
         }
@@ -590,7 +590,7 @@ public:
         real C_MMM_inv = C_pref / (real)MMM;
         for (iterator::CellListIterator it(realCells); it.isValid(); ++it)
         {
-            Particle &p = *it;
+            Particle& p = *it;
 
             int iii = p.id();
             Real3D ff(0.0);
@@ -655,7 +655,7 @@ public:
         err.setException(msg.str());
         return 0.0;
     }
-    bool _computeForceRaw(Real3D &force, const Real3D &dist, real distSqr) const
+    bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const
     {
         esutil::Error err(system->comm);
         stringstream msg;

@@ -46,7 +46,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "fcs.h"
-//#include "common/near/near.h"
+// #include "common/near/near.h"
 
 #include "boost/serialization/vector.hpp"
 #include "boost/serialization/complex.hpp"
@@ -110,17 +110,17 @@ private:
     real sum_q2;
     real en_local;
 
-    dcomplex *sum;
-    dcomplex *totsum;
+    dcomplex* sum;
+    dcomplex* totsum;
 
     // MPI_Comm communicator = MPI_COMM_WORLD;
 
-    fcs_float *sfcs_coor;
-    fcs_float *sfcs_cg;
-    fcs_float *sfcs_field;
-    fcs_float *sfcs_pot;
+    fcs_float* sfcs_coor;
+    fcs_float* sfcs_cg;
+    fcs_float* sfcs_field;
+    fcs_float* sfcs_pot;
     fcs_float sfcs_prefac;
-    fcs_int *sfcs_map;
+    fcs_int* sfcs_map;
     // fcs_int sfcs_pdc[3];
 #if FCS_ENABLE_DIRECT
     char DIRECT_parameters[200];
@@ -167,7 +167,7 @@ public:
                     real _prefactor,
                     real _tolerance,
                     int _ntotal,
-                    const char *_method);
+                    const char* _method);
 
     ~CoulombScafacos();
 
@@ -187,10 +187,10 @@ public:
         string Llz = to_string(Lz);
         string fcs_tol_field = to_string(tolerance);
 
-        const char *llx = Llx.c_str();
-        const char *lly = Lly.c_str();
-        const char *llz = Llz.c_str();
-        const char *ffcs_tol_field = fcs_tol_field.c_str();
+        const char* llx = Llx.c_str();
+        const char* lly = Lly.c_str();
+        const char* llz = Llz.c_str();
+        const char* ffcs_tol_field = fcs_tol_field.c_str();
 
         num_glob = ntotal;
         ifBoundaryCross = false;
@@ -410,7 +410,7 @@ public:
         real node_sum_q2 = 0.0;
         for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
         {
-            Particle &p = *it;
+            Particle& p = *it;
             node_sum_q2 += (p.q() * p.q());
         }
         sum_q2 = 0.0;
@@ -436,12 +436,12 @@ public:
         preset();
     }
     int getNTotal() const { return ntotal; }
-    void setMethod(const char *_method)
+    void setMethod(const char* _method)
     {
         method = _method;
         preset();
     }
-    char const *getMethod() const { return method.c_str(); }
+    char const* getMethod() const { return method.c_str(); }
 
     real _computeEnergy(CellList realcells)
     {
@@ -475,13 +475,13 @@ public:
         // fprintf (stderr, "dims: %d %d %d\n", dims[0], dims[1], dims[2]);
         // MPI_Cart_create (communicator, 3, dims, pers, 0, &cart_comm);
         // communicator = cart_comm;
-        sfcs_coor = (fcs_float *)malloc(3 * sizeof(fcs_float) * num_local);
-        sfcs_cg = (fcs_float *)malloc(sizeof(fcs_float) * num_local);
-        sfcs_field = (fcs_float *)malloc(3 * sizeof(fcs_float) * num_local);
-        sfcs_pot = (fcs_float *)malloc(sizeof(fcs_float) * num_local);
+        sfcs_coor = (fcs_float*)malloc(3 * sizeof(fcs_float) * num_local);
+        sfcs_cg = (fcs_float*)malloc(sizeof(fcs_float) * num_local);
+        sfcs_field = (fcs_float*)malloc(3 * sizeof(fcs_float) * num_local);
+        sfcs_pot = (fcs_float*)malloc(sizeof(fcs_float) * num_local);
         // velocities = (fcs_float *) malloc (3 * sizeof (fcs_float) * num_local);
         // masses = (fcs_float *) malloc (sizeof (fcs_float) * num_local);
-        sfcs_map = (fcs_int *)malloc(sizeof(fcs_int) * num_local);
+        sfcs_map = (fcs_int*)malloc(sizeof(fcs_int) * num_local);
         // cout<<"SCATEST: DEF end\n";
         // load all particles from the current processor and transform into
         // fcs format
@@ -491,7 +491,7 @@ public:
         {
             for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
             {
-                Particle &p = *it;
+                Particle& p = *it;
 
                 if (p.q() != 0.0)
                 {
@@ -528,7 +528,7 @@ public:
         {
             for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
             {
-                Particle &p = *it;
+                Particle& p = *it;
 
                 if (p.q() != 0.0)
                 {
@@ -591,7 +591,7 @@ public:
 
         for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
         {
-            Particle &p = *it;
+            Particle& p = *it;
 
             if (sfcs_map[k] == idx)
             {
@@ -666,7 +666,7 @@ public:
         err.setException(msg.str());
         return 0.0;
     }
-    bool _computeForceRaw(Real3D &force, const Real3D &dist, real distSqr) const
+    bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const
     {
         esutil::Error err(system->comm);
         stringstream msg;

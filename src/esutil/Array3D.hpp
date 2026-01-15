@@ -53,9 +53,9 @@ public:
     /** \brief The type of object, \c T, stored in the Array1D. */
     typedef T value_type;
     /** \brief Reference to to a \c T object. */
-    typedef T &reference;
+    typedef T& reference;
     /** \brief Const reference to to a \c T object. */
-    typedef const T &const_reference;
+    typedef const T& const_reference;
     /** \brief An unsigned integer type. */
     typedef typename Super::size_type size_type;
     /** \brief Iterator used to iterate through an Array1D. */
@@ -68,7 +68,7 @@ public:
 
     /** \brief Creates a 3-dimensional \p n x \p m x \p l array,
         initialising the values with copies of \a t. */
-    Array3D(size_type n, size_type m, size_type l, const T &t = T()) { init(n, m, l, t); }
+    Array3D(size_type n, size_type m, size_type l, const T& t = T()) { init(n, m, l, t); }
 
     /** \brief Erases all elements. */
     void clear()
@@ -81,7 +81,7 @@ public:
 
     /** \brief Creates a 3-dimensional \p n x \p m x \p l array,
         initialising the values with copies of \a t. */
-    void init(size_type n, size_type m, size_type l, const T &t = T())
+    void init(size_type n, size_type m, size_type l, const T& t = T())
     {
         Super::clear();
         resize(n, m, l, t);
@@ -97,7 +97,7 @@ public:
         when \a T has no default constructor.
 
     */
-    void resize(size_type n, size_type m, size_type l, const T &t = T())
+    void resize(size_type n, size_type m, size_type l, const T& t = T())
     {
         this->n = n;
         this->m = m;
@@ -143,7 +143,7 @@ public:
     and \c pos[2] return the indices.
         \attention No range checking. */
     template <class Vector>
-    reference operator()(const Vector &pos)
+    reference operator()(const Vector& pos)
     {
         return operator()(pos[0], pos[1], pos[2]);
     }
@@ -154,7 +154,7 @@ public:
     \c pos[2] return the indices.
         \attention No range checking. */
     template <class Vector>
-    const_reference operator()(const Vector &pos) const
+    const_reference operator()(const Vector& pos) const
     {
         return operator()(pos[0], pos[1], pos[2]);
     }
@@ -186,7 +186,7 @@ public:
 
         \exception out_of_range \p i is out of range of the Array3D */
     template <class Vector>
-    reference at(const Vector &pos)
+    reference at(const Vector& pos)
     {
         return at(pos[0], pos[1], pos[2]);
     }
@@ -198,7 +198,7 @@ public:
 
         \exception out_of_range \p i is out of range of the Array3D */
     template <class Vector>
-    const_reference at(const Vector &pos) const
+    const_reference at(const Vector& pos) const
     {
         return at(pos[0], pos[1], pos[2]);
     }
@@ -221,53 +221,53 @@ public:
 
     /** \brief Assigns t2 to each of the elements. */
     template <class T2>
-    void operator=(const T2 &t2)
+    void operator=(const T2& t2)
     {
         for (iterator it = begin(); it != end(); it++) *it = t2;
     }
 
     /** \brief Adds t2 to each of the elements.  */
     template <class T2>
-    void operator+=(const T2 &t2)
+    void operator+=(const T2& t2)
     {
         for (iterator it = begin(); it != end(); it++) *it += t2;
     }
 
     /** \brief Adds t2 to each of the elements.  */
     template <class T2>
-    void operator-=(const T2 &t2)
+    void operator-=(const T2& t2)
     {
         for (iterator it = begin(); it != end(); it++) *it -= t2;
     }
 
     /** \brief Multiplies each of the elements by t2. */
     template <class T2>
-    void operator*=(const T2 &t2)
+    void operator*=(const T2& t2)
     {
         for (iterator it = begin(); it != end(); it++) *it *= t2;
     }
 
     /** \brief Divides each of the elements by t2. */
     template <class T2>
-    void operator/=(const T2 &t2)
+    void operator/=(const T2& t2)
     {
         for (iterator it = begin(); it != end(); it++) *it /= t2;
     }
 
-    void operator/=(const double &x)
+    void operator/=(const double& x)
     {
         double x_rec = 1.0 / x;
         for (iterator it = begin(); it != end(); it++) *it *= x_rec;
     }
 
     /** \brief Equality operator. */
-    bool operator==(const Array3D<T, exception> &a)
+    bool operator==(const Array3D<T, exception>& a)
     {
         return static_cast<std::vector<T> >(*this) == static_cast<std::vector<T> >(a);
     }
 
     /** \brief Inequality operator. */
-    bool operator!=(const Array3D<T, exception> &a)
+    bool operator!=(const Array3D<T, exception>& a)
     {
         return static_cast<std::vector<T> >(*this) != static_cast<std::vector<T> >(a);
     }
@@ -291,9 +291,9 @@ public:
     /** \brief The type of object, \c T, stored in the Array1D. */
     typedef T value_type;
     /** \brief Reference to to a \c T object. */
-    typedef T &reference;
+    typedef T& reference;
     /** \brief Const reference to to a \c T object. */
-    typedef const T &const_reference;
+    typedef const T& const_reference;
     /** \brief An unsigned integer type. */
     typedef typename Super::size_type size_type;
     /** \brief Iterator used to iterate through an Array1D. */
@@ -306,12 +306,12 @@ public:
     using Super::size_n;
 
     /** \brief Default constructor. */
-    Array3D(const T &prototype = T()) { init(0, 0, 0, prototype); }
+    Array3D(const T& prototype = T()) { init(0, 0, 0, prototype); }
 
     /** \brief Creates a one-dimensional array of size \a n with \a n
         copies of \a prototype.
         Also sets the \p prototype. */
-    Array3D(size_type n, size_type m, size_type l, const T &prototype = T())
+    Array3D(size_type n, size_type m, size_type l, const T& prototype = T())
     {
         init(n, m, l, prototype);
     }
@@ -319,7 +319,7 @@ public:
     /** \brief Creates a one-dimensional array of size \a n with \a n
         copies of \a prototype.
         Also sets the \p prototype. */
-    void init(size_type n, size_type m, size_type l, const T &prototype = T())
+    void init(size_type n, size_type m, size_type l, const T& prototype = T())
     {
         set_prototype(prototype);
         Super::init(n, m, l, prototype);
@@ -327,7 +327,7 @@ public:
 
     /** \brief Sets the \p prototype used when the Array3D<T,enlarge>
         is automatically resized. */
-    void set_prototype(const T &prototype = T()) { this->prototype = prototype; }
+    void set_prototype(const T& prototype = T()) { this->prototype = prototype; }
 
     /** \brief Returns the element at position \p i x \p j x \p k.
 
@@ -382,7 +382,7 @@ public:
         initialised with copies of the prototype.
     */
     template <class Vector>
-    reference at(const Vector &pos)
+    reference at(const Vector& pos)
     {
         return at(pos[0], pos[1], pos[2]);
     }

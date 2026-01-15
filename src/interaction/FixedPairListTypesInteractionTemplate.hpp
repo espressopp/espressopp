@@ -79,7 +79,7 @@ public:
 
     std::shared_ptr<FixedPairList> getFixedPairList() { return fixedpairList; }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -91,7 +91,7 @@ public:
     }
 
     // this is used in the innermost force-loop
-    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
     // this is mainly used to access the potential from Python (e.g. to change parameters of the
     // potential)
@@ -107,11 +107,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Pair; }
 
@@ -129,7 +129,7 @@ template <typename _Potential>
 inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real offs = getSystemRef().shearOffset;
     bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
@@ -140,11 +140,11 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
 
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0);
@@ -187,11 +187,11 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
     {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0);
@@ -217,7 +217,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
 
     real e = 0.0;
     real es = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
     bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
@@ -228,11 +228,11 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
 
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // shared_ptr<Potential> potential = getPotential(type1, type2);
             Real3D r21;
             Real3D dist_tmp(.0);
@@ -268,11 +268,11 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
     {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // std::shared_ptr<Potential> potential = getPotential(type1, type2);
             Real3D r21;
             bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
@@ -341,7 +341,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyCG(i
 
 template <typename _Potential>
 inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in FixedPairListTypesInteractionTemplate "
                  "does not work."
@@ -359,7 +359,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
         << std::endl;*/
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     real offs = getSystemRef().shearOffset;
     bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
@@ -369,11 +369,11 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
         real Lz = bc.getBoxL()[2];
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0, 0.0, 0.0);
@@ -407,11 +407,11 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
     {
         for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             int type1 = p1.type();
             int type2 = p2.type();
-            Potential &potential = getPotential(type1, type2);
+            Potential& potential = getPotential(type1, type2);
             // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
             Real3D force(0.0, 0.0, 0.0);
@@ -434,7 +434,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
                  "FixedPairListTypesInteractionTemplate does not work."
@@ -468,7 +468,7 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                    real z)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
@@ -508,7 +508,7 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w, int n)
 {
     /*std::cout << "Warning! At the moment computeVirialTensor() in "
                  "FixedPairListTypesInteractionTemplate does not work."

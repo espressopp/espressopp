@@ -71,14 +71,14 @@ FixedQuadrupleAngleList::~FixedQuadrupleAngleList()
 bool FixedQuadrupleAngleList::add(longint pid1, longint pid2, longint pid3, longint pid4)
 {
     bool returnVal = true;
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // ADD THE LOCAL QUADRUPLET
-    Particle *p1 = storage->lookupLocalParticle(pid1);
-    Particle *p2 = storage->lookupRealParticle(pid2);
-    Particle *p3 = storage->lookupLocalParticle(pid3);
-    Particle *p4 = storage->lookupLocalParticle(pid4);
+    Particle* p1 = storage->lookupLocalParticle(pid1);
+    Particle* p2 = storage->lookupRealParticle(pid2);
+    Particle* p3 = storage->lookupLocalParticle(pid3);
+    Particle* p4 = storage->lookupLocalParticle(pid4);
 
     // at first we check the real particle
     if (!p2)
@@ -218,7 +218,7 @@ real FixedQuadrupleAngleList::getAngle(int pid1, int pid2, int pid3, int pid4)
     return returnVal;
 }
 
-void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf)
+void FixedQuadrupleAngleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
 {
     std::vector<longint> toSendInt;
     std::vector<real> toSendReal;
@@ -261,7 +261,7 @@ void FixedQuadrupleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &b
     LOG4ESPP_INFO(theLogger, "prepared fixed quadruple list before send particles");
 }
 
-void FixedQuadrupleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf)
+void FixedQuadrupleAngleList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
 {
     std::vector<longint> receivedInt;
     std::vector<real> receivedReal;
@@ -302,16 +302,16 @@ void FixedQuadrupleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf
 
 void FixedQuadrupleAngleList::onParticlesChanged()
 {
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // (re-)generate the local quadruple list from the global list
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1 = nullptr;
-    Particle *p2 = nullptr;
-    Particle *p3 = nullptr;
-    Particle *p4 = nullptr;
+    Particle* p1 = nullptr;
+    Particle* p2 = nullptr;
+    Particle* p3 = nullptr;
+    Particle* p4 = nullptr;
     for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
          it != quadruplesAngles.end(); ++it)
     {

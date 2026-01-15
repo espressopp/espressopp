@@ -48,7 +48,7 @@ const int DD_COMM_TAG = 0xab;
 
 LOG4ESPP_LOGGER(DomainDecompositionAdress::logger, "DomainDecompositionAdress");
 
-std::string formatMismatchMessage2(const Int3D &gridRequested, int nodesAvailable)
+std::string formatMismatchMessage2(const Int3D& gridRequested, int nodesAvailable)
 {
     std::ostringstream out;
     out << "requested node grid (" << gridRequested
@@ -56,14 +56,14 @@ std::string formatMismatchMessage2(const Int3D &gridRequested, int nodesAvailabl
     return out.str();
 }
 
-NodeGridMismatch2::NodeGridMismatch2(const Int3D &gridRequested, int nodesAvailable)
+NodeGridMismatch2::NodeGridMismatch2(const Int3D& gridRequested, int nodesAvailable)
     : std::invalid_argument(formatMismatchMessage2(gridRequested, nodesAvailable))
 {
 }
 
 DomainDecompositionAdress::DomainDecompositionAdress(std::shared_ptr<System> _system,
-                                                     const Int3D &_nodeGrid,
-                                                     const Int3D &_cellGrid,
+                                                     const Int3D& _nodeGrid,
+                                                     const Int3D& _cellGrid,
                                                      int _halfCellInt)
     : Storage(_system, _halfCellInt), exchangeBufferSize(0)
 {
@@ -77,7 +77,7 @@ DomainDecompositionAdress::DomainDecompositionAdress(std::shared_ptr<System> _sy
     LOG4ESPP_DEBUG(logger, "done");
 }
 
-void DomainDecompositionAdress::createCellGrid(const Int3D &_nodeGrid, const Int3D &_cellGrid)
+void DomainDecompositionAdress::createCellGrid(const Int3D& _nodeGrid, const Int3D& _cellGrid)
 {
     real myLeft[3];
     real myRight[3];
@@ -145,7 +145,7 @@ void DomainDecompositionAdress::markCells()
         {
             for (int m = 0; m < cellGrid.getFrameGridSize(0); ++m)
             {
-                Cell *cur = &cells[cellGrid.mapPositionToIndex(m, n, o)];
+                Cell* cur = &cells[cellGrid.mapPositionToIndex(m, n, o)];
                 if (cellGrid.isInnerCell(m, n, o))
                 {
                     LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is inner cell (" << m
@@ -223,9 +223,9 @@ void DomainDecompositionAdress::cellAdjust(bool withShear = false)
     {
         for (size_t p = 0; p < tmp_pl[i].size(); ++p)
         {
-            Particle &part = tmp_pl[i][p];
-            const Real3D &pos = part.position();
-            Cell *sortCell = mapPositionToCellClipped(pos);
+            Particle& part = tmp_pl[i][p];
+            const Real3D& pos = part.position();
+            Cell* sortCell = mapPositionToCellClipped(pos);
             appendUnindexedParticle(sortCell->particles, part);
         }
     }
@@ -255,7 +255,7 @@ void DomainDecompositionAdress::initCellInteractions()
             for (int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m)
             {
                 longint cellIdx = cellGrid.mapPositionToIndex(m, n, o);
-                Cell *cell = &cells[cellIdx];
+                Cell* cell = &cells[cellIdx];
 
                 LOG4ESPP_TRACE(logger, "setting up neighbors for cell "
                                            << cell - getFirstCell() << " @ " << m << " " << n << " "
@@ -274,7 +274,7 @@ void DomainDecompositionAdress::initCellInteractions()
                             if (p != o || q != n || r != m)
                             {
                                 longint cell2Idx = cellGrid.mapPositionToIndex(r, q, p);
-                                Cell *cell2 = &cells[cell2Idx];
+                                Cell* cell2 = &cells[cell2Idx];
                                 cell->neighborCells.push_back(
                                     NeighborCellInfo(cell2, (cell2Idx < cellIdx)));
 
@@ -298,17 +298,17 @@ void DomainDecompositionAdress::initCellInteractions()
 // dummy function, only used for shear flow simulation (see in DomainDecomposition.cpp)
 void DomainDecompositionAdress::remapNeighbourCells(int cell_shift) { ; }
 
-Cell *DomainDecompositionAdress::mapPositionToCell(const Real3D &pos)
+Cell* DomainDecompositionAdress::mapPositionToCell(const Real3D& pos)
 {
     return &cells[cellGrid.mapPositionToCell(pos)];
 }
 
-Cell *DomainDecompositionAdress::mapPositionToCellClipped(const Real3D &pos)
+Cell* DomainDecompositionAdress::mapPositionToCellClipped(const Real3D& pos)
 {
     return &cells[cellGrid.mapPositionToCellClipped(pos)];
 }
 
-Cell *DomainDecompositionAdress::mapPositionToCellChecked(const Real3D &pos)
+Cell* DomainDecompositionAdress::mapPositionToCellChecked(const Real3D& pos)
 {
     longint c = cellGrid.mapPositionToCellChecked(pos);
     if (c == CellGrid::noCell)
@@ -321,12 +321,12 @@ Cell *DomainDecompositionAdress::mapPositionToCellChecked(const Real3D &pos)
     }
 }
 
-longint DomainDecompositionAdress::mapPositionToNodeClipped(const Real3D &pos)
+longint DomainDecompositionAdress::mapPositionToNodeClipped(const Real3D& pos)
 {
     return nodeGrid.mapPositionToNodeClipped(pos);
 }
 
-bool DomainDecompositionAdress::checkIsRealParticle(longint id, const Real3D &pos)
+bool DomainDecompositionAdress::checkIsRealParticle(longint id, const Real3D& pos)
 {
     return getSystem()->comm->rank() == mapPositionToNodeClipped(pos);
 }
@@ -351,7 +351,7 @@ void DomainDecompositionAdress::invalidateGhosts()
     FixedTupleListAdress::iterator it = fixedtupleList->begin();
     for (; it != fixedtupleList->end();)
     {
-        Particle *vp = it->first;
+        Particle* vp = it->first;
         if (vp->ghost())
         {
             // std::cout << "erasing ghost particle in tuple: " << vp->id() << "-" << vp->ghost() <<
@@ -378,12 +378,12 @@ void DomainDecompositionAdress::decompose()
     onParticlesChanged();
 }
 
-void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
-                                                 Cell &_reals,
+void DomainDecompositionAdress::packPositionsEtc(OutBuffer& buf,
+                                                 Cell& _reals,
                                                  int extradata,
-                                                 const Real3D &shift)
+                                                 const Real3D& shift)
 {
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
 
     for (ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src)
     {
@@ -398,14 +398,14 @@ void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
         it = fixedtupleList->find(&(*src));
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it->second;
+            std::vector<Particle*> atList = it->second;
 
             int size = atList.size();
             buf.write(size);  // write size of vector first
 
             for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
-                Particle &at = **itv;
+                Particle& at = **itv;
 
                 /*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" <<
                    at.ghost() << " (" << at.position() << ") type " << at.type() << " \n";*/
@@ -423,9 +423,9 @@ void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
     }
 }
 
-void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata)
+void DomainDecompositionAdress::unpackPositionsEtc(Cell& _ghosts, InBuffer& buf, int extradata)
 {
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     for (ParticleList::iterator dst = ghosts.begin(), end = ghosts.end(); dst != end; ++dst)
     {
@@ -453,11 +453,11 @@ void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf,
         it = fixedtupleList->find(&(*dst));
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it->second;
+            std::vector<Particle*> atList = it->second;
 
             for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
-                Particle &atg = **itv;
+                Particle& atg = **itv;
                 buf.read(atg,
                          extradata);  // we force extradata to 1 (although not necessary here...)
 
@@ -468,7 +468,7 @@ void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf,
         }
         else
         {
-            std::vector<Particle *> tmp;
+            std::vector<Particle*> tmp;
             // Particle* atg; // atom, ghost
             // Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
 
@@ -492,7 +492,7 @@ void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf,
 
                 tmp.push_back(atg);*/
 
-                Particle &atg = *itv2;
+                Particle& atg = *itv2;
                 buf.read(atg, extradata);
 
                 atg.ghost() = 1;
@@ -515,13 +515,13 @@ void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf,
     }
 }
 
-void DomainDecompositionAdress::copyRealsToGhosts(Cell &_reals,
-                                                  Cell &_ghosts,
+void DomainDecompositionAdress::copyRealsToGhosts(Cell& _reals,
+                                                  Cell& _ghosts,
                                                   int extradata,
-                                                  const Real3D &shift)
+                                                  const Real3D& shift)
 {
-    ParticleList &reals = _reals.particles;
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& reals = _reals.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     ghosts.resize(reals.size());
 
@@ -537,31 +537,31 @@ void DomainDecompositionAdress::copyRealsToGhosts(Cell &_reals,
     }
 }
 
-inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
-                                                       Particle &dst,
+inline void DomainDecompositionAdress::copyGhostTuples(Particle& src,
+                                                       Particle& dst,
                                                        int extradata,
-                                                       const Real3D &shift)
+                                                       const Real3D& shift)
 {
     // create ghosts of particles in tuples
     FixedTupleListAdress::iterator its;
     its = fixedtupleList->find(&src);
     if (its != fixedtupleList->end())
     {
-        std::vector<Particle *> atList = its->second;  // src atomistic list
+        std::vector<Particle*> atList = its->second;  // src atomistic list
 
         FixedTupleListAdress::iterator itd;
         itd = fixedtupleList->find(&dst);
         if (itd == fixedtupleList->end())
-        {                                 // if there is no dst tuple
-            std::vector<Particle *> tmp;  // temporary vector
-            ParticleList tmp2;            // temporary vector
+        {                                // if there is no dst tuple
+            std::vector<Particle*> tmp;  // temporary vector
+            ParticleList tmp2;           // temporary vector
             tmp2.resize(atList.size());
             appendParticleListToGhosts(tmp2);  // insert into list
             ParticleList::iterator itv2 = (getAdrATParticlesG().back()).begin();
             for (auto itv = atList.begin(); itv != atList.end(); ++itv, ++itv2)
             {
-                Particle &at = **itv;
-                Particle &atg = *itv2;
+                Particle& at = **itv;
+                Particle& atg = *itv2;
                 atg.copyAsGhost(at, extradata, shift);
                 tmp.push_back(&atg);
             }
@@ -570,14 +570,14 @@ inline void DomainDecompositionAdress::copyGhostTuples(Particle &src,
         }
 
         else
-        {                                                   // if the dst tuple already exists
-            std::vector<Particle *> atgList = itd->second;  // dst atomistic ghost list
-            std::vector<Particle *>::iterator itv;
-            std::vector<Particle *>::iterator itv2 = atgList.begin();
+        {                                                  // if the dst tuple already exists
+            std::vector<Particle*> atgList = itd->second;  // dst atomistic ghost list
+            std::vector<Particle*>::iterator itv;
+            std::vector<Particle*>::iterator itv2 = atgList.begin();
             for (itv = atList.begin(); itv != atList.end(); ++itv, ++itv2)
             {
-                Particle &at = **itv;
-                Particle &atg = **itv2;
+                Particle& at = **itv;
+                Particle& atg = **itv2;
                 atg.copyAsGhost(at, extradata, shift);
             }
         }
@@ -624,9 +624,9 @@ tuples!\n"; exit(1); return;
 }
 */
 
-void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts)
+void DomainDecompositionAdress::packForces(OutBuffer& buf, Cell& _ghosts)
 {
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     for (ParticleList::iterator src = ghosts.begin(), end = ghosts.end(); src != end; ++src)
     {
@@ -643,11 +643,11 @@ void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts)
         it = fixedtupleList->find(&(*src));
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it->second;
+            std::vector<Particle*> atList = it->second;
 
             for (auto itv = atList.begin(); itv != atList.end(); ++itv)
             {
-                Particle &at = **itv;
+                Particle& at = **itv;
 
                 /*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" <<
                    at.ghost() << " (" << at.position() << ") type " << at.type() << " \n";*/
@@ -665,11 +665,11 @@ void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts)
     }
 }
 
-void DomainDecompositionAdress::unpackAndAddForces(Cell &_reals, InBuffer &buf)
+void DomainDecompositionAdress::unpackAndAddForces(Cell& _reals, InBuffer& buf)
 {
     LOG4ESPP_DEBUG(logger, "add forces from buffer to cell " << (&_reals - getFirstCell()));
 
-    ParticleList &reals = _reals.particles;
+    ParticleList& reals = _reals.particles;
 
     for (ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst)
     {
@@ -692,12 +692,12 @@ void DomainDecompositionAdress::unpackAndAddForces(Cell &_reals, InBuffer &buf)
 
         if (it != fixedtupleList->end())
         {
-            std::vector<Particle *> atList1 = it->second;
+            std::vector<Particle*> atList1 = it->second;
 
             // std::cout << "AT forces ...\n";
             for (auto itv = atList1.begin(); itv != atList1.end(); ++itv)
             {
-                Particle &p3 = **itv;
+                Particle& p3 = **itv;
                 // std::cout << getSystem()->comm->rank() << ": buf.read(AT force)
                 // (unpackAndAddForces) \n";
                 buf.read(f);
@@ -714,10 +714,10 @@ void DomainDecompositionAdress::unpackAndAddForces(Cell &_reals, InBuffer &buf)
     }
 }
 
-void DomainDecompositionAdress::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
+void DomainDecompositionAdress::addGhostForcesToReals(Cell& _ghosts, Cell& _reals)
 {
-    ParticleList &reals = _reals.particles;
-    ParticleList &ghosts = _ghosts.particles;
+    ParticleList& reals = _reals.particles;
+    ParticleList& ghosts = _ghosts.particles;
 
     for (ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
          dst != end; ++dst, ++src)
@@ -732,7 +732,7 @@ void DomainDecompositionAdress::addGhostForcesToReals(Cell &_ghosts, Cell &_real
     }
 }
 
-inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle &src, Particle &dst)
+inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle& src, Particle& dst)
 {
     // iterate through atomistic particles in fixedtuplelist
     FixedTupleListAdress::iterator its;
@@ -743,14 +743,14 @@ inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle &src, P
     // std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
     if (its != fixedtupleList->end() && itd != fixedtupleList->end())
     {
-        std::vector<Particle *> atList1 = its->second;
-        std::vector<Particle *> atList2 = itd->second;
+        std::vector<Particle*> atList1 = its->second;
+        std::vector<Particle*> atList2 = itd->second;
 
         for (auto itv = atList1.begin(), itv2 = atList2.begin(); itv != atList1.end();
              ++itv, ++itv2)
         {
-            Particle &p3 = **itv;
-            Particle &p4 = **itv2;
+            Particle& p3 = **itv;
+            Particle& p4 = **itv2;
 
             p4.particleForce() += p3.particleForce();
         }
@@ -764,7 +764,7 @@ inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle &src, P
     }
 }
 
-bool DomainDecompositionAdress::appendParticles(ParticleList &l, int dir)
+bool DomainDecompositionAdress::appendParticles(ParticleList& l, int dir)
 {
     bool outlier = false;
 
@@ -772,7 +772,7 @@ bool DomainDecompositionAdress::appendParticles(ParticleList &l, int dir)
 
     for (ParticleList::iterator it = l.begin(), end = l.end(); it != end; ++it)
     {
-        Real3D &pos = it->position();
+        Real3D& pos = it->position();
 
         if (nodeGrid.getBoundary(dir) != 0)
         {
@@ -827,14 +827,14 @@ void DomainDecompositionAdress::decomposeRealParticles()
             {
                 for (auto it = realCells.begin(), end = realCells.end(); it != end; ++it)
                 {
-                    Cell &cell = **it;
+                    Cell& cell = **it;
 
                     // do not use an iterator here, since we need to take out particles during the
                     // loop
                     for (size_t p = 0; p < cell.particles.size(); ++p)
                     {
-                        Particle &part = cell.particles[p];
-                        const Real3D &pos = part.position();
+                        Particle& part = cell.particles[p];
+                        const Real3D& pos = part.position();
 
                         // check whether the particle is now "left" of the local domain
                         if (pos[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC)
@@ -854,8 +854,8 @@ void DomainDecompositionAdress::decomposeRealParticles()
                         // Sort particles in cells of this node during last direction
                         else if (coord == 2)
                         {
-                            const Real3D &pos = part.position();
-                            Cell *sortCell = mapPositionToCellChecked(pos);
+                            const Real3D& pos = part.position();
+                            Cell* sortCell = mapPositionToCellChecked(pos);
                             if (sortCell != &cell)
                             {
                                 if (sortCell == 0)
@@ -924,19 +924,19 @@ void DomainDecompositionAdress::decomposeRealParticles()
                    Fold particles that have left the box */
                 for (auto it = realCells.begin(), end = realCells.end(); it != end; ++it)
                 {
-                    Cell &cell = **it;
+                    Cell& cell = **it;
                     // do not use an iterator here, since we have need to take out particles during
                     // the loop
                     for (size_t p = 0; p < cell.particles.size(); ++p)
                     {
-                        Particle &part = cell.particles[p];
+                        Particle& part = cell.particles[p];
                         getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
                         LOG4ESPP_TRACE(
                             logger, "folded coordinate " << coord << " of particle " << part.id());
 
                         if (coord == 2)
                         {
-                            Cell *sortCell = mapPositionToCellChecked(part.position());
+                            Cell* sortCell = mapPositionToCellChecked(part.position());
 
                             if (sortCell != &cell)
                             {
@@ -947,7 +947,7 @@ void DomainDecompositionAdress::decomposeRealParticles()
                                                                << part.position()
                                                                << " is not inside node domain "
                                                                   "after neighbor exchange");
-                                    const Real3D &pos = part.position();
+                                    const Real3D& pos = part.position();
                                     // isnan function is C99 only, x != x is only true if x == nan
                                     if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2])
                                     {
@@ -1016,7 +1016,7 @@ void DomainDecompositionAdress::collectGhostForces()
     doGhostCommunication(false, false);
 }
 
-void DomainDecompositionAdress::fillCells(std::vector<Cell *> &cv,
+void DomainDecompositionAdress::fillCells(std::vector<Cell*>& cv,
                                           const int leftBoundary[3],
                                           const int rightBoundary[3])
 {
@@ -1289,8 +1289,8 @@ class PyDomainDecompositionAdress : public DomainDecompositionAdress
 {
 public:
     PyDomainDecompositionAdress(std::shared_ptr<System> _system,
-                                const Int3D &_nodeGrid,
-                                const Int3D &_cellGrid,
+                                const Int3D& _nodeGrid,
+                                const Int3D& _cellGrid,
                                 int _halfCellInt)
         : DomainDecompositionAdress(_system, _nodeGrid, _cellGrid, _halfCellInt)
     {
@@ -1305,7 +1305,7 @@ void DomainDecompositionAdress::registerPython()
     using namespace espressopp::python;
     class_<PyDomainDecompositionAdress, bases<Storage>, boost::noncopyable>(
         "storage_DomainDecompositionAdress",
-        init<std::shared_ptr<System>, const Int3D &, const Int3D &, int>())
+        init<std::shared_ptr<System>, const Int3D&, const Int3D&, int>())
         .def("mapPositionToNodeClipped", &DomainDecompositionAdress::mapPositionToNodeClipped)
         .def("getCellGrid", &DomainDecompositionAdress::getInt3DCellGrid)
         .def("cellAdjust", &DomainDecompositionAdress::cellAdjust);
