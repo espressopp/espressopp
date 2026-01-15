@@ -26,7 +26,7 @@
 
 #include "AngularPotential.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
-//#include <cmath>
+// #include <cmath>
 
 namespace espressopp
 {

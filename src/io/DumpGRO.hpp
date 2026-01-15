@@ -119,8 +119,7 @@ public:
         if (v != "LJ" && v != "nm" && v != "A")
         {
             std::stringstream msg;
-            msg << "Wrong unit length: " << v << "  It should be string: LJ, nm or A"
-                << "\n";
+            msg << "Wrong unit length: " << v << "  It should be string: LJ, nm or A" << "\n";
             err.setException(msg.str());
             err.checkException();
         }

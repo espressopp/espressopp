@@ -26,7 +26,7 @@
 #ifndef _INTERACTION_VERLETLISTINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "types.hpp"
 #include "Interaction.hpp"

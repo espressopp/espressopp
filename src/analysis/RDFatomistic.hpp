@@ -63,10 +63,10 @@ public:
         template <class Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& pos;
-            ar& type;
-            ar& molecule;
-            ar& resolution;
+            ar & pos;
+            ar & type;
+            ar & molecule;
+            ar & resolution;
         }
     };
 
@@ -81,10 +81,10 @@ public:
         template <class Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& pos;
-            ar& type;
-            ar& molecule;
-            ar& pib;
+            ar & pos;
+            ar & type;
+            ar & molecule;
+            ar & pib;
         }
     };
 
