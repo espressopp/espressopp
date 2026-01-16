@@ -72,44 +72,9 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 - Efficient parallelization for large-scale simulations of complex systems.
 - A rich library of coarse-grained interaction models and algorithms tailored to soft matter.
 - A Python-based scripting interface for ease of use, reproducibility, and coupling with external analysis tools.
+- Multi-scale simulation techniques such as AdResS and Lees-Edwards
 
-Espresso++ is widely used in academic research for simulating phenomena such as polymer rheology, membrane dynamics, colloidal suspensions, and active particles.
-
-# Functionality
-
-Key features of Espresso++ include:
-
-- **Inter-particle interactions**: Lennard-Jones, Coulomb, soft repulsive, bonded interactions, tabulated potentials, and more.
-- **Algorithms**: Molecular dynamics, Langevin dynamics, dissipative particle dynamics (DPD), Brownian dynamics, Monte Carlo sampling.
-- **Electrostatics**: Particle–particle particle–mesh (P3M), Ewald summation, and other long-range methods.
-- **Parallelization**: Domain decomposition using MPI, optimized for massively parallel architectures.
-- **Python interface**: Full simulation control and analysis scripting in Python.
-- **Extensibility**: Modular design allows easy addition of new force fields, integrators, or analysis tools.
-
-# New Feature since last release
-
-Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
-
-- **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
-- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao]
-- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for \dots [@Guzman:2017]
-- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD 
-- **checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
-- **I/O**: support for parallel writing and reading of H5MD checkpoints
-- **Python 3 compatibility**
-
-
-# Impact
-Espresso++ has been applied in numerous scientific studies, including investigations of:
-
-- Polymer rheology and entanglement effects
-- Lipid membranes and vesicle dynamics
-- Colloidal self-assembly
-- Active matter and microswimmers
-
-It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
-
-# Research Projects using ESPResSo++ in the last 5 years [@Grommes:2025]
+Espresso++ is widely used in academic research for simulating phenomena such as polymer rheology, membrane dynamics, colloidal suspensions, and active particles. Recent research projects using ESPResSo++ include [@Grommes:2025]
 
 - Gholami, Abbas and Kloth, Sebastian and Xu, Zhen-Hao and Kremer, Kurt and Vogel, Michael and Stuehn, Torsten and Rudzinski, Joseph F., 
 "Structure and dynamics of ionic liquids under shear flow", 
@@ -222,6 +187,39 @@ doi:10.1021/acs.macromol.9b02209
 SOFT MATERIALS (2020), 
 doi:10.1080/1539445X.2020.1722692
 
+## Merge into above
+Espresso++ has been applied in numerous scientific studies, including investigations of:
+
+- Polymer rheology and entanglement effects
+- Lipid membranes and vesicle dynamics
+- Colloidal self-assembly
+- Active matter and microswimmers
+
+It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
+
+
+# Functionality
+
+Key features of Espresso++ include:
+
+- **Inter-particle interactions**: Lennard-Jones, Coulomb, soft repulsive, bonded interactions, tabulated potentials, and more.
+- **Algorithms**: Molecular dynamics, Langevin dynamics, dissipative particle dynamics (DPD), Brownian dynamics, adpative resolution simulations (AdResS), Monte Carlo sampling.
+- **Electrostatics**: Particle–particle particle–mesh (P3M), Ewald summation, and other long-range methods.
+- **Parallelization**: Domain decomposition using MPI, optimized for massively parallel architectures.
+- **Python interface**: Full simulation control and analysis scripting in Python.
+- **Extensibility**: Modular design allows easy addition of new force fields, integrators, or analysis tools.
+
+# New Feature since last release
+
+Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
+
+- **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
+- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao]
+- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for \dots [@Guzman:2017]
+- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD 
+- **checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
+- **I/O**: support for parallel writing and reading of H5MD checkpoints
+- **Python 3 compatibility**
 
 # Example usage
 
@@ -283,7 +281,10 @@ while pid <= num_particles:
         new_particles = []
     pid += 1
 system.storage.addParticles(new_particles, *props)
+
+TODO add integrate() call
 ```
 
 # Acknowledgements
 We thank the Espresso++ developer community and all contributors listed in the AUTHORS file.
+Espresso++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
