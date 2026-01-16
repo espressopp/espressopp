@@ -289,8 +289,8 @@ void FixedPairList::onParticlesChanged()
             {
                 std::stringstream msg;
                 msg << "onParticlesChanged error. Fixed Pair List particle p1 " << it->first
-                    << " does not exist here. "
-                    << "Checking pair (" << it->first << "," << it->second << ")";
+                    << " does not exist here. " << "Checking pair (" << it->first << ","
+                    << it->second << ")";
                 err.setException(msg.str());
             }
             lastpid1 = it->first;
@@ -300,8 +300,8 @@ void FixedPairList::onParticlesChanged()
         {
             std::stringstream msg;
             msg << "onParticlesChanged error. Fixed Pair List particle p2 " << it->second
-                << " does not exist here. "
-                << "Checking pair (" << it->first << "," << it->second << ")";
+                << " does not exist here. " << "Checking pair (" << it->first << "," << it->second
+                << ")";
             err.setException(msg.str());
         }
         this->push_back({p1, p2});

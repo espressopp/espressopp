@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
-//#include "Configuration.hpp"
+// #include "Configuration.hpp"
 #include "RDFatomistic.hpp"
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"

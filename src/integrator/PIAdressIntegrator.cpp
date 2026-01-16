@@ -270,8 +270,8 @@ void PIAdressIntegrator::initializeSetup()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -341,8 +341,8 @@ void PIAdressIntegrator::integrateV1(int t, bool doubletime)
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -541,8 +541,8 @@ void PIAdressIntegrator::integrateV2()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -923,8 +923,8 @@ void PIAdressIntegrator::OUintegrate()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -981,8 +981,8 @@ void PIAdressIntegrator::transPos1()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1033,8 +1033,8 @@ void PIAdressIntegrator::transPos2()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1132,8 +1132,8 @@ void PIAdressIntegrator::transMom1()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1221,8 +1221,8 @@ void PIAdressIntegrator::transMom2()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1270,8 +1270,8 @@ void PIAdressIntegrator::transForces()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1592,8 +1592,8 @@ void PIAdressIntegrator::distributeForces()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1717,8 +1717,8 @@ real PIAdressIntegrator::computeKineticEnergy()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1765,8 +1765,8 @@ real PIAdressIntegrator::computeRingEnergy()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1821,8 +1821,8 @@ real PIAdressIntegrator::computeRingEnergyRaw()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }
@@ -1994,8 +1994,8 @@ void PIAdressIntegrator::setWeights()
         else
         {
             std::stringstream ss;
-            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples "
-               << " (" << vp.position() << ").";
+            ss << "VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples " << " ("
+               << vp.position() << ").";
             throw std::runtime_error(ss.str());
         }
     }

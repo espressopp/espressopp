@@ -230,8 +230,8 @@ public:
         {
             if (this_node == 0)
             {
-                cout << "assignment of chain ids went wrong."
-                     << "Particles were assigned to chain " << cid << "\n";
+                cout << "assignment of chain ids went wrong." << "Particles were assigned to chain "
+                     << cid << "\n";
                 cout << "highest chain id should be " << num_chains - 1 << "\n";
                 cout << "check if total number of particles matches with chainlength\n";
             }

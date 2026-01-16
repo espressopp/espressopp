@@ -159,12 +159,12 @@ inline void FixedPairListInteractionTemplate<_Potential>::addForces()
             f_y[p2] -= force.get()[1];
             f_z[p2] -= force.get()[2];
 
-            LOG4ESPP_DEBUG(
-                _Potential::theLogger,
-                "p" << id[p1] << "(" << p_x[p1] << "," << p_y[p1] << "," << p_z[p1] << ") "
-                    << "p" << id[p2] << "(" << p_x[p2] << "," << p_y[p2] << "," << p_z[p2] << ") "
-                    << "dist=" << sqrt(dist * dist) << " "
-                    << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")");
+            LOG4ESPP_DEBUG(_Potential::theLogger,
+                           "p" << id[p1] << "(" << p_x[p1] << "," << p_y[p1] << "," << p_z[p1]
+                               << ") " << "p" << id[p2] << "(" << p_x[p2] << "," << p_y[p2] << ","
+                               << p_z[p2] << ") " << "dist=" << sqrt(dist * dist) << " "
+                               << "force=(" << force[0] << "," << force[1] << "," << force[2]
+                               << ")");
         }
     }
 }

@@ -70,8 +70,7 @@ void DumpGROAdress::dump()
 
             // myfile << num_of_particles << endl;
             myfile << setiosflags(ios::fixed);  // needed for fixed-width output
-            myfile << "system description, "
-                   << "current step=" << integrator->getStep() << ", "
+            myfile << "system description, " << "current step=" << integrator->getStep() << ", "
                    << "length unit=" << length_unit << endl;
             myfile << setw(5) << num_of_particles << endl;
 

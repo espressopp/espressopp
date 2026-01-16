@@ -26,7 +26,7 @@
 #include "types.hpp"
 #include "ExtAnalyze.hpp"
 #include "SystemAccess.hpp"
-//#include "analysis/AnalysisBase.hpp"
+// #include "analysis/AnalysisBase.hpp"
 #include "ParticleAccess.hpp"
 
 namespace espressopp
