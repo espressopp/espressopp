@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -84,6 +86,12 @@ private:
     int nParticles;   // local variable for the number of particles
     real rclx, rcly, rclz;
     real force_prefac[3];  // real array for force prefactors [0]: x,[1]: y,[2]: z
+    real cottheta =
+        .0;  // necessary components for cell basis matrix for a parallelepiped periodic box
+    bool shear_flag = false;
+    int useOtherPreset =
+        -1;  // "-1": uninitialized; "0": do nothing (only do preset at the beginning)
+             // "1": do preset_lite() every MD step; "2": kvector interpolation
 
     vector<real> kvector;  // precalculated k-vector
     int kVectorLength;     // length of precalculated k-vector
@@ -99,6 +107,7 @@ private:
 
     // precalculated factors for the virial and virial tensor
     vector<real> virialPref;
+    vector<real> virialDyadicXZ;
     vector<Tensor> virialTensorPref;
     Tensor I;
 
@@ -130,6 +139,13 @@ public:
         Ly = Li[1];
         Lz = Li[2];
 
+        // test code
+        /*if (getenv("CTHETAX10")!=NULL){
+          cottheta=(atoi(getenv("CTHETAX10"))+.0)/10.0;
+          shear_flag=true;
+          std::cout<<"COTTHETA> "<<cottheta<<" \n";
+        }*/
+
         real skmax = kmax / min(Lx, min(Ly, Lz));
         real skmaxsq = skmax * skmax;  // we choose the biggest cutoff
 
@@ -155,6 +171,7 @@ public:
         real rLz2 = 1. / (Lz * Lz);
         real rk2PIx, rk2PIy, rk2PIz;
         kVectorLength = 0;
+
         // clear all vectors
         kvector.clear();
         kxfield.clear();
@@ -165,18 +182,23 @@ public:
         ky_ind.clear();
         kz_ind.clear();
         virialPref.clear();
+        virialDyadicXZ.clear();
         virialTensorPref.clear();
+
+        int min_ky = 0;
+        int min_kz = 1;
+
         for (int kx = 0; kx <= kmax; kx++)
         {
             kx2 = kx * kx;
             rkx2 = kx2 * rLx2;
             rk2PIx = kx * rclx;
-            for (int ky = -kmax; ky <= kmax; ky++)
+            for (int ky = min_ky; ky <= kmax; ky++)
             {
                 ky2 = ky * ky;
                 rky2 = ky2 * rLy2;
                 rk2PIy = ky * rcly;
-                for (int kz = -kmax; kz <= kmax; kz++)
+                for (int kz = min_kz; kz <= kmax; kz++)
                 {
                     kz2 = kz * kz;
                     rkz2 = kz2 * rLz2;
@@ -203,17 +225,124 @@ public:
                         real h2 = h * h;
                         Tensor hh(h, h);  // it is tensor: hi*hj
 
-                        virialPref.push_back(1 - h2 * inv2alpha2);
-                        virialTensorPref.push_back(I - 2 * hh / h2 - hh * inv2alpha2);
+                        virialPref.push_back(prefactor * (1 - h2 * inv2alpha2));
+                        virialTensorPref.push_back(prefactor * (I - 2 * hh / h2 - hh * inv2alpha2));
+                        virialDyadicXZ.push_back(-prefactor * M_2PI * M_2PI *
+                                                 (4.0 / h2 + invAlpha2) / Lx / Lz);
 
                         kVectorLength++;
                     }
                 }
+                min_kz = -kmax;
             }
+            min_ky = -kmax;
         }
 
         // cout <<"node:  "<< system->comm->rank() <<  " kVectorLength: "<< kVectorLength<< " kmax:
         // "<< skmax  <<endl;
+        if (sum != NULL)
+        {
+            delete[] sum;
+            sum = NULL;
+        }
+        if (totsum != NULL)
+        {
+            delete[] totsum;
+            totsum = NULL;
+        }
+        sum = new dcomplex[kVectorLength];
+        totsum = new dcomplex[kVectorLength];
+
+        getParticleNumber();
+    }
+
+    // A lite ver. of preset that only kvector[] is refreshed
+    void preset_lite()
+    {
+        // TODO it could be parallelized too
+        Real3D Li = system->bc->getBoxL();  // getting the system size
+        Lx = Li[0];
+        Ly = Li[1];
+        Lz = Li[2];
+
+        real skmax = kmax / min(Lx, min(Ly, Lz));
+        real skmaxsq = skmax * skmax;  // we choose the biggest cutoff
+
+        // precalculate factors
+        real invAlpha2 = 1.0 / (alpha * alpha);
+        real B = M_PI2 * invAlpha2;  // PI^2 / alpha^2
+        real V = M_2PI * Lx * Ly * Lz;
+
+        /* calculate the k-vector array */
+        int ksq, kx2, ky2, kz2;
+        real rksq, rkx2, rky2, rkz2;
+        real rLx2 = 1. / (Lx * Lx);
+        real rLy2 = 1. / (Ly * Ly);
+        real rk2PIx, rk2PIy, rk2PIz;
+        kVectorLength = 0;
+
+        // clear all vectors
+        kvector.clear();
+        kxfield.clear();
+        kyfield.clear();
+        kzfield.clear();
+
+        kx_ind.clear();
+        ky_ind.clear();
+        kz_ind.clear();
+        virialDyadicXZ.clear();
+
+        int min_ky = 0;
+        int min_kz = 1;
+
+        for (int kx = 0; kx <= kmax; kx++)
+        {
+            kx2 = kx * kx;
+            rkx2 = kx2 * rLx2;
+            rk2PIx = kx * rclx;
+            for (int ky = min_ky; ky <= kmax; ky++)
+            {
+                ky2 = ky * ky;
+                rky2 = ky2 * rLy2;
+                rk2PIy = ky * rcly;
+                for (int kz = min_kz; kz <= kmax; kz++)
+                {
+                    kz2 = kz * kz;
+                    rkz2 = (kz + .0) / Lz - cottheta * (kx + .0) / Lx;
+                    rkz2 = rkz2 * rkz2;
+                    rk2PIz = kz * rclz;
+
+                    ksq = kx2 + ky2 + kz2;
+                    rksq = rkx2 + rky2 + rkz2;
+
+                    if ((rksq < skmaxsq) && (ksq != 0))
+                    {
+                        kvector.push_back(exp(-rksq * B) / (rksq * V));
+
+                        kxfield.push_back(kx);
+                        kyfield.push_back(ky);
+                        kzfield.push_back(kz);
+
+                        kx_ind.push_back(kx);
+                        ky_ind.push_back(kmax + ky);
+                        kz_ind.push_back(kmax + kz);
+
+                        // the tensor should be: deltaKronecker(i,j) - 2*hi*hj / h^2 - hi*hj /
+                        // (2*alfa^2)
+                        Real3D h(rk2PIx, rk2PIy, rk2PIz);
+                        real h2 = h * h;
+
+                        virialDyadicXZ.push_back(-prefactor * M_2PI * M_2PI *
+                                                 (4.0 / h2 + invAlpha2) / Lx / Lz);
+
+                        kVectorLength++;
+                    }
+                }
+                min_kz = -kmax;
+            }
+            min_ky = -kmax;
+        }
+
         if (sum != NULL)
         {
             delete[] sum;
@@ -277,27 +406,89 @@ public:
     int getKMax() const { return kmax; }
 
     // compute force and energy
-    void exponentPrecalculation(CellList realcells)
+    void exponentPrecalculation(CellList realcells, bool ifVirial = false)
     {
+        if (useOtherPreset < 0)
+        {
+            // initialize useOtherPreset for the first sheared step
+            if (system->ifShear)
+            {
+                useOtherPreset = 1;  // preset_lite() every step
+                // useOtherPreset = 2; // interpolate kvectors, NOT done yet
+                shear_flag = system->ifShear;
+            }
+        }
+
+        if (shear_flag)
+        {
+            real offs = system->shearOffset;
+            cottheta = ((offs > Lx / 2.0 ? offs - Lx : offs)) / Lz;
+        }
         /* Calculation of k space sums */
         // -1, 0, 1
         int j = 0;  // auxiliary variable, particle counter
-        for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
+
+        if (shear_flag && cottheta != .0)
         {
-            Particle& p = *it;
+            if (!ifVirial)
+            {
+                if (useOtherPreset == 1)
+                {
+                    preset_lite();
+                    // preset();
+                }
+                else  // interpolate kvectors, NOT done yet
+                    ;
+            }
 
-            eikx[0][j] = dcomplex(1.0, 0.0);
-            eiky[kmax + 0][j] = dcomplex(1.0, 0.0);
-            eikz[kmax + 0][j] = dcomplex(1.0, 0.0);
+            // calculate ksum for ewald under shear flow
+            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
+            {
+                Particle& p = *it;
 
-            eikx[1][j] = dcomplex(cos(rclx * p.position()[0]), sin(rclx * p.position()[0]));
-            eiky[kmax + 1][j] = dcomplex(cos(rcly * p.position()[1]), sin(rcly * p.position()[1]));
-            eikz[kmax + 1][j] = dcomplex(cos(rclz * p.position()[2]), sin(rclz * p.position()[2]));
+                real intc = Lx / cottheta;
+                real zshift = -p.position()[0] / cottheta;
+                int nshift = static_cast<int>(floor((p.position()[2] + zshift) / intc) + 1.0);
+                real px = p.position()[0] + (nshift + .0) * Lx;
 
-            eiky[kmax - 1][j] = conj(eiky[kmax + 1][j]);
-            eikz[kmax - 1][j] = conj(eikz[kmax + 1][j]);
+                eikx[0][j] = dcomplex(1.0, 0.0);
+                eiky[kmax + 0][j] = dcomplex(1.0, 0.0);
+                eikz[kmax + 0][j] = dcomplex(1.0, 0.0);
 
-            j++;
+                eikx[1][j] = dcomplex(cos(rclx * (px - cottheta * p.position()[2])),
+                                      sin(rclx * (px - cottheta * p.position()[2])));
+                eiky[kmax + 1][j] =
+                    dcomplex(cos(rcly * p.position()[1]), sin(rcly * p.position()[1]));
+                eikz[kmax + 1][j] =
+                    dcomplex(cos(rclz * p.position()[2]), sin(rclz * p.position()[2]));
+
+                eiky[kmax - 1][j] = conj(eiky[kmax + 1][j]);
+                eikz[kmax - 1][j] = conj(eikz[kmax + 1][j]);
+
+                j++;
+            }
+        }
+        else
+        {
+            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
+            {
+                Particle& p = *it;
+
+                eikx[0][j] = dcomplex(1.0, 0.0);
+                eiky[kmax + 0][j] = dcomplex(1.0, 0.0);
+                eikz[kmax + 0][j] = dcomplex(1.0, 0.0);
+
+                eikx[1][j] = dcomplex(cos(rclx * p.position()[0]), sin(rclx * p.position()[0]));
+                eiky[kmax + 1][j] =
+                    dcomplex(cos(rcly * p.position()[1]), sin(rcly * p.position()[1]));
+                eikz[kmax + 1][j] =
+                    dcomplex(cos(rclz * p.position()[2]), sin(rclz * p.position()[2]));
+
+                eiky[kmax - 1][j] = conj(eiky[kmax + 1][j]);
+                eikz[kmax - 1][j] = conj(eikz[kmax + 1][j]);
+
+                j++;
+            }
         }
 
         // calculation of the rest terms
@@ -390,25 +581,48 @@ public:
             if (kxfield[k] == 0)
                 fact = 1.0;
             else
+            {
                 fact = 2.0;
+                if (shear_flag && system->ifViscosity && kzfield[k] != 0)
+                    system->dyadicP_xz +=
+                        kvector[k] * virialDyadicXZ[k] * norm(totsum[k]) * kxfield[k] * kzfield[k];
+            }
 
             dcomplex tff = fact * kvector[k] * totsum[k];  // auxiliary complex factor
             int j = 0;
-            for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
-            {
-                Particle& p = *it;
-
-                real tf = 0.0;
-                if (p.q() != 0)
+            if (shear_flag && cottheta != .0)
+                for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
                 {
-                    tf = imag(tff * conj(eik[k][j]));
+                    Particle& p = *it;
 
-                    p.force()[0] += force_prefac[0] * tf * kxfield[k];
-                    p.force()[1] += force_prefac[1] * tf * kyfield[k];
-                    p.force()[2] += force_prefac[2] * tf * kzfield[k];
+                    real tf = 0.0;
+                    if (p.q() != 0)
+                    {
+                        tf = imag(tff * conj(eik[k][j]));
+
+                        p.force()[0] += force_prefac[0] * tf * kxfield[k];
+                        p.force()[1] += force_prefac[1] * tf * kyfield[k];
+                        p.force()[2] += force_prefac[2] * tf * kzfield[k] -
+                                        force_prefac[0] * cottheta * tf * kxfield[k];
+                    }
+                    j++;
                 }
-                j++;
-            }
+            else
+                for (iterator::CellListIterator it(realcells); !it.isDone(); ++it)
+                {
+                    Particle& p = *it;
+
+                    real tf = 0.0;
+                    if (p.q() != 0)
+                    {
+                        tf = imag(tff * conj(eik[k][j]));
+
+                        p.force()[0] += force_prefac[0] * tf * kxfield[k];
+                        p.force()[1] += force_prefac[1] * tf * kyfield[k];
+                        p.force()[2] += force_prefac[2] * tf * kzfield[k];
+                    }
+                    j++;
+                }
         }
 
         return true;
@@ -420,7 +634,7 @@ public:
     {
         // TODO it's exactly the same part as energy has
         // exponent array
-        exponentPrecalculation(realcells);
+        exponentPrecalculation(realcells, true);
 
         mpi::communicator communic = *system->comm;
 
@@ -454,7 +668,7 @@ public:
     {
         // TODO it's exactly the same part as energy does
         // exponent array
-        exponentPrecalculation(realcells);
+        exponentPrecalculation(realcells, true);
 
         mpi::communicator communic = *system->comm;
 

@@ -88,11 +88,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Dihedral; }
 
@@ -110,29 +110,110 @@ inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::addForces
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleList");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    real offs = getSystemRef().shearOffset;
 
-    for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
+    if (offs != .0)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
+        int xtmp;
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
+        for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid();
+             ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            Particle& p3 = *it->third;
+            Particle& p4 = *it->fourth;
 
-        Real3D dist21, dist32, dist43;  //
+            Real3D dist21, dist32, dist43;  //
 
-        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+            Real3D dist_tmp(.0);
+            dpos = p2.position()[2] - p1.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p2.position()[0] + dist_tmp[0] - p1.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist21, p2.position() + dist_tmp, p1.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
 
-        Real3D force1, force2, force3, force4;  // result forces
+            dist_tmp = {.0, .0, .0};
+            dpos = p3.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p3.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist32, p3.position() + dist_tmp, p2.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
 
-        potential->computeColVarWeights(dist21, dist32, dist43, bc);
-        potential->_computeForce(force1, force2, force3, force4, dist21, dist32, dist43);
-        p1.force() += force1;
-        p2.force() += force2;  // p2.force() -= force2;
-        p3.force() += force3;
-        p4.force() += force4;
+            dist_tmp = {.0, .0, .0};
+            dpos = p4.position()[2] - p3.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p4.position()[0] + dist_tmp[0] - p3.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist43, p4.position() + dist_tmp, p3.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+            Real3D force1, force2, force3, force4;  // result forces
+
+            potential->computeColVarWeights(dist21, dist32, dist43, bc);
+            potential->_computeForce(force1, force2, force3, force4, dist21, dist32, dist43);
+            p1.force() += force1;
+            p2.force() += force2;  // f2=-f1+f_jk, f_jk=f1+f2
+            p3.force() += force3;  // f3=-f4-f_jk, f_jk=-(f3+f4)
+            p4.force() += force4;
+            // Analysis to get stress tensors
+            // f21=-f1, f32=-f_jk=f3+f4, f43=f4
+            if (getSystemRef().ifViscosity)
+            {
+                getSystemRef().dyadicP_xz -= dist21[0] * force1[2];
+                getSystemRef().dyadicP_zx -= dist21[2] * force1[0];
+                getSystemRef().dyadicP_xz += dist32[0] * (force3[2] + force4[2]);
+                getSystemRef().dyadicP_zx += dist32[2] * (force3[0] + force4[0]);
+                getSystemRef().dyadicP_xz += dist43[0] * force4[2];
+                getSystemRef().dyadicP_zx += dist43[2] * force4[0];
+            }
+        }
+    }
+    else
+    {
+        for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid();
+             ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            Particle& p3 = *it->third;
+            Particle& p4 = *it->fourth;
+
+            Real3D dist21, dist32, dist43;  //
+
+            bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+            bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+            bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+            Real3D force1, force2, force3, force4;  // result forces
+
+            potential->computeColVarWeights(dist21, dist32, dist43, bc);
+            potential->_computeForce(force1, force2, force3, force4, dist21, dist32, dist43);
+            p1.force() += force1;
+            p2.force() += force2;  // p2.force() -= force2;
+            p3.force() += force3;
+            p4.force() += force4;
+        }
     }
 }
 
@@ -141,24 +222,91 @@ inline real FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeEn
 {
     LOG4ESPP_INFO(theLogger, "compute energy of the quadruples");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     real e = 0.0;
-    for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
+    real offs = getSystemRef().shearOffset;
+
+    if (offs != .0)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
+        int xtmp;
+        real sqrlz_4 = Lz * Lz / 4.0, dpos;
 
-        Real3D dist21, dist32, dist43;  //
+        for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid();
+             ++it)
+        {
+            const Particle& p1 = *it->first;
+            const Particle& p2 = *it->second;
+            const Particle& p3 = *it->third;
+            const Particle& p4 = *it->fourth;
 
-        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+            Real3D dist21, dist32, dist43;  //
 
-        potential->computeColVarWeights(dist21, dist32, dist43, bc);
-        e += potential->_computeEnergy(dist21, dist32, dist43);
+            Real3D dist_tmp(.0);
+            dpos = p2.position()[2] - p1.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p2.position()[0] + dist_tmp[0] - p1.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist21, p2.position() + dist_tmp, p1.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+
+            dist_tmp = {.0, .0, .0};
+            dpos = p3.position()[2] - p2.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p3.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist32, p3.position() + dist_tmp, p2.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+
+            dist_tmp = {.0, .0, .0};
+            dpos = p4.position()[2] - p3.position()[2];
+            if (dpos * dpos > sqrlz_4)
+            {
+                dist_tmp[0] = (dpos > .0 ? -offs : offs);
+                xtmp = static_cast<int>(
+                    floor((p4.position()[0] + dist_tmp[0] - p3.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+                bc.getMinimumImageVectorBox(dist43, p4.position() + dist_tmp, p3.position());
+            }
+            else
+                bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+            potential->computeColVarWeights(dist21, dist32, dist43, bc);
+            e += potential->_computeEnergy(dist21, dist32, dist43);
+        }
     }
+    else
+    {
+        for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid();
+             ++it)
+        {
+            const Particle& p1 = *it->first;
+            const Particle& p2 = *it->second;
+            const Particle& p3 = *it->third;
+            const Particle& p4 = *it->fourth;
+
+            Real3D dist21, dist32, dist43;  //
+
+            bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+            bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+            bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+            potential->computeColVarWeights(dist21, dist32, dist43, bc);
+            e += potential->_computeEnergy(dist21, dist32, dist43);
+        }
+    }
+
     real esum;
     boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
     return esum;
@@ -211,7 +359,7 @@ inline real FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeEn
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in FixedQuadrupleListInteractionTemplate "
                  "does not work."
@@ -226,13 +374,13 @@ inline real FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVi
     LOG4ESPP_INFO(theLogger, "compute scalar virial of the quadruples");
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D dist21, dist32, dist43;
 
@@ -257,19 +405,19 @@ inline real FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVi
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w)
+    Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D dist21, dist32, dist43;
 
@@ -288,18 +436,18 @@ inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVi
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w, real z)
+    Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleListInteractionTemplate at the moment"
@@ -307,10 +455,10 @@ inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVi
 
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D dist21, dist32, dist43;
 
@@ -329,13 +477,13 @@ inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVi
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor *w, int n)
+    Tensor* w, int n)
 {
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleListInteractionTemplate at the moment"

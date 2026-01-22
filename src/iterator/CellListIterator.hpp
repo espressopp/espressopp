@@ -39,16 +39,16 @@ class CellListIterator
 {
 public:
     CellListIterator();
-    CellListIterator(CellList &cl);
-    CellListIterator &operator++();
+    CellListIterator(CellList& cl);
+    CellListIterator& operator++();
 
     bool isValid() const;
     bool isDone() const;
 
-    Particle &operator*() const;
-    Particle *operator->() const;
+    Particle& operator*() const;
+    Particle* operator->() const;
 
-    Cell &getCurrentCell() const;
+    Cell& getCurrentCell() const;
 
 private:
     void findNonemptyCell();
@@ -61,14 +61,14 @@ private:
 // INLINE IMPLEMENTATION
 inline CellListIterator::CellListIterator() {}
 
-inline CellListIterator::CellListIterator(CellList &cl) : cit(cl), pit()
+inline CellListIterator::CellListIterator(CellList& cl) : cit(cl), pit()
 {
     if (cit.isDone()) return;
     pit = ParticleList::Iterator((*cit)->particles);
     findNonemptyCell();
 }
 
-inline CellListIterator &CellListIterator::operator++()
+inline CellListIterator& CellListIterator::operator++()
 {
     ++pit;
     findNonemptyCell();
@@ -79,11 +79,11 @@ inline bool CellListIterator::isValid() const { return cit.isValid(); }
 
 inline bool CellListIterator::isDone() const { return !isValid(); }
 
-inline Particle &CellListIterator::operator*() const { return *pit; }
+inline Particle& CellListIterator::operator*() const { return *pit; }
 
-inline Particle *CellListIterator::operator->() const { return &**this; }
+inline Particle* CellListIterator::operator->() const { return &**this; }
 
-inline Cell &CellListIterator::getCurrentCell() const { return **cit; }
+inline Cell& CellListIterator::getCurrentCell() const { return **cit; }
 
 inline void CellListIterator::findNonemptyCell()
 {

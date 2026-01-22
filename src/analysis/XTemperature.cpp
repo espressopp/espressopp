@@ -47,7 +47,7 @@ namespace analysis
 // AdResS simulations.
 python::list XTemperature::computeArray(int n) const
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     // const bc::BC& bc = *system.bc;  // boundary conditions
     system.storage->decompose();
 
@@ -59,9 +59,9 @@ python::list XTemperature::computeArray(int n) const
     // real Volume = Li[1] * Li[2] * lX;
     int bin = 0;
 
-    real *vvlocal = 0;
+    real* vvlocal = 0;
     vvlocal = new real[n];
-    int *count = 0;
+    int* count = 0;
     count = new int[n];
     for (int i = 0; i < n; i++)
     {
@@ -74,7 +74,7 @@ python::list XTemperature::computeArray(int n) const
     CellList realCells = system.storage->getRealCells();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
         // Real3D pos = cit->position();
@@ -83,12 +83,12 @@ python::list XTemperature::computeArray(int n) const
         if (it2 != fixedtupleList->end())
         {  // Are there atomistic particles for given CG particle? If yes, use those for
            // calculation.
-            std::vector<Particle *> atList;
+            std::vector<Particle*> atList;
             atList = it2->second;
             // Real3D vel(0.0,0.0,0.0);
-            for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
+            for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
                 Real3D vel = at.velocity();
                 Real3D pos = at.position();
 
@@ -175,9 +175,9 @@ python::list XTemperature::computeArray(int n) const
         }
     }
 
-    real *vv = 0;
+    real* vv = 0;
     vv = new real[n];
-    int *systemN = 0;
+    int* systemN = 0;
     systemN = new int[n];
     for (int i = 0; i < n; i++)
     {

@@ -61,7 +61,7 @@ public:
 
     std::shared_ptr<VerletList> getVerletList() { return verletList; }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -73,7 +73,7 @@ public:
     }
 
     // this is used in the innermost force-loop
-    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
     // this is mainly used to access the potential from Python (e.g. to change parameters of the
     // potential)
@@ -89,11 +89,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Nonbonded; }
 
@@ -114,11 +114,11 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::addForces()
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
@@ -143,11 +143,11 @@ inline real VerletListVSphereInteractionTemplate<_Potential>::computeEnergy()
     real es = 0.0;
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
         e = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
@@ -209,7 +209,7 @@ inline real VerletListVSphereInteractionTemplate<_Potential>::computeEnergyCG(in
 
 template <typename _Potential>
 inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout
         << "Warning! At the moment computeVirialX in VerletListInteractionTemplate does not work."
@@ -226,11 +226,11 @@ inline real VerletListVSphereInteractionTemplate<_Potential>::computeVirial()
     real w = 0.0;
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -252,18 +252,18 @@ inline real VerletListVSphereInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
     Tensor wlocal(0.0);
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         // std::shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -280,17 +280,17 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 // local pressure tensor for layer, plane is defined by z coordinate
 template <typename _Potential>
-inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w, real z)
+inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
-    System &system = verletList->getSystemRef();
+    System& system = verletList->getSystemRef();
     Real3D Li = system.bc->getBoxL();
 
     real rc_cutoff = verletList->getVerletCutoff();
@@ -312,8 +312,8 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
     Tensor wlocal(0.0);
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
@@ -323,7 +323,7 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
         {
             int type1 = p1.type();
             int type2 = p2.type();
-            const Potential &potential = getPotential(type1, type2);
+            const Potential& potential = getPotential(type1, type2);
 
             Real3D force(0.0, 0.0, 0.0);
             real fsi = 0;
@@ -339,33 +339,33 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 // it will calculate the pressure in 'n' layers along Z axis
 // the first layer has coordinate 0.0 the last - (Lz - Lz/n)
 template <typename _Potential>
-inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w, int n)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
-    System &system = verletList->getSystemRef();
+    System& system = verletList->getSystemRef();
     Real3D Li = system.bc->getBoxL();
 
     real z_dist = Li[2] / float(n);  // distance between two layers
-    Tensor *wlocal = new Tensor[n];
+    Tensor* wlocal = new Tensor[n];
     for (int i = 0; i < n; i++) wlocal[i] = Tensor(0.0);
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         Tensor ww;
@@ -419,8 +419,8 @@ inline void VerletListVSphereInteractionTemplate<_Potential>::computeVirialTenso
     }
 
     // reduce over all CPUs
-    Tensor *wsum = new Tensor[n];
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, n, (double *)&wsum, std::plus<double>());
+    Tensor* wsum = new Tensor[n];
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
 
     for (int j = 0; j < n; j++)
     {

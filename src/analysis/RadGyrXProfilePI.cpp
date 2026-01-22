@@ -39,14 +39,14 @@ namespace analysis
 {
 python::list RadGyrXProfilePI::computeArray(int splitN, int ntrotter, int ptype) const
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     esutil::Error err(system.comm);
     real Li = system.bc->getBoxL()[0];
 
-    real *histogram = 0;
+    real* histogram = 0;
     histogram = new real[splitN];
     for (int i = 0; i < splitN; i++) histogram[i] = 0.0;
-    int *countsarray = 0;
+    int* countsarray = 0;
     countsarray = new int[splitN];
     for (int i = 0; i < splitN; i++) countsarray[i] = 0;
 
@@ -62,7 +62,7 @@ python::list RadGyrXProfilePI::computeArray(int splitN, int ntrotter, int ptype)
 
         for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
         {
-            Particle &vp = *cit;
+            Particle& vp = *cit;
             FixedTupleListAdress::iterator it2;
             it2 = fixedtupleList->find(&vp);
 
@@ -86,12 +86,12 @@ python::list RadGyrXProfilePI::computeArray(int splitN, int ntrotter, int ptype)
 
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList;
+                    std::vector<Particle*> atList;
                     atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end();
+                         ++it3)
                     {
-                        Particle &at = **it3;
+                        Particle& at = **it3;
                         radgyr += (vp.position() - at.position()).sqr();
                     }
                 }
@@ -115,11 +115,11 @@ python::list RadGyrXProfilePI::computeArray(int splitN, int ntrotter, int ptype)
         exit(1);
     }
 
-    real *totHistogram = 0;
+    real* totHistogram = 0;
     totHistogram = new real[splitN];
     for (int i = 0; i < splitN; i++) totHistogram[i] = 0.0;
 
-    int *totCountsarray = 0;
+    int* totCountsarray = 0;
     totCountsarray = new int[splitN];
     for (int i = 0; i < splitN; i++) totCountsarray[i] = 0;
 

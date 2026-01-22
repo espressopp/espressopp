@@ -65,7 +65,7 @@ void TabulatedSubEns::setFilenames(int dim, int itype, boost::python::list _file
     }
 }
 
-void TabulatedSubEns::addInteraction(int itype, boost::python::str fname, const RealND &_cvref)
+void TabulatedSubEns::addInteraction(int itype, boost::python::str fname, const RealND& _cvref)
 {
     boost::mpi::communicator world;
     int i = numInteractions;
@@ -96,14 +96,14 @@ void TabulatedSubEns::addInteraction(int itype, boost::python::str fname, const 
     }
 }
 
-void TabulatedSubEns::setColVarRef(const RealNDs &cvRefs)
+void TabulatedSubEns::setColVarRef(const RealNDs& cvRefs)
 {
     // Set the reference values of the collective variables
     // aka cluster centers
     for (int i = 0; i < numInteractions; ++i) colVarRef[i] = cvRefs[i];
 }
 
-void TabulatedSubEns::computeColVarWeights(const Real3D &dist, const bc::BC &bc)
+void TabulatedSubEns::computeColVarWeights(const Real3D& dist, const bc::BC& bc)
 {
     // Sanity Check
     if (weights.getDimension() == 0)
@@ -187,7 +187,7 @@ void TabulatedSubEns::computeColVarWeights(const Real3D &dist, const bc::BC &bc)
 }
 
 // Collective variables
-void TabulatedSubEns::setColVar(const Real3D &dist, const bc::BC &bc)
+void TabulatedSubEns::setColVar(const Real3D& dist, const bc::BC& bc)
 {
     colVar.setDimension(1);
     colVar[0] = sqrt(dist * dist);
@@ -199,8 +199,8 @@ void TabulatedSubEns::setColVar(const Real3D &dist, const bc::BC &bc)
         for (FixedPairList::PairList::Iterator it(*colVarBondList); it.isValid(); ++it)
         {
             colVar.setDimension(i + 1);
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
             Real3D dist12;
             bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
             colVar[i] = sqrt(dist12 * dist12);
@@ -214,9 +214,9 @@ void TabulatedSubEns::setColVar(const Real3D &dist, const bc::BC &bc)
         for (FixedTripleList::TripleList::Iterator it(*colVarAngleList); it.isValid(); ++it)
         {
             colVar.setDimension(i + 1);
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
-            Particle &p3 = *it->third;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            Particle& p3 = *it->third;
             Real3D dist12, dist32;
             bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
             bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
@@ -235,10 +235,10 @@ void TabulatedSubEns::setColVar(const Real3D &dist, const bc::BC &bc)
         for (FixedQuadrupleList::QuadrupleList::Iterator it(*colVarDihedList); it.isValid(); ++it)
         {
             colVar.setDimension(i + 1);
-            Particle &p1 = *it->first;
-            Particle &p2 = *it->second;
-            Particle &p3 = *it->third;
-            Particle &p4 = *it->fourth;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            Particle& p3 = *it->third;
+            Particle& p4 = *it->fourth;
             Real3D r21, r32, r43;
             bc.getMinimumImageVectorBox(r21, p2.position(), p1.position());
             bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());

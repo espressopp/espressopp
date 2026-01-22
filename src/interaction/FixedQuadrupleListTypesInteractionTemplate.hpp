@@ -68,7 +68,7 @@ public:
 
     std::shared_ptr<FixedQuadrupleList> getFixedQuadrupleList() { return fixedquadrupleList; }
 
-    void setPotential(int type1, int type2, int type3, int type4, const Potential &potential)
+    void setPotential(int type1, int type2, int type3, int type4, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes,
@@ -81,7 +81,7 @@ public:
     }
 
     // this is used in the innermost force-loop
-    Potential &getPotential(int type1, int type2, int type3, int type4)
+    Potential& getPotential(int type1, int type2, int type3, int type4)
     {
         return potentialArray.at(type1, type2, type3, type4);
     }
@@ -98,11 +98,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Dihedral; }
 
@@ -120,21 +120,21 @@ inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::addF
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleList");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
+        Particle& p4 = *it->fourth;
 
         longint type1 = p1.type();
         longint type2 = p2.type();
         longint type3 = p3.type();
         longint type4 = p4.type();
 
-        Potential &potential = getPotential(type1, type2, type3, type4);
+        Potential& potential = getPotential(type1, type2, type3, type4);
 
         Real3D dist21, dist32, dist43;
 
@@ -158,21 +158,21 @@ inline real FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
 {
     LOG4ESPP_INFO(theLogger, "compute energy of the quadruples");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     real e = 0.0;
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         longint type1 = p1.type();
         longint type2 = p2.type();
         longint type3 = p3.type();
         longint type4 = p4.type();
 
-        Potential &potential = getPotential(type1, type2, type3, type4);
+        Potential& potential = getPotential(type1, type2, type3, type4);
 
         Real3D dist21, dist32, dist43;
 
@@ -237,7 +237,7 @@ inline real FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX(std::vector<real> &p_xx_total, int bins) "
                  "in FixedQuadrupleListTypesInteractionTemplate does not work."
@@ -250,20 +250,20 @@ inline real FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
     LOG4ESPP_INFO(theLogger, "compute scalar virial of the quadruples");
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         longint type1 = p1.type();
         longint type2 = p2.type();
         longint type3 = p3.type();
         longint type4 = p4.type();
 
-        Potential &potential = getPotential(type1, type2, type3, type4);
+        Potential& potential = getPotential(type1, type2, type3, type4);
 
         Real3D dist21, dist32, dist43;
 
@@ -288,26 +288,26 @@ inline real FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w)
+    Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         longint type1 = p1.type();
         longint type2 = p2.type();
         longint type3 = p3.type();
         longint type4 = p4.type();
 
-        Potential &potential = getPotential(type1, type2, type3, type4);
+        Potential& potential = getPotential(type1, type2, type3, type4);
 
         Real3D dist21, dist32, dist43;
 
@@ -326,18 +326,18 @@ inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w, real z)
+    Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleListTypesInteractionTemplate at the moment"
@@ -345,17 +345,17 @@ inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
 
     for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         longint type1 = p1.type();
         longint type2 = p2.type();
         longint type3 = p3.type();
         longint type4 = p4.type();
 
-        Potential &potential = getPotential(type1, type2, type3, type4);
+        Potential& potential = getPotential(type1, type2, type3, type4);
 
         Real3D dist21, dist32, dist43;
 
@@ -374,13 +374,13 @@ inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::comp
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleListTypesInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor *w, int n)
+    Tensor* w, int n)
 {
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleListTypesInteractionTemplate at the moment"

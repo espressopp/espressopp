@@ -49,7 +49,7 @@ public:
         ntypes = 0;
     }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -62,7 +62,7 @@ public:
         //        }
     }
 
-    Potential &getPotential(int type1, int type2) { return potentialArray(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray(type1, type2); }
 
     virtual void addForces();
     virtual real computeEnergy();
@@ -71,11 +71,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &wij);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& wij);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Nonbonded; }
 
@@ -95,9 +95,9 @@ inline void CellListAllPairsInteractionTemplate<_Potential>::addForces()
 
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        const Potential& potential = getPotential(p1.type(), p2.type());
 
         Real3D force(0.0, 0.0, 0.0);
         if (potential._computeForce(force, p1, p2))
@@ -116,9 +116,9 @@ inline real CellListAllPairsInteractionTemplate<_Potential>::computeEnergy()
     real e = 0.0;
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Potential& potential = getPotential(p1.type(), p2.type());
         e += potential._computeEnergy(p1, p2);
     }
 
@@ -175,7 +175,7 @@ inline real CellListAllPairsInteractionTemplate<_Potential>::computeEnergyCG(int
 
 template <typename _Potential>
 inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in CellListAllPairsInteractionTemplate "
                  "does not work."
@@ -192,11 +192,11 @@ inline real CellListAllPairsInteractionTemplate<_Potential>::computeVirial()
     real w = 0.0;
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if (potential._computeForce(force, p1, p2))
@@ -213,16 +213,16 @@ inline real CellListAllPairsInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor &wij)
+inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor& wij)
 {
     LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
     Tensor wlocal(0.0);
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Potential& potential = getPotential(p1.type(), p2.type());
 
         Real3D force(0.0, 0.0, 0.0);
         if (potential._computeForce(force, p1, p2))
@@ -234,28 +234,28 @@ inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     wij += wsum;
 }
 
 template <typename _Potential>
-inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor &wij,
+inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor& wij,
                                                                                  real z)
 {
     LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *storage->getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *storage->getSystemRef().bc;  // boundary conditions
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
         if ((p1pos[2] >= z && p2pos[2] <= z) || (p1pos[2] <= z && p2pos[2] >= z))
         {
-            const Potential &potential = getPotential(p1.type(), p2.type());
+            const Potential& potential = getPotential(p1.type(), p2.type());
 
             Real3D force(0.0, 0.0, 0.0);
             if (potential._computeForce(force, p1, p2))
@@ -269,23 +269,23 @@ inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     wij += wsum;
 }
 
 template <typename _Potential>
-inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor *wij, int n)
+inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor(Tensor* wij, int n)
 {
     LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
-    const bc::BC &bc = *storage->getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *storage->getSystemRef().bc;  // boundary conditions
     Real3D Li = bc.getBoxL();
-    Tensor *wlocal = new Tensor[n];
+    Tensor* wlocal = new Tensor[n];
     for (int i = 0; i < n; i++) wlocal[i] = Tensor(0.0);
     for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
@@ -295,7 +295,7 @@ inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor
         int maxpos = std::max(position1, position2);
         int minpos = std::min(position1, position2);
 
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        const Potential& potential = getPotential(p1.type(), p2.type());
 
         Real3D force(0.0, 0.0, 0.0);
         Tensor ww;
@@ -315,8 +315,8 @@ inline void CellListAllPairsInteractionTemplate<_Potential>::computeVirialTensor
     }
 
     // reduce over all CPUs
-    Tensor *wsum = new Tensor[n];
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, n, (double *)&wsum, std::plus<double>());
+    Tensor* wsum = new Tensor[n];
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
 
     for (int j = 0; j < n; j++)
     {

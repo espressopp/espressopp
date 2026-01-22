@@ -30,7 +30,7 @@
 void initMPIEnv();
 
 /* Initialize MPI. */
-void initMPIEnv(int &argc, char **&argv);
+void initMPIEnv(int& argc, char**& argv);
 
 /* Finalize MPI. */
 void finalizeMPIEnv();

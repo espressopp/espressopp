@@ -37,15 +37,15 @@ class CellListAllPairsIterator
 {
 public:
     CellListAllPairsIterator();
-    CellListAllPairsIterator(CellList &cl);
+    CellListAllPairsIterator(CellList& cl);
 
-    CellListAllPairsIterator &operator++();
+    CellListAllPairsIterator& operator++();
 
     bool isValid() const;
     bool isDone() const;
 
-    const ParticlePair &operator*() const;
-    const ParticlePair *operator->() const;
+    const ParticlePair& operator*() const;
+    const ParticlePair* operator->() const;
 
 private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
@@ -69,7 +69,7 @@ private:
 // INLINE IMPLEMENTATION
 inline CellListAllPairsIterator::CellListAllPairsIterator() {}
 
-inline CellListAllPairsIterator::CellListAllPairsIterator(CellList &cl)
+inline CellListAllPairsIterator::CellListAllPairsIterator(CellList& cl)
 {
     cit = CellList::Iterator(cl);
     if (cit.isDone()) return;
@@ -86,7 +86,7 @@ inline CellListAllPairsIterator::CellListAllPairsIterator(CellList &cl)
     this->operator++();
 }
 
-inline CellListAllPairsIterator &CellListAllPairsIterator::operator++()
+inline CellListAllPairsIterator& CellListAllPairsIterator::operator++()
 {
     ++npit;
     while (npit.isDone())
@@ -147,9 +147,9 @@ inline bool CellListAllPairsIterator::isValid() const { return cit.isValid(); }
 
 inline bool CellListAllPairsIterator::isDone() const { return !isValid(); }
 
-inline const ParticlePair &CellListAllPairsIterator::operator*() const { return current; }
+inline const ParticlePair& CellListAllPairsIterator::operator*() const { return current; }
 
-inline const ParticlePair *CellListAllPairsIterator::operator->() const { return &(**this); }
+inline const ParticlePair* CellListAllPairsIterator::operator->() const { return &(**this); }
 
 }  // namespace iterator
 }  // namespace espressopp

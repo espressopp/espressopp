@@ -87,13 +87,13 @@ bool FixedTripleList::add(longint pid1, longint pid2, longint pid3)
     //  std::swap(pid2, pid3);
 
     bool returnVal = true;
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // ADD THE LOCAL TRIPLET
-    Particle *p1 = storage->lookupLocalParticle(pid1);
-    Particle *p2 = storage->lookupRealParticle(pid2);
-    Particle *p3 = storage->lookupLocalParticle(pid3);
+    Particle* p1 = storage->lookupLocalParticle(pid1);
+    Particle* p2 = storage->lookupRealParticle(pid2);
+    Particle* p3 = storage->lookupLocalParticle(pid3);
 
     // middle particle is the reference particle and must exist here
     if (!p2)
@@ -185,7 +185,7 @@ std::vector<longint> FixedTripleList::getTripleList()
     return ret;
 }
 
-void FixedTripleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf)
+void FixedTripleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
 {
     std::vector<longint> toSend;
     // loop over the particle list
@@ -229,7 +229,7 @@ void FixedTripleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf)
     LOG4ESPP_INFO(theLogger, "prepared fixed triple list before send particles");
 }
 
-void FixedTripleList::afterRecvParticles(ParticleList &pl, InBuffer &buf)
+void FixedTripleList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
 {
     std::vector<longint> received;
     int n;
@@ -265,16 +265,16 @@ void FixedTripleList::afterRecvParticles(ParticleList &pl, InBuffer &buf)
 
 void FixedTripleList::onParticlesChanged()
 {
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // (re-)generate the local triple list from the global list
     // printf("FixedTripleList: rebuild local triple list from global\n");
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1 = nullptr;
-    Particle *p2 = nullptr;
-    Particle *p3 = nullptr;
+    Particle* p1 = nullptr;
+    Particle* p2 = nullptr;
+    Particle* p3 = nullptr;
     for (GlobalTriples::const_iterator it = globalTriples.begin(); it != globalTriples.end(); ++it)
     {
         // printf("lookup global triple %d %d %d\n", it->first, it->second.first,

@@ -58,6 +58,18 @@ System::System(int fComm)
 {
     comm = std::make_shared<mpi::communicator>(MPI_Comm_f2c(fComm), mpi::comm_attach);
     maxCutoff = 0.0;
+    shearOffset = 0.0;
+    NGridSize = {1, 1, 1};
+    ghostShift = 0;
+    lebcMode = 0;
+    ifShear = false;
+    shearRate = 0.0;
+    irank = 0;
+    dyadicP_xz = .0;
+    dyadicP_zx = .0;
+    sumP_xz = .0;
+    ifViscosity = false;
+    seed64 = 0;
 }
 
 void System::setSkin(real _skin)
@@ -72,7 +84,7 @@ void System::setSkin(real _skin)
         real cs = maxCutoff + skin;
         if (cs > std::min(std::min(cellGr[0], cellGr[1]), cellGr[2]))
         {
-            storage->cellAdjust();
+            storage->cellAdjust(false);
         }
     }
     // storage -> decompose();  // it's not nessesary because at the end of cellAdjust()
@@ -201,7 +213,11 @@ void System::registerPython()
         .def_readwrite("vectorization", &System::vectorization)
         //      .def_readwrite("shortRangeInteractions",
         //		     &System::shortRangeInteractions)
+        .def_readwrite("lebcMode", &System::lebcMode)
         .def_readonly("maxCutoff", &System::maxCutoff)
+        .def_readonly("sumP_xz", &System::sumP_xz)
+        .def_readwrite("shearOffset", &System::shearOffset)
+        .def_readwrite("seed64", &System::seed64)
         .def("addInteraction", &System::addInteraction)
         .def("removeInteraction", &System::removeInteraction)
         .def("getInteraction", &System::getInteraction)

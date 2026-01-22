@@ -68,7 +68,7 @@ public:
 
     std::shared_ptr<FixedTripleList> getFixedTripleList() { return fixedtripleList; }
 
-    void setPotential(int type1, int type2, int type3, const Potential &potential)
+    void setPotential(int type1, int type2, int type3, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(std::max(type1 + 1, type2 + 1), type3 + 1));
@@ -80,7 +80,7 @@ public:
     }
 
     // this is used in the innermost force-loop
-    Potential &getPotential(int type1, int type2, int type3)
+    Potential& getPotential(int type1, int type2, int type3)
     {
         return potentialArray.at(type1, type2, type3);
     }
@@ -97,11 +97,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Angular; }
 
@@ -118,17 +118,17 @@ template <typename _Potential>
 inline void FixedTripleListTypesInteractionTemplate<_Potential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by the FixedTriple List");
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        Potential &potential = getPotential(type1, type2, type3);
+        Potential& potential = getPotential(type1, type2, type3);
 
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
@@ -148,17 +148,17 @@ inline real FixedTripleListTypesInteractionTemplate<_Potential>::computeEnergy()
     LOG4ESPP_INFO(theLogger, "compute energy of the FixedTriple list pairs");
 
     real e = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
 
-        Potential &potential = getPotential(type1, type2, type3);
+        Potential& potential = getPotential(type1, type2, type3);
 
         Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
@@ -221,7 +221,7 @@ inline real FixedTripleListTypesInteractionTemplate<_Potential>::computeEnergyCG
 
 template <typename _Potential>
 inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
 }
 
@@ -231,16 +231,16 @@ inline real FixedTripleListTypesInteractionTemplate<_Potential>::computeVirial()
     LOG4ESPP_INFO(theLogger, "compute the virial for the FixedTriple List with types");
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        Potential &potential = getPotential(type1, type2, type3);
+        Potential& potential = getPotential(type1, type2, type3);
 
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
@@ -258,21 +258,21 @@ inline real FixedTripleListTypesInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedTriple List");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        Potential &potential = getPotential(type1, type2, type3);
+        Potential& potential = getPotential(type1, type2, type3);
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
@@ -289,14 +289,14 @@ inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTe
 }
 
 template <typename _Potential>
-inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                      real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 }
 
 template <typename _Potential>
-inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w,
+inline void FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w,
                                                                                      int n)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedTriple List");

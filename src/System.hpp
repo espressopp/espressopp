@@ -29,6 +29,7 @@
 #include "boost/enable_shared_from_this.hpp"
 #include "interaction/Interaction.hpp"
 #include "types.hpp"
+#include "Int3D.hpp"
 
 namespace espressopp
 {
@@ -61,6 +62,22 @@ public:
     interaction::InteractionList shortRangeInteractions;
 
     real maxCutoff;  // maximal cutoff over all of the interactions
+
+    real shearOffset;  // offset of x-position for image particles over the boundary (only with
+                       // Lees-Edwards)
+
+    Int3D NGridSize;  // NodeGridSize fetched by Storage and LEBC integrator
+
+    int ghostShift;  // Cell shift for the ghost layer over the boundary (only with Lees-Edwards)
+    int lebcMode;
+    bool ifShear;
+    real shearRate;
+    int irank;
+    bool ifViscosity;
+    real dyadicP_xz;
+    real dyadicP_zx;
+    real sumP_xz;
+    uint64_t seed64;  // user-settable seed
 
     bool CommunicatorIsInitialized;
 

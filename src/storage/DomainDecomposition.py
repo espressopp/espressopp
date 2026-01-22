@@ -70,11 +70,16 @@ class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getNodeGrid(self)
 
+    def cellAdjust(self, shear=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.cellAdjust(self, shear)
+
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(
           cls = 'espressopp.storage.DomainDecompositionLocal',
-          pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust']
+          pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust'],
+          pmiproperty = ['shear']
         )
         def __init__(self, system,
                      nodeGrid='auto',
