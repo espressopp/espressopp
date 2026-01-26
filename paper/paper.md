@@ -76,61 +76,27 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 
 Espresso++ is widely used in academic research for simulating phenomena such as polymer rheology, membrane dynamics, colloidal suspensions, and active particles. Recent research projects using ESPResSo++ include [@Grommes:2025]
 
-- Gholami, Abbas and Kloth, Sebastian and Xu, Zhen-Hao and Kremer, Kurt and Vogel, Michael and Stuehn, Torsten and Rudzinski, Joseph F., 
-"Structure and dynamics of ionic liquids under shear flow", 
-JOURNAL OF CHEMICAL PHYSICS (2025), 
-doi:10.1063/5.0279946
+[@Gholami2025]
 
-- Grommes, Dirk and Bruch, Olaf and Reith, Dirk, 
-"Mimicking Polymer Processing Conditions on the Meso-Scale: Relaxation and Crystallization in Polyethylene Systems after Uni- and Biaxial Stretching", 
-MOLECULES (2024), 
-doi:10.3390/molecules29143391
+[@Grommes2024]
 
-- Hsu, Hsiao-Ping and Kremer, Kurt, 
-"Entanglement-Stabilized Nanoporous Polymer Films Made by Mechanical Deformation", 
-MACROMOLECULES (2024), 
-doi:10.1021/acs.macromol.4c00187
+[@Hsu2024]
 
-- Hsu, Hsiao-Ping and Kremer, Kurt, 
-"Glass transition temperature of (ultra-)thin polymer films", 
-JOURNAL OF CHEMICAL PHYSICS (2023), 
-doi:10.1063/5.0165902
+[@Hsu2023]
 
+[@Ohkuma2023]
 
-- Ohkuma, Takahiro and Hagita, Katsumi and Murashima, Takahiro and Deguchi, Tetsuo, 
-"Miscibility and exchange chemical potential of ring polymers in symmetric ring-ring blends", 
-SOFT MATTER (2023), 
-doi:10.1039/d3sm00108c
+[@Grommes2022]
 
-- Grommes, Dirk and Schenk, Martin R. and Bruch, Olaf and Reith, Dirk, 
-"Initial Crystallization Effects in Coarse-Grained Polyethylene Systems after Uni- and Biaxial Stretching in Blow-Molding Cooling Scenarios", 
-POLYMERS (2022), 
-doi:10.3390/polym14235144
+[@Grommes2021]
 
-- Grommes, Dirk and Schenk, Martin R. and Bruch, Olaf and Reith, Dirk, 
-"Investigation of Crystallization and Relaxation Effects in Coarse-Grained Polyethylene Systems after Uniaxial Stretching", 
-POLYMERS (2021), 
-doi:10.3390/polym13244466
+[@Brunk2021]
 
-- Brunk, Aaron and Duenweg, Burkhard and Egger, Herbert and Habrich, Oliver and Lukacova-Medvid'ova, Maria and Spiller, Dominic, 
-"Analysis of a viscoelastic phase separation model", 
-JOURNAL OF PHYSICS-CONDENSED MATTER (2021), 
-doi:10.1088/1361-648X/abeb13
+[@Zhang2021]
 
-- Zhang, Zidan and Krajniak, Jakub and Ganesan, Venkat, 
-"A Multiscale Simulation Study of Influence of Morphology on Ion Transport in Block Copolymeric Ionic Liquids", 
-MACROMOLECULES (2021), 
-doi:10.1021/acs.macromol.1c00025
+[@Tubiana2021]
 
-- Tubiana, Luca and Kobayashi, Hideki and Potestio, Raffaello and Duenweg, Burkhard and Kremer, Kurt and Virnau, Peter and Daoulas, Kostas, 
-"Comparing equilibration schemes of high-molecular-weight polymer melts with topological indicators", 
-JOURNAL OF PHYSICS-CONDENSED MATTER (2021), 
-doi:10.1088/1361-648X/abf20c
-
-- Thaler, S. and Praprotnik, M. and Zavadlav, J., 
-"Back-mapping augmented adaptive resolution simulation", 
-JOURNAL OF CHEMICAL PHYSICS (2020), 
-doi:10.1063/5.0025728
+[@Thaler2020]
 
 - Hsu, Hsiao-Ping and Kremer, Kurt, 
 "Efficient equilibration of confined and free-standing films of highly entangled polymer melts", 
