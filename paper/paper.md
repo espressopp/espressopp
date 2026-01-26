@@ -98,60 +98,27 @@ Espresso++ is widely used in academic research for simulating phenomena such as 
 
 [@Thaler2020]
 
-- Hsu, Hsiao-Ping and Kremer, Kurt, 
-"Efficient equilibration of confined and free-standing films of highly entangled polymer melts", 
-JOURNAL OF CHEMICAL PHYSICS (2020), 
-doi:10.1063/5.0022781
+[@Hsu2020]
 
-- Fiorentini, Raffaele and Kremer, Kurt and Potestio, Raffaello, 
-"Ligand-protein interactions in lysozyme investigated through a dual-resolution model", 
-PROTEINS-STRUCTURE FUNCTION AND BIOINFORMATICS (2020), 
-doi:10.1002/prot.25954
+[@Fiorentini2020]
 
-- Papez, Petra and Merzel, Franci and Praprotnik, Matej, 
-"Rotational Dynamics of a Protein under Shear Flow Studied by the Eckart Frame Formalism", 
-JOURNAL OF PHYSICAL CHEMISTRY B (2023), 
-doi:10.1021/acs.jpcb.3c02324
+[@Pape2023]
 
-- Smith, Spencer and Michalski, Peter and Carette, Jacques and Keshavarz-Motamed, Zahra, 
-"State of the Practice for Lattice Boltzmann Method Software", 
-ARCHIVES OF COMPUTATIONAL METHODS IN ENGINEERING (2024), 
-doi:10.1007/s11831-023-09981-2
+[@Smith2023]
 
-- Bause, Marius and Bereau, Tristan, 
-"Reweighting non-equilibrium steady-state dynamics along collective variables", 
-JOURNAL OF CHEMICAL PHYSICS (2021), 
-doi:10.1063/5.0042972
+[@Bause2021]
 
-- Rudzinski, Joseph F. and Bereau, Tristan, 
-"Coarse-grained conformational surface hopping: Methodology and transferability", 
-JOURNAL OF CHEMICAL PHYSICS (2020), 
-doi:10.1063/5.0031249
+[@Rudzinski2020]
 
-- Singh, Manjesh K. and Hu, Minghan and Cang, Yu and Hsu, Hsiao-Ping and Therien-Aubin, Heloise and Koynov, Kaloian and Fytas, George and Landfester, Katharina and Kremer, Kurt, 
-"Glass Transition of Disentangled and Entangled Polymer Melts: Single-Chain-Nanoparticles Approach", 
-MACROMOLECULES (2020), 
-doi:10.1021/acs.macromol.0c00550
+[@Singh2020]
 
-- Zhao, Yani and Cortes-Huerto, Robinson and Kremer, Kurt and Rudzinski, Joseph F., 
-"Investigating the Conformational Ensembles of Intrinsically Disordered Proteins with a Simple Physics-Based Model", 
-JOURNAL OF PHYSICAL CHEMISTRY B (2020), 
-doi:10.1021/acs.jpcb.0c01949
+[@Zhao2020]
 
-- Zhao, Yani and Singh, Manjesh K. and Kremer, Kurt and Cortes-Huerto, Robinson and Mukherji, Debashish, 
-"Why Do Elastin-Like Polypeptides Possibly Have Different Solvation Behaviors in Water-Ethanol and Water-Urea Mixtures?", 
-MACROMOLECULES (2020), 
-doi:10.1021/acs.macromol.9b02123
+[@Zhao2020b]
 
-- Lee, Eunsang and Paul, Wolfgang, 
-"Additional Entanglement Effect Imposed by Small Sized Ring Aggregates in Supramolecular Polymer Melts: Molecular Dynamics Simulation Study", 
-MACROMOLECULES (2020), 
-doi:10.1021/acs.macromol.9b02209
+[@Lee2020]
 
-- Grommes, Dirk and Reith, Dirk, 
-"Determination of relevant mechanical properties for the production process of polyethylene by using mesoscale molecular simulation techniques", 
-SOFT MATERIALS (2020), 
-doi:10.1080/1539445X.2020.1722692
+[@Grommes2020]
 
 ## Merge into above
 Espresso++ has been applied in numerous scientific studies, including investigations of:
