@@ -33,7 +33,86 @@ from espressopp.tools import gromacs
 from espressopp.tools import decomp
 from espressopp.tools import timers
 
-# This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file.
+# This function assists users to calculate type-specific radial distribution function
+def computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomtypes):
+    list_t = []
+    M_PI = 3.1415926535897932384626433832795029
+    type_end = []
+    type_end.append(0)
+    for k in range(len(atomtypes)):
+        for pid in range(num_particles):
+            if types[pid]==k:
+                list_t.append(pid+1)
+        type_end.append(len(list_t))
+    
+    rdf_maxr = min(Lx,Ly,Lz)
+    rdf_bin = int(0.5*rdf_maxr/rdf_dr)
+    
+    rdf_array = []
+    for k in range(len(rdf_pair)):
+        arr_tmp=[0]*rdf_bin
+        rdf_array.append(arr_tmp)
+        del arr_tmp
+
+    pos = espressopp.analysis.Configurations(system)
+    pos.capacity=1
+    pos.gather()
+    
+    for p in range(len(rdf_pair)):
+        itype=rdf_pair[p][0]
+        jtype=rdf_pair[p][1]
+        
+        istart=type_end[itype]
+        ilast=type_end[itype+1]
+        
+        for i in range(istart,ilast):
+            idx=list_t[i]
+            
+            jlast=type_end[jtype+1]
+            jstart=type_end[jtype]
+                
+            for j in range(jstart,jlast):
+                jdx=list_t[j]
+                if idx!=jdx:
+                    l=pos[0][jdx]-pos[0][idx]
+                    if l[0]<-Lx/2.0: l[0]+=Lx
+                    elif l[0]>Lx/2.0: l[0]-=Lx
+                    if l[1]<-Ly/2.0: l[1]+=Ly
+                    elif l[1]>Ly/2.0: l[1]-=Ly
+                    if l[2]<-Lz/2.0: l[2]+=Lz
+                    elif l[2]>Lz/2.0: l[2]-=Lz
+                    dist=l.abs()
+                    bin_index=int(dist/rdf_dr);
+                    if bin_index<rdf_bin:
+                        rdf_array[p][bin_index]+=1
+                        
+    for p in range(len(rdf_pair)):
+        idx=rdf_pair[p][0]
+        jdx=rdf_pair[p][1]
+        itot_f=float(type_end[idx+1]-type_end[idx])
+        jtot_f=float(type_end[jdx+1]-type_end[jdx])
+        rho_j=jtot_f/Lx/Ly/Lz
+        
+        if jdx==idx:
+            rad_tmp=rdf_bin*rdf_dr
+            vol_tmp=4.0/3.0*M_PI*pow(rad_tmp,3)
+            rho_j*=1.0-1.0/vol_tmp
+        
+        typeI=str(list(atomtypes.keys())[list(atomtypes.values()).index(idx)])
+        typeJ=str(list(atomtypes.keys())[list(atomtypes.values()).index(jdx)])
+        filename="rdf."+typeI+"-"+typeJ+".dat"
+        out_stream = open(filename, 'w')
+        for i in range(rdf_bin):
+            rdf_rad=(i+0.5)*rdf_dr
+            rdf_fac=4.0*M_PI*rdf_rad*rdf_rad*rdf_dr*itot_f*rho_j
+            out_stream.write("%.4f\t%.6f\n" %(rdf_rad, rdf_array[p][i]/rdf_fac))
+        out_stream.close()
+        print("The calculation to g(r) for %s-%s pairs is finished. See in %s" % (typeI,typeJ,filename))
+    
+    print("") 
+
+# This example reads in a gromacs water system (SPC/Fw) treated with reaction field.
+# See the corresponding gromacs grompp.mdp paramter file.
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
@@ -47,6 +126,9 @@ sigma = 1.0
 epsilon = 1.0
 c6 = 1.0
 c12 = 1.0
+# parameters to calculate partial radial distribution functions
+rdf_pair = [[0,0],[1,0],[1,1]]  # type-type [(H,H),(O,H),(O,O)]
+rdf_dr = 0.002                  # width for each ridial shell
 
 # GROMACS setup files
 grofile = "conf.gro"
@@ -166,6 +248,10 @@ for i in range(int(check)):
 # print timings and neighbor list information
 end_time = time.process_time()
 timers.show(integrator.getTimers(), precision=2)
+
+# compute partial RDF for selected type-type pairs
+print("Now compute radial distribution functions for SPC/fw water in the last frame")
+computeRDF(system, rdf_pair, rdf_dr, num_particles, Lx, Ly, Lz, types, atomtypes)
 
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

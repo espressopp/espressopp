@@ -6,6 +6,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -31,22 +33,45 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "bc/BC.hpp"
+#include <cmath>
+#include <utility>
+
+#ifdef RANDOM123_EXIST
+#include "mpi.hpp"
+#include <boost/signals2.hpp>
+/*UNCOMMENT TO ENABLE GAUSSIAN DISTRIBUTION
+#ifndef M_PIl
+#define M_PIl 3.1415926535897932384626433832795029L
+#endif
+#define M_2PI (2 * M_PIl)
+*/
+#endif
 
 namespace espressopp
 {
 namespace integrator
 {
 using namespace espressopp::iterator;
+// using namespace r123;
 
 DPDThermostat::DPDThermostat(std::shared_ptr<System> system,
-                             std::shared_ptr<VerletList> _verletList)
-    : Extension(system), verletList(_verletList)
+                             std::shared_ptr<VerletList> _verletList,
+                             int _ntotal)
+    : Extension(system), verletList(_verletList), ntotal(_ntotal)
 {
     type = Extension::Thermostat;
 
     gamma = 0.0;
     temperature = 0.0;
 
+    mdStep = 0;
+#ifdef RANDOM123_EXIST
+    ncounter_per_pair = 1;
+    if (tgamma > 0.0) ncounter_per_pair++;
+    if (ntotal <= 0)
+        throw std::runtime_error("DPD/random123 needs a read to the total number of particles");
+#endif
     current_cutoff = verletList->getVerletCutoff() - system->getSkin();
     current_cutoff_sqr = current_cutoff * current_cutoff;
 
@@ -101,7 +126,38 @@ void DPDThermostat::thermalize()
     System& system = getSystemRef();
     system.storage->updateGhostsV();
 
+#ifdef RANDOM123_EXIST
+    uint64_t internal_seed = system.seed64;
+    if (mdStep == 0)
+    {
+        if (internal_seed == 0)
+        {
+            if (system.comm->rank() == 0)
+            {
+                int rng1, rng2, rng3;
+                rng1 = (*rng)(2);
+                rng2 = (*rng)(INT_MAX);
+                rng3 = (*rng)(INT_MAX);
+                internal_seed =
+                    (uint64_t)rng1 * (uint64_t)rng2 * (uint64_t)UINT_MAX + (uint64_t)rng3;
+            }
+
+            mpi::broadcast(*system.comm, internal_seed, 0);
+            system.seed64 = internal_seed;
+        }
+
+        counter = {{0}};
+        ukey = {{internal_seed}};
+        key = ukey;
+        // crng = threefry2x64(counter, key);
+        // counter.v[0]=ULONG_MAX-1;std::cout<<"CTR> "<<counter.v[0]<<"\n";
+        // std::cout<<"RNG-"<<system->comm->rank()<<" ("<<counter
+        //<<","<<key<<") /"<<uneg11<double>(crng.v[0])<<std::endl;
+    }
+#endif
+
     // loop over VL pairs
+    intStep = integrator->getStep();
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
         Particle& p1 = *it->first;
@@ -110,6 +166,20 @@ void DPDThermostat::thermalize()
         if (gamma > 0.0) frictionThermoDPD(p1, p2);
         if (tgamma > 0.0) frictionThermoTDPD(p1, p2);
     }
+
+#ifdef RANDOM123_EXIST
+    uint64_t ncounter_per_step =
+        (uint64_t)ntotal * (uint64_t)(ntotal - 1) / (uint64_t)2 * (uint64_t)ncounter_per_pair;
+
+    if (ULONG_MAX - mdStep * ncounter_per_step < ncounter_per_step)
+    {
+        mdStep = 0;
+        internal_seed = 0;
+        system.seed64 = 0;
+    }
+    else
+        mdStep++;
+#endif
 }
 
 void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
@@ -117,23 +187,87 @@ void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2)
     // Implements the standard DPD thermostat
     Real3D r = p1.position() - p2.position();
     real dist2 = r.sqr();
+    System& system = getSystemRef();
+
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int modeThermal = system.lebcMode;
+    */
 
     if (dist2 < current_cutoff_sqr)
     {
         real dist = sqrt(dist2);
         real omega = 1 - dist / current_cutoff;
         real omega2 = omega * omega;
+        real veldiff = .0;
 
+#ifdef RANDOM123_EXIST
+        uint64_t i = p1.id();
+        uint64_t j = p2.id();
+        if (i > j) std::swap(i, j);
+
+        counter.v[0] =
+            (intStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            ncounter_per_pair;
+        crng = threefry2x64(counter, key);  // call rng generator
+
+        real zrng = u01<double>(crng.v[0]);
+
+        /*UNCOMMENT TO ENABLE GAUSSIAN DISTRIBUTION
+        real u2 = u01<double>(crng.v[1]);
+        zrng=sqrt(-2.0*log(zrng))*cos(M_2PI*u2); // get a rng with normal distribution
+        */
+#endif
         r /= dist;
 
-        real veldiff = (p1.velocity() - p2.velocity()) * r;
+        /*  UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear)
+            if (modeThermal == 1)
+            {
+                Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+                veldiff = (p1.velocity() + vsdiff - p2.velocity()) * r;
+            }
+            else if (modeThermal == 2)
+                veldiff = (p1.velocity()[1] - p2.velocity()[1]) * r[1];
+            else
+                veldiff = (p1.velocity() - p2.velocity()) * r;
+        else
+        */
+        veldiff = (p1.velocity() - p2.velocity()) * r;
+
         real friction = pref1 * omega2 * veldiff;
+#ifdef RANDOM123_EXIST
+        real r0 = zrng - 0.5;
+        /*UNCOMMENT TO ENABLE GAUSSIAN DISTRIBUTION
+        r0 = zrng;
+        */
+#else
         real r0 = ((*rng)() - 0.5);
+#endif
         real noise = pref2 * omega * r0;  //(*rng)() - 0.5);
 
         Real3D f = (noise - friction) * r;
+
+        /*  UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear && modeThermal == 2)
+        {
+            f[0]=.0;
+            f[2]=.0;
+        }
+        */
+
         p1.force() += f;
         p2.force() -= f;
+
+        // Analysis to get stress tensors
+        if (system.ifShear && system.ifViscosity)
+        {
+            system.dyadicP_xz += r[0] * f[2];
+            system.dyadicP_zx += r[2] * f[0];
+        }
     }
 }
 
@@ -142,21 +276,58 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
     // Implements a transverse DPD thermostat with the canonical functional form of omega
     Real3D r = p1.position() - p2.position();
     real dist2 = r.sqr();
+    System& system = getSystemRef();
+
+    // Test code for different thermalizing modes
+    // mode(0): the thermostat acts on peculiar velocities (default)
+    // mode(1): on full velocities (incl. shear contribution);
+    // mode(2): on y-dir of velocities ONLY (vorticity)
+    /* UNCOMMENT TO ACTIVATE MODE1/2
+    int modeThermal = system.lebcMode;
+    */
 
     if (dist2 < current_cutoff_sqr)
     {
         real dist = sqrt(dist2);
         real omega = 1 - dist / current_cutoff;
         real omega2 = omega * omega;
+        Real3D veldiff = .0;
 
         r /= dist;
 
         Real3D noisevec(0.0);
+#ifdef RANDOM123_EXIST
+        int i = p1.id();
+        int j = p2.id();
+        if (i > j) std::swap(i, j);
+
+        counter.v[0] =
+            (intStep * ntotal * (ntotal - 1) / 2 + (ntotal * (i - 1) - i * (i + 1) / 2 + j)) *
+            ncounter_per_pair;
+        crng = threefry2x64(counter, key);  // call rng generator
+        real zrng = u01<double>(crng.v[1]);
+        noisevec[0] = zrng - 0.5;
+        counter.v[0]--;
+        zrng = u01<double>(crng.v[0]);
+        noisevec[1] = zrng - 0.5;
+        zrng = u01<double>(crng.v[1]);
+        noisevec[2] = zrng - 0.5;
+#else
         noisevec[0] = (*rng)() - 0.5;
         noisevec[1] = (*rng)() - 0.5;
         noisevec[2] = (*rng)() - 0.5;
-
-        Real3D veldiff = p1.velocity() - p2.velocity();
+#endif
+        /* UNCOMMENT TO ACTIVATE MODE1/2
+        if (system.ifShear)
+            if (modeThermal == 1)
+            {
+                Real3D vsdiff = {system.shearRate * (p1.position()[2] - p2.position()[2]), .0, .0};
+                veldiff = p1.velocity() - p2.velocity() + vsdiff;
+            }
+            else if (modeThermal == 2)
+                veldiff[1] = p1.velocity()[1] - p2.velocity()[1];
+            else*/
+        veldiff = p1.velocity() - p2.velocity();
 
         Real3D f_damp, f_rand;
 
@@ -180,8 +351,15 @@ void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2)
         f_damp *= pref3 * omega2;
         f_rand *= pref4 * omega;
 
-        p1.force() += f_rand - f_damp;
-        p2.force() -= f_rand - f_damp;
+        Real3D f_tmp = f_rand - f_damp;
+        p1.force() += f_tmp;
+        p2.force() -= f_tmp;
+        // Analysis to get stress tensors
+        if (system.ifShear && system.ifViscosity)
+        {
+            system.dyadicP_xz += r[0] * f_tmp[2];
+            system.dyadicP_zx += r[2] * f_tmp[0];
+        }
     }
 }
 
@@ -240,7 +418,8 @@ void DPDThermostat::registerPython()
 {
     using namespace espressopp::python;
     class_<DPDThermostat, std::shared_ptr<DPDThermostat>, bases<Extension> >(
-        "integrator_DPDThermostat", init<std::shared_ptr<System>, std::shared_ptr<VerletList> >())
+        "integrator_DPDThermostat",
+        init<std::shared_ptr<System>, std::shared_ptr<VerletList>, int>())
         .def("connect", &DPDThermostat::connect)
         .def("disconnect", &DPDThermostat::disconnect)
         .add_property("gamma", &DPDThermostat::getGamma, &DPDThermostat::setGamma)

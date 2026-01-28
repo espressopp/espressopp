@@ -37,14 +37,14 @@ struct Single
 
     Single() : first(T1()) {}
 
-    Single(const T1 &x) : first(x) {}
+    Single(const T1& x) : first(x) {}
 
     template <class U>
-    Single(const Single<U> &p) : first(p.first)
+    Single(const Single<U>& p) : first(p.first)
     {
     }
 
-    inline bool operator==(const Single &T) const { return (first == T.first); }
+    inline bool operator==(const Single& T) const { return (first == T.first); }
 };
 
 }  // namespace espressopp

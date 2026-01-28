@@ -29,10 +29,10 @@
 
 #include "Particle.hpp"
 #include "esutil/ESPPIterator.hpp"
-//#include <boost/unordered_map.hpp>
+// #include <boost/unordered_map.hpp>
 #include <map>
 #include <boost/signals2.hpp>
-//#include "FixedListComm.hpp"
+// #include "FixedListComm.hpp"
 
 /*
  * This list is temporary solution. In general it should be derived from FixedTripleList.

@@ -144,10 +144,13 @@ void Configurations::gather()
         {
             Real3D pos = cit->position();
             Int3D img = cit->image();
-            if (folded)
-                system.bc->foldPosition(pos, img);
-            else
-                system.bc->unfoldPosition(pos, img);
+            if (!system.ifShear)
+            {
+                if (folded)
+                    system.bc->foldPosition(pos, img);
+                else
+                    system.bc->unfoldPosition(pos, img);
+            }
             coordinates[i] = pos;
         }
         if (gatherVel) velocities[i] = cit->velocity();
@@ -263,8 +266,8 @@ void Configurations::gather()
     }
     else
     {
-        LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data "
-                                      << " of " << myN << " particles");
+        LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data " << " of " << myN
+                                      << " particles");
 
         // not master process, send data to master process
 

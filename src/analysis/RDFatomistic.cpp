@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
-//#include "Configuration.hpp"
+// #include "Configuration.hpp"
 #include "RDFatomistic.hpp"
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"
@@ -46,7 +46,7 @@ namespace analysis
 // equal to L_y) rdfN is a level of discretisation of rdf (how many elements it contains)
 python::list RDFatomistic::computeArray(int rdfN) const
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     esutil::Error err(system.comm);
     Real3D Li = system.bc->getBoxL();
     Real3D Li_half = Li / 2.;
@@ -71,17 +71,17 @@ python::list RDFatomistic::computeArray(int rdfN) const
             CellList realCells = system.storage->getRealCells();
             for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
             {
-                Particle &vp = *cit;
+                Particle& vp = *cit;
                 FixedTupleListAdress::iterator it2;
                 it2 = fixedtupleList->find(&vp);
 
                 if (it2 != fixedtupleList->end())
                 {  // Are there atomistic particles for given CG particle? If yes, use those for
                    // calculation.
-                    std::vector<Particle *> atList = it2->second;
+                    std::vector<Particle*> atList = it2->second;
                     for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                     {
-                        Particle &at = **it3;
+                        Particle& at = **it3;
                         int id = at.id();
                         data tmp = {at.position(), at.type(), vp.id(), vp.lambda()};
                         conf[id] = tmp;
@@ -215,7 +215,7 @@ python::list RDFatomistic::computeArray(int rdfN) const
 
 python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     esutil::Error err(system.comm);
     Real3D Li = system.bc->getBoxL();
     Real3D Li_half = Li / 2.;
@@ -243,16 +243,16 @@ python::list RDFatomistic::computeArrayPathIntegral(int rdfN) const
             CellList realCells = system.storage->getRealCells();
             for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
             {
-                Particle &vp = *cit;
+                Particle& vp = *cit;
                 FixedTupleListAdress::iterator it2;
                 it2 = fixedtupleList->find(&vp);
 
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList = it2->second;
+                    std::vector<Particle*> atList = it2->second;
                     for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                     {
-                        Particle &at = **it3;
+                        Particle& at = **it3;
 
                         if ((at.position()[0] < Xmax) && (at.position()[0] > Xmin))
                         {

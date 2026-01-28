@@ -56,7 +56,7 @@ void DumpGROAdress::dump()
         // if (num_of_particles != 0 )
         // dimension = 6;//conf_real->getProperties(0).getDimension();
 
-        char *ch_f_name = new char[file_name.length() + 1];
+        char* ch_f_name = new char[file_name.length() + 1];
         strcpy(ch_f_name, file_name.c_str());
         ofstream myfile(ch_f_name, ios::out | ios::app);
         if (myfile.is_open())
@@ -70,8 +70,7 @@ void DumpGROAdress::dump()
 
             // myfile << num_of_particles << endl;
             myfile << setiosflags(ios::fixed);  // needed for fixed-width output
-            myfile << "system description, "
-                   << "current step=" << integrator->getStep() << ", "
+            myfile << "system description, " << "current step=" << integrator->getStep() << ", "
                    << "length unit=" << length_unit << endl;
             myfile << setw(5) << num_of_particles << endl;
 

@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -24,7 +26,7 @@
 #ifndef _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_FIXEDPAIRLISTTYPESINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "types.hpp"
 #include "Interaction.hpp"
@@ -77,7 +79,7 @@ public:
 
     std::shared_ptr<FixedPairList> getFixedPairList() { return fixedpairList; }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -89,7 +91,7 @@ public:
     }
 
     // this is used in the innermost force-loop
-    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
     // this is mainly used to access the potential from Python (e.g. to change parameters of the
     // potential)
@@ -105,11 +107,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Pair; }
 
@@ -127,32 +129,83 @@ template <typename _Potential>
 inline void FixedPairListTypesInteractionTemplate<_Potential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
+    real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
-    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+    if (shear_flag)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        Potential &potential = getPotential(type1, type2);
-        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
 
-        Real3D force(0.0);
-        // if(potential._computeForce(force, p1, p2)) {
-        ////if(potential->_computeForce(force, p1, p2)) {
-        //  p1.force() += force;
-        //  p2.force() -= force;
-        //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" <<
-        //  force);
-        //}
-        Real3D dist;
-        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-        potential.computeColVarWeights(dist, bc);
-        if (potential._computeForce(force, p1, p2, dist))
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            p1.force() += force;
-            p2.force() -= force;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // shared_ptr<Potential> potential = getPotential(type1, type2);
+
+            Real3D force(0.0);
+            Real3D dist;
+            Real3D dist_tmp(.0);
+            if (p1.position()[2] - p2.position()[2] > Lz / 2.0)
+            {
+                dist_tmp[0] = -offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+            else if (p1.position()[2] - p2.position()[2] < -Lz / 2.0)
+            {
+                dist_tmp[0] = offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+
+            bc.getMinimumImageVectorBox(dist, p1.position() + dist_tmp, p2.position());
+
+            potential.computeColVarWeights(dist, bc);
+            if (potential._computeForce(force, p1, p2, dist))
+            {
+                p1.force() += force;
+                p2.force() -= force;
+                //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force="
+                //  << force);
+                // Analysis to get stress tensors
+                if (getSystemRef().ifViscosity)
+                {
+                    getSystemRef().dyadicP_xz += dist[0] * force[2];
+                    // getSystemRef().dyadicP_zx+=dist[2]*force[0];
+                }
+            }
+        }
+    }
+    else
+    {
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // std::shared_ptr<Potential> potential = getPotential(type1, type2);
+
+            Real3D force(0.0);
+            Real3D dist;
+            bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+
+            potential.computeColVarWeights(dist, bc);
+            if (potential._computeForce(force, p1, p2, dist))
+            {
+                p1.force() += force;
+                p2.force() -= force;
+                //  LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force="
+                //  << force);
+            }
         }
     }
 }
@@ -164,26 +217,75 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergy()
 
     real e = 0.0;
     real es = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
-    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
+
+    if (shear_flag)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        Potential &potential = getPotential(type1, type2);
-        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
-        Real3D r21;
-        bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-        // e   = potential._computeEnergy(p1, p2);
-        // e   = potential->_computeEnergy(p1, p2);
-        potential.computeColVarWeights(r21, bc);
-        e = potential._computeEnergy(p1, p2, r21);
-        es += e;
-        LOG4ESPP_TRACE(theLogger,
-                       "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
-        // std::cout << "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e <<
-        // std::endl;
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
+
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // shared_ptr<Potential> potential = getPotential(type1, type2);
+            Real3D r21;
+            Real3D dist_tmp(.0);
+            if (p1.position()[2] - p2.position()[2] > Lz / 2.0)
+            {
+                dist_tmp[0] = -offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+            else if (p1.position()[2] - p2.position()[2] < -Lz / 2.0)
+            {
+                dist_tmp[0] = offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+
+            bc.getMinimumImageVectorBox(r21, p1.position() + dist_tmp, p2.position());
+
+            // e   = potential._computeEnergy(p1, p2);
+            // e   = potential->_computeEnergy(p1, p2);
+            potential.computeColVarWeights(r21, bc);
+            e = potential._computeEnergy(p1, p2, r21);
+            es += e;
+            LOG4ESPP_TRACE(theLogger,
+                           "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+            // std::cout << "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e <<
+            // std::endl;
+        }
+    }
+    else
+    {
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // std::shared_ptr<Potential> potential = getPotential(type1, type2);
+            Real3D r21;
+            bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+            // e   = potential._computeEnergy(p1, p2);
+            // e   = potential->_computeEnergy(p1, p2);
+            potential.computeColVarWeights(r21, bc);
+            e = potential._computeEnergy(p1, p2, r21);
+            es += e;
+            LOG4ESPP_TRACE(theLogger,
+                           "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+            // std::cout << "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e <<
+            // std::endl;
+        }
     }
 
     // reduce over all CPUs
@@ -239,7 +341,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeEnergyCG(i
 
 template <typename _Potential>
 inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in FixedPairListTypesInteractionTemplate "
                  "does not work."
@@ -252,30 +354,76 @@ template <typename _Potential>
 inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
 {
     LOG4ESPP_INFO(theLogger, "compute the virial for the Fixed Pair List with types");
-    std::cout
+    /*std::cout
         << "Warning! computeVirial in FixedPairListTypesInteractionTemplate has not been tested."
-        << std::endl;
+        << std::endl;*/
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
-    for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
-    {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        Potential &potential = getPotential(type1, type2);
-        // std::shared_ptr<Potential> potential = getPotential(type1, type2);
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+    real offs = getSystemRef().shearOffset;
+    bool shear_flag = (getSystemRef().ifShear && offs != .0);
 
-        Real3D force(0.0, 0.0, 0.0);
-        Real3D r21;
-        bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-        potential.computeColVarWeights(r21, bc);
-        if (potential._computeForce(force, p1, p2, r21))
+    if (shear_flag)
+    {
+        real Lx = bc.getBoxL()[0];
+        real Lz = bc.getBoxL()[2];
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
         {
-            // if(potential->_computeForce(force, p1, p2)) {
-            // Real3D r21 = p1.position() - p2.position();
-            w = w + r21 * force;
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // shared_ptr<Potential> potential = getPotential(type1, type2);
+
+            Real3D force(0.0, 0.0, 0.0);
+            Real3D r21;
+            Real3D dist_tmp(.0);
+            if (p1.position()[2] - p2.position()[2] > Lz / 2.0)
+            {
+                dist_tmp[0] = -offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+            else if (p1.position()[2] - p2.position()[2] < -Lz / 2.0)
+            {
+                dist_tmp[0] = offs;
+                int xtmp = static_cast<int>(
+                    floor((p1.position()[0] + dist_tmp[0] - p2.position()[0]) / Lx + 0.5));
+                dist_tmp[0] -= (xtmp + .0) * Lx;
+            }
+            bc.getMinimumImageVectorBox(r21, p1.position() + dist_tmp, p2.position());
+            potential.computeColVarWeights(r21, bc);
+            if (potential._computeForce(force, p1, p2, r21))
+            {
+                // if(potential->_computeForce(force, p1, p2)) {
+                // Real3D r21 = p1.position() - p2.position();
+                w = w + r21 * force;
+            }
+        }
+    }
+    else
+    {
+        for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it)
+        {
+            Particle& p1 = *it->first;
+            Particle& p2 = *it->second;
+            int type1 = p1.type();
+            int type2 = p2.type();
+            Potential& potential = getPotential(type1, type2);
+            // std::shared_ptr<Potential> potential = getPotential(type1, type2);
+
+            Real3D force(0.0, 0.0, 0.0);
+            Real3D r21;
+            bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+            potential.computeColVarWeights(r21, bc);
+            if (potential._computeForce(force, p1, p2, r21))
+            {
+                // if(potential->_computeForce(force, p1, p2)) {
+                // Real3D r21 = p1.position() - p2.position();
+                w = w + r21 * force;
+            }
         }
     }
 
@@ -286,7 +434,7 @@ inline real FixedPairListTypesInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
                  "FixedPairListTypesInteractionTemplate does not work."
@@ -320,7 +468,7 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                    real z)
 {
     std::cout << "Warning! At the moment computeVirialTensor() in "
@@ -360,11 +508,11 @@ inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+inline void FixedPairListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w, int n)
 {
-    std::cout << "Warning! At the moment computeVirialTensor() in "
+    /*std::cout << "Warning! At the moment computeVirialTensor() in "
                  "FixedPairListTypesInteractionTemplate does not work."
-              << std::endl;
+              << std::endl;*/
     /*LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
     const bc::BC& bc = *getSystemRef().bc;  // boundary conditions

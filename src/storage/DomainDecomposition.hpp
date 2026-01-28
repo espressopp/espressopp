@@ -5,6 +5,8 @@
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   Copyright (C) 2019
       Max Planck Computing and Data Facility
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -60,7 +62,7 @@ public:
 
     // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
     // as a consequence of the system resizing
-    virtual void cellAdjust();
+    virtual void cellAdjust(bool withShear);
 
     virtual Cell* mapPositionToCell(const Real3D& pos);
     virtual Cell* mapPositionToCellClipped(const Real3D& pos);
@@ -97,6 +99,8 @@ protected:
 
     /// init global Verlet list
     void initCellInteractions();
+    /// reset connection of neighbour cells
+    void remapNeighbourCells(int cell_shift);
     /// set the grids and allocate space accordingly
     void createCellGrid(const Int3D& nodeGrid, const Int3D& cellGrid);
     /// sort cells into local/ghost cell arrays
@@ -132,6 +136,8 @@ protected:
         For the order, see NodeGrid.
     */
     CommCells commCells[6];
+    /// A backup commCells list (LEBC only)
+    CommCells commCells_bkp[2];
 
     static LOG4ESPP_DECL_LOGGER(logger);
 };

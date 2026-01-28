@@ -27,7 +27,7 @@
 #include "Cell.hpp"
 #include "log4espp.hpp"
 #include "iterator/CellListIterator.hpp"
-//#include "iterator/NeighborCellListIterator.hpp"
+// #include "iterator/NeighborCellListIterator.hpp"
 
 #include "esutil/Error.hpp"
 
@@ -41,15 +41,15 @@ class CellListAllTriplesIterator
 {
 public:
     CellListAllTriplesIterator();
-    CellListAllTriplesIterator(CellList &cl);
+    CellListAllTriplesIterator(CellList& cl);
 
-    CellListAllTriplesIterator &operator++();
+    CellListAllTriplesIterator& operator++();
 
     bool isValid() const;
     bool isDone() const;
 
-    const ParticleTriple &operator*() const;
-    const ParticleTriple *operator->() const;
+    const ParticleTriple& operator*() const;
+    const ParticleTriple* operator->() const;
 
 private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
@@ -90,7 +90,7 @@ private:
 // INLINE IMPLEMENTATION
 inline CellListAllTriplesIterator::CellListAllTriplesIterator() {}
 
-inline CellListAllTriplesIterator::CellListAllTriplesIterator(CellList &cl)
+inline CellListAllTriplesIterator::CellListAllTriplesIterator(CellList& cl)
 {
     cit1 = CellList::Iterator(cl);
     if (cit1.isDone()) return;
@@ -128,7 +128,7 @@ inline CellListAllTriplesIterator::CellListAllTriplesIterator(CellList &cl)
     this->operator++();
 }
 
-inline CellListAllTriplesIterator &CellListAllTriplesIterator::operator++()
+inline CellListAllTriplesIterator& CellListAllTriplesIterator::operator++()
 {
     // pit1 = ParticleList::Iterator((*cit1)->particles);
     // cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
@@ -376,9 +376,9 @@ inline bool CellListAllTriplesIterator::isValid() const { return cit1.isValid();
 
 inline bool CellListAllTriplesIterator::isDone() const { return !isValid(); }
 
-inline const ParticleTriple &CellListAllTriplesIterator::operator*() const { return current; }
+inline const ParticleTriple& CellListAllTriplesIterator::operator*() const { return current; }
 
-inline const ParticleTriple *CellListAllTriplesIterator::operator->() const { return &(**this); }
+inline const ParticleTriple* CellListAllTriplesIterator::operator->() const { return &(**this); }
 
 }  // namespace iterator
 }  // namespace espressopp

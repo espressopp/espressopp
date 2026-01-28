@@ -48,7 +48,7 @@ InterpolationCubic::~InterpolationCubic() { LOG4ESPP_INFO(theLogger, "~Interpola
 // public functions
 
 // this is called by the created InterpolationCubic object
-void InterpolationCubic::readRaw(mpi::communicator comm, const char *file)
+void InterpolationCubic::readRaw(mpi::communicator comm, const char* file)
 {
     int root = 0;  // control processor
 
@@ -123,11 +123,11 @@ void InterpolationCubic::readRaw(mpi::communicator comm, const char *file)
 
 // read file, store values in r, e, f, and return number of read lines
 // (called by read())
-int InterpolationCubic::readFile(const char *file, bool dummy)
+int InterpolationCubic::readFile(const char* file, bool dummy)
 {
     char line[MAXLINE];
     real r, e, f;
-    FILE *fp = fopen(file, "r");
+    FILE* fp = fopen(file, "r");
 
     if (fp == NULL)
     {
@@ -169,9 +169,9 @@ int InterpolationCubic::readFile(const char *file, bool dummy)
 }  // readfile
 
 /** Spline read-in values. */
-void InterpolationCubic::spline(const real *x, const real *y, int n, real yp1, real ypn, real *y2)
+void InterpolationCubic::spline(const real* x, const real* y, int n, real yp1, real ypn, real* y2)
 {
-    real *u = new real[n];
+    real* u = new real[n];
 
     if (yp1 > 0.99e30)
     {

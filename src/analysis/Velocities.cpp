@@ -219,8 +219,8 @@ void Velocities::gather()
     }
     else
     {
-        LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data "
-                                      << " of " << myN << " particles");
+        LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data " << " of " << myN
+                                      << " particles");
 
         // not master process, send data to master process
 

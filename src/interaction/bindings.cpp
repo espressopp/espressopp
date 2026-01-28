@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -68,6 +70,10 @@
 #include "DihedralHarmonic.hpp"
 #include "DihedralRB.hpp"
 #include "CoulombKSpaceEwald.hpp"
+#include "CoulombMultiSiteCorrectionEwald.hpp"
+#ifdef FCS_EXIST
+#include "CoulombScafacos.hpp"
+#endif
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
@@ -143,6 +149,10 @@ void registerPython()
     DihedralHarmonic::registerPython();
 
     CoulombKSpaceEwald::registerPython();
+    CoulombMultiSiteCorrectionEwald::registerPython();
+#ifdef FCS_EXIST
+    CoulombScafacos::registerPython();
+#endif
     CoulombRSpace::registerPython();
     StillingerWeberPairTerm::registerPython();
     StillingerWeberTripleTerm::registerPython();

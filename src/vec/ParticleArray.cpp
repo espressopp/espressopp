@@ -379,8 +379,7 @@ void ParticleArray::verify(CellList const& srcCells) const
     if ((cellRange_.size() != srcCells.size() + 1) || (sizes_.size() != srcCells.size()))
     {
         std::ostringstream oss;
-        oss << "ParticleArray::verify "
-            << "Incompatible number of cells in srcCells";
+        oss << "ParticleArray::verify " << "Incompatible number of cells in srcCells";
         throw std::runtime_error(oss.str());
     }
     if (!checkSizes())
@@ -396,9 +395,8 @@ void ParticleArray::verify(CellList const& srcCells) const
         if (sizes_[ic] != particlelist.size())
         {
             std::ostringstream oss;
-            oss << "ParticleArray::verify "
-                << "Incompatible number of particles in srcCells[" << ic << "]: "
-                << "expected " << sizes_[ic] << ", got " << particlelist.size();
+            oss << "ParticleArray::verify " << "Incompatible number of particles in srcCells[" << ic
+                << "]: " << "expected " << sizes_[ic] << ", got " << particlelist.size();
             throw std::runtime_error(oss.str());
         }
     }

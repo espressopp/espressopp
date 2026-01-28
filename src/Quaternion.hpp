@@ -41,7 +41,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
-        ar& real_part;
+        ar & real_part;
         for (int i = 0; i < 3; ++i) ar& unreal_part[i];
     }
 

@@ -7,6 +7,8 @@
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   Copyright (C) 2019
       Max Planck Computing and Data Facility
+  Copyright (C) 2022
+      Data Center, Johannes Gutenberg University Mainz
 
   This file is part of ESPResSo++.
 
@@ -30,7 +32,7 @@
 #include "python.hpp"
 #include "SystemAccess.hpp"
 #include "mpi.hpp"
-//#include <vector>
+// #include <vector>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include <list>
@@ -66,7 +68,7 @@ public:
     virtual void scaleVolume(Real3D s, bool pS) = 0;
 
     /** It should be used at the place where is the possibility of cell size<cutoff+skin*/
-    virtual void cellAdjust() = 0;
+    virtual void cellAdjust(bool withShear) = 0;
 
     /** It should return cell grid as an integer vector*/
     virtual Int3D getInt3DCellGrid() = 0;
@@ -223,6 +225,7 @@ public:
      * Needed for DPD thermostat for example.
      */
     virtual void updateGhostsV() = 0;
+    virtual void remapNeighbourCells(int cshift) = 0;
 
     /** read back forces from ghost particles by two-sided
         communication.
@@ -313,6 +316,8 @@ protected:
                                   int extradata,
                                   const Real3D& shift);
 
+    virtual void packPositionsEtc_LEBC(
+        class OutBuffer& buf, Cell& reals, int extradata, const Real3D& shift, real offset);
     /** unpack received data for ghosts. */
     virtual void unpackPositionsEtc(Cell& ghosts, class InBuffer& buf, int extradata);
 
@@ -322,6 +327,10 @@ protected:
     */
     virtual void copyRealsToGhosts(Cell& reals, Cell& ghosts, int extradata, const Real3D& shift);
 
+    virtual void copyRealsToGhosts_LEBC(Cell& reals,
+                                        Cell& ghosts,
+                                        int extradata,
+                                        const Real3D& shift);
     // void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
 
     /** pack ghost forces for sending. */

@@ -60,7 +60,7 @@ std::vector<real> LBSite::phiLoc(19, 0.);
 /*******************************************************************************************/
 
 void LBSite::collision(
-    bool _fluct, bool _extForce, bool _coupling, Real3D _force, std::vector<real> &_gamma)
+    bool _fluct, bool _extForce, bool _coupling, Real3D _force, std::vector<real>& _gamma)
 {
     real m[19];
 
@@ -79,7 +79,7 @@ void LBSite::collision(
 /*******************************************************************************************/
 
 /* CALCULATION OF THE LOCAL MOMENTS */
-void LBSite::calcLocalMoments(real *m)
+void LBSite::calcLocalMoments(real* m)
 {
     real f0, f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10, f11p12, f11m12, f13p14,
         f13m14, f15p16, f15m16, f17p18, f17m18;
@@ -136,7 +136,7 @@ void LBSite::calcLocalMoments(real *m)
 /*******************************************************************************************/
 
 /* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-void LBSite::relaxMoments(real *m, bool _extForce, Real3D _f, std::vector<real> &_gamma)
+void LBSite::relaxMoments(real* m, bool _extForce, Real3D _f, std::vector<real>& _gamma)
 {
     // moments on the site //
     real _invTauLoc = 1. / LatticePar::getTauLoc();
@@ -184,7 +184,7 @@ void LBSite::relaxMoments(real *m, bool _extForce, Real3D _f, std::vector<real> 
 /*******************************************************************************************/
 
 /* ADDING THERMAL FLUCTUATIONS */
-void LBSite::thermalFluct(real *m)
+void LBSite::thermalFluct(real* m)
 {
     /* values of PhiLoc were already set in LatticeBoltzmann.cpp */
     int _numVelsLoc = LatticePar::getNumVelsLoc();
@@ -204,7 +204,7 @@ void LBSite::thermalFluct(real *m)
 
 /*******************************************************************************************/
 
-void LBSite::applyForces(real *m, Real3D _f, std::vector<real> &_gamma)
+void LBSite::applyForces(real* m, Real3D _f, std::vector<real>& _gamma)
 {
     // set velocity _u
     Real3D _u = 0.5 * _f;
@@ -244,7 +244,7 @@ void LBSite::applyForces(real *m, Real3D _f, std::vector<real> &_gamma)
 
 /*******************************************************************************************/
 
-void LBSite::btranMomToPop(real *m)
+void LBSite::btranMomToPop(real* m)
 {
     int _numVelsLoc = LatticePar::getNumVelsLoc();
 

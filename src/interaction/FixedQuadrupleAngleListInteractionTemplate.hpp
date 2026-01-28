@@ -94,11 +94,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Dihedral; }
 
@@ -116,15 +116,15 @@ inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::addF
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleAngleList");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
     for (FixedQuadrupleAngleList::QuadrupleList::Iterator it(*fixedQuadrupleAngleList);
          it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
+        Particle& p4 = *it->fourth;
 
         Real3D r21, r32, r43;  //
 
@@ -150,15 +150,15 @@ inline real FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
 {
     LOG4ESPP_INFO(theLogger, "compute energy of the quadruples");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     real e = 0.0;
     for (FixedQuadrupleAngleList::QuadrupleList::Iterator it(*fixedQuadrupleAngleList);
          it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D r21, r32, r43;  //
 
@@ -225,7 +225,7 @@ inline real FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in "
                  "FixedQuadrupleAngleListInteractionTemplate does not work."
@@ -240,14 +240,14 @@ inline real FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
     LOG4ESPP_INFO(theLogger, "compute scalar virial of the quadruples");
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedQuadrupleAngleList::QuadrupleList::Iterator it(*fixedQuadrupleAngleList);
          it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D r21, r32, r43;
 
@@ -274,20 +274,20 @@ inline real FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
 
 template <typename _DihedralPotential>
 inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w)
+    Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     for (FixedQuadrupleAngleList::QuadrupleList::Iterator it(*fixedQuadrupleAngleList);
          it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D r21, r32, r43;
 
@@ -308,19 +308,19 @@ inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 // TODO !!!!! This doesn't work
 template <typename _DihedralPotential>
 inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor &w, real z)
+    Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
 
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleAngleListInteractionTemplate at the moment"
@@ -329,10 +329,10 @@ inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
     for (FixedQuadrupleAngleList::QuadrupleList::Iterator it(*fixedQuadrupleAngleList);
          it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
-        const Particle &p4 = *it->fourth;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
+        const Particle& p4 = *it->fourth;
 
         Real3D r21, r32, r43;
 
@@ -353,14 +353,14 @@ inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::comp
     }
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 // TODO !!!!! This doesn't work
 template <typename _DihedralPotential>
 inline void FixedQuadrupleAngleListInteractionTemplate<_DihedralPotential>::computeVirialTensor(
-    Tensor *w, int n)
+    Tensor* w, int n)
 {
     std::cout << "Warning!!! computeVirialTensor in specified volume doesn't work for "
                  "FixedQuadrupleAngleListInteractionTemplate at the moment"

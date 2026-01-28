@@ -20,11 +20,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include "python.hpp"
-//#include <algorithm>
-//#include <cmath>
-//#include <sstream>
-//#include "log4espp.hpp"
+// #include "python.hpp"
+// #include <algorithm>
+// #include <cmath>
+// #include <sstream>
+// #include "log4espp.hpp"
 #include "System.hpp"
 #include "Real3D.hpp"
 #include "DomainDecomposition.hpp"
@@ -44,8 +44,8 @@ namespace storage
 const int DD_COMM_TAG = 0xab;
 
 DomainDecompositionNonBlocking::DomainDecompositionNonBlocking(std::shared_ptr<System> _system,
-                                                               const Int3D &_nodeGrid,
-                                                               const Int3D &_cellGrid)
+                                                               const Int3D& _nodeGrid,
+                                                               const Int3D& _cellGrid)
     : DomainDecomposition(_system,
                           _nodeGrid,
                           _cellGrid,
@@ -88,17 +88,17 @@ void DomainDecompositionNonBlocking::decomposeRealParticles()
 
             if (nodeGrid.getGridSize(coord) > 1)
             {
-                for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end();
+                for (std::vector<Cell*>::iterator it = realCells.begin(), end = realCells.end();
                      it != end; ++it)
                 {
-                    Cell &cell = **it;
+                    Cell& cell = **it;
 
                     // do not use an iterator here, since we need to take out particles during the
                     // loop
                     for (size_t p = 0; p < cell.particles.size(); ++p)
                     {
-                        Particle &part = cell.particles[p];
-                        const Real3D &pos = part.position();
+                        Particle& part = cell.particles[p];
+                        const Real3D& pos = part.position();
 
                         // check whether the particle is now "left" of the local domain
                         if (pos[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC)
@@ -118,8 +118,8 @@ void DomainDecompositionNonBlocking::decomposeRealParticles()
                         // Sort particles in cells of this node during last direction
                         else if (coord == 2)
                         {
-                            const Real3D &pos = part.position();
-                            Cell *sortCell = mapPositionToCellChecked(pos);
+                            const Real3D& pos = part.position();
+                            Cell* sortCell = mapPositionToCellChecked(pos);
                             if (sortCell != &cell)
                             {
                                 if (sortCell == 0)
@@ -209,22 +209,22 @@ void DomainDecompositionNonBlocking::decomposeRealParticles()
             {
                 /* Single node direction case (no communication)
                   Fold particles that have left the box */
-                for (std::vector<Cell *>::iterator it = realCells.begin(), end = realCells.end();
+                for (std::vector<Cell*>::iterator it = realCells.begin(), end = realCells.end();
                      it != end; ++it)
                 {
-                    Cell &cell = **it;
+                    Cell& cell = **it;
                     // do not use an iterator here, since we have need to take out particles during
                     // the loop
                     for (size_t p = 0; p < cell.particles.size(); ++p)
                     {
-                        Particle &part = cell.particles[p];
+                        Particle& part = cell.particles[p];
                         getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
                         LOG4ESPP_TRACE(
                             logger, "folded coordinate " << coord << " of particle " << part.id());
 
                         if (coord == 2)
                         {
-                            Cell *sortCell = mapPositionToCellChecked(part.position());
+                            Cell* sortCell = mapPositionToCellChecked(part.position());
 
                             if (sortCell != &cell)
                             {
@@ -235,7 +235,7 @@ void DomainDecompositionNonBlocking::decomposeRealParticles()
                                                                << part.position()
                                                                << " is not inside node domain "
                                                                   "after neighbor exchange");
-                                    const Real3D &pos = part.position();
+                                    const Real3D& pos = part.position();
                                     // isnan function is C99 only, x != x is only true if x == nan
                                     if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2])
                                     {
@@ -456,8 +456,8 @@ void DomainDecompositionNonBlocking::doGhostCommunication(bool sizesFirst,
     LOG4ESPP_DEBUG(logger, "ghost communication finished");
 }
 
-mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer &data,
-                                                            ParticleList &list,
+mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer& data,
+                                                            ParticleList& list,
                                                             longint node)
 {
     LOG4ESPP_DEBUG(logger,
@@ -477,13 +477,13 @@ mpi::request DomainDecompositionNonBlocking::isendParticles(OutBuffer &data,
     return data.isend(node, DD_COMM_TAG);
 }
 
-mpi::request DomainDecompositionNonBlocking::irecvParticles_initiate(InBuffer &data, longint node)
+mpi::request DomainDecompositionNonBlocking::irecvParticles_initiate(InBuffer& data, longint node)
 {
     LOG4ESPP_DEBUG(logger, "initiate non blocking irecv on " << node);
     return data.irecv(node, DD_COMM_TAG);
 }
 
-void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data, ParticleList &list)
+void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer& data, ParticleList& list)
 {
     LOG4ESPP_DEBUG(logger, "finish non blocking irecv");
     // ... and unpack
@@ -498,7 +498,7 @@ void DomainDecompositionNonBlocking::irecvParticles_finish(InBuffer &data, Parti
 
         for (int i = 0; i < size; ++i)
         {
-            Particle *p = &list[curSize + i];
+            Particle* p = &list[curSize + i];
             data.read(*p);
             updateInLocalParticles(p);
         }
@@ -516,7 +516,7 @@ void DomainDecompositionNonBlocking::registerPython()
     using namespace espressopp::python;
     class_<DomainDecompositionNonBlocking, bases<DomainDecomposition>, boost::noncopyable>(
         "storage_DomainDecompositionNonBlocking",
-        init<std::shared_ptr<System>, const Int3D &, const Int3D &>());
+        init<std::shared_ptr<System>, const Int3D&, const Int3D&>());
 }
 
 }  // namespace storage

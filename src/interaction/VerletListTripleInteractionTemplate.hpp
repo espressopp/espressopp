@@ -64,14 +64,14 @@ public:
      * For example, type1 = 0, type2 = 1:
      * 000, 100, 001, 010, 101, 111
      */
-    void setPotential(int type1, int type2, int type3, const Potential &potential)
+    void setPotential(int type1, int type2, int type3, const Potential& potential)
     {
         ntypes = std::max(ntypes, std::max(type1 + 1, std::max(type2 + 1, type3 + 1)));
 
         potentialArray.at(type1, type2, type3) = potential;
     }
 
-    Potential &getPotential(int type1, int type2, int type3)
+    Potential& getPotential(int type1, int type2, int type3)
     {
         return potentialArray.at(type1, type2, type3);
     }
@@ -83,11 +83,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Angular; }
 
@@ -104,13 +104,13 @@ template <typename _ThreeBodyPotential>
 inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by VerletListTriple");
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
     for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;  // the main particle
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;  // the main particle
+        Particle& p3 = *it->third;
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
@@ -118,7 +118,7 @@ inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::addForces(
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        const Potential &potential = getPotential(type1, type2, type3);
+        const Potential& potential = getPotential(type1, type2, type3);
 
         Real3D force12(0.0, 0.0, 0.0), force32(0.0, 0.0, 0.0);
 
@@ -136,20 +136,20 @@ inline real VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeEne
 {
     LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real e = 0.0;
     for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         Real3D r12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D r32 = bc.getMinimumImageVector(p3.position(), p2.position());
 
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        const Potential &potential = getPotential(type1, type2, type3);
+        const Potential& potential = getPotential(type1, type2, type3);
 
         e += potential._computeEnergy(r12, r32);
     }
@@ -205,7 +205,7 @@ inline real VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeEne
 
 template <typename _ThreeBodyPotential>
 inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in VerletListTripleInteractionTemplate "
                  "does not work."
@@ -222,11 +222,11 @@ inline real VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
     real w = 0.0;
     for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         // const Potential &potential = getPotential(p1.type(), p2.type());
-        const espressopp::bc::BC &bc = *getSystemRef().bc;
+        const espressopp::bc::BC& bc = *getSystemRef().bc;
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
@@ -234,7 +234,7 @@ inline real VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        const Potential &potential = getPotential(type1, type2, type3);
+        const Potential& potential = getPotential(type1, type2, type3);
 
         Real3D force12(0.0, 0.0, 0.0), force32(0.0, 0.0, 0.0);
         if (potential._computeForce(force12, force32, dist12, dist32))
@@ -249,17 +249,17 @@ inline real VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
 }
 
 template <typename _ThreeBodyPotential>
-inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor &w)
+inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
@@ -267,7 +267,7 @@ inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
         int type1 = p1.type();
         int type2 = p2.type();
         int type3 = p3.type();
-        const Potential &potential = getPotential(type1, type2, type3);
+        const Potential& potential = getPotential(type1, type2, type3);
 
         Real3D force12(0.0, 0.0, 0.0), force32(0.0, 0.0, 0.0);
         if (potential._computeForce(force12, force32, r12, r32))
@@ -278,13 +278,13 @@ inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 // Irvin-Kirkwood method
 template <typename _ThreeBodyPotential>
-inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor &w,
+inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor& w,
                                                                                           real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
@@ -328,7 +328,7 @@ inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVir
 }
 // Irvin-Kirkwood method
 template <typename _ThreeBodyPotential>
-inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor *w,
+inline void VerletListTripleInteractionTemplate<_ThreeBodyPotential>::computeVirialTensor(Tensor* w,
                                                                                           int n)
 {
     std::cout << "At the moment IK computeVirialTensor for triples does'n work" << std::endl;

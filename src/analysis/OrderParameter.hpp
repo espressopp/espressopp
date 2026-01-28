@@ -87,18 +87,18 @@ private:
 
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive &ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int version)
     {
-        ar &d;
-        ar &qlmSumSqrt;
-        ar &nnns;
-        ar &ang_m;
-        ar &particle_id;
-        ar &nns;
-        ar &qlm;
-        ar &is_solid;
-        ar &is_surface;
-        ar &label;
+        ar & d;
+        ar & qlmSumSqrt;
+        ar & nnns;
+        ar & ang_m;
+        ar & particle_id;
+        ar & nns;
+        ar & qlm;
+        ar & is_solid;
+        ar & is_surface;
+        ar & label;
     }
 
 public:
@@ -292,7 +292,7 @@ public:
         CellList cells_loc = stor->getLocalCells();
         for (CellListIterator cit(cells_loc); !cit.isDone(); ++cit)
         {
-            Particle &p = *cit;
+            Particle& p = *cit;
             opp_map.insert(make_pair(p.id(), OrderParticleProps(angular_momentum, p.id())));
         }
 
@@ -308,8 +308,8 @@ public:
             {
                 pairs.insert(make_pair(it->first->id(), it->second->id()));
 
-                OrderParticleProps *opp_i1 = &(opp_map.find(it->first->id()))->second;
-                OrderParticleProps *opp_i2 = &(opp_map.find(it->second->id()))->second;
+                OrderParticleProps* opp_i1 = &(opp_map.find(it->first->id()))->second;
+                OrderParticleProps* opp_i2 = &(opp_map.find(it->second->id()))->second;
                 opp_i1->insertNN(it->second->id());
                 opp_i2->insertNN(it->first->id());
 
@@ -344,7 +344,7 @@ public:
             int id = (*opm).first;
             if (!stor->lookupRealParticle(id))
             {
-                OrderParticleProps &op = (*opm).second;
+                OrderParticleProps& op = (*opm).second;
                 if (!(op.getNumNN() == 0)) sendGhostInfo.push_back((*opm).second);
             }
         }
@@ -360,13 +360,13 @@ public:
         vector<int> realHere;
         for (vector<OrderParticleProps>::iterator it = totID.begin(); it != totID.end(); ++it)
         {
-            OrderParticleProps &gop = *it;
+            OrderParticleProps& gop = *it;
             if (gop.getPID() != -1 && stor->lookupRealParticle(gop.getPID()))
             {
                 if (find(realHere.begin(), realHere.end(), gop.getPID()) == realHere.end())
                     realHere.push_back(gop.getPID());
 
-                OrderParticleProps *opp_i = &(opp_map.find(gop.getPID()))->second;
+                OrderParticleProps* opp_i = &(opp_map.find(gop.getPID()))->second;
                 opp_i->addQlmVector(gop.getQlmVector());
                 int numPadd = gop.getNumNN();
                 for (int i = 0; i < numPadd; i++)
@@ -381,8 +381,8 @@ public:
         for (CellListIterator cit(cells_real); !cit.isDone(); ++cit)
         {
             // for(CellListIterator cit(cells_loc); !cit.isDone(); ++cit) {
-            Particle &p = *cit;
-            OrderParticleProps *opp_i = &(opp_map.find(p.id()))->second;
+            Particle& p = *cit;
+            OrderParticleProps* opp_i = &(opp_map.find(p.id()))->second;
             opp_i->calculateSumQlm();
         }
 
@@ -403,7 +403,7 @@ public:
 
         for (vector<OrderParticleProps>::iterator it = totID.begin(); it != totID.end(); ++it)
         {
-            OrderParticleProps &gop = *it;
+            OrderParticleProps& gop = *it;
             if (gop.getPID() != -1 && stor->lookupGhostParticle(gop.getPID()))
             {
                 (opp_map.find(gop.getPID()))->second = gop;
@@ -417,8 +417,8 @@ public:
         {
             int first = (*pit).first;
             int second = (*pit).second;
-            OrderParticleProps *opp_i1 = &(opp_map.find(first))->second;
-            OrderParticleProps *opp_i2 = &(opp_map.find(second))->second;
+            OrderParticleProps* opp_i1 = &(opp_map.find(first))->second;
+            OrderParticleProps* opp_i2 = &(opp_map.find(second))->second;
 
             // checking 0 sum Qlm
             if (opp_i2->getSumQlm() == 0)
@@ -452,7 +452,7 @@ public:
             int id = (*opm).first;
             if (stor->lookupGhostParticle(id))
             {
-                OrderParticleProps &op = (*opm).second;
+                OrderParticleProps& op = (*opm).second;
                 if (!(op.getNumNN() == 0)) sendGhostInfo.push_back((*opm).second);
             }
         }
@@ -465,11 +465,11 @@ public:
 
         for (vector<OrderParticleProps>::iterator it = totID.begin(); it != totID.end(); ++it)
         {
-            OrderParticleProps &gop = *it;
+            OrderParticleProps& gop = *it;
             if (gop.getPID() != -1 && stor->lookupRealParticle(gop.getPID()))
             {
                 // if( gop.getPID()!=-1 && stor->lookupLocalParticle( gop.getPID() ) ){
-                OrderParticleProps *opp_i = &(opp_map.find(gop.getPID()))->second;
+                OrderParticleProps* opp_i = &(opp_map.find(gop.getPID()))->second;
                 opp_i->setD(opp_i->getD() + gop.getD());
             }
         }
@@ -478,9 +478,9 @@ public:
         // loop over particles and normalize d
         for (CellListIterator cit(cells_real); !cit.isDone(); ++cit)
         {
-            Particle &p = *cit;
+            Particle& p = *cit;
             int pid = p.id();
-            OrderParticleProps *opp_i = &(opp_map.find(pid))->second;
+            OrderParticleProps* opp_i = &(opp_map.find(pid))->second;
 
             // catch particles without neighbors
             if (opp_i->getNumNN() == 0)
@@ -514,9 +514,9 @@ public:
 
         for (CellListIterator cit(cells); !cit.isDone(); ++cit)
         {
-            Particle &p = *cit;
+            Particle& p = *cit;
             int pid = p.id();
-            OrderParticleProps *opp_i = &(opp_map.find(pid))->second;
+            OrderParticleProps* opp_i = &(opp_map.find(pid))->second;
             if (opp_i->getD() >= d_min && opp_i->getD() <= d_max)
             {
                 opp_i->setSolid(true);
@@ -531,9 +531,9 @@ public:
             vector<OrderParticleProps> sendGhostInfo;
             for (CellListIterator cit(cells); !cit.isDone(); ++cit)
             {
-                Particle &p = *cit;
+                Particle& p = *cit;
                 int pid = p.id();
-                OrderParticleProps *opp_i = &(opp_map.find(pid))->second;
+                OrderParticleProps* opp_i = &(opp_map.find(pid))->second;
                 sendGhostInfo.push_back(*opp_i);
             }
 
@@ -546,7 +546,7 @@ public:
 
             for (vector<OrderParticleProps>::iterator it = totID.begin(); it != totID.end(); ++it)
             {
-                OrderParticleProps &gop = *it;
+                OrderParticleProps& gop = *it;
 
                 if (gop.getPID() != -1)
                 {
@@ -557,7 +557,7 @@ public:
                         {
                             if (getSystem()->storage->lookupRealParticle(gop.getNN(i)))
                             {
-                                OrderParticleProps *opp_i_surf =
+                                OrderParticleProps* opp_i_surf =
                                     &(opp_map.find(gop.getNN(i)))->second;
                                 if (!opp_i_surf->getSolid())
                                 {
@@ -621,11 +621,11 @@ public:
         for (vector<communicate_label>::iterator it = tot_label_info.begin();
              it != tot_label_info.end(); ++it)
         {
-            communicate_label &cur_lab = *it;
+            communicate_label& cur_lab = *it;
 
             if (cur_lab.cpu != -1 && getSystem()->storage->lookupRealParticle(cur_lab.pid))
             {
-                OrderParticleProps &opp = (opp_map.find(cur_lab.pid))->second;
+                OrderParticleProps& opp = (opp_map.find(cur_lab.pid))->second;
                 int labll = opp.getLabel();
 
                 if ((opp.getSolid() || opp.getSurface()))
@@ -768,9 +768,9 @@ public:
         CellList cells = getSystem()->storage->getRealCells();
         for (CellListIterator cit(cells); !cit.isDone(); ++cit)
         {
-            Particle &p = *cit;
+            Particle& p = *cit;
             int pid = p.id();
-            OrderParticleProps &opp_i = (opp_map.find(pid))->second;
+            OrderParticleProps& opp_i = (opp_map.find(pid))->second;
             if (opp_i.getLabel() == -1 && opp_i.getSolid() && !(opp_i.getSurface()))
             {
                 //          if ( opp_i.getLabel() == -1 && (opp_i.getSolid() || opp_i.getSurface())
@@ -793,11 +793,11 @@ public:
         int cpu;
 
         template <typename Archive>
-        void serialize(Archive &ar, const unsigned int version)
+        void serialize(Archive& ar, const unsigned int version)
         {
-            ar &pid;
-            ar &label;
-            ar &cpu;
+            ar & pid;
+            ar & label;
+            ar & cpu;
         }
     };
 
@@ -807,7 +807,7 @@ public:
 
     // ***************************************************************************************
 
-    void cluster_walk(int pid, int cur_lab, OrderParticleProps &opp)
+    void cluster_walk(int pid, int cur_lab, OrderParticleProps& opp)
     {
         opp.setLabel(cur_lab);
         int num_nn = opp.getNumNN();
@@ -826,7 +826,7 @@ public:
             }
             else
             {
-                OrderParticleProps &opp_neib = (opp_map.find(pid_neib))->second;
+                OrderParticleProps& opp_neib = (opp_map.find(pid_neib))->second;
                 int lab_neib = opp_neib.getLabel();
 
                 if (lab_neib != cur_lab && pid_neib != pid && opp_neib.getSolid() &&
@@ -864,7 +864,7 @@ public:
         for (boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin();
              opm != opp_map.end(); ++opm)
         {
-            OrderParticleProps &opp = (*opm).second;
+            OrderParticleProps& opp = (*opm).second;
             if (opp.getLabel() == old_lab)
             {
                 opp.setLabel(new_lab);
@@ -906,7 +906,7 @@ public:
         for (boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin();
              opm != opp_map.end(); ++opm)
         {
-            OrderParticleProps &opp = (*opm).second;
+            OrderParticleProps& opp = (*opm).second;
             if (opp.getSolid() || opp.getSurface())
             {
                 if (opp.getLabel() < 0 && opp.getSolid())
@@ -931,7 +931,7 @@ public:
         vector<OrderParticleProps> sendGhostInfo;
         for (CellListIterator cit(cells); !cit.isDone(); ++cit)
         {
-            Particle &p = *cit;
+            Particle& p = *cit;
             int pid = p.id();
             OrderParticleProps opp_i = (opp_map.find(pid))->second;
             sendGhostInfo.push_back(opp_i);
@@ -956,7 +956,7 @@ public:
         {
             for (vector<OrderParticleProps>::iterator it = totID.begin(); it != totID.end(); ++it)
             {
-                OrderParticleProps &gop = *it;
+                OrderParticleProps& gop = *it;
                 if (gop.getPID() >= 0)
                 {
                     if (gop.getLabel() >= 0)

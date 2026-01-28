@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2022
+#      Data Center, Johannes Gutenberg University Mainz
 #
 #  This file is part of ESPResSo++.
 #
@@ -73,6 +75,13 @@ from espressopp.interaction.DihedralHarmonic import *
 from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *
+from espressopp.interaction.CoulombMultiSiteCorrectionEwald import *
+
+try:
+    from espressopp.interaction.CoulombScafacos import *
+except ImportError:
+    pass
+
 from espressopp.interaction.CoulombRSpace import *
 from espressopp.interaction.StillingerWeberPairTerm import *
 from espressopp.interaction.StillingerWeberTripleTerm import *

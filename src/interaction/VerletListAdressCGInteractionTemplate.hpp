@@ -22,7 +22,7 @@
 #ifndef _INTERACTION_VERLETLISTADRESSCGINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTADRESSCGINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
+// #include <typeinfo>
 
 #include "System.hpp"
 #include "bc/BC.hpp"
@@ -73,7 +73,7 @@ public:
         fixedtupleList = _fixedtupleList;
     }
 
-    void setPotential(int type1, int type2, const Potential &potential)
+    void setPotential(int type1, int type2, const Potential& potential)
     {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
@@ -85,7 +85,7 @@ public:
         }
     }
 
-    Potential &getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
+    Potential& getPotential(int type1, int type2) { return potentialArray.at(type1, type2); }
 
     std::shared_ptr<Potential> getPotentialPtr(int type1, int type2)
     {
@@ -99,11 +99,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return NonbondedSlow; }
 
@@ -136,12 +136,12 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::addForces()
     // Pairs not inside the AdResS Zone (CG region)
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
 
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
 
@@ -157,8 +157,8 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::addForces()
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
         // these are the two VP interacting
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
 
         // read weights
         real w1 = p1.lambda();
@@ -168,7 +168,7 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::addForces()
         // force between VP particles
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         Real3D forcevp(0.0, 0.0, 0.0);
         if (w12 != 1)
         {  // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
@@ -190,24 +190,24 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::addForces()
     // calculate CG forces/velocities and distribute them to AT particles. In contrast, in H-AdResS,
     // we calculate AT forces from intra-molecular interactions and inter-molecular center-of-mass
     // interactions and just update the positions of the center-of-mass CG particles.
-    std::set<Particle *> cgZone = verletList->getCGZone();
-    for (std::set<Particle *>::iterator it = cgZone.begin(); it != cgZone.end(); ++it)
+    std::set<Particle*> cgZone = verletList->getCGZone();
+    for (std::set<Particle*>::iterator it = cgZone.begin(); it != cgZone.end(); ++it)
     {
-        Particle &vp = **it;
+        Particle& vp = **it;
 
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList1;
+            std::vector<Particle*> atList1;
             atList1 = it3->second;
 
             // Real3D vpfm = vp.force() / vp.getMass();
-            for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+            for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                  ++itv)
             {
-                Particle &at = **itv;
+                Particle& at = **itv;
                 at.velocity() = vp.velocity();  // Overwrite velocity - Note (Karsten): See comment
                                                 // above. at.force() += at.mass() * vpfm;
             }
@@ -224,32 +224,32 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::addForces()
 template <typename _Potential>
 inline real VerletListAdressCGInteractionTemplate<_Potential>::computeEnergy()
 {
-    std::set<Particle *> cgZone = verletList->getCGZone();
-    for (std::set<Particle *>::iterator it = cgZone.begin(); it != cgZone.end(); ++it)
+    std::set<Particle*> cgZone = verletList->getCGZone();
+    for (std::set<Particle*>::iterator it = cgZone.begin(); it != cgZone.end(); ++it)
     {
-        Particle &vp = **it;
+        Particle& vp = **it;
         vp.lambda() = 0.0;
     }
 
-    std::set<Particle *> adrZone = verletList->getAdrZone();
-    for (std::set<Particle *>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
+    std::set<Particle*> adrZone = verletList->getAdrZone();
+    for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it)
     {
-        Particle &vp = **it;
+        Particle& vp = **it;
 
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList;
+            std::vector<Particle*> atList;
             atList = it3->second;
 
             // compute center of mass
             Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
             Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-            for (std::vector<Particle *>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
+            for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 cmp += at.mass() * at.position();
                 cmv += at.mass() * at.velocity();
             }
@@ -261,7 +261,7 @@ inline real VerletListAdressCGInteractionTemplate<_Potential>::computeEnergy()
             vp.velocity() = cmv;
 
             // calculate distance to nearest adress particle or center
-            std::vector<Real3D *>::iterator it2 = verletList->getAdrPositions().begin();
+            std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
             Real3D pa = **it2;  // position of adress particle
             Real3D d1;
             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
@@ -323,24 +323,24 @@ inline real VerletListAdressCGInteractionTemplate<_Potential>::computeEnergy()
 
     for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         e += potential._computeEnergy(p1, p2);
     }
 
     for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         real w1 = p1.lambda();
         real w2 = p2.lambda();
         real w12 = w1 * w2;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const Potential& potential = getPotential(type1, type2);
         e += (1.0 - w12) * potential._computeEnergy(p1, p2);
     }
 
@@ -396,7 +396,7 @@ inline real VerletListAdressCGInteractionTemplate<_Potential>::computeEnergyCG(i
 
 template <typename _Potential>
 inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in VerletListAdressCGInteractionTemplate "
                  "does'n work"
@@ -414,7 +414,7 @@ inline real VerletListAdressCGInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
     std::cout << "Warning! At the moment computeVirialTensor in "
@@ -423,7 +423,7 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w,
+inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w,
                                                                                    real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
@@ -433,7 +433,7 @@ inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTens
 }
 
 template <typename _Potential>
-inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+inline void VerletListAdressCGInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w, int n)
 {
     std::cout << "Warning! At the moment computeVirialTensor in "
                  "VerletListAdressCGInteractionTemplate does'n work"
