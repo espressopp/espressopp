@@ -142,7 +142,7 @@ Key features of Espresso++ include:
 - **Python interface**: Full simulation control and analysis scripting in Python.
 - **Extensibility**: Modular design allows easy addition of new force fields, integrators, or analysis tools.
 
-# New Feature since last release
+# New Features since last release
 
 Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
 
