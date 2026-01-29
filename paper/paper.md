@@ -147,10 +147,10 @@ Key features of Espresso++ include:
 Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
 
 - **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
-- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao]
+- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao:2004]
 - **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for \dots [@Guzman:2017]
-- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD 
-- **checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
+- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lee-Edwards boundary conditions 
+- **Checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
 - **I/O**: support for parallel writing and reading of H5MD checkpoints
 - **Python 3 compatibility**
 
