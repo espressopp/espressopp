@@ -29,6 +29,7 @@ authors:
     orcid: 0000-0003-2564-3005
     affiliation: 1
   - name: Bin Song
+    orcid: 0000-0003-4229-9242
     affiliation: 1
   - name: Markus Rampp
     orcid: 0000-0001-8177-8698
