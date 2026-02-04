@@ -160,6 +160,7 @@ A minimal Python script to run a simple (repulsive only) Lennard-Jones type part
 
 ```python
 import espressopp
+from mpi4py import MPI
 
 # simulation system parameters
 num_particles = 10000      # total number of particles in the system
@@ -170,6 +171,7 @@ dt            = 0.005      # time step for 1 md step
 epsilon       = 1.0        # energy unit
 sigma         = 1.0        # length unit
 temperature   = 1.0        # temperature of the simulation, e.g. used in Langevin Thermostat
+LJcaprad      = 0.8        # inital capping radius for LJ interaction to prevent explosion for random configurations
 
 # system setup
 system         = espressopp.System()
@@ -183,8 +185,8 @@ cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # interaction setup, here short range non-bonded Lennard Jones potential
-interaction    = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))
-interaction.setPotential(type1=0, type2=0, potential=espressopp.interaction.LennardJones(epsilon, sigma, rc, shift='auto'))
+interaction    = espressopp.interaction.VerletListLennardJonesCapped(espressopp.VerletList(system, cutoff=rc))
+interaction.setPotential(type1=0, type2=0, potential=espressopp.interaction.LennardJonesCapped(epsilon, sigma, rc, shift='auto', caprad=LJcaprad))
 system.addInteraction(interaction)
 
 # integrator setup
@@ -215,7 +217,21 @@ while pid <= num_particles:
     pid += 1
 system.storage.addParticles(new_particles, *props)
 
-TODO add integrate() call
+integrator.dt = 0.0001 # very small timestep for initial warmup
+for n in range(20):
+  if n == 10: # warmup finished, switch to uncapped Lennard Jones potential and increase timestep
+    interaction   = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))
+    interaction.setPotential(type1=0, type2=0, potential=espressopp.interaction.LennardJones(epsilon, sigma, rc, shift='auto'))
+    system.removeInteraction(0)
+    system.addInteraction(interaction)
+    integrator.dt = 0.005
+  integrator.run(10000)
+  Etot = system.getInteraction(0).computeEnergy()
+  print("md time = {:4.1f}, total energy of the system: {:10.2f}".format(integrator.dt*n*10000, Etot))
+
+#write PDB file of (quasi) equilibrated LJ system. At this temperature it is more or less crystallized.
+espressopp.tools.pdbwrite("simplelj.pdb", system, molsize=num_particles)
+
 ```
 
 # Acknowledgements
