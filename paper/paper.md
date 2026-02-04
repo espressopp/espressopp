@@ -8,12 +8,12 @@ tags:
   - C++/Python
 authors:
   - name: Zhen-Hao Xu
-    affiliation: 1
+    affiliation: 4
   - name: James Vance
     orcid: 0000-0001-7112-0382
-    affiliation: 3
+    affiliation: 4
   - name: Nikita Tretyakov
-    affiliation: 3
+    affiliation: 4
   - name: Sebastian Eibl
     orcid: 0000-0002-1069-2720
     affiliation: 2
