@@ -75,59 +75,17 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 - A Python-based scripting interface for ease of use, reproducibility, and coupling with external analysis tools.
 - Multi-scale simulation techniques such as AdResS and Lees-Edwards
 
-Espresso++ is widely used in academic research for simulating phenomena such as polymer rheology, membrane dynamics, colloidal suspensions, and active particles. Recent research projects using ESPResSo++ include [@Grommes:2025]
+Espresso++ is widely used in academic research and has been applied in numerous scientific studies, including investigations of:
 
-[@Gholami2025]
-
-[@Grommes2024]
-
-[@Hsu2024]
-
-[@Hsu2023]
-
-[@Ohkuma2023]
-
-[@Grommes2022]
-
-[@Grommes2021]
-
-[@Brunk2021]
-
-[@Zhang2021]
-
-[@Tubiana2021]
-
-[@Thaler2020]
-
-[@Hsu2020]
-
-[@Fiorentini2020]
-
-[@Pape2023]
-
-[@Smith2023]
-
-[@Bause2021]
-
-[@Rudzinski2020]
-
-[@Singh2020]
-
-[@Zhao2020]
-
-[@Zhao2020b]
-
-[@Lee2020]
-
-[@Grommes2020]
-
-## Merge into above
-Espresso++ has been applied in numerous scientific studies, including investigations of:
-
-- Polymer rheology and entanglement effects
-- Lipid membranes and vesicle dynamics
+- Polymer rheology and entanglement effects (@Grommes:2025, @Grommes2024, @Hsu2023, @Hsu2024, @Ohkuma2023, @Grommes2022, @Grommes2021, @Tubiana2021, @Hsu2020, @Singh2020, @Zhao2020b, @Lee2020, @Grommes2020)
+- Lipid membranes, protein and vesicle dynamics (@Pape2023, @Bause2021, @Zhao2020)
 - Colloidal self-assembly
+- Adaptive resoultion simulations (@Thaler2020, @Fiorentini2020)
+- Ionic liquids (@Gholami2025, @Zhang2021)
+- Phase separation models [@Brunk2021]
 - Active matter and microswimmers
+- Coarse-grained methods [@Rudzinski2020]
+- Others [@Smith2023]
 
 It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
 
@@ -149,7 +107,7 @@ Since the last major release of Espresso++ v2.0 in 2018 a number of new function
 
 - **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
 - **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao:2004]
-- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for \dots [@Guzman:2017]
+- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman:2017]
 - **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lee-Edwards boundary conditions 
 - **Checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
 - **I/O**: support for parallel writing and reading of H5MD checkpoints
