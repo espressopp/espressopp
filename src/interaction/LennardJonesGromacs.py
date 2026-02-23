@@ -107,7 +107,7 @@ else
 """
 
 
-"""
+r"""
     real sig2 = sigma * sigma;
     real sig6 = sig2 * sig2 * sig2;
     ff1 = 48 \varepsilon \sigma^{12}
