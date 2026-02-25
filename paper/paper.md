@@ -77,11 +77,11 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 
 Espresso++ is widely used in academic research and has been applied in numerous scientific studies, including investigations of:
 
-- Polymer rheology and entanglement effects (@Grommes:2025, @Grommes2024, @Hsu2023, @Hsu2024, @Ohkuma2023, @Grommes2022, @Grommes2021, @Tubiana2021, @Hsu2020, @Singh2020, @Zhao2020b, @Lee2020, @Grommes2020)
-- Lipid membranes, protein and vesicle dynamics (@Pape2023, @Bause2021, @Zhao2020)
+- Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
+- Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
 - Colloidal self-assembly
-- Adaptive resoultion simulations (@Thaler2020, @Fiorentini2020)
-- Ionic liquids (@Gholami2025, @Zhang2021)
+- Adaptive resoultion simulations [@Thaler2020; @Fiorentini2020]
+- Ionic liquids [@Gholami2025; @Zhang2021]
 - Phase separation models [@Brunk2021]
 - Active matter and microswimmers
 - Coarse-grained methods [@Rudzinski2020]
@@ -105,7 +105,7 @@ Key features of Espresso++ include:
 
 Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
 
-- **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance2023]
+- **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance:2023]
 - **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao:2004]
 - **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman:2017]
 - **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lee-Edwards boundary conditions 
