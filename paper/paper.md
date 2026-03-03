@@ -1,5 +1,5 @@
 ---
-title: 'Espresso++: A Fast and Extensible Molecular Simulation Package for Coarse-Grained Models'
+title: 'ESPResSo++: A Fast and Extensible Molecular Simulation Package for Coarse-Grained Models'
 tags:
   - molecular dynamics
   - coarse-grained simulations
@@ -61,13 +61,13 @@ bibliography: paper.bib
 
 # Summary
 
-**Espresso++** is an open-source software package for **molecular dynamics (MD) simulations** with a particular emphasis on **coarse-grained models** of soft matter systems. Written in C++ with a flexible Python interface, it is designed for **high-performance computing (HPC)** environments and supports **massively parallel simulations** through MPI. The package enables simulations of polymers, membranes, colloids, complex fluids, and active matter with a wide range of interaction models and advanced algorithms.
+**ESPResSo++** is an open-source software package for **molecular dynamics (MD) simulations** with a particular emphasis on **coarse-grained models** of soft matter systems. Written in C++ with a flexible Python interface, it is designed for **high-performance computing (HPC)** environments and supports **massively parallel simulations** through MPI. The package enables simulations of polymers, membranes, colloids, complex fluids, and active matter with a wide range of interaction models and advanced algorithms.
 
-Espresso++ builds upon the experience of its predecessor [ESPResSo](http://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. The software is actively developed by an international community of researchers in physics, chemistry, biology, and materials science.
+ESPResSo++ builds upon the experience of its predecessor [ESPResSo](http://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. The software is actively developed by an international community of researchers in physics, chemistry, biology, and materials science.
 
 # Statement of need
 
-Molecular dynamics simulations are essential tools for exploring the behavior of soft matter systems at mesoscopic scales. Traditional all-atom MD codes (e.g., GROMACS, LAMMPS) are often not efficient or flexible enough for coarse-grained models that require custom interactions or specialized algorithms. Espresso++ addresses this gap by providing:
+Molecular dynamics simulations are essential tools for exploring the behavior of soft matter systems at mesoscopic scales. Traditional all-atom MD codes (e.g., GROMACS, LAMMPS) are often not efficient or flexible enough for coarse-grained models that require custom interactions or specialized algorithms. ESPResSo++ addresses this gap by providing:
 
 - A modular and extensible design, enabling researchers to easily implement new interaction potentials and integrators.
 - Efficient parallelization for large-scale simulations of complex systems.
@@ -75,11 +75,11 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 - A Python-based scripting interface for ease of use, reproducibility, and coupling with external analysis tools.
 - Multi-scale simulation techniques such as AdResS and Lees-Edwards
 
-Espresso++ is widely used in academic research and has been applied in numerous scientific studies, including investigations of:
+ESPResSo++ is widely used in academic research and has been applied in numerous scientific studies, including investigations of:
 
 - Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
 - Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
-- Adaptive resoultion simulations [@Thaler2020; @Fiorentini2020]
+- Adaptive resolution simulations [@Thaler2020; @Fiorentini2020]
 - Ionic liquids [@Gholami2025; @Zhang2021]
 - Others [@Smith2023; @Brunk2021; @Rudzinski2020]
 
@@ -88,10 +88,10 @@ It is actively maintained and extended by a community of researchers, with contr
 
 # Functionality
 
-Key features of Espresso++ include:
+Key features of ESPResSo++ include:
 
 - **Inter-particle interactions**: Lennard-Jones, Coulomb, soft repulsive, bonded interactions, tabulated potentials, and more.
-- **Algorithms**: Molecular dynamics, Langevin dynamics, dissipative particle dynamics (DPD), Brownian dynamics, adpative resolution simulations (AdResS), Monte Carlo sampling.
+- **Algorithms**: Molecular dynamics, Langevin dynamics, dissipative particle dynamics (DPD), Brownian dynamics, adaptive resolution simulations (AdResS), Monte Carlo sampling.
 - **Electrostatics**: Particle–particle particle–mesh (P3M), Ewald summation, and other long-range methods.
 - **Parallelization**: Domain decomposition using MPI, optimized for massively parallel architectures.
 - **Python interface**: Full simulation control and analysis scripting in Python.
@@ -99,12 +99,12 @@ Key features of Espresso++ include:
 
 # New Features since last release
 
-Since the last major release of Espresso++ v2.0 in 2018 a number of new functionalities and features have been added, including:
+Since the last major release of ESPResSo++ v2.0 in 2018 a number of new functionalities and features have been added, including:
 
 - **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance:2023]
-- **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao:2004]
+- **Cell decomposition**: allow sub-decomposition into cells with a length of half or a third of the cutoff for direct force calculations [@Yao:2004]
 - **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman:2017]
-- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lee-Edwards boundary conditions 
+- **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lees-Edwards boundary conditions 
 - **Checkpoint the state of the random number generator (RNG)**: allow restarting from checkpointed state of RNG
 - **I/O**: support for parallel writing and reading of H5MD checkpoints
 - **Python 3 compatibility**
@@ -190,4 +190,4 @@ espressopp.tools.pdbwrite("simplelj.pdb", system, molsize=num_particles)
 ```
 
 # Acknowledgements
-We thank the Espresso++ developer community and all contributors listed in the AUTHORS file. Espresso++ has been supported by the Transregio TRR146 of the German Research Foundation. Espresso++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
+We thank the ESPResSo++ developer community and all contributors listed in the AUTHORS file. ESPResSo++ has been supported by the Transregio TRR146 of the German Research Foundation. ESPResSo++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
