@@ -79,13 +79,9 @@ Espresso++ is widely used in academic research and has been applied in numerous 
 
 - Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
 - Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
-- Colloidal self-assembly
 - Adaptive resoultion simulations [@Thaler2020; @Fiorentini2020]
 - Ionic liquids [@Gholami2025; @Zhang2021]
-- Phase separation models [@Brunk2021]
-- Active matter and microswimmers
-- Coarse-grained methods [@Rudzinski2020]
-- Others [@Smith2023]
+- Others [@Smith2023; @Brunk2021; @Rudzinski2020]
 
 It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
 
