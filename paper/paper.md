@@ -109,7 +109,7 @@ Since the last major release of Espresso++ v2.0 in 2018 a number of new function
 - **Cell decomposition**: allow sub-demcomposition into cells with a lenght of half or a third of the cutoff for direct force calaculations [@Yao:2004]
 - **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman:2017]
 - **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lee-Edwards boundary conditions 
-- **Checkpoint the state of the random number generator (RNG)**: allow restaring from checkpointed state of RNG
+- **Checkpoint the state of the random number generator (RNG)**: allow restarting from checkpointed state of RNG
 - **I/O**: support for parallel writing and reading of H5MD checkpoints
 - **Python 3 compatibility**
 
@@ -194,5 +194,4 @@ espressopp.tools.pdbwrite("simplelj.pdb", system, molsize=num_particles)
 ```
 
 # Acknowledgements
-We thank the Espresso++ developer community and all contributors listed in the AUTHORS file.
-Espresso++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
+We thank the Espresso++ developer community and all contributors listed in the AUTHORS file. Espresso++ has been supported by the Transregio TRR146 of the German Research Foundation. Espresso++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
