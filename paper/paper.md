@@ -63,7 +63,7 @@ bibliography: paper.bib
 
 **ESPResSo++** is an open-source software package for **molecular dynamics (MD) simulations** with a particular emphasis on **coarse-grained models** of soft matter systems. Written in C++ with a flexible Python interface, it is designed for **high-performance computing (HPC)** environments and supports **massively parallel simulations** through MPI. The package enables simulations of polymers, membranes, colloids, complex fluids, and active matter with a wide range of interaction models and advanced algorithms.
 
-ESPResSo++ builds upon the experience of its predecessor [ESPResSo](http://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. The software is actively developed by an international community of researchers in physics, chemistry, biology, and materials science.
+ESPResSo++ builds upon the experience of its predecessor [ESPResSo](https://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. The software is actively developed by an international community of researchers in physics, chemistry, biology, and materials science.
 
 # Statement of need
 
@@ -190,4 +190,4 @@ espressopp.tools.pdbwrite("simplelj.pdb", system, molsize=num_particles)
 ```
 
 # Acknowledgements
-We thank the ESPResSo++ developer community and all contributors listed in the AUTHORS file. ESPResSo++ has been supported by the Transregio TRR146 of the German Research Foundation. ESPResSo++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
+We thank the ESPResSo++ developer community and all contributors listed in the AUTHORS file. ESPResSo++ has been supported by the Transregio TRR146 of the German Research Foundation. The ESPResSo++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
