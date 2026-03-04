@@ -55,19 +55,19 @@ affiliations:
     index: 6
 
 
-date: 2025-10-02
+date: 2 October 2025
 bibliography: paper.bib
 ---
 
 # Summary
 
-**ESPResSo++** is an open-source software package for **molecular dynamics (MD) simulations** with a particular emphasis on **coarse-grained models** of soft matter systems. Written in C++ with a flexible Python interface, it is designed for **high-performance computing (HPC)** environments and supports **massively parallel simulations** through MPI. The package enables simulations of polymers, membranes, colloids, complex fluids, and active matter with a wide range of interaction models and advanced algorithms.
+**ESPResSo++** is an open-source software package for molecular dynamics (MD) simulations with a particular emphasis on coarse-grained (CG) models of soft matter systems. Written in C++ with a flexible Python interface, it is designed for high-performance computing (HPC) environments and supports massively parallel simulations through MPI. The package enables simulations of polymers, membranes, colloids, complex fluids, and active matter with a wide range of interaction models and advanced algorithms.
 
-ESPResSo++ builds upon the experience of its predecessor [ESPResSo](https://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. The software is actively developed by an international community of researchers in physics, chemistry, biology, and materials science.
+ESPResSo++ builds upon the experience of its predecessor [ESPResSo](https://espressomd.org), but provides a cleaner, more modular codebase and enhanced extensibility. It is actively developed by an international community of researchers across multiple institutions and disciplines.
 
 # Statement of need
 
-Molecular dynamics simulations are essential tools for exploring the behavior of soft matter systems at mesoscopic scales. Traditional all-atom MD codes (e.g., GROMACS, LAMMPS) are often not efficient or flexible enough for coarse-grained models that require custom interactions or specialized algorithms. ESPResSo++ addresses this gap by providing:
+Molecular dynamics simulations are essential tools for exploring the behavior of soft matter systems at mesoscopic scales. General-purpose MD codes such as GROMACS [@Abraham2015] and LAMMPS [@Thompson2022] are primarily optimized for all-atom simulations and may require significant customization for coarse-grained models that need non-standard interactions or specialized multiscale algorithms. ESPResSo++ addresses this gap by providing:
 
 - A modular and extensible design, enabling researchers to easily implement new interaction potentials and integrators.
 - Efficient parallelization for large-scale simulations of complex systems.
@@ -75,16 +75,35 @@ Molecular dynamics simulations are essential tools for exploring the behavior of
 - A Python-based scripting interface for ease of use, reproducibility, and coupling with external analysis tools.
 - Multi-scale simulation techniques such as AdResS and Lees-Edwards
 
-ESPResSo++ is widely used in academic research and has been applied in numerous scientific studies, including investigations of:
+# State of the field
+
+Several established MD packages serve the soft matter and coarse-grained simulation communities. **LAMMPS** [@Thompson2022] is a general-purpose, highly scalable code with broad force field support and a flexible plugin architecture; however, its input scripting language is less suited to complex CG workflows, and adaptive resolution is not a core feature. **GROMACS** [@Abraham2015] provides exceptional performance for standard force fields and supports the Martini CG model ecosystem, but adding truly novel CG interactions requires modifying the C++ source, and its file-based workflow is less interactive than a Python API. **HOOMD-blue** [@Anderson2020] is the most directly comparable package, offering a Python-native API and GPU-accelerated CG simulations for soft matter; however, it lacks support for adaptive resolution methods. **OpenMM** [@Eastman2017] excels at GPU-accelerated simulations and allows custom force definitions via algebraic expressions, but targets primarily biomolecular systems and lacks MPI-based multi-node parallelization. The sibling project **ESPResSo** [@Weik2019] shares common roots but focuses on charged systems, hydrodynamic coupling (lattice Boltzmann), and electrokinetics rather than multiscale resolution bridging.
+
+ESPResSo++ occupies a distinct niche as a package purpose-built for coarse-grained and multiscale soft matter simulations. Its key differentiator is first-class support for adaptive resolution simulation (AdResS), which allows seamless coupling of atomistic and coarse-grained representations within a single simulation. ESPResSo++ is currently the only actively maintained MD package that provides AdResS as a core feature; none of the other packages listed above offer this capability. Rather than contributing these capabilities to an existing general-purpose code, a dedicated package allows tighter integration of multiscale algorithms with the domain decomposition, neighbor list construction, and force computation pipeline — design choices that would be difficult to retrofit into architectures optimized for all-atom throughput.
+
+# Software design
+
+ESPResSo++ uses a layered C++/Python architecture. The performance-critical computational kernel — force calculations, integration, domain decomposition, and communication — is implemented in C++17 and exposed to Python through Boost.Python bindings. Each C++ class provides a static `registerPython()` method, and a central registration dispatcher ensures that the full object hierarchy is available as the `espressopp` Python module. This design lets users assemble, configure, and control simulations entirely from Python while retaining the performance of compiled C++ for the inner loops.
+
+**Modularity through templates and extensions.** Interactions are implemented using C++ class templates parameterized by a potential type (e.g., `VerletListInteractionTemplate<_Potential>`), so that adding a new pairwise potential requires only implementing the `computeEnergy()` and `computeForce()` methods of a `Potential` subclass. The integrator follows a similar pattern: an `MDIntegrator` base class exposes an `addExtension()` mechanism through which thermostats, barostats, constraints, and adaptive resolution layers are attached via Boost.Signals2 callbacks. This signal-based coupling keeps extensions decoupled from the integration loop and from each other.
+
+**Parallelization.** ESPResSo++ employs spatial domain decomposition with MPI. The simulation box is partitioned across MPI ranks using a `NodeGrid`, and each rank further subdivides its domain into linked cells via a `CellGrid`. Ghost particle exchange handles communication of boundary data. A non-blocking variant (`DomainDecompositionNonBlocking`) overlaps communication with computation, and the heterogeneous spatial domain decomposition algorithm (HeSpaDDA) [@Guzman:2017] provides load balancing for spatially inhomogeneous systems.
+
+**Performance optimizations.** Since version 2.0, ESPResSo++ has been modernized with SIMD vectorization through a structure-of-arrays (SOA) particle data layout (`ParticleArray`) with 64-byte alignment, yielding an overall three-times speedup for short-range non-bonded force calculations [@Vance:2023]. An improved cell decomposition scheme [@Yao:2004] allows sub-decomposition into cells with a length of half or a third of the cutoff radius, reducing the number of unnecessary distance calculations.
+
+**Testing and documentation.** The code is tested through a combination of Boost.Test (C++) and Python `unittest` test suites, executed via CMake/CTest and continuous integration on GitHub Actions. User documentation is built with Sphinx; developer API documentation with Doxygen.
+
+# Research impact statement
+
+ESPResSo++ has enabled research across a broad range of soft matter topics over more than a decade of active development. It has been used in numerous peer-reviewed studies, including investigations of:
 
 - Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
 - Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
 - Adaptive resolution simulations [@Thaler2020; @Fiorentini2020]
-- Ionic liquids [@Gholami2025; @Zhang2021]
-- Others [@Smith2023; @Brunk2021; @Rudzinski2020]
+- Ionic liquids under shear flow [@Gholami2025; @Zhang2021]
+- Coarse-grained conformational surface hopping [@Rudzinski2020]
 
-It is actively maintained and extended by a community of researchers, with contributions from multiple institutions. Its flexible architecture makes it a valuable tool for developing novel coarse-grained models and algorithms in soft matter research.
-
+The project is developed across multiple institutions — Max Planck Institute for Polymer Research, Max Planck Computing and Data Facility, Los Alamos National Laboratory, Johannes Gutenberg University of Mainz, and Heidelberg University — with contributions from both current and former developers documented in the AUTHORS file. The codebase has a public development history spanning more than ten years on GitHub, with continuous integration, code coverage tracking, and versioned releases.
 
 # Functionality
 
@@ -188,6 +207,10 @@ for n in range(20):
 espressopp.tools.pdbwrite("simplelj.pdb", system, molsize=num_particles)
 
 ```
+
+# AI usage disclosure
+
+No generative AI tools were used in the creation of the ESPResSo++ software or its documentation. During the preparation of this manuscript, AI-assisted tools were used for copyediting and formatting. All content was reviewed and verified by the authors.
 
 # Acknowledgements
 We thank the ESPResSo++ developer community and all contributors listed in the AUTHORS file. ESPResSo++ has been supported by the Transregio TRR146 of the German Research Foundation. The ESPResSo++ project is supported by the U.S. Department of Energy through Los Alamos National Laboratory (LANL). Los Alamos National Laboratory is operated by Triad National Security, LLC, for the National Nuclear Security Administration of the U.S. Department of Energy (contract no. 89233218CNA000001). This paper has been assigned a Los Alamos Unlimited Release number of LA-UR-26-XXXXX.
