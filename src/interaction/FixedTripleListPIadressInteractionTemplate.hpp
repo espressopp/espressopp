@@ -113,11 +113,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Angular; }
 
@@ -136,12 +136,12 @@ protected:
 template <typename _AngularPotential>
 inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addForces()
 {
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -174,17 +174,17 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addFo
                     it6 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
-                    std::vector<Particle *> atList3;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
+                    std::vector<Particle*> atList3;
                     atList1 = it4->second;
                     atList2 = it5->second;
                     atList3 = it6->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    std::vector<Particle *>::iterator itv3 = atList3.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    std::vector<Particle*>::iterator itv3 = atList3.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -197,9 +197,9 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addFo
                         }
 
                         // Get the individual PI beads
-                        Particle &p4 = **itv;
-                        Particle &p5 = **itv2;
-                        Particle &p6 = **itv3;
+                        Particle& p4 = **itv;
+                        Particle& p5 = **itv2;
+                        Particle& p6 = **itv3;
 
                         if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                         {
@@ -252,17 +252,17 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addFo
                 it6 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
-                std::vector<Particle *> atList3;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
+                std::vector<Particle*> atList3;
                 atList1 = it4->second;
                 atList2 = it5->second;
                 atList3 = it6->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                std::vector<Particle *>::iterator itv3 = atList3.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                std::vector<Particle*>::iterator itv3 = atList3.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -275,9 +275,9 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addFo
                     }
 
                     // Get the individual PI beads
-                    Particle &p4 = **itv;
-                    Particle &p5 = **itv2;
-                    Particle &p6 = **itv3;
+                    Particle& p4 = **itv;
+                    Particle& p5 = **itv2;
+                    Particle& p6 = **itv3;
 
                     if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                     {
@@ -321,13 +321,13 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::addFo
 template <typename _AngularPotential>
 inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeEnergy()
 {
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real e = 0.0;
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -355,17 +355,17 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                     it6 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
-                    std::vector<Particle *> atList3;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
+                    std::vector<Particle*> atList3;
                     atList1 = it4->second;
                     atList2 = it5->second;
                     atList3 = it6->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    std::vector<Particle *>::iterator itv3 = atList3.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    std::vector<Particle*>::iterator itv3 = atList3.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -378,9 +378,9 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                         }
 
                         // Get the individual PI beads
-                        Particle &p4 = **itv;
-                        Particle &p5 = **itv2;
-                        Particle &p6 = **itv3;
+                        Particle& p4 = **itv;
+                        Particle& p5 = **itv2;
+                        Particle& p6 = **itv3;
 
                         if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                         {
@@ -425,17 +425,17 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                 it6 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
-                std::vector<Particle *> atList3;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
+                std::vector<Particle*> atList3;
                 atList1 = it4->second;
                 atList2 = it5->second;
                 atList3 = it6->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                std::vector<Particle *>::iterator itv3 = atList3.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                std::vector<Particle*>::iterator itv3 = atList3.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -448,9 +448,9 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                     }
 
                     // Get the individual PI beads
-                    Particle &p4 = **itv;
-                    Particle &p5 = **itv2;
-                    Particle &p6 = **itv3;
+                    Particle& p4 = **itv;
+                    Particle& p5 = **itv2;
+                    Particle& p6 = **itv3;
 
                     if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                     {
@@ -536,7 +536,7 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
 
 template <typename _AngularPotential>
 inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in "
                  "FixedTripleListPIadressInteractionTemplate does not work."
@@ -548,12 +548,12 @@ template <typename _AngularPotential>
 inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeVirial()
 {
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
 
         real w1 = p1.lambda();
         real w2 = p2.lambda();
@@ -584,17 +584,17 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                     it6 != fixedtupleList->end())
                 {
                     // Get the PI bead lists (i.e. the AdResS particles)
-                    std::vector<Particle *> atList1;
-                    std::vector<Particle *> atList2;
-                    std::vector<Particle *> atList3;
+                    std::vector<Particle*> atList1;
+                    std::vector<Particle*> atList2;
+                    std::vector<Particle*> atList3;
                     atList1 = it4->second;
                     atList2 = it5->second;
                     atList3 = it6->second;
 
                     // Iterate the two iterators in a parallel fashion
-                    std::vector<Particle *>::iterator itv2 = atList2.begin();
-                    std::vector<Particle *>::iterator itv3 = atList3.begin();
-                    for (std::vector<Particle *>::iterator itv = atList1.begin();
+                    std::vector<Particle*>::iterator itv2 = atList2.begin();
+                    std::vector<Particle*>::iterator itv3 = atList3.begin();
+                    for (std::vector<Particle*>::iterator itv = atList1.begin();
                          itv != atList1.end(); ++itv)
                     {
                         if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -607,9 +607,9 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                         }
 
                         // Get the individual PI beads
-                        Particle &p4 = **itv;
-                        Particle &p5 = **itv2;
-                        Particle &p6 = **itv3;
+                        Particle& p4 = **itv;
+                        Particle& p5 = **itv2;
+                        Particle& p6 = **itv3;
 
                         if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                         {
@@ -659,17 +659,17 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                 it6 != fixedtupleList->end())
             {
                 // Get the PI bead lists (i.e. the AdResS particles)
-                std::vector<Particle *> atList1;
-                std::vector<Particle *> atList2;
-                std::vector<Particle *> atList3;
+                std::vector<Particle*> atList1;
+                std::vector<Particle*> atList2;
+                std::vector<Particle*> atList3;
                 atList1 = it4->second;
                 atList2 = it5->second;
                 atList3 = it6->second;
 
                 // Iterate the two iterators in a parallel fashion
-                std::vector<Particle *>::iterator itv2 = atList2.begin();
-                std::vector<Particle *>::iterator itv3 = atList3.begin();
-                for (std::vector<Particle *>::iterator itv = atList1.begin(); itv != atList1.end();
+                std::vector<Particle*>::iterator itv2 = atList2.begin();
+                std::vector<Particle*>::iterator itv3 = atList3.begin();
+                for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end();
                      ++itv)
                 {
                     if (itv2 == atList2.end() || itv3 == atList3.end())
@@ -682,9 +682,9 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
                     }
 
                     // Get the individual PI beads
-                    Particle &p4 = **itv;
-                    Particle &p5 = **itv2;
-                    Particle &p6 = **itv3;
+                    Particle& p4 = **itv;
+                    Particle& p5 = **itv2;
+                    Particle& p6 = **itv3;
 
                     if (p4.pib() != p5.pib() || p5.pib() != p6.pib())
                     {
@@ -729,7 +729,7 @@ inline real FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
 
 template <typename _AngularPotential>
 inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor &w)
+    Tensor& w)
 {
     std::cout << "Warning! At the moment computeVirialTensor in "
                  "FixedTripleListPIadressInteractionTemplate does not work."
@@ -739,7 +739,7 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
 
 template <typename _AngularPotential>
 inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor &w, real z)
+    Tensor& w, real z)
 {
     std::cout << "Warning! At the moment IK computeVirialTensor in "
                  "FixedTripleListPIadressInteractionTemplate does not work."
@@ -749,7 +749,7 @@ inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::compu
 
 template <typename _AngularPotential>
 inline void FixedTripleListPIadressInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor *w, int n)
+    Tensor* w, int n)
 {
     std::cout << "Warning! At the moment IK computeVirialTensor in "
                  "FixedTripleListPIadressInteractionTemplate does not work."

@@ -35,16 +35,26 @@
 
 #include "boost/signals2.hpp"
 
+#ifdef RANDOM123_EXIST
+#include <Random123/threefry.h>
+#include <Random123/uniform.hpp>
+#endif
+
 namespace espressopp
 {
 namespace integrator
 {
+#ifdef RANDOM123_EXIST
+using namespace r123;
+#endif
 /** DPD thermostat */
 
 class DPDThermostat : public Extension
 {
 public:
-    DPDThermostat(std::shared_ptr<System> system, std::shared_ptr<VerletList> _verletList);
+    DPDThermostat(std::shared_ptr<System> system,
+                  std::shared_ptr<VerletList> _verletList,
+                  int _ntotal);
     ~DPDThermostat();
 
     void setGamma(real gamma);
@@ -95,6 +105,17 @@ private:
     real current_cutoff_sqr;
     std::shared_ptr<VerletList> verletList;
     std::shared_ptr<esutil::RNG> rng;  //!< random number generator used for friction term
+
+    uint64_t mdStep;
+    long long intStep;
+    int ntotal;
+    uint64_t ncounter_per_pair;
+#ifdef RANDOM123_EXIST
+    // uint64_t seed64;  // user-settable seed
+    Threefry2x64::ctr_type counter, crng;
+    Threefry2x64::ukey_type ukey;
+    Threefry2x64::key_type key;
+#endif
 };
 }  // namespace integrator
 }  // namespace espressopp

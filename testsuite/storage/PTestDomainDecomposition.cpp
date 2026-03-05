@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(addAndLookup)
 
     // create a single particle
     Real3D pos(0.5, 0.5, 0.5);
-    Particle *p = domdec->addParticle(0, pos);
+    Particle* p = domdec->addParticle(0, pos);
 
     // now check whether it is there
     BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
@@ -152,12 +152,12 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 
     DomainDecomposition domdec(system, nodeGrid, cellGrid, halfCellInt);
 
-    const CellGrid &cGrid = domdec.getCellGrid();
+    const CellGrid& cGrid = domdec.getCellGrid();
 
     {
         int cnt = 0;
-        for (std::vector<Cell *>::const_iterator it = domdec.getRealCells().begin(),
-                                                 end = domdec.getRealCells().end();
+        for (std::vector<Cell*>::const_iterator it = domdec.getRealCells().begin(),
+                                                end = domdec.getRealCells().end();
              it != end; ++it, ++cnt)
         {
             int m, n, o;
@@ -168,8 +168,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     }
     {
         int cnt = 0;
-        for (std::vector<Cell *>::const_iterator it = domdec.getGhostCells().begin(),
-                                                 end = domdec.getGhostCells().end();
+        for (std::vector<Cell*>::const_iterator it = domdec.getGhostCells().begin(),
+                                                end = domdec.getGhostCells().end();
              it != end; ++it, ++cnt)
         {
             int m, n, o;
@@ -184,8 +184,8 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
 {
     {
         // minimal test: inner cells have 26 neighbors
-        for (std::vector<Cell *>::const_iterator it = domdec->getRealCells().begin(),
-                                                 end = domdec->getRealCells().end();
+        for (std::vector<Cell*>::const_iterator it = domdec->getRealCells().begin(),
+                                                end = domdec->getRealCells().end();
              it != end; ++it)
         {
             BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(26));
@@ -193,8 +193,8 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
     }
     {
         // minimal test: ghost cells have no neighbors
-        for (std::vector<Cell *>::const_iterator it = domdec->getGhostCells().begin(),
-                                                 end = domdec->getGhostCells().end();
+        for (std::vector<Cell*>::const_iterator it = domdec->getGhostCells().begin(),
+                                                end = domdec->getGhostCells().end();
              it != end; ++it)
         {
             BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(0));
@@ -215,7 +215,7 @@ BOOST_FIXTURE_TEST_CASE(decompose, Fixture)
             for (real z = 0.01; z < 3.0; z += 3.0 / 9)
             {
                 Real3D pos(x, y, z);
-                if (domdec->addParticle(count, pos) != static_cast<Particle *>(0))
+                if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
                     numRealParticles++;
                 ++count;
             }
@@ -249,7 +249,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
             for (real z = 0.01; z < 3.0; z += 3.0 / 9)
             {
                 Real3D pos(x, y, z);
-                if (domdec->addParticle(count, pos) != static_cast<Particle *>(0))
+                if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
                     numRealParticles++;
                 ++count;
             }
@@ -298,7 +298,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
                     pos[i] = (0.5 + ipos[i]) * cGrid.getCellSize(i);
                 }
 
-                Particle *p = domdec->addParticle(c++, pos);
+                Particle* p = domdec->addParticle(c++, pos);
 
                 p->type() = 10000 * ipos[0] + 100 * ipos[1] + ipos[2];
                 BOOST_TEST_MESSAGE("generated particle with type " << p->type());
@@ -316,7 +316,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
     for (ESPPIterator<CellList> it(domdec->getLocalCells()); it.isValid(); ++it)
     {
         bool failed = true;
-        ParticleList &pl = (*it)->particles;
+        ParticleList& pl = (*it)->particles;
         int cnt = pl.size();
         // map back cell to coordinates
         Int3D ipos;
@@ -387,7 +387,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
     /* now check that the forces on the particles are correct */
     for (ESPPIterator<CellList> it(domdec->getRealCells()); it.isValid(); ++it)
     {
-        ParticleList &pl = (*it)->particles;
+        ParticleList& pl = (*it)->particles;
         int cnt = pl.size();
         // map back cell to coordinates
         Int3D ipos;
@@ -446,7 +446,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 bool afterResortCalled = false;
 bool beforeResortCalled = false;
 
-void beforeResort(ParticleList &pl, OutBuffer &out)
+void beforeResort(ParticleList& pl, OutBuffer& out)
 {
     if (pl.size() == 1)
     {
@@ -456,7 +456,7 @@ void beforeResort(ParticleList &pl, OutBuffer &out)
     }
 }
 
-void afterResort(ParticleList &pl, InBuffer &inbuf)
+void afterResort(ParticleList& pl, InBuffer& inbuf)
 {
     if (pl.size() == 1)
     {
@@ -496,7 +496,7 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
     Real3D pos(nodes * 1.0 - 0.5, 0.5, 0.5);
     if (mpiWorld->rank() == 0)
     {
-        Particle *p = domdec->addParticle(0, pos);
+        Particle* p = domdec->addParticle(0, pos);
         BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
     }
 
@@ -508,10 +508,10 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
     // now the particle should be on the the last node
     if (mpiWorld->rank() == lastnode)
     {
-        BOOST_CHECK_NE(domdec->lookupRealParticle(0), static_cast<Particle *>(0));
+        BOOST_CHECK_NE(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
     }
     else
     {
-        BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle *>(0));
+        BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
     }
 }

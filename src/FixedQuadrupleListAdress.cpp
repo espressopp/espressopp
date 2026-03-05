@@ -67,14 +67,14 @@ bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, lon
 {
     // here we assume pid1 < pid2 < pid3 < pid4
     bool returnVal = true;
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // ADD THE LOCAL QUADRUPLET
-    Particle *p1 = storage->lookupAdrATParticle(pid1);
-    Particle *p2 = storage->lookupAdrATParticle(pid2);
-    Particle *p3 = storage->lookupAdrATParticle(pid3);
-    Particle *p4 = storage->lookupAdrATParticle(pid4);
+    Particle* p1 = storage->lookupAdrATParticle(pid1);
+    Particle* p2 = storage->lookupAdrATParticle(pid2);
+    Particle* p3 = storage->lookupAdrATParticle(pid3);
+    Particle* p4 = storage->lookupAdrATParticle(pid4);
     if (!p1)
     {
         // Particle does not exist here, return false
@@ -136,7 +136,7 @@ bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, lon
     return returnVal;
 }
 
-void FixedQuadrupleListAdress::beforeSendATParticles(std::vector<longint> &atpl, OutBuffer &buf)
+void FixedQuadrupleListAdress::beforeSendATParticles(std::vector<longint>& atpl, OutBuffer& buf)
 {
     std::vector<longint> toSend;
 
@@ -179,22 +179,22 @@ void FixedQuadrupleListAdress::beforeSendATParticles(std::vector<longint> &atpl,
 }
 
 // Override parent function, this one should be empty
-void FixedQuadrupleListAdress::beforeSendParticles(ParticleList &pl, OutBuffer &buf) {}
+void FixedQuadrupleListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {}
 
 void FixedQuadrupleListAdress::onParticlesChanged()
 {
     // (re-)generate the local quadruple list from the global list
     LOG4ESPP_INFO(theLogger, "Rebuild local bond list from global\n");
 
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     this->clear();
     longint lastpid1 = -1;
-    Particle *p1 = nullptr;
-    Particle *p2 = nullptr;
-    Particle *p3 = nullptr;
-    Particle *p4 = nullptr;
+    Particle* p1 = nullptr;
+    Particle* p2 = nullptr;
+    Particle* p3 = nullptr;
+    Particle* p4 = nullptr;
     for (GlobalQuadruples::const_iterator it = globalQuadruples.begin();
          it != globalQuadruples.end(); ++it)
     {

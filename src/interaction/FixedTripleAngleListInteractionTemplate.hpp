@@ -93,11 +93,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Angular; }
 
@@ -114,12 +114,12 @@ template <typename _AngularPotential>
 inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleAngleList");
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
+        Particle& p3 = *it->third;
         // const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
@@ -140,13 +140,13 @@ inline real FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeE
 {
     LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real e = 0.0;
     for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         // const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
@@ -209,7 +209,7 @@ inline real FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeE
 
 template <typename _AngularPotential>
 inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in FixedTripleAngleListInteractionTemplate "
                  "does not work."
@@ -223,15 +223,15 @@ inline real FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeV
 {
     LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     real w = 0.0;
     for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         // const Potential &potential = getPotential(p1.type(), p2.type());
-        const espressopp::bc::BC &bc = *getSystemRef().bc;
+        const espressopp::bc::BC& bc = *getSystemRef().bc;
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
@@ -249,17 +249,17 @@ inline real FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeV
 
 template <typename _AngularPotential>
 inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor &w)
+    Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Particle &p3 = *it->third;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
+        const Particle& p3 = *it->third;
         // const Potential &potential = getPotential(0, 0);
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
@@ -274,13 +274,13 @@ inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeV
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _AngularPotential>
 inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor &w, real z)
+    Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
@@ -320,7 +320,7 @@ inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeV
 
 template <typename _AngularPotential>
 inline void FixedTripleAngleListInteractionTemplate<_AngularPotential>::computeVirialTensor(
-    Tensor *w, int n)
+    Tensor* w, int n)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 

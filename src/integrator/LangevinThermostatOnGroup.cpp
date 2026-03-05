@@ -94,7 +94,7 @@ void LangevinThermostatOnGroup::thermalize()
     }
 }
 
-void LangevinThermostatOnGroup::frictionThermo(Particle &p)
+void LangevinThermostatOnGroup::frictionThermo(Particle& p)
 {
     real massf = sqrt(p.mass());
 

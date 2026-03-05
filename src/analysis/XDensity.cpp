@@ -42,12 +42,12 @@ namespace analysis
 // splitN is a level of discretisation of density profile (how many elements it contains)
 python::list XDensity::computeArray(int splitN) const
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     esutil::Error err(system.comm);
     real Li = system.bc->getBoxL()[0];
     // int nprocs = system.comm->size();
     // int myrank = system.comm->rank();
-    real *histogram = 0;
+    real* histogram = 0;
     histogram = new real[splitN];
     for (int i = 0; i < splitN; i++) histogram[i] = 0.0;
     // std::vector<real> histogram;
@@ -121,19 +121,19 @@ python::list XDensity::computeArray(int splitN) const
 
         for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
         {  // Iterate over all (CG) particles.
-            Particle &vp = *cit;
+            Particle& vp = *cit;
             FixedTupleListAdress::iterator it2;
             it2 = fixedtupleList->find(&vp);
 
             if (it2 != fixedtupleList->end())
             {  // Are there atomistic particles for given CG particle? If yes, use those for
                // calculation.
-                std::vector<Particle *> atList;
+                std::vector<Particle*> atList;
                 atList = it2->second;
-                for (std::vector<Particle *>::iterator it3 = atList.begin(); it3 != atList.end();
+                for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end();
                      ++it3)
                 {
-                    Particle &at = **it3;
+                    Particle& at = **it3;
                     pos = at.position()[0];
                     if (pos < 0.0)
                     {
@@ -230,7 +230,7 @@ python::list XDensity::computeArray(int splitN) const
     int total_num_part = 0;
     // std::vector<real> totHistogram;
     // for(int i=0;i<splitN;i++) totHistogram.push_back(0.0);
-    real *totHistogram = 0;
+    real* totHistogram = 0;
     totHistogram = new real[splitN];
     for (int i = 0; i < splitN; i++) totHistogram[i] = 0.0;
 

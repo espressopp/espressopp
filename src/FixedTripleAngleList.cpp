@@ -62,13 +62,13 @@ FixedTripleAngleList::~FixedTripleAngleList()
 bool FixedTripleAngleList::add(longint pid1, longint pid2, longint pid3)
 {
     bool returnVal = true;
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // ADD THE LOCAL TRIPLET
-    Particle *p1 = storage->lookupLocalParticle(pid1);
-    Particle *p2 = storage->lookupRealParticle(pid2);
-    Particle *p3 = storage->lookupLocalParticle(pid3);
+    Particle* p1 = storage->lookupLocalParticle(pid1);
+    Particle* p2 = storage->lookupRealParticle(pid2);
+    Particle* p3 = storage->lookupLocalParticle(pid3);
 
     // middle particle is the reference particle and must exist here
     if (!p2)
@@ -179,7 +179,7 @@ real FixedTripleAngleList::getAngle(int pid1, int pid2, int pid3)
     return returnVal;
 }
 
-void FixedTripleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf)
+void FixedTripleAngleList::beforeSendParticles(ParticleList& pl, OutBuffer& buf)
 {
     std::vector<longint> toSendInt;
     std::vector<real> toSendReal;
@@ -220,7 +220,7 @@ void FixedTripleAngleList::beforeSendParticles(ParticleList &pl, OutBuffer &buf)
     LOG4ESPP_INFO(theLogger, "prepared fixed triple list before send particles");
 }
 
-void FixedTripleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf)
+void FixedTripleAngleList::afterRecvParticles(ParticleList& pl, InBuffer& buf)
 {
     std::vector<longint> receivedInt;
     std::vector<real> receivedReal;
@@ -259,16 +259,16 @@ void FixedTripleAngleList::afterRecvParticles(ParticleList &pl, InBuffer &buf)
 
 void FixedTripleAngleList::onParticlesChanged()
 {
-    System &system = storage->getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
     // (re-)generate the local triple list from the global list
     // printf("FixedTripleAngleList: rebuild local triple list from global\n");
     this->clear();
     longint lastpid2 = -1;
-    Particle *p1 = nullptr;
-    Particle *p2 = nullptr;
-    Particle *p3 = nullptr;
+    Particle* p1 = nullptr;
+    Particle* p2 = nullptr;
+    Particle* p3 = nullptr;
     for (TriplesAngles::const_iterator it = triplesAngles.begin(); it != triplesAngles.end(); ++it)
     {
         // printf("lookup global triple %d %d %d\n", it->first, it->second.first,

@@ -40,7 +40,7 @@ namespace espressopp
 {
 namespace io
 {
-bool DumpXTC::open(const char *mode)
+bool DumpXTC::open(const char* mode)
 {
     if (mode[0] == 'a' && !boost::filesystem::exists(file_name))
     {
@@ -81,7 +81,7 @@ void DumpXTC::dump()
         {
             ConfigurationExtIterator cei = conf_real->getIterator();
             // Real3D *box = new Real3D [dim];
-            rvec *coord = new rvec[num_of_particles];
+            rvec* coord = new rvec[num_of_particles];
             RealND props;
             props.setDimension(cei.currentProperties().getDimension());
 

@@ -28,9 +28,9 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-const char *get_format(double x) { return "d"; }
-const char *get_format(float x) { return "f"; }
-const char *get_format(int x) { return "i"; }
+const char* get_format(double x) { return "d"; }
+const char* get_format(float x) { return "f"; }
+const char* get_format(int x) { return "i"; }
 
 namespace espressopp
 {
@@ -39,7 +39,7 @@ namespace io
 /** Initialize a Py_buffer object
  */
 template <class T>
-void init_pb(Py_buffer *pb, int ndim, int *shape)
+void init_pb(Py_buffer* pb, int ndim, int* shape)
 {
     T dum = 0;
     // Setting basic variable of the Py_buffer
@@ -49,10 +49,10 @@ void init_pb(Py_buffer *pb, int ndim, int *shape)
     pb->readonly = 1;
     pb->ndim = ndim;
     // The format is computed as a function of the template type T
-    pb->format = (char *)malloc(2 * sizeof(const char));
+    pb->format = (char*)malloc(2 * sizeof(const char));
     strcpy(pb->format, get_format(dum));
     // Allocation and setting of the shape, stride and len
-    pb->shape = (Py_ssize_t *)malloc(pb->ndim * sizeof(Py_ssize_t));
+    pb->shape = (Py_ssize_t*)malloc(pb->ndim * sizeof(Py_ssize_t));
     pb->strides = NULL;
     pb->itemsize = sizeof(T);
     pb->len = pb->itemsize;
@@ -64,7 +64,7 @@ void init_pb(Py_buffer *pb, int ndim, int *shape)
     pb->buf = malloc(pb->len);
 }
 
-void free_pb(Py_buffer *pb)
+void free_pb(Py_buffer* pb)
 {
     free(pb->format);
     pb->format = NULL;
@@ -122,7 +122,7 @@ void DumpH5MD::clear_buffers()
 
 void DumpH5MD::update()
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     int shape[2];
 
     clear_buffers();
@@ -160,45 +160,45 @@ void DumpH5MD::update()
             it3 = ftpl->find(&(*cit));
             if (it3 != ftpl->end())
             {
-                std::vector<Particle *> atList = it3->second;
-                for (std::vector<Particle *>::iterator itv = atList.begin(); itv != atList.end();
+                std::vector<Particle*> atList = it3->second;
+                for (std::vector<Particle*>::iterator itv = atList.begin(); itv != atList.end();
                      ++itv)
                 {
-                    Particle &at = **itv;
+                    Particle& at = **itv;
                     if (store_position)
                     {
-                        Real3D &tmpPos = at.position();
-                        Int3D &tmpImage = at.image();
-                        ((real *)position.buf)[3 * i] = tmpPos[0];
-                        ((real *)position.buf)[3 * i + 1] = tmpPos[1];
-                        ((real *)position.buf)[3 * i + 2] = tmpPos[2];
+                        Real3D& tmpPos = at.position();
+                        Int3D& tmpImage = at.image();
+                        ((real*)position.buf)[3 * i] = tmpPos[0];
+                        ((real*)position.buf)[3 * i + 1] = tmpPos[1];
+                        ((real*)position.buf)[3 * i + 2] = tmpPos[2];
                         // Store image
-                        ((longint *)image.buf)[3 * i] = tmpImage[0];
-                        ((longint *)image.buf)[3 * i + 1] = tmpImage[1];
-                        ((longint *)image.buf)[3 * i + 2] = tmpImage[2];
+                        ((longint*)image.buf)[3 * i] = tmpImage[0];
+                        ((longint*)image.buf)[3 * i + 1] = tmpImage[1];
+                        ((longint*)image.buf)[3 * i + 2] = tmpImage[2];
                     }
 
-                    ((longint *)id.buf)[i] = at.id();
-                    if (store_mass) ((real *)mass.buf)[i] = at.mass();
-                    if (store_species) ((int *)species.buf)[i] = at.type();
-                    if (store_state) ((int *)state.buf)[i] = at.state();
+                    ((longint*)id.buf)[i] = at.id();
+                    if (store_mass) ((real*)mass.buf)[i] = at.mass();
+                    if (store_species) ((int*)species.buf)[i] = at.type();
+                    if (store_state) ((int*)state.buf)[i] = at.state();
                     if (store_velocity)
                     {
-                        Real3D &tmpVel = at.velocity();
-                        ((real *)velocity.buf)[3 * i] = tmpVel[0];
-                        ((real *)velocity.buf)[3 * i + 1] = tmpVel[1];
-                        ((real *)velocity.buf)[3 * i + 2] = tmpVel[2];
+                        Real3D& tmpVel = at.velocity();
+                        ((real*)velocity.buf)[3 * i] = tmpVel[0];
+                        ((real*)velocity.buf)[3 * i + 1] = tmpVel[1];
+                        ((real*)velocity.buf)[3 * i + 2] = tmpVel[2];
                     }
                     if (store_force)
                     {
-                        Real3D &tmpF = at.force();
-                        ((real *)force.buf)[3 * i] = tmpF[0];
-                        ((real *)force.buf)[3 * i + 1] = tmpF[1];
-                        ((real *)force.buf)[3 * i + 2] = tmpF[2];
+                        Real3D& tmpF = at.force();
+                        ((real*)force.buf)[3 * i] = tmpF[0];
+                        ((real*)force.buf)[3 * i + 1] = tmpF[1];
+                        ((real*)force.buf)[3 * i + 2] = tmpF[2];
                     }
-                    if (store_charge) ((real *)charge.buf)[i] = at.q();
-                    if (store_lambda) ((real *)lambda.buf)[i] = at.lambda();
-                    if (store_res_id) ((int *)res_id.buf)[i] = at.res_id();
+                    if (store_charge) ((real*)charge.buf)[i] = at.q();
+                    if (store_lambda) ((real*)lambda.buf)[i] = at.lambda();
+                    if (store_res_id) ((int*)res_id.buf)[i] = at.res_id();
                     i++;
                 }
             }
@@ -210,49 +210,49 @@ void DumpH5MD::update()
         {
             if (store_position)
             {
-                Real3D &tmpPos = cit->position();
-                Int3D &tmpImage = cit->image();
-                ((real *)position.buf)[3 * i] = tmpPos[0];
-                ((real *)position.buf)[3 * i + 1] = tmpPos[1];
-                ((real *)position.buf)[3 * i + 2] = tmpPos[2];
+                Real3D& tmpPos = cit->position();
+                Int3D& tmpImage = cit->image();
+                ((real*)position.buf)[3 * i] = tmpPos[0];
+                ((real*)position.buf)[3 * i + 1] = tmpPos[1];
+                ((real*)position.buf)[3 * i + 2] = tmpPos[2];
                 // Store image
-                ((longint *)image.buf)[3 * i] = tmpImage[0];
-                ((longint *)image.buf)[3 * i + 1] = tmpImage[1];
-                ((longint *)image.buf)[3 * i + 2] = tmpImage[2];
+                ((longint*)image.buf)[3 * i] = tmpImage[0];
+                ((longint*)image.buf)[3 * i + 1] = tmpImage[1];
+                ((longint*)image.buf)[3 * i + 2] = tmpImage[2];
             }
-            ((longint *)id.buf)[i] = cit->getId();
-            if (store_mass) ((real *)mass.buf)[i] = cit->getMass();
-            if (store_species) ((int *)species.buf)[i] = cit->getType();
-            if (store_state) ((int *)state.buf)[i] = cit->getState();
+            ((longint*)id.buf)[i] = cit->getId();
+            if (store_mass) ((real*)mass.buf)[i] = cit->getMass();
+            if (store_species) ((int*)species.buf)[i] = cit->getType();
+            if (store_state) ((int*)state.buf)[i] = cit->getState();
             if (store_velocity)
             {
-                Real3D &tmpVel = cit->velocity();
-                ((real *)velocity.buf)[3 * i] = tmpVel[0];
-                ((real *)velocity.buf)[3 * i + 1] = tmpVel[1];
-                ((real *)velocity.buf)[3 * i + 2] = tmpVel[2];
+                Real3D& tmpVel = cit->velocity();
+                ((real*)velocity.buf)[3 * i] = tmpVel[0];
+                ((real*)velocity.buf)[3 * i + 1] = tmpVel[1];
+                ((real*)velocity.buf)[3 * i + 2] = tmpVel[2];
             }
             if (store_force)
             {
-                Real3D &tmpF = cit->force();
-                ((real *)force.buf)[3 * i] = tmpF[0];
-                ((real *)force.buf)[3 * i + 1] = tmpF[1];
-                ((real *)force.buf)[3 * i + 2] = tmpF[2];
+                Real3D& tmpF = cit->force();
+                ((real*)force.buf)[3 * i] = tmpF[0];
+                ((real*)force.buf)[3 * i + 1] = tmpF[1];
+                ((real*)force.buf)[3 * i + 2] = tmpF[2];
             }
-            if (store_charge) ((real *)charge.buf)[i] = cit->q();
-            if (store_lambda) ((real *)lambda.buf)[i] = cit->lambda();
-            if (store_res_id) ((int *)res_id.buf)[i] = cit->res_id();
+            if (store_charge) ((real*)charge.buf)[i] = cit->q();
+            if (store_lambda) ((real*)lambda.buf)[i] = cit->lambda();
+            if (store_res_id) ((int*)res_id.buf)[i] = cit->res_id();
             i++;
         }
     }
 }
 
-PyObject *DumpH5MD::getPosition()
+PyObject* DumpH5MD::getPosition()
 {
     if (store_position && position.len) return PyMemoryView_FromBuffer(&position);
     Py_INCREF(Py_None);
     return Py_None;
 }
-PyObject *DumpH5MD::getImage()
+PyObject* DumpH5MD::getImage()
 {
     if (store_position && image.len) return PyMemoryView_FromBuffer(&image);
     std::cout << "store_position=" << store_position << " position.len=" << position.len
@@ -262,63 +262,63 @@ PyObject *DumpH5MD::getImage()
     return Py_None;
 }
 
-PyObject *DumpH5MD::getId()
+PyObject* DumpH5MD::getId()
 {
     if (id.len) return PyMemoryView_FromBuffer(&id);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getSpecies()
+PyObject* DumpH5MD::getSpecies()
 {
     if (store_species && species.len) return PyMemoryView_FromBuffer(&species);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getState()
+PyObject* DumpH5MD::getState()
 {
     if (store_state && state.len) return PyMemoryView_FromBuffer(&state);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getVelocity()
+PyObject* DumpH5MD::getVelocity()
 {
     if (store_velocity && velocity.len) return PyMemoryView_FromBuffer(&velocity);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getForce()
+PyObject* DumpH5MD::getForce()
 {
     if (store_force && force.len) return PyMemoryView_FromBuffer(&force);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getMass()
+PyObject* DumpH5MD::getMass()
 {
     if (store_mass && mass.len) return PyMemoryView_FromBuffer(&mass);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getCharge()
+PyObject* DumpH5MD::getCharge()
 {
     if (store_charge && charge.len) return PyMemoryView_FromBuffer(&charge);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getLambda()
+PyObject* DumpH5MD::getLambda()
 {
     if (store_lambda && lambda.len) return PyMemoryView_FromBuffer(&lambda);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-PyObject *DumpH5MD::getResId()
+PyObject* DumpH5MD::getResId()
 {
     if (store_res_id && res_id.len) return PyMemoryView_FromBuffer(&res_id);
     Py_INCREF(Py_None);

@@ -98,8 +98,8 @@ void PIAdressIntegrator::run(int nsteps)
             "masses for kinetic masses!");
     }
 
-    System &system = getSystemRef();
-    storage::Storage &storage = *system.storage;
+    System& system = getSystemRef();
+    storage::Storage& storage = *system.storage;
     real skinHalf = 0.5 * system.getSkin();
 
     // Set the centroids, weights, and masses
@@ -200,25 +200,25 @@ using namespace boost::python;
 
 void PIAdressIntegrator::initializeSetup()
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getLocalCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
 
             Real3D cmp(0.0, 0.0, 0.0);
             Real3D cmv(0.0, 0.0, 0.0);
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 cmp += at.position();
                 cmv += at.velocity();
             }
@@ -308,22 +308,22 @@ void PIAdressIntegrator::integrateV1(int t, bool doubletime)
             "integrateV1 routine in PIAdressIntegrator received wrong integer.");
     }
 
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
 
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 if ((at.pib() != 1) && (speedup == true) && (vp.lambda() < 0.000000001))
                 {
                     continue;
@@ -353,17 +353,17 @@ void PIAdressIntegrator::integrateV2()
     real half_dt = 0.5 * dt;
     real half_dt4 = 0.25 * dt;
 
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
 
             if (constkinmass == false)
             {  // kinetic mass also changes - hence, second decomposition level required
@@ -373,7 +373,7 @@ void PIAdressIntegrator::integrateV2()
                 {  // do not propagate the higher modes in the CL region when using speedup
                     for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                     {
-                        Particle &at = **it2;
+                        Particle& at = **it2;
                         if (at.pib() == 1)
                         {  // exclude centroid
                             continue;
@@ -394,7 +394,7 @@ void PIAdressIntegrator::integrateV2()
                 // half_dt2, only centroid mode
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if (at.pib() == 1)
                     {  // only centroid
 
@@ -405,7 +405,7 @@ void PIAdressIntegrator::integrateV2()
                             real xi = 0.0;
                             for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                             {
-                                Particle &at2 = **it5;
+                                Particle& at2 = **it5;
                                 if (at2.pib() != 1)
                                 {
                                     if (realkinmass == false)
@@ -499,7 +499,7 @@ void PIAdressIntegrator::integrateV2()
 
                     for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                     {
-                        Particle &at = **it2;
+                        Particle& at = **it2;
 
                         if (at.pib() == 1)
                         {  // exclude centroid
@@ -522,7 +522,7 @@ void PIAdressIntegrator::integrateV2()
             {  // constant kinetic mass - hence, no second decomposition level required
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if ((at.pib() != 1) && (speedup == true) && (vp.lambda() < 0.000000001))
                     {
                         continue;
@@ -550,12 +550,12 @@ void PIAdressIntegrator::integrateV2()
 
 void PIAdressIntegrator::integrateModePos()
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();  //!!!!
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
 
         if (constkinmass == false)
         {  // kinetic mass also changes - hence, second decomposition level required
@@ -565,12 +565,12 @@ void PIAdressIntegrator::integrateModePos()
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList = it3->second;
+                std::vector<Particle*> atList = it3->second;
 
                 // First half_dt4 loop with only centroid mode
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if (at.pib() == 1)
                     {  // only centroid
                         at.modepos() += half_dt4 * at.modemom();
@@ -630,7 +630,7 @@ void PIAdressIntegrator::integrateModePos()
                 real half_dt = 0.5 * ntrotter * dt / (CMDparameter * vp.varmass());
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if ((at.pib() == 1) ||
                         ((speedup == true) && (vp.lambda() < 0.000000001) && (at.pib() != 1)))
                     {  // do not propagate the higher modes in the CL region when using speedup,
@@ -653,7 +653,7 @@ void PIAdressIntegrator::integrateModePos()
                 // Second half_dt4 loop with only centroid mode
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
 
                     if (at.pib() == 1)
                     {  // only centroid
@@ -726,11 +726,11 @@ void PIAdressIntegrator::integrateModePos()
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList = it3->second;
+                std::vector<Particle*> atList = it3->second;
 
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
 
                     if (at.pib() == 1)
                     {
@@ -825,13 +825,13 @@ void PIAdressIntegrator::OUintegrate()
     // careful with 12... it's because the uniform distribution needs to have the same width as the
     // Gaussian one. also note that kb is inside temperature, we use gromacs units
 
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
@@ -840,7 +840,7 @@ void PIAdressIntegrator::OUintegrate()
 
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 if (at.pib() == 1)
                 {
                     if (centroidthermostat == true || vp.lambda() < 1.0)
@@ -933,30 +933,30 @@ void PIAdressIntegrator::OUintegrate()
 void PIAdressIntegrator::transPos1()
 {  // Update the real positions from mode positions
     real maxSqDist = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it2->second;
+            std::vector<Particle*> atList = it2->second;
             Real3D oldpos = vp.position();
 
             for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.position() = zero;
 
                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                 {
-                    Particle &at2 = **it5;
+                    Particle& at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
                     {
                         at.position() += at2.modepos() * Tvectors[at.pib() - 1][at2.pib() - 1];
@@ -994,29 +994,29 @@ void PIAdressIntegrator::transPos1()
 
 void PIAdressIntegrator::transPos2()
 {  // Update the mode positions from real positions
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it2->second;
+            std::vector<Particle*> atList = it2->second;
 
             for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.modepos() = zero;
 
                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                 {
-                    Particle &at2 = **it5;
+                    Particle& at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
                     {
                         at.modepos() += at2.position() * Eigenvectors[at.pib() - 1][at2.pib() - 1];
@@ -1044,28 +1044,28 @@ void PIAdressIntegrator::transMom1()
 {  // Update the real velocities from mode momenta
     real maxSqDist = 0.0;
 
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it2->second;
+            std::vector<Particle*> atList = it2->second;
             for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.velocity() = zero;
 
                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                 {
-                    Particle &at2 = **it5;
+                    Particle& at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
                     {
                         if (int_c(at2.pib()) > 1 && int_c(at2.pib()) <= ntrotter)
@@ -1145,28 +1145,28 @@ void PIAdressIntegrator::transMom1()
 
 void PIAdressIntegrator::transMom2()
 {  // Update the mode momenta from real velocities
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it2->second;
+            std::vector<Particle*> atList = it2->second;
             for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
                 Real3D zero(0.0, 0.0, 0.0);
                 at.modemom() = zero;
 
                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                 {
-                    Particle &at2 = **it5;
+                    Particle& at2 = **it5;
                     if (int_c(at.pib()) <= ntrotter)
                     {
                         at.modemom() += at2.velocity() * Eigenvectors[at.pib() - 1][at2.pib() - 1];
@@ -1230,26 +1230,26 @@ void PIAdressIntegrator::transMom2()
 
 void PIAdressIntegrator::transForces()
 {  // Update the mode forces from real forces
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
         if (it2 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it2->second;
+            std::vector<Particle*> atList = it2->second;
             for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
             {
-                Particle &at = **it3;
+                Particle& at = **it3;
 
                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                 {
-                    Particle &at2 = **it5;
+                    Particle& at2 = **it5;
                     if (at.pib() == 1)
                     {
                         at.forcem() += (1.0 / sqrt(ntrotter)) * at2.force();
@@ -1279,8 +1279,8 @@ void PIAdressIntegrator::transForces()
 
 void PIAdressIntegrator::calcForcesS()
 {  // Calculate slow forces, this is, all interatomic non-bonded forces
-    System &sys = getSystemRef();
-    const InteractionList &srIL = sys.shortRangeInteractions;
+    System& sys = getSystemRef();
+    const InteractionList& srIL = sys.shortRangeInteractions;
     for (size_t i = 0; i < srIL.size(); i++)
     {
         if (srIL[i]->bondType() == Nonbonded)
@@ -1292,8 +1292,8 @@ void PIAdressIntegrator::calcForcesS()
 
 void PIAdressIntegrator::calcForcesM()
 {  // Calculate medium forces, this is, all interatomic bonded forces (pair and angular)
-    System &sys = getSystemRef();
-    const InteractionList &srIL = sys.shortRangeInteractions;
+    System& sys = getSystemRef();
+    const InteractionList& srIL = sys.shortRangeInteractions;
     for (size_t i = 0; i < srIL.size(); i++)
     {
         if (srIL[i]->bondType() == Pair || srIL[i]->bondType() == Angular)
@@ -1309,13 +1309,13 @@ void PIAdressIntegrator::calcForcesM()
 void PIAdressIntegrator::calcForcesF()
 {  // Calculate fast forces, this is, the intra-ring forces between the path integral beads (purely
    // in mode space)
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it2;
         it2 = fixedtupleList->find(&vp);
 
@@ -1329,10 +1329,10 @@ void PIAdressIntegrator::calcForcesF()
             {
                 if (it2 != fixedtupleList->end())
                 {
-                    std::vector<Particle *> atList = it2->second;
+                    std::vector<Particle*> atList = it2->second;
                     for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                     {
-                        Particle &at = **it3;
+                        Particle& at = **it3;
                         if (at.pib() > 1 && int_c(at.pib()) <= ntrotter)
                         {
                             at.forcem() -=
@@ -1346,7 +1346,7 @@ void PIAdressIntegrator::calcForcesF()
                                 real xi = 0.0;
                                 for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                                 {
-                                    Particle &at2 = **it5;
+                                    Particle& at2 = **it5;
                                     if (at2.pib() != 1)
                                     {
                                         xi += at2.modepos().sqr() * Eigenvalues[at2.pib() - 1];
@@ -1429,10 +1429,10 @@ void PIAdressIntegrator::calcForcesF()
         {
             if (it2 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList = it2->second;
+                std::vector<Particle*> atList = it2->second;
                 for (auto it3 = atList.begin(); it3 != atList.end(); ++it3)
                 {
-                    Particle &at = **it3;
+                    Particle& at = **it3;
                     if (at.pib() > 1 && int_c(at.pib()) <= ntrotter)
                     {
                         at.forcem() -=
@@ -1446,7 +1446,7 @@ void PIAdressIntegrator::calcForcesF()
                             real xi = 0.0;
                             for (auto it5 = atList.begin(); it5 != atList.end(); ++it5)
                             {
-                                Particle &at2 = **it5;
+                                Particle& at2 = **it5;
                                 if (at2.pib() != 1)
                                 {
                                     xi += at2.modepos().sqr() * Eigenvalues[at2.pib() - 1];
@@ -1531,7 +1531,7 @@ void PIAdressIntegrator::updateForces(int f)
 {
     initForces(f);
 
-    storage::Storage &storage = *getSystemRef().storage;
+    storage::Storage& storage = *getSystemRef().storage;
     if (f == 2 || f == 3)
     {
         storage.updateGhosts();
@@ -1570,22 +1570,22 @@ void PIAdressIntegrator::updateForces(int f)
 void PIAdressIntegrator::distributeForces()
 {  // distribute forces from atomistic particles (path integral beads) to CG particles (physical
    // atoms)
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getLocalCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
             Real3D vpfm = vp.force();
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 at.force() += (1.0 / ntrotter) * vpfm;
             }
         }
@@ -1601,13 +1601,13 @@ void PIAdressIntegrator::distributeForces()
 
 void PIAdressIntegrator::initForces(int f)
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
 
     if (f == 1)
     {  // If mode forces, we do not care about ghosts, CG particles, and real forces
         // real atomistic particles
         CellList localCells = system.storage->getLocalCells();
-        ParticleList &adrATparticles = system.storage->getAdrATParticles();
+        ParticleList& adrATparticles = system.storage->getAdrATParticles();
         for (auto it = adrATparticles.begin(); it != adrATparticles.end(); ++it)
         {
             it->forcem() = 0.0;
@@ -1624,7 +1624,7 @@ void PIAdressIntegrator::initForces(int f)
             cit->forcem() = 0.0;
         }
         // real atomistic particles
-        ParticleList &adrATparticles = system.storage->getAdrATParticles();
+        ParticleList& adrATparticles = system.storage->getAdrATParticles();
         for (auto it = adrATparticles.begin(); it != adrATparticles.end(); ++it)
         {
             it->force() = 0.0;
@@ -1632,7 +1632,7 @@ void PIAdressIntegrator::initForces(int f)
         }
         // atomistic ghost particles
         typedef std::list<ParticleList> ParticleListAdr;
-        ParticleListAdr &adrATparticlesG = system.storage->getAdrATParticlesG();
+        ParticleListAdr& adrATparticlesG = system.storage->getAdrATParticlesG();
         for (auto it = adrATparticlesG.begin(); it != adrATparticlesG.end(); ++it)
         {
             for (auto it2 = it->begin(); it2 != it->end(); ++it2)
@@ -1653,20 +1653,20 @@ void PIAdressIntegrator::initForces(int f)
 real PIAdressIntegrator::computeKineticEnergy()
 {
     real esum = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 if (at.pib() == 1)
                 {
                     esum += at.modemom().sqr() * ntrotter / vp.mass();
@@ -1731,20 +1731,20 @@ real PIAdressIntegrator::computeKineticEnergy()
 real PIAdressIntegrator::computeRingEnergy()
 {  // internal ring energy based on mode positions
     real esum = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 if (at.pib() == 1)
                 {
                     continue;
@@ -1779,22 +1779,22 @@ real PIAdressIntegrator::computeRingEnergy()
 real PIAdressIntegrator::computeRingEnergyRaw()
 {  // internal ring energy based on real positions
     real esum = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())
         {
-            std::vector<Particle *> atList = it3->second;
+            std::vector<Particle*> atList = it3->second;
             Real3D pos1(0.0, 0.0, 0.0);
             Real3D posN(0.0, 0.0, 0.0);
             for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
             {
-                Particle &at = **it2;
+                Particle& at = **it2;
                 if (at.pib() == 1)
                 {
                     pos1 = at.position();
@@ -1835,22 +1835,22 @@ real PIAdressIntegrator::computeRingEnergyRaw()
 real PIAdressIntegrator::computeMomentumDrift(int parttype)
 {
     real esum = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         if (int_c(vp.type()) == parttype)
         {
             FixedTupleListAdress::iterator it3;
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList = it3->second;
+                std::vector<Particle*> atList = it3->second;
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if (at.pib() == 1)
                     {
                         continue;
@@ -1896,22 +1896,22 @@ real PIAdressIntegrator::computeMomentumDrift(int parttype)
 real PIAdressIntegrator::computePositionDrift(int parttype)
 {
     real esum = 0.0;
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList realCells = system.storage->getRealCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         if (int_c(vp.type()) == parttype)
         {
             FixedTupleListAdress::iterator it3;
             it3 = fixedtupleList->find(&vp);
             if (it3 != fixedtupleList->end())
             {
-                std::vector<Particle *> atList = it3->second;
+                std::vector<Particle*> atList = it3->second;
                 for (auto it2 = atList.begin(); it2 != atList.end(); ++it2)
                 {
-                    Particle &at = **it2;
+                    Particle& at = **it2;
                     if (at.pib() == 1)
                     {
                         continue;
@@ -1945,13 +1945,13 @@ real PIAdressIntegrator::computePositionDrift(int parttype)
 
 void PIAdressIntegrator::setWeights()
 {
-    System &system = getSystemRef();
+    System& system = getSystemRef();
     CellList localCells = system.storage->getLocalCells();
     std::shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
 
     for (CellListIterator cit(localCells); !cit.isDone(); ++cit)
     {
-        Particle &vp = *cit;
+        Particle& vp = *cit;
         FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
         if (it3 != fixedtupleList->end())

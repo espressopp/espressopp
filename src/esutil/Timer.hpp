@@ -53,7 +53,7 @@ public:
 };
 
 /// when printing give the current elapsed time
-inline std::ostream &operator<<(std::ostream &os, const Timer &timer)
+inline std::ostream& operator<<(std::ostream& os, const Timer& timer)
 {
     os << timer.getElapsedTime() << "s";
     return os;

@@ -43,7 +43,7 @@ public:
         size[2] = z;
     }
 
-    Grid(const Int3D &_size)
+    Grid(const Int3D& _size)
     {
         for (int i = 0; i < 3; ++i)
         {
@@ -52,7 +52,7 @@ public:
     }
 
     longint getGridSize(int i) const { return size[i]; }
-    const Int3D &getGridSize() const { return size; }
+    const Int3D& getGridSize() const { return size; }
 
     longint getNumberOfCells() const
     {
@@ -69,13 +69,13 @@ public:
     {
         return p1 + size[0] * (p2 + size[1] * p3);
     }
-    longint mapPositionToIndex(const Int3D &pos) const
+    longint mapPositionToIndex(const Int3D& pos) const
     {
         return mapPositionToIndex(pos[0], pos[1], pos[2]);
     }
 
     /// convert a sequence index back to a grid position
-    void mapIndexToPosition(int &p1, int &p2, int &p3, longint index) const
+    void mapIndexToPosition(int& p1, int& p2, int& p3, longint index) const
     {
         p1 = index % size[0];
         index /= size[0];
@@ -84,7 +84,7 @@ public:
         p3 = index;
     }
 
-    void mapIndexToPosition(Int3D &pos, longint index) const
+    void mapIndexToPosition(Int3D& pos, longint index) const
     {
         mapIndexToPosition(pos[0], pos[1], pos[2], index);
     }

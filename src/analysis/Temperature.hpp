@@ -59,7 +59,7 @@ public:
         int myN, systemN;
         real sumT = 0.0;
         real v2sum = 0.0;
-        System &system = getSystemRef();
+        System& system = getSystemRef();
         int count = 0;
 
         if (system.storage->getFixedTuples())
@@ -68,19 +68,19 @@ public:
             CellList realCells = system.storage->getRealCells();
             for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
             {  // Iterate over all (CG) particles.
-                Particle &vp = *cit;
+                Particle& vp = *cit;
                 FixedTupleListAdress::iterator it2;
                 it2 = fixedtupleList->find(&vp);
 
                 if (it2 != fixedtupleList->end())
                 {  // Are there atomistic particles for given CG particle? If yes, use those for
                    // calculation.
-                    std::vector<Particle *> atList;
+                    std::vector<Particle*> atList;
                     atList = it2->second;
-                    for (std::vector<Particle *>::iterator it3 = atList.begin();
-                         it3 != atList.end(); ++it3)
+                    for (std::vector<Particle*>::iterator it3 = atList.begin(); it3 != atList.end();
+                         ++it3)
                     {
-                        Particle &at = **it3;
+                        Particle& at = **it3;
                         if (!has_types || valid_type_ids.count(at.type()))
                         {
                             Real3D vel = at.velocity();

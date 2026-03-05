@@ -33,17 +33,17 @@ namespace espressopp
 namespace esutil
 {
 /** Print Stack*/
-static inline void printStackTrace(std::stringstream &msg)
+static inline void printStackTrace(std::stringstream& msg)
 {
-    void *addrlist[128];
-    int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void *));
+    void* addrlist[128];
+    int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void*));
     if (addrlen == 0)
     {
         return;
     }
     msg << "Stack trace:" << std::endl;
 
-    char **symbollist = backtrace_symbols(addrlist, addrlen);
+    char** symbollist = backtrace_symbols(addrlist, addrlen);
     for (int i = 4; i < addrlen; i++)
     {
         msg << symbollist[i] << std::endl;

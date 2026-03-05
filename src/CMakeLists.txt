@@ -1,8 +1,9 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES esutil/GenLogger.cpp)
 file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp io/DumpXTCAdress.cpp)
+file(GLOB_RECURSE FCS_SOURCE interaction/CoulombScafacos.cpp)
 
-list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE})
+list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${DUMP_XTC_SOURCE} ${FCS_SOURCE})
 
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
                                                       -DPROJECT_VERSION_MAJOR="${PROJECT_VERSION_MAJOR}"
@@ -71,6 +72,17 @@ target_link_libraries(_espressopp PUBLIC Python3::Python)
 target_link_libraries(_espressopp PUBLIC MPI::MPI_CXX)
 target_link_libraries(_espressopp PRIVATE FFTW3::fftw3)
 target_link_libraries(_espressopp PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
+
+if (SCAFACOS_FOUND)
+    target_compile_definitions(_espressopp PRIVATE -DFCS_EXIST -DHAVE_CONFIG_H)
+    target_link_libraries(_espressopp PRIVATE PkgConfig::SCAFACOS)
+    target_sources(_espressopp PRIVATE ${FCS_SOURCE})
+endif()
+
+if (RANDOM123_FOUND)
+    target_include_directories(_espressopp PRIVATE ${RANDOM123_INCLUDES})
+    target_compile_definitions(_espressopp PRIVATE -DRANDOM123_EXIST)
+endif()
 
 if(WITH_XTC)
     target_compile_definitions(_espressopp PRIVATE -DHAS_GROMACS)

@@ -88,11 +88,11 @@ public:
     virtual real computeEnergyCG();
     virtual real computeEnergyAA(int atomtype);
     virtual real computeEnergyCG(int atomtype);
-    virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
+    virtual void computeVirialX(std::vector<real>& p_xx_total, int bins);
     virtual real computeVirial();
-    virtual void computeVirialTensor(Tensor &w);
-    virtual void computeVirialTensor(Tensor &w, real z);
-    virtual void computeVirialTensor(Tensor *w, int n);
+    virtual void computeVirialTensor(Tensor& w);
+    virtual void computeVirialTensor(Tensor& w, real z);
+    virtual void computeVirialTensor(Tensor* w, int n);
     virtual real getMaxCutoff();
     virtual int bondType() { return Pair; }
 
@@ -109,11 +109,11 @@ template <typename _Potential>
 inline void FixedPairDistListInteractionTemplate<_Potential>::addForces()
 {
     LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
-    const bc::BC &bc = *getSystemRef().bc;
+    const bc::BC& bc = *getSystemRef().bc;
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle& p1 = *it->first;
+        Particle& p2 = *it->second;
         Real3D r21(0.0, 0.0, 0.0);
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
@@ -134,11 +134,11 @@ inline real FixedPairDistListInteractionTemplate<_Potential>::computeEnergy()
     LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
 
     real e = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D r21(0.0, 0.0, 0.0);
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         real currentDist = fixedPairDistList->getDist(p1.getId(), p2.getId());
@@ -197,7 +197,7 @@ inline real FixedPairDistListInteractionTemplate<_Potential>::computeEnergyCG(in
 
 template <typename _Potential>
 inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialX(
-    std::vector<real> &p_xx_total, int bins)
+    std::vector<real>& p_xx_total, int bins)
 {
     std::cout << "Warning! At the moment computeVirialX in FixedPairDistListInteractionTemplate "
                  "does not work."
@@ -212,11 +212,11 @@ inline real FixedPairDistListInteractionTemplate<_Potential>::computeVirial()
     LOG4ESPP_INFO(theLogger, "compute the virial for the FixedPair List");
 
     real w = 0.0;
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
 
         Real3D r21(0.0, 0.0, 0.0);
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
@@ -235,16 +235,16 @@ inline real FixedPairDistListInteractionTemplate<_Potential>::computeVirial()
 }
 
 template <typename _Potential>
-inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w)
+inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D r21(0.0, 0.0, 0.0);
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         real currentDist = fixedPairDistList->getDist(p1.getId(), p2.getId());
@@ -258,21 +258,21 @@ inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTenso
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _Potential>
-inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w, real z)
+inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor& w, real z)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
     Tensor wlocal(0.0);
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
@@ -292,23 +292,23 @@ inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTenso
 
     // reduce over all CPUs
     Tensor wsum(0.0);
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, 6, (double *)&wsum, std::plus<double>());
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
     w += wsum;
 }
 
 template <typename _Potential>
-inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor *w, int n)
+inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTensor(Tensor* w, int n)
 {
     LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-    const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
+    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
     Real3D Li = bc.getBoxL();
-    Tensor *wlocal = new Tensor[n];
+    Tensor* wlocal = new Tensor[n];
     for (int i = 0; i < n; i++) wlocal[i] = Tensor(0.0);
     for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList); it.isValid(); ++it)
     {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
+        const Particle& p1 = *it->first;
+        const Particle& p2 = *it->second;
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
 
@@ -338,8 +338,8 @@ inline void FixedPairDistListInteractionTemplate<_Potential>::computeVirialTenso
     }
 
     // reduce over all CPUs
-    Tensor *wsum = new Tensor[n];
-    boost::mpi::all_reduce(*mpiWorld, (double *)&wlocal, n, (double *)&wsum, std::plus<double>());
+    Tensor* wsum = new Tensor[n];
+    boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
 
     for (int j = 0; j < n; j++)
     {

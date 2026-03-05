@@ -61,7 +61,7 @@ BOOST_FIXTURE_TEST_CASE(test1, Fixture)
     default constructor. */
 BOOST_FIXTURE_TEST_CASE(test2, Fixture)
 {
-    T &t = a4.at(0, 0, 0, 0);
+    T& t = a4.at(0, 0, 0, 0);
     BOOST_CHECK_EQUAL(t.a_, -1);
 }
 
@@ -76,15 +76,15 @@ BOOST_FIXTURE_TEST_CASE(test3, Fixture)
     a4.at(1, 1, 1, 1) = T(6);
 
     // First check if objects at certain places are correct.
-    T &t2 = a4.at(2, 0, 0, 0);
+    T& t2 = a4.at(2, 0, 0, 0);
     BOOST_CHECK_EQUAL(t2.a_, 2);
-    T &t3 = a4.at(2, 3, 0, 0);
+    T& t3 = a4.at(2, 3, 0, 0);
     BOOST_CHECK_EQUAL(t3.a_, 3);
-    T &t4 = a4.at(2, 3, 4, 0);
+    T& t4 = a4.at(2, 3, 4, 0);
     BOOST_CHECK_EQUAL(t4.a_, 4);
-    T &t5 = a4.at(2, 3, 4, 5);
+    T& t5 = a4.at(2, 3, 4, 5);
     BOOST_CHECK_EQUAL(t5.a_, 5);
-    T &t6 = a4.at(1, 1, 1, 1);
+    T& t6 = a4.at(1, 1, 1, 1);
     BOOST_CHECK_EQUAL(t6.a_, 6);
 
     // Check the size of the array.
@@ -102,7 +102,7 @@ BOOST_FIXTURE_TEST_CASE(test3, Fixture)
             {
                 for (int q = 0; q < a4.size_q(); q++)
                 {
-                    T &tt = a4.at(i, j, p, q);
+                    T& tt = a4.at(i, j, p, q);
                     if (i == 2 && j == 0 && p == 0 && q == 0)
                         BOOST_CHECK_EQUAL(tt.a_, 2);
                     else if (i == 2 && j == 3 && p == 0 && q == 0)

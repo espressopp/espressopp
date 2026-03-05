@@ -115,6 +115,23 @@ if (USE_CCACHE)
     endif()
 endif()
 
+#############################
+# Find ScaFaCoS (optional)  #
+#############################
+
+find_package(PkgConfig)
+if(PkgConfig_FOUND)
+    pkg_check_modules(SCAFACOS IMPORTED_TARGET scafacos)
+    if ( SCAFACOS_FOUND )
+        add_definitions( -DHAVE_CONFIG_H )
+    endif()
+endif()
+
+#############################
+# Find Random123 (optional) #
+#############################
+find_package(RANDOM123)
+
 ######################################
 # Include the following subdirectory #
 ######################################

@@ -65,21 +65,21 @@ public:
                    bool _extForce,
                    bool _coupling,
                    Real3D _f,
-                   std::vector<real> &_gamma);  // perform collision step
+                   std::vector<real>& _gamma);  // perform collision step
 
-    void calcLocalMoments(real *m);  // calculate local moments
+    void calcLocalMoments(real* m);  // calculate local moments
 
-    void relaxMoments(real *m,
+    void relaxMoments(real* m,
                       bool _extForce,
                       Real3D _f,
-                      std::vector<real> &_gamma);  // relax local moms to eq moms
+                      std::vector<real>& _gamma);  // relax local moms to eq moms
 
-    void thermalFluct(real *m);  // apply thermal fluctuations
+    void thermalFluct(real* m);  // apply thermal fluctuations
 
-    void applyForces(real *m, Real3D _f,
-                     std::vector<real> &_gamma);  // apply ext and coupl forces
+    void applyForces(real* m, Real3D _f,
+                     std::vector<real>& _gamma);  // apply ext and coupl forces
 
-    void btranMomToPop(real *m);  // back-transform moms to pops
+    void btranMomToPop(real* m);  // back-transform moms to pops
 
 private:
     std::vector<real> f;              // populations on a site

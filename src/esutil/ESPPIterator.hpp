@@ -36,14 +36,14 @@ class ESPPIterator
 public:
     ESPPIterator() : stlIt(), stlEnd() {}
 
-    ESPPIterator(STLContainer &container) : stlIt(container.begin()), stlEnd(container.end()) {}
+    ESPPIterator(STLContainer& container) : stlIt(container.begin()), stlEnd(container.end()) {}
 
     ESPPIterator(typename STLContainer::iterator begin, typename STLContainer::iterator end)
         : stlIt(begin), stlEnd(end)
     {
     }
 
-    ESPPIterator &operator++()
+    ESPPIterator& operator++()
     {
         ++stlIt;
         return *this;
@@ -51,8 +51,8 @@ public:
     bool isValid() const { return stlIt != stlEnd; }
     bool isDone() const { return !isValid(); }
 
-    value_type &operator*() const { return *stlIt; }
-    value_type *operator->() const { return &**this; }
+    value_type& operator*() const { return *stlIt; }
+    value_type* operator->() const { return &**this; }
 
     typename STLContainer::iterator getSTLIterator() { return stlIt; }
 

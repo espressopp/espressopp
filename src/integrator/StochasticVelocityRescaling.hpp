@@ -118,7 +118,7 @@ private:
 
     std::shared_ptr<esutil::RNG> rng;  //!< random number generator
 
-    GammaDistribution *gammaDist;
+    GammaDistribution* gammaDist;
 
     void rescaleVelocities();
 
