@@ -85,11 +85,12 @@ ESPResSo++ occupies a distinct niche as a package purpose-built for coarse-grain
 
 ESPResSo++ uses a layered C++/Python architecture. The performance-critical computational kernel (force calculations, integration, domain decomposition, and communication) is implemented in C++17 and exposed to Python through Boost.Python bindings. Each C++ class provides a static `registerPython()` method, and a central registration dispatcher ensures that the full object hierarchy is available as the `espressopp` Python module. This design lets users assemble, configure, and control simulations entirely from Python while retaining the performance of compiled C++ for the inner loops.
 
-**Modularity through templates and extensions.** Interactions are implemented using C++ class templates parameterized by a potential type (e.g., `VerletListInteractionTemplate<_Potential>`), so that adding a new pairwise potential requires only implementing the `computeEnergy()` and `computeForce()` methods of a `Potential` subclass. The integrator follows a similar pattern: an `MDIntegrator` base class exposes an `addExtension()` mechanism through which thermostats, barostats, constraints, and adaptive resolution layers are attached via Boost.Signals2 callbacks. This signal-based coupling keeps extensions decoupled from the integration loop and from each other.
+**Modularity through templates and extensions.** Interactions are implemented using C++ class templates parameterized by a potential type (e.g.,\
+`VerletListInteractionTemplate<_Potential>`), so that adding a new pairwise potential requires only implementing the `computeEnergy()` and `computeForce()` methods of a `Potential` subclass. The integrator follows a similar pattern: an `MDIntegrator` base class exposes an `addExtension()` mechanism through which thermostats, barostats, constraints, and adaptive resolution layers are attached via Boost.Signals2 callbacks. This signal-based coupling keeps extensions decoupled from the integration loop and from each other.
 
 **Parallelization.** ESPResSo++ employs spatial domain decomposition with MPI. The simulation box is partitioned across MPI ranks using a `NodeGrid`, and each rank further subdivides its domain into linked cells via a `CellGrid`. Ghost particle exchange handles communication of boundary data. A non-blocking variant (`DomainDecompositionNonBlocking`) overlaps communication with computation, and the heterogeneous spatial domain decomposition algorithm (HeSpaDDA) [@Guzman:2017] provides load balancing for spatially inhomogeneous systems.
 
-**Performance optimizations.** Since version 2.0, ESPResSo++ has been modernized with SIMD vectorization through a structure-of-arrays (SOA) particle data layout (`ParticleArray`) with 64-byte alignment, yielding an overall three-times speedup for short-range non-bonded force calculations [@Vance:2023]. An improved cell decomposition scheme [@Yao:2004] allows sub-decomposition into cells with a length of half or a third of the cutoff radius, reducing the number of unnecessary distance calculations.
+**Performance optimizations.** Since version 2.0 [@Guzman2019], ESPResSo++ has been modernized with SIMD vectorization through a structure-of-arrays (SOA) particle data layout (`ParticleArray`) with 64-byte alignment, yielding an overall three-times speedup for short-range non-bonded force calculations [@Vance:2023]. An improved cell decomposition scheme [@Yao:2004] allows sub-decomposition into cells with a length of half or a third of the cutoff radius, reducing the number of unnecessary distance calculations.
 
 **Testing and documentation.** The code is tested through a combination of Boost.Test (C++) and Python `unittest` test suites, executed via CMake/CTest and continuous integration on GitHub Actions. User documentation is built with Sphinx; developer API documentation with Doxygen.
 
@@ -145,7 +146,7 @@ dt            = 0.005      # time step for 1 md step
 epsilon       = 1.0        # energy unit
 sigma         = 1.0        # length unit
 temperature   = 1.0        # temperature of the simulation
-LJcaprad      = 0.8        # inital capping radius for LJ interaction to prevent explosion
+LJcaprad      = 0.8        # inital capping radius for LJ interaction
                            # for random configurations
 
 # system setup
@@ -160,7 +161,8 @@ cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # interaction setup, here short range non-bonded Lennard Jones potential
-interaction    = espressopp.interaction.VerletListLennardJonesCapped(espressopp.VerletList(system, cutoff=rc))
+interaction    = espressopp.interaction.VerletListLennardJonesCapped(
+                   espressopp.VerletList(system, cutoff=rc))
 interaction.setPotential(type1=0, type2=0,
                          potential=espressopp.interaction.LennardJonesCapped(
                            epsilon, sigma, rc, shift='auto', caprad=LJcaprad))
