@@ -43,7 +43,7 @@ authors:
 affiliations:
   - name: Max Planck Institute for Polymer Research, Mainz, Germany
     index: 1
-  - name: Max Planck Computing and Data Facility, Garchingen, Germany
+  - name: Max Planck Computing and Data Facility, Garching, Germany
     index: 2
   - name: Los Alamos National Laboratory, Los Alamos, USA
     index: 3
