@@ -25,9 +25,9 @@ authors:
   - name: Tristan Bereau
     orcid: 0000-0001-9945-1271
     affiliation: 5
-  - name: Horacio Vargas Guzman
+  - name: Horacio V. Guzman
     orcid: 0000-0003-2564-3005
-    affiliation: 1
+    affiliation: 7
   - name: Bin Song
     orcid: 0000-0003-4229-9242
     affiliation: 1
@@ -53,7 +53,8 @@ affiliations:
     index: 5
   - name: Independent researcher, Poznań, Poland 
     index: 6
-
+  - name: Institut de Ciència de Materials, Barcelona, Spain
+    index: 7
 
 date: 2 October 2025
 bibliography: paper.bib
