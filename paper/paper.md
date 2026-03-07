@@ -53,7 +53,7 @@ affiliations:
     index: 5
   - name: Independent researcher, Poznań, Poland 
     index: 6
-  - name: Institut de Ciència de Materials de Barcelona ICMAB-CSIC, E-08193 Spain
+  - name: Institut de Ciència de Materials, Barcelona, Spain
     index: 7
 
 date: 2 October 2025
