@@ -84,7 +84,7 @@ ESPResSo++ occupies a distinct niche as a package purpose-built for coarse-grain
 
 # Software design
 
-ESPResSo++ uses a layered C++/Python architecture. The performance-critical computational kernel (force calculations, integration, domain decomposition, and communication) is implemented in C++17 and exposed to Python through Boost.Python bindings. Each C++ class provides a static `registerPython()` method, and a central registration dispatcher ensures that the full object hierarchy is available as the `espressopp` Python module. This design lets users assemble, configure, and control simulations entirely from Python while retaining the performance of compiled C++ for the inner loops.
+ESPResSo++ uses a layered C++/Python architecture. The performance-critical computational kernel (force calculations, integration, domain decomposition, and communication) is implemented in C++17 and exposed to Python through Boost.Python bindings. Each Python-exposed C++ class provides a static `registerPython()` method, and a central registration dispatcher ensures that the full object hierarchy is available as the `espressopp` Python module. This design lets users assemble, configure, and control simulations entirely from Python while retaining the performance of compiled C++ for the inner loops.
 
 **Modularity through templates and extensions.**\
 Interactions are implemented using C++ class templates parameterized by a potential type (e.g., `VerletListInteractionTemplate<_Potential>`), so that adding a new pairwise potential requires only implementing the `computeEnergy()` and `computeForce()` methods of a `Potential` subclass. The integrator follows a similar pattern: an `MDIntegrator` base class exposes an `addExtension()` mechanism through which thermostats, barostats, constraints, and adaptive resolution layers are attached via Boost.Signals2 callbacks. This signal-based coupling keeps extensions decoupled from the integration loop and from each other.
@@ -121,7 +121,7 @@ Key features of ESPResSo++ include:
 - **Python interface**: Full simulation control and analysis scripting in Python.
 - **Extensibility**: Modular design allows easy addition of new force fields, integrators, or analysis tools.
 
-# New Features since last release
+# New Features since ESPResSo++ v2.0
 
 Since the last major release of ESPResSo++ v2.0 in 2018 [@Guzman2019] a number of new functionalities and features have been added, including:
 
@@ -174,7 +174,6 @@ system.addInteraction(interaction)
 
 # integrator setup
 integrator     = espressopp.integrator.VelocityVerlet(system)
-integrator.dt  = dt
 
 # thermostat setup
 thermostat             = espressopp.integrator.LangevinThermostat(system)
@@ -202,7 +201,7 @@ system.storage.addParticles(new_particles, *props)
 
 integrator.dt = 0.0001 # very small timestep for initial warmup
 for n in range(20):
-  # warmup finished, switch to uncapped Lennard Jones potential and increase timestep
+  # warmup finished, switch to uncapped Lennard Jones potential and increase timestep dt
   if n == 10: 
     interaction = espressopp.interaction.VerletListLennardJones(
                     espressopp.VerletList(system, cutoff=rc))
@@ -211,7 +210,7 @@ for n in range(20):
                                epsilon, sigma, rc, shift='auto'))
     system.removeInteraction(0)
     system.addInteraction(interaction)
-    integrator.dt = 0.005
+    integrator.dt = dt
   integrator.run(10000)
   Etot = system.getInteraction(0).computeEnergy()
   print("md time = {:4.1f}, total energy: {:10.2f}".format(integrator.dt*n*10000, Etot))

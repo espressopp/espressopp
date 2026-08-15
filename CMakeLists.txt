@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 include(CMakePrintHelpers)
 
-project(espressopp VERSION 3.0.0 LANGUAGES CXX)
+project(espressopp VERSION 3.1.0 LANGUAGES CXX)
 # C is only used for hdf5, see https://gitlab.kitware.com/cmake/cmake/-/merge_requests/8015
 if(CMAKE_VERSION VERSION_LESS 3.26)
  enable_language(C)
