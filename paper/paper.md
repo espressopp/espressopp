@@ -103,7 +103,7 @@ The code is tested through a combination of Boost.Test (C++) and Python `unittes
 ESPResSo++ has enabled research across a broad range of soft matter topics over more than a decade of active development. It has been used in numerous peer-reviewed studies, including investigations of:
 
 - Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
-- Polymer concepts in Polysomes organization [@Guzman2026]
+- Polymer concepts in Polysomes organization [@Guzman:2026]
 - Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
 - Adaptive resolution simulations [@Thaler2020; @Fiorentini2020]
 - Ionic liquids under shear flow [@Gholami2025; @Zhang2021]
