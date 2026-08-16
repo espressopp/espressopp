@@ -90,7 +90,7 @@ ESPResSo++ uses a layered C++/Python architecture. The performance-critical comp
 Interactions are implemented using C++ class templates parameterized by a potential type (e.g., `VerletListInteractionTemplate<_Potential>`), so that adding a new pairwise potential requires only implementing the `computeEnergy()` and `computeForce()` methods of a `Potential` subclass. The integrator follows a similar pattern: an `MDIntegrator` base class exposes an `addExtension()` mechanism through which thermostats, barostats, constraints, and adaptive resolution layers are attached via Boost.Signals2 callbacks. This signal-based coupling keeps extensions decoupled from the integration loop and from each other.
 
 **Parallelization.**\
-ESPResSo++ employs spatial domain decomposition with MPI. The simulation box is partitioned across MPI ranks using a `NodeGrid`, and each rank further subdivides its domain into linked cells via a `CellGrid`. Ghost particle exchange handles communication of boundary data. A non-blocking variant (`DomainDecompositionNonBlocking`) overlaps communication with computation, and the heterogeneous spatial domain decomposition algorithm (HeSpaDDA) [@Guzman:2017] provides load balancing for spatially inhomogeneous systems.
+ESPResSo++ employs spatial domain decomposition with MPI. The simulation box is partitioned across MPI ranks using a `NodeGrid`, and each rank further subdivides its domain into linked cells via a `CellGrid`. Ghost particle exchange handles communication of boundary data. A non-blocking variant (`DomainDecompositionNonBlocking`) overlaps communication with computation, and the heterogeneous spatial domain decomposition algorithm (HeSpaDDA) [@Guzman2017] provides load balancing for spatially inhomogeneous systems.
 
 **Performance optimizations.**\
 Since version 2.0 [@Guzman2019], ESPResSo++ has been modernized with SIMD vectorization through a structure-of-arrays (SOA) particle data layout (`ParticleArray`) with 64-byte alignment, yielding an overall three-times speedup for short-range non-bonded force calculations [@Vance:2023]. An improved cell decomposition scheme [@Yao:2004] allows sub-decomposition into cells with a length of half or a third of the cutoff radius, reducing the number of unnecessary distance calculations.
@@ -103,9 +103,9 @@ The code is tested through a combination of Boost.Test (C++) and Python `unittes
 ESPResSo++ has enabled research across a broad range of soft matter topics over more than a decade of active development. It has been used in numerous peer-reviewed studies, including investigations of:
 
 - Polymer rheology and entanglement effects [@Grommes:2025; @Grommes2024; @Hsu2023; @Hsu2024; @Ohkuma2023; @Grommes2022; @Grommes2021; @Tubiana2021; @Hsu2020; @Singh2020; @Zhao2020b; @Lee2020; @Grommes2020]
-- Polymer concepts in Polysomes organization [@Guzman:2026]
+- Polymer concepts in Polysomes organization [@Guzman2026]
 - Lipid membranes, protein and vesicle dynamics [@Pape2023; @Bause2021; @Zhao2020]
-- Adaptive resolution simulations [@Thaler2020; @Fiorentini2020]
+- Adaptive resolution simulations [@Bevc2013; @Thaler2020; @Fiorentini2020]
 - Ionic liquids under shear flow [@Gholami2025; @Zhang2021]
 - Coarse-grained conformational surface hopping [@Rudzinski2020]
 
@@ -128,7 +128,7 @@ Since the last major release of ESPResSo++ v2.0 in 2018 [@Guzman2019] a number o
 
 - **SIMD vectorization and related optimizations**: enhance compute performance on modern CPUs [@Vance:2023]
 - **Cell decomposition**: allow sub-decomposition into cells with a length of half or a third of the cutoff for direct force calculations [@Yao:2004]
-- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman:2017]
+- **HeSpaDDA**: heterogeneous spatial domain decomposition algorithm (HeSpaDDA) for larger scale simulations [@Guzman2017]
 - **new potentials and simulation methods**: AngularCosineSquared, TabulatedSubEnsAngular, surface hopping MD, Lees-Edwards boundary conditions 
 - **Checkpoint the state of the random number generator (RNG)**: allow restarting from checkpointed state of RNG
 - **I/O**: support for parallel writing and reading of H5MD checkpoints
