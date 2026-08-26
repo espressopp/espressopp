@@ -103,10 +103,10 @@ Here is an example of an end-user's python script to add an interaction using th
 
 .. code-block:: python
 
-   harmonicbondslist = espresso.FixedPairList(system.storage)
+   harmonicbondslist = espressopp.FixedPairList(system.storage)
    harmonicbondslist.addBonds(bond_list) #bond_list is a list of tuples [(particleindex_i,particleindex_j),...]
-   harmonic_potential = espresso.interaction.Harmonic(K=10.0, r0=1.0, cutoff = 5.0, shift = 0.0)
-   harmonic_interaction = espresso.interaction.FixedPairListHarmonic(system, harmonicbondslist, potential=harmonic_potential)
+   harmonic_potential = espressopp.interaction.Harmonic(K=10.0, r0=1.0, cutoff = 5.0, shift = 0.0)
+   harmonic_interaction = espressopp.interaction.FixedPairListHarmonic(system, harmonicbondslist, potential=harmonic_potential)
    system.addInteraction(harmonic_interaction)
 
 Compare this to the contents of ``Harmonic.py`` to understand the python source code.

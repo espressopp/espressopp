@@ -76,7 +76,7 @@ In this interaction potential, a different charge can be associated with each pa
 
 >>> pref = 138.935485
 >>> rc = 1.2
->>> fixedpairlist = espresso.FixedPairList(system.storage)
+>>> fixedpairlist = espressopp.FixedPairList(system.storage)
 >>> fixedpairlist.addBonds([(1,2),(2,3)])
 >>> pot = espressopp.interaction.CoulombTruncated(prefactor=pref, cutoff=rc)
 >>> interaction=espressopp.interaction.FixedPairListTypesCoulombTruncated(system,fixedpairlist)
