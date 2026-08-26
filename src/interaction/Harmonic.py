@@ -481,6 +481,6 @@ if pmi.isController:
 
     class VerletListHarmonic(Interaction, metaclass=pmi.Proxy):
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHarmonicLocal',
+            cls =  'espressopp.interaction.VerletListHarmonicLocal',
             pmicall = ['setPotential','getPotential']
             )

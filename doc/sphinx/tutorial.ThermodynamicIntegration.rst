@@ -152,6 +152,6 @@ Some notes
 
 2. The procedure described here is desolvation. To get the free energy of solvation, we take the negative of the value obtained after integration.
 
-3. The example Python code snippets here use the helper functions ``gromacs.setLennardJonesInteractionsTI`` and ``gromacs.setCoulombInteractionsTI`` contained in ``$ESPRESSOHOME/src/tools/convert/gromacs.py``, but this is not necessary. You can do TI with |espp| without the Gromacs parser by directly calling ``espresso.interaction.LennardJonesSoftcoreTI`` and ``espresso.interaction.ReactionFieldGeneralizedTI``. See the documentation of these two classes. 
+3. The example Python code snippets here use the helper functions ``gromacs.setLennardJonesInteractionsTI`` and ``gromacs.setCoulombInteractionsTI`` contained in ``$ESPRESSOHOME/src/tools/convert/gromacs.py``, but this is not necessary. You can do TI with |espp| without the Gromacs parser by directly calling ``espressopp.interaction.LennardJonesSoftcoreTI`` and ``espressopp.interaction.ReactionFieldGeneralizedTI``. See the documentation of these two classes. 
 
 .. 2. For convenience, there is a module ``WCASoftcoreTI`` for doing TI in WCA systems, though in principal one could also use ``LJSoftcoreTI`` to simulate the WCA potential by choosing the appropriate cutoff and post-processing the output.
