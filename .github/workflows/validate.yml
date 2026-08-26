@@ -53,6 +53,11 @@ jobs:
       - name: Build
         run: cmake --build build --verbose --target all -j 2
 
+      - name: Test module
+        run: |
+          export PYTHONPATH=$PWD/build${PYTHONPATH:+:$PYTHONPATH}
+          python3 -c "import espressopp"
+
       - name: Install
         run: cmake --install build
 
