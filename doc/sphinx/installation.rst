@@ -57,7 +57,7 @@ After successfully building |espp| add the src directory to your PYTHONPATH:
 
 In order to use matplotlib.pyplot for graphical output get the open source code from:
 
-  http://sourceforge.net/projects/matplotlib
+  https://matplotlib.org/
 
 and follow the installation instructions of your distribution.
 
