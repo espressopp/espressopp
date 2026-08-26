@@ -53,7 +53,7 @@ After successfully building |espp| add the src directory to your PYTHONPATH:
 
 .. code-block:: bash
 
-   export PYTHONPATH=$PWD/src:${PYTHONPATH}
+   export PYTHONPATH=$PWD/src${PYTHONPATH:+:$PYTHONPATH}
 
 In order to use matplotlib.pyplot for graphical output get the open source code from:
 
