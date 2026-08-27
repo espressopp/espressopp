@@ -56,7 +56,7 @@ jobs:
       - name: Test module
         run: |
           export PYTHONPATH=$PWD/build${PYTHONPATH:+:$PYTHONPATH}
-          python3 -W invalid -c "import espressopp"
+          python3 -W default -c "import espressopp"
 
       - name: Install
         run: cmake --install build
