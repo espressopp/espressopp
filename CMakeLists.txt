@@ -139,7 +139,7 @@ add_subdirectory(src)
 add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
-add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
+add_custom_command(TARGET symlink POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink
         ${CMAKE_SOURCE_DIR}/src espressopp)
 
 add_subdirectory(doc)
