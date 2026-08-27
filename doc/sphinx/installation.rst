@@ -55,11 +55,11 @@ After successfully building all the Makefiles you should build |espp| with:
 
 (This will take several minutes)
 
-After successfully building |espp| add the src directory to your PYTHONPATH:
+After successfully building |espp| add the build directory to your PYTHONPATH:
 
 .. code-block:: bash
 
-   export PYTHONPATH=$PWD/src${PYTHONPATH:+:$PYTHONPATH}
+   export PYTHONPATH=$PWD/builddir${PYTHONPATH:+:$PYTHONPATH}
 
 In order to use matplotlib.pyplot for graphical output get the open source code from:
 
