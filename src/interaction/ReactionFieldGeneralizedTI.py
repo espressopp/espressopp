@@ -76,7 +76,7 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
 >>> #calculate dU/dlambda
 >>> dUdl = qq_adres_interaction.computeEnergyDeriv()
 
-.. function:: espressopppp.interaction.ReactionFieldGeneralizedTI(prefactor, kappa, epsilon1, epsilon2, cutoff, lambdaTI, annihilate)
+.. function:: espressopp.interaction.ReactionFieldGeneralizedTI(prefactor, kappa, epsilon1, epsilon2, cutoff, lambdaTI, annihilate)
 
                 :param prefactor: (default: 1.0) RF parameter
                 :param kappa: (default: 0.0) RF parameter
@@ -93,32 +93,32 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
                 :type lambdaTI: real
                 :type annihilate: bool
 
-.. function:: espressopppp.interaction.ReactionFieldGeneralizedTI.addPids(pidlist)
+.. function:: espressopp.interaction.ReactionFieldGeneralizedTI.addPids(pidlist)
 
                 :param pidlist: list of particle ids of particles whose charge is zero in state B
                 :type pidlist: python list
 
-.. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized(vl, fixedtupleList)
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized(vl, fixedtupleList)
 
                 :param vl: Verlet list
                 :param fixedtupleList: list of tuples describing mapping between CG and AT particles
                 :type vl: VerletListAdress object
                 :type fixedtupleList: FixedTupleListAdress object
 
-.. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
 
                 :param type1: atomtype
                 :param type2: atomtype
-                :param potential: espressopppp potential
+                :param potential: espressopp potential
                 :type type1: int
                 :type type2: int
                 :type potential: Potential
 
-.. function:: espressopppp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
 
                 :param type1: atomtype
                 :param type2: atomtype
-                :param potential: espressopppp potential
+                :param potential: espressopp potential
                 :type type1: int
                 :type type2: int
                 :type potential: Potential

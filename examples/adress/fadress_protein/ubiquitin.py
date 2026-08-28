@@ -428,7 +428,7 @@ for atkey in list(atImpropertypes.keys()):
 improperinteractions=gromacs.setImproperInteractions(system, cgImpropertypes, impropertypeparams)
 
 cgExclusions = [] #previously existing atExclusions list was for atomistic protein, don't use it
-#in espressopppp, exclusions are handled at the CG particle level
+#in espressopp, exclusions are handled at the CG particle level
 for pair in atExclusions:
     vp1 = mapAtToCgIndex[pair[0]]
     vp2 = mapAtToCgIndex[pair[1]]

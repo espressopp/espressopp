@@ -90,7 +90,7 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
 >>> #calculate dU/dlambda
 >>> dUdl = lj_adres_interaction.computeEnergyDeriv()
 
-.. function:: espressopppp.interaction.LennardJonesSoftcoreTI(epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
+.. function:: espressopp.interaction.LennardJonesSoftcoreTI(epsilonA, sigmaA, epsilonB, sigmaB, alpha, power, cutoff, lambdaTI, annihilate)
 
                 :param epsilonA: (default: 1.0) LJ interaction parameter
                 :param sigmaA: (default: 1.0) LJ interaction parameter
@@ -111,32 +111,32 @@ During the MD run, one can then calculate the derivative of the RF energy wrt la
                 :type lambdaTI: real
                 :type annihilate: bool
 
-.. function:: espressopppp.interaction.LennardJonesSoftcoreTI.addPids(pidlist)
+.. function:: espressopp.interaction.LennardJonesSoftcoreTI.addPids(pidlist)
 
                 :param pidlist: list of particle ids of particles whose interaction parameters differ in state A and B
                 :type pidlist: python list
 
-.. function:: espressopppp.interaction.VerletListAdressLennardJones(vl, fixedtupleList)
+.. function:: espressopp.interaction.VerletListAdressLennardJones(vl, fixedtupleList)
 
                 :param vl: Verlet list
                 :param fixedtupleList: list of tuples describing mapping between CG and AT particles
                 :type vl: VerletListAdress object
                 :type fixedtupleList: FixedTupleListAdress object
 
-.. function:: espressopppp.interaction.VerletListAdressLennardJones.setPotentialAT(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListAdressLennardJones.setPotentialAT(type1, type2, potential)
 
                 :param type1: atomtype
                 :param type2: atomtype
-                :param potential: espressopppp potential
+                :param potential: espressopp potential
                 :type type1: int
                 :type type2: int
                 :type potential: Potential
 
-.. function:: espressopppp.interaction.VerletListAdressLennardJones.setPotentialCG(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListAdressLennardJones.setPotentialCG(type1, type2, potential)
 
                 :param type1: atomtype
                 :param type2: atomtype
-                :param potential: espressopppp potential
+                :param potential: espressopp potential
                 :type type1: int
                 :type type2: int
                 :type potential: Potential
