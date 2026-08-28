@@ -315,7 +315,6 @@ class StorageLocal(object):
                     else:
                         storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
                 else:
-                    #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                     storedParticle = self.cxxclass.addParticle(self, id, pos, True)
 
                 if storedParticle is not None:
@@ -402,7 +401,6 @@ class StorageLocal(object):
              # self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
              # pass
             #else:
-         # print "WARNING: Particle ", pid, " does not exist and was not modified"
 
 
     def savePositions(self, idList):

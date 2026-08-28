@@ -132,7 +132,6 @@ for i in range(num_chains):
             for k in range(3):
                 x_i = (float(parameters[6 + k - i_diff]) + 2.*L)%L
                 pos_j.append(x_i)
-            #print "Load:", pid + j, pos_j, pos_i
             if j != 0:
                 diff = []
                 for k in range(3):
@@ -148,7 +147,6 @@ for i in range(num_chains):
             res_position = espressopp.Real3D(pos_i[0],
                                              pos_i[1],
                                              pos_i[2])
-            #print "Position:", pid + j, res_position, image
             part = [pid + j, type, mass, res_position, vel_zero]
             chain.append(part)
             j += 1
@@ -171,7 +169,6 @@ density = num_particles * 1.0 / (L * L * L)
     #tuple = []
     #for j in xrange(num_constrain):
         #tuple.append(num_constrain*i + j + 1)
-    #print "Add tuple", tuple
     #tuplelist.addTuple(tuple)
 
 #Generating Constrain
@@ -181,14 +178,12 @@ density = num_particles * 1.0 / (L * L * L)
 #  for j in xrange(1, monomers_per_chain/50):
 #    tuple.append(monomers_per_chain*i + 50*j)
 #    tuple.append(monomers_per_chain*i + 50*j + 1)
-#  print "Add constrain1 tuple", tuple
 #  constrainlist1.addTuple(tuple)
 #for i in xrange(num_chains):
 #  tuple = []
 #  for j in xrange(0, monomers_per_chain/50):
 #    tuple.append(monomers_per_chain*i + 50*j + 25)
 #    tuple.append(monomers_per_chain*i + 50*j + 26)
-#  print "Add constrain2 tuple", tuple
 #  constrainlist2.addTuple(tuple)
 
 print("Init LJ")
@@ -212,11 +207,9 @@ print("Init LJ3")
 exclusion_list = []
 
 for i in range(num_chains):
-    #print "Init LJ3:", i
     for j in range(monomers_per_chain):
         goal  = min(j + 3, monomers_per_chain)
         for k in range(j + 1, goal):
-            #print "Init LJ3:", i*monomers_per_chain + j, i*monomers_per_chain + k
             dmy_pair = [i*monomers_per_chain + j, i*monomers_per_chain + k]
             exclusion_list.append(dmy_pair)
 capradO = 2.**(1./6.)*sigma
@@ -238,19 +231,17 @@ potFENE = espressopp.interaction.FENECapped(K=K_fene, r0=r0_fene, rMax=rmax_fene
 interFENE_All = espressopp.interaction.FixedPairListFENECapped(system, bondlist, potFENE)
 system.addInteraction(interFENE_All, 'FENE')
 
-#print "Init COM"
 # Constrain COM
 #potCOM = espressopp.interaction.ConstrainCOM(k_com)
 #interCOM = espressopp.interaction.FixedLocalTupleListConstrainCOM(system, tuplelist, potCOM)
 #interCOM.setCom(softblobs_chain)
 
-#print "Init RG"
 # Constrain RG
 #potRG = espressopp.interaction.ConstrainRG(k_rg=0.04)
 #interRG = espressopp.interaction.FixedLocalTupleListConstrainRG(system, tuplelist, potRG)
 #interRG.setRG(softblobs_chain)
 
-# print simulation parameters
+# Print simulation parameters
 print('')
 print('number of particles = ', num_particles)
 print('density             = ', density)
@@ -346,7 +337,6 @@ for k in range(1):
 espressopp.tools.analyse.info(system, integrator)
 for i in range(100//accelerate + 1):
     #signal = calculate_signal()
-    #print "#INITIAL_SIGNAL", i, signal
     isteps = 50000//t_up
     if i > 70:
         isteps = 100000//t_up

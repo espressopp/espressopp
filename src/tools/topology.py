@@ -71,7 +71,6 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 
                 if lc > mindist:
                     avecostheta += - (ax*bx + ay*by + az*bz) / (la * lb)
-                    #print "cos theta:", (ax*bx + ay*by + az*bz) / (la * lb)
                     break
 
 
