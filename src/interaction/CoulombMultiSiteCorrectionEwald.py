@@ -29,7 +29,7 @@ where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of par
 
 In this interaction potential, a different charge can be associated with each particle. For a truncated Coulomb interaction potential where only one :math:`q_iq_j` value is specified for all interactions, see CoulombTruncatedUniqueCharge.
 
-.. function:: espressopppp.interaction.CoulombMultiSiteCorrectionEwald(prefactor, alpha, cutoff)
+.. function:: espressopp.interaction.CoulombMultiSiteCorrectionEwald(prefactor, alpha, cutoff)
 
 		:param prefactor: (default: 1.0) user-supplied prefactor `k`
 		:param alpha: (default: 1.0)
@@ -38,18 +38,18 @@ In this interaction potential, a different charge can be associated with each pa
 		:type alpha: real
 		:type cutoff: real
 
-.. function:: espressopppp.interaction.VerletListCoulombMultiSiteCorrectionEwald(vl)
+.. function:: espressopp.interaction.VerletListCoulombMultiSiteCorrectionEwald(vl)
 
 		:param espressopp.VerletList vl: verlet list object defined earlier in python script
 
-.. function:: espressopppp.interaction.VerletListCoulombMultiSiteCorrectionEwald.getPotential(type1, type2)
+.. function:: espressopp.interaction.VerletListCoulombMultiSiteCorrectionEwald.getPotential(type1, type2)
 
 		:param type1: type of first atom in pair
 		:param type2: type of second atom in pair
 		:type type1: integer
 		:type type2: integer
 
-.. function:: espressopppp.interaction.VerletListCoulombMultiSiteCorrectionEwald.setPotential(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListCoulombMultiSiteCorrectionEwald.setPotential(type1, type2, potential)
 
 		:param type1: type of first atom in pair
 		:param type2: type of second atom in pair
@@ -58,12 +58,12 @@ In this interaction potential, a different charge can be associated with each pa
 		:type type2: integer
 		:type potential: CoulombMultiSiteCorrectionEwald potential
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombMultiSiteCorrectionEwald(system, vl)
+.. function:: espressopp.interaction.FixedPairListTypesCoulombMultiSiteCorrectionEwald(system, vl)
 
 		:param espressopp.System system: system object defined earlier in the python script
 		:param espressopp.FixedPairList vl: fixedpairlist object defined earlier in the python script
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombMultiSiteCorrectionEwald.setPotential(potential)
+.. function:: espressopp.interaction.FixedPairListTypesCoulombMultiSiteCorrectionEwald.setPotential(potential)
 
 		:param type1: type of first atom in pair
 		:param type2: type of second atom in pair

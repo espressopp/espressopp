@@ -31,25 +31,25 @@ where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of par
 
 In this interaction potential, a different charge can be associated with each particle. For a truncated Coulomb interaction potential where only one :math:`q_iq_j` value is specified for all interactions, see CoulombTruncatedUniqueCharge.
 
-.. function:: espressopppp.interaction.CoulombTruncated(prefactor, cutoff)
+.. function:: espressopp.interaction.CoulombTruncated(prefactor, cutoff)
 
                 :param prefactor: (default: 1.0) user-supplied prefactor `k`
                 :param cutoff: (default: infinity) user-supplied interaction cutoff
                 :type prefactor: real
                 :type cutoff: real
 
-.. function:: espressopppp.interaction.VerletListCoulombTruncated(vl)
+.. function:: espressopp.interaction.VerletListCoulombTruncated(vl)
 
                 :param espressopp.VerletList vl: verlet list object defined earlier in python script
 
-.. function:: espressopppp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
+.. function:: espressopp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
 
                 :param type1: type of first atom in pair
                 :param type2: type of second atom in pair
                 :type type1: integer
                 :type type2: integer
 
-.. function:: espressopppp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
 
                 :param type1: type of first atom in pair
                 :param type2: type of second atom in pair
@@ -58,12 +58,12 @@ In this interaction potential, a different charge can be associated with each pa
                 :type type2: integer
                 :type potential: CoulombTruncated potential
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl)
+.. function:: espressopp.interaction.FixedPairListTypesCoulombTruncated(system, vl)
 
                 :param espressopp.System system: system object defined earlier in the python script
                 :param espressopp.FixedPairList vl: fixedpairlist object defined earlier in the python script
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated.setPotential(potential)
+.. function:: espressopp.interaction.FixedPairListTypesCoulombTruncated.setPotential(potential)
 
                 :param type1: type of first atom in pair
                 :param type2: type of second atom in pair
