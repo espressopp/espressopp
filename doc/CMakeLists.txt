@@ -26,12 +26,12 @@ if (SPHINX_EXECUTABLE)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 
     add_custom_target(sphinx
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${ESP_PY_ENV} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
+            COMMAND ${CMAKE_COMMAND} -E env ${ESP_PY_ENV} ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}/html
             DEPENDS ${SPHINX_SOURCE}/conf.py _espressopp
             )
 
     add_custom_target(sphinx-pdf
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH} ${SPHINX_EXECUTABLE} -b latex ${SPHINX_SOURCE} ${SPHINX_BUILD}/pdf
+            COMMAND ${CMAKE_COMMAND} -E env ${ESP_PY_ENV} ${SPHINX_EXECUTABLE} -b latex ${SPHINX_SOURCE} ${SPHINX_BUILD}/pdf
             COMMAND make -C ${SPHINX_BUILD}/pdf
             DEPENDS ${SPHINX_SOURCE}/conf.py _espressopp
             )
