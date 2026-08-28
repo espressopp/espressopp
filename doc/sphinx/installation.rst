@@ -26,7 +26,7 @@ ESPResSo++ requires Python 3.7 or newer. All required Python packages are listed
 
 .. code-block:: bash
 
-   pip3 install -r requirements.txt`
+   pip3 install -r requirements.txt
 
 Create the Makefiles using the cmake command. If you don't have it yet, you have to
 install it first. It is available for all major Linux distributions and also for Mac OS X.
