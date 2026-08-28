@@ -134,7 +134,6 @@ for i in range(num_chains):
             res_positions = espressopp.Real3D((float(parameters[6 - i_diff]) + 2.*L)%L,
                                               (float(parameters[7 - i_diff]) + 2.*L)%L,
                                               (float(parameters[8 - i_diff]) + 2.*L)%L)
-            #print i*monomers_per_chain + j, " ", res_positions
             radius = float(parameters[10 - i_diff])
             part = [res_positions, radius]
             softblobs_chain.append(part)
@@ -207,7 +206,6 @@ for i in range(num_chains):
             #Generating Random Vector
             nextZ = 0.5*(1. + (dist**2)*(2.*(sequential_num - k) - 1)/(sequential_num - k)**2 )/dist
             phi   = 2.0*3.141592*random.uniform(0,1)
-            #print k, ":", nextZ
             if nextZ > 1.:
                 nextZ = 0.707
             rr    = sqrt(1. - nextZ*nextZ)
@@ -231,7 +229,6 @@ for i in range(num_chains):
                                             float(start[1] + 2.*L)%L,
                                             float(start[2] + 2.*L)%L)
 
-            #print "pid:", pid + k + 1
             part = [pid + k + 1, type, mass, fg_position, vel_zero, 1.0, 0.]
             chain.append(part)
 
@@ -259,7 +256,6 @@ for i in range(num_particles//num_constrain):
     tuple = []
     for j in range(num_constrain):
         tuple.append(num_constrain*i + j + 1)
-    #print "Add tuple", tuple
     tuplelist.addTuple(tuple)
 
 print("Init LJ Pair")
@@ -308,7 +304,7 @@ interCosine = espressopp.interaction.FixedTripleListCosine(system, anglelist, po
 #filename = "microscopic_nb1.pdb"
 #espressopp.tools.pdb.pqrwrite(filename, system, monomers_per_chain, False)
 
-# print simulation parameters
+# Print simulation parameters
 print('')
 print('number of particles = ', num_particles)
 print('density             = ', density)

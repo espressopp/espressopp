@@ -33,7 +33,7 @@ Example of standalone Usage:
 
 >>> pt = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for i in xrange(n):
->>>     print "pressure tensor in layer %d: %s" % ( i, pt.compute())
+>>>     print("pressure tensor in layer %d: %s" % ( i, pt.compute()))
 
 or
 
@@ -42,7 +42,7 @@ or
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
 >>> for i in xrange(n):
->>>     print "average pressure tensor in layer %d: %s" % ( i, pt.compute())
+>>>     print("average pressure tensor in layer %d: %s" % ( i, pt.compute()))
 
 Example of usage in integrator with ExtAnalyze:
 
@@ -52,9 +52,9 @@ Example of usage in integrator with ExtAnalyze:
 >>> integrator.run(10000)
 >>> pt_ave = pt.getAverageValue()
 >>> for i in xrange(n):
->>>   print "average Pressure Tensor = ", pt_ave[i][:6]
->>>   print "          std deviation = ", pt_ave[i][6:]
->>> print "number of measurements  = ", pt.getNumberOfMeasurements()
+>>>   print("average Pressure Tensor = ", pt_ave[i][:6])
+>>>   print("          std deviation = ", pt_ave[i][6:])
+>>> print("number of measurements  = ", pt.getNumberOfMeasurements())
 
 The following methods are supported:
 

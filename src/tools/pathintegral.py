@@ -135,13 +135,10 @@ disableVVL=False
             for j in range(0, numtypes):
                 pitype=types[j]+numtypes*(i-1)
                 tt.append(pitype)
-            #print i, "mapped", tt, " to ", iVerletLists[i]
             vvl.mapTypeToVerletList(tt, iVerletLists[1])
 
 
     system.storage.addParticles(piParticles, *props)
-    #print "1 PYTHON IMG 1947",  system.storage.getParticle(1947).pos, system.storage.getParticle(1947).imageBox
-    #print "RINGIDS", ringids
 
     # store each ring in a FixedTupleList
     if not disableVVL:
@@ -164,7 +161,6 @@ disableVVL=False
             t.append(k)
             t=t+v
             vptuples.append(t)
-            #print "VPARTICLE", part, "TUPLE", t
         system.storage.addParticles(vParticles, *vpprops)
 
         #always decpmpose before adding tuples
@@ -194,7 +190,6 @@ disableVVL=False
                         print("Interaction", numtypes*i+j, numtypes*i+k, pot)
             if not disableVVL:
                 vl=interaction.getVerletList()
-                #print "VL has", vl.totalSize(),"disconnecting"
                 vl.disconnect()
                 interaction.setVerletList(iVerletLists[1])
 
@@ -204,15 +199,12 @@ disableVVL=False
             # loop over bond lists returned by each cpu
             for l in bond_fpl.getBonds():
                 cla_bonds.extend(l)
-            #print "CLA BONDS", bond_fpl.size()
             for i in range(1, P):
                 tmp=0
                 for b in cla_bonds:
                     # create additional bonds for this imag time
                     bond_fpl.add(b[0]+num_cla_part*i, b[1]+num_cla_part*i)
                     tmp+=1
-                #print "trying to add", tmp, "bonds"
-                #print "i=", i, " PI BONDS", bond_fpl.size()
 
         if interaction.bondType() == espressopp.interaction.Angular:
             angle_ftl=interaction.getFixedTripleList()
@@ -221,7 +213,6 @@ disableVVL=False
             cla_angles=[]
             for l in angle_ftl.getTriples():
                 cla_angles.extend(l)
-            #print "CLA_ANGLES", cla_angles
             for i in range(1, P):
                 for a in cla_angles:
                     # create additional angles for this imag time

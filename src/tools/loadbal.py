@@ -462,7 +462,6 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
                         wholeNeiListX_EH[i] = round(1.0 * (totCellsEH - 1) / totNodesEH - 0.5)
                     # Punishing the last Node with an additional cell
                     wholeNeiListX[indEH1 - 1] = wholeNeiListX_EH[indEH1 - 1] + 1
-                # print "Whole lists are as:",wholeNeiListX_EH,wholeNeiListX_CG
                 for k in range(node_gridX):
                     wholeNeiListX[k] = wholeNeiListX_EH[k] + wholeNeiListX_CG[k]  # Superposing both Arrays
 
@@ -499,7 +498,6 @@ def reDistCells(halfNeilListX, cellsX, eh_size, rc_skin, node_gridX, ratioMS, si
             elif cellsX % 2 == 0:
                 [wholeNeiListX.append(round((cellsX) / node_gridX - 0.5)) for i in range(node_gridX)]
                 wholeNeiListX = redistDeltaRandomly(wholeNeiListX, cellsX - sum(wholeNeiListX), totNodesEH, cellsX - sum(wholeNeiListX) - 1)
-    # print "My Redist WholeNeiList is TODOs !:",wholeNeiListX
     return wholeNeiListX
 
 # This function distributes the remaining DELTA cells into nodes as semi randomly. By default the biase applies to the CG-region and it assumes ther cannot be more than 3 extra cells to redistribute, because this is the total number of regions in the simulation box |CG|EH|CG| (by default the cg biased is left this could be updated in the dyn load balancing case!

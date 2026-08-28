@@ -31,7 +31,7 @@ in combination with the integrator extension ExtAnalyze.
 Example of standalone Usage:
 
 >>> pt = espressopp.analysis.PressureTensor(system)
->>> print "pressure tensor of current configuration = ", pt.compute()
+>>> print("pressure tensor of current configuration = ", pt.compute())
 
 or
 
@@ -39,7 +39,7 @@ or
 >>> for k in xrange(100):
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
->>> print "average pressure tensor = ", pt.getAverageValue()
+>>> print("average pressure tensor = ", pt.getAverageValue())
 
 Example of usage in integrator with ExtAnalyze:
 
@@ -48,9 +48,9 @@ Example of usage in integrator with ExtAnalyze:
 >>> integrator.addExtension(extension_pt)
 >>> integrator.run(10000)
 >>> pt_ave = pt.getAverageValue()
->>> print "average Pressure Tensor = ", pt_ave[:6]
->>> print "          std deviation = ", pt_ave[6:]
->>> print "number of measurements  = ", pt.getNumberOfMeasurements()
+>>> print("average Pressure Tensor = ", pt_ave[:6])
+>>> print("          std deviation = ", pt_ave[6:])
+>>> print("number of measurements  = ", pt.getNumberOfMeasurements())
 
 The following methods are supported:
 

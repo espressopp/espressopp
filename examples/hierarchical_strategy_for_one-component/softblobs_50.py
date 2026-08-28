@@ -274,7 +274,6 @@ def calculate_signal():
     for r in dev:
         print(r, end=' ')
     print("end")
-    #print "#current msid", msid[5]/6., msid[6]/7., msid[7]/8., msid[8]/9.
     signal = 0.
     for i in range(5, index - 2):
         if fabs(dev[i]) > 0.005:
@@ -289,7 +288,7 @@ def calculate_signal():
     return signal
 #############################################
 
-# print simulation parameters
+# Print simulation parameters
 print('')
 print('number of particles = ', num_particles)
 print('density             = ', density)

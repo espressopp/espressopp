@@ -351,7 +351,6 @@ def read(gro_file, top_file="", doRegularExcl=True):
                             angletypes[i].update({j:{k:atypeid}})
                     else:
                         angletypes.update({i:{j:{k:atypeid}}})
-                    #print "FOUND angletype: ", angletypecount, " : ", p.parameters
                     #angletypeparams.update({angletypecount:p})
                     #angletypecount+=1
 
@@ -616,7 +615,6 @@ def storeMolecules(f, molecules, mol=""):
     line = f.readline()
     while(len(line) > 1 and not '[' in line):
         if line[0] == ";":   # skip comment lines
-            #print "skipping line: "+line.strip("\n")
             line = f.readline()
             continue
         fields=line.split()
@@ -892,29 +890,23 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
             t1, t2, t3, t4 = types[pid1-1], types[pid2-1], types[pid3-1], types[pid4-1] # get types of particles
             try:
                 dihtypeid = impropertypes[t1][t2][t3][t4] #dihtypeid is now a tuple
-#                print t1, t2, t3, t4, 'found'
             except KeyError:
-#                print t1, t2, t3, t4, 'not yet found'
                 t1, t2, t3, t4 = atomtype_wildcard, t2, t3, t4
                 try:
                     dihtypeid = impropertypes[t1][t2][t3][t4]
                 except KeyError:
-#                    print t1, t2, t3, t4, 'not yet found'
                     t1, t2, t3, t4 = atomtype_wildcard, atomtype_wildcard, t3, t4
                     try:
                         dihtypeid = impropertypes[t1][t2][t3][t4]
                     except KeyError:
-#                        print t1, t2, t3, t4, 'not yet found'
                         t1, t2, t3, t4 = atomtype_wildcard, atomtype_wildcard,types[pid1-1], types[pid2-1]
                         try:
                             dihtypeid = impropertypes[t1][t2][t3][t4]
                         except KeyError:
-#                            print t1, t2, t3, t4, 'not yet found'
                             t1, t2, t3, t4 = types[pid4-1], types[pid2-1], types[pid3-1], types[pid1-1]
                             try:
                                 dihtypeid = impropertypes[t1][t2][t3][t4]
                             except KeyError:
-#                                print t1, t2, t3, t4, 'not yet found'
                                 t1, t2, t3, t4 = types[pid4-1], types[pid3-1], types[pid2-1], types[pid1-1]
                                 try:
                                     dihtypeid = impropertypes[t1][t2][t3][t4]
@@ -1123,7 +1115,6 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 sig=float(pi['sig'])
                 eps=float(pi['eps'])
             if (sig>0 and eps >0):
-                #print "# Setting LJ interaction for", i, j, "to sig ", sig, "eps", eps, "cutoff", cutoff
                 ljpot= espressopp.interaction.LennardJones(epsilon=eps, sigma=sig, shift='auto', cutoff=cutoff)
                 if hadress or adress:
                     interaction.setPotentialAT(type1=i, type2=j, potential=ljpot)
@@ -1217,7 +1208,6 @@ def setLennardJones14Interactions(system, defaults, atomtypeparams, onefourlist,
                 eps=float(pi['eps'])
             if (sig>0 and eps >0):
                 eps = eps*fudge
-                #print "Setting 1-4 LJ interaction for", i, j, "to sig ", sig, "eps", eps, "cutoff", cutoff
                 ljpot= espressopp.interaction.LennardJones(epsilon=eps, sigma=sig, cutoff=cutoff, shift=0)
                 #ljpot= espressopp.interaction.LennardJonesGromacs(epsilon=eps, sigma=sig, cutoff=cutoff, shift=0)
                 interaction.setPotential(type1=i, type2=j, potential=ljpot)

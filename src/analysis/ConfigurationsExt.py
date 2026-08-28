@@ -62,11 +62,11 @@ iterate over all particles stored in configuration:
 
 >>>   for pid in conf
 >>>     particle_coords = conf[pid]
->>>     print pid, particle_coords
+>>>     print(pid, particle_coords)
 
 access particle with id <pid> of stored configuration <n>:
 
->>> print "particle coord: ",configurations[n][pid]
+>>> print("particle coord: ",configurations[n][pid])
 
 .. function:: espressopp.analysis.ConfigurationsExt(system)
 

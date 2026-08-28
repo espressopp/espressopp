@@ -139,7 +139,7 @@ Now we can propagate the particle by calling the integrator:
 
 Check the result with:
 
->>> print "The new particle position is: ", system.storage.getParticle(pid).pos
+>>> print("The new particle position is: ", system.storage.getParticle(pid).pos)
 
 Let's add some more particles at random positions with random velocities and
 random mass and random type 0 or 1. The boundary condition object knows about how to create random positions
@@ -175,4 +175,4 @@ or you could print all particle information to the screen:
 
 >>> for k in range(10):
 >>>   p = system.storage.getParticle(k+1)
->>>   print p.id, p.type, p.mass, p.pos, p.v, p.f, p.q
+>>>   print(p.id, p.type, p.mass, p.pos, p.v, p.f, p.q)
