@@ -38,11 +38,11 @@ As LangevinThermostat, but for use in AdResS systems, to allow the application o
   >>>
   >>> # set Langevin friction constants
   >>> thermostat.gamma       = 0.0 # units = 1/timeunit
-  >>> print "# gamma for atomistic region for langevin thermostat = ",thermostat.gamma
+  >>> print("# gamma for atomistic region for langevin thermostat = ",thermostat.gamma)
   >>> thermostat.gammahy     = 10.0 # units = 1/timeunit
-  >>> print "# gamma for hybrid region for langevin thermostat = ",thermostat.gammahy
+  >>> print("# gamma for hybrid region for langevin thermostat = ",thermostat.gammahy)
   >>> thermostat.gammacg     = 10.0 # units = 1/timeunit
-  >>> print "# gamma for coarse-grained region for langevin thermostat = ",thermostat.gammacg
+  >>> print("# gamma for coarse-grained region for langevin thermostat = ",thermostat.gammacg)
   >>>
   >>> # set temperature of thermostat
   >>> thermostat.temperature = kBT

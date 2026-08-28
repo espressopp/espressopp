@@ -49,8 +49,8 @@ All derived classes implement at least the following methods:
    This can be used to get specific particle information:
 
    >>> particle = system.storage.getParticle(15)
-   >>> print "Particle ID is       : ", particle.id
-   >>> print "Particle position is : ", particle.pos
+   >>> print("Particle ID is       : ", particle.id)
+   >>> print("Particle position is : ", particle.pos)
 
    you cannot use this particle object to modify particle data.
    You have to use the modifyParticle command for that (see below).

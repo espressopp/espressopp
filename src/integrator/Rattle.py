@@ -57,9 +57,9 @@ This list of lists of constrained bonds can be conveniently built using the espr
 >>> # hydrogenIDs - list of indices of hydrogen atoms
 >>> # constrainedBondsDict - dictionary mapping from a heavy atom to all the light atoms it is bonded to, key: heavy atom index (int), value: list of light atom indices (list of int)
 >>> # constrainedBondsList - list of lists, constrained bonds for use with Rattle.addConstrainedBonds()
->>> print "# found", len(hydrogenIDs)," hydrogens in the solute"
->>> print "# found", len(constrainedBondsDict)," heavy atoms involved in bonds to hydrogen"
->>> print "# will constrain", len(constrainedBondsList)," bonds using RATTLE"
+>>> print("# found", len(hydrogenIDs)," hydrogens in the solute")
+>>> print("# found", len(constrainedBondsDict)," heavy atoms involved in bonds to hydrogen")
+>>> print("# will constrain", len(constrainedBondsList)," bonds using RATTLE")
 
 .. function:: espressopp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
 

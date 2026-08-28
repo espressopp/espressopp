@@ -91,7 +91,7 @@ named CapForces. The two parameters of this Extension are the system and the max
 a particle can get. The following python code shows how CapForces can be used. Add it to your
 Lennard-Jones example just after adding the Langevin Extension:
 
->>> print "starting warmup with force capping ..."
+>>> print("starting warmup with force capping ...")
 >>> force_capping   = espressopp.integrator.CapForce(system, 1000000.0)
 >>> integrator.addExtension(force_capping)
 >>> # reduce the time step of the integrator to make the integration numerically more stable
@@ -108,7 +108,7 @@ full Lennard-Jones potential back.
 >>> integrator.dt   = 0.005
 >>> integrator.step = 0
 >>> force_capping.disconnect()
->>> print "warmup finished - force capping switched off."
+>>> print("warmup finished - force capping switched off.")
 
 Task 1: 
 -------

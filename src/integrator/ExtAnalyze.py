@@ -36,9 +36,9 @@ Example Usage:
 >>> integrator.run(10000)
 >>>
 >>> pt_ave = pt.getAverageValue()
->>> print "average Pressure Tensor = ", pt_ave[:6]
->>> print "          std deviation = ", pt_ave[6:]
->>> print "number of measurements  = ", pt.getNumberOfMeasurements()
+>>> print("average Pressure Tensor = ", pt_ave[:6])
+>>> print("          std deviation = ", pt_ave[6:])
+>>> print("number of measurements  = ", pt.getNumberOfMeasurements())
 
 .. function:: espressopp.integrator.ExtAnalyze(action_obj, interval)
 

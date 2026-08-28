@@ -29,14 +29,14 @@ Return version information of espressopp module
 Example:
 
 >>> version     = espressopp.Version()
->>> print "Name                   = ", version.name
->>> print "Major version number   = ", version.major
->>> print "Minor version number   = ", version.minor
->>> print "Git revision = ", version.gitrevision
->>> print "boost version          = ", version.boostversion
->>> print "Patchlevel             = ", version.patchlevel
->>> print "Compilation date       = ", version.date
->>> print "Compilation time       = ", version.time
+>>> print("Name                   = ", version.name)
+>>> print("Major version number   = ", version.major)
+>>> print("Minor version number   = ", version.minor)
+>>> print("Git revision = ", version.gitrevision)
+>>> print("boost version          = ", version.boostversion)
+>>> print("Patchlevel             = ", version.patchlevel)
+>>> print("Compilation date       = ", version.date)
+>>> print("Compilation time       = ", version.time)
 
 to print a full version info string:
 

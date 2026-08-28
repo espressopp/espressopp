@@ -98,9 +98,9 @@ prod_nloops       = 500
 # number of integration steps performed in each production loop
 prod_isteps       = 50
 
-# print ESPResSo++ version and compile info
+# Print ESPResSo++ version and compile info
 print(espressopp.Version().info())
-# print simulation parameters (useful to have them in a log file)
+# Print simulation parameters (useful to have them in a log file)
 print("Npart              = ", Npart) 
 print("rho                = ", rho)
 print("box                = ", box)
@@ -210,8 +210,6 @@ interaction.setPotential(type1=0, type2=0, potential=LJpot)
 system.addInteraction(interaction)
 
 print("starting warm-up ...")
-# print some status information (time, measured temperature, pressure,
-# pressure tensor (xy only), kinetic energy, potential energy, total energy, boxsize)
 espressopp.tools.analyse.info(system, integrator)
 for step in range(warmup_nloops):
   # perform warmup_isteps integraton steps
@@ -220,7 +218,7 @@ for step in range(warmup_nloops):
   LJpot.epsilon += epsilon_delta
   # update the type0-type0 interaction to use the new values of LJpot
   interaction.setPotential(type1=0, type2=0, potential=LJpot)
-  # print status info
+  # Print status info
   espressopp.tools.analyse.info(system, integrator) 
 print("warmup finished")
 # remove the force capping interaction from the system
@@ -267,14 +265,14 @@ integrator.resetTimers()
 integrator.step = 0
 
 print("starting equilibration ...")
-# print inital status information
+# Print inital status information
 espressopp.tools.analyse.info(system, integrator)
 #sock = espressopp.tools.vmd.connect(system)
 filename = "equi.xyz"
 for step in range(equil_nloops):
   # perform equilibration_isteps integration steps
   integrator.run(equil_isteps)
-  # print status information
+  # Print status information
   #espressopp.tools.vmd.imd_positions(system, sock)
   espressopp.tools.analyse.info(system, integrator)
   #espressopp.tools.writexyz(filename, system, velocities = False, unfolded = False, append=True)
@@ -310,7 +308,7 @@ system.storage.cellAdjust(shear = True)
 
 print("starting production ...")
 
-# print inital status information
+# Print inital status information
 espressopp.tools.analyse.info(system, integrator2)
 #sock = espressopp.tools.vmd.connect(system)
 filename = "prod.xyz"
@@ -319,7 +317,7 @@ tstart=time.process_time()
 for step in range(prod_nloops):
   # perform equilibration_isteps integration steps
   integrator2.run(prod_isteps)
-  # print status information
+  # Print status information
   #espressopp.tools.vmd.imd_positions(system, sock)
   espressopp.tools.analyse.info(system, integrator2)
   #espressopp.tools.writexyz(filename, system, velocities = False, unfolded = False, append=True)
@@ -340,7 +338,6 @@ print("production finished")
 # all other lines : ParticleID  ParticleType  x_pos  y_pos  z_pos  x_vel  y_vel  z_vel 
 
 #filename = "lennard_jones_fluid_%0i.xyz" % integrator.step
-#print "writing final configuration file ..." 
 #espressopp.tools.writexyz(filename, system, velocities = True, unfolded = False)
 
 # also write a PDB file which can be used to visualize configuration with VMD
