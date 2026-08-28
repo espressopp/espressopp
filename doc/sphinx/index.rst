@@ -11,7 +11,7 @@ Welcome to the user documentation of ESPResSo++
    :maxdepth: 2
    :titlesonly:
 
-   instalation.rst
+   installation.rst
    tutorial.rst
    classdescription.rst
 
