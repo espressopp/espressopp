@@ -3,7 +3,7 @@ AddNewPotential
 
 .. |espp| replace:: ESPResSo++
 
-The aim of the tutorial is to implement a new interaction potential in |espp|. We start with the Gromos fourth-power bond-stretching potential, because its functional form is simple and its implementation is somewhat similar to other potentials already implemented in |espp|. Everything you learn in this tutorial will then be relevent for implementing any other more complicated potential.
+The aim of the tutorial is to implement a new interaction potential in |espp|. We start with the Gromos fourth-power bond-stretching potential, because its functional form is simple and its implementation is somewhat similar to other potentials already implemented in |espp|. Everything you learn in this tutorial will then be relevant for implementing any other more complicated potential.
 
 Make sure you have a working, compiled version of |espp| before starting the tutorial.
 
@@ -87,7 +87,7 @@ You don't need to modify anything in ``Potential.hpp`` today. (Close it without 
 
 An easy way to implement the new C++ class is to identify a previously implemented potential which somewhat resembles your new potential, e.g. here we could take the Harmonic potential, which is also a 2-body potential, and which has also been interfaced with the FixedPairListInteractionTemplate.
 
-Still in ``$ESPRESSOHOME/src/interaction``, copy the files ``Harmonic.py``, ``Harmonic.cpp`` and ``Harmonic.hpp`` to new files ``FourthPower.py``, ``FourthPower.cpp`` and ``FourthPower.hpp``. In the new files, find and replace all occurences of 'Harmonic' with 'FourthPower', and 'HARMONIC' with 'FOURTHPOWER'.
+Still in ``$ESPRESSOHOME/src/interaction``, copy the files ``Harmonic.py``, ``Harmonic.cpp`` and ``Harmonic.hpp`` to new files ``FourthPower.py``, ``FourthPower.cpp`` and ``FourthPower.hpp``. In the new files, find and replace all occurrences of 'Harmonic' with 'FourthPower', and 'HARMONIC' with 'FOURTHPOWER'.
 
 First modify ``FourthPower.hpp``.
 

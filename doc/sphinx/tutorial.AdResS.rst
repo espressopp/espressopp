@@ -37,11 +37,11 @@ Usually, the force fields used in the different regions of the adaptive simulati
 
 Several measures had to be taken to implement adaptive resolution simulations in ESPResSo++. On top of the normal particles, which serve as the CG particles in AdResS, another layer of extra AT particles is introduced such that one has access to both atomistic and CG particles throughout the whole system. A mapping between the two defines which atoms belong to which CG bead. The resolution function :math:`\lambda` is implemented as a particle property of the CG particles that is updated after each integration step based on the new positions. This happens in an extension to the Velocity Verlet integrator. The actual adaptive resolution scheme is then implemented via new interaction templates that define how forces and energies are computed in force-based and energy-based AdResS. These templates use for particle pairs in the atomistic region the actual atoms, this is the AT particles, for the force and energy computation while in the CG region they use the CG particles. In the hybrid region, both are used, as defined in the equations above. The drift term of H-AdResS is implemented similarly. Furthermore, the AdResS integrator extension makes sure that the atomistic particles in the CG region travel along with the CG particles and that similarly the CG particles in the AT region are properly updated according to the new atomistic positions after each integration step. The FEC as well as a module to apply the Thermodynamic Force are implemented as integrator extensions.
 
-In the following, we explain the new features step by step (more details about parameters etc. can be found in the documention of the different classes).
+In the following, we explain the new features step by step (more details about parameters etc. can be found in the documentation of the different classes).
 
 Adress Domain Decomposition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When setting up the storage we have to use an appropriate domain decomposition that accomodates storage and proper interprocessor communication of both AT and CG particles.
+When setting up the storage we have to use an appropriate domain decomposition that accommodates storage and proper interprocessor communication of both AT and CG particles.
 
 .. code-block:: python
 
@@ -122,7 +122,7 @@ Finally, we have to set up the AdResS integrator extension:
 .. code-block:: python
 
   # AdResS integrator extension
-  adress = espressopp.integrator.Adress(system, verletlist, ftpl, regionupdates = 1)
+  address = espressopp.integrator.Adress(system, verletlist, ftpl, regionupdates = 1)
   integrator.addExtension(adress)
 
 It takes as arguments the Verlet list and the fixed tuple list. Additionally, for the case of a moving and/or deforming AdResS region based on one or more particles, the parameter ``regionupdates`` specifies how regularly we want to update the shape of the AdResS region in number of steps. This is to avoid as much as possible of the additional communication required to inform different processors of the change of the AdResS region. The parameter defaults to 1 and is not used at all for static AdResS regions.
@@ -171,7 +171,7 @@ It is also possible to define a thermodynamic force, which is suited for an adap
   thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
   integrator.addExtension(thdforce)
 
-It gets three more parameters, ``startdist``, ``enddist`` and ``edgeweightmultiplier``. ``startdist`` explicitely says at which distance from the center of the closest AT region defining particle the thermodynamic force starts to act and ``enddist`` says where it ends. Hence, these value should correspond to what is actually written in the table. ``edgeweightmultiplier`` is a parameter that speficies how precisely the thermodynamic force should be applied in the overlap regions of different spheres. For most applications, however, 20 should provide reasonable results (for details, see Kreis et al., J. Chem. Theory Comput. 12, 4067 (2016)). The 3 additional parameters are of course also present with some default values in the basic case, but they are ignored unless we have an AT region that is constructed via the overlap of several spherical regions.
+It gets three more parameters, ``startdist``, ``enddist`` and ``edgeweightmultiplier``. ``startdist`` explicitly says at which distance from the center of the closest AT region defining particle the thermodynamic force starts to act and ``enddist`` says where it ends. Hence, these value should correspond to what is actually written in the table. ``edgeweightmultiplier`` is a parameter that specifies how precisely the thermodynamic force should be applied in the overlap regions of different spheres. For most applications, however, 20 should provide reasonable results (for details, see Kreis et al., J. Chem. Theory Comput. 12, 4067 (2016)). The 3 additional parameters are of course also present with some default values in the basic case, but they are ignored unless we have an AT region that is constructed via the overlap of several spherical regions.
 
 Examples
 ----------------------

@@ -100,7 +100,7 @@ Next we set up the Coulombic interactions, assuming we already have created a ``
   #epsilon1,epsilon2,kappa - reaction field parameters
   #annihilate=False means decoupling is used (see Note 1)
   #ftpl - a FixedTupleListAdResS object (see AdResS tutorial)
-  #for non-AdResS simulations, simply set adress=False, and the parameter ftpl is not needed
+  #for non-AdResS simulations, simply set address=False, and the parameter ftpl is not needed
   qq_adres_interaction = gromacs.setCoulombInteractionsTI(system, verletlist, nbCutoff, 
                                                   atTypes, epsilon1=1, epsilon2=80, 
                                                   kappa=0, lambdaTI=lambdaTICoul, 

@@ -49,7 +49,7 @@ We want to observe temperature and energy of the system:
 >>> T   = espressopp.analysis.Temperature(system)
 >>> E   = espressopp.analysis.EnergyPot(system, per_atom=True)
 
-x will be the x-axixs of the graph containg the time. yT and yE will be temperature
+x will be the x-axixs of the graph containing the time. yT and yE will be temperature
 and energy as y-axes in 2 plots:
 
 >>> x   = []
@@ -63,7 +63,7 @@ and energy as y-axes in 2 plots:
 >>> yTmax = max(yT)
 >>> yEmax = max(yE)
 
-Initialize the two graphs ('ro' means red circles, 'go' means green cirlces, see also pyplot documentation)
+Initialize the two graphs ('ro' means red circles, 'go' means green circles, see also pyplot documentation)
 
 >>> plt.subplot(211)
 >>> gT, = plt.plot(x, yT, 'ro')
