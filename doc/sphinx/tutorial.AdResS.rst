@@ -122,7 +122,7 @@ Finally, we have to set up the AdResS integrator extension:
 .. code-block:: python
 
   # AdResS integrator extension
-  address = espressopp.integrator.Adress(system, verletlist, ftpl, regionupdates = 1)
+  adress = espressopp.integrator.Adress(system, verletlist, ftpl, regionupdates = 1)
   integrator.addExtension(adress)
 
 It takes as arguments the Verlet list and the fixed tuple list. Additionally, for the case of a moving and/or deforming AdResS region based on one or more particles, the parameter ``regionupdates`` specifies how regularly we want to update the shape of the AdResS region in number of steps. This is to avoid as much as possible of the additional communication required to inform different processors of the change of the AdResS region. The parameter defaults to 1 and is not used at all for static AdResS regions.
