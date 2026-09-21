@@ -1,5 +1,6 @@
 # ESPResSo++
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.11072/status.svg)](https://doi.org/10.21105/joss.11072)
 ![Build Status](https://github.com/espressopp/espressopp/actions/workflows/validate.yml/badge.svg?branch=master)
 [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
 [![codecov](https://codecov.io/gh/espressopp/espressopp/branch/master/graph/badge.svg?token=gx8YKTpfcR)](https://codecov.io/gh/espressopp/espressopp)
