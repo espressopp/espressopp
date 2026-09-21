@@ -1,5 +1,5 @@
 ---
-title: 'ESPResSo\texttt{++}: A Fast and Extensible Molecular Simulation Package for Coarse-Grained Models'
+title: 'ESPResSo++: A Fast and Extensible Molecular Simulation Package for Coarse-Grained Models'
 tags:
   - molecular dynamics
   - coarse-grained simulations
