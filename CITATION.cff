@@ -1,0 +1,88 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Xu
+  given-names: Zhen-Hao
+- family-names: Vance
+  given-names: James
+  orcid: "https://orcid.org/0000-0001-7112-0382"
+- family-names: Tretyakov
+  given-names: Nikita
+- family-names: Eibl
+  given-names: Sebastian
+  orcid: "https://orcid.org/0000-0002-1069-2720"
+- family-names: Kus
+  given-names: Pavel
+- family-names: Krajniak
+  given-names: Jakub
+  orcid: "https://orcid.org/0000-0001-9372-6975"
+- family-names: Bereau
+  given-names: Tristan
+  orcid: "https://orcid.org/0000-0001-9945-1271"
+- family-names: Guzman
+  given-names: Horacio V.
+  orcid: "https://orcid.org/0000-0003-2564-3005"
+- family-names: Song
+  given-names: Bin
+  orcid: "https://orcid.org/0000-0003-4229-9242"
+- family-names: Rampp
+  given-names: Markus
+  orcid: "https://orcid.org/0000-0001-8177-8698"
+- family-names: Stuehn
+  given-names: Torsten
+  orcid: "https://orcid.org/0009-0006-2144-2002"
+- family-names: Junghans
+  given-names: Christoph
+  orcid: "https://orcid.org/0000-0003-0925-1458"
+doi: 10.5281/zenodo.22151265
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Xu
+    given-names: Zhen-Hao
+  - family-names: Vance
+    given-names: James
+    orcid: "https://orcid.org/0000-0001-7112-0382"
+  - family-names: Tretyakov
+    given-names: Nikita
+  - family-names: Eibl
+    given-names: Sebastian
+    orcid: "https://orcid.org/0000-0002-1069-2720"
+  - family-names: Kus
+    given-names: Pavel
+  - family-names: Krajniak
+    given-names: Jakub
+    orcid: "https://orcid.org/0000-0001-9372-6975"
+  - family-names: Bereau
+    given-names: Tristan
+    orcid: "https://orcid.org/0000-0001-9945-1271"
+  - family-names: Guzman
+    given-names: Horacio V.
+    orcid: "https://orcid.org/0000-0003-2564-3005"
+  - family-names: Song
+    given-names: Bin
+    orcid: "https://orcid.org/0000-0003-4229-9242"
+  - family-names: Rampp
+    given-names: Markus
+    orcid: "https://orcid.org/0000-0001-8177-8698"
+  - family-names: Stuehn
+    given-names: Torsten
+    orcid: "https://orcid.org/0009-0006-2144-2002"
+  - family-names: Junghans
+    given-names: Christoph
+    orcid: "https://orcid.org/0000-0003-0925-1458"
+  date-published: 2026-09-21
+  doi: 10.21105/joss.11072
+  issn: 2475-9066
+  issue: 125
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 11072
+  title: "ESPResSo++: A Fast and Extensible Molecular Simulation Package
+    for Coarse-Grained Models"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.11072"
+  volume: 11
+title: "ESPResSo++: A Fast and Extensible Molecular Simulation Package
+  for Coarse-Grained Models"
