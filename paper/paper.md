@@ -151,7 +151,7 @@ dt            = 0.005      # time step for 1 md step
 epsilon       = 1.0        # energy unit
 sigma         = 1.0        # length unit
 temperature   = 1.0        # temperature of the simulation
-LJcaprad      = 0.8        # inital capping radius for LJ interaction
+LJcaprad      = 0.8        # initial capping radius for LJ interaction
                            # for random configurations
 
 # system setup
