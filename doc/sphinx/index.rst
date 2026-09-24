@@ -23,6 +23,11 @@ Welcome to the user documentation of ESPResSo++
 
 **Please cite this, if you used ESPResSo++ in your research**
 
+| Z.-H. Xu, J. Vance, N. Tretyakov, S. Eibl, P. Kus, J. Krajniak, T. Bereau, H. V. Guzman, B. Song, M. Rampp, T. Stuehn, C. Junghans,
+| "ESPResSo++: A Fast and Extensible Molecular Simulation Package for Coarse-Grained Models",
+| *Journal of Open Source Software*, **11** (2026), 11072
+| `DOI: 10.21105/joss.11072  <https://doi.org/10.21105/joss.11072>`_
+
 | H.V.Guzman, N.Tretyakov, H.Kobayashi, A.C.Fogarty, K.Kreis, J.Krajniak, C.Junghans, K.Kremer, T.Stuehn,
 | "ESPResSo++ 2.0: Advanced methods for multiscale molecular simulation",
 | *Computer Physics Communications*, **238** (2019), pp. 66-76
